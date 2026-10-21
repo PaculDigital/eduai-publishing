@@ -20,7 +20,7 @@ Melengkapi: AUDIT_WULAN_BAB4_21OKT2026.md + RANCANGAN_JEMBATAN_BAB4_21OKT2026.md
    ukur 2×? kuesioner sekali sebar?). Kalau fakta kurang, yang ditanyakan
    adalah pertanyaan FAKTA bahasa sehari-hari tentang apa yang user
    lakukan. User mengonfirmasi CERITA faktual, label dihitung aturan.
-5. **Senjata ke lapangan selalu berpasangan** (alat ambil data + wadah
+5. **Instrumen ke lapangan selalu berpasangan** (alat ambil data + wadah
    pengembalian), lahir dari peta yang sama → "match data":
    - Kuantitatif: kuesioner dari indikator definisi operasional (skala 1–5)
      + template data berkomposisi kolom yang sama + kartu petunjuk lapangan.
@@ -61,7 +61,20 @@ Melengkapi: AUDIT_WULAN_BAB4_21OKT2026.md + RANCANGAN_JEMBATAN_BAB4_21OKT2026.md
 12. **Label simulasi**: data simulasi bertanda SIMULASI, BAB IV darinya =
     draf latihan; data asli masuk → tanda hilang, draf diganti hasil asli.
     (Prinsip diusulkan Wulan, sejalan dengan tujuan belajar Bos.)
-13. **Simulasi dua arah (catatan Bos)**: hasil simulasi WAJIB bisa
+13. **PAKET & ISTILAH — FINAL (dikunci Bos 21 Okt 2026)**:
+    - Satu-satunya barang: **Paket Olah Data 30 token**, isinya tiga:
+      instrumen (kuesioner/panduan + template) + SIMULASI (bonus di dalam
+      paket) + olah data asli. Tidak ada penjualan simulasi terpisah.
+      Narasi tetap terpisah, 30.
+    - ISTILAH: kata "senjata" DILARANG — pakai instrumen, olah data,
+      analisis data.
+    - SIMULASI SEBELUM BAYAR = PLACEHOLDER: satu contoh penelitian tetap,
+      data itu-itu saja, hasil sudah jadi & ditampilkan menarik, bertanda
+      "contoh tampilan" — TANPA mesin, TANPA AI (biaya nol, tidak bisa
+      disalahgunakan). Simulasi sungguhan (dari model user sendiri,
+      pakai mesin/AI, bisa diatur & di-download) hanya SETELAH bayar,
+      sebagai bonus paket.
+14. **Simulasi dua arah (catatan Bos)**: hasil simulasi WAJIB bisa
     di-download sebagai file DATA TEMPLATE dengan format yang sama persis
     seperti template resmi. Satu format untuk semua arah: template kosong
     yang diberikan ke user = file hasil simulasi = file data lapangan asli
@@ -77,7 +90,7 @@ Melengkapi: AUDIT_WULAN_BAB4_21OKT2026.md + RANCANGAN_JEMBATAN_BAB4_21OKT2026.md
 Naskah BAB I–III
  → [1] Jev+AI baca → usulan peta (bukti terlampir)
  → [2] User sahkan peta (betulkan cerita fakta bila perlu)
- → [3] Senjata dibuat dari peta (kuesioner/panduan + template + petunjuk)
+ → [3] Instrumen dibuat dari peta (kuesioner/panduan + template + petunjuk)
  → [4] User ke lapangan (atau tekan SIMULASI untuk latihan)
  → [5] Data kembali ke halaman Data Lapangan (ketik / upload / simulasi)
  → [6] User periksa & betulkan tabel → kirim
@@ -103,22 +116,19 @@ Naskah BAB I–III
    sendiri (tabulasi ringan, bukan uji statistik). Prinsip ISI SEKALI DI
    DEPAN: user tidak input ulang untuk 4.1 dst — lokasi dari BAB III via
    peta yang disahkan; profil responden/informan ditabulasi otomatis dari
-   data yang kembali (kolom identitas disertakan sejak template senjata
-   dibuat; daftar informan didaftarkan sejak tahap senjata); tingkat
+   data yang kembali (kolom identitas disertakan sejak template instrumen
+   dibuat; daftar informan didaftarkan sejak tahap instrumen); tingkat
    pengembalian = target sampel di peta vs baris masuk. Fakta yang tidak
    ada di mana-mana ditanyakan SEKALI di tahap peta (pertanyaan fakta),
    tidak ditagih ulang saat narasi.
-3. **Harga**: (a) senjata — arah paket: ikut olah_data 30, bayar sekali di
-   depan (BELUM dikunci final); (b) ~~simulasi~~ **SELESAI — diputuskan
-   Bos 21 Okt 2026, aturan DISAMAKAN dengan olah data live** (sederhana,
-   tidak membingungkan, hanya user serius): simulasi gratis 3× percobaan
-   tapi TERKUNCI (hasil hanya dilihat, data tidak bisa di-download) →
-   bayar 30: kunci terbuka (download boleh) + 3× gratis lagi → lewat itu
-   5 token per simulasi. **30 simulasi itu dihitung sekalian sebagai
-   bayar OLAH DATA** (khusus olah data — data asli datang tidak bayar
-   olah lagi); **NARASI tetap bayar sendiri, terpisah 30.** Catatan:
-   ini mengubah bunyi poin A.13 — download hasil simulasi adalah fasilitas
-   BERBAYAR (setelah kunci terbuka), bukan sejak gratisan;
+3. **Harga**: (a) instrumen — SELESAI: isi Paket Olah Data 30 (lihat (b)); (b) ~~simulasi~~ **SELESAI — diputuskan
+   Bos 21 Okt 2026, DIPELURUSKAN menjadi bentuk FINAL di A.13**: tidak
+   ada penjualan simulasi terpisah — simulasi adalah BONUS di dalam
+   Paket Olah Data 30 yang sama (aturan revisi di dalam paket: 3× gratis
+   untuk data/skenario yang sama, lewat itu 5 token per jalan, sama
+   seperti olah data asli). Sebelum bayar, simulasi hanya PLACEHOLDER
+   contoh tetap tanpa mesin/AI (A.13). **NARASI tetap bayar sendiri,
+   terpisah 30.**
    (c) ~~data keliru~~ **SEBAGIAN SELESAI — diputuskan
    Bos 21 Okt 2026**: revisi/olah ulang data pada penelitian & data yang
    SAMA **gratis hanya 3 kali** (pagar anti-rugi: tanpa batas = Bos
@@ -135,7 +145,7 @@ Naskah BAB I–III
 
 ### C2. Bagian rancangan yang belum dibahas sama sekali
 6. ~~**Jembatan KUALITATIF**~~ **SELESAI — diputuskan Bos 21 Okt 2026:
-   KUALITATIF PAKAI API.** Senjata kualitatif ada DUA (diingatkan Bos):
+   KUALITATIF PAKAI API.** Instrumen analisis kualitatif ada DUA (diingatkan Bos):
    Analisis Tematik+Triangulasi dan Analisis SWOT — keduanya sudah hidup
    di /kualitatif Statistik Lab, tapi hitungannya berjalan di browser.
    Keputusan: bangun API kualitatif di Statistik Lab = pindahkan hitungan
@@ -153,7 +163,7 @@ Naskah BAB I–III
 7. ~~**Kerangka BAB IV kualitatif**~~ **SELESAI — disetujui Bos 21 Okt
    2026.** Tulang punggung SAMA untuk semua jalur (4.1 gambaran,
    4.2 sajian data, 4.3 pengujian/keabsahan, 4.4 pembahasan); yang berganti
-   hanya isi mengikuti senjatanya:
+   hanya isi mengikuti instrumen analisisnya:
    - Tematik: 4.1 gambaran lokasi & informan · 4.2 temuan per tema +
      kutipan asli · 4.3 keabsahan: matriks triangulasi (tema kuat/lemah) ·
      4.4 pembahasan (tema vs teori BAB II).
@@ -164,7 +174,7 @@ Naskah BAB I–III
    ditambahkan sejajar, BUKAN mengganti.
 8. **Mixed methods**: urutan & penggabungannya (kuantitatif dulu →
    kualitatif → diskusi terintegrasi) belum dibahas untuk EduAi.
-9. **Uji coba instrumen**: kuesioner hasil senjata — perlu uji
+9. **Uji coba instrumen**: kuesioner hasil instrumen — perlu uji
    validitas/reliabilitas pilot (responden kecil) sebelum sebar besar?
    Belum dibahas masuk alur atau tidak.
 10. **Batas simulasi**: jumlah responden/informan default & maksimum
