@@ -354,7 +354,17 @@ def buat_instrumen(peta: dict) -> dict:
         nama = str(v.get('nama') or '')
         dasar = _nama_kolom(nama)
         indikator = [str(x) for x in (v.get('indikator') or [])]
-        jumlah = int(v.get('jumlah_butir') or len(indikator) or 4)
+        # jumlah_butir dari peta TIDAK dipercaya mentah (temuan review
+        # Fase 3): teks 'abc' meledakkan int() → 500; negatif membuat
+        # kuesioner kosong diam-diam. Nilai aneh → jatuh ke jumlah
+        # indikator / bawaan 4; dibatasi wajar 1–20.
+        try:
+            jumlah = int(v.get('jumlah_butir'))
+        except (TypeError, ValueError):
+            jumlah = 0
+        if jumlah < 1:
+            jumlah = len(indikator) or 4
+        jumlah = min(jumlah, 20)
         butir = []
         for i in range(1, jumlah + 1):
             kode = f'{dasar}_{i}'
@@ -480,13 +490,17 @@ def susun_payload_hitung(peta: dict, kolom: list, tahap: str = 'utama') -> dict:
     # CATATAN KONTRAK (terbukti di uji Fase 3): pintu jembatan menolak
     # kiriman yang mencampur 'peran' dengan kolom eksplisit — kirim
     # SATU bentuk saja (kolom eksplisit / konstruk).
+    import re as _re
     peran, konstruk = {}, {}
     for v in peta.get('variabel') or []:
         if not isinstance(v, dict):
             continue
         dasar = _nama_kolom(str(v.get('nama') or ''))
-        milik = [k for k in kolom
-                 if k == dasar or k.startswith(dasar + '_')]
+        # Pola TEGAS (temuan review Fase 3): hanya '<Dasar>_<angka>'
+        # yang milik variabel ini. startswith biasa membuat variabel
+        # 'Harga' menelan butir 'Harga_Diskon_1' milik variabel lain.
+        pola = _re.compile(rf'{_re.escape(dasar)}_\d+$')
+        milik = [k for k in kolom if pola.match(k)]
         peran[str(v.get('nama'))] = v.get('peran')
         konstruk[str(v.get('nama'))] = milik
     payload: dict = {'tahap': tahap, 'mode': mode}
@@ -495,13 +509,24 @@ def susun_payload_hitung(peta: dict, kolom: list, tahap: str = 'utama') -> dict:
         payload['konstruk'] = konstruk
         payload['kolom_y_konstruk'] = y
     else:
-        ambil = lambda r: [k for n, rr in peran.items() if rr == r
-                           for k in konstruk.get(n, [])]
-        payload.update({
-            'kolom_x': ambil('X'), 'kolom_y': ambil('Y'),
-            'kolom_m': ambil('M'), 'kolom_z': ambil('Z'),
-            'bentuk_mediasi': _bentuk_mediasi(peta),
-        })
+        # BUG PALING BERAT (temuan review Fase 3): kontrak mesin SPSS
+        # meminta kolom_y SATU nama kolom gabungan — mengirim daftar
+        # butir Y membuat SEMUA olah data SPSS ditolak 400. Bentuk
+        # yang benar = 'peran' per butir (X1, X2, M1, Z1, Y1 per
+        # variabel): mesin menggabungkan butir per variabel jadi skor
+        # konstruk dengan aturannya sendiri (skor_konstruk), persis
+        # jalur yang dipakai halaman Diagnosis selama ini.
+        nomor: dict[str, int] = {}
+        peran_kolom: dict[str, str] = {}
+        for nama, r in peran.items():
+            if r not in ('X', 'M', 'Z', 'Y'):
+                continue
+            nomor[r] = nomor.get(r, 0) + 1
+            label = f'{r}{nomor[r]}'
+            for k in konstruk.get(nama, []):
+                peran_kolom[k] = label
+        payload['peran'] = peran_kolom
+        payload['bentuk_mediasi'] = _bentuk_mediasi(peta)
     return payload
 
 

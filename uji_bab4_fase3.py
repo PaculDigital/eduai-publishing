@@ -125,6 +125,82 @@ cek('ringkasan: terkunci=1, data utama 60 baris', r.json().get('versi_terkunci')
 r = k.get('/api/bab4/instrumen', params={'file_id': 999})
 cek('berkas bukan milik → 404', r.status_code == 404, str(r.status_code))
 
+print('── Regresi 5 bug review Fase 3 ──')
+from app import bab4 as _b4, bab4_rute as _br, jembatan_statistik as _jb
+from app.models import HasilBab4 as _HB
+
+# BUG 3 (unit): Harga vs Harga Diskon — tak boleh tertukar
+pl = _b4.susun_payload_hitung(
+    {'metode': 'Regresi', 'variabel': [
+        {'nama': 'Harga', 'peran': 'X'}, {'nama': 'Harga Diskon', 'peran': 'Y'}],
+     'jalur': []},
+    ['Harga_1', 'Harga_2', 'Harga_Diskon_1', 'Harga_Diskon_2'])
+cek('BUG3 peran kolom Harga murni X1, Diskon murni Y1',
+    pl['peran'] == {'Harga_1': 'X1', 'Harga_2': 'X1',
+                    'Harga_Diskon_1': 'Y1', 'Harga_Diskon_2': 'Y1'},
+    str(pl.get('peran')))
+cek('BUG1 payload SPSS tanpa kolom_y daftar', 'kolom_y' not in pl and 'kolom_x' not in pl)
+
+# BUG 4-5 (unit): jumlah_butir aneh
+ins = _b4.buat_instrumen({'variabel': [
+    {'nama': 'Aneh', 'peran': 'X', 'jumlah_butir': -3},
+    {'nama': 'Teks', 'peran': 'Y', 'jumlah_butir': 'abc'},
+    {'nama': 'Normal', 'peran': 'Y', 'jumlah_butir': 3}]})
+cek('BUG4-5 jumlah_butir -3/abc jatuh aman (4), normal tetap 3',
+    [len(b['butir']) for b in ins['kuesioner']] == [4, 4, 3],
+    str([len(b['butir']) for b in ins['kuesioner']]))
+
+# BUG 1 (e2e): peta SPSS mediasi di berkas kedua
+db1 = Sesi(); db1.add(FileBerkas(id=11, user_id=1, nama='spss.docx',
+                                 nama_simpan='spss.docx', ukuran=10)); db1.commit(); db1.close()
+peta_spss = {'jenis': 'kuantitatif', 'metode': 'Regresi', 'jumlah_hipotesis': 3,
+             'variabel': [
+                 {'nama': 'Kualitas', 'peran': 'X', 'bukti': B,
+                  'indikator': ['Produk awet.', 'Produk rapi.']},
+                 {'nama': 'Kepuasan', 'peran': 'M', 'bukti': B,
+                  'indikator': ['Saya puas.', 'Sesuai harapan.']},
+                 {'nama': 'Minat', 'peran': 'Y', 'bukti': B,
+                  'indikator': ['Beli lagi.', 'Rekomendasi.']}],
+             'jalur': [
+                 {'dari': 'Kualitas', 'ke': 'Kepuasan', 'hipotesis': 'H1', 'jenis': 'langsung'},
+                 {'dari': 'Kepuasan', 'ke': 'Minat', 'hipotesis': 'H2', 'jenis': 'langsung'},
+                 {'dari': 'Kualitas', 'ke': 'Minat', 'hipotesis': 'H3', 'jenis': 'langsung'}]}
+r = k.post('/api/bab4/peta', json={'file_id': 11, 'peta': peta_spss}, headers=H)
+r2 = k.post('/api/bab4/peta/sahkan', json={'file_id': 11}, headers=H)
+kolom2 = k.get('/api/bab4/instrumen', params={'file_id': 11}).json()['kolom_template']
+k.put('/api/bab4/data', json={'file_id': 11, 'tahap': 'utama',
+      'kolom': kolom2, 'baris': buat(60)}, headers=H)
+r = k.post('/api/bab4/olah-data', json={'file_id': 11}, headers=H)
+j = r.json() if r.status_code == 200 else {}
+cek('BUG1 olah data SPSS (mediasi) JALAN — versi 1 terbit',
+    r.status_code == 200 and j.get('versi') == 1, r.text[:250])
+cek('BUG1 hasil SPSS memuat angka (r2/koefisien)',
+    bool(j.get('hasil')) and ('r2' in str(j['hasil'])[:2000] or 'koef' in str(j['hasil'])[:2000]),
+    str(j.get('hasil'))[:200])
+
+# BUG 2 (unit rute): mesin gagal → token 5 kembali
+db2 = Sesi()
+for i in range(4):
+    db2.add(_HB(user_id=1, file_id=11, jenis='olah_data', mode='spss',
+                nomor=i + 1, status='draf', hasil='{}'))
+db2.commit(); db2.close()
+catatan = {}
+_asli_potong, _asli_kembali = _br.kuota.potong_banyak, _br.kuota.kembalikan_banyak
+_asli_hitung = _jb.hitung
+_br.kuota.potong_banyak = lambda db, u, jml, jenis_addon='ai': catatan.update(potong=jml) or {'dipotong': jml}
+_br.kuota.kembalikan_banyak = lambda db, u, jml, ja='ai': catatan.update(kembali=jml) or {'dikembalikan': jml}
+def _mati(payload, timeout=None):
+    raise _jb.GagalJembatan('Mesin statistik tidak menjawab.', 502)
+_jb.hitung = _mati
+try:
+    r = k.post('/api/bab4/olah-data', json={'file_id': 11}, headers=H)
+finally:
+    _br.kuota.potong_banyak, _br.kuota.kembalikan_banyak = _asli_potong, _asli_kembali
+    _jb.hitung = _asli_hitung
+cek('BUG2 mesin mati → 502 dan token 5 DIKEMBALIKAN',
+    r.status_code == 502 and catatan.get('potong') == 5 and catatan.get('kembali') == 5,
+    f'{r.status_code} {catatan}')
+
 print()
 print('❌ GAGAL: ' + ', '.join(gagal) if gagal else '✅ SEMUA LULUS — Fase 3 inti (rute BAB IV)')
 sys.exit(1 if gagal else 0)

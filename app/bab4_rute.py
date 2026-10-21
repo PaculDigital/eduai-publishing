@@ -220,14 +220,24 @@ def olah_data(body: dict, u: User = Depends(wajib_login_api),
     d = _data(db, u, file_id, 'utama')
     kolom = json.loads(d.kolom or '[]')
     tarif = bab4.tarif_generate_berikutnya(db, u.id, file_id)
+    terpotong = 0
     if tarif > 0:
-        kuota.potong_banyak(db, u, tarif, jenis_addon='ai')  # 402 bila kurang
+        info = kuota.potong_banyak(db, u, tarif, jenis_addon='ai')
+        terpotong = int(info.get('dipotong') or 0)  # 402 bila kurang
     payload = bab4.susun_payload_hitung(peta, kolom, tahap='utama')
     payload['baris'] = bab4.baris_ke_objek(
         kolom, json.loads(d.baris or '[]'))
     try:
         hasil = jembatan_statistik.hitung(payload)
     except Exception as e:  # noqa: BLE001
+        # Token TIDAK BOLEH hangus karena mesin gagal (temuan review
+        # Fase 3; pola yang sama dipakai app/ai.py): kembalikan dulu,
+        # baru laporkan kegagalannya.
+        if terpotong:
+            try:
+                kuota.kembalikan_banyak(db, u, terpotong, 'ai')
+            except Exception:  # noqa: BLE001 — pengembalian jangan menutupi galat asli
+                pass
         raise _terjemahkan_gagal(e) from e
     h = bab4.simpan_hasil(db, u.id, file_id, 'olah_data',
                           payload['mode'], hasil)
