@@ -718,7 +718,8 @@ def petakan_hasil_ke_hipotesis(peta: dict, hasil: dict) -> list[dict]:
                 if sig is None and tl.get('lo') is not None and tl.get('hi') is not None:
                     sig = not (float(tl['lo']) <= 0 <= float(tl['hi']))
                 entri.update(ketemu=True, b=tl.get('b'), p=tl.get('p'),
-                             signifikan=sig)
+                             signifikan=sig,
+                             lo=tl.get('lo'), hi=tl.get('hi'))
         elif j.get('jenis') == 'interaksi':
             cocok = [m for (x, z, y), m in moderasi.items()
                      if z == label.get(dari, '') and y == label.get(ke, '')]
@@ -769,9 +770,21 @@ def petakan_hasil_ke_hipotesis(peta: dict, hasil: dict) -> list[dict]:
                              signifikan=_sig(sumber.get('p')),
                              sumber=asal)
         if entri['ketemu'] and not entri['ringkas']:
-            entri['ringkas'] = (f"{entri['hipotesis']}: b={entri['b']}, "
-                                f"p={entri['p']} → "
-                                f"{'signifikan' if entri['signifikan'] else 'tidak signifikan'}")
+            # Ringkas TANPA label H (pemanggil yang memberi label —
+            # versi lama menimbulkan "H1: H1:") dan TANPA mencetak
+            # None: p absen (lazim pada efek tidak langsung, yang
+            # diuji lewat rentang kepercayaan bootstrap) diganti
+            # keterangan CI; signifikan tak diketahui TIDAK divonis.
+            potongan = [f"b={entri['b']}"]
+            if entri.get('p') is not None:
+                potongan.append(f"p={entri['p']}")
+            if entri.get('lo') is not None and entri.get('hi') is not None:
+                potongan.append(
+                    f"rentang kepercayaan 95% [{entri['lo']}, {entri['hi']}]")
+            vonis = ('signifikan' if entri['signifikan'] is True else
+                     'tidak signifikan' if entri['signifikan'] is False else
+                     'belum dapat diputuskan')
+            entri['ringkas'] = ', '.join(potongan) + f' → {vonis}'
         keluar.append(entri)
     return keluar
 

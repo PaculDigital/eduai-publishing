@@ -81,11 +81,30 @@ def susun_draf(b: dict) -> str:
         if e.get('jenis') == 'interaksi':
             L.append(f"- {e.get('hipotesis')} (moderasi): "
                      f"{e.get('ringkas') or 'lihat hasil moderasi.'}")
+        elif e.get('signifikan') is None:
+            # TIDAK ADA dasar vonis (p tidak tersedia dan CI tidak
+            # ada) — narasi DILARANG mengarang putusan (temuan review
+            # ronde 8: efek tidak langsung divonis 'ditolak' padahal
+            # mesin tidak memberi p untuk jalur itu).
+            L.append(f"- {e.get('hipotesis')}: pengaruh "
+                     f"{e.get('dari')} terhadap {e.get('ke')} "
+                     f"sebesar {_fmt(e.get('b'))}. Putusan signifikansi "
+                     'belum dapat diambil dari hasil ini karena nilai '
+                     'p maupun rentang kepercayaan tidak tersedia.')
+        elif e.get('p') is None and e.get('lo') is not None:
+            L.append(f"- {e.get('hipotesis')}: pengaruh tidak langsung "
+                     f"{e.get('dari')} terhadap {e.get('ke')} "
+                     f"sebesar {_fmt(e.get('b'))}; rentang kepercayaan "
+                     f"95% [{_fmt(e.get('lo'))}, {_fmt(e.get('hi'))}] "
+                     f"{'tidak' if e.get('signifikan') else ''} melewati "
+                     'nol — hipotesis '
+                     f"{'diterima' if e.get('signifikan') else 'ditolak'} "
+                     '(berdasarkan uji bootstrap).')
         else:
             L.append(f"- {e.get('hipotesis')}: pengaruh "
                      f"{e.get('dari')} terhadap {e.get('ke')} "
                      f"sebesar {_fmt(e.get('b'))} dengan nilai "
-                     f"signifikansi {_fmt(e.get('p'))} — hipotesis "
+                     f"signifikansi {_fmt(e.get('p'))}; hipotesis "
                      f"{'diterima' if e.get('signifikan') else 'ditolak'}.")
     L += ['', '## 4.3 Pengujian Hipotesis', '']
     for e in peta_h:
@@ -94,8 +113,10 @@ def susun_draf(b: dict) -> str:
     L += ['', '## 4.4 Pembahasan', '']
     for e in peta_h:
         putusan = ('sejalan dengan hipotesis yang diajukan'
-                   if e.get('signifikan') else
-                   'tidak mendukung hipotesis yang diajukan')
+                   if e.get('signifikan') is True else
+                   'tidak mendukung hipotesis yang diajukan'
+                   if e.get('signifikan') is False else
+                   'belum dapat diputuskan dari hasil pengujian ini')
         L.append(f"Hasil pengujian {e.get('hipotesis')} "
                  f"({e.get('dari')} → {e.get('ke')}) {putusan}. "
                  '(Kaitkan temuan ini dengan teori dan penelitian '

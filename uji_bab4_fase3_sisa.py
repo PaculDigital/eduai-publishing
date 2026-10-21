@@ -140,6 +140,33 @@ cek('semua URL yang dipanggil layar terdaftar sebagai rute', not _hilang,
 cek('layar memanggil GET /hasil (BUG 2)', '/api/bab4/hasil' in _html)
 cek('layar memanggil GET /profil (BUG 3)', '/api/bab4/profil' in _html)
 
+
+print('── Isi narasi kata-per-kata (ronde 8) ──')
+_bahan = {'hasil': {'r2': 0.42, 'peta_hipotesis': [
+    {'hipotesis': 'H1', 'dari': 'Harga', 'ke': 'Kepuasan', 'jenis': 'langsung',
+     'ketemu': True, 'b': -0.043379, 'p': 0.605672, 'signifikan': False,
+     'ringkas': 'b=-0.043379, p=0.605672 → tidak signifikan'},
+    {'hipotesis': 'H3', 'dari': 'Harga', 'ke': 'Keputusan', 'jenis': 'tidak_langsung',
+     'ketemu': True, 'b': 0.006458, 'p': None, 'signifikan': True,
+     'lo': 0.001, 'hi': 0.02,
+     'ringkas': 'b=0.006458, rentang kepercayaan 95% [0.001, 0.02] → signifikan'},
+    {'hipotesis': 'H9', 'dari': 'Harga', 'ke': 'Keputusan', 'jenis': 'langsung',
+     'ketemu': True, 'b': 0.1, 'p': None, 'signifikan': None, 'ringkas': ''}]},
+    'versi_terkunci': 1, 'mode': 'spss', 'peta': {'variabel': []},
+    'responden_masuk': 60, 'target': 80, 'pengembalian': 75.0, 'kartu_pra': None}
+_teks = bab4_narasi.susun_draf(_bahan)
+cek('BUG 1 tidak ada label dobel "H1: H1"', 'H1: H1' not in _teks and 'H3: H3' not in _teks)
+cek('BUG 4 kata "None" tidak bocor ke teks', 'None' not in _teks)
+cek('BUG 2 tidak ada tanda pisah dobel "— —"', '— —' not in _teks)
+_baris_h3 = [b for b in _teks.splitlines() if b.strip().startswith('- H3')]
+_baris_h9 = [b for b in _teks.splitlines() if b.strip().startswith('- H9')]
+cek('BUG 3 efek tidak langsung tanpa p → disebut CI + diterima (bukan vonis p)',
+    bool(_baris_h3) and 'rentang kepercayaan' in _baris_h3[0] and 'diterima' in _baris_h3[0],
+    str(_baris_h3)[:160])
+cek('BUG 3 tanpa p & tanpa CI → "belum dapat diambil", BUKAN ditolak',
+    bool(_baris_h9) and 'belum dapat diambil' in _baris_h9[0] and 'ditolak' not in _baris_h9[0],
+    str(_baris_h9)[:160])
+
 print()
 print('❌ GAGAL: ' + ', '.join(gagal) if gagal else '✅ SEMUA LULUS — Fase 3 sisa (simulasi, narasi, layar)')
 sys.exit(1 if gagal else 0)
