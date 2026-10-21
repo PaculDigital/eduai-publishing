@@ -310,6 +310,16 @@ halaman ini, sebelum data dikirim ke jembatan.
 - Yang menghitung adalah MESIN (rumus pasti: korelasi butir–total,
   Cronbach Alpha). AI hanya MENERJEMAHKAN hasil ke bahasa sederhana
   dan MENGUSULKAN kata-kata pengganti untuk butir lemah.
+- **Klarifikasi teknis [FAKTA kode mesin]:** "alat yang sama" berarti
+  satu mesin & satu rumus, BUKAN nol perubahan di Statistik Lab.
+  `periksa_spss` hari ini selalu mengembalikan hasil LENGKAP; keluaran
+  validitas per butir untuk jalur SPSS belum ada (yang sudah ada:
+  Cronbach Alpha `_alpha` dan keluaran PLS). Maka di dalam PAKET
+  JEMBATAN §11.2 — yang memang dikerjakan di repo Statistik Lab —
+  termasuk: mode berhenti-awal (parameter tahap `pra-survei`) pada
+  pintu tanpa sesi, dan penambahan keluaran validitas per butir memakai
+  fungsi `_alpha` yang sudah ada. Yang DILARANG adalah mesin/rumus
+  duplikat terpisah — bukan penambahan mode pada paket yang sama.
 - Butir diperbaiki dari hasil pra-survei → user mengunduh ulang HANYA
   kuesioner versi perbaikannya (berkas yang sama, edisi revisi);
   semua lolos → tidak ada unduhan baru, paket yang sama langsung ke
@@ -374,12 +384,29 @@ Isinya TIGA: **(1) instrumen** (§6), **(2) simulasi sungguhan** (§9.2),
 biaya instrumen terpisah. Harga ini SUDAH ada di kode
 (`app/config.py`: `4:olah_data` = 30).
 
+**Mekanisme potongnya [FAKTA pola kode + TERKUNCI]:** token user
+dipotong SEKALI DI DEPAN saat paket dibeli — mengikuti pola pembelian
+layanan yang sudah berjalan (buku besar `saldo_token`, gerbang
+`cek_dan_potong` di `app/kuota.py`). BUKAN dipotong per generate.
+Jatah "gratis 3×" di §10.3 adalah risiko biaya platform yang DIBATASI
+Bos dengan sadar (batas 3 + tarif 5 token per generate sesudahnya
+adalah pagarnya) — implementer DILARANG mengubahnya menjadi potongan
+token tersembunyi per generate, itu akan menagih user dua kali.
+
 ### 10.2 Harga per MODEL, bukan per jalur [TERKUNCI]
 - Mediasi, moderasi, dan model banyak jalur dalam SATU model = **1×
   paket** (mesin memang menghitung semua jalur dalam satu panggilan).
   Contoh: model mediasi 7 hipotesis tetap 30, BUKAN 2× atau 7×.
 - Yang membayar dua kali HANYA **penelitian campuran** (dua JENIS
   penelitian berbeda): olah data kuantitatif 30 + kualitatif 30.
+  **Waktu bayarnya [USULAN — belum diputuskan Bos, lihat §15]:** per
+  putaran SAAT PUTARAN ITU DIMULAI (30 di putaran 1; 30 lagi hanya
+  bila putaran 2 benar-benar dimulai) — BUKAN 60 sekaligus di depan.
+  Alasannya: putaran 2 dibangun dari hasil putaran 1 (§5.5) sehingga
+  tidak bisa dihitung/dibayar di depan; dengan bayar per putaran,
+  user yang berhenti di tengah tidak memegang dana tertahan dan tidak
+  ada persoalan pengembalian. Narasi 30 dibayar saat tahap narasi
+  dimulai, sesudah putaran yang ditempuh selesai.
 - **Narasi selalu satu kali 30** per BAB IV, termasuk untuk campuran.
 
 ### 10.3 Revisi data — skema Kunci Hasil [TERKUNCI]
@@ -389,6 +416,13 @@ biaya instrumen terpisah. Harga ini SUDAH ada di kode
   user; tempat coba-coba resmi adalah simulasi di dalam paket.
 - Tombol **Kunci Hasil** membekukan versi hasil yang menjadi dasar
   narasi. Narasi hanya lahir dari hasil TERKUNCI.
+- **Catatan bangun [FAKTA teknis]:** Kunci Hasil BUKAN sekadar tombol
+  UI — ia butuh tempat di basis data EduAi: catatan hasil olah data
+  dengan nomor versi + status (draf/terkunci) + penanda subbab narasi
+  yang terdampak revisi. Belum ada tabelnya (fiturnya belum ada).
+  Pola versioning SUDAH ada di repo untuk dokumen (`VersiDokumen` +
+  penanda versi terpakai di `app/models.py`) — IKUTI pola itu, jangan
+  menciptakan pola versioning kedua.
 - Revisi data sesudah kunci: subbab narasi yang terdampak DITANDAI;
   user memperbaikinya lewat aturan revisi narasi (10.4).
 
@@ -549,6 +583,14 @@ Semua panggilan AI tetap lewat **satu pintu 9router** (aturan repo).
 8. Kredensial: jangan pernah menulis token/kunci ke berkas repo atau
    dokumen. Kunci antar-layanan disimpan sebagai konfigurasi layanan,
    bukan di kode.
+9. **PAT BUKAN PROSEDUR.** Push branch ini pada 21 Okt 2026 memakai PAT
+   Bos atas PERINTAH LANGSUNG Bos untuk peristiwa itu saja — pengecualian
+   satu kali oleh pemilik repo, BUKAN tata cara tetap dan BUKAN preseden.
+   Agen DILARANG meminta, menerima sebagai kebiasaan, atau menyimpan
+   PAT/kredensial pemilik sebagai cara kerja. Jalur normal satu-satunya:
+   aturan `AGEN_LUAR_ATURAN.md` (fork → branch → PR; push/merge oleh
+   pemilik). Nilai PAT tidak pernah tertulis di repo ini; yang tercatat
+   hanya peristiwanya, dan catatan itu tidak memberi izin apa pun.
 
 ---
 
@@ -566,6 +608,9 @@ Semua panggilan AI tetap lewat **satu pintu 9router** (aturan repo).
 4. Timeout & perilaku kegagalan jembatan (§11.3).
 5. Rincian kecil tahap bangun: apakah panel pengaturan simulasi selalu
    tampil atau hanya mode lanjutan.
+6. Waktu pembayaran penelitian campuran: per putaran saat dimulai
+   (usulan di §10.2) atau sekaligus di depan — termasuk aturan bila
+   user berhenti di tengah. Menunggu putusan Bos.
 
 ---
 
