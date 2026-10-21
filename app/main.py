@@ -115,6 +115,7 @@ app.include_router(rute_bagikan.router)        # /pembimbing/* (23Sep26)
 app.include_router(rute_alur.router, prefix='/api/ai/v1')   # alur awal (26Sep26)
 from . import bab4_rute as _bab4_rute
 app.include_router(_bab4_rute.router)          # BAB IV Fase 3 (21Okt26)
+app.include_router(_bab4_rute.router_layar)    # layar BAB IV (21Okt26)
 #  Jurnal & pencarian referensi (ACC Bos 06Okt26) — tab Referensi.
 app.include_router(rute_jurnal.router, prefix='/api/ai/v1/jurnal')
 

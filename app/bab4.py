@@ -774,3 +774,89 @@ def petakan_hasil_ke_hipotesis(peta: dict, hasil: dict) -> list[dict]:
                                 f"{'signifikan' if entri['signifikan'] else 'tidak signifikan'}")
         keluar.append(entri)
     return keluar
+
+
+# ============================================================
+#  Simulasi sungguhan (bonus paket): permintaan ke mesin BUAT DATA
+# ============================================================
+
+KEKUATAN_EFEK = {'kuat': 0.55, 'sedang': 0.35, 'lemah': 0.18, 'nol': 0.0}
+
+
+def susun_permintaan_simulasi(peta: dict, n: int = 120,
+                              efek: dict | None = None) -> dict:
+    """Terjemahkan peta + pilihan kekuatan per hipotesis menjadi
+    permintaan pintu simulasi jembatan.
+
+    Model yang didukung mesin BUAT DATA per jalur: mediasi (1 X,
+    1 perantara), mediasi-paralel (2 perantara), mediasi-berjenjang
+    (perantara bersambung), moderasi (X + penguat). Di luar itu
+    ValueError dengan pesan jelas — BUKAN data karangan pengganti.
+    efek: {label_hipotesis: 'kuat'|'sedang'|'lemah'|'nol'}; bawaan
+    semua 'sedang'."""
+    efek = efek or {}
+    label = label_peran(peta)
+    nama_per_label = {v: k for k, v in label.items()}
+    ins = buat_instrumen(peta)
+    butir_per_variabel = {b['variabel']: len(b['butir'])
+                          for b in ins['kuesioner']}
+    konstruk = []
+    for nama, lb in label.items():
+        # Kode konstruk mesin BUAT DATA: 'X'/'Z'/'Y' tanpa nomor,
+        # perantara bernomor HANYA bila lebih dari satu (M1/M2).
+        kode = lb if (lb.startswith('M') and len(
+            [1 for x in label.values() if x.startswith('M')]) > 1) else lb[0]
+        konstruk.append({'kode': kode, 'nama_kolom': _nama_kolom(nama),
+                         'butir': butir_per_variabel.get(nama, 3)})
+    jalur = {(str(j.get('dari')), str(j.get('ke')), j.get('jenis')): j
+             for j in (peta.get('jalur') or []) if isinstance(j, dict)}
+
+    def kuat(dari_nama: str, ke_nama: str, jenis: str = 'langsung') -> float:
+        j = jalur.get((dari_nama, ke_nama, jenis)) or {}
+        return KEKUATAN_EFEK.get(str(efek.get(j.get('hipotesis'), 'sedang')),
+                                 0.35)
+
+    xs = [nm for nm, lb in label.items() if lb.startswith('X')]
+    ms = [nm for nm, lb in label.items() if lb.startswith('M')]
+    zs = [nm for nm, lb in label.items() if lb.startswith('Z')]
+    ys = [nm for nm, lb in label.items() if lb.startswith('Y')]
+    if len(ys) != 1 or len(xs) != 1:
+        raise ValueError('Simulasi mesin saat ini untuk model satu X '
+                         'dan satu Y; model penelitianmu di luar itu.')
+    x, y = xs[0], ys[0]
+    nama_mesin = {'x': x, 'y': y}
+    if zs:
+        if len(zs) != 1 or ms:
+            raise ValueError('Simulasi moderasi campuran perantara '
+                             'belum didukung mesin.')
+        z = zs[0]
+        nama_mesin['z'] = z
+        return {'model': 'moderasi', 'n': n, 'nama': nama_mesin,
+                'konstruk': konstruk,
+                'params': {'bx': kuat(x, y), 'bz': kuat(z, y),
+                           'interaksi': kuat(z, y, 'interaksi')}}
+    if len(ms) == 1:
+        m = ms[0]
+        nama_mesin['m'] = m
+        return {'model': 'mediasi', 'n': n, 'nama': nama_mesin,
+                'konstruk': konstruk,
+                'params': {'a': kuat(x, m), 'b': kuat(m, y),
+                           'langsung': kuat(x, y)}}
+    if len(ms) == 2:
+        m1, m2 = ms
+        nama_mesin.update({'m1': m1, 'm2': m2})
+        bersambung = (x, m2, 'langsung') not in jalur and \
+                     (m1, m2, 'langsung') in jalur
+        if bersambung:
+            return {'model': 'mediasi-berjenjang', 'n': n,
+                    'nama': nama_mesin, 'konstruk': konstruk,
+                    'params': {'a1': kuat(x, m1), 'd': kuat(m1, m2),
+                               'b2': kuat(m2, y), 'langsung': kuat(x, y)}}
+        return {'model': 'mediasi-paralel', 'n': n, 'nama': nama_mesin,
+                'konstruk': konstruk,
+                'params': {'a1': kuat(x, m1), 'a2': kuat(x, m2),
+                           'b1': kuat(m1, y), 'b2': kuat(m2, y),
+                           'langsung': kuat(x, y)}}
+    raise ValueError('Bentuk model penelitianmu belum didukung mesin '
+                     'simulasi (didukung: mediasi, dua perantara, '
+                     'moderasi).')

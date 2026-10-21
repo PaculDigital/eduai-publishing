@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 
@@ -20,6 +20,27 @@ from .models import (DataLapanganBab4, FileBerkas, PetaBab4, User,
 
 router = APIRouter(prefix='/api/bab4', tags=['bab4'],
                    dependencies=[Depends(wajib_login_api)])
+
+# ── Layar HTML (Fase 3 sisa): satu halaman per berkas ────────────
+from pathlib import Path as _Path
+
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates as _Jinja
+
+from .auth import wajib_login as _wajib_login_html
+
+_templates = _Jinja(directory=str(_Path(__file__).parent / 'templates'))
+router_layar = APIRouter(tags=['bab4-layar'])
+
+
+@router_layar.get('/bab4/{file_id}', response_class=HTMLResponse)
+def layar_bab4(file_id: int, request: Request,
+               u: User = Depends(_wajib_login_html),
+               db: Session = Depends(get_db)):
+    f = _berkas_milik(db, u, file_id)
+    return _templates.TemplateResponse(
+        'bab4.html', {'request': request, 'file_id': file_id,
+                      'nama_berkas': f.nama})
 
 
 def _berkas_milik(db: Session, u: User, file_id: int) -> FileBerkas:
@@ -325,7 +346,7 @@ def baca_hasil_rute(file_id: int, jenis: str = 'olah_data',
     `versi`: isi versi itu. Jenis: olah_data | pra_survei | simulasi."""
     from .models import HasilBab4
     _berkas_milik(db, u, file_id)
-    if jenis not in ('olah_data', 'pra_survei', 'simulasi'):
+    if jenis not in ('olah_data', 'pra_survei', 'simulasi', 'narasi'):
         raise HTTPException(422, 'Jenis hasil tidak dikenal.')
     semua = (db.query(HasilBab4)
              .filter_by(user_id=u.id, file_id=file_id, jenis=jenis)
@@ -372,3 +393,110 @@ def profil(file_id: int, kolom_frekuensi: str = '',
             'tingkat_pengembalian_persen':
                 bab4.tingkat_pengembalian(len(baris), d.target_responden),
             'frekuensi': frek}
+
+
+# ── Simulasi sungguhan (bonus paket olah data) ──────────────────
+@router.post('/simulasi/buat')
+def simulasi_buat(body: dict, u: User = Depends(wajib_login_api),
+                  db: Session = Depends(get_db)):
+    """Buat data latihan dari model user sendiri via mesin BUAT
+    DATA, simpan sebagai data tahap 'simulasi'. Tanpa potongan token
+    (bonus paket, keputusan harga final 21 Okt)."""
+    file_id = int(body.get('file_id') or 0)
+    _berkas_milik(db, u, file_id)
+    peta = _peta_disahkan(db, u, file_id)
+    try:
+        minta = bab4.susun_permintaan_simulasi(
+            peta, n=int(body.get('n') or 120), efek=body.get('efek') or {})
+    except (ValueError, TypeError) as e:
+        raise HTTPException(422, str(e)) from e
+    try:
+        hasil = jembatan_statistik.buat_data_simulasi(minta)
+    except Exception as e:  # noqa: BLE001
+        raise _terjemahkan_gagal(e) from e
+    d = (db.query(DataLapanganBab4)
+         .filter_by(user_id=u.id, file_id=file_id, tahap='simulasi').first())
+    if d is None:
+        d = DataLapanganBab4(user_id=u.id, file_id=file_id, tahap='simulasi')
+        db.add(d)
+    d.kolom = json.dumps(hasil.get('kolom') or [])
+    d.baris = json.dumps(hasil.get('baris') or [])
+    db.commit()
+    return {'kolom': hasil.get('kolom'), 'jumlah_baris': len(hasil.get('baris') or []),
+            'laporan': hasil.get('laporan')}
+
+
+@router.get('/data/unduh.csv')
+def unduh_data_csv(file_id: int, tahap: str = 'simulasi',
+                   u: User = Depends(wajib_login_api),
+                   db: Session = Depends(get_db)):
+    """Unduh data tersimpan (format template resmi: kepala kolom +
+    satu baris per responden) — untuk simulasi: berkas latihan yang
+    bisa diunggah balik / dibawa ke SPSS/SmartPLS."""
+    _berkas_milik(db, u, file_id)
+    d = _data(db, u, file_id, tahap)
+    kolom = json.loads(d.kolom or '[]')
+    baris = json.loads(d.baris or '[]')
+    teks = [','.join(kolom)]
+    for b in baris:
+        teks.append(','.join('' if s is None else str(s) for s in b))
+    return PlainTextResponse(
+        '\n'.join(teks) + '\n', media_type='text/csv',
+        headers={'Content-Disposition':
+                 f'attachment; filename="data-{tahap}.csv"'})
+
+
+# ── Narasi dari hasil terkunci ──────────────────────────────────
+@router.post('/narasi')
+async def buat_narasi(body: dict, u: User = Depends(wajib_login_api),
+                      db: Session = Depends(get_db)):
+    """Hasilkan narasi BAB IV dari hasil TERKUNCI saja.
+
+    Tarif (keputusan harga final): narasi pertama 30 token; buat
+    ulang berikutnya 5 token (mengikuti pola generate ulang yang
+    sudah ada); suntingan manual lewat PUT /narasi/teks gratis.
+    Token dipotong SESUDAH draf berhasil dibuat — gagal buat, tidak
+    ada potongan."""
+    from . import bab4_narasi
+    file_id = int(body.get('file_id') or 0)
+    _berkas_milik(db, u, file_id)
+    bahan = bab4_narasi.kumpulkan_bahan(db, u, file_id)
+    if bahan is None:
+        raise HTTPException(
+            409, 'Belum ada hasil yang dikunci. Kunci hasil dulu — '
+                 'narasi hanya lahir dari angka yang sudah dikunci.')
+    draf = bab4_narasi.susun_draf(bahan)
+    teks, dipoles = await bab4_narasi.poles_ai(draf)
+    sudah_ada = (db.query(bab4.HasilBab4)
+                 .filter_by(user_id=u.id, file_id=file_id, jenis='narasi')
+                 .count() > 0)
+    tarif = 5 if sudah_ada else 30
+    terpotong = 0
+    if tarif > 0:
+        info = kuota.potong_banyak(db, u, tarif, jenis_addon='ai')
+        terpotong = int(info.get('dipotong') or 0)
+    h = bab4.simpan_hasil(
+        db, u.id, file_id, 'narasi', bahan['mode'],
+        {'teks': teks, 'dari_versi_terkunci': bahan['versi_terkunci'],
+         'dipoles_ai': dipoles})
+    return {'versi': h.nomor, 'tarif_dikenakan': terpotong,
+            'dipoles_ai': dipoles, 'teks': teks}
+
+
+@router.put('/narasi/teks')
+def sunting_narasi(body: dict, u: User = Depends(wajib_login_api),
+                   db: Session = Depends(get_db)):
+    """Suntingan manual narasi — gratis (aturan revisi lama),
+    tersimpan sebagai versi narasi baru."""
+    file_id = int(body.get('file_id') or 0)
+    _berkas_milik(db, u, file_id)
+    teks = str(body.get('teks') or '')
+    if not teks.strip():
+        raise HTTPException(422, 'Teks narasi kosong.')
+    terkunci = bab4.hasil_terkunci(db, u.id, file_id, 'olah_data')
+    h = bab4.simpan_hasil(
+        db, u.id, file_id, 'narasi',
+        terkunci.mode if terkunci else '',
+        {'teks': teks, 'suntingan_manual': True,
+         'dari_versi_terkunci': terkunci.nomor if terkunci else None})
+    return {'versi': h.nomor, 'tarif_dikenakan': 0}

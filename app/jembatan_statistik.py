@@ -126,3 +126,37 @@ def hitung(payload: dict, timeout: float | None = None) -> dict:
     raise GagalJembatan(
         f'Statistik Lab menjawab dengan galat {r.status_code}. '
         'Coba lagi sebentar lagi.', r.status_code)
+
+
+def buat_data_simulasi(payload: dict, timeout: float | None = None) -> dict:
+    """Minta data latihan terkalibrasi ke pintu BUAT DATA jembatan.
+
+    Mengembalikan {kolom, baris, laporan}. Galat diterjemahkan ke
+    GagalJembatan seperti hitung()."""
+    kunci_ = kunci()
+    if not kunci_:
+        raise GagalJembatan(
+            'Kunci layanan statistik belum dipasang di EduAi.', 503)
+    try:
+        with httpx.Client(timeout=timeout or _timeout(),
+                          trust_env=False) as k:
+            r = k.post(f'{alamat()}/api/jembatan/simulasi',
+                       json=payload, headers={'X-Kunci-Layanan': kunci_})
+    except httpx.TimeoutException:
+        raise GagalJembatan(
+            'Mesin BUAT DATA tidak menjawab (lewat batas waktu).', 504)
+    except httpx.HTTPError as e:
+        raise GagalJembatan(f'Mesin BUAT DATA tak terjangkau: {e}', 502)
+    if r.status_code == 200:
+        return r.json()
+    if r.status_code == 401:
+        raise GagalJembatan('Kunci antar-layanan ditolak Statistik Lab.', 401)
+    if r.status_code == 503:
+        raise GagalJembatan('Kunci belum dipasang di Statistik Lab.', 503)
+    detail = ''
+    try:
+        detail = str(r.json().get('detail') or '')
+    except Exception:  # noqa: BLE001
+        pass
+    raise GagalJembatan(detail or f'Mesin BUAT DATA menolak ({r.status_code}).',
+                        r.status_code if 400 <= r.status_code < 500 else 502)
