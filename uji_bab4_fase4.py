@@ -162,6 +162,27 @@ r = k.post('/api/bab4/narasi', json={'file_id': 30, 'sumber': 'campuran'}, heade
 teks = r.json().get('teks', '') if r.status_code == 200 else ''
 cek('narasi campuran: ada 4.3 kualitatif + 4.4 terpadu', r.status_code == 200 and 'Hasil Kualitatif (Putaran 2)' in teks and 'Pembahasan Terpadu' in teks, r.text[:150])
 
+
+print('── Isi narasi 4.3: istilah informan vs teknik (review Fase 4) ──')
+from app.bab4_narasi import susun_draf_kualitatif as _sdk
+_bq = {'jenis': 'kualitatif_tematik', 'peta': {'fokus': [{'nama': 'mutu layanan'}]},
+       'hasil': {'triangulasi': {'tema': [
+           {'tema': 'Mutu Layanan', 'total_kutipan': 3, 'jumlah_informan': 3,
+            'jumlah_teknik': 1, 'kuat': True, 'tertriangulasi': False,
+            'per_jenis': {'eksternal': 3},
+            'contoh_kutipan': {'teks': 'lambat', 'informan': 'I1'}},
+           {'tema': 'Harga', 'total_kutipan': 2, 'jumlah_informan': 2,
+            'jumlah_teknik': 2, 'kuat': True, 'tertriangulasi': True,
+            'per_jenis': {'internal': 1, 'eksternal': 1},
+            'contoh_kutipan': {'teks': 'mahal', 'informan': 'I2'}}]}}}
+_tq = _sdk(_bq)
+cek('3 informan disebut ANGKA 3 (bukan "satu")', 'didukung 3 informan' in _tq)
+cek('1 teknik disebut sebagai teknik pengumpulan data', '1 teknik pengumpulan data' in _tq)
+cek('tidak ada klaim "satu jenis informan" yang menyesatkan',
+    'baru didukung satu jenis informan' not in _tq and 'satu informan' not in _tq)
+cek('tertriangulasi=True -> frasa tertriangulasi sumber muncul', 'tertriangulasi sumber (didukung dua jenis informan)' in _tq)
+cek('jenis informan disebut namanya (eksternal/internal)', '1 jenis: eksternal' in _tq and '2 jenis: internal, eksternal' in _tq)
+
 print()
 print('❌ GAGAL: ' + ', '.join(gagal) if gagal else '✅ SEMUA LULUS — Fase 4 (kualitatif + campuran)')
 sys.exit(1 if gagal else 0)
