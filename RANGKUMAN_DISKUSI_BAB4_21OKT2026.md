@@ -185,9 +185,35 @@ Naskah BAB I–III
    PER JALUR** — mediasi/moderasi/banyak jalur dalam SATU model = satu
    paket 30, satu kali generate, satu narasi 30. Yang dua kali hanya
    penelitian campuran (dua JENIS penelitian berbeda).
-9. **Uji coba instrumen**: kuesioner hasil instrumen — perlu uji
-   validitas/reliabilitas pilot (responden kecil) sebelum sebar besar?
-   Belum dibahas masuk alur atau tidak.
+9. ~~**Uji coba instrumen (PRA-SURVEI)**~~ **SELESAI — disetujui Bos
+   21 Okt 2026** (setelah diluruskan bertahap):
+   - BEDA dari simulasi: simulasi = data rekaan mesin/AI untuk belajar;
+     pra-survei = responden ASLI sedikit (10–30) untuk memeriksa
+     kuesionernya (validitas tiap pertanyaan + reliabilitas variabel).
+   - ALAT YANG SAMA, bukan mesin baru: pra-survei = mode pemeriksaan awal
+     dari alat olah data yang sama (alat utama memang wajib memeriksa
+     instrumen dulu sebelum hitungan lain — dua alat berisiko beda angka
+     dan merusak prinsip satu mesin). Mode ini berhenti di pemeriksaan
+     instrumen; data berlabel "pra-survei" terpisah dari data utama;
+     keluarannya kartu kesehatan kuesioner. Yang menghitung MESIN (rumus
+     pasti), AI hanya menerjemahkan hasil + usul kata ganti.
+   - URUTAN (diluruskan ke Bos): kuesioner di-download PALING AWAL dalam
+     SATU paket (kuesioner + template) — pra-survei MEMAKAI paket itu.
+     Semua bagus → tidak ada unduhan baru, paket yang sama ke lapangan.
+     Ada yang lemah → perbaiki di EduAi, download hanya versi perbaikannya.
+   - BOLEH DILEWATI: tombol "Lewati Pra-Survei" → langsung berangkat
+     dengan paket yang sudah di tangan; atau "Uji coba manual" dengan
+     melampirkan bukti (hasil hitung sendiri / instrumen dari penelitian
+     terdahulu) — pola lama kita: AI/manual selalu pilihan, sistem
+     mengingatkan, user memutuskan.
+   - NARASI MENYESUAIKAN JALAN: laporan pra-survei hanya muncul di
+     tulisan bila benar-benar dilakukan (tempatnya di bagian uji
+     instrumen, BUKAN pembahasan); dilewati → bagian itu tidak muncul
+     sama sekali. Uji instrumen pada DATA UTAMA tetap selalu ada di
+     BAB IV pada semua jalur.
+   - Harga: bagian dari Paket Olah Data yang sama (bukan barang baru);
+     perbaikan instrumen dari hasil pra-survei tidak memotong jatah
+     revisi data.
 10. **Batas simulasi**: jumlah responden/informan default & maksimum
     simulasi, dan apakah skenario panel atur SELALU tampil atau hanya
     mode lanjutan (pertanyaan Wulan terakhir sebelum rangkuman ini).
