@@ -162,6 +162,41 @@ def simpan_data(body: dict, u: User = Depends(wajib_login_api),
     baris = body.get('baris') or []
     if not isinstance(kolom, list) or not isinstance(baris, list):
         raise HTTPException(422, 'Kolom dan baris harus berupa daftar.')
+    kolom = [str(k) for k in kolom]
+    # Normalisasi & validasi di PINTU MASUK (temuan review ronde 5):
+    # baris boleh daftar (urutan kolom) atau objek {kolom: nilai}
+    # (bentuk wajar dari layar) — keduanya disimpan sebagai daftar.
+    # Sel hanya boleh angka atau kosong; teks seperti "abc" ditolak
+    # 422 dengan posisi persisnya, BUKAN disimpan lalu berbeda hasil.
+    baris_bersih: list[list] = []
+    for no, b in enumerate(baris, start=1):
+        if isinstance(b, dict):
+            b = [b.get(k) for k in kolom]
+        if not isinstance(b, list):
+            raise HTTPException(
+                422, f'Baris ke-{no} bentuknya tidak dikenal — kirim '
+                     'daftar angka atau objek kolom.')
+        sel_bersih = []
+        for j, sel in enumerate(b):
+            if sel is None or sel == '':
+                sel_bersih.append(None)
+                continue
+            if isinstance(sel, bool):
+                raise HTTPException(
+                    422, f'Baris ke-{no}, kolom {kolom[j] if j < len(kolom) else j}: '
+                         'isinya harus angka (1–5) atau kosong.')
+            if isinstance(sel, (int, float)):
+                sel_bersih.append(sel)
+                continue
+            try:
+                sel_bersih.append(float(str(sel).replace(',', '.')))
+            except (TypeError, ValueError):
+                raise HTTPException(
+                    422, f'Baris ke-{no}, kolom '
+                         f'{kolom[j] if j < len(kolom) else j}: isinya '
+                         f'"{sel}" — harus angka (1–5) atau kosong.') from None
+        baris_bersih.append(sel_bersih)
+    baris = baris_bersih
     d = (db.query(DataLapanganBab4)
          .filter_by(user_id=u.id, file_id=file_id, tahap=tahap).first())
     if d is None:

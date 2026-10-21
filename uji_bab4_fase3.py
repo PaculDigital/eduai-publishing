@@ -7,7 +7,7 @@ Jalan: EDUAI_STATISTIK_URL=http://127.0.0.1:8799 \
        EDUAI_STATISTIK_KUNCI=kunci-e2e EDUAI_SECRET_KEY=x \
        EDUAI_ROUTER_KEY=x python uji_bab4_fase3.py
 """
-import sys, types, json
+import sys, types, json, copy
 sys.path.insert(0, '.')
 import numpy as np
 from fastapi import FastAPI
@@ -329,6 +329,58 @@ h2 = next((e for e in ph3 if e['hipotesis'] == 'H2'), {})
 cek('e2e moderasi: H2 interaksi terpetakan dengan angka (b & signifikan terisi)',
     r.status_code == 200 and h2.get('ketemu') and h2.get('b') is not None
     and h2.get('signifikan') is not None, f'{r.status_code} {h2}')
+
+print('── Regresi ronde 5: pintu masuk ──')
+# BUG 1: data bentuk OBJEK diterima & dinormalisasi, olah data jalan
+db4 = Sesi(); db4.add(FileBerkas(id=13, user_id=1, nama='obj.docx',
+                                 nama_simpan='obj.docx', ukuran=10)); db4.commit(); db4.close()
+k.post('/api/bab4/peta', json={'file_id': 13, 'peta': peta_spss}, headers=H)
+k.post('/api/bab4/peta/sahkan', json={'file_id': 13}, headers=H)
+kolom4 = k.get('/api/bab4/instrumen', params={'file_id': 13}).json()['kolom_template']
+baris_obj = [dict(zip(kolom4, b)) for b in buat(40)]
+r = k.put('/api/bab4/data', json={'file_id': 13, 'tahap': 'utama',
+          'kolom': kolom4, 'baris': baris_obj}, headers=H)
+cek('BUG 1 PUT data bentuk objek diterima rapi (200)', r.status_code == 200, r.text[:150])
+d_obj = k.get('/api/bab4/data', params={'file_id': 13}).json()
+cek('BUG 1 data tersimpan sebagai daftar (ternormalisasi)',
+    isinstance(d_obj['baris'][0], list), str(d_obj['baris'][0])[:60])
+r = k.post('/api/bab4/olah-data', json={'file_id': 13}, headers=H)
+cek('BUG 1 olah data dari data objek JALAN (bukan 500 KeyError)',
+    r.status_code == 200 and r.json().get('versi') == 1, r.text[:200])
+
+# BUG 3: sel teks ditolak di pintu dengan 422
+r = k.put('/api/bab4/data', json={'file_id': 13, 'tahap': 'utama',
+          'kolom': kolom4, 'baris': [[None, 'abc', 3, 4, 5, 1]]}, headers=H)
+cek('BUG 3 sel teks "abc" ditolak 422 saat simpan', r.status_code == 422, f'{r.status_code} {r.text[:120]}')
+
+# BUG 2: jumlah_hipotesis bukan angka → masalah peta, bukan 500
+p_aneh = copy.deepcopy(peta_spss); p_aneh['jumlah_hipotesis'] = 'tiga'
+r = k.post('/api/bab4/peta', json={'file_id': 13, 'peta': p_aneh}, headers=H)
+cek('BUG 2 POST /peta jumlah "tiga" → 200 + masalah jumlah_hipotesis_salah',
+    r.status_code == 200 and any(m['kode'] == 'jumlah_hipotesis_salah'
+                                 for m in r.json().get('masalah', [])), r.text[:200])
+r = k.post('/api/bab4/peta/sahkan', json={'file_id': 13}, headers=H)
+cek('BUG 2 sahkan peta "tiga" → 422 (bukan 500)', r.status_code == 422, str(r.status_code))
+
+# BUG 4: bentrok awalan Harga vs Harga 1
+p_bentrok = {'jenis': 'kuantitatif', 'jumlah_hipotesis': 1,
+             'variabel': [{'nama': 'Harga 1', 'peran': 'X', 'bukti': B},
+                          {'nama': 'Harga', 'peran': 'Y', 'bukti': B}],
+             'jalur': [{'dari': 'Harga 1', 'ke': 'Harga', 'hipotesis': 'H1',
+                        'jenis': 'langsung'}]}
+cek('BUG 4 Harga vs Harga 1 → kolom_tabrakan',
+    any(m['kode'] == 'kolom_tabrakan' for m in _b4.periksa_peta(p_bentrok)),
+    str(_b4.periksa_peta(p_bentrok)))
+
+# BUG 5: kartu kesehatan tahan bentuk aneh
+try:
+    _k1 = _b4.kartu_kesehatan({'variabel': 'teks'})
+    _k2 = _b4.kartu_kesehatan({'variabel': [{'nama': 'A', 'butir': {'x': 1}}]})
+    _k3 = _b4.kartu_kesehatan(None)
+    cek('BUG 5 kartu_kesehatan tahan bentuk aneh (tidak meledak)',
+        isinstance(_k1, dict) and isinstance(_k2, dict) and isinstance(_k3, dict))
+except Exception as e:
+    cek('BUG 5 kartu_kesehatan tahan bentuk aneh (tidak meledak)', False, str(e))
 
 print()
 print('❌ GAGAL: ' + ', '.join(gagal) if gagal else '✅ SEMUA LULUS — Fase 3 inti (rute BAB IV)')

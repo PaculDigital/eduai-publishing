@@ -254,10 +254,20 @@ def periksa_peta(peta: dict) -> list[dict]:
         tambah('label_kembar', 'Ada label hipotesis yang dipakai dua '
                                'jalur sekaligus.')
     jml_hip = peta.get('jumlah_hipotesis')
-    if jml_hip is not None and len(jalur) != int(jml_hip):
+    # jumlah_hipotesis datang dari AI/pembacaan naskah — bisa bukan
+    # angka ('tiga'). int() mentah meledak → 500 di rute (temuan
+    # review ronde 5). Parse aman: bukan angka = masalah peta (422).
+    try:
+        jml_hip_int = int(jml_hip) if jml_hip is not None else None
+    except (TypeError, ValueError):
+        jml_hip_int = None
+        tambah('jumlah_hipotesis_salah',
+               f'Jumlah hipotesis harus berupa angka, diterima: '
+               f'{jml_hip!r}.')
+    if jml_hip_int is not None and len(jalur) != jml_hip_int:
         tambah('jumlah_tak_sama',
                f'Jumlah jalur ({len(jalur)}) tidak sama dengan jumlah '
-               f'hipotesis di naskah ({jml_hip}).')
+               f'hipotesis di naskah ({jml_hip_int}).')
 
     # Tabrakan nama kolom (temuan review Fase 3): dua nama variabel
     # berbeda bisa menyatu jadi dasar kolom yang sama sesudah
@@ -274,6 +284,19 @@ def periksa_peta(peta: dict) -> list[dict]:
                    'samakan ejaannya atau bedakan namanya supaya data '
                    'tidak tertukar.')
         dasar_kolom.setdefault(dasar, nama_v)
+    # Bentrok awalan (temuan review ronde 5): dasar yang satu menjadi
+    # awalan dasar lain pada batas garis bawah ('Harga' vs 'Harga_1')
+    # membuat butir 'Harga_1' ambigu — bisa berarti butir 1 dari
+    # 'Harga' atau butir dari variabel 'Harga 1'. Mesin membaca awalan
+    # dan akan menggabungkan dua variabel diam-diam. Tolak juga.
+    dasars = sorted(dasar_kolom)
+    for i, a in enumerate(dasars):
+        for b in dasars[i + 1:]:
+            if b.startswith(a + '_') or a.startswith(b + '_'):
+                tambah('kolom_tabrakan',
+                       f'Nama kolom "{a}" dan "{b}" saling mengawali — '
+                       'butirnya akan terbaca sebagai satu variabel '
+                       'oleh mesin. Bedakan nama variabelnya.')
 
     # Jalur hantu (temuan review 21 Okt): ujung jalur harus variabel
     # yang BENAR-BENAR ada di daftar — jalur ke variabel tak dikenal
@@ -437,10 +460,18 @@ def kartu_kesehatan(hasil_pra: dict) -> dict:
     memperbaiki KATA-KATA butir (bukan menyalahkan responden).
     Mesin yang menghitung; fungsi ini hanya menerjemahkan."""
     kartu, lemah_semua = [], []
-    for g in (hasil_pra or {}).get('variabel') or []:
+    if not isinstance(hasil_pra, dict):
+        hasil_pra = {}
+    for g in hasil_pra.get('variabel') or []:
+        if not isinstance(g, dict):
+            continue
+        butir = g.get('butir')
+        if not isinstance(butir, list):
+            butir = []
         lemah = [{'butir': b.get('butir'), 'r': b.get('r'),
                   'r_kritis': b.get('r_kritis')}
-                 for b in (g.get('butir') or []) if not b.get('lolos')]
+                 for b in butir
+                 if isinstance(b, dict) and not b.get('lolos')]
         lemah_semua += lemah
         alpha_ok = bool(g.get('lolos_alpha', True))
         sehat = not lemah and alpha_ok
@@ -575,6 +606,12 @@ def baris_ke_objek(kolom: list, baris: list) -> list[dict]:
     dibuang dari objek (di mesin terbaca sebagai kosong betulan)."""
     objek = []
     for b in baris:
+        if isinstance(b, dict):
+            # Baris sudah berbentuk objek {kolom: nilai} (bentuk yang
+            # wajar dari layar) — saring ke kolom yang dikenal saja.
+            objek.append({str(k): v for k, v in b.items()
+                          if v not in (None, '')})
+            continue
         o = {}
         for i, k in enumerate(kolom):
             if i < len(b) and b[i] not in (None, ''):
