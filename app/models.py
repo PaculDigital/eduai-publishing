@@ -1294,6 +1294,25 @@ class PetaBab4(Base):
     disahkan_pada: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
+class DataLapanganBab4(Base):
+    """Isi Halaman Data Lapangan BAB IV (keputusan Bab IV 21 Okt 2026).
+
+    Rumah data penelitian adalah EduAi: grid jawaban responden
+    (ketik manual / unggah template / simulasi) disimpan di sini per
+    tahap — 'pra' (uji coba instrumen), 'utama' (data penelitian),
+    'simulasi' (latihan). Yang dikirim ke Statistik Lab hanya salinan
+    untuk dihitung saat itu juga (Jembatan Opsi B, tanpa simpan)."""
+    __tablename__ = 'data_lapangan_bab4'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True, nullable=False)
+    file_id: Mapped[int] = mapped_column(ForeignKey('files.id'), index=True, nullable=False)
+    tahap: Mapped[str] = mapped_column(String(10), default='utama', index=True)  # pra | utama | simulasi
+    kolom: Mapped[str] = mapped_column(Text, default='[]')       # JSON: daftar nama kolom
+    baris: Mapped[str] = mapped_column(Text, default='[]')       # JSON: daftar baris (daftar sel)
+    target_responden: Mapped[int | None] = mapped_column(nullable=True)  # untuk tingkat pengembalian Bab IV 4.1
+    diperbarui: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
 def init_db() -> None:
     Base.metadata.create_all(engine)
     _migrasi_kolom()

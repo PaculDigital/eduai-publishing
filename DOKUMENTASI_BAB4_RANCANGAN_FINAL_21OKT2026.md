@@ -626,7 +626,20 @@ Semua panggilan AI tetap lewat **satu pintu 9router** (aturan repo).
   Review agen Bos menemukan 6 hal: 5 bug kode (kunci mundur ke versi
   lama; pemeriksa meledak pada bentuk salah ×2; jalur hantu; peran tak
   dikenal) — DIPERBAIKI & teruji regresi; 1 hal di bawah ini.
-- ⚠️ **FONDASI BELUM DIPASANG KE APLIKASI**: `app/bab4.py` dan
+- **Fase 3 INTI SELESAI & ter-push** (21 Okt sore): modul terpasang —
+  `app/bab4_rute.py` terdaftar di main.py, 11 rute /api/bab4 (peta,
+  sahkan, instrumen + 2 unduhan, data 3 tahap, pra-survei + kartu
+  kesehatan, olah-data + tarif, kunci-hasil, ringkasan, simulasi
+  contoh); tabel `data_lapangan_bab4`; pembuat instrumen lahir dari
+  peta. Uji rute ujung-ke-ujung 13 pemeriksaan LULUS melawan server
+  Statistik Lab hidup. Uji ini menangkap 3 cacat antar-fase yang uji
+  per-fase tidak lihat: FK tabel salah nama ('file_berkas' → 'files'),
+  bentuk baris kontrak (objek per responden), dan larangan mencampur
+  'peran' + kolom eksplisit. SISA Fase 3: simulasi sungguhan (mesin
+  BUAT DATA), narasi AI dari hasil terkunci, dan layar HTML Halaman
+  Data Lapangan (rute JSON sudah siap).
+- ⚠️ **FONDASI BELUM DIPASANG KE APLIKASI** (status SEBELUM Fase 3 —
+  kini sudah terpasang, lihat butir di atas): `app/bab4.py` dan
   `app/jembatan_statistik.py` saat ini MODUL FONDASI — belum diimpor
   `main.py`, belum ada rute HTTP, belum ada layar. Itu memang cakupan
   Fase 3 (orkestrasi + rute + UI), BUKAN kelalaian — tapi siapa pun

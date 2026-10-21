@@ -323,3 +323,225 @@ def label_desain(fakta: dict) -> dict:
             'alasan': ['Fakta lapangan belum cukup untuk menentukan '
                        'desain — tanyakan fakta kegiatannya, bukan '
                        'labelnya.']}
+
+
+# ============================================================
+#  Instrumen (lahir dari peta yang sama → data pasti cocok mesin)
+# ============================================================
+
+def _nama_kolom(nama_variabel: str) -> str:
+    """'Keaslian Streamer' → 'Keaslian' tidak aman; pakai SELURUH nama
+    dibersihkan: spasi→garis bawah, buang selain huruf/angka/_. Pola
+    ini yang dikenali mesin Statistik Lab (Nama_Variabel_Nomor)."""
+    bersih = ''.join(ch if (ch.isalnum() or ch == ' ') else ' '
+                     for ch in nama_variabel).split()
+    return '_'.join(bersih) or 'Variabel'
+
+
+def buat_instrumen(peta: dict) -> dict:
+    """Susun paket instrumen dari peta yang DISAHKAN:
+
+    - kuesioner: butir per variabel. Teks butir diambil dari
+      'indikator' variabel bila ada; bila belum ada, dibuat kerangka
+      'Pernyataan ke-i tentang <variabel>' bertanda contoh — TIDAK
+      mengarang isi pernyataan (itu pekerjaan peneliti/AI perancang).
+    - kolom_template: nama kolom persis pola mesin, urut per variabel.
+    - petunjuk: kartu ringkas cara mengisi & menyebar."""
+    bagian, kolom = [], []
+    for v in peta.get('variabel') or []:
+        if not isinstance(v, dict):
+            continue
+        nama = str(v.get('nama') or '')
+        dasar = _nama_kolom(nama)
+        indikator = [str(x) for x in (v.get('indikator') or [])]
+        jumlah = int(v.get('jumlah_butir') or len(indikator) or 4)
+        butir = []
+        for i in range(1, jumlah + 1):
+            kode = f'{dasar}_{i}'
+            kolom.append(kode)
+            if i <= len(indikator):
+                butir.append({'kode': kode, 'teks': indikator[i - 1],
+                              'dari_indikator': True})
+            else:
+                butir.append({'kode': kode,
+                              'teks': f'Pernyataan ke-{i} tentang {nama.lower()} '
+                                      '(tulis pernyataanmu di sini).',
+                              'dari_indikator': False})
+        bagian.append({'variabel': nama, 'peran': v.get('peran'),
+                       'butir': butir})
+    return {
+        'kuesioner': bagian,
+        'kolom_template': kolom,
+        'skala': 'Likert 1–5 (1 = sangat tidak setuju, 5 = sangat setuju)',
+        'petunjuk': [
+            'Satu baris = satu responden. Satu kolom = satu pernyataan.',
+            'Isi hanya angka 1–5. Jawaban kosong biarkan KOSONG '
+            '(jangan diisi 0).',
+            'Jangan mengubah nama kolom — mesin membacanya dari nama.',
+            'Paket yang sama dipakai untuk uji coba (10–30 responden) '
+            'dan penyebaran utama.',
+        ],
+    }
+
+
+def teks_template_csv(instrumen: dict) -> str:
+    """CSV satu baris kepala — template unduhan resmi."""
+    return ','.join(instrumen.get('kolom_template') or []) + '\n'
+
+
+def teks_kuesioner_md(instrumen: dict, judul: str = 'Kuesioner Penelitian') -> str:
+    baris = [f'# {judul}', '', f"Skala: {instrumen.get('skala', '')}", '']
+    for b in instrumen.get('kuesioner') or []:
+        baris.append(f"## {b['variabel']}")
+        for bt in b['butir']:
+            baris.append(f"- [{bt['kode']}] {bt['teks']}")
+        baris.append('')
+    return '\n'.join(baris)
+
+
+# ============================================================
+#  Kartu kesehatan (terjemahan manusiawi hasil pra-survei)
+# ============================================================
+
+def kartu_kesehatan(hasil_pra: dict) -> dict:
+    """Ubah hasil hitung pra-survei (bentuk pintu jembatan Fase 1:
+    {variabel: [{nama, butir: [{butir, r, r_kritis, lolos}], alpha,
+    lolos_alpha}]}) menjadi kartu sederhana: per variabel
+    sehat/perlu-perhatian + daftar butir lemah dengan nasihat
+    memperbaiki KATA-KATA butir (bukan menyalahkan responden).
+    Mesin yang menghitung; fungsi ini hanya menerjemahkan."""
+    kartu, lemah_semua = [], []
+    for g in (hasil_pra or {}).get('variabel') or []:
+        lemah = [{'butir': b.get('butir'), 'r': b.get('r'),
+                  'r_kritis': b.get('r_kritis')}
+                 for b in (g.get('butir') or []) if not b.get('lolos')]
+        lemah_semua += lemah
+        alpha_ok = bool(g.get('lolos_alpha', True))
+        sehat = not lemah and alpha_ok
+        kartu.append({
+            'variabel': g.get('nama'),
+            'alpha': g.get('alpha'),
+            'sehat': sehat,
+            'pesan': ('Semua butir sehat dan kelompoknya konsisten.'
+                      if sehat else
+                      (f"{len(lemah)} butir lemah — periksa kata-katanya."
+                       if lemah else
+                       'Butir lolos, tetapi konsistensi kelompoknya '
+                       'rendah — periksa lagi pertanyaannya.')),
+        })
+    return {
+        'semua_sehat': not lemah_semua and
+                       all(k['sehat'] for k in kartu),
+        'butir_lemah': lemah_semua,
+        'nasihat': ('Butir lemah biasanya kalimatnya membingungkan atau '
+                    'berisi dua pertanyaan sekaligus — perjelas '
+                    'kata-katanya, lalu uji lagi ke responden baru.'
+                    if lemah_semua else
+                    'Kuesioner siap dipakai untuk penyebaran utama.'),
+        'per_variabel': kartu,
+    }
+
+
+# ============================================================
+#  Deskriptif ringan untuk 4.1/4.2 (dihitung di EduAi sendiri)
+# ============================================================
+
+def frekuensi_kolom(baris: list, kolom: list, nama: str) -> dict:
+    """Hitung frekuensi nilai satu kolom (profil responden 4.1)."""
+    if nama not in kolom:
+        return {}
+    i = kolom.index(nama)
+    hitung: dict[str, int] = {}
+    for b in baris:
+        if i < len(b) and b[i] not in (None, ''):
+            kunci = str(b[i])
+            hitung[kunci] = hitung.get(kunci, 0) + 1
+    return hitung
+
+
+def tingkat_pengembalian(masuk: int, target: int | None) -> float | None:
+    if not target:
+        return None
+    return round(masuk / target * 100, 1)
+
+
+# ============================================================
+#  Susun kiriman hitung utama dari peta + data lapangan
+# ============================================================
+
+def susun_payload_hitung(peta: dict, kolom: list, tahap: str = 'utama') -> dict:
+    """Petakan peran peta ke kontrak jembatan Statistik Lab.
+
+    mode: 'pls' bila peta menyebut metode PLS/SEM, selain itu 'spss'.
+    peran dibangun dari daftar variabel peta; kolom butir diambil dari
+    awalan nama kolom variabel (pola buat_instrumen)."""
+    mode = 'pls' if 'pls' in str(peta.get('metode') or '').lower() \
+        or 'sem' in str(peta.get('metode') or '').lower() else 'spss'
+    # CATATAN KONTRAK (terbukti di uji Fase 3): pintu jembatan menolak
+    # kiriman yang mencampur 'peran' dengan kolom eksplisit — kirim
+    # SATU bentuk saja (kolom eksplisit / konstruk).
+    peran, konstruk = {}, {}
+    for v in peta.get('variabel') or []:
+        if not isinstance(v, dict):
+            continue
+        dasar = _nama_kolom(str(v.get('nama') or ''))
+        milik = [k for k in kolom
+                 if k == dasar or k.startswith(dasar + '_')]
+        peran[str(v.get('nama'))] = v.get('peran')
+        konstruk[str(v.get('nama'))] = milik
+    payload: dict = {'tahap': tahap, 'mode': mode}
+    if mode == 'pls':
+        y = next((n for n, r in peran.items() if r == 'Y'), None)
+        payload['konstruk'] = konstruk
+        payload['kolom_y_konstruk'] = y
+    else:
+        ambil = lambda r: [k for n, rr in peran.items() if rr == r
+                           for k in konstruk.get(n, [])]
+        payload.update({
+            'kolom_x': ambil('X'), 'kolom_y': ambil('Y'),
+            'kolom_m': ambil('M'), 'kolom_z': ambil('Z'),
+            'bentuk_mediasi': _bentuk_mediasi(peta),
+        })
+    return payload
+
+
+def _bentuk_mediasi(peta: dict) -> str:
+    peran = {str(v.get('nama')): v.get('peran')
+             for v in (peta.get('variabel') or []) if isinstance(v, dict)}
+    if 'M' not in peran.values():
+        return 'regresi_biasa'
+    langsung_xy = any(
+        j.get('jenis') == 'langsung' and
+        peran.get(str(j.get('dari'))) == 'X' and
+        peran.get(str(j.get('ke'))) == 'Y'
+        for j in (peta.get('jalur') or []) if isinstance(j, dict))
+    return 'lengkap' if langsung_xy else 'tidak_langsung_saja'
+
+
+# ============================================================
+#  Simulasi placeholder (sebelum bayar): contoh TETAP berlabel
+# ============================================================
+
+SIMULASI_CONTOH: dict = {
+    'tanda': 'CONTOH TAMPILAN — bukan hasil penelitianmu',
+    'model': {'X': ['Kualitas Produk', 'Harga'], 'M': 'Kepuasan',
+              'Y': 'Loyalitas'},
+    'hasil_ringkasan': {'r2': 0.42,
+                        'catatan': 'Ini contoh tampilan. Simulasi dari '
+                                   'model penelitianmu sendiri terbuka '
+                                   'setelah Paket Olah Data aktif.'},
+}
+
+
+def baris_ke_objek(kolom: list, baris: list) -> list[dict]:
+    """Ubah grid (daftar-daftar) menjadi bentuk kontrak jembatan:
+    satu OBJEK per responden {nama_kolom: nilai}. Sel kosong/None
+    dibuang dari objek (di mesin terbaca sebagai kosong betulan)."""
+    objek = []
+    for b in baris:
+        o = {}
+        for i, k in enumerate(kolom):
+            if i < len(b) and b[i] not in (None, ''):
+                o[str(k)] = b[i]
+        objek.append(o)
+    return objek
