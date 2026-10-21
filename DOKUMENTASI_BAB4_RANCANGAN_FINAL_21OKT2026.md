@@ -626,26 +626,129 @@ Semua panggilan AI tetap lewat **satu pintu 9router** (aturan repo).
   Review agen Bos menemukan 6 hal: 5 bug kode (kunci mundur ke versi
   lama; pemeriksa meledak pada bentuk salah ×2; jalur hantu; peran tak
   dikenal) — DIPERBAIKI & teruji regresi; 1 hal di bawah ini.
-- **Fase 3 INTI SELESAI & ter-push** (21 Okt sore): modul terpasang —
-  `app/bab4_rute.py` terdaftar di main.py, 11 rute /api/bab4 (peta,
-  sahkan, instrumen + 2 unduhan, data 3 tahap, pra-survei + kartu
-  kesehatan, olah-data + tarif, kunci-hasil, ringkasan, simulasi
-  contoh); tabel `data_lapangan_bab4`; pembuat instrumen lahir dari
-  peta. Uji rute ujung-ke-ujung 13 pemeriksaan LULUS melawan server
-  Statistik Lab hidup. Uji ini menangkap 3 cacat antar-fase yang uji
-  per-fase tidak lihat: FK tabel salah nama ('file_berkas' → 'files'),
-  bentuk baris kontrak (objek per responden), dan larangan mencampur
-  'peran' + kolom eksplisit. SISA Fase 3: simulasi sungguhan (mesin
-  BUAT DATA), narasi AI dari hasil terkunci, dan layar HTML Halaman
-  Data Lapangan (rute JSON sudah siap).
-- ⚠️ **FONDASI BELUM DIPASANG KE APLIKASI** (status SEBELUM Fase 3 —
-  kini sudah terpasang, lihat butir di atas): `app/bab4.py` dan
-  `app/jembatan_statistik.py` saat ini MODUL FONDASI — belum diimpor
-  `main.py`, belum ada rute HTTP, belum ada layar. Itu memang cakupan
-  Fase 3 (orkestrasi + rute + UI), BUKAN kelalaian — tapi siapa pun
-  yang membaca status ini tidak boleh mengira fitur BAB IV sudah bisa
-  dipakai user. Bukti silang-repo kemarin adalah uji layanan, bukan
-  pemasangan.
+- **Fase 3 SELESAI, LULUS REVIEW & SUDAH DI `main`** (21 Okt, malam):
+  modul terpasang — `app/bab4_rute.py` terdaftar di main.py, **17 rute**
+  /api/bab4 (peta, sahkan, instrumen + 2 unduhan, data 3 tahap,
+  pra-survei + kartu kesehatan, olah-data + tarif, kunci-hasil, hasil,
+  profil, ringkasan, simulasi contoh, simulasi/buat, narasi,
+  narasi/teks, data/unduh.csv); tabel `data_lapangan_bab4`; pembuat
+  instrumen lahir dari peta; **layar** `templates/bab4.html`.
+  Simulasi lewat **mesin BUAT DATA** (bukan AI mengarang), narasi AI
+  hanya lahir dari hasil TERKUNCI. Review **9 ronde, 34 bug** ditutup,
+  uji mutasi terbukti bergigi — rincian di §15d. Sudah di-merge ke
+  `main` (`3ca2f2d`, catatan `ef402e2`).
+- ⚠️ **RIWAYAT (bukan status sekarang)** — blok di bawah ini ditulis
+  SEBELUM Fase 3 dipasang; disimpan sebagai catatan, JANGAN dibaca
+  sebagai keadaan kini: `app/bab4.py` dan `app/jembatan_statistik.py`
+  dulu MODUL FONDASI (belum diimpor `main.py`, belum ada rute HTTP,
+  belum ada layar). Kini SUDAH terpasang — lihat butir Fase 3 di atas.
+
+## 15c. VONIS REVIEW KETIGA — FASE 2 LULUS SEBAGAI FONDASI (21 Okt 2026)
+
+Reviewer: Wulan (pemegang kendali `main`). Branch: `agen/wulan/bab4-statistik-backend`
+@ **5eeeff0**. Metode: baca diff baris-per-baris + jalankan uji bawaan +
+**uji bug independen yang sama persis seperti review sebelumnya** + **uji
+mutasi** (perbaikan dicabut untuk membuktikan uji bisa GAGAL).
+
+### Status 6 temuan review kedua
+
+| # | Temuan | Status | Bukti |
+|---|---|---|---|
+| 1 | Kunci Hasil mundur ke versi lama | ✅ TUNTAS + BERGIGI | kunci#2 → `None`; bug disuntik balik → uji GAGAL |
+| 2 | `periksa_peta([])` meledak | ✅ TUNTAS | → masalah `bentuk_salah` |
+| 3 | `periksa_peta({'variabel':'x'})` meledak | ✅ TUNTAS | → masalah `bentuk_salah` |
+| 4 | Jalur ke variabel hantu | ✅ TUNTAS | → masalah `jalur_hantu` |
+| 5 | Peran tak dikenal (`Q`) | ✅ TUNTAS | → masalah `peran_tak_dikenal` |
+| 6 | Modul belum dipasang ke aplikasi | ⚠️ DIAKUI JUJUR di §15b | verifikasi ulang: `main.py` memang belum impor, rute `/bab4` belum ada — klaim COCOK kenyataan |
+
+### Uji mutasi (bukti uji tidak hijau palsu)
+
+| Keadaan | `kunci#2` |
+|---|---|
+| Kode asli (5eeeff0) | **None** ✅ |
+| Bug lama disuntik balik | **2** ← uji menangkap |
+
+### Uji tepi tambahan reviewer (di luar uji bawaan)
+
+| Kasus | Hasil |
+|---|---|
+| Kunci v3 → generate v4,v5 → kunci lagi | v5 ✅ (tidak mundur) |
+| Kunci v4 → generate v5 → kunci | v5 ✅ (bukan v3) |
+| 12 generate berturut-turut | 12 baris, tanpa error |
+
+`uji_bab4_fase2.py`: **22 → 29 asersi, semua LULUS.**
+
+### Catatan kecil (BUKAN bug, tidak menghalangi merge)
+
+- `bab4.py` menyimpan SEMUA versi draf tanpa batas (12 generate = 12 baris),
+  sedangkan pola `VersiDokumen` di repo ini menyimpan maksimal 2 versi lama.
+  Dokumen tidak mewajibkan pembatasan, tapi tabel bisa membesar bila narasi
+  dijalankan terus. **Catat untuk Fase 3**, bukan syarat merge.
+
+**VONIS: LULUS SEBAGAI FONDASI — boleh masuk `main` dengan pesan tegas
+"fondasi, belum bisa dipakai user". Fitur BAB IV belum bisa dipakai sampai
+Fase 3 (orkestrasi + rute + layar) selesai.**
+
+---
+
+## 15d. VONIS REVIEW KEEMPAT — **FASE 3 LULUS, SIAP MERGE**
+
+Diperiksa 21 Okt 2026 oleh Wulan (penjaga `main`). Branch
+`agen/wulan/bab4-statistik-backend` @ **`cb36678`**. **9 ronde** review,
+**34 bug** ditemukan dan seluruhnya ditutup. Bukti: skrip audit Wulan
+(`_g1.py` … `_g11.py`) + uji bawaan + **uji mutasi bergigi**.
+
+### Rekap temuan per ronde (semua TUNTAS)
+
+| Ronde | Temuan | Bukti penutupan |
+|---|---|---|
+| 1 | Mode SPSS SELALU gagal (`kolom_y` dikirim sebagai daftar, kontrak mesin minta satu nama) · token hangus bila mesin gagal · `startswith` membuat variabel saling mengandung · `jumlah_butir` negatif/teks | regresi/mediasi/moderasi/2-X semua **200**; mesin mati → 502 + token **dikembalikan** |
+| 2 | `peta['jalur']` diabaikan → hipotesis tak bisa dipetakan ke hasil | `peta_hipotesis` H1–H3 tersimpan bersama hasil |
+| 3 | Hipotesis moderasi kosong (`b`/`p`/`signifikan` = None) · presisi campur 4 vs 6 desimal | `b=0.176639`, `p=0.449784`, `delta_r2`, `arah`, `kalimat_mesin`; presisi seragam |
+| 4 | Simpan data bentuk objek → olah-data **500** · `int('tiga')` → **500** · data sampah lolos · kolom bentrok lolos pagar · `kartu_kesehatan` meledak | normalisasi di pintu masuk; **422** + masalah; `kolom_tabrakan` |
+| 5 | `GET /hasil` TIDAK ADA (hasil masuk DB, tak bisa dibaca) · tahap simulasi tak bisa diolah · `frekuensi_kolom`/`tingkat_pengembalian` nol pemanggil | `GET /hasil`, `olah-data?tahap`, `GET /profil` |
+| 6 | Kunci simulasi bisa "memakan" kunci penelitian (urutan simulasi→asli = data asli tak bisa dikunci) | `kunci_hasil(jenis=)`; simulasi **409**; **bergigi** |
+| 7 | 3 endpoint layar **404** (`/kunci`, `/olah`, `/pra`) · layar tak baca `/hasil` · tak pakai `/profil` | 13/13 endpoint cocok; gerbang kontrak layar↔rute ditambahkan |
+| 8 | 4 cacat narasi: label `H1: H1:` dobel · `— —` · **vonis "ditolak" untuk p yang TIDAK ADA** · `None` tercetak | CI bootstrap untuk efek tidak langsung; vonis "belum dapat diputuskan" bila tak ada dasar |
+| 9 | Spasi dobel pada kalimat rentang kepercayaan | 1 spasi; uji khusus ditambahkan |
+
+### Uji mutasi (bukan hijau palsu)
+
+Dibuktikan bisa GAGAL lagi bila bug dikembalikan: label dobel → tertangkap;
+`None` tercetak → tertangkap; vonis paksa → tertangkap; kunci simulasi
+tanpa filter `jenis` → tertangkap.
+
+### Yang sudah TERBUKTI jalan
+
+- **17 rute** `/api/bab4`, **13 dipakai layar**, **nol endpoint yatim**.
+- SPSS (regresi/mediasi/moderasi/2-X) + PLS semuanya 200.
+- Simulasi lewat **mesin BUAT DATA** (bukan AI mengarang); kolom sama
+  persis template instrumen; nilai Likert 1–5; tarif **0**; jatah
+  generate data asli **tidak** tergores.
+- Narasi: tarif **30** (pertama) / **5** (buat ulang) / **0** (sunting
+  manual); hanya lahir dari hasil **terkunci** (409 bila belum).
+- Pagar: kebocoran antar-user **404 semua** (7 variasi); token **tidak**
+  hangus bila mesin gagal; kunci simulasi ditolak.
+- `uji_bab4_fase3.py` + `uji_bab4_fase3_sisa.py`: **SEMUA LULUS**.
+- `statistik-lab`: pintu simulasi `06cf13d` — `uji_simulasi_jembatan.py`
+  **5/5 LULUS**; jembatan Fase 1 `uji_jembatan.py` **26/26**.
+
+### ⚠️ YANG BELUM (bukan bug — jangan dikira sudah jadi)
+
+1. **BELUM DEPLOY.** Kode di branch; server live belum di-rebuild
+   (`bash jalankan.sh`) — keputusan Bos.
+2. **`JEMBATAN_KUNCI_LAYANAN` produksi belum dipasang** → pintu masih
+   **503** sampai kunci dipasang di kedua repo.
+3. **`statistik-lab` `06cf13d`** (pintu simulasi) **belum** di-merge ke
+   `master` repo itu — baru di branch `agen/wulan/jembatan-bab4`.
+4. **Dua pintu kualitatif** (§12: koding + triangulasi/SWOT) belum ada.
+5. **Draf narasi tanpa batas baris** — 12 generate = 12 baris; pola
+   `VersiDokumen` maksimal 2. Dicatat, belum diputuskan.
+6. **Layar belum diuji di HP** (mobile-first, kebiasaan Bos).
+7. **§10.2 waktu bayar campuran** dan **§11.3 timeout** masih terbuka
+   (lihat §15 butir 4 & 6).
+
+---
 
 ## 16. URUTAN BANGUN YANG DIUSULKAN [USULAN Wulan — belum diperintah Bos]
 
