@@ -796,7 +796,6 @@ def susun_permintaan_simulasi(peta: dict, n: int = 120,
     semua 'sedang'."""
     efek = efek or {}
     label = label_peran(peta)
-    nama_per_label = {v: k for k, v in label.items()}
     ins = buat_instrumen(peta)
     butir_per_variabel = {b['variabel']: len(b['butir'])
                           for b in ins['kuesioner']}
