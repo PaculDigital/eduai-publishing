@@ -265,6 +265,71 @@ _h9 = _jb.hitung({'tahap': 'utama', 'mode': 'spss', 'bentuk_mediasi': 'lengkap',
 cek('BUG BARU 2 mediasi+moderasi → entri moderasi terbaca mesin',
     bool(_h9['kaitan'].get('moderasi')), str(list(_h9.get('kaitan', {}).keys())))
 
+print('── Regresi ronde 4: moderasi & presisi ──')
+# unit: bentuk moderasi PERSIS tangkapan mesin asli
+_hmod = {'mode': 'spss', 'koef': [],
+         'kaitan': {'moderasi': [
+             {'x': 'X1', 'z': 'Z1', 'y': 'Y1', 'delta_r2': 0.132073,
+              'jenis': 'memoderasi', 'arah': 'memperkuat',
+              'kalimat': 'Z1 MEMPERKUAT pengaruh X1 terhadap Y1.',
+              'dengan_interaksi': {'r2': 0.336138,
+                                   'interaksi': {'b': 0.67477, 't': 4.37, 'p': 3.1e-05}}}]}}
+_pmod = {'variabel': [{'nama': 'X', 'peran': 'X'}, {'nama': 'Z', 'peran': 'Z'},
+                      {'nama': 'Y', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Z', 'ke': 'Y', 'hipotesis': 'H2', 'jenis': 'interaksi'}]}
+_em = _b4.petakan_hasil_ke_hipotesis(_pmod, _hmod)[0]
+cek('BUG BARU 1 interaksi terisi: b, p, signifikan, delta_r2, kalimat',
+    _em['ketemu'] and _em['b'] == 0.67477 and _em['signifikan'] is True
+    and _em['delta_r2'] == 0.132073 and bool(_em['ringkas']), str(_em))
+
+# unit presisi: koef 4-desimal vs kaitan penuh → pilih kaitan
+_hpres = {'mode': 'spss',
+          'koef': [{'nama': 'X1', 'b': 0.4390, 'p': 0.0}],
+          'kaitan': {'mediasi': [
+              {'x': 'X1', 'm': 'M1', 'y': 'Y1', 'a': {'b': 0.599145, 'p': 0.0},
+               'cp': {'b': 0.438984, 'p': 4.3e-05},
+               'tidak_langsung': {'b': 0.348885, 'lo': 0.2, 'hi': 0.51}}]}}
+_ep = _b4.petakan_hasil_ke_hipotesis(_peta_tiru, _hpres)
+_dir = [e for e in _ep if e['hipotesis'] == 'H3'][0] if False else None
+_pdir = {'variabel': [{'nama': 'X', 'peran': 'X'}, {'nama': 'Med', 'peran': 'M'},
+                      {'nama': 'Y', 'peran': 'Y'}],
+         'jalur': [{'dari': 'X', 'ke': 'Y', 'hipotesis': 'H9', 'jenis': 'langsung'}]}
+_ed = _b4.petakan_hasil_ke_hipotesis(_pdir, _hpres)[0]
+cek('BUG BARU 2 X→Y langsung mengambil presisi penuh kaitan (cp), bukan koef 4-desimal',
+    _ed['b'] == 0.438984 and _ed.get('sumber') == 'kaitan', str(_ed))
+
+# e2e: peta moderasi lewat rute (berkas 12)
+db3 = Sesi(); db3.add(FileBerkas(id=12, user_id=1, nama='mod.docx',
+                                 nama_simpan='mod.docx', ukuran=10)); db3.commit(); db3.close()
+peta_mod = {'jenis': 'kuantitatif', 'metode': 'Regresi', 'jumlah_hipotesis': 2,
+            'variabel': [
+                {'nama': 'Kualitas', 'peran': 'X', 'bukti': B,
+                 'indikator': ['Produk awet.', 'Produk rapi.']},
+                {'nama': 'Kepercayaan', 'peran': 'Z', 'bukti': B,
+                 'indikator': ['Percaya merek.', 'Percaya penjual.']},
+                {'nama': 'Minat', 'peran': 'Y', 'bukti': B,
+                 'indikator': ['Beli lagi.', 'Rekomendasi.']}],
+            'jalur': [
+                {'dari': 'Kualitas', 'ke': 'Minat', 'hipotesis': 'H1', 'jenis': 'langsung'},
+                {'dari': 'Kepercayaan', 'ke': 'Minat', 'hipotesis': 'H2', 'jenis': 'interaksi'}]}
+k.post('/api/bab4/peta', json={'file_id': 12, 'peta': peta_mod}, headers=H)
+k.post('/api/bab4/peta/sahkan', json={'file_id': 12}, headers=H)
+kolom3 = k.get('/api/bab4/instrumen', params={'file_id': 12}).json()['kolom_template']
+rng3 = np.random.default_rng(7)
+_x3 = rng3.normal(size=100); _z3 = rng3.normal(size=100)
+_y3 = 0.5*_x3 + 0.4*_x3*_z3 + rng3.normal(scale=.7, size=100)
+_l3 = lambda v: np.clip(np.round(3 + v + rng3.normal(scale=.4, size=100)), 1, 5).astype(int)
+_b12 = [[int(_l3(_x3)[i]), int(_l3(_x3)[i]), int(_l3(_z3)[i]), int(_l3(_z3)[i]),
+         int(_l3(_y3)[i]), int(_l3(_y3)[i])] for i in range(100)]
+k.put('/api/bab4/data', json={'file_id': 12, 'tahap': 'utama',
+      'kolom': kolom3, 'baris': _b12}, headers=H)
+r = k.post('/api/bab4/olah-data', json={'file_id': 12}, headers=H)
+ph3 = r.json().get('hasil', {}).get('peta_hipotesis', []) if r.status_code == 200 else []
+h2 = next((e for e in ph3 if e['hipotesis'] == 'H2'), {})
+cek('e2e moderasi: H2 interaksi terpetakan dengan angka (b & signifikan terisi)',
+    r.status_code == 200 and h2.get('ketemu') and h2.get('b') is not None
+    and h2.get('signifikan') is not None, f'{r.status_code} {h2}')
+
 print()
 print('❌ GAGAL: ' + ', '.join(gagal) if gagal else '✅ SEMUA LULUS — Fase 3 inti (rute BAB IV)')
 sys.exit(1 if gagal else 0)

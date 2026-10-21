@@ -677,24 +677,51 @@ def petakan_hasil_ke_hipotesis(peta: dict, hasil: dict) -> list[dict]:
             cocok = [m for (x, z, y), m in moderasi.items()
                      if z == label.get(dari, '') and y == label.get(ke, '')]
             if cocok:
-                di = (cocok[0].get('dengan_interaksi') or {})
-                entri.update(ketemu=True, b=None, p=None,
-                             signifikan=None,
-                             ringkas=f"R² dengan interaksi: {di.get('r2')}")
-                entri['dengan_interaksi'] = di
+                m = cocok[0]
+                di = (m.get('dengan_interaksi') or {})
+                inter = di.get('interaksi') or {}
+                # Mesin SUDAH menyediakan angka interaksi lengkap
+                # (b, t, p), delta_r2, jenis, arah, dan kalimat —
+                # ambil semuanya (temuan review: versi lama hanya
+                # mengambil r2, menyisakan hipotesis moderasi kosong).
+                entri.update(
+                    ketemu=True, b=inter.get('b'), p=inter.get('p'),
+                    signifikan=_sig(inter.get('p')),
+                    delta_r2=m.get('delta_r2'),
+                    jenis_moderasi=m.get('jenis'), arah=m.get('arah'),
+                    kalimat_mesin=m.get('kalimat'),
+                    ringkas=m.get('kalimat') or '')
         else:  # langsung
-            sumber = None
-            if label.get(ke, '').startswith('Y'):
-                sumber = koef.get(label.get(dari, ''))
-            elif label.get(ke, '').startswith('M'):
-                m = mediasi.get((label.get(dari, ''), label.get(ke, ''),
+            # Presisi (temuan review): 'koef' mesin dibulatkan 4
+            # desimal, 'kaitan' presisi penuh. Untuk model ber-mediasi
+            # ambil angka jalur langsung dari kaitan (c' untuk X→Y,
+            # b untuk M→Y) supaya SATU laporan tidak mencampur dua
+            # presisi. Tanpa mediasi, koef adalah satu-satunya sumber.
+            sumber, asal = None, None
+            ld, lk = label.get(dari, ''), label.get(ke, '')
+            if lk.startswith('Y'):
+                if ld.startswith('M'):
+                    m = next((mm for (x, mm_, y), mm in mediasi.items()
+                              if mm_ == ld and y == lk), None)
+                    if m:
+                        sumber, asal = m.get('b'), 'kaitan'
+                if sumber is None:
+                    m = next((mm for (x, mm_, y), mm in mediasi.items()
+                              if x == ld and y == lk), None)
+                    if m:
+                        sumber, asal = m.get('cp'), 'kaitan'
+                if sumber is None:
+                    sumber, asal = koef.get(ld), 'koef'
+            elif lk.startswith('M'):
+                m = mediasi.get((ld, lk,
                                  next((lb for nm, lb in label.items()
                                        if lb.startswith('Y')), '')))
-                sumber = (m or {}).get('a')
+                sumber, asal = (m or {}).get('a'), 'kaitan'
             if sumber:
                 entri.update(ketemu=True, b=sumber.get('b'),
                              p=sumber.get('p'),
-                             signifikan=_sig(sumber.get('p')))
+                             signifikan=_sig(sumber.get('p')),
+                             sumber=asal)
         if entri['ketemu'] and not entri['ringkas']:
             entri['ringkas'] = (f"{entri['hipotesis']}: b={entri['b']}, "
                                 f"p={entri['p']} → "
