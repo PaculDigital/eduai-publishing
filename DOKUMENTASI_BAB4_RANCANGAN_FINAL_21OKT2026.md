@@ -659,3 +659,31 @@ Semua panggilan AI tetap lewat **satu pintu 9router** (aturan repo).
 3. Jalur kualitatif penuh (§12), lalu campuran (§5.5).
 4. Gerbang `scripts/periksa_kode.sh`, uji ujung-ke-ujung di HP
    (mobile-first: user Bos menguji lewat ponsel), baru PR.
+
+### Pembaruan Fase 4 (21 Okt 2026, petang) — SELESAI di branch
+
+- **Statistik Lab** (branch `agen/wulan/jembatan-bab4`, commit `59df57b`):
+  `POST /api/jembatan/kualitatif/koding` (catatan informan → AI
+  mengusulkan kode+tema per potongan; pengesahan tetap manusia di
+  EduAi) dan `POST /api/jembatan/kualitatif/matriks` (koding tersahkan
+  → triangulasi / SWOT+IFAS-EFAS+kuadran). Hitungan adalah pindahan
+  PERSIS logika peramban `kualitatif.html` (aturan tema kuat:
+  ≥3 informan atau ≥2 informan + ≥2 teknik; kuadran dari titik tengah
+  2,50) — halaman /kualitatif pemakai langsung TIDAK diubah. Pemanggil
+  AI disuntikkan dari `main.py` (`_panggil_ai_server`, pola saran yang
+  sudah ada). Uji: `uji_jembatan_kualitatif.py` semua lulus.
+- **EduAi** (branch ini): catatan & segmen & faktor tersimpan di EduAi
+  (tahap `kual_catatan`/`kual_segmen`/`swot_faktor`); rute
+  `/api/bab4/kualitatif/*` (catatan, usulkan-koding, segmen, faktor,
+  matriks — tarif meteran generate per jenis hasil, token kembali bila
+  mesin gagal); `/kunci-hasil` menerima jenis kualitatif; narasi
+  `sumber: kualitatif_tematik | kualitatif_swot | campuran`.
+- **Campuran dua putaran**: gerbang keras — matriks tematik pada peta
+  campuran ditolak 409 sampai hasil kuantitatif dikunci;
+  `POST /api/bab4/campuran/pendalaman` menyusun pertanyaan wawancara
+  putaran 2 secara deterministik dari putusan hipotesis terkunci
+  (jalur tak signifikan digali sebab lapangannya). `periksa_peta`
+  kini memeriksa bukti fokus/informan juga untuk jenis campuran.
+- **BELUM DIPUTUSKAN Bos**: waktu bayar campuran (usulan Wulan: per
+  putaran) — implementasi mengikuti meteran generate per jenis yang
+  sudah ada, bukan skema bayar baru. PR & deploy tetap menunggu Bos.

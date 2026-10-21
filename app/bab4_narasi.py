@@ -144,3 +144,167 @@ async def poles_ai(draf: str) -> tuple[str, bool]:
         return (teks, True) if teks else (draf, False)
     except Exception:  # noqa: BLE001
         return draf, False
+
+# ── Fase 4: kualitatif & campuran ───────────────────────────────
+def susun_pertanyaan_pendalaman(peta_hipotesis: list[dict]) -> list[dict]:
+    """Pertanyaan wawancara putaran 2 (campuran) DIBANGUN dari hasil
+    kuantitatif terkunci — terutama jalur yang tidak signifikan, sesuai
+    desain explanatory sequential (§14 rancangan final). Deterministik:
+    kalimatnya templat jujur dari putusan mesin, bukan karangan AI."""
+    hasil = []
+    for e in (peta_hipotesis or []):
+        if not e.get('ketemu'):
+            continue
+        dari, ke = e.get('dari'), e.get('ke')
+        if e.get('jenis') == 'interaksi':
+            putusan = 'moderasi'
+            q = (f'Hasil hitung menunjukkan pengaruh {dari} terhadap {ke} '
+                 'berubah mengikuti variabel penguatnya. Menurut '
+                 'Bapak/Ibu, dalam keadaan seperti apa pengaruh itu '
+                 'terasa paling kuat di lapangan?')
+        elif e.get('signifikan') is True:
+            putusan = 'terbukti berpengaruh'
+            q = (f'Hasil survei menunjukkan {dari} terbukti berpengaruh '
+                 f'terhadap {ke}. Menurut pengalaman Bapak/Ibu, apa '
+                 'contoh nyatanya di lapangan — kejadian apa yang '
+                 'membuat pengaruh itu terasa?')
+        elif e.get('signifikan') is False:
+            putusan = 'belum terbukti berpengaruh'
+            q = (f'Hasil survei menunjukkan {dari} belum terbukti '
+                 f'berpengaruh terhadap {ke}. Menurut Bapak/Ibu, apa '
+                 'yang sebenarnya terjadi di lapangan — adakah hal lain '
+                 f'yang lebih menentukan {ke}?')
+        else:
+            putusan = 'belum dapat diputuskan'
+            q = (f'Pengaruh {dari} terhadap {ke} belum dapat diputuskan '
+                 'dari hasil survei. Menurut Bapak/Ibu, bagaimana '
+                 'sebenarnya hubungan keduanya di lapangan?')
+        hasil.append({'hipotesis': e.get('hipotesis'), 'dari': dari,
+                      'ke': ke, 'putusan': putusan, 'pertanyaan': q})
+    return hasil
+
+
+def kumpulkan_bahan_kualitatif(db: Session, u: User, file_id: int,
+                                 jenis: str) -> dict | None:
+    """Bahan narasi kualitatif dari hasil matriks TERKUNCI saja."""
+    terkunci = bab4.hasil_terkunci(db, u.id, file_id, jenis)
+    if terkunci is None:
+        return None
+    peta_row = (db.query(bab4.PetaBab4)
+                .filter_by(user_id=u.id, file_id=file_id)
+                .order_by(bab4.PetaBab4.nomor.desc()).first())
+    peta = bab4.baca_peta(peta_row) if peta_row else {}
+    return {'hasil': bab4.baca_hasil(terkunci),
+            'versi_terkunci': terkunci.nomor, 'mode': terkunci.mode,
+            'peta': peta, 'jenis': jenis}
+
+
+def susun_draf_kualitatif(b: dict) -> str:
+    """Draf 4.1–4.4 kualitatif dari matriks terkunci (deterministik).
+
+    Angka & kutipan hanya dari hasil mesin; tafsir akhir tetap milik
+    peneliti (kalimat draf menyebut dukungan datanya apa adanya).
+    """
+    peta = b.get('peta') or {}
+    _f = peta.get('fokus')
+    fokus = ('; '.join(str(x.get('nama') or '') for x in _f
+                       if isinstance(x, dict))
+             if isinstance(_f, list) else str(_f or '')) \
+        or 'fokus penelitian'
+    L = ['## 4.1 Gambaran Umum Objek Penelitian',
+         '',
+         f'Penelitian ini berfokus pada {fokus}. Data kualitatif '
+         'dikumpulkan dari informan yang dipilih sesuai peta penelitian '
+         'yang telah disahkan.']
+    if b.get('jenis') == 'kualitatif_tematik':
+        tri = (b.get('hasil') or {}).get('triangulasi') or {}
+        temas = tri.get('tema') or []
+        L += ['', '## 4.2 Penyajian Data', '']
+        if not temas:
+            L.append('Belum ada tema yang terbentuk dari koding yang '
+                     'disahkan.')
+        for t in temas:
+            ck = t.get('contoh_kutipan') or {}
+            L.append(
+                f"Tema {t.get('tema')} didukung {t.get('total_kutipan')} "
+                f"kutipan dari {t.get('jumlah_informan')} informan. "
+                f"Contoh kutipan: \"{ck.get('teks')}\" "
+                f"({ck.get('informan')}).")
+            L.append('')
+        L += ['## 4.3 Keabsahan Data (Triangulasi)', '']
+        for t in temas:
+            L.append(
+                f"Tema {t.get('tema')}: "
+                f"{'kuat' if t.get('kuat') else 'perlu diperkuat'}; "
+                'didukung dua jenis informan (tertriangulasi sumber).'
+                if t.get('tertriangulasi') else
+                f"Tema {t.get('tema')}: "
+                f"{'kuat' if t.get('kuat') else 'perlu diperkuat'}; "
+                'baru didukung satu jenis informan.')
+            L.append('')
+        L += ['## 4.4 Pembahasan', '',
+              'Tema yang kuat dan tertriangulasi menjadi temuan utama '
+              'yang dibahas pada bagian ini; tema yang perlu diperkuat '
+              'dibahas dengan hati-hati dan ditunjukkan keterbatasannya. '
+              'Tafsir akhir atas setiap tema ditulis peneliti dengan '
+              'menghubungkannya ke teori pada Bab II.']
+    else:  # kualitatif_swot
+        sw = (b.get('hasil') or {}).get('swot') or {}
+        kel = sw.get('kelompok') or {}
+        nama = {'S': 'Kekuatan (Strength)', 'W': 'Kelemahan (Weakness)',
+                'O': 'Peluang (Opportunity)', 'T': 'Ancaman (Threat)'}
+        L += ['', '## 4.2 Penyajian Data', '']
+        for k in 'SWOT':
+            daftar = kel.get(k) or []
+            L.append(f"{nama[k]}: " + ('; '.join(
+                str(x.get('teks')) for x in daftar) or '—') + '.')
+            L.append('')
+        ifas, efas, kuad = sw.get('ifas') or {}, sw.get('efas') or {}, \
+            sw.get('kuadran') or {}
+        L += ['## 4.3 Matriks SWOT, IFAS/EFAS, dan Posisi Kuadran', '',
+              f"Total skor IFAS { _fmt(ifas.get('total_skor'))} dan EFAS "
+              f"{_fmt(efas.get('total_skor'))}."]
+        if kuad:
+            L.append(f"Posisi objek penelitian berada pada kuadran "
+                     f"{kuad.get('label')} (x={_fmt(kuad.get('x'))}, "
+                     f"y={_fmt(kuad.get('y'))} dari titik tengah 2,50).")
+        for g, nm in ((ifas, 'IFAS'), (efas, 'EFAS')):
+            if g and not g.get('bobot_pas_satu'):
+                L.append(f"Catatan: total bobot {nm} adalah "
+                         f"{_fmt(g.get('total_bobot'))} (idealnya 1,00) — "
+                         'sesuaikan bobot sebelum naskah difinalkan.')
+        L += ['', '## 4.4 Pembahasan', '',
+              'Strategi pada matriks SO, WO, ST, dan WT dibahas pada '
+              'bagian ini berdasarkan posisi kuadran di atas; strategi '
+              'yang dipilih dihubungkan peneliti dengan kondisi nyata '
+              'objek penelitian.']
+    return '\n'.join(L)
+
+
+def susun_draf_campuran(bk: dict, bq: dict) -> str:
+    """BAB IV campuran: 4.2 kuantitatif, 4.3 kualitatif, 4.4 terpadu.
+
+    Rangka dari draf kuantitatif (4.1 + hasil) lalu bagian kualitatif
+    disisipkan sebelum pembahasan terpadu yang menghubungkan keduanya.
+    """
+    draf_k = susun_draf(bk)
+    tri = (bq.get('hasil') or {}).get('triangulasi') or {}
+    temas = tri.get('tema') or []
+    L = [draf_k, '', '## 4.3 Hasil Kualitatif (Putaran 2)', '']
+    for t in temas:
+        ck = t.get('contoh_kutipan') or {}
+        L.append(
+            f"Tema {t.get('tema')} ({t.get('total_kutipan')} kutipan, "
+            f"{t.get('jumlah_informan')} informan): \"{ck.get('teks')}\" "
+            f"({ck.get('informan')}).")
+        L.append('')
+    L += ['## 4.4 Pembahasan Terpadu', '',
+          'Pada penelitian campuran ini, temuan kualitatif dipakai '
+          'menjelaskan hasil kuantitatif: tema yang muncul dari informan '
+          'dihubungkan satu per satu dengan putusan hipotesis pada '
+          'bagian 4.2 — terutama jalur yang belum terbukti berpengaruh, '
+          'yang memang digali khusus lewat pertanyaan pendalaman. '
+          'Peneliti menuliskan hubungan itu dengan kata-katanya sendiri '
+          'berdasarkan kutipan pada bagian 4.3.']
+    return '\n'.join(L)
+
