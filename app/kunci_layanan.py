@@ -63,6 +63,17 @@ LAYANAN = {
         'catatan': 'Kunci mati — tempel sekali, jalan terus.',
         'cara': 'Ambil di openalex.org/settings/api.',
     },
+    'statistik': {
+        'label': 'Statistik Lab — Jembatan BAB IV',
+        'env': 'EDUAI_STATISTIK_KUNCI',
+        'sifat': 'mati',
+        'catatan': 'Kunci mati — tempel sekali, jalan terus. Nilainya harus '
+                   'SAMA PERSIS dengan JEMBATAN_KUNCI_LAYANAN di server '
+                   'Statistik Lab.',
+        'cara': 'Buat satu nilai acak panjang, pasang di server Statistik '
+                'Lab (env JEMBATAN_KUNCI_LAYANAN), lalu tempel nilai yang '
+                'sama di sini.',
+    },
     'scite': {
         'label': 'Scite',
         'env': 'EDUAI_SCITE_TOKEN',
