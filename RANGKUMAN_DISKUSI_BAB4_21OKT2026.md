@@ -106,10 +106,22 @@ Naskah BAB I–III
 5. **Cara Wulan push/PR branch ini** (PAT sesaat / fork / lokal saja).
 
 ### C2. Bagian rancangan yang belum dibahas sama sekali
-6. **Jembatan KUALITATIF**: kontraknya belum dirancang — data informan di
-   EduAi dikirim ke mesin kualitatif Statistik Lab (koding/triangulasi)
-   dalam bentuk apa? Atau koding dikerjakan di EduAi dan Statistik Lab
-   hanya untuk kuantitatif? Ini lubang terbesar setelah C1.1.
+6. ~~**Jembatan KUALITATIF**~~ **SELESAI — diputuskan Bos 21 Okt 2026:
+   KUALITATIF PAKAI API.** Senjata kualitatif ada DUA (diingatkan Bos):
+   Analisis Tematik+Triangulasi dan Analisis SWOT — keduanya sudah hidup
+   di /kualitatif Statistik Lab, tapi hitungannya berjalan di browser.
+   Keputusan: bangun API kualitatif di Statistik Lab = pindahkan hitungan
+   triangulasi + SWOT (matriks, IFAS/EFAS, kuadran) dari browser ke server
+   + satu panggilan AI koding berkelompok (memakai pola endpoint saran
+   yang sudah ada di server). Dua panggilan, tanpa simpan sesi:
+   (1) kirim catatan informan → balas usulan kode/tema per potongan;
+   user SAHKAN/betulkan usulan itu di EduAi (koding = tafsir peneliti,
+   sengaja tidak otomatis penuh); (2) kirim koding yang disahkan → balas
+   matriks triangulasi + tema final + kutipan (atau matriks SWOT +
+   IFAS/EFAS + kuadran). Rumah data tetap EduAi. Halaman /kualitatif
+   untuk pemakai langsung TIDAK berubah. (Usulan jembatan berkas —
+   mahasiswa bekerja di Statistik Lab lalu upload .md pulang — DITOLAK
+   Bos demi otomatis & mahasiswa tidak keluar dari EduAi.)
 7. **Kerangka BAB IV kualitatif**: kerangka_bab.py yang ada berorientasi
    kuantitatif (4.2 statistik deskriptif, 4.3 uji prasyarat, 4.4 uji
    hipotesis). Versi kualitatifnya (deskripsi situs/informan, temuan per
