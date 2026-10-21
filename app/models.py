@@ -1240,6 +1240,60 @@ def _atur_sqlite(dbapi_conn, _):
 SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
 
 
+
+class HasilBab4(Base):
+    """Hasil hitung BAB IV dari jembatan Statistik Lab — BERVERSI.
+
+    ═══ KENAPA ADA (Fase 2 BAB IV, 21 Okt 2026) ═══
+    Temuan review: skema "Kunci Hasil" (keputusan Bos) butuh tempat nyata
+    di basis data, bukan sekadar tombol. Pola mengikuti `VersiDokumen`:
+      · setiap generate = baris BARU dengan `nomor` naik (1, 2, 3, …)
+      · `status`: 'draf' (masih boleh diganti generate baru) atau
+        'terkunci' (dibekukan tombol Kunci Hasil; narasi BAB IV hanya
+        boleh lahir dari baris terkunci)
+      · hasil mentah mesin disimpan sebagai JSON di `hasil` — rumah data
+        adalah EduAi; Statistik Lab tidak menyimpan apa pun (Opsi B).
+    Tabel BARU — dibuat `create_all()` di `init_db()`, tabel lama tidak
+    disentuh.
+    """
+
+    __tablename__ = 'hasil_bab4'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True, nullable=False)
+    file_id: Mapped[int] = mapped_column(ForeignKey('files.id'), index=True, nullable=False)
+    # 'olah_data' = hitung utama · 'pra_survei' = pemeriksaan instrumen
+    jenis: Mapped[str] = mapped_column(String(30), default='olah_data', index=True)
+    mode: Mapped[str] = mapped_column(String(10), default='spss')   # 'spss' | 'pls'
+    nomor: Mapped[int] = mapped_column(Integer, default=1)
+    status: Mapped[str] = mapped_column(String(20), default='draf', index=True)
+    hasil: Mapped[str] = mapped_column(Text, nullable=False, default='{}')
+    dibuat: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    dikunci_pada: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class PetaBab4(Base):
+    """Peta Penelitian BAB IV yang diusulkan AI dan disahkan user.
+
+    Isi peta (JSON di `isi`): jenis, desain + fakta sidik jarinya,
+    variabel/fokus beserta BUKTI kalimatnya, jalur + label hipotesis,
+    target sampel. `status`: 'usulan' → 'disahkan'. Instrumen, template,
+    dan simulasi hanya boleh lahir dari peta yang 'disahkan'.
+    Tabel BARU — dibuat `create_all()` di `init_db()`.
+    """
+
+    __tablename__ = 'peta_bab4'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True, nullable=False)
+    file_id: Mapped[int] = mapped_column(ForeignKey('files.id'), index=True, nullable=False)
+    nomor: Mapped[int] = mapped_column(Integer, default=1)
+    status: Mapped[str] = mapped_column(String(20), default='usulan', index=True)
+    isi: Mapped[str] = mapped_column(Text, nullable=False, default='{}')
+    dibuat: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    disahkan_pada: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
 def init_db() -> None:
     Base.metadata.create_all(engine)
     _migrasi_kolom()
