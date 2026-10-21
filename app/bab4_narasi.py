@@ -233,14 +233,26 @@ def susun_draf_kualitatif(b: dict) -> str:
             L.append('')
         L += ['## 4.3 Keabsahan Data (Triangulasi)', '']
         for t in temas:
+            # Istilah TIDAK boleh tertukar (temuan review Fase 4):
+            # informan = ORANGNYA (jumlah_informan), teknik = CARANYA
+            # (jumlah_teknik: wawancara/observasi/dokumentasi), jenis
+            # informan = internal/eksternal (dasar 'tertriangulasi').
+            # Kalimat menyebut ketiga angka dengan namanya masing-
+            # masing — versi lama menulis 'satu jenis informan' untuk
+            # tema 3 informan 1 teknik, terbaca 'informannya satu'.
+            per_jen = t.get('per_jenis') or {}
+            n_jen = sum(1 for v in per_jen.values() if v)
+            label_jen = ', '.join(k for k, v in per_jen.items() if v)
+            tri = ('tertriangulasi sumber (didukung dua jenis informan)'
+                   if t.get('tertriangulasi') else
+                   'belum tertriangulasi sumber')
             L.append(
                 f"Tema {t.get('tema')}: "
-                f"{'kuat' if t.get('kuat') else 'perlu diperkuat'}; "
-                'didukung dua jenis informan (tertriangulasi sumber).'
-                if t.get('tertriangulasi') else
-                f"Tema {t.get('tema')}: "
-                f"{'kuat' if t.get('kuat') else 'perlu diperkuat'}; "
-                'baru didukung satu jenis informan.')
+                f"{'kuat' if t.get('kuat') else 'perlu diperkuat'} — "
+                f"didukung {t.get('jumlah_informan')} informan "
+                f"({n_jen} jenis: {label_jen}) melalui "
+                f"{t.get('jumlah_teknik')} teknik pengumpulan data; "
+                f'{tri}.')
             L.append('')
         L += ['## 4.4 Pembahasan', '',
               'Tema yang kuat dan tertriangulasi menjadi temuan utama '
