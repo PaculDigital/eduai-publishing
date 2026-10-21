@@ -254,10 +254,49 @@ def periksa_peta(peta: dict) -> list[dict]:
         tambah('label_kembar', 'Ada label hipotesis yang dipakai dua '
                                'jalur sekaligus.')
     jml_hip = peta.get('jumlah_hipotesis')
-    if jml_hip is not None and len(jalur) != int(jml_hip):
+    # jumlah_hipotesis datang dari AI/pembacaan naskah — bisa bukan
+    # angka ('tiga'). int() mentah meledak → 500 di rute (temuan
+    # review ronde 5). Parse aman: bukan angka = masalah peta (422).
+    try:
+        jml_hip_int = int(jml_hip) if jml_hip is not None else None
+    except (TypeError, ValueError):
+        jml_hip_int = None
+        tambah('jumlah_hipotesis_salah',
+               f'Jumlah hipotesis harus berupa angka, diterima: '
+               f'{jml_hip!r}.')
+    if jml_hip_int is not None and len(jalur) != jml_hip_int:
         tambah('jumlah_tak_sama',
                f'Jumlah jalur ({len(jalur)}) tidak sama dengan jumlah '
-               f'hipotesis di naskah ({jml_hip}).')
+               f'hipotesis di naskah ({jml_hip_int}).')
+
+    # Tabrakan nama kolom (temuan review Fase 3): dua nama variabel
+    # berbeda bisa menyatu jadi dasar kolom yang sama sesudah
+    # dibersihkan ('Kualitas Produk' dan 'Kualitas_Produk' → sama) —
+    # data dua variabel akan tertukar diam-diam. Tolak sejak peta.
+    dasar_kolom: dict[str, str] = {}
+    for v in variabel:
+        nama_v = str(v.get('nama') or '')
+        dasar = _nama_kolom(nama_v)
+        if dasar in dasar_kolom and dasar_kolom[dasar] != nama_v:
+            tambah('kolom_tabrakan',
+                   f'Variabel "{nama_v}" dan "{dasar_kolom[dasar]}" '
+                   f'menghasilkan nama kolom yang sama ("{dasar}") — '
+                   'samakan ejaannya atau bedakan namanya supaya data '
+                   'tidak tertukar.')
+        dasar_kolom.setdefault(dasar, nama_v)
+    # Bentrok awalan (temuan review ronde 5): dasar yang satu menjadi
+    # awalan dasar lain pada batas garis bawah ('Harga' vs 'Harga_1')
+    # membuat butir 'Harga_1' ambigu — bisa berarti butir 1 dari
+    # 'Harga' atau butir dari variabel 'Harga 1'. Mesin membaca awalan
+    # dan akan menggabungkan dua variabel diam-diam. Tolak juga.
+    dasars = sorted(dasar_kolom)
+    for i, a in enumerate(dasars):
+        for b in dasars[i + 1:]:
+            if b.startswith(a + '_') or a.startswith(b + '_'):
+                tambah('kolom_tabrakan',
+                       f'Nama kolom "{a}" dan "{b}" saling mengawali — '
+                       'butirnya akan terbaca sebagai satu variabel '
+                       'oleh mesin. Bedakan nama variabelnya.')
 
     # Jalur hantu (temuan review 21 Okt): ujung jalur harus variabel
     # yang BENAR-BENAR ada di daftar — jalur ke variabel tak dikenal
@@ -323,3 +362,513 @@ def label_desain(fakta: dict) -> dict:
             'alasan': ['Fakta lapangan belum cukup untuk menentukan '
                        'desain — tanyakan fakta kegiatannya, bukan '
                        'labelnya.']}
+
+
+# ============================================================
+#  Instrumen (lahir dari peta yang sama → data pasti cocok mesin)
+# ============================================================
+
+def _nama_kolom(nama_variabel: str) -> str:
+    """'Keaslian Streamer' → 'Keaslian' tidak aman; pakai SELURUH nama
+    dibersihkan: spasi→garis bawah, buang selain huruf/angka/_. Pola
+    ini yang dikenali mesin Statistik Lab (Nama_Variabel_Nomor)."""
+    bersih = ''.join(ch if (ch.isalnum() or ch == ' ') else ' '
+                     for ch in nama_variabel).split()
+    return '_'.join(bersih) or 'Variabel'
+
+
+def buat_instrumen(peta: dict) -> dict:
+    """Susun paket instrumen dari peta yang DISAHKAN:
+
+    - kuesioner: butir per variabel. Teks butir diambil dari
+      'indikator' variabel bila ada; bila belum ada, dibuat kerangka
+      'Pernyataan ke-i tentang <variabel>' bertanda contoh — TIDAK
+      mengarang isi pernyataan (itu pekerjaan peneliti/AI perancang).
+    - kolom_template: nama kolom persis pola mesin, urut per variabel.
+    - petunjuk: kartu ringkas cara mengisi & menyebar."""
+    bagian, kolom = [], []
+    for v in peta.get('variabel') or []:
+        if not isinstance(v, dict):
+            continue
+        nama = str(v.get('nama') or '')
+        dasar = _nama_kolom(nama)
+        indikator = [str(x) for x in (v.get('indikator') or [])]
+        # jumlah_butir dari peta TIDAK dipercaya mentah (temuan review
+        # Fase 3): teks 'abc' meledakkan int() → 500; negatif membuat
+        # kuesioner kosong diam-diam. Nilai aneh → jatuh ke jumlah
+        # indikator / bawaan 4; dibatasi wajar 1–20.
+        try:
+            jumlah = int(v.get('jumlah_butir'))
+        except (TypeError, ValueError):
+            jumlah = 0
+        if jumlah < 1:
+            jumlah = len(indikator) or 4
+        jumlah = min(jumlah, 20)
+        butir = []
+        for i in range(1, jumlah + 1):
+            kode = f'{dasar}_{i}'
+            kolom.append(kode)
+            if i <= len(indikator):
+                butir.append({'kode': kode, 'teks': indikator[i - 1],
+                              'dari_indikator': True})
+            else:
+                butir.append({'kode': kode,
+                              'teks': f'Pernyataan ke-{i} tentang {nama.lower()} '
+                                      '(tulis pernyataanmu di sini).',
+                              'dari_indikator': False})
+        bagian.append({'variabel': nama, 'peran': v.get('peran'),
+                       'butir': butir})
+    return {
+        'kuesioner': bagian,
+        'kolom_template': kolom,
+        'skala': 'Likert 1–5 (1 = sangat tidak setuju, 5 = sangat setuju)',
+        'petunjuk': [
+            'Satu baris = satu responden. Satu kolom = satu pernyataan.',
+            'Isi hanya angka 1–5. Jawaban kosong biarkan KOSONG '
+            '(jangan diisi 0).',
+            'Jangan mengubah nama kolom — mesin membacanya dari nama.',
+            'Paket yang sama dipakai untuk uji coba (10–30 responden) '
+            'dan penyebaran utama.',
+        ],
+    }
+
+
+def teks_template_csv(instrumen: dict) -> str:
+    """CSV satu baris kepala — template unduhan resmi."""
+    return ','.join(instrumen.get('kolom_template') or []) + '\n'
+
+
+def teks_kuesioner_md(instrumen: dict, judul: str = 'Kuesioner Penelitian') -> str:
+    baris = [f'# {judul}', '', f"Skala: {instrumen.get('skala', '')}", '']
+    for b in instrumen.get('kuesioner') or []:
+        baris.append(f"## {b['variabel']}")
+        for bt in b['butir']:
+            baris.append(f"- [{bt['kode']}] {bt['teks']}")
+        baris.append('')
+    return '\n'.join(baris)
+
+
+# ============================================================
+#  Kartu kesehatan (terjemahan manusiawi hasil pra-survei)
+# ============================================================
+
+def kartu_kesehatan(hasil_pra: dict) -> dict:
+    """Ubah hasil hitung pra-survei (bentuk pintu jembatan Fase 1:
+    {variabel: [{nama, butir: [{butir, r, r_kritis, lolos}], alpha,
+    lolos_alpha}]}) menjadi kartu sederhana: per variabel
+    sehat/perlu-perhatian + daftar butir lemah dengan nasihat
+    memperbaiki KATA-KATA butir (bukan menyalahkan responden).
+    Mesin yang menghitung; fungsi ini hanya menerjemahkan."""
+    kartu, lemah_semua = [], []
+    if not isinstance(hasil_pra, dict):
+        hasil_pra = {}
+    for g in hasil_pra.get('variabel') or []:
+        if not isinstance(g, dict):
+            continue
+        butir = g.get('butir')
+        if not isinstance(butir, list):
+            butir = []
+        lemah = [{'butir': b.get('butir'), 'r': b.get('r'),
+                  'r_kritis': b.get('r_kritis')}
+                 for b in butir
+                 if isinstance(b, dict) and not b.get('lolos')]
+        lemah_semua += lemah
+        alpha_ok = bool(g.get('lolos_alpha', True))
+        sehat = not lemah and alpha_ok
+        kartu.append({
+            'variabel': g.get('nama'),
+            'alpha': g.get('alpha'),
+            'sehat': sehat,
+            'pesan': ('Semua butir sehat dan kelompoknya konsisten.'
+                      if sehat else
+                      (f"{len(lemah)} butir lemah — periksa kata-katanya."
+                       if lemah else
+                       'Butir lolos, tetapi konsistensi kelompoknya '
+                       'rendah — periksa lagi pertanyaannya.')),
+        })
+    return {
+        'semua_sehat': not lemah_semua and
+                       all(k['sehat'] for k in kartu),
+        'butir_lemah': lemah_semua,
+        'nasihat': ('Butir lemah biasanya kalimatnya membingungkan atau '
+                    'berisi dua pertanyaan sekaligus — perjelas '
+                    'kata-katanya, lalu uji lagi ke responden baru.'
+                    if lemah_semua else
+                    'Kuesioner siap dipakai untuk penyebaran utama.'),
+        'per_variabel': kartu,
+    }
+
+
+# ============================================================
+#  Deskriptif ringan untuk 4.1/4.2 (dihitung di EduAi sendiri)
+# ============================================================
+
+def frekuensi_kolom(baris: list, kolom: list, nama: str) -> dict:
+    """Hitung frekuensi nilai satu kolom (profil responden 4.1)."""
+    if nama not in kolom:
+        return {}
+    i = kolom.index(nama)
+    hitung: dict[str, int] = {}
+    for b in baris:
+        if i < len(b) and b[i] not in (None, ''):
+            kunci = str(b[i])
+            hitung[kunci] = hitung.get(kunci, 0) + 1
+    return hitung
+
+
+def tingkat_pengembalian(masuk: int, target: int | None) -> float | None:
+    if not target:
+        return None
+    return round(masuk / target * 100, 1)
+
+
+# ============================================================
+#  Susun kiriman hitung utama dari peta + data lapangan
+# ============================================================
+
+def susun_payload_hitung(peta: dict, kolom: list, tahap: str = 'utama') -> dict:
+    """Petakan peran peta ke kontrak jembatan Statistik Lab.
+
+    mode: 'pls' bila peta menyebut metode PLS/SEM, selain itu 'spss'.
+    peran dibangun dari daftar variabel peta; kolom butir diambil dari
+    awalan nama kolom variabel (pola buat_instrumen)."""
+    mode = 'pls' if 'pls' in str(peta.get('metode') or '').lower() \
+        or 'sem' in str(peta.get('metode') or '').lower() else 'spss'
+    # CATATAN KONTRAK (terbukti di uji Fase 3): pintu jembatan menolak
+    # kiriman yang mencampur 'peran' dengan kolom eksplisit — kirim
+    # SATU bentuk saja (kolom eksplisit / konstruk).
+    import re as _re
+    peran, konstruk = {}, {}
+    for v in peta.get('variabel') or []:
+        if not isinstance(v, dict):
+            continue
+        dasar = _nama_kolom(str(v.get('nama') or ''))
+        # Pola TEGAS (temuan review Fase 3): hanya '<Dasar>_<angka>'
+        # yang milik variabel ini. startswith biasa membuat variabel
+        # 'Harga' menelan butir 'Harga_Diskon_1' milik variabel lain.
+        pola = _re.compile(rf'{_re.escape(dasar)}_\d+$')
+        milik = [k for k in kolom if pola.match(k)]
+        peran[str(v.get('nama'))] = v.get('peran')
+        konstruk[str(v.get('nama'))] = milik
+    payload: dict = {'tahap': tahap, 'mode': mode}
+    if mode == 'pls':
+        if not any(konstruk.values()):
+            raise ValueError(
+                'Tidak ada kolom data yang cocok dengan variabel peta '
+                '— payload kosong tidak dikirim ke mesin.')
+        y = next((n for n, r in peran.items() if r == 'Y'), None)
+        payload['konstruk'] = konstruk
+        payload['kolom_y_konstruk'] = y
+    else:
+        # BUG PALING BERAT (temuan review Fase 3): kontrak mesin SPSS
+        # meminta kolom_y SATU nama kolom gabungan — mengirim daftar
+        # butir Y membuat SEMUA olah data SPSS ditolak 400. Bentuk
+        # yang benar = 'peran' per butir (X1, X2, M1, Z1, Y1 per
+        # variabel): mesin menggabungkan butir per variabel jadi skor
+        # konstruk dengan aturannya sendiri (skor_konstruk), persis
+        # jalur yang dipakai halaman Diagnosis selama ini.
+        label = label_peran(peta)
+        peran_kolom = {k: label[nama] for nama in peran
+                       if nama in label
+                       for k in konstruk.get(nama, [])}
+        if not peran_kolom:
+            raise ValueError(
+                'Peta tidak mempunyai variabel berperan sah (X/M/Z/Y) '
+                'yang kolomnya ada di data — payload kosong tidak '
+                'dikirim ke mesin.')
+        payload['peran'] = peran_kolom
+        payload['bentuk_mediasi'] = _bentuk_mediasi(peta)
+    return payload
+
+
+def _bentuk_mediasi(peta: dict) -> str:
+    peran = {str(v.get('nama')): v.get('peran')
+             for v in (peta.get('variabel') or []) if isinstance(v, dict)}
+    if 'M' not in peran.values():
+        return 'regresi_biasa'
+    langsung_xy = any(
+        j.get('jenis') == 'langsung' and
+        peran.get(str(j.get('dari'))) == 'X' and
+        peran.get(str(j.get('ke'))) == 'Y'
+        for j in (peta.get('jalur') or []) if isinstance(j, dict))
+    return 'lengkap' if langsung_xy else 'tidak_langsung_saja'
+
+
+# ============================================================
+#  Simulasi placeholder (sebelum bayar): contoh TETAP berlabel
+# ============================================================
+
+SIMULASI_CONTOH: dict = {
+    'tanda': 'CONTOH TAMPILAN — bukan hasil penelitianmu',
+    'model': {'X': ['Kualitas Produk', 'Harga'], 'M': 'Kepuasan',
+              'Y': 'Loyalitas'},
+    'hasil_ringkasan': {'r2': 0.42,
+                        'catatan': 'Ini contoh tampilan. Simulasi dari '
+                                   'model penelitianmu sendiri terbuka '
+                                   'setelah Paket Olah Data aktif.'},
+}
+
+
+def baris_ke_objek(kolom: list, baris: list) -> list[dict]:
+    """Ubah grid (daftar-daftar) menjadi bentuk kontrak jembatan:
+    satu OBJEK per responden {nama_kolom: nilai}. Sel kosong/None
+    dibuang dari objek (di mesin terbaca sebagai kosong betulan)."""
+    objek = []
+    for b in baris:
+        if isinstance(b, dict):
+            # Baris sudah berbentuk objek {kolom: nilai} (bentuk yang
+            # wajar dari layar) — saring ke kolom yang dikenal saja.
+            objek.append({str(k): v for k, v in b.items()
+                          if v not in (None, '')})
+            continue
+        o = {}
+        for i, k in enumerate(kolom):
+            if i < len(b) and b[i] not in (None, ''):
+                o[str(k)] = b[i]
+        objek.append(o)
+    return objek
+
+
+# ============================================================
+#  Pemeta hasil → hipotesis (BUG BARU 1 review Fase 3)
+# ============================================================
+
+def label_peran(peta: dict) -> dict[str, str]:
+    """Label mesin per variabel: {nama: 'X1'|'X2'|'M1'|'Z1'|'Y1'}.
+
+    Urutan mengikuti daftar variabel di peta. Label inilah yang
+    dikirim ke mesin (bentuk peran SPSS) dan yang muncul di hasil
+    mesin ('koef', 'kaitan') — pemeta hipotesis memakainya untuk
+    menyambungkan hasil kembali ke H1..Hn milik peneliti."""
+    label: dict[str, str] = {}
+    nomor: dict[str, int] = {}
+    for v in peta.get('variabel') or []:
+        if not isinstance(v, dict):
+            continue
+        r = v.get('peran')
+        if r not in ('X', 'M', 'Z', 'Y'):
+            continue
+        nomor[r] = nomor.get(r, 0) + 1
+        label[str(v.get('nama'))] = f'{r}{nomor[r]}'
+    return label
+
+
+def _sig(p) -> bool | None:
+    try:
+        return float(p) < 0.05
+    except (TypeError, ValueError):
+        return None
+
+
+def petakan_hasil_ke_hipotesis(peta: dict, hasil: dict) -> list[dict]:
+    """Sambungkan hasil mentah mesin ke hipotesis peta (H1..Hn).
+
+    TANPA fungsi ini hasil mesin tidak bisa dipakai narasi: mesin
+    melaporkan jalur per label (X1→Y1 dst), peneliti berpikir per
+    hipotesis. Keluaran per jalur peta: {hipotesis, dari, ke, jenis,
+    ketemu, b, p, signifikan, ringkas}. Jalur yang tidak ditemukan di
+    hasil ditandai ketemu=False — JANGAN ditebak angkanya."""
+    label = label_peran(peta)
+    mode = str((hasil or {}).get('mode') or '')
+    koef: dict[str, dict] = {}
+    mediasi: dict[tuple, dict] = {}
+    moderasi: dict[tuple, dict] = {}
+    jalur_pls: dict[tuple, dict] = {}
+    mediasi_pls: dict[tuple, dict] = {}
+    if mode == 'pls':
+        for j in hasil.get('jalur') or []:
+            jalur_pls[(str(j.get('dari')), str(j.get('ke')))] = j
+        for m in hasil.get('mediasi') or []:
+            mediasi_pls[(str(m.get('dari')), str(m.get('lewat')),
+                         str(m.get('ke')))] = m
+    else:
+        for k in hasil.get('koef') or []:
+            koef[str(k.get('nama'))] = k
+        for m in (hasil.get('kaitan') or {}).get('mediasi') or []:
+            mediasi[(str(m.get('x')), str(m.get('m')), str(m.get('y')))] = m
+        for m in (hasil.get('kaitan') or {}).get('moderasi') or []:
+            moderasi[(str(m.get('x')), str(m.get('z')), str(m.get('y')))] = m
+
+    keluar: list[dict] = []
+    for j in peta.get('jalur') or []:
+        if not isinstance(j, dict):
+            continue
+        dari, ke = str(j.get('dari')), str(j.get('ke'))
+        entri: dict = {'hipotesis': j.get('hipotesis'), 'dari': dari,
+                       'ke': ke, 'jenis': j.get('jenis'),
+                       'ketemu': False, 'b': None, 'p': None,
+                       'signifikan': None, 'ringkas': ''}
+        if mode == 'pls':
+            if j.get('jenis') == 'tidak_langsung':
+                m = mediasi_pls.get((dari, str(j.get('lewat')), ke))
+                if m:
+                    entri.update(ketemu=True, b=m.get('efek'), p=m.get('p'),
+                                 signifikan=_sig(m.get('p')))
+            else:
+                jj = jalur_pls.get((dari, ke))
+                if jj:
+                    entri.update(ketemu=True, b=jj.get('koef'),
+                                 p=jj.get('p'), signifikan=_sig(jj.get('p')))
+        elif j.get('jenis') == 'tidak_langsung':
+            m = mediasi.get((label.get(dari, ''), label.get(str(j.get('lewat')), ''),
+                             label.get(ke, '')))
+            if m and isinstance(m.get('tidak_langsung'), dict):
+                tl = m['tidak_langsung']
+                sig = _sig(tl.get('p'))
+                if sig is None and tl.get('lo') is not None and tl.get('hi') is not None:
+                    sig = not (float(tl['lo']) <= 0 <= float(tl['hi']))
+                entri.update(ketemu=True, b=tl.get('b'), p=tl.get('p'),
+                             signifikan=sig,
+                             lo=tl.get('lo'), hi=tl.get('hi'))
+        elif j.get('jenis') == 'interaksi':
+            cocok = [m for (x, z, y), m in moderasi.items()
+                     if z == label.get(dari, '') and y == label.get(ke, '')]
+            if cocok:
+                m = cocok[0]
+                di = (m.get('dengan_interaksi') or {})
+                inter = di.get('interaksi') or {}
+                # Mesin SUDAH menyediakan angka interaksi lengkap
+                # (b, t, p), delta_r2, jenis, arah, dan kalimat —
+                # ambil semuanya (temuan review: versi lama hanya
+                # mengambil r2, menyisakan hipotesis moderasi kosong).
+                entri.update(
+                    ketemu=True, b=inter.get('b'), p=inter.get('p'),
+                    signifikan=_sig(inter.get('p')),
+                    delta_r2=m.get('delta_r2'),
+                    jenis_moderasi=m.get('jenis'), arah=m.get('arah'),
+                    kalimat_mesin=m.get('kalimat'),
+                    ringkas=m.get('kalimat') or '')
+        else:  # langsung
+            # Presisi (temuan review): 'koef' mesin dibulatkan 4
+            # desimal, 'kaitan' presisi penuh. Untuk model ber-mediasi
+            # ambil angka jalur langsung dari kaitan (c' untuk X→Y,
+            # b untuk M→Y) supaya SATU laporan tidak mencampur dua
+            # presisi. Tanpa mediasi, koef adalah satu-satunya sumber.
+            sumber, asal = None, None
+            ld, lk = label.get(dari, ''), label.get(ke, '')
+            if lk.startswith('Y'):
+                if ld.startswith('M'):
+                    m = next((mm for (x, mm_, y), mm in mediasi.items()
+                              if mm_ == ld and y == lk), None)
+                    if m:
+                        sumber, asal = m.get('b'), 'kaitan'
+                if sumber is None:
+                    m = next((mm for (x, mm_, y), mm in mediasi.items()
+                              if x == ld and y == lk), None)
+                    if m:
+                        sumber, asal = m.get('cp'), 'kaitan'
+                if sumber is None:
+                    sumber, asal = koef.get(ld), 'koef'
+            elif lk.startswith('M'):
+                m = mediasi.get((ld, lk,
+                                 next((lb for nm, lb in label.items()
+                                       if lb.startswith('Y')), '')))
+                sumber, asal = (m or {}).get('a'), 'kaitan'
+            if sumber:
+                entri.update(ketemu=True, b=sumber.get('b'),
+                             p=sumber.get('p'),
+                             signifikan=_sig(sumber.get('p')),
+                             sumber=asal)
+        if entri['ketemu'] and not entri['ringkas']:
+            # Ringkas TANPA label H (pemanggil yang memberi label —
+            # versi lama menimbulkan "H1: H1:") dan TANPA mencetak
+            # None: p absen (lazim pada efek tidak langsung, yang
+            # diuji lewat rentang kepercayaan bootstrap) diganti
+            # keterangan CI; signifikan tak diketahui TIDAK divonis.
+            potongan = [f"b={entri['b']}"]
+            if entri.get('p') is not None:
+                potongan.append(f"p={entri['p']}")
+            if entri.get('lo') is not None and entri.get('hi') is not None:
+                potongan.append(
+                    f"rentang kepercayaan 95% [{entri['lo']}, {entri['hi']}]")
+            vonis = ('signifikan' if entri['signifikan'] is True else
+                     'tidak signifikan' if entri['signifikan'] is False else
+                     'belum dapat diputuskan')
+            entri['ringkas'] = ', '.join(potongan) + f' → {vonis}'
+        keluar.append(entri)
+    return keluar
+
+
+# ============================================================
+#  Simulasi sungguhan (bonus paket): permintaan ke mesin BUAT DATA
+# ============================================================
+
+KEKUATAN_EFEK = {'kuat': 0.55, 'sedang': 0.35, 'lemah': 0.18, 'nol': 0.0}
+
+
+def susun_permintaan_simulasi(peta: dict, n: int = 120,
+                              efek: dict | None = None) -> dict:
+    """Terjemahkan peta + pilihan kekuatan per hipotesis menjadi
+    permintaan pintu simulasi jembatan.
+
+    Model yang didukung mesin BUAT DATA per jalur: mediasi (1 X,
+    1 perantara), mediasi-paralel (2 perantara), mediasi-berjenjang
+    (perantara bersambung), moderasi (X + penguat). Di luar itu
+    ValueError dengan pesan jelas — BUKAN data karangan pengganti.
+    efek: {label_hipotesis: 'kuat'|'sedang'|'lemah'|'nol'}; bawaan
+    semua 'sedang'."""
+    efek = efek or {}
+    label = label_peran(peta)
+    ins = buat_instrumen(peta)
+    butir_per_variabel = {b['variabel']: len(b['butir'])
+                          for b in ins['kuesioner']}
+    konstruk = []
+    for nama, lb in label.items():
+        # Kode konstruk mesin BUAT DATA: 'X'/'Z'/'Y' tanpa nomor,
+        # perantara bernomor HANYA bila lebih dari satu (M1/M2).
+        kode = lb if (lb.startswith('M') and len(
+            [1 for x in label.values() if x.startswith('M')]) > 1) else lb[0]
+        konstruk.append({'kode': kode, 'nama_kolom': _nama_kolom(nama),
+                         'butir': butir_per_variabel.get(nama, 3)})
+    jalur = {(str(j.get('dari')), str(j.get('ke')), j.get('jenis')): j
+             for j in (peta.get('jalur') or []) if isinstance(j, dict)}
+
+    def kuat(dari_nama: str, ke_nama: str, jenis: str = 'langsung') -> float:
+        j = jalur.get((dari_nama, ke_nama, jenis)) or {}
+        return KEKUATAN_EFEK.get(str(efek.get(j.get('hipotesis'), 'sedang')),
+                                 0.35)
+
+    xs = [nm for nm, lb in label.items() if lb.startswith('X')]
+    ms = [nm for nm, lb in label.items() if lb.startswith('M')]
+    zs = [nm for nm, lb in label.items() if lb.startswith('Z')]
+    ys = [nm for nm, lb in label.items() if lb.startswith('Y')]
+    if len(ys) != 1 or len(xs) != 1:
+        raise ValueError('Simulasi mesin saat ini untuk model satu X '
+                         'dan satu Y; model penelitianmu di luar itu.')
+    x, y = xs[0], ys[0]
+    nama_mesin = {'x': x, 'y': y}
+    if zs:
+        if len(zs) != 1 or ms:
+            raise ValueError('Simulasi moderasi campuran perantara '
+                             'belum didukung mesin.')
+        z = zs[0]
+        nama_mesin['z'] = z
+        return {'model': 'moderasi', 'n': n, 'nama': nama_mesin,
+                'konstruk': konstruk,
+                'params': {'bx': kuat(x, y), 'bz': kuat(z, y),
+                           'interaksi': kuat(z, y, 'interaksi')}}
+    if len(ms) == 1:
+        m = ms[0]
+        nama_mesin['m'] = m
+        return {'model': 'mediasi', 'n': n, 'nama': nama_mesin,
+                'konstruk': konstruk,
+                'params': {'a': kuat(x, m), 'b': kuat(m, y),
+                           'langsung': kuat(x, y)}}
+    if len(ms) == 2:
+        m1, m2 = ms
+        nama_mesin.update({'m1': m1, 'm2': m2})
+        bersambung = (x, m2, 'langsung') not in jalur and \
+                     (m1, m2, 'langsung') in jalur
+        if bersambung:
+            return {'model': 'mediasi-berjenjang', 'n': n,
+                    'nama': nama_mesin, 'konstruk': konstruk,
+                    'params': {'a1': kuat(x, m1), 'd': kuat(m1, m2),
+                               'b2': kuat(m2, y), 'langsung': kuat(x, y)}}
+        return {'model': 'mediasi-paralel', 'n': n, 'nama': nama_mesin,
+                'konstruk': konstruk,
+                'params': {'a1': kuat(x, m1), 'a2': kuat(x, m2),
+                           'b1': kuat(m1, y), 'b2': kuat(m2, y),
+                           'langsung': kuat(x, y)}}
+    raise ValueError('Bentuk model penelitianmu belum didukung mesin '
+                     'simulasi (didukung: mediasi, dua perantara, '
+                     'moderasi).')

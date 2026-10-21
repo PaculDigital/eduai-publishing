@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BAB IV — {{ nama_berkas }}</title>
+<style>
+  body{font-family:system-ui,sans-serif;margin:0;background:#0f172a;color:#e2e8f0}
+  main{max-width:860px;margin:0 auto;padding:16px}
+  h1{font-size:20px} h2{font-size:16px;margin-top:28px;color:#fbbf24}
+  .kartu{background:#1e293b;border-radius:12px;padding:14px;margin:10px 0}
+  button{background:#f59e0b;color:#111827;border:0;border-radius:8px;padding:9px 14px;font-weight:600;cursor:pointer;margin:4px 4px 4px 0}
+  button.abu{background:#334155;color:#e2e8f0}
+  textarea{width:100%;min-height:130px;background:#0b1220;color:#e2e8f0;border:1px solid #334155;border-radius:8px;padding:8px;box-sizing:border-box;font-family:ui-monospace,monospace;font-size:12px}
+  a.btn{display:inline-block;background:#334155;color:#e2e8f0;border-radius:8px;padding:9px 14px;text-decoration:none;margin:4px 4px 4px 0}
+  .ok{color:#4ade80}.err{color:#f87171}.kecil{font-size:13px;color:#94a3b8}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  td,th{border-bottom:1px solid #334155;padding:6px;text-align:left}
+  pre{white-space:pre-wrap;font-size:13px}
+</style>
+</head>
+<body>
+<main>
+  <h1>BAB IV — Hasil &amp; Pembahasan</h1>
+  <p class="kecil">Berkas: {{ nama_berkas }} · <span id="statusPeta">memuat…</span></p>
+
+  <h2>1 · Instrumen (dari peta yang disahkan)</h2>
+  <div class="kartu">
+    <a class="btn" href="/api/bab4/instrumen/kuesioner.md?file_id={{ file_id }}">Unduh kuesioner</a>
+    <a class="btn" href="/api/bab4/instrumen/template.csv?file_id={{ file_id }}">Unduh template data</a>
+    <span class="kecil">Satu paket yang sama untuk uji coba dan penyebaran utama.</span>
+  </div>
+
+  <h2>2 · Data Lapangan</h2>
+  <div class="kartu">
+    <label class="kecil">Tahap:
+      <select id="tahap"><option value="pra">Uji coba (pra-survei)</option>
+      <option value="utama" selected>Data utama</option>
+      <option value="simulasi">Simulasi</option></select>
+    </label>
+    <p class="kecil">Tempel data CSV (baris pertama = nama kolom), atau ketik langsung. Satu baris = satu responden, isi angka 1–5, kosongkan yang tidak dijawab.</p>
+    <textarea id="grid" placeholder="Harga_1,Harga_2,...&#10;4,5,..."></textarea>
+    <div>
+      <button id="btnSimpanData">Simpan data</button>
+      <button class="abu" id="btnMuatData">Muat data tersimpan</button>
+      <a class="btn" id="unduhData" href="#">Unduh CSV tahap ini</a>
+      <span id="infoData" class="kecil"></span>
+    </div>
+  </div>
+
+  <div class="kartu"><span class="kecil" id="profil">Profil responden: memuat…</span></div>
+
+  <h2>3 · Uji &amp; Hitung</h2>
+  <div class="kartu">
+    <button id="btnPra">Uji coba instrumen (pra-survei)</button>
+    <button id="btnOlah">Olah data tahap terpilih</button>
+    <button class="abu" id="btnKunci">Kunci Hasil</button>
+    <div id="infoHitung" class="kecil"></div>
+    <div id="kartuSehat"></div>
+    <div id="tabelH"></div>
+    <div id="hasilTersimpan"></div>
+  </div>
+
+  <h2>4 · Simulasi (bonus paket)</h2>
+  <div class="kartu">
+    <span class="kecil">Data latihan dibuat mesin dari model penelitianmu sendiri.</span><br>
+    <button id="btnSimulasi">Buat data simulasi</button>
+    <span id="infoSimulasi" class="kecil"></span>
+  </div>
+
+  <h2>5 · Narasi BAB IV</h2>
+  <div class="kartu">
+    <button id="btnNarasi">Buat narasi dari hasil terkunci</button>
+    <button class="abu" id="btnSimpanNarasi">Simpan suntingan (gratis)</button>
+    <span id="infoNarasi" class="kecil"></span>
+    <textarea id="teksNarasi" style="min-height:260px" placeholder="Narasi akan muncul di sini. Angka hanya dari hasil yang dikunci."></textarea>
+  </div>
+</main>
+<script>
+const FID = {{ file_id }};
+const $ = id => document.getElementById(id);
+async function api(url, metode, body){
+  const r = await fetch(url, {method: metode||'GET', headers:{'Content-Type':'application/json'},
+    body: body? JSON.stringify(body): undefined});
+  const j = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error((j.detail && (j.detail.pesan||j.detail)) || ('HTTP '+r.status));
+  return j;
+}
+function csvKeBaris(teks){
+  const baris = teks.trim().split(/\n/).map(s=>s.split(',').map(x=>x.trim()));
+  return {kolom: baris[0], baris: baris.slice(1).map(r=>r.map(x=>x===''?null:Number(x)))};
+}
+function barisKeCsv(kolom, baris){
+  return [kolom.join(',')].concat(baris.map(r=>r.map(x=>x==null?'':x).join(','))).join('\n');
+}
+async function muatRingkasan(){
+  try{ const j = await api('/api/bab4/ringkasan?file_id='+FID);
+    $('statusPeta').textContent = 'Peta: '+(j.peta? j.peta.status:'belum ada')+
+      ' · generate terpakai: '+j.jumlah_generate+' · tarif berikutnya: '+j.tarif_generate_berikutnya+
+      ' token · versi terkunci: '+(j.versi_terkunci?? 'belum ada');
+  }catch(e){ $('statusPeta').textContent = 'Gagal memuat: '+e.message; }
+}
+$('btnSimpanData').onclick = async ()=>{
+  try{ const {kolom, baris} = csvKeBaris($('grid').value);
+    const j = await api('/api/bab4/data','PUT',{file_id:FID, tahap:$('tahap').value, kolom, baris});
+    $('infoData').textContent = 'Tersimpan: '+j.baris+' baris.'; muatRingkasan(); muatProfil();
+  }catch(e){ $('infoData').textContent = 'Gagal: '+e.message; }
+};
+$('btnMuatData').onclick = async ()=>{
+  try{ const j = await api('/api/bab4/data?file_id='+FID+'&tahap='+$('tahap').value);
+    $('grid').value = j.kolom.length? barisKeCsv(j.kolom, j.baris): '';
+    $('infoData').textContent = j.baris.length+' baris termuat.';
+    $('unduhData').href = '/api/bab4/data/unduh.csv?file_id='+FID+'&tahap='+$('tahap').value;
+  }catch(e){ $('infoData').textContent = 'Gagal: '+e.message; }
+};
+$('tahap').onchange = ()=>{ $('unduhData').href = '/api/bab4/data/unduh.csv?file_id='+FID+'&tahap='+$('tahap').value; };
+$('btnPra').onclick = async ()=>{
+  try{ const j = await api('/api/bab4/pra-survei','POST',{file_id:FID});
+    const k = j.kartu;
+    $('kartuSehat').innerHTML = '<p class="'+(k.semua_sehat?'ok':'err')+'">'+
+      (k.semua_sehat? 'Kuesioner sehat, siap sebar.': 'Ada butir lemah: '+k.butir_lemah.map(b=>b.butir).join(', '))+
+      '</p><p class="kecil">'+k.nasihat+'</p>';
+  }catch(e){ $('infoHitung').textContent = 'Gagal: '+e.message; }
+};
+$('btnOlah').onclick = async ()=>{
+  try{ const tahap = $('tahap').value === 'pra'? 'utama': $('tahap').value;
+    const j = await api('/api/bab4/olah-data','POST',{file_id:FID, tahap});
+    const ph = (j.hasil && j.hasil.peta_hipotesis) || [];
+    $('tabelH').innerHTML = '<table><tr><th>H</th><th>Jalur</th><th>b</th><th>p</th><th>Putusan</th></tr>'+
+      ph.map(e=>'<tr><td>'+e.hipotesis+'</td><td>'+e.dari+' → '+e.ke+'</td><td>'+(e.b??'—')+
+      '</td><td>'+(e.p??'—')+'</td><td>'+(e.signifikan==null?'—':(e.signifikan?'Signifikan':'Tidak signifikan'))+'</td></tr>').join('')+'</table>';
+    $('infoHitung').textContent = 'Hasil versi '+j.versi+' ('+j.jenis+'), tarif '+j.tarif_dikenakan+' token.';
+    muatRingkasan();
+  }catch(e){ $('infoHitung').textContent = 'Gagal: '+e.message; }
+};
+$('btnKunci').onclick = async ()=>{
+  try{ const j = await api('/api/bab4/kunci-hasil','POST',{file_id:FID});
+    $('infoHitung').textContent = 'Hasil versi '+j.versi_terkunci+' TERKUNCI.'; muatRingkasan(); muatHasil();
+  }catch(e){ $('infoHitung').textContent = 'Gagal: '+e.message; }
+};
+$('btnSimulasi').onclick = async ()=>{
+  try{ const j = await api('/api/bab4/simulasi/buat','POST',{file_id:FID, n:120});
+    $('infoSimulasi').textContent = 'Data simulasi: '+j.jumlah_baris+' baris tersimpan di tahap simulasi. '+
+      'Pilih tahap Simulasi di bagian 2 untuk melihat/mengunduh, lalu olah dari bagian 3.';
+  }catch(e){ $('infoSimulasi').textContent = 'Gagal: '+e.message; }
+};
+$('btnNarasi').onclick = async ()=>{
+  try{ const j = await api('/api/bab4/narasi','POST',{file_id:FID});
+    $('teksNarasi').value = j.teks;
+    $('infoNarasi').textContent = 'Narasi versi '+j.versi+', tarif '+j.tarif_dikenakan+' token'+(j.dipoles_ai?', dipoles AI.':'.');
+  }catch(e){ $('infoNarasi').textContent = 'Gagal: '+e.message; }
+};
+$('btnSimpanNarasi').onclick = async ()=>{
+  try{ const j = await api('/api/bab4/narasi/teks','PUT',{file_id:FID, teks:$('teksNarasi').value});
+    $('infoNarasi').textContent = 'Suntingan tersimpan sebagai versi '+j.versi+' (gratis).';
+  }catch(e){ $('infoNarasi').textContent = 'Gagal: '+e.message; }
+};
+async function muatProfil(){
+  try{ const j = await api('/api/bab4/profil?file_id='+FID);
+    $('profil').textContent = 'Profil responden (4.1): masuk '+j.responden_masuk+
+      (j.target? ' dari target '+j.target+' — tingkat pengembalian '+
+       j.tingkat_pengembalian_persen+'%': ' (target belum diisi)');
+  }catch(e){ $('profil').textContent = 'Profil: '+e.message; }
+}
+function gambarTabel(ph, judul){
+  if(!ph || !ph.length) return '';
+  return '<p class="kecil">'+judul+'</p><table><tr><th>H</th><th>Jalur</th><th>b</th><th>p</th><th>Putusan</th></tr>'+
+    ph.map(e=>'<tr><td>'+e.hipotesis+'</td><td>'+e.dari+' → '+e.ke+'</td><td>'+(e.b??'—')+
+    '</td><td>'+(e.p??'—')+'</td><td>'+(e.signifikan==null?'—':(e.signifikan?'Signifikan':'Tidak signifikan'))+'</td></tr>').join('')+'</table>';
+}
+async function muatHasil(){
+  try{ const j = await api('/api/bab4/hasil?file_id='+FID);
+    if(j.terkunci){
+      $('hasilTersimpan').innerHTML = gambarTabel(j.terkunci.isi.peta_hipotesis,
+        'Hasil TERKUNCI versi '+j.terkunci.nomor+' (bahan narasi):');
+    } else if(j.meta && j.meta.length){
+      $('hasilTersimpan').innerHTML = '<p class="kecil">Ada '+j.meta.length+
+        ' versi hasil, belum ada yang dikunci.</p>';
+    }
+    const jn = await api('/api/bab4/hasil?file_id='+FID+'&jenis=narasi');
+    if(jn.meta && jn.meta.length && !$('teksNarasi').value){
+      const terakhir = jn.meta[jn.meta.length-1].nomor;
+      const isi = await api('/api/bab4/hasil?file_id='+FID+'&jenis=narasi&versi='+terakhir);
+      if(isi.isi && isi.isi.teks) $('teksNarasi').value = isi.isi.teks;
+    }
+  }catch(e){ /* layar tetap bisa dipakai tanpa hasil tersimpan */ }
+}
+muatRingkasan(); muatProfil(); muatHasil();
+</script>
+</body>
+</html>
