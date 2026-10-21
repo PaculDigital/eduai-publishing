@@ -108,10 +108,18 @@ Naskah BAB I–III
    pengembalian = target sampel di peta vs baris masuk. Fakta yang tidak
    ada di mana-mana ditanyakan SEKALI di tahap peta (pertanyaan fakta),
    tidak ditagih ulang saat narasi.
-3. **Harga yang belum diputuskan**: (a) senjata/kuesioner masuk token
-   olah_data (30) atau AddOn terpisah; (b) simulasi gratis / token /
-   berapa kali; (c) data keliru → charge perbaikan berapa & bentuknya.
-   (Harga analisa 30 & olah_data 30 SUDAH ada di config.)
+3. **Harga**: (a) senjata — arah paket: ikut olah_data 30, bayar sekali di
+   depan (BELUM dikunci final); (b) simulasi gratis/token berapa kali —
+   BELUM diputuskan; (c) ~~data keliru~~ **SEBAGIAN SELESAI — diputuskan
+   Bos 21 Okt 2026**: revisi/olah ulang data pada penelitian & data yang
+   SAMA **gratis hanya 3 kali** (pagar anti-rugi: tanpa batas = Bos
+   menanggung coba-coba user; simulasi adalah tempat coba-coba resminya),
+   lewat itu **5 token per sekali generate**. Skema "Kunci Hasil" berlaku:
+   sebelum kunci = masa revisi; narasi hanya lahir dari hasil terkunci.
+   (Harga analisa 30 & olah_data 30 SUDAH ada di config. Usulan paket
+   revisi pasca-kunci 30 termasuk narasi ulang: masih menyatu dengan
+   aturan revisi narasi yang sudah ada — revisi AI biasa 1 token/item,
+   manual gratis; yang 2 token/item khusus konversi jurnal, beda fitur.)
 4. **Token antar-layanan** untuk jembatan produksi (API mesin hari ini
    publik tanpa kunci) — ACC pembuatan kunci baru milik EduAi.
 5. **Cara Wulan push/PR branch ini** (PAT sesaat / fork / lokal saja).
