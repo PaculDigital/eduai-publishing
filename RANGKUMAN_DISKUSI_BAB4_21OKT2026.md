@@ -172,8 +172,19 @@ Naskah BAB I–III
      4.4 pembahasan.
    Kerangka kuantitatif yang ada (4.1–4.5) tetap; versi kualitatif
    ditambahkan sejajar, BUKAN mengganti.
-8. **Mixed methods**: urutan & penggabungannya (kuantitatif dulu →
-   kualitatif → diskusi terintegrasi) belum dibahas untuk EduAi.
+8. ~~**Mixed methods**~~ **SELESAI — bentuk disetujui Bos 21 Okt 2026**:
+   penjelasan berurutan, dua putaran — (1) kuantitatif penuh dulu;
+   (2) kualitatif menyusul, pertanyaan pendalamannya DIBANGUN DARI HASIL
+   kuantitatif (mis. jalur yang tidak signifikan digali sebabnya ke
+   informan); (3) BAB IV: 4.1 gambaran umum · 4.2 hasil kuantitatif ·
+   4.3 hasil kualitatif · 4.4 pembahasan TERPADU (AI memegang dua hasil,
+   tema menjelaskan angka). Harga: olah data PER JALUR (kuantitatif 30 +
+   kualitatif 30, karena dua analisis berbeda), narasi SATU kali 30
+   (satu BAB IV terpadu, penggabungan termasuk). Prinsip pendamping yang
+   ditegaskan Bos lewat tanya jawab mediasi: **HARGA PER MODEL, BUKAN
+   PER JALUR** — mediasi/moderasi/banyak jalur dalam SATU model = satu
+   paket 30, satu kali generate, satu narasi 30. Yang dua kali hanya
+   penelitian campuran (dua JENIS penelitian berbeda).
 9. **Uji coba instrumen**: kuesioner hasil instrumen — perlu uji
    validitas/reliabilitas pilot (responden kecil) sebelum sebar besar?
    Belum dibahas masuk alur atau tidak.
