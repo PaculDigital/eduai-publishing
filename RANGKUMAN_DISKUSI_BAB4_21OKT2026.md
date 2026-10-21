@@ -109,8 +109,17 @@ Naskah BAB I–III
    ada di mana-mana ditanyakan SEKALI di tahap peta (pertanyaan fakta),
    tidak ditagih ulang saat narasi.
 3. **Harga**: (a) senjata — arah paket: ikut olah_data 30, bayar sekali di
-   depan (BELUM dikunci final); (b) simulasi gratis/token berapa kali —
-   BELUM diputuskan; (c) ~~data keliru~~ **SEBAGIAN SELESAI — diputuskan
+   depan (BELUM dikunci final); (b) ~~simulasi~~ **SELESAI — diputuskan
+   Bos 21 Okt 2026, aturan DISAMAKAN dengan olah data live** (sederhana,
+   tidak membingungkan, hanya user serius): simulasi gratis 3× percobaan
+   tapi TERKUNCI (hasil hanya dilihat, data tidak bisa di-download) →
+   bayar 30: kunci terbuka (download boleh) + 3× gratis lagi → lewat itu
+   5 token per simulasi. **30 simulasi itu dihitung sekalian sebagai
+   bayar OLAH DATA** (khusus olah data — data asli datang tidak bayar
+   olah lagi); **NARASI tetap bayar sendiri, terpisah 30.** Catatan:
+   ini mengubah bunyi poin A.13 — download hasil simulasi adalah fasilitas
+   BERBAYAR (setelah kunci terbuka), bukan sejak gratisan;
+   (c) ~~data keliru~~ **SEBAGIAN SELESAI — diputuskan
    Bos 21 Okt 2026**: revisi/olah ulang data pada penelitian & data yang
    SAMA **gratis hanya 3 kali** (pagar anti-rugi: tanpa batas = Bos
    menanggung coba-coba user; simulasi adalah tempat coba-coba resminya),
