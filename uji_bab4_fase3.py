@@ -382,6 +382,54 @@ try:
 except Exception as e:
     cek('BUG 5 kartu_kesehatan tahan bentuk aneh (tidak meledak)', False, str(e))
 
+print('── Regresi ronde 6: audit global ──')
+# GLOBAL 1: hasil bisa dibaca kembali
+r = k.get('/api/bab4/hasil', params={'file_id': 13})
+j = r.json() if r.status_code == 200 else {}
+cek('GLOBAL 1 GET /hasil: daftar versi ada', r.status_code == 200 and len(j.get('meta', [])) >= 1, r.text[:200])
+k.post('/api/bab4/kunci-hasil', json={'file_id': 13}, headers=H)
+r = k.get('/api/bab4/hasil', params={'file_id': 13, 'versi': 1})
+cek('GLOBAL 1 GET /hasil?versi=1 → isi + peta_hipotesis terbaca',
+    r.status_code == 200 and 'peta_hipotesis' in r.json().get('isi', {}), r.text[:200])
+r = k.get('/api/bab4/hasil', params={'file_id': 13})
+cek('GLOBAL 1 versi terkunci ikut terbaca untuk narasi',
+    (r.json().get('terkunci') or {}).get('nomor') == 1, r.text[:200])
+r = k.get('/api/bab4/hasil', params={'file_id': 13, 'versi': 99})
+cek('GLOBAL 1 versi tak ada → 404', r.status_code == 404, str(r.status_code))
+
+# GLOBAL 2: tahap simulasi bisa diolah, tarif 0, tak menggerus jatah
+gen_sebelum = k.get('/api/bab4/ringkasan', params={'file_id': 13}).json()['jumlah_generate']
+k.post('/api/bab4/peta', json={'file_id': 13, 'peta': peta_spss}, headers=H)
+k.post('/api/bab4/peta/sahkan', json={'file_id': 13}, headers=H)
+k.put('/api/bab4/data', json={'file_id': 13, 'tahap': 'simulasi',
+      'kolom': kolom4, 'baris': buat(40)}, headers=H)
+r = k.post('/api/bab4/olah-data', json={'file_id': 13, 'tahap': 'simulasi'}, headers=H)
+j = r.json() if r.status_code == 200 else {}
+cek('GLOBAL 2 olah tahap simulasi JALAN, tarif 0, jenis simulasi',
+    r.status_code == 200 and j.get('jenis') == 'simulasi' and j.get('tarif_dikenakan') == 0,
+    r.text[:200])
+gen_sesudah = k.get('/api/bab4/ringkasan', params={'file_id': 13}).json()['jumlah_generate']
+cek('GLOBAL 2 jatah generate data asli TIDAK berkurang oleh simulasi',
+    gen_sebelum == gen_sesudah, f'{gen_sebelum} → {gen_sesudah}')
+
+# GLOBAL 3: profil 4.1 tersambung (berkas 10: 60 masuk, target 80)
+r = k.get('/api/bab4/profil', params={'file_id': 10, 'kolom_frekuensi': 'Keaslian_Streamer_1'})
+j = r.json() if r.status_code == 200 else {}
+cek('GLOBAL 3 profil: 60 masuk, tingkat pengembalian 75.0%',
+    j.get('responden_masuk') == 60 and j.get('tingkat_pengembalian_persen') == 75.0,
+    r.text[:200])
+cek('GLOBAL 3 frekuensi kolom keluar', sum(j.get('frekuensi', {}).get('Keaslian_Streamer_1', {}).values()) == 60,
+    str(j.get('frekuensi'))[:120])
+
+# BUG 5: payload kosong ditolak di penyusun
+try:
+    _b4.susun_payload_hitung(
+        {'metode': 'Regresi', 'variabel': [{'nama': 'A', 'peran': None}], 'jalur': []},
+        ['A_1'])
+    cek('BUG 5 peta tanpa peran sah → ValueError (bukan payload kosong)', False, 'tidak meledak')
+except ValueError:
+    cek('BUG 5 peta tanpa peran sah → ValueError (bukan payload kosong)', True)
+
 print()
 print('❌ GAGAL: ' + ', '.join(gagal) if gagal else '✅ SEMUA LULUS — Fase 3 inti (rute BAB IV)')
 sys.exit(1 if gagal else 0)

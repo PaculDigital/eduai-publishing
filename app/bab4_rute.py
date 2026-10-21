@@ -252,14 +252,24 @@ def olah_data(body: dict, u: User = Depends(wajib_login_api),
     file_id = int(body.get('file_id') or 0)
     _berkas_milik(db, u, file_id)
     peta = _peta_disahkan(db, u, file_id)
-    d = _data(db, u, file_id, 'utama')
+    tahap_data = str(body.get('tahap') or 'utama')
+    if tahap_data not in ('utama', 'simulasi'):
+        raise HTTPException(422, 'Tahap olah data hanya utama/simulasi.')
+    d = _data(db, u, file_id, tahap_data)
     kolom = json.loads(d.kolom or '[]')
-    tarif = bab4.tarif_generate_berikutnya(db, u.id, file_id)
+    # Simulasi = latihan dari paket: tarif selalu 0 dan hasilnya
+    # disimpan berjenis 'simulasi' — TIDAK menggerus jatah generate
+    # data asli dan TIDAK bisa dikunci sebagai hasil penelitian.
+    tarif = (0 if tahap_data == 'simulasi' else
+             bab4.tarif_generate_berikutnya(db, u.id, file_id))
     terpotong = 0
     if tarif > 0:
         info = kuota.potong_banyak(db, u, tarif, jenis_addon='ai')
         terpotong = int(info.get('dipotong') or 0)  # 402 bila kurang
-    payload = bab4.susun_payload_hitung(peta, kolom, tahap='utama')
+    try:
+        payload = bab4.susun_payload_hitung(peta, kolom, tahap='utama')
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
     payload['baris'] = bab4.baris_ke_objek(
         kolom, json.loads(d.baris or '[]'))
     try:
@@ -278,10 +288,11 @@ def olah_data(body: dict, u: User = Depends(wajib_login_api),
     # membaca hasil terkunci, jadi peta hipotesis harus ikut tersimpan
     # di dalamnya (temuan review Fase 3 — BUG BARU 1).
     hasil['peta_hipotesis'] = bab4.petakan_hasil_ke_hipotesis(peta, hasil)
-    h = bab4.simpan_hasil(db, u.id, file_id, 'olah_data',
+    jenis_hasil = 'simulasi' if tahap_data == 'simulasi' else 'olah_data'
+    h = bab4.simpan_hasil(db, u.id, file_id, jenis_hasil,
                           payload['mode'], hasil)
-    return {'versi': h.nomor, 'tarif_dikenakan': tarif,
-            'hasil': hasil}
+    return {'versi': h.nomor, 'jenis': jenis_hasil,
+            'tarif_dikenakan': tarif, 'hasil': hasil}
 
 
 @router.post('/kunci-hasil')
@@ -301,3 +312,63 @@ def kunci_hasil_rute(body: dict, u: User = Depends(wajib_login_api),
 @router.get('/simulasi/contoh')
 def simulasi_contoh(u: User = Depends(wajib_login_api)):
     return bab4.SIMULASI_CONTOH
+
+
+# ── Baca hasil (GLOBAL 1: hasil WAJIB bisa dibaca kembali) ─────
+@router.get('/hasil')
+def baca_hasil_rute(file_id: int, jenis: str = 'olah_data',
+                    versi: int | None = None,
+                    u: User = Depends(wajib_login_api),
+                    db: Session = Depends(get_db)):
+    """Daftar versi hasil + isi. Tanpa `versi`: kembalikan metadata
+    semua versi dan isi versi TERKUNCI (bahan narasi BAB IV). Dengan
+    `versi`: isi versi itu. Jenis: olah_data | pra_survei | simulasi."""
+    from .models import HasilBab4
+    _berkas_milik(db, u, file_id)
+    if jenis not in ('olah_data', 'pra_survei', 'simulasi'):
+        raise HTTPException(422, 'Jenis hasil tidak dikenal.')
+    semua = (db.query(HasilBab4)
+             .filter_by(user_id=u.id, file_id=file_id, jenis=jenis)
+             .order_by(HasilBab4.nomor).all())
+    meta = [{'nomor': h.nomor, 'status': h.status, 'mode': h.mode,
+             'dibuat': h.dibuat.isoformat() if h.dibuat else None,
+             'dikunci_pada': (h.dikunci_pada.isoformat()
+                              if h.dikunci_pada else None)}
+            for h in semua]
+    if versi is not None:
+        pilih = next((h for h in semua if h.nomor == versi), None)
+        if pilih is None:
+            raise HTTPException(404, 'Versi hasil tidak ditemukan.')
+        return {'meta': meta, 'isi': bab4.baca_hasil(pilih),
+                'nomor': pilih.nomor, 'status': pilih.status}
+    terkunci = bab4.hasil_terkunci(db, u.id, file_id, jenis)
+    return {'meta': meta,
+            'terkunci': None if terkunci is None else {
+                'nomor': terkunci.nomor,
+                'isi': bab4.baca_hasil(terkunci)}}
+
+
+# ── Profil responden 4.1 (GLOBAL 3: fungsi deskriptif disambung) ─
+@router.get('/profil')
+def profil(file_id: int, kolom_frekuensi: str = '',
+           u: User = Depends(wajib_login_api),
+           db: Session = Depends(get_db)):
+    """Bahan BAB IV 4.1 dari data utama: jumlah masuk, target,
+    tingkat pengembalian, dan frekuensi kolom identitas yang diminta
+    (?kolom_frekuensi=Jenis_Kelamin,Usia). Dihitung di EduAi sendiri
+    (deskriptif ringan, bukan uji statistik)."""
+    _berkas_milik(db, u, file_id)
+    d = (db.query(DataLapanganBab4)
+         .filter_by(user_id=u.id, file_id=file_id, tahap='utama').first())
+    if d is None:
+        return {'responden_masuk': 0, 'target': None,
+                'tingkat_pengembalian_persen': None, 'frekuensi': {}}
+    kolom = json.loads(d.kolom or '[]')
+    baris = json.loads(d.baris or '[]')
+    frek = {}
+    for nama in [x.strip() for x in kolom_frekuensi.split(',') if x.strip()]:
+        frek[nama] = bab4.frekuensi_kolom(baris, kolom, nama)
+    return {'responden_masuk': len(baris), 'target': d.target_responden,
+            'tingkat_pengembalian_persen':
+                bab4.tingkat_pengembalian(len(baris), d.target_responden),
+            'frekuensi': frek}

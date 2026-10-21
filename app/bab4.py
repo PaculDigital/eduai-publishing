@@ -552,6 +552,10 @@ def susun_payload_hitung(peta: dict, kolom: list, tahap: str = 'utama') -> dict:
         konstruk[str(v.get('nama'))] = milik
     payload: dict = {'tahap': tahap, 'mode': mode}
     if mode == 'pls':
+        if not any(konstruk.values()):
+            raise ValueError(
+                'Tidak ada kolom data yang cocok dengan variabel peta '
+                '— payload kosong tidak dikirim ke mesin.')
         y = next((n for n, r in peran.items() if r == 'Y'), None)
         payload['konstruk'] = konstruk
         payload['kolom_y_konstruk'] = y
@@ -567,6 +571,11 @@ def susun_payload_hitung(peta: dict, kolom: list, tahap: str = 'utama') -> dict:
         peran_kolom = {k: label[nama] for nama in peran
                        if nama in label
                        for k in konstruk.get(nama, [])}
+        if not peran_kolom:
+            raise ValueError(
+                'Peta tidak mempunyai variabel berperan sah (X/M/Z/Y) '
+                'yang kolomnya ada di data — payload kosong tidak '
+                'dikirim ke mesin.')
         payload['peran'] = peran_kolom
         payload['bentuk_mediasi'] = _bentuk_mediasi(peta)
     return payload
