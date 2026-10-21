@@ -90,13 +90,25 @@ Naskah BAB I–III
 ## C. YANG KURANG / BELUM DIPUTUSKAN (penghalang BAB IV utuh)
 
 ### C1. Keputusan Bos yang masih terbuka
-1. **Bentuk jembatan**: Opsi A (alur unggah 2 langkah mesin apa adanya,
-   data singgah di memori ≤45 mnt) vs Opsi B (endpoint stateless khusus
-   di Statistik Lab). Rekomendasi Wulan: A prototipe → B produksi.
-2. **Deskriptif 4.2 & karakteristik responden 4.1** dihitung di mana —
-   mesin belum mengeluarkannya. Pilihan: hitung ringan di EduAi dari data
-   EduAi sendiri, atau tambah ke respons mesin (sekalian Opsi B).
-   Termasuk: kolom demografis (usia/jenis kelamin) masuk kontrak peta?
+1. **Bentuk jembatan kuantitatif**: Opsi A (alur unggah 2 langkah mesin
+   apa adanya, data singgah di memori ≤45 mnt) vs Opsi B (endpoint
+   stateless khusus di Statistik Lab). MASIH TERBUKA — tapi konteksnya
+   berubah setelah poin 1 dikunci (lihat catatan di C2.6): Statistik Lab
+   toh akan dibuka untuk API kualitatif, dan fungsi hitung kuantitatif
+   (periksa_spss/periksa_pls) sudah murni menerima tabel — endpoint
+   stateless tinggal pembungkus tipis tanpa simpan_sementara.
+   Rekomendasi Wulan kini: langsung B, satu paket kerja dengan API
+   kualitatif + token antar-layanan.
+2. ~~**Deskriptif 4.2 & karakteristik responden 4.1**~~ **SELESAI —
+   disetujui Bos 21 Okt 2026**: dihitung DI EDUAI dari data milik EduAi
+   sendiri (tabulasi ringan, bukan uji statistik). Prinsip ISI SEKALI DI
+   DEPAN: user tidak input ulang untuk 4.1 dst — lokasi dari BAB III via
+   peta yang disahkan; profil responden/informan ditabulasi otomatis dari
+   data yang kembali (kolom identitas disertakan sejak template senjata
+   dibuat; daftar informan didaftarkan sejak tahap senjata); tingkat
+   pengembalian = target sampel di peta vs baris masuk. Fakta yang tidak
+   ada di mana-mana ditanyakan SEKALI di tahap peta (pertanyaan fakta),
+   tidak ditagih ulang saat narasi.
 3. **Harga yang belum diputuskan**: (a) senjata/kuesioner masuk token
    olah_data (30) atau AddOn terpisah; (b) simulasi gratis / token /
    berapa kali; (c) data keliru → charge perbaikan berapa & bentuknya.
@@ -122,10 +134,18 @@ Naskah BAB I–III
    untuk pemakai langsung TIDAK berubah. (Usulan jembatan berkas —
    mahasiswa bekerja di Statistik Lab lalu upload .md pulang — DITOLAK
    Bos demi otomatis & mahasiswa tidak keluar dari EduAi.)
-7. **Kerangka BAB IV kualitatif**: kerangka_bab.py yang ada berorientasi
-   kuantitatif (4.2 statistik deskriptif, 4.3 uji prasyarat, 4.4 uji
-   hipotesis). Versi kualitatifnya (deskripsi situs/informan, temuan per
-   tema, triangulasi, pembahasan) belum disusun.
+7. ~~**Kerangka BAB IV kualitatif**~~ **SELESAI — disetujui Bos 21 Okt
+   2026.** Tulang punggung SAMA untuk semua jalur (4.1 gambaran,
+   4.2 sajian data, 4.3 pengujian/keabsahan, 4.4 pembahasan); yang berganti
+   hanya isi mengikuti senjatanya:
+   - Tematik: 4.1 gambaran lokasi & informan · 4.2 temuan per tema +
+     kutipan asli · 4.3 keabsahan: matriks triangulasi (tema kuat/lemah) ·
+     4.4 pembahasan (tema vs teori BAB II).
+   - SWOT: 4.1 sama · 4.2 faktor internal/eksternal + tabel IFAS/EFAS ·
+     4.3 matriks SWOT + posisi kuadran + strategi SO/WO/ST/WT ·
+     4.4 pembahasan.
+   Kerangka kuantitatif yang ada (4.1–4.5) tetap; versi kualitatif
+   ditambahkan sejajar, BUKAN mengganti.
 8. **Mixed methods**: urutan & penggabungannya (kuantitatif dulu →
    kualitatif → diskusi terintegrasi) belum dibahas untuk EduAi.
 9. **Uji coba instrumen**: kuesioner hasil senjata — perlu uji
