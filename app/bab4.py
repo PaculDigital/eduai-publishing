@@ -259,6 +259,22 @@ def periksa_peta(peta: dict) -> list[dict]:
                f'Jumlah jalur ({len(jalur)}) tidak sama dengan jumlah '
                f'hipotesis di naskah ({jml_hip}).')
 
+    # Tabrakan nama kolom (temuan review Fase 3): dua nama variabel
+    # berbeda bisa menyatu jadi dasar kolom yang sama sesudah
+    # dibersihkan ('Kualitas Produk' dan 'Kualitas_Produk' → sama) —
+    # data dua variabel akan tertukar diam-diam. Tolak sejak peta.
+    dasar_kolom: dict[str, str] = {}
+    for v in variabel:
+        nama_v = str(v.get('nama') or '')
+        dasar = _nama_kolom(nama_v)
+        if dasar in dasar_kolom and dasar_kolom[dasar] != nama_v:
+            tambah('kolom_tabrakan',
+                   f'Variabel "{nama_v}" dan "{dasar_kolom[dasar]}" '
+                   f'menghasilkan nama kolom yang sama ("{dasar}") — '
+                   'samakan ejaannya atau bedakan namanya supaya data '
+                   'tidak tertukar.')
+        dasar_kolom.setdefault(dasar, nama_v)
+
     # Jalur hantu (temuan review 21 Okt): ujung jalur harus variabel
     # yang BENAR-BENAR ada di daftar — jalur ke variabel tak dikenal
     # adalah persis yang wajib ditolak pemeriksa konsistensi.
@@ -516,15 +532,10 @@ def susun_payload_hitung(peta: dict, kolom: list, tahap: str = 'utama') -> dict:
         # variabel): mesin menggabungkan butir per variabel jadi skor
         # konstruk dengan aturannya sendiri (skor_konstruk), persis
         # jalur yang dipakai halaman Diagnosis selama ini.
-        nomor: dict[str, int] = {}
-        peran_kolom: dict[str, str] = {}
-        for nama, r in peran.items():
-            if r not in ('X', 'M', 'Z', 'Y'):
-                continue
-            nomor[r] = nomor.get(r, 0) + 1
-            label = f'{r}{nomor[r]}'
-            for k in konstruk.get(nama, []):
-                peran_kolom[k] = label
+        label = label_peran(peta)
+        peran_kolom = {k: label[nama] for nama in peran
+                       if nama in label
+                       for k in konstruk.get(nama, [])}
         payload['peran'] = peran_kolom
         payload['bentuk_mediasi'] = _bentuk_mediasi(peta)
     return payload
@@ -570,3 +581,123 @@ def baris_ke_objek(kolom: list, baris: list) -> list[dict]:
                 o[str(k)] = b[i]
         objek.append(o)
     return objek
+
+
+# ============================================================
+#  Pemeta hasil → hipotesis (BUG BARU 1 review Fase 3)
+# ============================================================
+
+def label_peran(peta: dict) -> dict[str, str]:
+    """Label mesin per variabel: {nama: 'X1'|'X2'|'M1'|'Z1'|'Y1'}.
+
+    Urutan mengikuti daftar variabel di peta. Label inilah yang
+    dikirim ke mesin (bentuk peran SPSS) dan yang muncul di hasil
+    mesin ('koef', 'kaitan') — pemeta hipotesis memakainya untuk
+    menyambungkan hasil kembali ke H1..Hn milik peneliti."""
+    label: dict[str, str] = {}
+    nomor: dict[str, int] = {}
+    for v in peta.get('variabel') or []:
+        if not isinstance(v, dict):
+            continue
+        r = v.get('peran')
+        if r not in ('X', 'M', 'Z', 'Y'):
+            continue
+        nomor[r] = nomor.get(r, 0) + 1
+        label[str(v.get('nama'))] = f'{r}{nomor[r]}'
+    return label
+
+
+def _sig(p) -> bool | None:
+    try:
+        return float(p) < 0.05
+    except (TypeError, ValueError):
+        return None
+
+
+def petakan_hasil_ke_hipotesis(peta: dict, hasil: dict) -> list[dict]:
+    """Sambungkan hasil mentah mesin ke hipotesis peta (H1..Hn).
+
+    TANPA fungsi ini hasil mesin tidak bisa dipakai narasi: mesin
+    melaporkan jalur per label (X1→Y1 dst), peneliti berpikir per
+    hipotesis. Keluaran per jalur peta: {hipotesis, dari, ke, jenis,
+    ketemu, b, p, signifikan, ringkas}. Jalur yang tidak ditemukan di
+    hasil ditandai ketemu=False — JANGAN ditebak angkanya."""
+    label = label_peran(peta)
+    mode = str((hasil or {}).get('mode') or '')
+    koef: dict[str, dict] = {}
+    mediasi: dict[tuple, dict] = {}
+    moderasi: dict[tuple, dict] = {}
+    jalur_pls: dict[tuple, dict] = {}
+    mediasi_pls: dict[tuple, dict] = {}
+    if mode == 'pls':
+        for j in hasil.get('jalur') or []:
+            jalur_pls[(str(j.get('dari')), str(j.get('ke')))] = j
+        for m in hasil.get('mediasi') or []:
+            mediasi_pls[(str(m.get('dari')), str(m.get('lewat')),
+                         str(m.get('ke')))] = m
+    else:
+        for k in hasil.get('koef') or []:
+            koef[str(k.get('nama'))] = k
+        for m in (hasil.get('kaitan') or {}).get('mediasi') or []:
+            mediasi[(str(m.get('x')), str(m.get('m')), str(m.get('y')))] = m
+        for m in (hasil.get('kaitan') or {}).get('moderasi') or []:
+            moderasi[(str(m.get('x')), str(m.get('z')), str(m.get('y')))] = m
+
+    keluar: list[dict] = []
+    for j in peta.get('jalur') or []:
+        if not isinstance(j, dict):
+            continue
+        dari, ke = str(j.get('dari')), str(j.get('ke'))
+        entri: dict = {'hipotesis': j.get('hipotesis'), 'dari': dari,
+                       'ke': ke, 'jenis': j.get('jenis'),
+                       'ketemu': False, 'b': None, 'p': None,
+                       'signifikan': None, 'ringkas': ''}
+        if mode == 'pls':
+            if j.get('jenis') == 'tidak_langsung':
+                m = mediasi_pls.get((dari, str(j.get('lewat')), ke))
+                if m:
+                    entri.update(ketemu=True, b=m.get('efek'), p=m.get('p'),
+                                 signifikan=_sig(m.get('p')))
+            else:
+                jj = jalur_pls.get((dari, ke))
+                if jj:
+                    entri.update(ketemu=True, b=jj.get('koef'),
+                                 p=jj.get('p'), signifikan=_sig(jj.get('p')))
+        elif j.get('jenis') == 'tidak_langsung':
+            m = mediasi.get((label.get(dari, ''), label.get(str(j.get('lewat')), ''),
+                             label.get(ke, '')))
+            if m and isinstance(m.get('tidak_langsung'), dict):
+                tl = m['tidak_langsung']
+                sig = _sig(tl.get('p'))
+                if sig is None and tl.get('lo') is not None and tl.get('hi') is not None:
+                    sig = not (float(tl['lo']) <= 0 <= float(tl['hi']))
+                entri.update(ketemu=True, b=tl.get('b'), p=tl.get('p'),
+                             signifikan=sig)
+        elif j.get('jenis') == 'interaksi':
+            cocok = [m for (x, z, y), m in moderasi.items()
+                     if z == label.get(dari, '') and y == label.get(ke, '')]
+            if cocok:
+                di = (cocok[0].get('dengan_interaksi') or {})
+                entri.update(ketemu=True, b=None, p=None,
+                             signifikan=None,
+                             ringkas=f"R² dengan interaksi: {di.get('r2')}")
+                entri['dengan_interaksi'] = di
+        else:  # langsung
+            sumber = None
+            if label.get(ke, '').startswith('Y'):
+                sumber = koef.get(label.get(dari, ''))
+            elif label.get(ke, '').startswith('M'):
+                m = mediasi.get((label.get(dari, ''), label.get(ke, ''),
+                                 next((lb for nm, lb in label.items()
+                                       if lb.startswith('Y')), '')))
+                sumber = (m or {}).get('a')
+            if sumber:
+                entri.update(ketemu=True, b=sumber.get('b'),
+                             p=sumber.get('p'),
+                             signifikan=_sig(sumber.get('p')))
+        if entri['ketemu'] and not entri['ringkas']:
+            entri['ringkas'] = (f"{entri['hipotesis']}: b={entri['b']}, "
+                                f"p={entri['p']} → "
+                                f"{'signifikan' if entri['signifikan'] else 'tidak signifikan'}")
+        keluar.append(entri)
+    return keluar

@@ -201,6 +201,70 @@ cek('BUG2 mesin mati → 502 dan token 5 DIKEMBALIKAN',
     r.status_code == 502 and catatan.get('potong') == 5 and catatan.get('kembali') == 5,
     f'{r.status_code} {catatan}')
 
+print('── Regresi ronde 3 review Fase 3 ──')
+# BUG BARU 1: hasil SPSS rute (berkas 11) membawa peta hipotesis
+ph = j.get('hasil', {}).get('peta_hipotesis', [])
+cek('BUG BARU 1 hasil olah-data memuat peta_hipotesis H1-H3, semua ketemu',
+    [e['hipotesis'] for e in ph] == ['H1', 'H2', 'H3'] and all(e['ketemu'] for e in ph),
+    str(ph)[:200])
+cek('BUG BARU 1 H3 (langsung X→Y) terpetakan dari koefisien regresi',
+    ph and ph[2]['jenis'] == 'langsung' and ph[2]['b'] is not None,
+    str(ph[2]) if len(ph) > 2 else 'kosong')
+# cabang tidak_langsung: bentuk hasil PERSIS tangkapan mesin asli
+_hasil_tiru = {'mode': 'spss',
+               'koef': [{'nama': 'X1', 'b': 0.44, 'p': 0.0},
+                        {'nama': 'M1', 'b': 0.58, 'p': 0.0}],
+               'kaitan': {'mediasi': [
+                   {'x': 'X1', 'm': 'M1', 'y': 'Y1',
+                    'a': {'b': 0.60, 'p': 0.0},
+                    'tidak_langsung': {'b': 0.349, 'lo': 0.20, 'hi': 0.51}}]}}
+_peta_tiru = {'variabel': [{'nama': 'X', 'peran': 'X'}, {'nama': 'Med', 'peran': 'M'},
+                           {'nama': 'Y', 'peran': 'Y'}],
+              'jalur': [{'dari': 'X', 'ke': 'Med', 'hipotesis': 'H1', 'jenis': 'langsung'},
+                        {'dari': 'Med', 'ke': 'Y', 'hipotesis': 'H2', 'jenis': 'langsung'},
+                        {'dari': 'X', 'ke': 'Y', 'hipotesis': 'H3', 'jenis': 'tidak_langsung',
+                         'lewat': 'Med'}]}
+_pm = _b4.petakan_hasil_ke_hipotesis(_peta_tiru, _hasil_tiru)
+cek('BUG BARU 1 cabang tidak_langsung: efek 0.349, signifikan dari rentang CI',
+    _pm[2]['ketemu'] and _pm[2]['b'] == 0.349 and _pm[2]['signifikan'] is True,
+    str(_pm[2]))
+cek('BUG BARU 1 cabang X→M terpetakan dari jalur a mediasi',
+    _pm[0]['ketemu'] and _pm[0]['b'] == 0.60, str(_pm[0]))
+
+# BUG BARU 3: tabrakan nama kolom tertolak periksa_peta
+p_tabrak = {'jenis': 'kuantitatif', 'jumlah_hipotesis': 1,
+            'variabel': [{'nama': 'Kualitas Produk', 'peran': 'X', 'bukti': B},
+                         {'nama': 'Kualitas_Produk', 'peran': 'Y', 'bukti': B}],
+            'jalur': [{'dari': 'Kualitas Produk', 'ke': 'Kualitas_Produk',
+                       'hipotesis': 'H1', 'jenis': 'langsung'}]}
+cek('BUG BARU 3 Kualitas Produk vs Kualitas_Produk → kolom_tabrakan',
+    any(m['kode'] == 'kolom_tabrakan' for m in _b4.periksa_peta(p_tabrak)),
+    str(_b4.periksa_peta(p_tabrak)))
+
+# BUG BARU 2: bukti mesin — dua perantara terpisah + moderasi terbaca
+rng2 = np.random.default_rng(3)
+_lik = lambda v: np.clip(np.round(3 + v + rng2.normal(scale=.4, size=len(v))), 1, 5).astype(int)
+_x = rng2.normal(size=90); _m1 = .7*_x + rng2.normal(scale=.6, size=90)
+_m2 = .5*_x + rng2.normal(scale=.6, size=90); _z = rng2.normal(size=90)
+_y = .4*_m1 + .4*_m2 + .3*_x + rng2.normal(scale=.6, size=90)
+_k8 = ['X_1','X_2','A_1','A_2','Bb_1','Bb_2','Y_1','Y_2']
+_b8 = [[int(_lik(_x)[i]), int(_lik(_x)[i]), int(_lik(_m1)[i]), int(_lik(_m1)[i]),
+        int(_lik(_m2)[i]), int(_lik(_m2)[i]), int(_lik(_y)[i]), int(_lik(_y)[i])] for i in range(90)]
+_h8 = _jb.hitung({'tahap': 'utama', 'mode': 'spss', 'bentuk_mediasi': 'lengkap',
+                  'peran': {'X_1':'X1','X_2':'X1','A_1':'M1','A_2':'M1','Bb_1':'M2','Bb_2':'M2','Y_1':'Y1','Y_2':'Y1'},
+                  'baris': _b4.baris_ke_objek(_k8, _b8)})
+cek('BUG BARU 2 dua perantara → dua entri mediasi terpisah (M1 & M2)',
+    sorted(e['m'] for e in _h8['kaitan']['mediasi']) == ['M1', 'M2'],
+    str(_h8.get('kaitan', {}).get('mediasi'))[:150])
+_k9 = ['X_1','X_2','M_1','M_2','Z_1','Z_2','Y_1','Y_2']
+_b9 = [[int(_lik(_x)[i]), int(_lik(_x)[i]), int(_lik(_m1)[i]), int(_lik(_m1)[i]),
+        int(_lik(_z)[i]), int(_lik(_z)[i]), int(_lik(_y)[i]), int(_lik(_y)[i])] for i in range(90)]
+_h9 = _jb.hitung({'tahap': 'utama', 'mode': 'spss', 'bentuk_mediasi': 'lengkap',
+                  'peran': {'X_1':'X1','X_2':'X1','M_1':'M1','M_2':'M1','Z_1':'Z1','Z_2':'Z1','Y_1':'Y1','Y_2':'Y1'},
+                  'baris': _b4.baris_ke_objek(_k9, _b9)})
+cek('BUG BARU 2 mediasi+moderasi → entri moderasi terbaca mesin',
+    bool(_h9['kaitan'].get('moderasi')), str(list(_h9.get('kaitan', {}).keys())))
+
 print()
 print('❌ GAGAL: ' + ', '.join(gagal) if gagal else '✅ SEMUA LULUS — Fase 3 inti (rute BAB IV)')
 sys.exit(1 if gagal else 0)

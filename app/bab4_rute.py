@@ -239,6 +239,10 @@ def olah_data(body: dict, u: User = Depends(wajib_login_api),
             except Exception:  # noqa: BLE001 — pengembalian jangan menutupi galat asli
                 pass
         raise _terjemahkan_gagal(e) from e
+    # Sematkan pemetaan H1..Hn SEBELUM disimpan: narasi hanya boleh
+    # membaca hasil terkunci, jadi peta hipotesis harus ikut tersimpan
+    # di dalamnya (temuan review Fase 3 — BUG BARU 1).
+    hasil['peta_hipotesis'] = bab4.petakan_hasil_ke_hipotesis(peta, hasil)
     h = bab4.simpan_hasil(db, u.id, file_id, 'olah_data',
                           payload['mode'], hasil)
     return {'versi': h.nomor, 'tarif_dikenakan': tarif,
