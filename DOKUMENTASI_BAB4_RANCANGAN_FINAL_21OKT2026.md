@@ -614,6 +614,26 @@ Semua panggilan AI tetap lewat **satu pintu 9router** (aturan repo).
 
 ---
 
+## 15b. STATUS BANGUN (diperbarui 21 Okt 2026, sore)
+
+- **Fase 1 SELESAI & ter-push** (repo statistik-lab, branch
+  `agen/wulan/jembatan-bab4`): pintu tanpa sesi + pra-survei + kunci
+  antar-layanan; sudah melewati 2 ronde review agen Bos (4 bug + 1
+  pendalaman BUG 3 bentuk peran — semua diperbaiki & teruji bergigi).
+- **Fase 2 SELESAI & ter-push** (repo ini, branch
+  `agen/wulan/bab4-statistik-backend`): tabel hasil/peta berversi,
+  klien jembatan, layanan Kunci Hasil & tarif, mesin aturan peta.
+  Review agen Bos menemukan 6 hal: 5 bug kode (kunci mundur ke versi
+  lama; pemeriksa meledak pada bentuk salah ×2; jalur hantu; peran tak
+  dikenal) — DIPERBAIKI & teruji regresi; 1 hal di bawah ini.
+- ⚠️ **FONDASI BELUM DIPASANG KE APLIKASI**: `app/bab4.py` dan
+  `app/jembatan_statistik.py` saat ini MODUL FONDASI — belum diimpor
+  `main.py`, belum ada rute HTTP, belum ada layar. Itu memang cakupan
+  Fase 3 (orkestrasi + rute + UI), BUKAN kelalaian — tapi siapa pun
+  yang membaca status ini tidak boleh mengira fitur BAB IV sudah bisa
+  dipakai user. Bukti silang-repo kemarin adalah uji layanan, bukan
+  pemasangan.
+
 ## 16. URUTAN BANGUN YANG DIUSULKAN [USULAN Wulan — belum diperintah Bos]
 
 1. Di Statistik Lab: pintu kuantitatif tanpa sesi + dua pintu

@@ -160,6 +160,43 @@ cek('peta kualitatif tanpa informan → masalah',
     any(m['kode'] == 'informan_kosong' for m in bab4.periksa_peta(
         {'jenis': 'kualitatif', 'fokus': [{'nama': 'Pengalaman', 'bukti': B}]})))
 
+print('── 4. Regresi 6 bug review agen Bos (21 Okt, sore) ──')
+from sqlalchemy import create_engine as _ce
+from sqlalchemy.orm import sessionmaker as _sm
+_e2 = _ce('sqlite://'); Base.metadata.create_all(_e2, tables=[HasilBab4.__table__])
+_d2 = _sm(bind=_e2)()
+for r in (0.1, 0.2, 0.3):
+    bab4.simpan_hasil(_d2, 7, 70, 'olah_data', 'spss', {'r2': r})
+bab4.kunci_hasil(_d2, 7, 70)
+k_lagi = bab4.kunci_hasil(_d2, 7, 70)
+_t = bab4.hasil_terkunci(_d2, 7, 70)
+cek('BUG1 kunci kedua tanpa data baru → kunci TETAP versi 3',
+    k_lagi is None and _t.nomor == 3 and bab4.baca_hasil(_t) == {'r2': 0.3},
+    f'k_lagi={k_lagi} terkunci={_t.nomor if _t else None}')
+bab4.simpan_hasil(_d2, 7, 70, 'olah_data', 'spss', {'r2': 0.4})
+k_baru = bab4.kunci_hasil(_d2, 7, 70)
+cek('BUG1 draf lebih baru tetap bisa dikunci (versi 4)',
+    k_baru is not None and k_baru.nomor == 4)
+cek('BUG2 periksa_peta([]) → masalah bentuk, tidak meledak',
+    bab4.periksa_peta([])[0]['kode'] == 'bentuk_salah')
+cek('BUG2 periksa_peta(variabel str) → tidak meledak',
+    isinstance(bab4.periksa_peta({'variabel': 'x'}), list))
+p_hantu = copy.deepcopy(peta_sah)
+p_hantu['jalur'].append({'dari': 'GHOST', 'ke': 'Pembelian Impulsif',
+                          'hipotesis': 'H8', 'jenis': 'langsung'})
+p_hantu['jumlah_hipotesis'] = 8
+cek('BUG3 jalur dari variabel hantu → jalur_hantu',
+    any(m['kode'] == 'jalur_hantu' for m in bab4.periksa_peta(p_hantu)))
+p_q = {'jenis': 'kuantitatif', 'jumlah_hipotesis': 1,
+       'variabel': [{'nama': 'Aneh', 'peran': 'Q', 'bukti': B},
+                    {'nama': 'Hasil', 'peran': 'Y', 'bukti': B}],
+       'jalur': [{'dari': 'Aneh', 'ke': 'Hasil', 'hipotesis': 'H1',
+                  'jenis': 'langsung'}]}
+cek('BUG4 peran Q → peran_tak_dikenal',
+    any(m['kode'] == 'peran_tak_dikenal' for m in bab4.periksa_peta(p_q)))
+cek('BUG5 label_desain(None) → belum_jelas, tidak meledak',
+    bab4.label_desain(None)['desain'] == 'belum_jelas')
+
 print()
 if gagal:
     print(f'❌ {len(gagal)} GAGAL: {gagal}')

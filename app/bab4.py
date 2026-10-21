@@ -74,14 +74,26 @@ def tarif_generate_berikutnya(db: Session, user_id: int, file_id: int,
 
 def kunci_hasil(db: Session, user_id: int, file_id: int,
                 jenis: str = 'olah_data') -> HasilBab4 | None:
-    """Bekukan versi draf TERBARU menjadi 'terkunci' (Kunci Hasil).
+    """Bekukan draf TERBARU menjadi 'terkunci' (Kunci Hasil).
 
-    Hanya satu versi terkunci yang berlaku pada satu waktu: versi
-    terkunci sebelumnya (bila ada) diturunkan kembali ke 'draf' supaya
-    sumber narasi tidak pernah ambigu."""
+    ATURAN (BUG kritis, temuan review 21 Okt): yang boleh dikunci
+    hanyalah draf yang nomornya LEBIH BARU dari versi terkunci yang
+    sedang berlaku. Tanpa aturan ini, panggilan kedua tanpa data baru
+    menurunkan kunci ke draf lama — narasi akan lahir dari angka yang
+    BUKAN terakhir dihitung. Tidak ada draf lebih baru → kembalikan
+    None, kunci lama tidak diganggu sama sekali.
+    Hanya satu versi terkunci yang berlaku pada satu waktu."""
+    berlaku = (db.query(HasilBab4)
+               .filter_by(user_id=user_id, file_id=file_id, jenis=jenis,
+                          status='terkunci')
+               .order_by(HasilBab4.nomor.desc()).first())
+    batas = berlaku.nomor if berlaku else 0
     draf = (db.query(HasilBab4)
-            .filter_by(user_id=user_id, file_id=file_id, jenis=jenis,
-                       status='draf')
+            .filter(HasilBab4.user_id == user_id,
+                    HasilBab4.file_id == file_id,
+                    HasilBab4.jenis == jenis,
+                    HasilBab4.status == 'draf',
+                    HasilBab4.nomor > batas)
             .order_by(HasilBab4.nomor.desc()).first())
     if draf is None:
         return None
@@ -173,6 +185,21 @@ def periksa_peta(peta: dict) -> list[dict]:
     def tambah(kode: str, pesan: str) -> None:
         masalah.append({'kode': kode, 'pesan': pesan})
 
+    # Pagar bentuk (temuan review 21 Okt): masukan bukan dict / daftar
+    # berisi bukan-dict TIDAK BOLEH meledakkan fungsi — pemeriksa yang
+    # meledak tidak bisa melaporkan apa-apa. Kembalikan masalah bentuk.
+    if not isinstance(peta, dict):
+        return [{'kode': 'bentuk_salah',
+                 'pesan': 'Peta harus berupa objek (dict), bukan '
+                          f'{type(peta).__name__}.'}]
+    for kunci_daftar in ('variabel', 'jalur', 'fokus', 'informan'):
+        nilai = peta.get(kunci_daftar)
+        if nilai is not None and (not isinstance(nilai, list) or
+                                  any(not isinstance(x, dict) for x in nilai)):
+            tambah('bentuk_salah',
+                   f'Bagian "{kunci_daftar}" harus berupa daftar objek.')
+            peta = {**peta, kunci_daftar: []}
+
     if peta.get('jenis') == 'kualitatif':
         if not peta.get('fokus'):
             tambah('fokus_kosong', 'Fokus penelitian belum terisi.')
@@ -195,6 +222,10 @@ def periksa_peta(peta: dict) -> list[dict]:
     nama_peran: dict[str, str] = {}
     for v in variabel:
         nama = str(v.get('nama') or '')
+        if v.get('peran') not in ('X', 'M', 'Z', 'Y'):
+            tambah('peran_tak_dikenal',
+                   f'Peran "{v.get("peran")}" untuk "{nama}" tidak '
+                   'dikenal — peran yang sah hanya X, M, Z, atau Y.')
         if nama in nama_peran and nama_peran[nama] != v.get('peran'):
             tambah('peran_ganda',
                    f'"{nama}" muncul dengan dua peran berbeda '
@@ -228,6 +259,17 @@ def periksa_peta(peta: dict) -> list[dict]:
                f'Jumlah jalur ({len(jalur)}) tidak sama dengan jumlah '
                f'hipotesis di naskah ({jml_hip}).')
 
+    # Jalur hantu (temuan review 21 Okt): ujung jalur harus variabel
+    # yang BENAR-BENAR ada di daftar — jalur ke variabel tak dikenal
+    # adalah persis yang wajib ditolak pemeriksa konsistensi.
+    for j in jalur:
+        for ujung in ('dari', 'ke'):
+            if str(j.get(ujung) or '') not in nama_peran:
+                tambah('jalur_hantu',
+                       f'Jalur {j.get("hipotesis", "?")} menunjuk '
+                       f'variabel "{j.get(ujung)}" yang tidak ada di '
+                       'daftar variabel.')
+
     masuk = {str(j.get('ke')) for j in jalur}
     keluar = {str(j.get('dari')) for j in jalur}
     for v in variabel:
@@ -257,6 +299,8 @@ def label_desain(fakta: dict) -> dict:
     'eksperimen', 'pra-eksperimen', 'survei', 'korelasional',
     'belum_jelas' (fakta belum cukup — yang ditanyakan ke user adalah
     pertanyaan fakta, lihat DOKUMENTASI §5.3)."""
+    if not isinstance(fakta, dict):
+        fakta = {}
     perlakuan = bool(fakta.get('perlakuan'))
     kontrol = bool(fakta.get('kelompok_kontrol'))
     sebelum = bool(fakta.get('ukur_sebelum_sesudah'))
