@@ -61,6 +61,15 @@ Melengkapi: AUDIT_WULAN_BAB4_21OKT2026.md + RANCANGAN_JEMBATAN_BAB4_21OKT2026.md
 12. **Label simulasi**: data simulasi bertanda SIMULASI, BAB IV darinya =
     draf latihan; data asli masuk → tanda hilang, draf diganti hasil asli.
     (Prinsip diusulkan Wulan, sejalan dengan tujuan belajar Bos.)
+13. **Simulasi dua arah (catatan Bos)**: hasil simulasi WAJIB bisa
+    di-download sebagai file DATA TEMPLATE dengan format yang sama persis
+    seperti template resmi. Satu format untuk semua arah: template kosong
+    yang diberikan ke user = file hasil simulasi = file data lapangan asli
+    yang di-upload balik lewat jalur resmi. Gunanya: mahasiswa berlatih
+    alur utuh (download simulasi → upload lewat jalur resmi → hitung),
+    dan bisa membawa file simulasi ke SPSS/SmartPLS untuk verifikasi
+    (pola unduh Statistik Lab yang sudah ada). Berlaku juga kualitatif:
+    catatan informan simulasi di-download dalam format template catatan.
 
 ## B. ALUR UTUH (hasil gabungan A)
 
