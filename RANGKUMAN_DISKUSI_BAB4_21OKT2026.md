@@ -90,15 +90,14 @@ Naskah BAB I–III
 ## C. YANG KURANG / BELUM DIPUTUSKAN (penghalang BAB IV utuh)
 
 ### C1. Keputusan Bos yang masih terbuka
-1. **Bentuk jembatan kuantitatif**: Opsi A (alur unggah 2 langkah mesin
-   apa adanya, data singgah di memori ≤45 mnt) vs Opsi B (endpoint
-   stateless khusus di Statistik Lab). MASIH TERBUKA — tapi konteksnya
-   berubah setelah poin 1 dikunci (lihat catatan di C2.6): Statistik Lab
-   toh akan dibuka untuk API kualitatif, dan fungsi hitung kuantitatif
-   (periksa_spss/periksa_pls) sudah murni menerima tabel — endpoint
-   stateless tinggal pembungkus tipis tanpa simpan_sementara.
-   Rekomendasi Wulan kini: langsung B, satu paket kerja dengan API
-   kualitatif + token antar-layanan.
+1. ~~**Bentuk jembatan kuantitatif**~~ **SELESAI — diputuskan Bos
+   21 Okt 2026: OPSI B UNTUK SEMUANYA.** Data dikirim → langsung dihitung
+   → hasil pulang; TIDAK ada data dititip/disimpan di Statistik Lab
+   (Opsi A = titip dulu pakai kunci sesi, ditolak). Berlaku kuantitatif
+   dan kualitatif. Satu paket kerja di Statistik Lab: pintu hitung
+   kuantitatif langsung (pembungkus tipis fungsi periksa_spss/periksa_pls
+   yang sudah murni) + dua pintu kualitatif (C2.6) + kunci pengaman
+   antar-layanan untuk semua pintu itu.
 2. ~~**Deskriptif 4.2 & karakteristik responden 4.1**~~ **SELESAI —
    disetujui Bos 21 Okt 2026**: dihitung DI EDUAI dari data milik EduAi
    sendiri (tabulasi ringan, bukan uji statistik). Prinsip ISI SEKALI DI
