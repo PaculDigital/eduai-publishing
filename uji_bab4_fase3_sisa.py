@@ -123,6 +123,23 @@ cek('layar HTML /bab4/20 tampil (200, ada Data Lapangan & Narasi)',
 r = k.get('/bab4/999')
 cek('layar berkas orang lain → 404', r.status_code == 404, str(r.status_code))
 
+# ── Kontrak layar (penengah sengketa review ronde 7) ──
+print('── Kontrak layar ↔ rute ──')
+import re as _re
+_html = open('app/templates/bab4.html', encoding='utf-8').read()
+_dipanggil = set(_re.findall(r"/api/bab4/[a-z0-9./_-]+", _html))
+_terdaftar = {'/api/bab4' + (r.path[len('/api/bab4'):] if r.path.startswith('/api/bab4') else r.path)
+              for r in bab4_rute.router.routes}
+_hilang = {u for u in _dipanggil
+           if not any(u == t or u.startswith(t + '/') or t.startswith(u.rstrip('/'))
+                      for t in _terdaftar)
+           and u not in ('/api/bab4/instrumen/kuesioner.md', '/api/bab4/instrumen/template.csv',
+                         '/api/bab4/data/unduh.csv')}
+cek('semua URL yang dipanggil layar terdaftar sebagai rute', not _hilang,
+    f'yatim: {_hilang}')
+cek('layar memanggil GET /hasil (BUG 2)', '/api/bab4/hasil' in _html)
+cek('layar memanggil GET /profil (BUG 3)', '/api/bab4/profil' in _html)
+
 print()
 print('❌ GAGAL: ' + ', '.join(gagal) if gagal else '✅ SEMUA LULUS — Fase 3 sisa (simulasi, narasi, layar)')
 sys.exit(1 if gagal else 0)

@@ -48,6 +48,8 @@
     </div>
   </div>
 
+  <div class="kartu"><span class="kecil" id="profil">Profil responden: memuat…</span></div>
+
   <h2>3 · Uji &amp; Hitung</h2>
   <div class="kartu">
     <button id="btnPra">Uji coba instrumen (pra-survei)</button>
@@ -56,6 +58,7 @@
     <div id="infoHitung" class="kecil"></div>
     <div id="kartuSehat"></div>
     <div id="tabelH"></div>
+    <div id="hasilTersimpan"></div>
   </div>
 
   <h2>4 · Simulasi (bonus paket)</h2>
@@ -100,7 +103,7 @@ async function muatRingkasan(){
 $('btnSimpanData').onclick = async ()=>{
   try{ const {kolom, baris} = csvKeBaris($('grid').value);
     const j = await api('/api/bab4/data','PUT',{file_id:FID, tahap:$('tahap').value, kolom, baris});
-    $('infoData').textContent = 'Tersimpan: '+j.baris+' baris.'; muatRingkasan();
+    $('infoData').textContent = 'Tersimpan: '+j.baris+' baris.'; muatRingkasan(); muatProfil();
   }catch(e){ $('infoData').textContent = 'Gagal: '+e.message; }
 };
 $('btnMuatData').onclick = async ()=>{
@@ -132,7 +135,7 @@ $('btnOlah').onclick = async ()=>{
 };
 $('btnKunci').onclick = async ()=>{
   try{ const j = await api('/api/bab4/kunci-hasil','POST',{file_id:FID});
-    $('infoHitung').textContent = 'Hasil versi '+j.versi_terkunci+' TERKUNCI.'; muatRingkasan();
+    $('infoHitung').textContent = 'Hasil versi '+j.versi_terkunci+' TERKUNCI.'; muatRingkasan(); muatHasil();
   }catch(e){ $('infoHitung').textContent = 'Gagal: '+e.message; }
 };
 $('btnSimulasi').onclick = async ()=>{
@@ -152,7 +155,37 @@ $('btnSimpanNarasi').onclick = async ()=>{
     $('infoNarasi').textContent = 'Suntingan tersimpan sebagai versi '+j.versi+' (gratis).';
   }catch(e){ $('infoNarasi').textContent = 'Gagal: '+e.message; }
 };
-muatRingkasan();
+async function muatProfil(){
+  try{ const j = await api('/api/bab4/profil?file_id='+FID);
+    $('profil').textContent = 'Profil responden (4.1): masuk '+j.responden_masuk+
+      (j.target? ' dari target '+j.target+' — tingkat pengembalian '+
+       j.tingkat_pengembalian_persen+'%': ' (target belum diisi)');
+  }catch(e){ $('profil').textContent = 'Profil: '+e.message; }
+}
+function gambarTabel(ph, judul){
+  if(!ph || !ph.length) return '';
+  return '<p class="kecil">'+judul+'</p><table><tr><th>H</th><th>Jalur</th><th>b</th><th>p</th><th>Putusan</th></tr>'+
+    ph.map(e=>'<tr><td>'+e.hipotesis+'</td><td>'+e.dari+' → '+e.ke+'</td><td>'+(e.b??'—')+
+    '</td><td>'+(e.p??'—')+'</td><td>'+(e.signifikan==null?'—':(e.signifikan?'Signifikan':'Tidak signifikan'))+'</td></tr>').join('')+'</table>';
+}
+async function muatHasil(){
+  try{ const j = await api('/api/bab4/hasil?file_id='+FID);
+    if(j.terkunci){
+      $('hasilTersimpan').innerHTML = gambarTabel(j.terkunci.isi.peta_hipotesis,
+        'Hasil TERKUNCI versi '+j.terkunci.nomor+' (bahan narasi):');
+    } else if(j.meta && j.meta.length){
+      $('hasilTersimpan').innerHTML = '<p class="kecil">Ada '+j.meta.length+
+        ' versi hasil, belum ada yang dikunci.</p>';
+    }
+    const jn = await api('/api/bab4/hasil?file_id='+FID+'&jenis=narasi');
+    if(jn.meta && jn.meta.length && !$('teksNarasi').value){
+      const terakhir = jn.meta[jn.meta.length-1].nomor;
+      const isi = await api('/api/bab4/hasil?file_id='+FID+'&jenis=narasi&versi='+terakhir);
+      if(isi.isi && isi.isi.teks) $('teksNarasi').value = isi.isi.teks;
+    }
+  }catch(e){ /* layar tetap bisa dipakai tanpa hasil tersimpan */ }
+}
+muatRingkasan(); muatProfil(); muatHasil();
 </script>
 </body>
 </html>
