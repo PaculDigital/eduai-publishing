@@ -96,7 +96,7 @@ def susun_draf(b: dict) -> str:
                      f"{e.get('dari')} terhadap {e.get('ke')} "
                      f"sebesar {_fmt(e.get('b'))}; rentang kepercayaan "
                      f"95% [{_fmt(e.get('lo'))}, {_fmt(e.get('hi'))}] "
-                     f"{'tidak' if e.get('signifikan') else ''} melewati "
+                     f"{'tidak ' if e.get('signifikan') else ''}melewati "
                      'nol — hipotesis '
                      f"{'diterima' if e.get('signifikan') else 'ditolak'} "
                      '(berdasarkan uji bootstrap).')

@@ -158,6 +158,16 @@ _teks = bab4_narasi.susun_draf(_bahan)
 cek('BUG 1 tidak ada label dobel "H1: H1"', 'H1: H1' not in _teks and 'H3: H3' not in _teks)
 cek('BUG 4 kata "None" tidak bocor ke teks', 'None' not in _teks)
 cek('BUG 2 tidak ada tanda pisah dobel "— —"', '— —' not in _teks)
+cek('tidak ada spasi dobel di seluruh teks narasi', '  ' not in _teks.replace('  ', '  ', 0) or all('  ' not in b for b in _teks.splitlines()))
+_bahan_ci_lewat = {'hasil': {'r2': 0.3, 'peta_hipotesis': [
+    {'hipotesis': 'H3', 'dari': 'Harga', 'ke': 'Keputusan', 'jenis': 'tidak_langsung',
+     'ketemu': True, 'b': 0.01, 'p': None, 'signifikan': False,
+     'lo': -0.017, 'hi': 0.0327, 'ringkas': ''}]},
+    'versi_terkunci': 1, 'mode': 'spss', 'peta': {'variabel': []},
+    'responden_masuk': 50, 'target': 60, 'pengembalian': 83.3, 'kartu_pra': None}
+_teks2 = bab4_narasi.susun_draf(_bahan_ci_lewat)
+cek('CI melewati nol → satu spasi & vonis ditolak',
+    '] melewati nol' in _teks2 and ']  melewati' not in _teks2 and 'ditolak' in _teks2)
 _baris_h3 = [b for b in _teks.splitlines() if b.strip().startswith('- H3')]
 _baris_h9 = [b for b in _teks.splitlines() if b.strip().startswith('- H9')]
 cek('BUG 3 efek tidak langsung tanpa p → disebut CI + diterima (bukan vonis p)',
