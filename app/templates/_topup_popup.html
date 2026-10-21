@@ -1,0 +1,1240 @@
+<link rel="stylesheet" href="/static/ikon.css">
+<!-- ═══ POPUP TOP-UP KUOTA (QRIS) ═══ -->
+<div class="tirai" id="tirai" hidden>
+  <div class="popup" role="dialog" aria-modal="true" aria-labelledby="popup-judul">
+    <button class="tutup-popup" id="tutup-popup" aria-label="Tutup">&times;</button>
+
+    <!-- TAB: Paket | Riwayat (17Sep26) -->
+    <div class="tab-popup" id="tab-popup">
+      <button type="button" class="tab-btn aktif" id="tab-paket">Beli Kuota</button>
+      <button type="button" class="tab-btn" id="tab-riwayat">Riwayat Transaksi</button>
+    </div>
+
+    <!-- LANGKAH 1: pilih paket -->
+    <div id="langkah-1">
+      <h2 id="popup-judul">Tambah Kuota</h2>
+      <p class="popup-sub" id="popup-sub">Pilih paket yang sesuai kebutuhan Anda.</p>
+
+      {# ═══ KARTU "SARAN UNTUK ANDA" (ACC Bos 15Sep26) ═════════════════════
+         MASALAH YANG DIPERBAIKI: popup lama = katalog statis. User bingung,
+         berisiko SALAH BELI (butuh +10 folder malah beli paket Rp 300.000
+         karena paket lebih menonjol dari AddOn Rp 25.000).
+
+         SOLUSI: kartu ini muncul PALING ATAS dan hanya berisi SATU jawaban,
+         sesuai masalah user (folder penuh / storage habis / kuota AI habis).
+         Di bawahnya, pilihan lain DILIPAT (default tertutup) supaya user
+         tidak bingung membandingkan. #}
+      <div id="kartu-saran" hidden>
+        <div id="saran-diagnosis" class="saran-diagnosis"></div>
+        <button type="button" class="saran-kartu" id="saran-tombol">
+          <span class="saran-lencana">
+            <span class="saran-ikon" id="saran-ikon"></span>
+            <span>
+              <span class="saran-label">SARAN UNTUK ANDA</span>
+              <span class="saran-nama" id="saran-nama"></span>
+              <span class="saran-ket" id="saran-ket"></span>
+            </span>
+          </span>
+          <span class="saran-harga" id="saran-harga"></span>
+        </button>
+        <p class="saran-alasan" id="saran-alasan"></p>
+      </div>
+
+      <!-- Pilihan lain: DILIPAT. Dibuka kalau user klik atau tak ada saran. -->
+      <details id="lipat-lain" class="lipat-lain">
+        <summary id="lipat-teks">
+          <span class="lipat-ikon"></span>
+          <span class="lipat-kiri">
+            <span class="lipat-utama">Lihat pilihan lain</span>
+            <span class="lipat-ket">Paket &amp; layanan tambahan lainnya</span>
+          </span>
+          <span class="lipat-panah" id="lipat-panah"></span>
+        </summary>
+        <div class="lipat-isi-bungkus">
+        <div class="isi-lipat">
+          <p class="lipat-sub">Paket menambah kuota bulanan berulang. AddOn
+            dibeli sekali dan langsung aktif.</p>
+          <div class="daftar-paket" id="daftar-paket">
+            <div class="memuat-paket">Memuat paket…</div>
+          </div>
+          {# AddOn: mesin uang — murah, dibeli BERULANG. #}
+          <div id="blok-addon" hidden>
+            <div class="pemisah-addon"><span>Pilihan lain</span></div>
+            <div class="daftar-addon" id="daftar-addon"></div>
+            <p class="catatan-addon" id="catatan-addon" hidden></p>
+          </div>
+        </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- PANEL RIWAYAT (17Sep26) -->
+    <div id="panel-riwayat" hidden>
+      <h2 id="popup-judul-riwayat">Riwayat Transaksi</h2>
+      <p class="popup-sub">Semua top-up kuota yang pernah Anda lakukan.</p>
+      <div id="wadah-riwayat">
+        <div class="memuat-paket">Memuat riwayat…</div>
+      </div>
+      <button type="button" class="tombol-batal" id="tutup-riwayat">Tutup</button>
+    </div>
+
+    <!-- LANGKAH 2: bayar QRIS -->
+    <div id="langkah-2" hidden>
+      <h2 id="popup-judul-2">Bayar dengan QRIS</h2>
+      <p class="popup-sub">
+        Scan QR di bawah dengan aplikasi bank / e-wallet Anda.
+      </p>
+
+      <div class="ringkas-paket">
+        <span id="rp-paket">—</span>
+        <b id="rp-jumlah">—</b>
+      </div>
+
+      <div class="kotak-qr">
+        <div id="tempat-qr" class="tempat-qr">
+          <div class="memuat-qr">Membuat QR…</div>
+        </div>
+        <div class="masa-berlaku" id="masa-berlaku"></div>
+
+        <!-- 12Sep26: user sering buka EduAi dari HP yang SAMA dengan app bank,
+             jadi tidak bisa scan layarnya sendiri. Sediakan: simpan QR + buka app bank. -->
+        <div class="aksi-qr" id="aksi-qr">
+          <button type="button" class="tombol-qr" id="simpan-qr"
+                  title="Simpan gambar QR ke galeri / unduhan">
+            {{ ikon('download', 15) }} Simpan QR
+          </button>
+          <button type="button" class="tombol-qr utama" id="buka-bank"
+                  title="Buka aplikasi bank / e-wallet untuk membayar">
+            {{ ikon('landmark', 15) }} Buka Aplikasi Bank
+          </button>
+        </div>
+        <p class="petunjuk-qr">
+          Di HP: simpan QR → buka aplikasi bank → menu QRIS → pilih <b>unggah dari galeri</b>.
+        </p>
+
+        <!-- 12Sep26: panduan manual kalau deep-link tidak jalan -->
+        <div class="panduan-bank" id="panduan-bank" hidden>
+          <b>Buka QRIS di aplikasi Anda:</b>
+          <ul>
+            <li><b>GoPay / OVO / DANA / ShopeePay</b> — menu <i>Scan</i> → <i>Unggah dari galeri</i></li>
+            <li><b>myBCA / Livin' / BRImo / BNI</b> — menu <i>QRIS</i> → <i>Unggah gambar QR</i></li>
+            <li><b>Semua m-banking</b> — cari menu <i>QRIS</i> / <i>Bayar</i> → unggah QR yang tersimpan</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="nomor-bayar">
+        <label>Nomor Pembayaran / Order ID</label>
+        <div class="salin">
+          <code id="kode-order">—</code>
+          <button type="button" class="tombol-salin" id="salin-order">Salin</button>
+        </div>
+      </div>
+
+      <div class="status-bayar" id="status-bayar">
+        <span class="denyut"></span> Menunggu pembayaran…
+      </div>
+
+      <div class="aksi-popup">
+        <button type="button" class="tombol-cek" id="cek-bayar">Sudah Bayar, Cek</button>
+        <button type="button" class="tombol-batal" id="batal-bayar">Batal</button>
+      </div>
+
+      <div class="catatan-sandbox" id="catatan-sandbox" hidden>
+        <b>Mode Uji (Sandbox):</b> pembayaran tidak nyata.
+        <button type="button" class="tombol-simulasi" id="simulasi-bayar">
+          Simulasikan Lunas
+        </button>
+      </div>
+    </div>
+
+    <!-- LANGKAH 3: sukses -->
+    <div id="langkah-3" hidden>
+      <div class="ikon-sukses">{{ ikon('check', 30) }}</div>
+      <h2 class="judul-sukses">Pembayaran Berhasil</h2>
+      <p class="popup-sub" id="pesan-sukses">Kuota Anda sudah ditambahkan.</p>
+      <button type="button" class="tombol-cek lebar" id="selesai">Selesai</button>
+    </div>
+
+    <div class="galat-popup" id="galat-popup" hidden></div>
+  </div>
+</div>
+
+<style>
+/* ═══ TAB: Beli Kuota | Riwayat (17Sep26) ═══ */
+.tab-popup{display:flex;gap:6px;background:#F2F4F5;border-radius:12px;padding:5px;
+           margin-bottom:18px}
+.tab-btn{flex:1;padding:10px 8px;border:0;border-radius:9px;background:transparent;
+         font-family:inherit;font-size:13px;font-weight:700;color:#68666e;
+         cursor:pointer;transition:.18s}
+.tab-btn:hover{color:#272530}
+.tab-btn.aktif{background:#fff;color:var(--hijau);box-shadow:0 2px 8px rgba(39,37,48,.12)}
+.tab-btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ═══ RIWAYAT: kartu transaksi ═══ */
+.riwayat{display:flex;flex-direction:column;gap:10px;max-height:52vh;overflow-y:auto;
+         padding-right:2px;margin-bottom:16px}
+.rw-kartu{border:1.5px solid var(--garis);border-radius:12px;padding:13px 15px;
+          background:#fff;transition:.18s}
+.rw-kartu:hover{border-color:#CFE7D6;background:#FBFEFC}
+.rw-atas{display:flex;align-items:center;justify-content:space-between;gap:10px;
+         margin-bottom:7px}
+.rw-paket{font-size:14.5px;font-weight:700}
+.rw-lencana{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:40px;
+            white-space:nowrap;text-transform:uppercase;letter-spacing:.3px}
+.rw-lencana.sukses{background:#EAF9EF;color:#0F6B2E;border:1px solid #A9E0BC}
+.rw-lencana.pending{background:#FEF8E7;color:#8A6D1F;border:1px solid #F5E3AC}
+.rw-lencana.gagal{background:#FDECEA;color:#B3261E;border:1px solid #F5C2BD}
+/* 12Sep26: status 'batal' */
+.rw-lencana.batal{background:#F2F3F5;color:#5C5A63;border:1px solid #D8DAE0}
+/* 12Sep26: status 'expired' — beda dari 'gagal' (oranye, bukan merah) */
+.rw-lencana.expired{background:#FEF3E7;color:#8A5218;border:1px solid #F3D6B0}
+/* baris tombol aksi di kartu riwayat */
+.rw-aksi{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.rw-aksi .rw-lanjut,.rw-aksi .rw-batal{flex:1;min-width:120px;margin-top:0}
+.rw-lanjut{padding:9px 12px;border-radius:40px;cursor:pointer;
+           font-family:inherit;font-size:12.5px;font-weight:700;transition:.2s;
+           border:1.5px solid var(--hijau);background:var(--hijau);color:#fff}
+.rw-lanjut:hover{background:#16712F}
+.rw-lanjut:disabled{opacity:.6;cursor:not-allowed}
+/* info total + muat lebih banyak */
+.rw-kaki{display:flex;flex-direction:column;align-items:center;gap:9px;
+         margin-top:14px;text-align:center}
+.rw-jml{font-size:12px;color:#8A8892}
+.rw-lebih{padding:10px 20px;border-radius:40px;cursor:pointer;
+          font-family:inherit;font-size:13px;font-weight:700;transition:.2s;
+          border:1.5px solid var(--hijau);background:#fff;color:var(--hijau)}
+.rw-lebih:hover{background:var(--hijau-muda)}
+.rw-lebih:disabled{opacity:.6;cursor:not-allowed}
+.rw-batal{margin-top:10px;width:100%;padding:8px 12px;border-radius:40px;cursor:pointer;
+          font-family:inherit;font-size:12.5px;font-weight:700;transition:.2s;
+          border:1.5px solid #F0C9C5;background:#fff;color:#B3261E}
+.rw-batal:hover{background:#FDECEA;border-color:#B3261E}
+.rw-baris{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+          font-size:12.5px;color:#68666e;margin-top:4px}
+.rw-baris b{font-size:14px;color:var(--hijau);font-weight:800}
+.rw-order{font-family:ui-monospace,monospace;font-size:11px;color:#9A98A0;
+          margin-top:7px;padding-top:7px;border-top:1px dashed var(--garis);
+          overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rw-kosong{text-align:center;padding:34px 18px;color:#68666e;font-size:13.5px;
+           border:1.5px dashed var(--garis);border-radius:12px;line-height:1.6}
+.rw-kosong .ikon{font-size:34px;display:block;margin-bottom:10px;opacity:.55}
+
+.tirai{position:fixed;inset:0;background:rgba(8,26,14,.62);backdrop-filter:blur(4px);
+       z-index:200;align-items:center;justify-content:center;padding:18px;
+       animation:memudar .2s ease}
+/* 🐛 WAJIB: [hidden] harus MENANG atas display:flex, kalau tidak tirai
+   transparan tetap menutupi seluruh halaman dan tombol tidak bisa diklik. */
+.tirai[hidden]{display:none!important}
+.tirai:not([hidden]){display:flex}
+@keyframes memudar{from{opacity:0}to{opacity:1}}
+.popup{background:#fff;border-radius:20px;width:100%;max-width:430px;
+       max-height:92vh;overflow-y:auto;padding:26px 24px;position:relative;
+       box-shadow:0 24px 60px rgba(0,0,0,.3);animation:naik .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes naik{from{transform:translateY(22px) scale(.97);opacity:0}
+                to{transform:none;opacity:1}}
+.tutup-popup{position:absolute;top:12px;right:12px;width:34px;height:34px;
+             border:none;background:#F2F4F5;border-radius:50%;font-size:20px;
+             line-height:1;color:#68666e;cursor:pointer;transition:.18s}
+.tutup-popup:hover{background:#E6EAE8;color:#272530}
+.popup h2{font-size:19px;font-weight:800;margin-bottom:5px}
+.popup-sub{font-size:13.5px;color:#68666e;margin-bottom:18px;line-height:1.5}
+
+/* paket */
+.daftar-paket{display:flex;flex-direction:column;gap:11px}
+.memuat-paket{text-align:center;color:#68666e;font-size:13.5px;padding:22px}
+.kartu-paket{display:flex;align-items:center;justify-content:space-between;gap:14px;
+             border:2px solid var(--garis);border-radius:14px;padding:15px 17px;
+             cursor:pointer;transition:.2s;background:#fff;text-align:left;width:100%;
+             font-family:inherit}
+.kartu-paket:hover{border-color:var(--hijau);background:#F7FCF9;transform:translateY(-1px)}
+.kartu-paket.pilih{border-color:var(--hijau);background:#F1F9F4;
+                   box-shadow:0 4px 14px rgba(25,142,59,.16)}
+.kartu-paket .kiri-p{display:flex;flex-direction:column;gap:3px}
+.kartu-paket .nama-p{font-size:15.5px;font-weight:700}
+.kartu-paket .mb-p{font-size:12.5px;color:#68666e}
+.kartu-paket .harga-p{font-size:15.5px;font-weight:800;color:var(--hijau);white-space:nowrap}
+.kartu-paket .pita-p{font-size:10px;font-weight:700;background:var(--oranye);color:#2E1B00;
+                     padding:2px 7px;border-radius:40px;align-self:flex-start}
+
+/* ═══ KARTU "SARAN UNTUK ANDA" (ACC Bos 15Sep26) ════════════════════════
+   Kenapa: popup lama = katalog statis → user bingung, risiko salah beli.
+   Kartu ini memberi SATU jawaban paling atas, sesuai masalah user. Pilihan
+   lain dilipat di bawah supaya tidak memancing perbandingan yang bikin ragu. */
+.saran-diagnosis{background:#EEF6FF;border:1px solid #CFE0F5;color:#1D4E7A;
+  border-radius:11px;padding:11px 14px;font-size:13px;line-height:1.5;
+  margin-bottom:12px;font-weight:600}
+.saran-kartu{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  width:100%;text-align:left;font-family:inherit;cursor:pointer;
+  border:2.5px solid var(--hijau);border-radius:15px;padding:15px 17px;
+  background:linear-gradient(180deg,#F2FBF5,#E7F6EC);transition:.2s;
+  box-shadow:0 4px 16px rgba(25,142,59,.14)}
+.saran-kartu:hover{transform:translateY(-2px);
+  box-shadow:0 8px 22px rgba(25,142,59,.22)}
+.saran-kartu[disabled]{opacity:.6;cursor:not-allowed;transform:none}
+.saran-lencana{display:flex;align-items:flex-start;gap:11px}
+.saran-ikon{color:var(--hijau);flex:0 0 auto;margin-top:2px}
+.saran-label{display:block;font-size:10.5px;font-weight:800;letter-spacing:.06em;
+  color:#15682F;text-transform:uppercase;margin-bottom:3px}
+.saran-nama{display:block;font-size:16px;font-weight:800;color:#1A1A22;line-height:1.25}
+.saran-ket{display:block;font-size:13px;color:#4A5A50;margin-top:3px}
+.saran-harga{font-size:17px;font-weight:800;color:var(--hijau);white-space:nowrap}
+.saran-alasan{font-size:12.5px;color:#5A6B60;margin-top:9px;line-height:1.55;
+  padding-left:2px}
+/* ═══ TOMBOL "LIHAT PILIHAN LAIN" — ORANYE, MENCOLOK (ACC Bos 15Sep26) ════
+   Kenapa diubah: versi pertama cuma teks abu-abu kecil → TENGGELAM di bawah
+   kartu hijau besar. User tidak menyadari masih ada pilihan lain. Sekarang
+   jadi tombol oranye (warna aksi sekunder, kontras dari hijau = aksi utama)
+   dengan ikon + keterangan, sehingga terlihat sebagai tombol yang bisa diklik. */
+.lipat-lain{margin-top:18px}
+.lipat-lain summary{display:flex;align-items:center;gap:12px;cursor:pointer;
+  list-style:none;user-select:none;background:#FFF6E9;border:2px solid var(--oranye);
+  border-radius:13px;padding:12px 15px;transition:.16s;font-family:inherit}
+.lipat-lain summary::-webkit-details-marker{display:none}
+.lipat-lain summary:hover{background:#FFEED6;transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(230,138,0,.18)}
+.lipat-lain[open] summary{background:#FFEED6;border-radius:13px 13px 0 0;
+  border-bottom-color:transparent}
+.lipat-ikon{flex:0 0 auto;width:30px;height:30px;border-radius:9px;
+  background:var(--oranye);color:#2E1B00;display:flex;align-items:center;
+  justify-content:center;font-size:17px;font-weight:800;line-height:1}
+.lipat-kiri{flex:1 1 auto;min-width:0}
+.lipat-utama{display:block;font-size:14.5px;font-weight:800;color:#8A5200;
+  letter-spacing:.01em}
+.lipat-ket{display:block;font-size:11.5px;color:#A8773A;margin-top:2px}
+.lipat-panah{flex:0 0 auto;display:flex;align-items:center;color:#B87700;
+  transition:transform .18s}
+.lipat-lain[open] .lipat-panah{transform:rotate(180deg)}
+.lipat-lain[open] .lipat-isi-bungkus{background:#FFEED6;border:2px solid var(--oranye);
+  border-top:none;border-radius:0 0 13px 13px;padding:16px 15px 15px}
+.lipat-sub{font-size:12px;color:#8A6A3A;line-height:1.5;margin:0 0 13px}
+.isi-lipat{padding-top:2px}
+
+/* ═══ ADDON ══════════════════════════════════════════════════════════════
+   AddOn = mesin uang: murah, dibeli berulang. Gaya sengaja lebih ringan
+   dari kartu paket — supaya user TIDAK tergoda pindah paket (strategi Bos),
+   tapi tetap gampang beli kalau butuh sedikit tambahan. */
+.pemisah-addon{display:flex;align-items:center;gap:12px;margin:22px 0 13px}
+.pemisah-addon::before,.pemisah-addon::after{content:'';flex:1;height:1px;background:var(--garis)}
+.pemisah-addon span{font-size:11.5px;color:#8A8894;white-space:nowrap;font-weight:600;
+                    letter-spacing:.02em;text-transform:uppercase}
+.daftar-addon{display:flex;flex-direction:column;gap:10px}
+.kartu-addon{display:flex;align-items:center;justify-content:space-between;gap:13px;
+             border:1.5px dashed #CFE7D6;border-radius:13px;padding:13px 15px;
+             cursor:pointer;transition:.2s;background:#FBFEFC;text-align:left;
+             width:100%;font-family:inherit}
+.kartu-addon:hover{border-color:var(--hijau);background:#F4FBF7;transform:translateY(-1px);
+                   border-style:solid}
+.kartu-addon[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.kartu-addon .kiri-a{display:flex;align-items:flex-start;gap:10px}
+.kartu-addon .ikon-a{color:var(--hijau);flex:0 0 auto;margin-top:1px}
+.kartu-addon .nama-a{font-size:14.5px;font-weight:700;display:block}
+.kartu-addon .isi-a{font-size:12.5px;color:#68666e;display:block;margin-top:2px}
+.kartu-addon .harga-a{font-size:15px;font-weight:800;color:var(--hijau);white-space:nowrap}
+.kartu-addon .pita-a{font-size:9.5px;font-weight:700;background:#E7F3EA;color:#15682F;
+                     padding:2px 6px;border-radius:40px;margin-left:6px;
+                     vertical-align:middle;white-space:nowrap}
+.catatan-addon{font-size:12px;color:#8A6D1F;background:#FFF9E8;border:1px solid #F2E2B0;
+               border-radius:10px;padding:10px 13px;margin-top:11px;line-height:1.5}
+
+/* ringkasan */
+.ringkas-paket{display:flex;align-items:center;justify-content:space-between;
+               background:#F1F9F4;border:1.5px solid #D6EBDD;border-radius:12px;
+               padding:13px 16px;margin-bottom:16px;font-size:14px}
+.ringkas-paket b{font-size:17px;color:var(--hijau);font-weight:800}
+
+/* QR */
+.kotak-qr{background:#fff;border:1.5px solid var(--garis);border-radius:14px;
+          padding:16px;text-align:center;margin-bottom:15px}
+/* 12Sep26: tombol simpan QR + buka app bank */
+.aksi-qr{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+.tombol-qr{flex:1;min-width:130px;padding:11px 14px;border-radius:70px;cursor:pointer;
+           font-family:inherit;font-size:13.5px;font-weight:700;transition:.2s;
+           border:1.5px solid var(--hijau);background:#fff;color:var(--hijau)}
+.tombol-qr:hover{background:var(--hijau-muda)}
+.tombol-qr.utama{background:var(--hijau);color:#fff;border-color:var(--hijau)}
+.tombol-qr.utama:hover{background:#16712F}
+.tombol-qr:disabled{opacity:.5;cursor:not-allowed}
+.petunjuk-qr{font-size:11.5px;color:#8A8892;line-height:1.5;margin-top:11px;
+             text-align:left;background:#F7FCF9;border-left:3px solid var(--hijau-muda);
+             border-radius:6px;padding:8px 11px}
+.petunjuk-qr b{color:var(--hijau)}
+/* 12Sep26: panduan manual kalau deep-link bank tidak jalan */
+.panduan-bank{margin-top:11px;padding:11px 14px;background:#FBF9F3;border:1.5px solid #F0E6CC;
+              border-radius:10px;text-align:left;font-size:12px;color:#5C5646;line-height:1.65}
+.panduan-bank b{color:#3D3830;font-size:12.5px}
+.panduan-bank ul{margin:7px 0 0 16px;padding:0}
+.panduan-bank li{margin-bottom:3px}
+.tempat-qr{display:flex;align-items:center;justify-content:center;min-height:232px}
+.tempat-qr img,.tempat-qr canvas{max-width:210px;width:100%;height:auto;display:block}
+.memuat-qr{color:#68666e;font-size:13.5px}
+.masa-berlaku{font-size:12.5px;color:#B3261E;font-weight:600;margin-top:10px}
+
+/* order id */
+.nomor-bayar{margin-bottom:15px}
+.nomor-bayar label{font-size:12.5px;font-weight:600;color:#68666e;display:block;margin-bottom:6px}
+.salin{display:flex;gap:8px;align-items:stretch}
+.salin code{flex:1;background:#F2F4F5;border:1.5px solid var(--garis);border-radius:9px;
+            padding:10px 12px;font-size:12.5px;font-family:ui-monospace,monospace;
+            overflow-x:auto;white-space:nowrap;display:flex;align-items:center;color:#272530}
+.tombol-salin{border:1.5px solid var(--hijau);background:#fff;color:var(--hijau);
+              font-family:inherit;font-size:12.5px;font-weight:700;padding:0 15px;
+              border-radius:9px;cursor:pointer;transition:.18s;white-space:nowrap}
+.tombol-salin:hover{background:var(--hijau);color:#fff}
+
+/* status */
+.status-bayar{display:flex;align-items:center;gap:9px;justify-content:center;
+              font-size:13.5px;font-weight:600;color:#8A6D1F;background:#FEF8E7;
+              border:1.5px solid #F5E3AC;border-radius:10px;padding:11px;margin-bottom:16px}
+.status-bayar.lunas{color:#0F6B2E;background:#EAF9EF;border-color:#A9E0BC}
+.status-bayar.gagal{color:#B3261E;background:#FDECEA;border-color:#F5C2BD}
+.denyut{width:9px;height:9px;border-radius:50%;background:#E0A800;
+        animation:denyut 1.3s ease-in-out infinite;flex-shrink:0}
+@keyframes denyut{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.78)}}
+.status-bayar.lunas .denyut{background:#198E3B;animation:none}
+.status-bayar.gagal .denyut{background:#B3261E;animation:none}
+
+/* tombol */
+.aksi-popup{display:flex;flex-direction:column;gap:9px}
+.tombol-cek{width:100%;padding:13px;border:none;border-radius:70px;background:var(--oranye);
+            color:#2E1B00;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
+            transition:.2s;box-shadow:0 6px 16px rgba(244,160,37,.28)}
+.tombol-cek:hover{background:#FFB63D;transform:translateY(-1px)}
+.tombol-cek:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.tombol-cek.lebar{max-width:100%}
+.tombol-batal{width:100%;padding:11px;border:1.5px solid var(--garis);border-radius:70px;
+              background:#fff;color:#68666e;font-family:inherit;font-size:14px;
+              font-weight:600;cursor:pointer;transition:.18s}
+.tombol-batal:hover{border-color:#B3261E;color:#B3261E;background:#FEF7F6}
+.catatan-sandbox{margin-top:15px;padding:12px 14px;background:#FFF9E6;
+                 border:1.5px dashed #E8CF7A;border-radius:11px;font-size:12.5px;
+                 color:#7A5F10;line-height:1.55}
+.tombol-simulasi{display:block;width:100%;margin-top:9px;padding:10px;border:none;
+                 border-radius:8px;background:#7A5F10;color:#fff;font-family:inherit;
+                 font-size:12.5px;font-weight:700;cursor:pointer;transition:.18s}
+.tombol-simulasi:hover{background:#5E4808}
+
+/* sukses */
+.ikon-sukses{width:62px;height:62px;border-radius:50%;background:#EAF9EF;color:#198E3B;
+             font-size:33px;display:grid;place-items:center;margin:8px auto 16px;
+             border:3px solid #A9E0BC}
+.judul-sukses{text-align:center}
+#pesan-sukses{text-align:center;margin-bottom:20px}
+
+.galat-popup{margin-top:14px;padding:11px 14px;background:#FDECEA;border:1.5px solid #F5C2BD;
+             border-radius:10px;color:#B3261E;font-size:13px;line-height:1.5}
+
+@media(max-width:620px){
+  .tirai{padding:0;align-items:flex-end}
+  .popup{max-width:100%;border-radius:22px 22px 0 0;max-height:94vh;padding:24px 18px 30px}
+  .tempat-qr img,.tempat-qr canvas{max-width:186px}
+  /* 12Sep26: aksi-popup sticky di bawah -> beri ruang agar konten terakhir
+     (petunjuk/panduan) tidak tertutup tombol. */
+  .aksi-popup{position:sticky;bottom:0;background:#fff;padding-top:8px;
+              padding-bottom:12px;box-shadow:0 -8px 14px -8px rgba(0,0,0,.10)}
+  #langkah-2{padding-bottom:8px}
+}
+</style>
+
+<script>
+// ═══ POPUP TOP-UP KUOTA + QRIS ═══
+(function () {
+  var tirai = document.getElementById('tirai');
+  var L1 = document.getElementById('langkah-1');
+  var L2 = document.getElementById('langkah-2');
+  var L3 = document.getElementById('langkah-3');
+  var galat = document.getElementById('galat-popup');
+  var paketAktif = null;
+  var orderAktif = null;
+  var timer = null;
+
+  function tampilGalat(pesan) {
+    galat.textContent = pesan;
+    galat.hidden = false;
+  }
+  function bersihGalat() { galat.hidden = true; galat.textContent = ''; }
+  function tampilLangkah(n) {
+    L1.hidden = n !== 1; L2.hidden = n !== 2; L3.hidden = n !== 3;
+    bersihGalat();
+    // Tombol paket/AddOn dimatikan saat mulai bayar (cegah klik ganda).
+    // Kalau kembali ke langkah 1, WAJIB dinyalakan lagi — kalau tidak,
+    // user yang QRIS-nya gagal TIDAK BISA mencoba lagi (tombol tetap mati).
+    if (n === 1) {
+      Array.prototype.forEach.call(
+        document.querySelectorAll('.kartu-paket, .kartu-addon'),
+        function (c) {
+          // Tombol AddOn paket gratis memang disabled sejak awal (ACC Bos:
+          // terkunci) → jangan dinyalakan.
+          if (!(c.classList.contains('kartu-addon') && c.dataset.terkunci)) {
+            c.disabled = false;
+          }
+        });
+    }
+  }
+  function hentikanTimer() { if (timer) { clearInterval(timer); timer = null; } }
+
+  // ---- buka popup ----
+  window.bukaTopup = function () {
+    tirai.hidden = false;
+    document.body.style.overflow = 'hidden';
+    tampilLangkah(1);
+    muatPaket();
+  };
+
+  // ---- buka popup langsung ke TAB RIWAYAT (17Sep26) ----
+  // Dipakai tombol "Riwayat Transaksi" di dashboard naskah.html.
+  window.bukaRiwayat = function () {
+    tirai.hidden = false;
+    document.body.style.overflow = 'hidden';
+    pindahTab('riwayat');
+  };
+  function tutupPopup() {
+    tirai.hidden = true;
+    document.body.style.overflow = '';
+    hentikanTimer();
+  }
+
+  // ---- 12Sep26: batalkan transaksi (ubah status di DB jadi 'batal') ----
+  var _sedangBatal = false;
+  async function batalkanTransaksi() {
+    if (_sedangBatal) return;
+    // Kalau belum ada transaksi aktif (user cuma membuka popup), cukup tutup.
+    if (!orderAktif) { tutupPopup(); return; }
+
+    var btn = document.getElementById('batal-bayar');
+    _sedangBatal = true;
+    var teksAsli = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Membatalkan…';
+    try {
+      var fd = new FormData();
+      fd.append('order_id', orderAktif);
+      var r = await fetch('/api/topup/batal', { method: 'POST', body: fd });
+      var d = await r.json().catch(function () { return {}; });
+      if (d.status === 'sukses') {
+        // Jangan batalkan transaksi yang sudah lunas.
+        alert('Transaksi ini sudah lunas, tidak bisa dibatalkan.');
+        tampilLangkah(3);
+        return;
+      }
+      orderAktif = null;
+      hentikanTimer();
+      tutupPopup();
+      // Segarkan riwayat kalau panelnya sedang terbuka.
+      if (typeof muatRiwayat === 'function') muatRiwayat();
+    } catch (e) {
+      // Jangan gagalkan UX karena jaringan; beri tahu jujur.
+      alert('Gagal membatalkan transaksi. Periksa koneksi lalu coba lagi.');
+    } finally {
+      _sedangBatal = false;
+      btn.disabled = false;
+      btn.textContent = teksAsli;
+    }
+  }
+  document.getElementById('tutup-popup').onclick = tutupPopup;
+  document.getElementById('tutup-riwayat').onclick = tutupPopup;
+  // 🐛 DIPERBAIKI 12Sep26: tombol "Batal" sebelumnya cuma menutup popup -> status
+  //    di DB tetap 'pending', riwayat menampilkan "Menunggu" padahal user batal.
+  //    Sekarang: panggil /api/topup/batal dulu (ubah status), baru tutup.
+  document.getElementById('batal-bayar').onclick = function () {
+    batalkanTransaksi();
+  };
+  document.getElementById('selesai').onclick = function () {
+    tutupPopup();
+    location.reload();
+  };
+  tirai.addEventListener('click', function (e) { if (e.target === tirai) tutupPopup(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !tirai.hidden) tutupPopup();
+  });
+
+  // ---- langkah 1: daftar ADDON (ACC Bos 15Sep26) ----
+  // AddOn = mesin uang: murah, dibeli BERULANG. Karena itu bloknya muncul
+  // di bawah paket dengan nada ringan — bukan tawaran utama.
+  var addonCache = [];
+  var SARAN = null;          // diisi dari /api/addon (saran pintar, 15Sep26)
+  var KONDISI = null;
+
+  function muatAddon() {
+    var blok = document.getElementById('blok-addon');
+    var wadah = document.getElementById('daftar-addon');
+    var catatan = document.getElementById('catatan-addon');
+    var sebab = window.SEBAB_ADDON || 'manual';   // folder|storage|ai|manual
+    fetch('/api/addon?sebab=' + encodeURIComponent(sebab))
+      .then(function (r) { return r.json(); }).then(function (d) {
+      addonCache = d.addon || [];
+      SARAN = d.saran || null;
+      KONDISI = SARAN ? SARAN.kondisi : null;
+      var adaIsi = addonCache.length > 0;
+      if (!adaIsi) { blok.hidden = true; }
+
+      // ── KARTU SARAN (paling atas) ───────────────────────────────────────
+      gambarSaran(SARAN, d.boleh_beli);
+
+      // ── DAFTAR ADDON (di dalam lipatan) ────────────────────────────────
+      wadah.innerHTML = '';
+      addonCache.forEach(function (a) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'kartu-addon';
+        // Paket gratis: tombol mati (ACC Bos: terkunci). Tapi kalau ini
+        // AddOn yang disarankan, biarkan hidup — itu jalan keluar user.
+        var iniSaran = SARAN && SARAN.saran && SARAN.saran.jenis === a.kode;
+        if (!d.boleh_beli && !iniSaran) {
+          b.disabled = true;
+          b.dataset.terkunci = '1';
+        }
+        var ik = a.kode === 'storage' ? 'folder-plus'
+               : (a.kode === 'ai' ? 'sparkles' : 'file-text');
+        b.innerHTML =
+          '<span class="kiri-a">' +
+            '<span class="ikon-a">' + ikonKecil(ik, 19) + '</span>' +
+            '<span>' +
+              '<span class="nama-a">' + a.nama +
+                (a.permanen ? '<span class="pita-a">PERMANEN</span>' : '') +
+              '</span>' +
+              '<span class="isi-a">' + a.keterangan + '</span>' +
+            '</span>' +
+          '</span>' +
+          '<span class="harga-a">' + a.label + '</span>';
+        if (d.boleh_beli || iniSaran) {
+          b.onclick = function () { buatTransaksiAddon(a.kode); };
+        }
+        wadah.appendChild(b);
+      });
+
+      if (!d.boleh_beli) {
+        catatan.hidden = false;
+        catatan.textContent = 'AddOn tersedia untuk paket berbayar.';
+      } else {
+        catatan.hidden = true;
+      }
+      if (adaIsi) blok.hidden = false;
+
+      // Kalau TIDAK ada saran (mis. user klik sendiri tanpa masalah),
+    // buka lipatan otomatis supaya user langsung lihat pilihannya.
+      if (!SARAN || !SARAN.saran) {
+        document.getElementById('lipat-lain').open = true;
+      }
+      gambarIkonLipat();
+      // Ikon panah ikut berubah saat dibuka/ditutup (Lucide, bukan teks ▾).
+      document.getElementById('lipat-lain')
+        .addEventListener('toggle', gambarIkonLipat);
+    }).catch(function () {
+      blok.hidden = true;
+      document.getElementById('lipat-lain').open = true;
+    });
+  }
+
+  // ── Ikon panah + ikon kiri tombol "Lihat pilihan lain" ─────────────────
+  // Pakai sprite Lucide (bukan emoji/teks ▾) supaya konsisten & tajam.
+  function gambarIkonLipat() {
+    // Sprite TIDAK punya 'chevron-up' & 'layers' (dicek 15Sep26). Jadi:
+    // panah pakai 'chevron-down' + ROTASI CSS saat terbuka; ikon kiri pakai
+    // 'file-plus' (tumpukan berkas = pilihan lain), bukan emoji.
+    var ph = document.getElementById('lipat-panah');
+    if (ph) ph.innerHTML = ikonKecil('chevron-down', 18);
+    var ik = document.querySelector('.lipat-ikon');
+    if (ik) ik.innerHTML = ikonKecil('file-plus', 17);
+  }
+
+  // ── Gambar kartu "SARAN UNTUK ANDA" ────────────────────────────────────
+  function gambarSaran(s, bolehBeli) {
+    var kartu = document.getElementById('kartu-saran');
+    if (!s || !s.saran) { kartu.hidden = true; return; }
+
+    document.getElementById('saran-diagnosis').textContent = s.diagnosis;
+    document.getElementById('saran-nama').textContent = s.saran.nama;
+    document.getElementById('saran-ket').textContent =
+      s.saran.keterangan + (s.saran.permanen ? ' · permanen' : '');
+    document.getElementById('saran-harga').textContent = s.saran.label;
+    document.getElementById('saran-alasan').textContent = s.saran.alasan;
+    document.getElementById('saran-ikon').innerHTML =
+      ikonKecil(s.saran.jenis === 'ai' ? 'sparkles' : 'folder-plus', 22);
+
+    // Judul popup disesuaikan dengan masalahnya (bukan "Tambah Kuota" saja).
+    var JUDUL = {
+      folder: 'Tambah Jatah Folder',
+      storage: 'Tambah Storage',
+      ai: 'Tambah Kuota AI'
+    };
+    if (JUDUL[s.sebab]) {
+      document.getElementById('popup-judul').textContent = JUDUL[s.sebab];
+      document.getElementById('popup-sub').textContent =
+        'Solusi paling sesuai untuk Anda ada di bawah ini.';
+    }
+
+    var tb = document.getElementById('saran-tombol');
+    tb.onclick = function () { buatTransaksiAddon(s.saran.jenis); };
+    if (!bolehBeli) {
+      // Teoretis: saran hanya dikirim kalau boleh beli. Kalau toh lewat,
+      // jangan biarkan tombol mati tanpa penjelasan.
+      tb.disabled = true;
+      document.getElementById('saran-alasan').textContent =
+        'Tambahan tersedia untuk paket berbayar. Tingkatkan paket Anda dulu.';
+    }
+    kartu.hidden = false;
+  }
+
+  // ---- langkah 2: bayar ADDON (pakai QRIS yang sama dengan paket) ----
+  function buatTransaksiAddon(kode, tombol) {
+    var semua = document.querySelectorAll('.kartu-addon, .kartu-paket');
+    Array.prototype.forEach.call(semua, function (c) { c.disabled = true; });
+    tampilLangkah(2);
+    document.getElementById('tempat-qr').innerHTML =
+      '<div class="memuat-qr">Membuat QRIS…</div>';
+    document.getElementById('masa-berlaku').textContent = '';
+    document.getElementById('status-bayar').className = 'status-bayar';
+    document.getElementById('status-bayar').innerHTML =
+      '<span class="denyut"></span> Menunggu pembayaran…';
+
+    var fd = new FormData();
+    fd.append('jenis', kode);
+    fetch('/api/addon/buat', { method: 'POST', body: fd })
+      .then(function (r) { return r.json().then(function (j) {
+        return { st: r.status, d: j }; }); })
+      .then(function (h) {
+        if (!h.d.ok) {
+          tampilLangkah(1);
+          tampilGalat(h.d.pesan || 'Tidak bisa membuat pembayaran.');
+          return;
+        }
+        orderAktif = h.d.order_id;
+        document.getElementById('rp-paket').textContent =
+          h.d.nama + ' · ' + (h.d.keterangan || '');
+        document.getElementById('rp-jumlah').textContent =
+          'Rp ' + Number(h.d.jumlah).toLocaleString('id-ID');
+        gambarQR(h.d.qr);
+        document.getElementById('masa-berlaku').textContent =
+          'Berlaku ' + (h.d.menit || 15) + ' menit';
+        mulaiHitungMundur(h.d.menit || 15);
+        mulaiPollingAddon();
+      })
+      .catch(function () {
+        tampilLangkah(1);
+        tampilGalat('Gagal menghubungi server. Coba lagi.');
+      });
+  }
+
+  // ---- POLLING KHUSUS ADDON (ACC Bos 15Sep26) ----
+  // ⚠ WAJIB beda dari mulaiPolling(): endpoint /api/topup/cek menambah
+  //   `trx.tambahan_mb` (kolom paket). Untuk transaksi AddOn kolom itu = 0,
+  //   jadi kuota TIDAK akan bertambah. AddOn harus lewat /api/addon/cek
+  //   yang memanggil tambah_addon() → mengubah kuota_mb + folder_ekstra.
+  function mulaiPollingAddon() {
+    var cek = function () {
+      if (!orderAktif) return;
+      var fd = new FormData();
+      fd.append('order_id', orderAktif);
+      fetch('/api/addon/cek', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.status === 'sukses') { sukses(d); }
+          else if (d.status === 'gagal') {
+            var el = document.getElementById('status-bayar');
+            el.className = 'status-bayar gagal';
+            el.innerHTML = '<span class="denyut"></span> Pembayaran dibatalkan';
+            hentikanTimer();
+          }
+        })
+        .catch(function () { /* diamkan, coba lagi */ });
+    };
+    cek();
+    if (!timer) timer = setInterval(cek, 5000);
+  }
+
+  // ---- langkah 1: daftar paket ----
+  function muatPaket() {
+    muatAddon();       // AddOn dimuat terpisah; tidak memblokir paket
+    fetch('/api/paket').then(function (r) { return r.json(); }).then(function (d) {
+      var wadah = document.getElementById('daftar-paket');
+      if (!d.qris_aktif) {
+        wadah.innerHTML = '<div class="galat-popup">Pembayaran QRIS belum aktif. ' +
+                          'Hubungi admin: eduai@bikinaja.id</div>';
+        return;
+      }
+      wadah.innerHTML = '';
+      d.paket.forEach(function (p, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'kartu-paket' + (i === 1 ? ' pilih' : '');
+        b.innerHTML =
+          '<span class="kiri-p">' +
+            (i === 1 ? '<span class="pita-p">PALING DIMINATI</span>' : '') +
+            '<span class="nama-p">' + p.nama + '</span>' +
+            '<span class="mb-p">' + p.teks_mb + ' penyimpanan tambahan</span>' +
+          '</span>' +
+          '<span class="harga-p">' + p.label + '</span>';
+        b.onclick = function () {
+          Array.prototype.forEach.call(wadah.children, function (c) {
+            c.classList.remove('pilih');
+          });
+          b.classList.add('pilih');
+          buatTransaksi(p.kode);
+        };
+        wadah.appendChild(b);
+      });
+    }).catch(function () {
+      tampilGalat('Tidak bisa memuat daftar paket. Coba lagi.');
+    });
+  }
+
+  // ---- langkah 2: buat transaksi & tampil QR ----
+  function buatTransaksi(kode) {
+    var wadah = document.getElementById('daftar-paket');
+    Array.prototype.forEach.call(wadah.children, function (c) { c.disabled = true; });
+    tampilLangkah(2);
+    document.getElementById('tempat-qr').innerHTML =
+      '<div class="memuat-qr">Membuat QRIS…</div>';
+    document.getElementById('masa-berlaku').textContent = '';
+    document.getElementById('status-bayar').className = 'status-bayar';
+    document.getElementById('status-bayar').innerHTML =
+      '<span class="denyut"></span> Menunggu pembayaran…';
+
+    localStorage.setItem('eduai_kuota_hidden', '1');
+
+    var fd = new FormData();
+    fd.append('paket', kode);
+    fetch('/api/topup/buat', { method: 'POST', body: fd })
+      .then(function (r) { return r.json().then(function (j) { return [r.status, j]; }); })
+      .then(function (hasil) {
+        var st = hasil[0], d = hasil[1];
+        if (st !== 200 || !d.ok) {
+          tampilLangkah(1);
+          tampilGalat(d.pesan || 'Gagal membuat QRIS.');
+          Array.prototype.forEach.call(wadah.children, function (c) { c.disabled = false; });
+          // 12Sep26: pending penuh -> arahkan user ke riwayat agar bisa
+          // membatalkan salah satu, bukan sekadar pesan error buntu.
+          if (d.kode === 'PENDING_PENUH') {
+            setTimeout(function () { pindahTab('riwayat'); }, 2200);
+          }
+          return;
+        }
+        orderAktif = d.order_id;
+        document.getElementById('rp-paket').textContent =
+          d.paket + ' · +' + d.mb + ' MB';
+        document.getElementById('rp-jumlah').textContent =
+          'Rp ' + d.total_bayar.toLocaleString('id-ID');
+        document.getElementById('kode-order').textContent = d.order_id;
+
+        gambarQR(d.qr);
+        mulaiHitungMundur(d.menit);
+
+        document.getElementById('catatan-sandbox').hidden = !d.sandbox;
+        mulaiPolling();
+      })
+      .catch(function () {
+        tampilLangkah(1);
+        tampilGalat('Koneksi gagal. Periksa internet Anda.');
+        Array.prototype.forEach.call(wadah.children, function (c) { c.disabled = false; });
+      });
+  }
+
+  // ---- gambar QR: pakai pustaka QR lokal kalau ada, kalau tidak pakai API ----
+  function gambarQR(teks) {
+    var wadah = document.getElementById('tempat-qr');
+    wadah.innerHTML = '';
+    // QR dirender SERVER kita sendiri (/api/qr) -> tidak bergantung layanan luar,
+    // dan payload QRIS tidak dikirim ke pihak ketiga.
+    var img = document.createElement('img');
+    img.alt = 'Kode QRIS';
+    img.src = '/api/qr?ukuran=420&data=' + encodeURIComponent(teks);
+    img.onerror = function () {
+      wadah.innerHTML = '<div class="memuat-qr">QR gagal dimuat.<br>' +
+                        'Gunakan nomor pembayaran di bawah.</div>';
+    };
+    wadah.appendChild(img);
+  }
+
+  // ---- 12Sep26: simpan QR sebagai PNG (untuk upload ke app bank) ----
+  document.getElementById('simpan-qr').onclick = async function () {
+    var btn = this;
+    var img = document.querySelector('#tempat-qr img');
+    if (!img) { alert('Gambar QR belum siap. Tunggu sebentar.'); return; }
+
+    btn.disabled = true;
+    var asli = btn.textContent;
+    btn.textContent = 'Menyiapkan…';
+    try {
+      // Ambil ulang sebagai blob supaya bisa diunduh / dibagikan.
+      var resp = await fetch(img.src);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      var blob = await resp.blob();
+      var url = URL.createObjectURL(blob);
+      var nama = 'QRIS-' + (orderAktif || 'eduai') + '.png';
+
+      // Web Share API dulu (paling nyaman di HP: bisa langsung "Simpan ke Galeri"
+      // atau kirim ke app bank). Fallback: unduh biasa.
+      var file = new File([blob], nama, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: 'Bayar QRIS', text: 'Kode QRIS EduAi' });
+          btn.disabled = false; btn.textContent = asli;
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') { btn.disabled = false; btn.textContent = asli; return; }
+          // kalau share gagal karena hal lain, lanjut ke unduhan biasa
+        }
+      }
+      var a = document.createElement('a');
+      a.href = url; a.download = nama;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    } catch (e) {
+      alert('Gagal menyiapkan QR: ' + e.message + '\nCoba tekan lama pada gambar QR lalu pilih "Simpan gambar".');
+    } finally {
+      btn.disabled = false; btn.textContent = asli;
+    }
+  };
+
+  // ---- 12Sep26: tombol "Buka Aplikasi Bank" ----
+  // Sebagian besar app bank/e-wallet menolak deep-link mentah dari browser.
+  // Strategi: coba skema populer via iframe tersembunyi; kalau tidak ada yang
+  // menyahut dalam ~1.2s, tampilkan panduan manual (kartu bank populer).
+  document.getElementById('buka-bank').onclick = function () {
+    var skema = [
+      'gojek://',            // GoPay
+      'ovo://',              // OVO
+      'dana://',             // DANA
+      'shopeepay://',        // ShopeePay
+      'linen://',            // LINE
+      'bca://',              // myBCA
+      'mandiri://',          // Livin'
+      'bri://',              // BRImo
+      'bni://',              // BNI Mobile
+    ];
+    // Coba satu per satu di iframe tersembunyi; browser mengabaikan yang tak ada.
+    skema.forEach(function (s) {
+      var f = document.createElement('iframe');
+      f.style.display = 'none';
+      f.src = s;
+      document.body.appendChild(f);
+      setTimeout(function () { f.remove(); }, 800);
+    });
+    // Panduan manual selalu tampil (deep-link tidak bisa dijamin).
+    var k = document.getElementById('panduan-bank');
+    if (k) k.hidden = false;
+  };
+
+  // ---- hitung mundur ----
+  function mulaiHitungMundur(menit) {
+    hentikanTimer();
+    var sisa = (menit || 20) * 60;
+    var el = document.getElementById('masa-berlaku');
+    function gambar() {
+      var m = Math.floor(sisa / 60), s = sisa % 60;
+      el.textContent = 'Berlaku ' + m + ':' + (s < 10 ? '0' : '') + s;
+      if (sisa-- <= 0) { hentikanTimer(); el.textContent = 'QR sudah kedaluwarsa'; }
+    }
+    gambar();
+    timer = setInterval(gambar, 1000);
+  }
+
+  // ---- polling status ----
+  function mulaiPolling() {
+    var cek = function () {
+      if (!orderAktif) return;
+      var fd = new FormData();
+      fd.append('order_id', orderAktif);
+      fetch('/api/topup/cek', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.status === 'sukses') { sukses(d); }
+          else if (d.status === 'gagal') {
+            var el = document.getElementById('status-bayar');
+            el.className = 'status-bayar gagal';
+            el.innerHTML = '<span class="denyut"></span> Pembayaran dibatalkan';
+            hentikanTimer();
+          }
+        })
+        .catch(function () { /* diamkan, coba lagi */ });
+    };
+    cek();
+    if (!timer) timer = setInterval(cek, 5000);
+  }
+
+  document.getElementById('cek-bayar').onclick = function () {
+    if (!orderAktif) return;
+    var b = this;
+    b.disabled = true; b.textContent = 'Memeriksa…';
+    var fd = new FormData();
+    fd.append('order_id', orderAktif);
+    fetch('/api/topup/cek', { method: 'POST', body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.status === 'sukses') { sukses(d); }
+        else { tampilGalat(d.pesan || 'Belum terdeteksi. Tunggu sebentar lalu coba lagi.'); }
+      })
+      .catch(function () { tampilGalat('Koneksi gagal saat memeriksa.'); })
+      .finally(function () { b.disabled = false; b.textContent = 'Sudah Bayar, Cek'; });
+  };
+
+  // ---- sandbox: simulasi lunas ----
+  var sim = document.getElementById('simulasi-bayar');
+  if (sim) sim.onclick = function () {
+    if (!orderAktif) return;
+    var fd = new FormData();
+    fd.append('order_id', orderAktif);
+    fetch('/api/topup/simulasi', { method: 'POST', body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.ok) sukses({ kuota_mb: d.kuota_mb,
+                           pesan: 'Kuota +' + d.tambah_mb + ' MB (mode uji)' });
+        else tampilGalat(d.detail || 'Simulasi gagal');
+      });
+  };
+
+  // ---- sukses ----
+  function sukses(d) {
+    hentikanTimer();
+    tampilLangkah(3);
+    var pesan = d.pesan || 'Pembayaran diterima.';
+    // AddOn storage menambah DUA hal — sebutkan keduanya supaya user tahu
+    // apa yang dia dapat (bukan cuma satu, itu bikin ragu beli lagi).
+    if (d.folder_ekstra) {
+      pesan = 'Tambahan aktif: storage Anda ' + d.kuota_mb + ' MB ' +
+              'dan jatah folder +' + d.folder_ekstra + ' folder.';
+    } else if (d.kuota_mb) {
+      pesan = pesan + ' Kuota Anda sekarang ' + d.kuota_mb + ' MB.';
+    }
+    document.getElementById('pesan-sukses').textContent = pesan;
+  }
+
+  // ═══ TAB: Beli Kuota | Riwayat Transaksi (17Sep26) ═══
+  var tabPaket = document.getElementById('tab-paket');
+  var tabRiwayat = document.getElementById('tab-riwayat');
+  var panelRiwayat = document.getElementById('panel-riwayat');
+  var tabBar = document.getElementById('tab-popup');
+
+  function pindahTab(nama) {
+    var keRiwayat = (nama === 'riwayat');
+    tabPaket.classList.toggle('aktif', !keRiwayat);
+    tabRiwayat.classList.toggle('aktif', keRiwayat);
+    panelRiwayat.hidden = !keRiwayat;
+    // Tab bar tetap tampil supaya user bisa balik ke Beli Kuota
+    tabBar.hidden = false;
+    // Sembunyikan langkah top-up saat melihat riwayat
+    if (keRiwayat) {
+      L1.hidden = true; L2.hidden = true; L3.hidden = true;
+      hentikanTimer();
+      muatRiwayat();
+    } else {
+      // kembali ke alur beli: reset ke langkah 1
+      tampilLangkah(1);
+      if (!document.getElementById('daftar-paket').children.length ||
+          document.getElementById('daftar-paket').querySelector('.memuat-paket')) {
+        muatPaket();
+      }
+    }
+  }
+  tabPaket.onclick = function () { pindahTab('paket'); };
+  tabRiwayat.onclick = function () { pindahTab('riwayat'); };
+
+  function rupiah(n) {
+    return 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+  }
+
+  var _rwHal = 1, _rwSemua = [], _rwTotal = 0, _rwAda = false;
+
+  function muatRiwayat(lanjut) {
+    var wadah = document.getElementById('wadah-riwayat');
+    if (!lanjut) { _rwHal = 1; _rwSemua = []; }
+    wadah.innerHTML = '<div class="memuat-paket">Memuat riwayat…</div>';
+    fetch('/api/riwayat?hal=' + _rwHal + '&per=10')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        _rwSemua = _rwSemua.concat((d && d.riwayat) || []);
+        _rwTotal = (d && d.total) || 0;
+        _rwAda = !!(d && d.ada_lagi);
+        gambarRiwayat(wadah, _rwSemua);
+      })
+      .catch(function () {
+        wadah.innerHTML = '<div class="galat-popup">Gagal memuat riwayat. ' +
+                          'Periksa koneksi lalu coba lagi.</div>';
+      });
+  }
+
+  // 12Sep26: peta status -> (kelas CSS, label)
+  var _STATUS = {
+    sukses:  ['sukses',  'Berhasil'],
+    pending: ['pending', 'Menunggu'],
+    batal:   ['batal',   'Dibatalkan'],
+    expired: ['expired', 'Kedaluwarsa'],
+    gagal:   ['gagal',   'Gagal'],
+  };
+
+  // Ikon Lucide untuk dipakai di dalam JS (tidak bisa lewat makro Jinja
+  // karena dibuat SETELAH halaman dimuat). Ambil dari sprite → konsisten
+  // dengan ikon lain di halaman.
+  function ikonKecil(nama, ukuran) {
+    ukuran = ukuran || 15;
+    return '<svg class="ik" width="' + ukuran + '" height="' + ukuran +
+           '" aria-hidden="true"><use href="#ik-' + nama + '"></use></svg>';
+  }
+
+  function gambarRiwayat(wadah, rows) {
+    if (!rows.length) {
+      wadah.innerHTML =
+        '<div class="rw-kosong"><span class="ikon">' +
+        ikonKecil('receipt', 34) + '</span>' +
+        'Belum ada transaksi.<br>Top-up kuota pertama Anda akan tampil di sini.</div>';
+      return;
+    }
+    var box = document.createElement('div');
+    box.className = 'riwayat';
+    rows.forEach(function (t) {
+      var kartu = document.createElement('div');
+      kartu.className = 'rw-kartu';
+      var info = _STATUS[t.status] || ['gagal', 'Gagal'];
+      var st = info[0], label = info[1];
+      kartu.innerHTML =
+        '<div class="rw-atas">' +
+          '<span class="rw-paket">' + (t.paket || '—') + '</span>' +
+          '<span class="rw-lencana ' + st + '">' + label + '</span>' +
+        '</div>' +
+        '<div class="rw-baris">' +
+          '<span>Tambahan kuota</span><span><b>+' + (t.mb || 0) + ' MB</b></span>' +
+        '</div>' +
+        '<div class="rw-baris">' +
+          '<span>Jumlah bayar</span><span>' + rupiah(t.jumlah) + '</span>' +
+        '</div>' +
+        '<div class="rw-baris">' +
+          '<span>Tanggal</span><span>' + (t.tanggal || '—') + '</span>' +
+        '</div>' +
+        '<div class="rw-order" title="' + (t.order_id || '') + '">' +
+          (t.order_id || '') + '</div>';
+
+      // Tombol aksi (bungkus dalam baris agar rapi berdampingan)
+      var aksi = document.createElement('div');
+      aksi.className = 'rw-aksi';
+      if (t.bisa_lanjut) {
+        var lanjut = document.createElement('button');
+        lanjut.type = 'button';
+        lanjut.className = 'rw-lanjut';
+        lanjut.textContent = t.status === 'expired' ? 'Buat QR Baru' : 'Lanjutkan Bayar';
+        lanjut.onclick = function () { lanjutkanBayar(t.order_id); };
+        aksi.appendChild(lanjut);
+      }
+      if (t.bisa_batal) {
+        var batalBtn = document.createElement('button');
+        batalBtn.type = 'button';
+        batalBtn.className = 'rw-batal';
+        batalBtn.textContent = 'Batalkan';
+        batalBtn.onclick = function () { batalkanDariRiwayat(t.order_id); };
+        aksi.appendChild(batalBtn);
+      }
+      if (aksi.children.length) kartu.appendChild(aksi);
+      box.appendChild(kartu);
+    });
+    wadah.innerHTML = '';
+    wadah.appendChild(box);
+
+    // Info total + tombol "Muat lebih banyak"
+    var kaki = document.createElement('div');
+    kaki.className = 'rw-kaki';
+    kaki.innerHTML = '<span class="rw-jml">Menampilkan ' + rows.length +
+                     ' dari ' + _rwTotal + ' transaksi</span>';
+    if (_rwAda) {
+      var lebih = document.createElement('button');
+      lebih.type = 'button';
+      lebih.className = 'rw-lebih';
+      lebih.textContent = 'Muat lebih banyak';
+      lebih.onclick = function () {
+        lebih.disabled = true; lebih.textContent = 'Memuat…';
+        _rwHal += 1; muatRiwayat(true);
+      };
+      kaki.appendChild(lebih);
+    }
+    wadah.appendChild(kaki);
+  }
+
+  // 12Sep26: lanjutkan pembayaran dari riwayat (ambil/buat ulang QR)
+  var _sedangLanjut = false;
+  async function lanjutkanBayar(orderId) {
+    if (_sedangLanjut) return;
+    _sedangLanjut = true;
+    try {
+      var fd = new FormData(); fd.append('order_id', orderId);
+      var r = await fetch('/api/topup/lanjut', { method: 'POST', body: fd });
+      var d = await r.json().catch(function () { return {}; });
+      if (!d.ok) {
+        alert(d.pesan || 'Tidak bisa melanjutkan transaksi ini.');
+        if (d.kode === 'PENDING_PENUH' || d.status) muatRiwayat();
+        return;
+      }
+      if (d.status === 'sukses') {
+        alert(d.pesan || 'Pembayaran sudah diterima.');
+        tutupPopup(); location.reload(); return;
+      }
+      // Tampilkan langkah QR dengan data dari server
+      orderAktif = d.order_id;
+      document.getElementById('rp-paket').textContent =
+        d.paket + ' · +' + d.mb + ' MB';
+      document.getElementById('rp-jumlah').textContent = rupiah(d.total_bayar);
+      document.getElementById('kode-order').textContent = d.order_id;
+      // 🐛 DIPERBAIKI 12Sep26: WAJIB keluar dari tab riwayat dulu.
+      // Sebelumnya tampilLangkah(2) saja tidak cukup -> panel riwayat tetap
+      // menutupi layar QR, jadi user klik "Lanjutkan Bayar" tapi tidak
+      // melihat perubahan apa pun.
+      // Catatan: langsung set hidden (bukan lewat pindahTab) supaya tidak
+      // memicu muatPaket() yang tidak perlu, lalu tampilLangkah(2) di bawah.
+      tabPaket.classList.add('aktif');
+      tabRiwayat.classList.remove('aktif');
+      panelRiwayat.hidden = true;
+      tabBar.hidden = false;
+      gambarQR(d.qr);
+      mulaiHitungMundur(d.sisa_detik ? d.sisa_detik / 60 : d.menit);
+      tampilLangkah(2);
+      mulaiPolling();
+      if (d.pakai_baru) {
+        tampilGalat('QR lama sudah tidak berlaku. Ini QR baru untuk paket yang sama.');
+      } else {
+        // bersihkan pesan lama kalau ada
+        var galat = document.querySelector('.galat-popup');
+        if (galat) galat.remove();
+      }
+    } catch (e) {
+      alert('Gagal memuat QR. Periksa koneksi lalu coba lagi.');
+    } finally {
+      _sedangLanjut = false;
+    }
+  }
+
+  // ---- 12Sep26: batalkan transaksi dari daftar riwayat ----
+  async function batalkanDariRiwayat(orderId) {
+    if (!confirm('Batalkan transaksi ini?\nTindakan ini tidak dapat dibatalkan.')) return;
+    try {
+      var fd = new FormData();
+      fd.append('order_id', orderId);
+      var r = await fetch('/api/topup/batal', { method: 'POST', body: fd });
+      var d = await r.json().catch(function () { return {}; });
+      if (d.status === 'sukses') { alert('Transaksi ini sudah lunas, tidak bisa dibatalkan.'); }
+      muatRiwayat();
+    } catch (e) {
+      alert('Gagal membatalkan transaksi. Periksa koneksi lalu coba lagi.');
+    }
+  }
+
+  // ---- salin order id ----
+  document.getElementById('salin-order').onclick = function () {
+    var teks = document.getElementById('kode-order').textContent;
+    var b = this;
+    var selesai = function () {
+      b.textContent = 'Tersalin';
+      setTimeout(function () { b.textContent = 'Salin'; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(teks).then(selesai).catch(function () {
+        var t = document.createElement('textarea');
+        t.value = teks; document.body.appendChild(t); t.select();
+        document.execCommand('copy'); document.body.removeChild(t); selesai();
+      });
+    } else {
+      var t2 = document.createElement('textarea');
+      t2.value = teks; document.body.appendChild(t2); t2.select();
+      document.execCommand('copy'); document.body.removeChild(t2); selesai();
+    }
+  };
+})();
+</script>

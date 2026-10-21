@@ -1,0 +1,47 @@
+=== ISI BAGIAN YANG DIREVISI (saat ini) ===
+
+1.5  State of the Art Penelitian
+
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini dapat dipetakan sebagai berikut.
+
+
+Ranah
+
+Perkembangan Terkini
+
+Titik Lanjut yang Ditawarkan Penelitian Ini
+
+Quality of Work Life (QWL)
+
+QWL terbukti meningkatkan kinerja melalui keterlibatan dan kontribusi karyawan (Leitão et al., 2019); QWL diuji bersama self-efficacy terhadap kinerja (Rahardhiansyah et al., 2026; Ayuni & Nuraeni, 2026)
+
+Menguji QWL sebagai sumber daya psikologis yang dikonversi melalui kesiapan digital, bukan jalur langsung
+
+Digital Self-Efficacy (DSE)
+
+DSE memediasi pengaruh transformasi digital terhadap kinerja (Sun & Yoon, 2025); DSE sebagai anteseden pembelajaran (Shahzad et al., 2025)
+
+Memposisikan DSE sebagai anteseden kesiapan digital, bukan mediator
+
+Digital Readiness (DR)
+
+DR diuji sebagai anteseden kepuasan kerja (Palapa & Saragih, 2026); kerangka multi-level kesiapan digital (Trenerry et al., 2021)
+
+Menempatkan DR sebagai simpul konversi (mediator) antara sumber daya dan kinerja
+
+Adaptive Performance (AP)
+
+Taksonomi AP orisinal (Pulakos et al., 2000); penentu AP pada berbagai level (Setiyadi et al., 2024); AP di sektor logistik masih terbatas
+
+Menguji AP pada level individu account officer di sektor logistik Indonesia
+
+Sumber: diolah peneliti (2026).
+
+Kebaruan (novelty) penelitian ini terletak pada tiga hal: pertama, kebaruan konteks, yaitu Account Officer PT JNE Wilayah Lampung, yaitu sektor logistik ekspedisi Indonesia pada level individu di wilayah yang belum diteliti; kedua, kebaruan model, integrasi dua teori besar (COR dan SCT) dalam satu model mediasi parsimonius dengan digital readiness sebagai mediator tunggal; ketiga, kebaruan fenomena, menggeser fokus dari tingkat kinerja ke mekanisme konversi, yaitu menjelaskan bagaimana sumber daya menjadi kinerja, bukan sekadar apakah berpengaruh.
+
+
+=== KOMENTAR/MASUKAN ===
+Perbaiki kalimat pembuka bagian ini supaya lebih mengalir dan jelas.
+
+=== TUGAS SAAT INI ===
+Revisi HANYA bagian **1.5**. Jangan menulis ulang bagian lain. Seluruh istilah dan variabel WAJIB sama dengan yang di atas.

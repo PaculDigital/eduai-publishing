@@ -1,0 +1,51 @@
+[PROFIL] Paradigma=kuantitatif; Desain=survei korelasional dengan PLS-SEM (cross-sectional)
+
+Komentar dosen menyentuh dua aspek sekaligus: (1) kelancaran kalimat dan (2) kejelasan rujukan setiap klaim. Karena komentar tidak menyebut bagian spesifik, saya menangani titik-titik paling kritis di Bab I Latar Belakang Masalah yang paling bermasalah secara alur maupun rujukan.
+
+---
+
+**[K1-KUTIP-ASLI]**
+"Kemampuan ini tidak terbentuk secara otomatis, melainkan didorong oleh faktor-faktor fundamental dari sisi kondisi kerja maupun kapasitas diri individu. Dua faktor yang menjadi fokus penelitian ini adalah quality of work life dan digital self-efficacy."
+
+**[K1-GANTI-JADI]**
+"Kemampuan ini tidak terbentuk secara otomatis; ia didorong oleh faktor-faktor fundamental dari sisi kondisi kerja maupun kapasitas diri individu (Hobfoll, 1989; Bandura, 2001). Dua faktor yang menjadi fokus penelitian ini adalah quality of work life dan digital self-efficacy."
+
+---
+
+**[K1-KUTIP-ASLI]**
+"Tuntutan ganda inilah yang menjadikan kapabilitas adaptif sumber daya manusia sebagai faktor penentu daya saing perusahaan logistik."
+
+**[K1-GANTI-JADI]**
+"Tuntutan ganda tersebut menjadikan kapabilitas adaptif sumber daya manusia sebagai faktor penentu daya saing perusahaan logistik (Metris et al., 2025; Kurnia Sari et al., 2025)."
+
+---
+
+**[K1-KUTIP-ASLI]**
+"Account Officer (AO) menempati posisi sentral karena menjadi penghubung antara kepentingan perusahaan dengan pengguna jasa. Di lingkungan bisnis logistik, AO tidak hanya bertugas mencari pelanggan baru dan menutup kesepakatan, tetapi juga memelihara hubungan jangka panjang, memastikan layanan sesuai kebutuhan pelanggan, dan mendorong pertumbuhan bisnis. Dalam era yang dinamis, AO dihadapkan pada tekanan target yang tinggi dan perubahan sistem digital yang konstan. Tanpa adaptive performance yang memadai, AO berisiko mengalami penurunan efektivitas kerja dan kegagalan merespons kebutuhan pasar, yang pada akhirnya mengancam keberlanjutan bisnis."
+
+**[K1-GANTI-JADI]**
+"Account Officer (AO) menempati posisi sentral karena menjadi penghubung langsung antara kepentingan perusahaan dengan pengguna jasa. Di lingkungan bisnis logistik, AO tidak hanya bertugas mencari pelanggan baru dan menutup kesepakatan, tetapi juga memelihara hubungan jangka panjang, memastikan layanan sesuai kebutuhan pelanggan, serta mendorong pertumbuhan bisnis (Palapa & Saragih, 2026). Dalam era yang dinamis, AO dihadapkan pada tekanan target yang tinggi dan perubahan sistem digital yang konstan. Tanpa adaptive performance yang memadai, AO berisiko mengalami penurunan efektivitas kerja dan kegagalan merespons kebutuhan pasar, yang pada akhirnya mengancam keberlanjutan bisnis (Setiyadi et al., 2024; Sitorus et al., 2026)."
+
+---
+
+**[K1-KUTIP-ASLI]**
+"Temuan ini mengindikasikan bahwa meskipun quality of work life dan digital self-efficacy Account Officer relatif baik, masih terdapat kesenjangan pada aspek kesiapan digital, khususnya kemampuan mengonversi keyakinan diri menjadi kelincahan belajar dalam menghadapi perubahan peran. Inilah celah yang diduga menjembatani modal awal karyawan dengan adaptive performance mereka."
+
+**[K1-GANTI-JADI]**
+"Hasil pra-survey pada Tabel 1.1 mengindikasikan bahwa meskipun quality of work life dan digital self-efficacy Account Officer relatif baik, masih terdapat kesenjangan pada aspek kesiapan digital, khususnya kemampuan mengonversi keyakinan diri menjadi kelincahan belajar dalam menghadapi perubahan peran. Inilah celah yang diduga menjembatani modal awal karyawan dengan adaptive performance mereka."
+
+---
+
+**[K1-KUTIP-ASLI]**
+"Kebaruan penelitian ini terletak pada tiga hal. Pertama, dari sisi konteks, penelitian ini mengkaji adaptive performance pada Account Officer perusahaan ekspedisi di Provinsi Lampung, sebuah konteks yang belum banyak diteliti. Kedua, dari sisi kombinasi model, penelitian ini menguji quality of work life sebagai faktor kondisi kerja dan digital self-efficacy sebagai faktor kapasitas diri secara simultan dalam memengaruhi adaptive performance melalui digital readiness, kombinasi yang belum banyak diuji secara bersama-sama. Ketiga, dari sisi teori, penelitian ini mengintegrasikan Conservation of Resources Theory dan Social Cognitive Theory untuk menjelaskan mekanisme konversi sumber daya dalam pembentukan kinerja adaptif pada level individu."
+
+**[K1-GANTI-JADI]**
+"Kebaruan penelitian ini terletak pada tiga hal, sebagaimana dipetakan dalam Tabel 1.2. Pertama, dari sisi konteks, penelitian ini mengkaji adaptive performance pada Account Officer perusahaan ekspedisi di Provinsi Lampung, sebuah konteks yang belum banyak diteliti (Setiyadi et al., 2024; Sitorus et al., 2026). Kedua, dari sisi kombinasi model, penelitian ini menguji quality of work life sebagai faktor kondisi kerja dan digital self-efficacy sebagai faktor kapasitas diri secara simultan dalam memengaruhi adaptive performance melalui digital readiness, kombinasi yang belum banyak diuji secara bersama-sama. Ketiga, dari sisi teori, penelitian ini mengintegrasikan Conservation of Resources Theory dan Social Cognitive Theory untuk menjelaskan mekanisme konversi sumber daya dalam pembentukan kinerja adaptif pada level individu (Hobfoll, 1989; Bandura, 2001)."
+
+---
+
+**[K1-KUTIP-ASLI]**
+"Berdasarkan uraian tersebut, peneliti tertarik untuk mengkaji secara mendalam bagaimana quality of work life dan digital self-efficacy memengaruhi adaptive performance melalui mediasi digital readiness pada Account Officer PT JNE Wilayah Lampung."
+
+**[K1-GANTI-JADI]**
+"Berdasarkan uraian latar belakang dan kesenjangan penelitian yang telah diidentifikasi tersebut, peneliti tertarik untuk mengkaji secara mendalam bagaimana quality of work life dan digital self-efficacy memengaruhi adaptive performance melalui mediasi digital readiness pada Account Officer PT JNE Wilayah Lampung."

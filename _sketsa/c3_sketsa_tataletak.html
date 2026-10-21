@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>C3 — Sketsa Tata Letak Log Revisi</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 26px 18px 60px; background: #F4F6F9;
+         font: 15px/1.55 -apple-system, 'Segoe UI', Roboto, sans-serif;
+         color: #1E2430; }
+  h1 { font-size: 20px; margin: 0 0 6px; }
+  .ket { color: #5A6472; font-size: 13px; margin: 0 0 28px; }
+  .pilihan { background: #fff; border: 1px solid #E1E6ED; border-radius: 14px;
+             padding: 20px; margin: 0 0 26px; }
+  .pilih-judul { display: flex; align-items: center; gap: 10px;
+                 margin: 0 0 4px; }
+  .badge { background: #1E2430; color: #fff; font-weight: 700;
+           font-size: 12px; padding: 3px 10px; border-radius: 20px; }
+  .pilih-sub { color: #5A6472; font-size: 13px; margin: 0 0 18px; }
+  .plus { color: #1B7A46; font-size: 13px; margin: 12px 0 0; }
+  .minus { color: #A33; font-size: 13px; margin: 4px 0 0; }
+
+  /* ── tiruan halaman naskah (ringkas) ── */
+  .hp { border: 1px solid #D9DFE8; border-radius: 12px; overflow: hidden;
+        background: #F7F9FC; }
+  .hp-kepala { background: #fff; padding: 10px 14px; border-bottom: 1px solid #E7ECF2;
+               display: flex; justify-content: space-between; font-size: 12px;
+               color: #6B7480; }
+  .hp-body { padding: 14px; }
+  .kuota { background: #fff; border: 1px solid #E1E6ED; border-radius: 10px;
+           padding: 12px; margin-bottom: 12px; }
+  .kuota-atas { display: flex; justify-content: space-between; align-items: center; }
+  .kuota h3 { margin: 0; font-size: 15px; }
+  .bar { height: 7px; background: #EDF0F5; border-radius: 6px; margin: 9px 0; }
+  .bar span { display: block; height: 100%; width: 42%; background: #2C7A4B;
+              border-radius: 6px; }
+  .baris-tombol { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tb { font-size: 12px; padding: 7px 11px; border-radius: 8px;
+        border: 1px solid #D9DFE8; background: #fff; color: #333; }
+  .tb-utama { background: #1E2430; color: #fff; border-color: #1E2430; }
+  .zon { border: 1px dashed #C9D2DE; border-radius: 10px; padding: 16px;
+         text-align: center; color: #7A8492; font-size: 12px; background: #fff; }
+  .judul-berkas { font-size: 13px; font-weight: 700; margin: 16px 0 8px;
+                  display: flex; justify-content: space-between; }
+  .berkas { background: #fff; border: 1px solid #E1E6ED; border-radius: 9px;
+            padding: 9px 11px; margin-bottom: 7px; font-size: 12.5px;
+            display: flex; justify-content: space-between; align-items: center; }
+
+  /* ── kartu Log Revisi (tampilan yang diusulkan) ── */
+  .log { background: #fff; border: 1px solid #E1E6ED; border-radius: 11px;
+         padding: 13px; margin-top: 12px; }
+  .log-judul { font-size: 13.5px; font-weight: 700; display: flex;
+               justify-content: space-between; align-items: center; }
+  .log-angka { display: flex; gap: 7px; margin: 11px 0; flex-wrap: wrap; }
+  .kotak { background: #F5F7FA; border-radius: 7px; padding: 7px 10px;
+           font-size: 11.5px; color: #56606E; }
+  .kotak b { display: block; font-size: 15px; color: #1E2430; }
+  .catatan { border: 1px solid #EDF0F5; border-radius: 8px; padding: 9px 11px;
+             margin-bottom: 7px; font-size: 12.5px; }
+  .catatan-atas { display: flex; justify-content: space-between;
+                  align-items: center; gap: 8px; }
+  .lencana { font-size: 10.5px; padding: 2px 8px; border-radius: 20px;
+             background: #F3F5F8; color: #5A6472; white-space: nowrap; }
+  .lencana-dilewati { background: #F0F1F3; color: #6B7480; }
+  .ikon { display: inline-flex; gap: 5px; }
+  .ik { width: 25px; height: 25px; border-radius: 7px; display: inline-flex;
+        align-items: center; justify-content: center; font-size: 13px; }
+  .ik-ai { background: #FDF8EC; color: #C08A16; }
+  .ik-man { background: #EFF8F2; color: #2C7A4B; }
+  .ik-skip { background: #FDF1F1; color: #C0392B; }
+
+  /* ── panel samping (untuk sketsa C) ── */
+  .dua { display: flex; gap: 12px; align-items: flex-start; }
+  .dua .kiri { flex: 1.35; }
+  .dua .kanan { flex: 1; }
+  .panel { background: #fff; border: 1px solid #E1E6ED; border-radius: 11px;
+           padding: 12px; }
+  .panel h4 { margin: 0 0 3px; font-size: 13px; }
+  .panel .sub { color: #6B7480; font-size: 11.5px; margin: 0 0 10px; }
+  .pisah { height: 1px; background: #EDF0F5; margin: 12px 0; }
+  .catatan-kecil { font-size: 12px; color: #56606E; padding: 6px 0;
+                   border-top: 1px solid #F2F4F7; }
+</style>
+</head>
+<body>
+
+<h1>🗂️ Log Revisi — 3 Usul Tata Letak</h1>
+<p class="ket">Masalah sekarang: Log Revisi <b>terkurung di dalam panel
+"Bagikan ke Pembimbing"</b> (panel itu isinya form bagi tautan). Mahasiswa harus
+mengklik "Bagikan" hanya untuk melihat catatan pembimbing — padahal dua hal itu
+berbeda maksud. Bos: <i>"Apakah sudah layak seperti itu? Tidak bisakah lebih rapi?"</i></p>
+
+<!-- ══════════ A ══════════ -->
+<div class="pilihan">
+  <div class="pilih-judul"><span class="badge">A</span>
+    <b>Kartu sendiri di dashboard — selalu terlihat</b></div>
+  <p class="pilih-sub">Log Revisi jadi kartu <b>permanen</b> di bawah "Naskah Saya".
+     Muncul otomatis begitu ada catatan; kalau belum ada, kartunya tidak tampil
+     sama sekali (tidak makan tempat).</p>
+
+  <div class="hp">
+    <div class="hp-kepala"><span>EDUAI</span><span>Beranda · Sampah · Keluar</span></div>
+    <div class="hp-body">
+      <div class="kuota">
+        <div class="kuota-atas"><h3>Naskah Saya</h3><span style="font-size:12px;color:#6B7480">3,2 MB dari 100 MB</span></div>
+        <div class="bar"><span></span></div>
+        <div class="baris-tombol">
+          <span class="tb tb-utama">👥 Bagikan ke Pembimbing</span>
+          <span class="tb">🧾 Riwayat</span>
+          <span class="tb">+ Tambah Kuota</span>
+        </div>
+      </div>
+
+      <!-- ★ KARTU BARU: LOG REVISI -->
+      <div class="log" style="margin-top:0;border-color:#D9C48A">
+        <div class="log-judul">
+          <span>📋 Catatan Pembimbing</span>
+          <span class="lencana">3 menunggu</span>
+        </div>
+        <div class="log-angka">
+          <div class="kotak"><b>4</b>Total catatan</div>
+          <div class="kotak"><b>3</b>Belum selesai</div>
+          <div class="kotak"><b>1</b>Sudah oke</div>
+          <div class="kotak"><b>0</b>Dilewati</div>
+        </div>
+        <div class="catatan">
+          <div class="catatan-atas">
+            <span><b>BAB I — Latar Belakang</b> · sorotan kuning</span>
+            <span class="lencana">Belum selesai</span>
+          </div>
+          <div style="color:#6B7480;margin-top:4px">"Perbaiki kutipan ini, tambahkan sumber terbaru."</div>
+          <div class="ikon" style="margin-top:7px">
+            <span class="ik ik-ai" title="Revisi dengan AI">✦</span>
+            <span class="ik ik-man" title="Dikerjakan sendiri">✎</span>
+            <span class="ik ik-skip" title="Lewati revisi ini">✕</span>
+          </div>
+        </div>
+        <div class="catatan">
+          <div class="catatan-atas">
+            <span><b>1.2 Rumusan Masalah</b> · per BAB</span>
+            <span class="lencana lencana-dilewati">Revisi Dilewati</span>
+          </div>
+          <div class="ikon" style="margin-top:7px">
+            <span class="ik ik-ai" style="opacity:.35">✦</span>
+            <span class="ik ik-man" style="opacity:.35">✎</span>
+            <span class="ik ik-skip" style="opacity:.35">✕</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="zon" style="margin-top:12px">Klik atau tarik berkas ke sini</div>
+      <div class="judul-berkas"><span>Berkas Tersimpan</span><span>9 / 50 berkas</span></div>
+      <div class="berkas"><span>📄 TESIS_LENGKAP_Goras.docx</span><span>Edit · Hapus</span></div>
+      <div class="berkas"><span>📄 Proposal_v3.docx</span><span>Edit · Hapus</span></div>
+    </div>
+  </div>
+
+  <p class="plus">✅ Mahasiswa <b>langsung tahu</b> ada 3 catatan menunggu — tanpa klik apa pun.</p>
+  <p class="plus">✅ Tombol ikon aksi (✦ ✎ ✕) ada di tempat yang dipakai tiap hari.</p>
+  <p class="minus">⚠️ Halaman jadi lebih panjang — <i>tapi</i> hanya kalau ada catatan;
+     kalau tidak ada, kartunya hilang total.</p>
+</div>
+
+<!-- ══════════ B ══════════ -->
+<div class="pilihan">
+  <div class="pilih-judul"><span class="badge">B</span>
+    <b>Lencana di tiap baris berkas</b></div>
+  <p class="pilih-sub">Tidak ada kartu baru. Yang muncul: <b>lencana kecil</b> di
+     baris berkas ("3 catatan") — klik lencana → panel Log Revisi terbuka.</p>
+
+  <div class="hp">
+    <div class="hp-kepala"><span>EDUAI</span><span>Beranda · Sampah · Keluar</span></div>
+    <div class="hp-body">
+      <div class="kuota">
+        <div class="kuota-atas"><h3>Naskah Saya</h3><span style="font-size:12px;color:#6B7480">3,2 MB dari 100 MB</span></div>
+        <div class="bar"><span></span></div>
+        <div class="baris-tombol">
+          <span class="tb tb-utama">👥 Bagikan ke Pembimbing</span>
+          <span class="tb">+ Tambah Kuota</span>
+        </div>
+      </div>
+      <div class="zon">Klik atau tarik berkas ke sini</div>
+      <div class="judul-berkas"><span>Berkas Tersimpan</span><span>9 / 50 berkas</span></div>
+      <div class="berkas">
+        <span>📄 TESIS_LENGKAP_Goras.docx</span>
+        <span style="display:flex;gap:7px;align-items:center">
+          <span class="lencana" style="background:#FDF8EC;color:#A9761A">📋 3 catatan</span>
+          <span>Edit · Hapus</span></span>
+      </div>
+      <div class="berkas"><span>📄 Proposal_v3.docx</span><span>Edit · Hapus</span></div>
+      <div class="berkas">
+        <span>📄 Bab_IV_Analisis.docx</span>
+        <span style="display:flex;gap:7px;align-items:center">
+          <span class="lencana">✓ 0 catatan</span>
+          <span>Edit · Hapus</span></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="plus">✅ Halaman tetap ringkas — tidak ada tambahan tinggi.</p>
+  <p class="plus">✅ Jelas <b>catatan itu milik naskah yang mana</b> (berguna kalau banyak berkas).</p>
+  <p class="minus">⚠️ Catatannya <b>tersembunyi 1 klik lagi</b> — mahasiswa bisa tidak sadar.</p>
+  <p class="minus">⚠️ Kalau mahasiswa masuk lewat "Edit", lencananya tidak terlihat.</p>
+</div>
+
+<!-- ══════════ C ══════════ -->
+<div class="pilihan">
+  <div class="pilih-judul"><span class="badge">C</span>
+    <b>Panel samping "Catatan Pembimbing" — tombol terpisah</b></div>
+  <p class="pilih-sub">Tombolnya <b>dipisah</b> dari "Bagikan": ada tombol
+     "📋 Catatan (3)" sendiri. Klik → panel samping terbuka berisi Log Revisi.</p>
+
+  <div class="hp">
+    <div class="hp-kepala"><span>EDUAI</span><span>Beranda · Sampah · Keluar</span></div>
+    <div class="hp-body">
+      <div class="dua">
+        <div class="kiri">
+          <div class="kuota">
+            <div class="kuota-atas"><h3>Naskah Saya</h3><span style="font-size:12px;color:#6B7480">3,2 MB / 100 MB</span></div>
+            <div class="bar"><span></span></div>
+            <div class="baris-tombol">
+              <span class="tb tb-utama">👥 Bagikan ke Pembimbing</span>
+              <span class="tb" style="border-color:#D9C48A;background:#FDF8EC;color:#8A6412">📋 Catatan Pembimbing <b>3</b></span>
+              <span class="tb">+ Tambah Kuota</span>
+            </div>
+          </div>
+          <div class="zon">Klik atau tarik berkas ke sini</div>
+        </div>
+        <div class="kanan">
+          <div class="panel">
+            <h4>📋 Catatan Pembimbing</h4>
+            <p class="sub">Prof. Uji Bab · 4 catatan</p>
+            <div class="log-angka" style="margin:0 0 10px">
+              <div class="kotak"><b>4</b>Total</div>
+              <div class="kotak"><b>3</b>Menunggu</div>
+            </div>
+            <div class="pisah"></div>
+            <div class="catatan-kecil"><b>BAB I — Latar Belakang</b><br>
+              "Perbaiki kutipan ini."<br>
+              <span class="ikon" style="margin-top:5px">
+                <span class="ik ik-ai">✦</span><span class="ik ik-man">✎</span><span class="ik ik-skip">✕</span></span>
+            </div>
+            <div class="catatan-kecil"><b>1.2 Rumusan Masalah</b>
+              <span class="lencana lencana-dilewati">Dilewati</span><br>
+              <span class="ikon" style="margin-top:5px;opacity:.35">
+                <span class="ik ik-ai">✦</span><span class="ik ik-man">✎</span><span class="ik ik-skip">✕</span></span>
+            </div>
+            <div class="pisah"></div>
+            <div style="font-size:11.5px;color:#6B7480">Tombol "Bagikan" tetap
+              untuk mengundang pembimbing — <b>tidak lagi mencampur</b> dua maksud.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="plus">✅ Dua maksud <b>dipisah jelas</b> — "bagikan" ≠ "lihat revisi".</p>
+  <p class="plus">✅ Halaman tetap ringkas (panel hanya terbuka saat diklik).</p>
+  <p class="minus">⚠️ Ada <b>2 tombol mirip</b> berdampingan → pernah bikin bingung
+     (pelajaran Bayana: "Pesanan saya" vs "Cek pesanan").</p>
+  <p class="minus">⚠️ Di HP, panel samping bisa sempit/turunkebawah.</p>
+</div>
+
+</body>
+</html>

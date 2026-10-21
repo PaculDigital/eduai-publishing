@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% if mode == 'daftar' %}Daftar{% else %}Masuk{% endif %} — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
+     background:#FAFCFB;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+.kiri{flex:1;background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);
+      display:flex;flex-direction:column;justify-content:center;padding:60px 56px;color:#fff}
+.kiri img{height:52px;width:auto;margin-bottom:36px;align-self:flex-start;filter:brightness(0) invert(1)}
+.kiri h1{font-size:clamp(26px,3vw,40px);font-weight:800;line-height:1.2;margin-bottom:18px;letter-spacing:-.5px}
+.kiri p{color:rgba(255,255,255,.85);font-size:16px;max-width:420px;margin-bottom:34px}
+.kiri ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.kiri ul li{display:flex;gap:11px;align-items:flex-start;font-size:15px;color:rgba(255,255,255,.94)}
+/* Ikon di daftar fitur — Lucide (ACC Bos 15Sep26). Sebelumnya pakai tanda
+   centang CSS; sekarang ikon garis supaya konsisten dengan halaman lain. */
+.kiri ul li{display:flex;align-items:flex-start;gap:9px}
+.kiri ul li .ik{color:#B9F5CE;margin-top:2px}
+
+.kanan{width:100%;max-width:520px;display:flex;flex-direction:column;justify-content:center;
+       padding:48px 44px;background:#fff}
+.logo-mobile{display:none;height:46px;width:auto;margin-bottom:26px;align-self:flex-start}
+.kanan h2{font-size:27px;font-weight:800;margin-bottom:8px;letter-spacing:-.4px}
+.kanan .sub{color:var(--teks-abu);font-size:15px;margin-bottom:30px}
+.pesan{background:#FDECEE;border:1px solid #F5C6CB;color:#8B1A25;
+       padding:13px 16px;border-radius:10px;font-size:14px;margin-bottom:20px}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:7px}
+input{width:100%;padding:13px 15px;border:1.5px solid var(--garis);border-radius:10px;
+      font-family:inherit;font-size:15px;margin-bottom:18px;transition:.2s;background:#fff}
+input:focus{outline:none;border-color:var(--hijau);box-shadow:0 0 0 3px rgba(25,142,59,.12)}
+
+/* --- kolom sandi + ikon mata --- */
+.kolom-sandi{position:relative}
+.kolom-sandi input{margin-bottom:18px;padding-right:48px}
+.mata{position:absolute;right:6px;top:50%;transform:translateY(-50%) translateY(-9px);
+      width:38px;height:38px;border:none;background:transparent;cursor:pointer;
+      display:grid;place-items:center;color:var(--teks-abu);border-radius:8px;
+      transition:.18s;padding:0}
+.mata:hover{background:#F2F4F5;color:var(--hijau)}
+.mata:focus-visible{outline:2px solid var(--hijau);outline-offset:1px}
+.mata svg{width:21px;height:21px;display:block}
+.mata .tutup{display:none}
+.mata.terlihat .buka{display:none}
+.mata.terlihat .tutup{display:block}
+.tombol{width:100%;padding:14px;border:none;border-radius:70px;background:var(--oranye);
+        color:#2E1B00;font-family:inherit;font-size:15.5px;font-weight:700;cursor:pointer;
+        transition:.2s;box-shadow:0 6px 18px rgba(244,160,37,.3)}
+.tombol:hover{background:#FFB63D;transform:translateY(-1px)}
+.bawah{text-align:center;color:var(--teks-abu);font-size:14.5px;margin-top:24px}
+.bawah a{color:var(--hijau);font-weight:600}
+.kembali{color:var(--teks-abu);font-size:13.5px;margin-top:30px;text-align:center}
+.kembali a{color:var(--hijau)}
+@media(max-width:880px){
+  .kiri{display:none}
+  .kanan{max-width:none;padding:36px 24px}
+  .logo-mobile{display:block}
+}
+</style>
+<link rel="stylesheet" href="/static/ikon.css">
+</head>
+<body>
+<!-- IKON: sprite Lucide (ACC Bos 15Sep26) -->
+{{ ikon_sprite() }}
+
+
+<aside class="kiri">
+  <img src="/static/logo-320.png" alt="EduAi">
+  <h1>Naskah Anda,<br>di Mana Saja</h1>
+  <p>Simpan tesis, skripsi, buku, dan artikel jurnal Anda di satu tempat. Buka dari perangkat apa pun.</p>
+  <ul>
+    <li>{{ ikon('cloud', 18) }}<span>30 MB gratis untuk memulai</span></li>
+    <li>{{ ikon('pencil', 18) }}<span>Edit langsung di browser</span></li>
+    <li>{{ ikon('lock', 18) }}<span>Naskah Anda terpisah &amp; aman</span></li>
+  </ul>
+</aside>
+
+<main class="kanan">
+  <img src="/static/logo-terang-320.png" alt="EduAi" class="logo-mobile">
+  <h2>{% if mode == 'daftar' %}Buat Akun Baru{% else %}Selamat Datang{% endif %}</h2>
+  <p class="sub">
+    {% if mode == 'daftar' %}
+      Daftar gratis dan dapatkan 30 MB penyimpanan.
+    {% else %}
+      Masuk untuk mengelola naskah Anda.
+    {% endif %}
+  </p>
+
+  {% if pesan %}<div class="pesan">{{ pesan }}</div>{% endif %}
+
+  <form method="post" action="{% if mode == 'daftar' %}/daftar{% else %}/masuk{% endif %}">
+    {% if mode == 'daftar' %}
+    <label for="nama">Nama</label>
+    <input type="text" id="nama" name="nama" placeholder="Nama Anda" autocomplete="name">
+    {% endif %}
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="nama@email.com"
+           required autocomplete="email">
+
+    <label for="password">Kata Sandi</label>
+    <div class="kolom-sandi">
+      <input type="password" id="password" name="password" placeholder="Minimal 8 karakter"
+             required minlength="8" autocomplete="{% if mode == 'daftar' %}new-password{% else %}current-password{% endif %}">
+      <button type="button" class="mata" id="lihat-sandi"
+              aria-label="Tampilkan kata sandi" title="Tampilkan kata sandi">
+        <svg class="buka" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <svg class="tutup" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.4 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/>
+          <path d="M6.61 6.61A18.15 18.15 0 0 0 2 12s3.6 7 10 7a9.12 9.12 0 0 0 5.39-1.61"/>
+          <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+          <line x1="2" y1="2" x2="22" y2="22"/>
+        </svg>
+      </button>
+    </div>
+
+    <button type="submit" class="tombol">
+      {% if mode == 'daftar' %}Daftar Gratis{% else %}Masuk{% endif %}
+    </button>
+  </form>
+
+  <div class="bawah">
+    {% if mode == 'daftar' %}
+      Sudah punya akun? <a href="/masuk">Masuk di sini</a>
+    {% else %}
+      Belum punya akun? <a href="/daftar">Daftar gratis</a>
+    {% endif %}
+  </div>
+  <div class="kembali"><a href="/">&larr; Kembali ke beranda</a></div>
+</main>
+
+<script>
+// Ikon mata: tampilkan / sembunyikan kata sandi
+(function () {
+  var tombol = document.getElementById('lihat-sandi');
+  var sandi = document.getElementById('password');
+  if (!tombol || !sandi) return;
+  tombol.addEventListener('click', function () {
+    var lihat = sandi.type === 'password';
+    sandi.type = lihat ? 'text' : 'password';
+    tombol.classList.toggle('terlihat', lihat);
+    tombol.setAttribute('aria-label', lihat ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+    tombol.setAttribute('title', lihat ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+    sandi.focus({ preventScroll: true });
+  });
+})();
+</script>
+
+</body>
+</html>

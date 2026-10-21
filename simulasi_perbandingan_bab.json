@@ -1,0 +1,53 @@
+[
+ {
+  "bab": "BAB I",
+  "kata": 4773,
+  "karakter": 37654,
+  "putaran": 5,
+  "putaran_sukses": 5,
+  "total_in": 35460,
+  "total_out": 2363,
+  "total_think": 1004,
+  "total_token": 37823,
+  "biaya_usd": 7.60908e-05,
+  "durasi_detik": 44.560392604907975,
+  "saldo_awal": 9.826611,
+  "saldo_akhir": 9.82628,
+  "selisih_saldo": 0.00033099999999919305,
+  "laporan": "# LAPORAN HASIL PEMERIKSAAN NASKAH\n\n## Status\n**Layak dilanjutkan dengan revisi terarah.** Seluruh bagian wajib BAB I tersedia, dan alur antara Latar Belakang, Rumusan Masalah, serta Tujuan Penelitian sudah konsisten. Namun, masih terdapat beberapa isu konseptual, konsistensi istilah, dan kebahasaan yang perlu diperbaiki sebelum naskah difinalkan.\n\n## Temuan Utama\n1. **Konstruk Digital Readiness belum sepenuhnya tepat.** Indikator \u201ckecepatan mempelajari peran atau tanggung jawab baru saat terjadi rotasi atau perubahan struktur\u201d lebih dekat dengan adaptive performance atau readiness to change daripada kesiapan digital.\n2. **Istilah kausal belum selaras dengan desain penelitian.** Kata \u201cpengaruh\u201d dan \u201cmemengaruhi\u201d perlu digunakan secara hati-hati karena desain cross-sectional tidak membuktikan kausalitas jangka panjang.\n3. **Terminologi belum konsisten.** Terdapat pergantian istilah bahasa Inggris dan bahasa Indonesia, variasi penamaan teori, serta penggunaan Account Officer, AO, dan account officer.\n4. **Beberapa singkatan belum diperkenalkan secara lengkap.** PLS-SEM perlu ditulis dalam bentuk lengkap pada kemunculan pertama.\n5. **Terdapat kesalahan PUEBI**, antara lain *pra-survey*, *pasca-pandemi*, *antar variabel*, dan *antar-mediator*.\n\n## PRIORITAS PERBAIKAN\n1. **Validasi dan perjelas indikator Digital Readiness.** Periksa sumber teori dan instrumen; revisi indikator atau jelaskan keterkaitannya dengan penggunaan teknologi digital.\n2. **Selaraskan klaim penelitian dengan desain cross-sectional.** Gunakan \u201chubungan\u201d atau \u201cberpengaruh secara statistik\u201d serta tambahkan batasan interpretasi kausal.\n3. **Lakukan standardisasi istilah dan penyuntingan akhir.** Tetapkan bentuk istilah konstruk, teori, jabatan, dan singkatan; perbaiki seluruh kesalahan PUEBI."
+ },
+ {
+  "bab": "BAB II",
+  "kata": 12998,
+  "karakter": 102807,
+  "putaran": 5,
+  "putaran_sukses": 5,
+  "total_in": 90841,
+  "total_out": 4477,
+  "total_think": 1307,
+  "total_token": 95318,
+  "biaya_usd": 0.00018779,
+  "durasi_detik": 66.31396759487689,
+  "saldo_awal": 9.82628,
+  "saldo_akhir": 9.826093,
+  "selisih_saldo": 0.0001870000000003813,
+  "laporan": "# LAPORAN HASIL PEMERIKSAAN NASKAH\n\n**Status:**  \n**Perlu revisi mayor.** Struktur teori telah tersedia dan seluruh variabel memiliki landasan teori. Namun, masih terdapat masalah konsistensi konstruk, ketepatan sitasi APA 7, serta kekuatan argumentasi hubungan antarvariabel dan hipotesis.\n\n**Temuan Utama:**\n1. **Landasan teori cukup lengkap**, dengan COR dan SCT sebagai grand theory serta dukungan JD-R, TAM, UTAUT, dan teori adaptive performance.\n2. **Sitasi APA 7 belum konsisten**, terutama penggunaan *et al.*, format penulis Venkatesh, penggunaan \u201c&\u201d dalam sitasi naratif, tahun publikasi Bandura, serta sumber primer Technology Readiness Index.\n3. **QWL belum selaras antara definisi dan indikator.** Definisi menggunakan delapan kriteria Walton, sedangkan indikator hanya mencakup fasilitas kerja, kompensasi/keamanan, dan work-life balance.\n4. **DSE berpotensi tumpang tindih dengan Digital Readiness**, khususnya indikator \u201cketenangan menghadapi peralihan cara kerja digital\u201d.\n5. **Digital Readiness belum memiliki unit analisis yang tegas.** Definisi mencakup individu dan organisasi, tetapi indikator dominan mengukur persepsi individu serta persepsi manfaat teknologi.\n6. **Argumentasi hipotesis belum sepenuhnya spesifik terhadap adaptive performance individu**, terutama pada hubungan QWL dan DSE dengan adaptive performance.\n\n**PRIORITAS PERBAIKAN:**\n1. **Selaraskan konstruk dan operasionalisasi variabel.** Tetapkan unit analisis Digital Readiness, revisi indikator DSE, serta pilih antara memperluas indikator QWL atau menegaskan QWL sebagai konstruk teradaptasi.\n2. **Perkuat kerangka berpikir dan hipotesis.** Tambahkan bukti empiris yang langsung menguji QWL/DSE terhadap adaptive performance dan jelaskan perbedaan pengaruh langsung dengan jalur mediasi Digital Readiness.\n3. **Lakukan audit seluruh sitasi dan sumber.** Terapkan APA 7 secara konsisten, lengkapi tahun publikasi, identifikasi sumber teori secara tepat, dan tambahkan sumber primer untuk Technology Readiness Index."
+ },
+ {
+  "bab": "BAB III",
+  "kata": 3634,
+  "karakter": 29174,
+  "putaran": 6,
+  "putaran_sukses": 6,
+  "total_in": 41145,
+  "total_out": 3445,
+  "total_think": 732,
+  "total_token": 44590,
+  "biaya_usd": 6.000000000000001e-05,
+  "durasi_detik": 57.571519491961226,
+  "saldo_awal": 9.826093,
+  "saldo_akhir": 9.826033,
+  "selisih_saldo": 5.9999999999504894e-05,
+  "laporan": "# LAPORAN HASIL PEMERIKSAAN NASKAH\n\n## Status\n**Perlu revisi substansial sebelum dapat dilanjutkan.** Desain kuantitatif eksplanatori, instrumen kuesioner Likert, dan penggunaan PLS-SEM sudah sesuai untuk menguji hubungan serta mediasi. Namun, transparansi metode, kelengkapan instrumen, spesifikasi konstruk, dan aspek etika belum memadai.\n\n## Temuan Utama\n1. Rancangan cross-sectional tidak mendukung klaim sebab-akibat yang kuat. Gunakan istilah *hubungan* atau *pengaruh statistik* dan nyatakan keterbatasan inferensi kausal.\n2. Dasar penetapan 100 responden belum transparan. Jumlah AO yang benar-benar memenuhi kriteria inklusi belum diketahui, mekanisme purposive sampling dan distribusi sampel pada 18 cabang belum dijelaskan, serta perhitungan *inverse square root* tidak dapat diverifikasi.\n3. Tabel instrumen QWL, DSE, DR, dan AP belum memuat indikator, definisi operasional, sumber, pemetaan dimensi, serta redaksi item. Spesifikasi konstruk reflektif, formatif, atau multidimensi juga belum ditetapkan.\n4. Analisis PLS-SEM telah relevan, tetapi evaluasi model perlu diperbarui, termasuk penggunaan *statistical power*, PLSpredict, HTMT, VIF, R\u00b2, Q\u00b2, f\u00b2, dan pemeriksaan *common method bias*.\n5. Prosedur etika penelitian belum dicantumkan, termasuk persetujuan etik, izin JNE, *informed consent*, kerahasiaan, keamanan data, dan hak responden.\n\n## PRIORITAS PERBAIKAN\n1. **Lengkapi instrumen dan model pengukuran.** Isi seluruh tabel variabel, petakan item ke dimensi, cantumkan sumber/adaptasi, serta tetapkan jenis konstruk dan metode evaluasinya.\n2. **Perjelas populasi, sampling, dan ukuran sampel.** Laporkan jumlah responden eligible, prosedur seleksi dan alokasi per cabang, rumus *power analysis* atau *inverse square root*, serta bedakan target dari realisasi sampel.\n3. **Perbaiki rencana analisis dan etika.** Batasi klaim kausalitas, tambahkan pemeriksaan *common method bias*, gunakan evaluasi prediktif yang sesuai SmartPLS 4, dan lengkapi seluruh prosedur perlindungan responden."
+ }
+]

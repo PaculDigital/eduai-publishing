@@ -1,0 +1,7 @@
+[PROFIL] Paradigma=kuantitatif; Desain=korelasional (pengujian mediasi)
+
+[K1-KUTIP-ASLI]
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini dapat dipetakan sebagai berikut.
+
+[K1-GANTI-JADI]
+Perkembangan penelitian terkini pada empat ranah yang menjadi fokus kajian ini, yaitu Quality of Work Life (QWL), Digital Self-Efficacy (DSE), Digital Readiness (DR), dan Adaptive Performance (AP), dapat dipetakan ke dalam dua hal, yakni capaian penelitian yang telah ada dan titik lanjut yang ditawarkan penelitian ini.

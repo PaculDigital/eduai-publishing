@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Referensi — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="stylesheet" href="/static/ikon.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA;--merah:#C0392B}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none}
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);border-bottom:1px solid rgba(255,255,255,.13);
+       position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;display:flex;align-items:center;justify-content:space-between}
+.nav img{height:52px;width:auto}
+.nav-kanan{display:flex;align-items:center;gap:16px;font-size:14.5px;color:rgba(255,255,255,.9)}
+.nav-kanan .keluar{color:#fff;font-weight:600;border:1.5px solid rgba(255,255,255,.34);padding:6px 15px;border-radius:70px}
+main{max-width:1080px;margin:0 auto;padding:28px 22px 60px}
+/* pita tab — gaya SAMA dgn naskah/kolaborasi/belajar */
+.pita{display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--garis);flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:2px}
+.pita a{padding:11px 20px;border-radius:10px 10px 0 0;font-size:14.5px;font-weight:600;color:var(--teks-abu);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pita a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);border-bottom:2px solid var(--hijau);margin-bottom:-2px}
+h1{font-size:21px;margin-bottom:6px}
+.sub{font-size:13.5px;color:var(--teks-abu);margin-bottom:20px}
+/* dua bagian — satu pintu */
+.dua{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+@media(max-width:780px){.dua{grid-template-columns:1fr}}
+.bagian{background:#fff;border:1px solid var(--garis);border-radius:14px;padding:18px 20px}
+.bagian h2{font-size:15.5px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.bagian p{font-size:12.8px;color:var(--teks-abu);margin-bottom:14px}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--teks-abu);margin:10px 0 5px}
+input,select{width:100%;padding:10px 12px;border:1.5px solid var(--garis);border-radius:9px;font-family:inherit;font-size:13.5px}
+input:focus,select:focus{outline:none;border-color:var(--hijau)}
+.tombol{background:var(--hijau);color:#fff;padding:11px 20px;border-radius:70px;font-size:13.5px;font-weight:600;margin-top:14px;width:100%}
+.tombol.ghost{background:#fff;color:var(--hijau);border:1.5px solid var(--hijau)}
+.tombol:disabled{opacity:.55;cursor:wait}
+/*  ⭐ 13Okt26: tombol bantu isi kata kunci (putusan Bos 2A) + chip konsep */
+.tombol-samar{background:#fff;color:var(--hijau);border:1.5px dashed var(--hijau);
+  padding:9px 16px;border-radius:70px;font-size:12.5px;font-weight:600;
+  margin-top:8px;width:100%;cursor:pointer}
+.tombol-samar:disabled{opacity:.55;cursor:wait}
+.bantu-info{font-size:12px;color:var(--teks-abu);margin-top:8px;line-height:1.5}
+.bantu-chip{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.bantu-chip span{background:var(--hijau-muda);color:var(--hijau-gelap);
+  font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:70px;
+  cursor:pointer}
+.bantu-chip span::after{content:' ×';opacity:.55}
+/* kesempatan */
+.kjatah{background:var(--hijau-muda);color:var(--hijau-gelap);border-radius:10px;padding:10px 14px;font-size:12.8px;margin-bottom:16px}
+.kjatah b{font-size:14px}
+/* daftar artikel */
+.bab-blok{margin-bottom:18px}
+.bab-judul{font-size:13.5px;font-weight:700;color:var(--hijau-gelap);margin-bottom:8px;display:flex;
+           align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.bab-judul span{font-size:11.5px;font-weight:600;color:var(--teks-abu)}
+.art{background:#fff;border:1px solid var(--garis);border-radius:12px;padding:13px 15px;margin-bottom:9px}
+.art .jd{font-size:13.5px;font-weight:600;line-height:1.4;margin-bottom:4px}
+.art .mt{font-size:12px;color:var(--teks-abu);line-height:1.5}
+.art .baris{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
+.lencana{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:70px}
+.lencana.ai{background:#E8F0FE;color:#1B4C9B}
+.lencana.manual{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.lencana.ok{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.lencana.warn{background:#FDF0E7;color:#8A5A22}
+/* PAGAR 2 (06Okt26): tanda "isi terbatas" — artikel tanpa abstrak.
+   Warna netral-abu (BUKAN merah) supaya tidak terkesan menuduh; pesannya
+   "batas informasi", bukan "rusak". */
+.lencana.batas{background:#EFF1F4;color:#4A5259}
+/* PAGAR 3 (06Okt26): abstrak bisa dibuka-tutup supaya user bisa MEMBUKTIKAN
+   sendiri isi yang dibaca AI. */
+details.abs{margin-top:7px;border-top:1px dashed var(--garis,#DDE3E8);padding-top:6px}
+details.abs summary{cursor:pointer;font-size:12px;color:#4A5259;display:flex;
+  align-items:center;gap:5px;list-style:none}
+details.abs summary::-webkit-details-marker{display:none}
+details.abs p{font-size:12px;line-height:1.55;color:#3C444B;margin:6px 0 0;
+  text-align:justify}
+.mini{font-size:11.5px;padding:5px 12px;border-radius:70px;border:1.5px solid var(--garis);background:#fff;color:var(--teks-abu)}
+.mini:hover{border-color:var(--hijau);color:var(--hijau)}
+/*  ── MUTU JURNAL (12Okt26) — PILIHAN A: lencana di depan angka ──────────
+    Bentuk: "Jurnal Kuat · SJR 1.42 · CiteScore 9.4"
+    ⚠️ Label = PENILAIAN EduAi dari SJR, bukan kuartil resmi Scopus. ── */
+.mutu{font-size:11.5px;padding:5px 11px;border-radius:70px;font-weight:600;
+      border:1.5px solid;display:inline-flex;align-items:center;gap:4px;
+      white-space:nowrap;cursor:help}
+.mutu-kuat{background:var(--hijau-muda);border-color:#9BD8B2;color:var(--hijau-gelap)}
+.mutu-sedang{background:#FFF6E5;border-color:#F3D08A;color:#8A5A08}
+.mutu-kecil{background:#F4F4F6;border-color:#DCDCE2;color:var(--teks-abu)}
+/*  ── PITA INDIKATOR ARTIKEL (12Okt26) — PUTUSAN BOS: tulis LENGKAP
+    (Didukung / Dibantah), kalau tidak ada data → "Tidak Cukup Data"  ── */
+.pita-indikator{display:flex;flex-wrap:wrap;gap:5px;align-items:center;
+  padding-bottom:7px;margin-bottom:7px;border-bottom:1px solid #E8EDEA}
+.ind{display:inline-flex;align-items:center;gap:3px;font-size:11px;
+  font-weight:600;border-radius:6px;padding:2px 7px}
+.ind-sitasi{background:#EEF2FF;color:#4338CA}
+.ind-dukung{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.ind-bantah{background:#FEE2E2;color:#B91C1C}
+.ind-kosong{background:#F4F4F6;color:var(--teks-abu);font-weight:500;font-style:italic}
+.ind svg{width:12px;height:12px}
+/*  ── DAFTAR ARTIKEL PENDUKUNG/PEMBANTAH (13Okt26) ── */
+.kutipan{margin:7px 0 2px;font-size:12px}
+.kutipan summary{cursor:pointer;color:var(--hijau-gelap);font-weight:600;
+  display:inline-flex;align-items:center;gap:4px;padding:3px 0}
+.kutipan summary svg{width:12px;height:12px}
+.kt-baris{display:flex;flex-wrap:wrap;gap:5px;align-items:baseline;
+  padding:4px 0 4px 10px;border-left:2px solid #E8EDEA;margin-top:4px}
+.kt-jenis{font-size:10.5px;font-weight:700;border-radius:5px;padding:1px 6px;text-transform:capitalize}
+.kt-didukung{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.kt-dibantah{background:#FEE2E2;color:#B91C1C}
+.kt-menyebut{background:#F4F4F6;color:var(--teks-abu)}
+.kt-judul{color:var(--teks);flex:1;min-width:180px}
+.kt-bagian{font-size:10.5px;color:var(--teks-abu);font-style:italic}
+.nota-mutu{font-size:11.5px;color:var(--teks-abu);background:#F7F9F8;
+      border:1px solid var(--garis);border-radius:10px;padding:9px 12px;
+      margin-bottom:12px;line-height:1.55}
+.nota-mutu b{color:var(--teks)}
+/* 13Okt26: keterangan dipindah ke atas sebagai <details> supaya tidak
+   memakan tempat tapi tetap mudah ditemukan. */
+details.nota-mutu summary{cursor:pointer;font-size:12.5px;color:var(--teks);
+      list-style:none;padding:2px 0}
+details.nota-mutu summary::-webkit-details-marker{display:none}
+details.nota-mutu summary::before{content:'▸ ';color:var(--hijau);
+      font-weight:700}
+details.nota-mutu[open] summary::before{content:'▾ '}
+details.nota-mutu summary:hover{color:var(--hijau)}
+.nota-isi{margin-top:8px;padding-top:8px;border-top:1px dashed var(--garis)}
+.nota-isi p{margin:0 0 8px}
+.nota-isi p:last-child{margin-bottom:0}
+.kosong{background:#fff;border:1.5px dashed var(--garis);border-radius:14px;padding:34px 24px;text-align:center;color:var(--teks-abu);font-size:13px}
+.kosong b{color:var(--teks);display:block;font-size:15px;margin-bottom:6px}
+.pesan{padding:12px 16px;border-radius:10px;font-size:13.2px;margin-bottom:16px;display:none}
+.pesan.ya{background:var(--hijau-muda);color:var(--hijau-gelap);display:block}
+.pesan.tidak{background:#FDF0E7;color:#8A5A22;display:block}
+.kaki{font-size:12px;color:var(--teks-abu);margin-top:8px;line-height:1.6}
+/* Simpan PDF ke workspace (06Okt26) — satu baris, enak di HP */
+.baris-simpan{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
+  background:#fff;border:1px solid var(--garis);border-radius:12px;
+  padding:12px 14px;margin-bottom:14px}
+.baris-simpan label{font-size:12.5px;font-weight:600;color:var(--teks-abu)}
+.baris-simpan select{flex:1;min-width:180px;padding:7px 9px;font-size:13px;
+  border:1px solid var(--garis);border-radius:9px;background:#fff}
+.baris-simpan .kaki{flex-basis:100%;margin-top:0}
+/* ── PAKAI ULANG ANTAR BAB (13Okt26) ── */
+.lencana.pakai{background:#EEF2FF;color:#1D4ED8}
+.pakai-kotak{background:#fff;border:1.5px solid var(--hijau);border-radius:14px;
+  padding:14px 16px;margin-top:12px;box-shadow:0 2px 8px rgba(20,38,26,.06)}
+.pakai-jd{font-size:13.5px;font-weight:700;margin-bottom:10px}
+.bab-cek{display:flex;align-items:center;gap:10px;padding:9px 11px;background:#FAFCFB;
+  border:1px solid var(--garis);border-radius:10px;margin-bottom:7px;font-size:13.5px;
+  cursor:pointer}
+.bab-cek.mati{opacity:.45;cursor:not-allowed;background:#F4F6F5}
+.bab-cek input{width:17px;height:17px;accent-color:var(--hijau);margin:0;flex:0 0 17px}
+.bab-cek small{margin-left:auto;font-size:11.5px;color:var(--teks-abu)}
+.pakai-aksi{display:flex;gap:8px;margin-top:11px}
+.pakai-aksi .tombol{margin-top:0;width:auto;padding:9px 20px}
+.pakai-kotak .kaki{margin-top:9px}
+</style>
+</head>
+<body>
+{{ ikon_sprite() }}
+<header><div class="nav">
+  <a href="/naskah"><img src="/static/logo-terang-320.png" alt="EduAi"></a>
+  <div class="nav-kanan"><span>{{ user.nama or user.email }}</span>
+    <a class="keluar" href="/keluar">Keluar</a></div>
+</div></header>
+<main>
+  {% set menu_aktif = 'referensi' %}
+  {% set menu_kelas = 'pita' %}
+  {% include '_menu.html' %}
+
+  <h1>{{ ikon('book-open', 22) }} Referensi</h1>
+  <p class="sub">Cari bahan bacaan untuk naskahmu — pilih naskah dan babnya dulu ya.</p>
+
+  <!--  ⭐ 13Okt26 (putusan Bos: "A"): keterangan tanda hasil pencarian
+        DIPINDAH KE ATAS — dulu letaknya di baris ~2509 (di bawah daftar
+        artikel), sehingga user harus menggulir jauh dan mengira tandanya
+        hilang. Sekarang tampil SEBELUM user melihat hasil.
+        Ditambah penjelasan SCITE, karena ada DUA indikator berbeda:
+        ① mutu jurnal (Scopus) ② kutipan (Scite) — mudah tertukar.  -->
+  <details class="nota-mutu" id="nota-mutu">
+    <summary><b>Cara membaca tanda di hasil pencarian</b> (buka)</summary>
+    <div class="nota-isi">
+      <p><b>① Mutu jurnal — dari Scopus.</b>
+        <span class="mutu mutu-kuat">Jurnal Kuat</span> SJR ≥ 1,0 ·
+        <span class="mutu mutu-sedang">Jurnal Sedang</span> SJR 0,4–0,99 ·
+        <span class="mutu mutu-kecil">Jurnal Kecil</span> SJR &lt; 0,4.
+        Ini <b>penilaian EduAi</b> dari angka <b>SJR</b> Scopus — bukan
+        peringkat resmi Scopus. Angka SJR &amp; CiteScore ditampilkan apa
+        adanya. Artikel tanpa ISSN Scopus (mis. Garuda) tidak bertanda.</p>
+      <p><b>② Kutipan — dari Scite.</b> Menampilkan berapa kali artikel
+        dibahas: <i>Dikutip</i> · <i>Didukung</i> · <i>Dibantah</i>.
+        Tulisan <b>Tidak Cukup Data</b> artinya Scite <b>sudah diperiksa</b>,
+        tetapi belum ada catatan kutipan untuk artikel itu — bukan tanda
+        ada yang rusak, dan bukan berarti artikelnya tidak bermutu.</p>
+    </div>
+  </details>
+
+  <div class="kjatah" id="kotak-kesempatan">
+    <b id="kesempatan-teks">Sedang menyiapkan…</b>
+    <div id="kesempatan-ket" class="kaki"></div>
+  </div>
+
+  <div class="pesan" id="pesan"></div>
+
+  <div class="dua">
+    <!-- BAGIAN 1: cari otomatis AI -->
+    <div class="bagian">
+      <h2>{{ ikon('sparkles', 18) }} Pilihan EduAi</h2>
+      <p>EduAi mencarikan artikel untukmu. Pilihanmu tetap utuh.</p>
+      <label for="naskah-ai">Naskah</label>
+      <select id="naskah-ai"></select>
+      <label for="bab-ai">Untuk BAB</label>
+      <select id="bab-ai">
+        <option value="BAB I">BAB I — Pendahuluan</option>
+        <option value="BAB II">BAB II — Tinjauan Pustaka</option>
+        <option value="BAB III">BAB III — Metode</option>
+      </select>
+      <label for="kk-ai">Kata kunci</label>
+      <input id="kk-ai" placeholder="mis. kualitas produk">
+      <!--  ⭐ 13Okt26 (putusan Bos 2A): tombol BANTU ISI — user klik,
+            EduAi petakan judul naskah jadi kata kunci; user tetap bisa
+            ubah/hapus. Keputusan akhir di user. -->
+      <button class="tombol-samar" id="btn-bantu" onclick="bantuIsi()">
+        {{ ikon('sparkles', 15) }} EduAi bantu isi</button>
+      <div id="bantu-info" class="bantu-info" hidden></div>
+      <div id="bantu-chip" class="bantu-chip" hidden></div>
+      <button class="tombol" id="btn-ai" onclick="cariAI()">{{ ikon('sparkles', 16) }} Carikan artikel</button>
+    </div>
+
+    <!-- BAGIAN 2: cari sendiri (2× tanpa Token / minggu, lalu 1 Token) -->
+    <div class="bagian">
+      <h2>{{ ikon('search', 18) }} Pencarian kamu <span class="lencana manual" id="lencana-manual">2× tanpa Token</span></h2>
+      <p>Kamu cari sendiri dengan kata kuncimu. Dua kali pertama tiap minggu tanpa Token Revisi.</p>
+      <label for="naskah-man">Naskah</label>
+      <select id="naskah-man"></select>
+      <label for="bab-man">Untuk BAB</label>
+      <select id="bab-man">
+        <option value="BAB I">BAB I — Pendahuluan</option>
+        <option value="BAB II">BAB II — Tinjauan Pustaka</option>
+        <option value="BAB III">BAB III — Metode</option>
+      </select>
+      <label for="kk-man">Kata kunci (satu topik per pencarian)</label>
+      <input id="kk-man" placeholder="mis. pengaruh harga">
+      <button class="tombol ghost" id="btn-man" onclick="cariManual()">{{ ikon('search', 16) }} Cari sendiri</button>
+    </div>
+  </div>
+
+  <!-- TAMBAH MANUAL -->
+  <div class="bagian" style="margin-bottom:22px">
+    <h2>{{ ikon('file-plus', 18) }} Tambah artikel sendiri</h2>
+    <p>Tempel DOI-nya (kami periksa keasliannya) atau isi datanya lengkap.
+       Maksimal 8 artikel tambahan per bab.</p>
+    <div class="dua">
+      <div>
+        <label for="t-naskah">Naskah</label>
+        <select id="t-naskah"></select>
+        <label for="t-bab">Untuk BAB</label>
+        <select id="t-bab">
+          <option value="BAB I">BAB I — Pendahuluan</option>
+          <option value="BAB II">BAB II — Tinjauan Pustaka</option>
+          <option value="BAB III">BAB III — Metode</option>
+        </select>
+        <label for="t-doi">DOI (kalau ada)</label>
+        <input id="t-doi" placeholder="mis. 10.1016/j.jbusres">
+      </div>
+      <div>
+        <label for="t-judul">Judul <span style="color:var(--merah)">*</span></label>
+        <input id="t-judul">
+        <label for="t-penulis">Penulis <span style="color:var(--merah)">*</span></label>
+        <input id="t-penulis" placeholder="mis. Susanti, A.">
+        <label for="t-tahun">Tahun <span style="color:var(--merah)">*</span></label>
+        <input id="t-tahun" type="number" min="1900" max="2100" placeholder="2020">
+        <label for="t-jurnal">Nama jurnal <span style="color:var(--merah)">*</span></label>
+        <input id="t-jurnal">
+      </div>
+    </div>
+    <button class="tombol" onclick="tambahManual()">{{ ikon('file-plus', 16) }} Tambahkan</button>
+    <div class="kaki">Kolom “terverifikasi” hanya bisa diisi oleh hasil pemeriksaan
+      kami — bukan oleh pengguna.</div>
+  </div>
+
+  <!-- DAFTAR TERKUMPUL -->
+  <h1 style="font-size:17px;margin:26px 0 12px">Artikel terkumpul</h1>
+  <div class="baris-simpan">
+    <label for="folder-tujuan">Simpan PDF ke workspace</label>
+    <select id="folder-tujuan">
+      <option value="0">— tanpa workspace —</option>
+    </select>
+    <button class="mini" id="tombol-link-jurnal" onclick="buatLinkJurnal()">
+      <span id="ikon-link-jurnal"></span> Link Jurnal</button>
+    <div class="kaki">PDF yang terbuka tersimpan ke workspace pilihanmu.
+      Artikel berlangganan cukup diberi tautannya ya.</div>
+    <div class="kaki">Tombol <b>Link Jurnal</b> membuat SATU berkas
+      <b>Link Jurnal.txt</b> berisi tautan semua artikelmu — bisa dibuka,
+      diunduh, dan kalau dihapus bisa dibuat lagi kapan saja.</div>
+  </div>
+  <div id="daftar"><div class="kosong"><b>Belum ada artikel</b>
+    Cari pakai salah satu cara di atas ya.</div></div>
+
+  <!-- Kotak centang "pakai juga di bab…" (13Okt26) — muncul saat tombol ditekan -->
+  <div id="kotak-pakai" hidden></div>
+</main>
+
+<script>
+function IKON(nama, uk){
+  //  Ikon Lucide dari sprite (bukan emoji) — 06Okt26 permintaan Bos.
+  return '<svg class="ik" width="'+uk+'" height="'+uk+'" aria-hidden="true">'
+       + '<use href="#ik-'+nama+'"/></svg>';
+}
+const BAB_LABEL = {'BAB I':'BAB I','BAB II':'BAB II','BAB III':'BAB III'};
+const MAX_ART = 8;
+//  daftar naskah dikirim SERVER (tidak menambah endpoint baru)
+let NASKAH = {{ (daftar_naskah or [])|tojson }};
+
+function $(id){return document.getElementById(id);}
+
+function pesan(t, jenis){
+  const p = $('pesan');
+  p.className = 'pesan ' + (jenis||'ya');
+  p.innerHTML = t;
+  if(!t) p.className = 'pesan';
+}
+
+async function api(jalur, opsi){
+  const r = await fetch('/api/ai/v1/jurnal/' + jalur, opsi);
+  try { return await r.json(); }
+  catch(_) { return {ok:false, pesan:'Server sedang sibuk, coba lagi ya.'}; }
+}
+
+function optsNaskah(){
+  return NASKAH.map(n => `<option value="${n.id}">${n.nama}</option>`).join('')
+      || '<option value="">— belum ada naskah —</option>';
+}
+
+function gambarJatah(j){
+  if(!j){ return; }
+  const s = (j.sisa !== undefined) ? j.sisa : 0;
+  $('kesempatan-teks').textContent = s > 0
+    ? `Kamu punya ${s} pencarian tanpa Token minggu ini`
+    : 'Pencarian tanpa Token minggu ini sudah terpakai';
+  const l = $('lencana-manual');
+  if(l) l.textContent = s > 0 ? `${s}× tanpa Token` : '1 Token Revisi';
+  const rp = (j.reset_pada || '').slice(0,10);
+  $('kesempatan-ket').textContent = (j.pesan || '') +
+    (rp ? ' Boleh dipakai lagi mulai ' + rp + ' ya.' : '');
+}
+
+function kartuArtikel(a){
+  const status = (a.doi_status === 'verified')
+    ? '<span class="lencana ok">' + IKON('shield-check',13) + ' terverifikasi</span>'
+    : '<span class="lencana warn">' + IKON('shield-alert',13) + ' belum terverifikasi</span>';
+  const asal = (a.asal === 'manual')
+    ? '<span class="lencana manual">' + IKON('search',12) + ' saya cari</span>'
+    : '<span class="lencana ai">' + IKON('sparkles',12) + ' pilihan EduAi</span>';
+  const link = a.doi
+    ? `<a class="mini" href="https://doi.org/${a.doi}" target="_blank" rel="noopener">${IKON('external-link',13)} Buka</a>`
+    : (a.garuda_id
+        ? `<a class="mini" href="https://garuda.kemdiktisaintek.go.id/documents/detail/${a.garuda_id}" target="_blank" rel="noopener">${IKON('external-link',13)} Buka</a>`
+        : '');
+  //  ── PAGAR 2 & 3 (06Okt26) ──────────────────────────────────────────
+  //  PAGAR 2: artikel tanpa abstrak DIBERI TANDA "isi terbatas" supaya user
+  //     tahu batasnya (tidak dipakai jadi dasar temuan).
+  //  PAGAR 3: abstraknya DITAMPILKAN (bisa dibuka-tutup) supaya user bisa
+  //     MEMBUKTIKAN sendiri apa yang dibaca AI — bukan percaya saja.
+  const terbatas = (a.isi_terbatas === true)
+    ? '<span class="lencana batas">' + IKON('alert-triangle',13) + ' isi terbatas</span>'
+    : '';
+  const abstrak = (a.abstract || '').trim();
+  const blokAbs = abstrak
+    ? `<details class="abs"><summary>${IKON('book-open',13)} Lihat abstrak</summary><p>${abstrak.replace(/</g,'&lt;')}</p></details>`
+    : '';
+  //  ── UNDUH KE WORKSPACE (06Okt26) ───────────────────────────────────
+  //  Tombol SELALU tampak (user tahu harga/tautan SEBELUM menekan).
+  //  Artikel berlangganan → mesin balas jujur + sertakan tautan.
+  //  ── TOMBOL UNDUH (06Okt26) ──────────────────────────────────────────
+  //  Syarat Bos: "kalo sudah download tidak bisa download atau double,
+  //  kecuali telah dihapus dan download lagi." ⇒ kalau artikel sudah ada
+  //  di berkas (`sudah_diunduh`), tombolnya MATI + bilang apa adanya.
+  const kunciAman = (a.kunci||'').replace(/'/g,"\\'");
+  const tombolUnduh = a.sudah_diunduh
+    ? `<button class="mini" disabled title="Sudah ada di berkasmu">${IKON('check',13)} sudah diunduh</button>`
+    : `<button class="mini" onclick="unduhArtikel('${kunciAman}')">${IKON('download',13)} unduh ke workspace</button>`;
+  //  ── MUTU JURNAL (12Okt26, PUTUSAN BOS = PILIHAN A) ──────────────────
+  //  Bentuk: "Jurnal Kuat · SJR 1.42 · CiteScore 9.4"
+  //  ⚠️ Kuat/Sedang/Kecil = PENILAIAN KITA dari SJR (ambang diputuskan Bos),
+  //     BUKAN kuartil resmi Scopus. Alasannya ditulis di judul (title) +
+  //     dijelaskan di kotak "Tentang tanda mutu" pada halaman ini.
+  const m = a.mutu;
+  const mutuPil = (m && m.label && m.sjr)
+    ? `<span class="mutu mutu-${m.kelas}" title="${'Penilaian EduAi memakai SJR (2025). SJR '+m.sjr+(m.snip?' · SNIP '+m.snip:'')+(m.penerbit?' · '+m.penerbit:'')}">${m.label} · SJR ${m.sjr}${m.cite_score ? ' · CiteScore '+m.cite_score : ''}</span>`
+    : '';
+  //  ── PITA INDIKATOR (12Okt26) — PUTUSAN BOS: "memberi indikator memudahkan
+  //  user menggunakan artikel". Tulisan LENGKAP (bukan cuma warna):
+  //  Didukung / Dibantah. Kalau tidak ada data → JANGAN sebut "Scite",
+  //  cukup "Tidak Cukup Data".
+  const sc = a.scite || null;
+  const punyaAngka = sc && (sc.total > 0 || sc.didukung > 0 || sc.dibantah > 0);
+  const pitaIndikator = punyaAngka
+    ? `<div class="pita-indikator">
+         <span class="ind ind-sitasi">${IKON('zap',12)} Dikutip ${sc.total.toLocaleString('id-ID')}&times;</span>
+         ${sc.didukung > 0 ? `<span class="ind ind-dukung">${IKON('check',12)} Didukung ${sc.didukung.toLocaleString('id-ID')}</span>` : ''}
+         ${sc.dibantah > 0 ? `<span class="ind ind-bantah">${IKON('alert-triangle',12)} Dibantah ${sc.dibantah.toLocaleString('id-ID')}</span>` : ''}
+       </div>`
+    : `<div class="pita-indikator">
+         <span class="ind ind-kosong">Tidak Cukup Data</span>
+       </div>`;
+  //  ── DAFTAR ARTIKEL PENDUKUNG/PEMBANTAH (13Okt26, akun premium Bos
+  //  lewat MCP). Muncul hanya kalau datanya ADA — kalau kosong, tidak
+  //  menambah apa pun ke kartu.
+  const kt = a.kutipan || null;
+  const blokKutipan = (kt && kt.length)
+    ? `<details class="kutipan">
+         <summary>${IKON('book-open',12)} Lihat ${kt.length} artikel yang membahas (didukung/dibantah)</summary>
+         ${kt.map(k => `<div class="kt-baris">
+             <span class="kt-jenis kt-${k.jenis}">${k.jenis}</span>
+             <span class="kt-judul">${k.judul || k.doi || '(tanpa DOI)'}</span>
+             ${k.bagian ? `<span class="kt-bagian">bagian: ${k.bagian}</span>` : ''}
+           </div>`).join('')}
+       </details>`
+    : '';
+  //  ── PAKAI ULANG ANTAR BAB (13Okt26, PUTUSAN BOS: "sisip saja") ──────
+  //  Artikel BAB III bisa dipakai juga di BAB I/II. Satu artikel tetap
+  //  SATU entri daftar pustaka (tidak dobel).
+  const dipakaiJuga = (a.dipakai_juga_di || []).filter(x => x && x !== ($('bab-ai') ? $('bab-ai').value : ''));
+  const pitaPakai = dipakaiJuga.length
+    ? `<span class="lencana pakai">${IKON('file-plus',12)} juga di ${dipakaiJuga.join(', ')}</span>`
+    : '';
+  const tombolPakai = kunciAman
+    ? `<button class="mini" onclick="bukaPakai('${kunciAman}')">${IKON('file-plus',13)} pakai juga di bab…</button>`
+    : '';
+  return `<div class="art">
+    ${pitaIndikator}
+    <div class="jd">${a.title || '(tanpa judul)'}</div>
+    <div class="mt">${a.authors || '-'} (${a.year || '-'}). ${a.journal || '-'}.</div>
+    <div class="baris">${asal} ${status} ${terbatas} ${mutuPil} ${pitaPakai} ${link} ${tombolUnduh}
+      ${tombolPakai}
+      <button class="mini" onclick="hapusArtikel('${(a.kunci||'').replace(/'/g,"\\'")}')">${IKON('trash-2',13)} hapus</button>
+    </div>
+    ${blokKutipan}
+    ${blokAbs}</div>`;
+}
+
+function gambarDaftar(j){
+  $('daftar').innerHTML = (j.artikel && j.artikel.length)
+    ? j.artikel.map(kartuArtikel).join('')
+    : `<div class="kosong"><b>Belum ada artikel untuk ${j.bab || 'bab ini'}</b>
+         Cari pakai salah satu cara di atas ya.</div>`;
+}
+
+async function muat(bab){
+  const fid = $('naskah-ai').value;
+  if(!fid){
+    //  PERBAIKAN (06Okt26): kesempatan itu milik USER, bukan naskah.
+    //     Dulu `return` duluan → kotak kesempatan MACET "Memuat…" selamanya
+    //     untuk akun yang belum punya naskah. Sekarang ambil kesempatan DULU.
+    await gambarKesempatan();
+    pesan('Belum ada naskah. Buat naskah dulu di menu Naskah Saya ya.', 'tidak');
+    return;
+  }
+  const j = await api('lihat?file_id=' + fid + '&bab=' + encodeURIComponent(bab||''));
+  if(j.ok){ gambarDaftar(j); gambarJatah(j.jatah); }
+}
+
+async function gambarKesempatan(){
+  //  Ambil kesempatan lewat pencarian yang TIDAK memotong apa pun kalau
+  //  gagal; lebih aman: panggil endpoint lihat tanpa naskah (fallback).
+  //  Karena `lihat` butuh file_id, kita pakai perhitungan sisi-server yang
+  //  sama lewat respons `lihat` — kalau tak ada naskah, ambil dari ringkas
+  //  bawaan halaman.
+  try{
+    const r = await fetch('/api/ai/v1/jurnal/kesempatan');
+    const j = await r.json();
+    if(j && j.ok) gambarJatah(j.kesempatan || j.jatah);
+  }catch(_){ /* diamkan — bukan hal fatal */ }
+}
+
+async function cariAI(){
+  const fid = $('naskah-ai').value, bab = $('bab-ai').value, kk = $('kk-ai').value.trim();
+  if(!fid){ pesan('Belum ada naskah ya.', 'tidak'); return; }
+  if(!kk){ pesan('Isi kata kuncinya dulu ya.', 'tidak'); return; }
+  const b = $('btn-ai'); b.disabled = true; b.innerHTML = IKON('sparkles',16) + ' Mencari…';
+  pesan('EduAi sedang mencarikan artikel untukmu…', 'ya');
+  const j = await api('cari-ai?file_id='+fid+'&bab='+encodeURIComponent(bab)+'&kata_kunci='+encodeURIComponent(kk), {method:'POST'});
+  b.disabled = false; b.innerHTML = IKON('sparkles',16) + ' Carikan artikel';
+  pesan(j.pesan || ('Dapat ' + (j.baru||0) + ' artikel.'), j.ok?'ya':'tidak');
+  if(j.ok){ $('kk-man').value = kk; gambarDaftar(j); gambarJatah(j.jatah); }
+}
+
+/*  ⭐ 13Okt26 (putusan Bos 2A) — "EduAi bantu isi".
+    User klik → EduAi petakan judul naskah → kata kunci muncul di kotak.
+    User TETAP bisa ubah/hapus; klik chip = buang konsep itu.
+    Kalau EduAi tidak bisa memetakan ⇒ bilang jujur, JANGAN dikarang.  */
+async function bantuIsi(){
+  const fid = $('naskah-ai') ? $('naskah-ai').value : '';
+  const kolom = $('kk-ai');
+  //  Judul bisa datang dari 2 tempat (13Okt26):
+  //    ① kolom kata kunci yang sudah diisi user, atau
+  //    ② naskah terpilih (server membaca judulnya).
+  const judul = (kolom && kolom.value ? kolom.value.trim() : '');
+  if(!fid && !judul){ pesan('Pilih naskah atau tulis judulnya dulu ya.', 'tidak'); return; }
+  const b = $('btn-bantu'); b.disabled = true; b.innerHTML = IKON('sparkles',15) + ' Membaca judul…';
+  const info = $('bantu-info'), chip = $('bantu-chip');
+  info.hidden = true; chip.hidden = true; chip.innerHTML = '';
+  //  ⚠️ WAJIB kirim `judul` juga — tanpa itu server tak bisa memetakan
+  //     apa pun (bug terukur 13Okt26: hanya file_id yang terkirim).
+  let q = 'kata-kunci-ai?file_id=' + encodeURIComponent(fid);
+  if(judul){ q += '&judul=' + encodeURIComponent(judul); }
+  const j = await api(q, {method:'POST'});
+  b.disabled = false; b.innerHTML = IKON('sparkles',15) + ' EduAi bantu isi';
+  if(!j.ok){ pesan(j.pesan || 'Belum bisa dibaca.', 'tidak'); return; }
+  $('kk-ai').value = j.usul || '';
+  info.textContent = (j.sumber_kata_kunci === 'kamus')
+    ? 'Kata kunci ini diambil dari daftar EduAi (cepat & tanpa biaya). Silakan ubah kalau perlu.'
+    : 'Kata kunci ini disusun EduAi dari judul naskahmu. Silakan ubah kalau perlu.';
+  info.hidden = false;
+  (j.konsep || []).forEach(function(k){
+    const s = document.createElement('span');
+    s.className = 'chip-konsep';
+    s.textContent = k.nama;
+    s.title = 'Klik untuk buang konsep ini';
+    s.onclick = function(){ buangKonsep(k.nama, s); };
+    chip.appendChild(s);
+  });
+  chip.hidden = false;
+}
+
+/*  Buang satu konsep dari kotak kata kunci (keputusan tetap di user). */
+function buangKonsep(nama, el){
+  const kotak = $('kk-ai');
+  kotak.value = kotak.value.split(',').map(function(x){ return x.trim(); })
+    .filter(function(x){ return x && x.toLowerCase() !== (nama||'').toLowerCase(); })
+    .join(', ');
+  el.remove();
+  if(!$('bantu-chip').children.length){ $('bantu-chip').hidden = true; }
+}
+
+async function cariManual(){
+  const fid = $('naskah-man').value, bab = $('bab-man').value, kk = $('kk-man').value.trim();
+  if(!fid){ pesan('Belum ada naskah ya.', 'tidak'); return; }
+  if(!kk){ pesan('Isi kata kuncinya dulu ya.', 'tidak'); return; }
+  const b = $('btn-man'); b.disabled = true; b.innerHTML = IKON('search',16) + ' Mencari…';
+  pesan('Sedang mencari…', 'ya');
+  const j = await api('cari?file_id='+fid+'&bab='+encodeURIComponent(bab)+'&kata_kunci='+encodeURIComponent(kk), {method:'POST'});
+  b.disabled = false; b.innerHTML = IKON('search',16) + ' Cari sendiri';
+  pesan(j.pesan || ('Dapat ' + (j.baru||0) + ' artikel' +
+        (j.jenis === 'gratis' ? ' (tanpa Token)' : ' (1 Token Revisi)')), j.ok?'ya':'tidak');
+  if(j.ok){ gambarDaftar(j); gambarJatah(j.jatah); }
+}
+
+async function tambahManual(){
+  const fid = $('t-naskah').value, bab = $('t-bab').value;
+  if(!fid){ pesan('Belum ada naskah ya.', 'tidak'); return; }
+  const q = new URLSearchParams({
+    file_id: fid, bab: bab, doi: $('t-doi').value.trim(),
+    title: $('t-judul').value.trim(), authors: $('t-penulis').value.trim(),
+    year: $('t-tahun').value || 0, journal: $('t-jurnal').value.trim()});
+  const j = await api('tambah-manual?' + q.toString(), {method:'POST'});
+  pesan(j.pesan || (j.ok ? 'Artikel ditambahkan.' : 'Belum bisa ditambahkan.'), j.ok?'ya':'tidak');
+  if(j.ok){
+    $('t-doi').value = $('t-judul').value = $('t-penulis').value = $('t-jurnal').value = '';
+    $('t-tahun').value = '';
+    gambarDaftar(j);
+  }
+}
+
+async function hapusArtikel(kunci){
+  const fid = $('naskah-ai').value, bab = $('bab-ai').value;
+  const j = await api('hapus?file_id='+fid+'&bab='+encodeURIComponent(bab)+'&kunci='+encodeURIComponent(kunci), {method:'POST'});
+  if(j.ok){ gambarDaftar(j); pesan('Artikel dihapus ya.', 'ya'); }
+}
+
+//  ── PAKAI ULANG ANTAR BAB (13Okt26, PUTUSAN BOS: "sisip saja") ──────
+//  Buka kotak centang: artikel ini mau dipakai juga di bab mana saja.
+//  Satu artikel = SATU entri daftar pustaka (tidak dobel).
+async function bukaPakai(kunci){
+  const fid = $('naskah-ai').value, bab = $('bab-ai').value;
+  const j = await api('pakai-di?file_id='+fid+'&bab='+encodeURIComponent(bab)
+                      +'&kunci='+encodeURIComponent(kunci));
+  const kotak = $('kotak-pakai');
+  if(!j.ok || !j.pilihan_bab || !j.pilihan_bab.length){
+    pesan('Belum ada bab lain yang bisa dipakai. Cari artikel di bab lain dulu ya.', 'tidak');
+    return;
+  }
+  const baris = j.pilihan_bab.map(b => {
+    const dipakaiSudah = b.sudah && !b.asal;
+    const bisaCek = !b.asal && !dipakaiSudah;
+    const tanda = b.asal ? 'sedang dibuka'
+                 : (dipakaiSudah ? 'sudah dipakai' : (b.jumlah+' artikel'));
+    return '<label class="bab-cek'+(bisaCek?'':' mati')+'">'
+      + '<input type="checkbox" value="'+esc(b.bab)+'"'+(bisaCek?'':' disabled')+'>'
+      + '<span>'+esc(b.bab)+'</span><small>'+tanda+'</small></label>';
+  }).join('');
+  kotak.innerHTML =
+    '<div class="pakai-kotak">'
+    + '<div class="pakai-jd">Pakai juga di bab:</div>'
+    + baris
+    + '<div class="pakai-aksi">'
+    + '<button class="tombol" onclick="simpanPakai(\''+kunci.replace(/'/g,"\\'")+'\')">Simpan</button>'
+    + '<button class="tombol ghost" onclick="tutupPakai()">Batal</button>'
+    + '</div>'
+    + '<div class="kaki">Satu artikel tetap <b>satu entri</b> daftar pustaka, '
+    + 'walau dipakai di beberapa bab.</div></div>';
+  kotak.hidden = false;
+  kotak.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function tutupPakai(){
+  const kotak = $('kotak-pakai');
+  if(kotak){ kotak.hidden = true; kotak.innerHTML = ''; }
+}
+
+async function simpanPakai(kunci){
+  const fid = $('naskah-ai').value, bab = $('bab-ai').value;
+  const dipilih = Array.from($('kotak-pakai').querySelectorAll('input:checked'))
+                        .map(x => x.value);
+  if(!dipilih.length){ pesan('Belum ada bab yang dicentang.', 'tidak'); return; }
+  const j = await api('pakai-di?file_id='+fid+'&bab='+encodeURIComponent(bab)
+                      +'&kunci='+encodeURIComponent(kunci)
+                      +'&ke_bab='+encodeURIComponent(dipilih.join(',')),
+                      {method:'POST'});
+  if(j.ok){
+    tutupPakai();
+    pesan(j.pesan || 'Berhasil dipakai di bab lain.', 'ya');
+    await muat(bab);          // gambar ulang supaya lencananya muncul
+  } else {
+    pesan((j.pesan || 'Gagal menyimpan.'), 'tidak');
+  }
+}
+
+function esc(t){ return String(t||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function unduhArtikel(kunci){
+  const fid = $('naskah-ai').value, bab = $('bab-ai').value;
+  if(!fid){ pesan('Belum ada naskah ya.', 'tidak'); return; }
+  const folder = $('folder-tujuan') ? $('folder-tujuan').value : '0';
+  pesan('Sedang mengambil artikelnya…', 'ya');
+  const j = await api('unduh?file_id='+fid+'&bab='+encodeURIComponent(bab)
+      +'&kunci='+encodeURIComponent(kunci)+'&folder_id='+encodeURIComponent(folder),
+      {method:'POST'});
+  const t = j.pesan || (j.ok ? 'Artikel tersimpan ya.' : 'Belum bisa diunduh.');
+  //  Artikel berlangganan → sertakan TAUTAN (jujur, tanpa menyuruh unduh sendiri)
+  pesan(t + (j.link ? ` <a class="mini" href="${j.link}" target="_blank" rel="noopener">${IKON('external-link',13)} buka tautannya</a>` : ''),
+        j.ok ? 'ya' : 'tidak');
+  //  Muat ULANG daftar supaya tombolnya berubah jadi "sudah diunduh"
+  //  (baik setelah berhasil, maupun setelah ditolak karena sudah ada).
+  if(j.ok || j.kode === 'sudah_diunduh'){
+    if(typeof muatWorkspace === 'function'){ muatWorkspace(); }
+    if(typeof muat === 'function'){ muat(bab); }
+  }
+}
+
+async function buatLinkJurnal(){
+  /*  Buat BERKAS "Link Jurnal.txt" di workspace pilihan (putusan Bos 06Okt26).
+      · A1 = CETAKAN: isi selalu dibuat ulang dari data artikel di app.
+      · B2 = hanya saat tombol ini ditekan.
+      · C  = satu berkas untuk semua topik/bab.
+      · D  = kalau berkasnya dihapus, tekan tombol ini lagi (isi tetap lengkap).
+  */
+  const fid = $('naskah-ai').value;
+  if(!fid){ pesan('Belum ada naskah ya.', 'tidak'); return; }
+  const folder = $('folder-tujuan') ? $('folder-tujuan').value : '0';
+  pesan('Sedang membuat berkas Link Jurnal…', 'ya');
+  const j = await api('link-jurnal?file_id='+fid+'&folder_id='+encodeURIComponent(folder),
+      {method:'POST'});
+  pesan(j.pesan || (j.ok ? 'Berkas Link Jurnal dibuat.' : 'Belum bisa dibuat.'),
+        j.ok ? 'ya' : 'tidak');
+  if(j.ok && typeof muatWorkspace === 'function'){ muatWorkspace(); }
+}
+
+async function muatWorkspace(){
+  try{
+    const r = await fetch('/api/ai/v1/jurnal/folder-pilihan');
+    const j = await r.json();
+    if(!j || !j.ok) return;
+    const sel = $('folder-tujuan');
+    if(!sel) return;
+    const lama = sel.value;
+    sel.innerHTML = '<option value="0">— tanpa workspace —</option>' +
+      (j.folder || []).map(f => `<option value="${f.id}">${f.nama} (${f.jumlah_berkas} berkas)</option>`).join('');
+    if(lama) sel.value = lama;
+  }catch(_){ /* bukan hal fatal — tanpa workspace pun tetap bisa unduh */ }
+}
+
+async function mulai(){
+  //  ⚠️ AKAR BUG (diperbaiki 06Okt26): dulu di sini `NASKAH` DITIMPA dengan
+  //  `window.DAFTAR_NASKAH` — variabel itu TIDAK PERNAH ADA di halaman ini
+  //  (hanya ada di /naskah). Akibatnya NASKAH jadi `[]` kosong ⇒ layar selalu
+  //  bilang "Belum ada naskah" walau user punya naskah, dan cara memilih
+  //  naskah tidak pernah bisa dipakai. Sekarang pakai `NASKAH` yang SUDAH
+  //  diisi server (`let NASKAH = {{ daftar_naskah|tojson }}` di atas).
+  const o = optsNaskah();
+  ['naskah-ai','naskah-man','t-naskah'].forEach(id => { $(id).innerHTML = o; });
+  //  Ikon tombol "Link Jurnal" (nama DICEK ke sprite dulu — jangan menebak).
+  const ikonLink = $('ikon-link-jurnal');
+  if(ikonLink){ ikonLink.innerHTML = IKON('file-text', 14); }
+  muatWorkspace();
+  muat('BAB II');
+}
+mulai();
+</script>
+</body>
+</html>

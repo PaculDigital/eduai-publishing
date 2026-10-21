@@ -1,0 +1,16 @@
+[PROFIL] Paradigma=kuantitatif; Desain=korelasional (survei, pengujian hipotesis langsung dan tidak langsung melalui PLS-SEM)
+
+[K1-KUTIP-ASLI]
+Penelitian ini disusun dalam lima bab yang saling berkaitan, dengan sistematika sebagai berikut.
+[K1-GANTI-JADI]
+Penelitian ini disusun dalam lima bab yang saling berkaitan dengan sistematika sebagai berikut.
+
+Bab I Pendahuluan. Bab ini menguraikan latar belakang masalah yang mendasari pentingnya penelitian, rumusan masalah yang menjadi fokus kajian, tujuan yang hendak dicapai, serta manfaat penelitian bagi pengembangan ilmu dan praktik. Selanjutnya, bab ini memetakan state of the art penelitian dan kesenjangan penelitian yang mendasari kebaruan kajian, kemudian menurunkan kerangka pemikiran beserta pengembangan hipotesis dari kesenjangan tersebut. Bab ini ditutup dengan batasan dan asumsi penelitian serta sistematika penulisan laporan.
+
+Bab II Kajian Pustaka. Bab ini menyajikan landasan teori yang menjadi pijakan penelitian, yang mencakup grand theory, yaitu Conservation of Resources Theory dan Social Cognitive Theory, serta teori pendukung mengenai quality of work life, digital self-efficacy, digital readiness, dan adaptive performance. Bab ini juga memuat kajian penelitian terdahulu, kerangka pemikiran, dan pengembangan hipotesis. Dengan demikian, kerangka pemikiran dan hipotesis yang telah diperkenalkan secara ringkas pada Bab I diuraikan secara lebih terperinci pada bab ini dengan dukungan teori dan hasil penelitian terdahulu.
+
+Bab III Metode Penelitian. Bab ini menjelaskan metode penelitian yang digunakan, meliputi jenis dan pendekatan penelitian, lokasi dan waktu penelitian, definisi operasional dan pengukuran variabel, populasi dan teknik penentuan sampel, metode pengumpulan data, serta teknik analisis data dengan pendekatan Partial Least Squares Structural Equation Modeling (PLS-SEM) menggunakan perangkat lunak SmartPLS.
+
+Bab IV Hasil Penelitian dan Pembahasan. Bab ini menyajikan hasil pengolahan data yang mencakup karakteristik responden, evaluasi model pengukuran (outer model), evaluasi model struktural (inner model), serta pengujian hipotesis langsung dan tidak langsung. Temuan tersebut kemudian dibahas dengan menghubungkannya pada teori yang digunakan dan penelitian terdahulu, disertai implikasi manajerial.
+
+Bab V Kesimpulan dan Saran. Bab ini memuat kesimpulan atas hasil pengujian hipotesis, keterbatasan penelitian, serta saran bagi manajemen, bagi penelitian selanjutnya, dan bagi pemangku kepentingan terkait.

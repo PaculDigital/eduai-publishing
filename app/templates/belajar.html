@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mode Belajar — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/ikon.css">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);
+       border-bottom:1px solid rgba(255,255,255,.13);position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;
+     display:flex;align-items:center;justify-content:space-between}
+.nav img{height:52px;width:auto}
+.nav-kanan{display:flex;align-items:center;gap:16px;font-size:14.5px}
+.nav-kanan .nama{color:rgba(255,255,255,.9)}
+.nav-kanan .keluar{color:#fff;font-weight:600;border:1.5px solid rgba(255,255,255,.34);
+     padding:6px 15px;border-radius:70px;transition:.2s}
+.nav-kanan .keluar:hover{background:rgba(255,255,255,.14)}
+.wadah{max-width:1080px;margin:0 auto;padding:22px 22px 70px}
+
+/* pita tab */
+.pita-tab{display:flex;gap:8px;margin:0 0 18px;width:100%;border-bottom:2px solid var(--garis);flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:2px}
+.pita-tab a{padding:9px 18px;border-radius:10px 10px 0 0;font-size:14px;font-weight:600;color:var(--teks-abu);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pita-tab a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);border-bottom:2px solid var(--hijau);margin-bottom:-2px}
+
+/* panel skor (PALING ATAS) */
+.panel-skor{background:#fff;border:1px solid var(--garis);border-radius:18px;padding:20px 22px;
+       margin-bottom:20px;box-shadow:0 4px 14px rgba(16,79,34,.05)}
+.ps-atas{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap}
+.ps-judul h2{font-size:19px;font-weight:800;margin-bottom:3px}
+.ps-judul p{font-size:13px;color:var(--teks-abu);line-height:1.55}
+.ps-angka{display:flex;gap:26px;flex-wrap:wrap}
+.pa{text-align:right;min-width:70px}
+.pa b{display:block;font-size:25px;font-weight:800;color:var(--hijau);line-height:1.15}
+.pa b.kosong{color:#B9B7C0}
+.pa small{font-size:11.5px;color:var(--teks-abu)}
+.ps-progres{margin-top:16px}
+.ps-label{display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px}
+.progres{height:11px;background:#EDEDF0;border-radius:70px;overflow:hidden}
+.progres span{display:block;height:100%;background:linear-gradient(90deg,#198E3B,#3CB35F);border-radius:70px;transition:width .5s}
+.ps-catatan{margin-top:11px;font-size:12.5px;color:var(--teks-abu);line-height:1.6}
+.ps-catatan b{color:var(--hijau-gelap)}
+
+/* 3 kartu tahap */
+.judul-bagian{font-size:15.5px;font-weight:800;margin:0 0 13px}
+.jalur{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tahap{background:#fff;border:1px solid var(--garis);border-radius:18px;padding:18px;
+       display:flex;flex-direction:column}
+.tahap.buka{border:2px solid var(--hijau);box-shadow:0 6px 20px rgba(25,142,59,.12)}
+.tahap.kunci{background:#F7F7F9;opacity:.75}
+.tahap .nomor{width:30px;height:30px;border-radius:9px;background:var(--hijau);color:#fff;
+       display:grid;place-items:center;font-weight:800;font-size:14px;margin-bottom:10px}
+.tahap.kunci .nomor{background:#CFCDD5}
+.tahap h4{font-size:15.5px;font-weight:800;margin-bottom:5px}
+.tahap .p{font-size:12.5px;color:var(--teks-abu);line-height:1.6;flex:1}
+.tahap .status{margin:12px 0;font-size:12px;font-weight:700;padding:5px 11px;
+       border-radius:70px;display:inline-block;align-self:flex-start}
+.s-buka{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.s-kunci{background:#EDEDF0;color:#8B8992}
+.tbl{background:var(--oranye);color:#2E1B00;font-weight:700;font-size:13.5px;
+     padding:11px 18px;border-radius:70px;border:none;cursor:pointer;width:100%;font-family:inherit}
+.tbl:hover{filter:brightness(1.06)}
+.tbl.mati{background:#E7E7EA;color:#A5A3AB;cursor:not-allowed}
+.tbl2{background:#fff;color:var(--hijau);border:1.5px solid var(--hijau);font-weight:700;
+     font-size:13.5px;padding:10px 18px;border-radius:70px;cursor:pointer;width:100%;font-family:inherit}
+
+/* pilih naskah */
+.pilih{background:#fff;border:1px solid var(--garis);border-radius:18px;padding:20px 22px}
+.pilih h3{font-size:16.5px;font-weight:800;margin-bottom:5px}
+.pilih p{font-size:13px;color:var(--teks-abu);line-height:1.6;margin-bottom:16px}
+.daftar-naskah{display:flex;flex-direction:column;gap:9px}
+.nas{display:flex;align-items:center;gap:13px;padding:13px 15px;border:1px solid var(--garis);
+     border-radius:13px;background:#FCFDFC}
+.nas.aktif{border-color:#B8E5C6;background:#F4FBF6}
+.nas .ikon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+     background:var(--hijau-muda);color:var(--hijau-gelap);font-weight:800;font-size:13px;flex:0 0 34px}
+.nas b{display:block;font-size:14px;font-weight:700}
+.nas small{color:var(--teks-abu);font-size:12px}
+.nas .kanan{margin-left:auto}
+.tbl-kecil{background:var(--hijau);color:#fff;border:none;font-weight:700;font-size:12.5px;
+     padding:8px 15px;border-radius:70px;cursor:pointer;font-family:inherit}
+.tbl-kecil.mati{background:#E7E7EA;color:#A5A3AB;cursor:not-allowed}
+
+/* kartu penenang / keterangan */
+.info{background:#FFF9EC;border-left:4px solid var(--oranye);padding:13px 17px;
+      border-radius:0 12px 12px 0;font-size:13px;color:var(--teks-abu);line-height:1.7;margin-bottom:18px}
+.info b{color:var(--teks)}
+.kosong-kotak{background:#fff;border:1px dashed var(--garis);border-radius:18px;
+      padding:34px 22px;text-align:center}
+.kosong-kotak h3{font-size:16.5px;font-weight:800;margin-bottom:7px}
+.kosong-kotak p{font-size:13.5px;color:var(--teks-abu);line-height:1.7;max-width:560px;margin:0 auto 16px}
+.kosong-kotak .tbl2{display:inline-block;width:auto;padding:11px 24px}
+
+@media(max-width:820px){
+  .jalur{grid-template-columns:1fr}
+  .nav{height:64px;padding:0 16px}.nav img{height:42px}
+  .wadah{padding:16px 14px 60px}
+  .ps-angka{gap:18px}
+  .pa b{font-size:21px}
+}
+</style>
+</head>
+<body>
+{{ ikon_sprite() }}
+<header>
+  <div class="nav">
+    <a href="/naskah"><img src="/static/logo-320.png" alt="EduAi Publishing"></a>
+    <div class="nav-kanan">
+      <span class="nama">{{ user.nama }}</span>
+      <a href="/setelan-wa" class="keluar" title="Setelan WhatsApp">WhatsApp</a>
+      <a href="/keluar" class="keluar">Keluar</a>
+    </div>
+  </div>
+</header>
+
+<div class="wadah">
+  {% set menu_aktif = 'belajar' %}
+  {% include '_menu.html' %}
+
+  {% if not boleh %}
+    {# ── belum berhak: tawarkan dengan HANGAT, ada jalan keluar ── #}
+    <div class="kosong-kotak">
+      <h3>Mode Belajar membantumu siap sidang</h3>
+      <p>Mode Belajar membaca naskahmu sendiri, lalu menuntunmu bertahap —
+         dari siap proposal sampai siap sidang. Fitur ini tersedia mulai paket
+         <b>Peneliti</b> (1 naskah) dan <b>Penerbit</b> (2 naskah).</p>
+      <a class="tbl2" href="/naskah">Lihat pilihan paket</a>
+    </div>
+
+  {% elif pilih %}
+    {# ══════════ SUDAH PILIH NASKAH → panel skor + 3 kartu ══════════ #}
+    <div class="panel-skor">
+      <div class="ps-atas">
+        <div class="ps-judul">
+          <h2>Penguasaan Naskahmu</h2>
+          <p>{{ pilih.nama }}</p>
+        </div>
+        <div class="ps-angka">
+          <div class="pa">
+            {% if pilih.bab_jumlah %}
+              <b>{{ pilih.bab_jumlah }}<span style="font-size:15px;color:#8B8992">/5</span></b>
+            {% else %}
+              <b class="kosong">—</b>
+            {% endif %}
+            <small>Bab terdeteksi</small>
+          </div>
+          <div class="pa"><b class="kosong">—</b><small>Rata-rata skor</small></div>
+          <div class="pa"><b class="kosong">—</b><small>Soal terlatih</small></div>
+        </div>
+      </div>
+      <div class="ps-progres">
+        <div class="ps-label">
+          <span>Perjalanan menuju sidang</span>
+          <span style="color:var(--hijau)">{{ label_tahap }}</span>
+        </div>
+        <div class="progres"><span style="width:{{ tahap_persen }}%"></span></div>
+        <div class="ps-catatan">
+          {% if dasar == 'revisi' %}
+          Belajarmu <b>tersimpan permanen</b> untuk naskah ini — tinggal dibuka
+          kapan pun kamu mau.
+          {% else %}
+          Buka tiap bab lewat <b>Revisi dengan EduAi</b> dulu — nanti bab yang sudah kamu revisi
+          akan membuka tahap belajarnya di sini.
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="judul-bagian">Perjalanan Belajarmu</div>
+    <div class="jalur">
+      {% for k in kartu %}
+        <div class="tahap {{ 'buka' if k.terbuka else 'kunci' }}">
+          <div class="nomor">{{ k.nomor }}</div>
+          <h4>{{ k.judul }}</h4>
+          <div class="p">{{ k.keterangan }}{% if k.alasan %} {{ k.alasan }}{% endif %}</div>
+          <span class="status {{ 's-buka' if k.terbuka else 's-kunci' }}">
+            {% if k.terbuka %}{{ ikon('check', 13) }} Terbuka{% else %}{{ ikon('lock', 13) }} Menunggu{% endif %}
+          </span>
+          {% if k.terbuka %}
+            <a class="tbl" href="/belajar/insight/{{ pilih.id }}?bab={{ k.bab_pertama }}">Mulai Belajar</a>
+          {% else %}
+            <button class="tbl mati" disabled>Belum terbuka</button>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    {# ── berhak, BELUM pilih naskah (atau belum aktivasi) ── #}
+    {% if aktif_rows %}
+      <div class="judul-bagian">Naskah yang sedang belajar</div>
+      <div class="daftar-naskah" style="margin-bottom:20px">
+        {% for a in aktif_rows %}
+          <div class="nas aktif">
+            <div class="ikon">{{ ikon('graduation-cap', 22) }}</div>
+            <div><b>{{ a.nama }}</b><small>Mode Belajar aktif</small></div>
+            <div class="kanan"><a class="tbl-kecil" href="/belajar?naskah={{ a.id }}">Buka</a></div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="pilih">
+      <h3>{% if aktif_rows %}Aktifkan ke naskah lain{% else %}Pilih naskah untuk belajar{% endif %}</h3>
+      <p>
+        Mode Belajar <b>melekat pada satu naskah</b> dan tidak bisa dipindah.
+        Naskah yang kamu pilih akan dibaca bertahap mengikuti bab yang sudah
+        kamu revisi. Sisa jatah: <b>{{ sisa }} dari {{ jatah }}</b> naskah.
+      </p>
+      {% if naskah %}
+        <div class="daftar-naskah">
+          {% for n in naskah %}
+            <div class="nas{% if n.aktif %} aktif{% endif %}">
+              <div class="ikon">{% if n.aktif %}{{ ikon('graduation-cap', 22) }}{% else %}{{ ikon('file-text', 22) }}{% endif %}</div>
+              <div><b>{{ n.nama }}</b>
+                <small>{{ 'Mode Belajar aktif' if n.aktif else 'Klik untuk mengaktifkan' }}</small>
+              </div>
+              <div class="kanan">
+                {% if n.aktif %}
+                  <a class="tbl-kecil" href="/belajar?naskah={{ n.id }}">Buka</a>
+                {% elif sisa > 0 %}
+                  <form method="post" action="/belajar/aktifkan" style="margin:0">
+                    <input type="hidden" name="naskah" value="{{ n.id }}">
+                    <button class="tbl-kecil" type="submit">Aktifkan</button>
+                  </form>
+                {% else %}
+                  <button class="tbl-kecil mati" disabled>Jatah habis</button>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="margin:0">Kamu belum punya naskah. Unggah naskah lebih dulu di
+           halaman <a href="/naskah" style="color:var(--hijau);font-weight:700">Naskah Saya</a>.</p>
+      {% endif %}
+    </div>
+
+    <div class="info" style="margin-top:18px">
+      <b>Mengapa harus dipilih dulu?</b> Mode Belajar membaca isi naskahmu sendiri,
+      jadi ia melekat pada satu naskah supaya hasilnya nyambung dan tidak
+      tertukar. Naskah lain bisa diaktifkan dengan menambah AddOn Mode Belajar.
+    </div>
+  {% endif %}
+
+  {% if pesan %}
+    <div class="info" style="margin-top:18px">{{ pesan }}</div>
+  {% endif %}
+</div>
+
+<script>
+function bukaTahap(no){
+  //  Mesin insight/soal BELUM dibangun (LANGKAH 2–4).
+  //  Jangan janjikan sesuatu yang belum ada — beri tahu apa adanya.
+  alert('Tahap ' + no + ' sedang disiapkan. Kami kabari kamu lewat notifikasi setelah siap.');
+}
+</script>
+</body>
+</html>

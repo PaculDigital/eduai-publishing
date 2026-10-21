@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sketsa Simulasi Sidang — 3 Pilihan</title>
+<style>
+:root{--hijau:#2f6e59;--hijau-tua:#1c4a3c;--emas:#b8862f;--abu:#6b7c76;--garis:#dfe8e3;--bg:#f6f9f7}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#1c2b25;line-height:1.6}
+.wadah{max-width:760px;margin:0 auto;padding:26px 18px 60px}
+h1{font-size:21px;margin:0 0 6px}
+.sub{color:var(--abu);font-size:13px;margin-bottom:26px}
+.bagian{background:#fff;border:1px solid var(--garis);border-radius:14px;padding:20px;margin-bottom:26px}
+.bagian>h2{font-size:16px;margin:0 0 4px;color:var(--hijau-tua)}
+.bagian>.ket{font-size:12.5px;color:var(--abu);margin-bottom:16px}
+.pilih{display:inline-block;background:var(--emas);color:#fff;border-radius:9px;padding:8px 16px;font-size:12.5px;font-weight:600;margin-top:4px}
+/*  ── sketsa ponsel ── */
+.hp{width:340px;border:1px solid #cfd9d4;border-radius:16px;background:#fff;padding:0;overflow:hidden;margin:0 auto}
+.hp-atas{background:var(--hijau);color:#fff;padding:10px 14px;font-size:12.5px;font-weight:600}
+.hp-isi{padding:16px 14px}
+.lencana{display:inline-block;background:#eef6f1;color:var(--hijau);border-radius:20px;padding:3px 11px;font-size:10.5px;font-weight:700;text-transform:capitalize}
+.lencana.tajam{background:#e6f0f4;color:#2b6a86}
+.lencana.jebakan{background:#fbf2e0;color:#8a6420}
+.tanya{font-size:14px;font-weight:600;margin:10px 0 8px}
+.tumpu{font-size:11.5px;color:#33544a;background:#f7faf8;border-radius:8px;padding:8px 10px;margin-bottom:14px}
+.kotak-jawab{border:1px solid #cfd9d4;border-radius:9px;padding:11px;font-size:12.5px;color:#93a29c;background:#fcfdfc;min-height:78px}
+.tombol{background:var(--hijau);color:#fff;border:0;border-radius:9px;padding:10px 18px;font-size:12.5px;font-weight:600;margin-top:12px}
+.tombol.garis{background:#fff;color:var(--hijau);border:1px solid #cfe6da}
+/*  ── kartu nilai ── */
+.nilai{border:1px solid var(--garis);border-radius:11px;padding:14px;margin-top:14px}
+.nilai-kepala{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.bulat{width:50px;height:50px;border-radius:50%;background:#eef6f1;color:var(--hijau);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;flex:0 0 auto}
+.bulat.sedang{background:#fbf2e0;color:#8a6420}
+.bulat.baik{background:#eef6f1;color:var(--hijau)}
+.nilai-judul{font-size:13.5px;font-weight:700}
+.nilai-sub{font-size:11.5px;color:var(--abu)}
+.nilai-isi{font-size:12.5px;color:#3c5a4f;background:#f7faf8;border-radius:8px;padding:9px 11px;margin-top:9px}
+.bar{height:7px;background:#eaf1ee;border-radius:5px;overflow:hidden;margin-top:6px}
+.bar>i{display:block;height:100%;background:var(--hijau);width:68%}
+.bar>i.sedang{background:var(--emas);width:48%}
+.skor{display:flex;align-items:baseline;gap:6px;margin:4px 0 2px}
+.skor b{font-size:26px;color:var(--hijau-tua)}
+.skor span{font-size:12px;color:var(--abu)}
+.dua{display:flex;gap:14px}
+.dua>*{flex:1}
+.banding{font-size:11.5px;color:#7a8b84;font-style:italic}
+.kaki{padding:20px;text-align:center;color:var(--abu);font-size:12px}
+</style></head>
+<body>
+<div class="wadah">
+  <h1>🎓 Sketsa Simulasi Sidang (L3) — 3 Pilihan Bentuk</h1>
+  <div class="sub">Mode Belajar — mahasiswa menjawab dengan kata sendiri, AI jadi penguji, keluar nilai.
+  <br>Pilih satu (A / B / C), Wulan kerjakan yang Bos pilih.</div>
+
+  <!--  ══════════════ PILIHAN A ══════════════  -->
+  <div class="bagian">
+    <h2>A. Menempel di halaman bab (paling ringan)</h2>
+    <div class="ket">Simulasi muncul di bawah Bank Soal, di halaman yang SUDAH ada.
+      Mahasiswa tidak pindah halaman. Satu soal tampil, dijawab, lalu nilai muncul di bawahnya.</div>
+
+    <div class="hp">
+      <div class="hp-atas">🎓 Belajar — BAB I · Simulasi Sidang</div>
+      <div class="hp-isi">
+        <div class="dua">
+          <div><span class="lencana">Dasar</span></div>
+          <div style="text-align:right"><span class="banding">Soal 1 dari 4</span></div>
+        </div>
+        <div class="tanya">Apa yang dimaksud digital readiness dalam naskah ini?</div>
+        <div class="tumpu">📄 “digital readiness, yaitu kapasitas dan kemauan karyawan untuk mengadopsi…”</div>
+        <div style="font-size:11.5px;color:var(--abu);margin-bottom:6px">Tulis jawabanmu dengan kata sendiri:</div>
+        <div class="kotak-jawab">digital readiness itu kesiapan karyawan memakai teknologi baru di pekerjaannya…</div>
+        <button class="tombol">Kirim Jawaban</button>
+
+        <div class="nilai">
+          <div class="nilai-kepala">
+            <div class="bulat baik">78</div>
+            <div><div class="nilai-judul">Sudah dekat</div>
+            <div class="nilai-sub">Hampir lengkap, satu bagian perlu ditambah</div></div>
+          </div>
+          <div class="nilai-isi"><b>Yang sudah tepat:</b> kamu menangkap inti “kesiapan memakai teknologi”.</div>
+          <div class="nilai-isi"><b>Yang bisa ditambah:</b> naskah juga menekankan <i>kemauan</i> (bukan cuma kemampuan)
+            — lihat paragraf tentang…</div>
+          <div class="nilai-isi"><b>Sumber naskah:</b> “kapasitas dan kemauan karyawan untuk mengadopsi…”</div>
+        </div>
+      </div>
+    </div>
+    <div class="pilih">Pilih A</div>
+  </div>
+
+  <!--  ══════════════ PILIHAN B ══════════════  -->
+  <div class="bagian">
+    <h2>B. Halaman sendiri — suasana sidang sungguhan</h2>
+    <div class="ket">Halaman terpisah. Satu soal satu layar, terasa seperti diuji.
+      Di akhir baru keluar ringkasan nilai.</div>
+
+    <div class="hp" style="width:100%;max-width:520px">
+      <div class="hp-atas" style="background:var(--hijau-tua)">🏛️ Simulasi Sidang · BAB I · 1/4</div>
+      <div class="hp-isi" style="min-height:250px">
+        <div class="tanya" style="font-size:15.5px">Dalam Bab I ini, penulis menyebut digital readiness
+          sebagai variabel mediasi. Boleh dijelaskan apa maksudnya?</div>
+        <div class="tumpu">📄 “digital readiness, yaitu kapasitas dan kemauan karyawan untuk mengadopsi…”</div>
+        <div class="kotak-jawab" style="min-height:110px">(kotak jawaban besar — fokus satu soal)</div>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button class="tombol">Kirim &amp; Lanjut →</button>
+          <button class="tombol garis">Lewati</button>
+        </div>
+      </div>
+      <div class="kaki">soal 1 · dasar &nbsp;|&nbsp; ◀ ▮▮ ▮▮ ▮▮ ▮▮ ▶ &nbsp;|&nbsp; belum dinilai</div>
+    </div>
+    <div class="pilih">Pilih B</div>
+  </div>
+
+  <!--  ══════════════ PILIHAN C ══════════════  -->
+  <div class="bagian">
+    <h2>C. Menempel + ringkasan nilai &amp; progres (A + L4)</h2>
+    <div class="ket">Menempel di halaman bab (seperti A), TAPI di atasnya ada panel progres
+      “Kesiapan Sidang” dan di akhir muncul ringkasan semua soal.</div>
+
+    <div class="hp">
+      <div class="hp-atas">🎓 Belajar — BAB I</div>
+      <div class="hp-isi">
+        <div class="nilai" style="margin-top:0">
+          <div class="nilai-kepala" style="justify-content:space-between">
+            <div><div class="nilai-judul">Kesiapan Sidang kamu</div>
+            <div class="nilai-sub">BAB I · dari 4 pertanyaan</div></div>
+            <div class="bulat" style="width:58px;height:58px;font-size:19px">68</div>
+          </div>
+          <div class="bar"><i></i></div>
+          <div style="font-size:11px;color:var(--abu);margin-top:5px">
+            Soal terjawab 2/4 · jawaban terakhir 78</div>
+        </div>
+
+        <div style="border-top:1px dashed #d8e5df;margin:14px 0 12px"></div>
+        <div class="dua">
+          <div><span class="lencana tajam">Tajam</span></div>
+          <div style="text-align:right"><span class="banding">Soal 3 dari 4</span></div>
+        </div>
+        <div class="tanya">Skor adaptive performance tertinggi pada pra-survey — apa artinya?</div>
+        <div class="kotak-jawab">mungkin karena responden menilai dirinya sendiri…</div>
+        <button class="tombol">Kirim Jawaban</button>
+
+        <div class="nilai">
+          <div class="nilai-kepala">
+            <div class="bulat sedang">48</div>
+            <div><div class="nilai-judul">Perlu dibaca lagi</div>
+            <div class="nilai-sub">Ada bagian penting yang belum tersentuh</div></div>
+          </div>
+          <div class="nilai-isi"><b>Yang sudah tepat:</b> kamu menyebut soal penilaian diri.</div>
+          <div class="nilai-isi"><b>Yang perlu:</b> naskah menegaskan ini <i>bias persepsi</i> —
+            bukan kinerja nyata. Lihat bagian pembahasan keterbatasan.</div>
+        </div>
+
+        <div class="nilai">
+          <div class="nilai-kepala" style="justify-content:space-between">
+            <div><div class="nilai-judul">Ringkasan BAB I</div>
+            <div class="nilai-sub">bisa dilihat dosen pembimbing</div></div>
+            <div class="skor"><b>63</b><span>/100</span></div>
+          </div>
+          <div style="font-size:11.5px;color:var(--abu)">Dasar 78 · Menengah 70 · Tajam 48 · Jebakan —</div>
+        </div>
+      </div>
+    </div>
+    <div class="pilih">Pilih C</div>
+  </div>
+
+  <div class="kaki">Sketsa 04 Okt 2026 · bukan halaman jadi · hanya untuk memilih bentuk</div>
+</div>
+</body></html>

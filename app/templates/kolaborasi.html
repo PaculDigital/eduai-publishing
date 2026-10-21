@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kolaborasi — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="stylesheet" href="/static/ikon.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);border-bottom:1px solid rgba(255,255,255,.13);
+       position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;
+     display:flex;align-items:center;justify-content:space-between}
+.nav img{height:52px;width:auto}
+.nav-kanan{display:flex;align-items:center;gap:16px;font-size:14.5px;color:rgba(255,255,255,.9)}
+.nav-kanan .keluar{color:#fff;font-weight:600;border:1.5px solid rgba(255,255,255,.34);padding:6px 15px;border-radius:70px}
+main{max-width:1080px;margin:0 auto;padding:28px 22px}
+/* PITA TAB (T5.1 — SATU dashboard 2 tab, putusan Bos) */
+.pita{display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--garis);flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:2px}
+.pita a{padding:11px 20px;border-radius:10px 10px 0 0;font-size:14.5px;font-weight:600;color:var(--teks-abu);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pita a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);border-bottom:2px solid var(--hijau);margin-bottom:-2px}
+h1{font-size:21px;margin-bottom:6px}
+.sub{font-size:13.5px;color:var(--teks-abu);margin-bottom:22px}
+/* kartu naskah yang diundangkan */
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:14px;padding:18px 20px;margin-bottom:14px;
+       display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap}
+.kartu .nama{font-weight:700;font-size:15px}
+.kartu .info{font-size:12.5px;color:var(--teks-abu);margin-top:3px}
+.kartu .tombol{background:var(--hijau);color:#fff;padding:9px 18px;border-radius:70px;font-size:13.5px;font-weight:600}
+.kartu .tombol.ghost{background:#fff;color:var(--hijau);border:1.5px solid var(--hijau)}
+.kartu .tombol.ghost:disabled{opacity:.55;cursor:wait}
+.aksi-kolab{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* kosong */
+.kosong{background:#fff;border:1.5px dashed var(--garis);border-radius:14px;padding:38px 24px;text-align:center;color:var(--teks-abu)}
+.kosong b{color:var(--teks);display:block;font-size:15.5px;margin-bottom:6px}
+/* pesan hasil kaitan */
+.pesan{padding:12px 16px;border-radius:10px;font-size:13.5px;margin-bottom:18px}
+.pesan.ya{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.pesan.tidak{background:#FDF0E7;color:#8A5A22}
+</style>
+</head>
+<body>
+{{ ikon_sprite() }}
+<header><div class="nav">
+  <a href="/naskah"><img src="/static/logo-terang-320.png" alt="EduAi"></a>
+  <div class="nav-kanan"><span class="nama">{{ user.nama or user.email }}</span>
+    <a class="keluar" href="/keluar">Keluar</a></div>
+</div></header>
+<main>
+  {% set menu_aktif = 'kolaborasi' %}
+  {% set menu_kelas = 'pita' %}
+  {% include '_menu.html' %}
+  <h1>Kolaborasi</h1>
+  <p class="sub">Naskah mahasiswa yang diundangkan ke Anda untuk ditinjau.</p>
+
+  {% if kait == 'ya' %}<div class="pesan ya">Naskah berhasil disambungkan ke akun ini — sekarang selalu muncul di halaman ini.</div>
+  {% elif kait == 'tidak' %}<div class="pesan tidak">Link itu tidak bisa disambungkan (mungkin milik email lain atau sudah tidak aktif). Tanyakan ke mahasiswa yang mengundang ya.</div>
+  {% elif kait == 'token_hilang' %}<div class="pesan tidak">Naskahnya ada di daftar, tapi pintu tinjauannya perlu dibuka lewat link asli dari mahasiswa sekali lagi (link lama tidak kami simpan demi keamanan). Setelah itu tombol "Buka tinjauan" selalu berfungsi.</div>{% endif %}
+
+  {% if daftar %}
+    {% for d in daftar %}
+    <div class="kartu">
+      <div>
+        <div class="nama">{{ d.b.nama or 'Mahasiswa' }}</div>
+        <div class="info">{{ d.b.user_id and '' }}Sisa masa tinjau: {{ d.sisa_hari }} hari ·
+             {% if d.sisa_hari == 0 %}hari terakhir{% endif %}
+             Dibuka: {{ 'sudah' if d.b.dibuka_pada else 'belum pernah' }}</div>
+      </div>
+      <div class="aksi-kolab">
+        <a class="tombol" href="/kolaborasi/buka/{{ d.b.id }}">Buka tinjauan</a>
+        {# {{ ikon('sparkles', 16) }} T5.2 Asisten Pembimbing: AI meninjau naskah, usulan LANGSUNG
+           masuk (C5) tanpa menunggu persetujuan. Tombol hanya bila user
+           login. Istilah = "tinjauan" (sama dengan tombol Buka tinjauan). #}
+        <button class="tombol ghost" type="button"
+                onclick="mintaTinjau({{ d.b.id }}, this)">Minta AI tinjau naskah</button>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="kosong">
+      <b>Belum ada naskah yang diundangkan ke akun ini</b>
+      Mahasiswa mengundang lewat link. Begitu link dibuka dan disambungkan
+      ke akun ini, daftarnya otomatis muncul di sini.
+    </div>
+  {% endif %}
+</main>
+<script>
+//  {{ ikon('sparkles', 16) }} T5.2 — tombol "Minta AI tinjau naskah". Kunci tombol saat berjalan supaya
+//  tidak dobel-klik (pola "kunci tombol" tinjau.html). Pesan selalu
+//  memberi jalan keluar, tanpa kata menakutkan.
+async function mintaTinjau(id, btn){
+  const lama = btn.textContent;
+  btn.disabled = true; btn.textContent = 'AI sedang meninjau…';
+  try {
+    const r = await fetch('/kolaborasi/asisten/' + id, {method:'POST'});
+    if (r.status === 303 || r.status === 401) { window.location = '/masuk'; return; }
+    const j = await r.json();
+    tampilHasil(j);
+  } catch (e) {
+    tampilHasil({ok:false, pesan:'Koneksi terputus di tengah jalan. Coba tekan tombolnya lagi ya.'});
+  }
+  btn.disabled = false; btn.textContent = lama;
+}
+function tampilHasil(j){
+  let el = document.getElementById('hasil-tinjau');
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'hasil-tinjau'; el.className = 'pesan ' + (j.ok ? 'ya' : 'tidak');
+    document.querySelector('main').prepend(el);
+  }
+  el.className = 'pesan ' + (j.ok ? 'ya' : 'tidak');
+  el.textContent = (j.pesan || (j.ok ? 'Selesai.' : 'Belum jalan.'))
+    + (j.ok && j.dibuat ? ' Cek lewat “Buka tinjauan”.' : '');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sketsa — Jembatan Konversi Jurnal (3 pilihan)</title>
+<style>
+  :root{
+    --hijau:#1a7f4b; --hijau-muda:#e8f5ee; --merah:#b3261e; --merah-muda:#fdecea;
+    --kuning:#8a6d00; --kuning-muda:#fff8e1; --biru:#14548c; --biru-muda:#e8f1fa;
+    --abu:#5f6368; --abu-muda:#f4f5f7; --garis:#e3e6ea; --teks:#202124;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef1f4;color:var(--teks);
+       font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  .bungkus{max-width:900px;margin:0 auto;padding:20px 14px 60px}
+  h1{font-size:20px;margin:6px 0 4px}
+  .kepala{background:#202124;color:#fff;padding:14px 16px;border-radius:12px;margin-bottom:18px}
+  .kepala p{margin:4px 0 0;font-size:13px;color:#c9ccd1}
+  .pilihan{background:#fff;border:1px solid var(--garis);border-radius:14px;
+           padding:16px;margin-bottom:22px}
+  .pilihan > h2{margin:0 0 4px;font-size:17px}
+  .pilihan > .ket{margin:0 0 14px;font-size:13px;color:var(--abu)}
+  .layar{border:2px dashed #c3c8ce;border-radius:12px;padding:16px;background:#fbfcfd}
+  .layar .judul-kecil{font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+                      color:var(--abu);margin-bottom:10px;font-weight:700}
+  .pesan{border-radius:9px;padding:11px 13px;margin:10px 0;font-size:14px;display:flex;gap:8px}
+  .pesan.henti{background:var(--merah-muda);color:#8a2418;border:1px solid #f5c6c0}
+  .pesan.tidak{background:var(--kuning-muda);color:var(--kuning);border:1px solid #f0e0a8}
+  .pesan.ya{background:var(--hijau-muda);color:var(--hijau);border:1px solid #bfe5cd}
+  .pesan.info{background:var(--biru-muda);color:var(--biru);border:1px solid #c7dcf0}
+  .kotak{border:1px solid var(--garis);border-radius:10px;padding:13px;margin:12px 0;background:#fff}
+  .kotak h3{margin:0 0 10px;font-size:14px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--garis)}
+  th{background:var(--abu-muda);font-size:12.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--abu)}
+  .tok{font-weight:700;color:var(--biru);white-space:nowrap}
+  .pil{display:inline-block;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:600}
+  .pil.kurang{background:var(--merah-muda);color:#8a2418}
+  .pil.ragu{background:var(--kuning-muda);color:var(--kuning)}
+  .pil.ada{background:var(--hijau-muda);color:var(--hijau)}
+  .pil.lunas{background:var(--biru-muda);color:var(--biru)}
+  .tombol{display:inline-block;border-radius:9px;padding:10px 15px;font-weight:700;
+          font-size:14px;margin:6px 8px 0 0;border:1px solid transparent;cursor:default}
+  .t-utama{background:var(--hijau);color:#fff}
+  .t-dua{background:#fff;color:var(--teks);border-color:#c3c8ce}
+  .t-mati{background:var(--abu-muda);color:#9aa0a6;border-color:var(--garis)}
+  .catatan{font-size:12.5px;color:var(--abu);margin-top:10px;font-style:italic}
+  .tanda{display:inline-block;background:var(--biru-muda);color:var(--biru);
+         border-radius:6px;padding:2px 7px;font-size:11.5px;font-weight:700}
+  .pemilih{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
+  .kartu-pilih{flex:1 1 260px;border:2px solid var(--garis);border-radius:11px;padding:13px;
+               background:#fff}
+  .kartu-pilih.rekomendasi{border-color:var(--hijau);box-shadow:0 3px 12px rgba(26,127,75,.12)}
+  .kartu-pilih b{display:block;margin-bottom:4px;font-size:14.5px}
+  .kartu-pilih span{font-size:13px;color:var(--abu)}
+  .centang{color:var(--hijau);font-weight:800}
+  .silang{color:var(--merah);font-weight:800}
+  .akhir{background:#fff;border-radius:12px;padding:16px;border:1px solid var(--garis)}
+  .alur{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;
+        background:#202124;color:#e6e8eb;border-radius:10px;padding:14px;overflow-x:auto;
+        white-space:pre;line-height:1.55}
+</style>
+</head>
+<body>
+<div class="bungkus">
+
+  <div class="kepala">
+    <h1>🧩 Sketsa — Jembatan Konversi Jurnal</h1>
+    <p>3 pilihan cara menampilkan. Bos pilih 1 huruf, baru Wulan koding.
+       Aturan kaku: <b>tombol bab</b> dan <b>tombol mutu</b> TIDAK PERNAH muncul bersama.</p>
+  </div>
+
+  <!-- ══════════ PILIHAN A ══════════ -->
+  <div class="pilihan">
+    <h2>Pilihan A — Kartu Bertingkat (halaman penuh, satu kartu saja)</h2>
+    <p class="ket">Layar hanya menampilkan SATU kartu sesuai keadaan. User tidak pernah melihat
+       pilihan yang tidak berlaku. Paling "bersih", sesuai aturan Bos.</p>
+    <div class="layar">
+      <div class="judul-kecil">Keadaan ① — bab belum lengkap</div>
+      <div class="pesan henti"><b>!</b> Naskah belum lengkap. Bagian yang belum ada:
+        <b>BAB IV Hasil</b> · <b>BAB V Kesimpulan</b></div>
+      <div class="kotak">
+        <h3>Langkah berikutnya</h3>
+        <p style="margin:0 0 10px;font-size:14px">Isi dulu bab yang belum ada bersama pembimbing,
+           lalu kembali ke sini untuk konversi. Naskah yang lengkap menghasilkan artikel yang utuh.</p>
+        <span class="tombol t-utama">Lengkapi di Kolaborasi →</span>
+        <span class="catatan" style="display:block">Tombol “Tambah Mutu” &amp; “Konversi”
+          tidak ditampilkan selama bab belum lengkap.</span>
+      </div>
+
+      <div class="judul-kecil" style="margin-top:20px">Keadaan ② — bab lengkap, mutu kurang</div>
+      <div class="pesan ya"><b>✓</b> Semua bab sudah lengkap (BAB I–V terbaca). Siap untuk langkah mutu.</div>
+      <div class="kotak">
+        <h3>Mutu artikel jurnal — perlu dilengkapi</h3>
+        <table>
+          <tr><th>Elemen</th><th>Nilai</th><th>Biaya</th><th>Pilih</th></tr>
+          <tr><td>Gap <span class="pil kurang">belum ada</span></td><td>0,18</td>
+              <td class="tok">3 token</td><td><span class="pil ada">☑</span> tambah</td></tr>
+          <tr><td>Novelty <span class="pil kurang">belum ada</span></td><td>0,12</td>
+              <td class="tok">2 token</td><td><span class="pil ada">☑</span> tambah</td></tr>
+          <tr><td>Hook</td><td>0,94</td><td>—</td><td><span class="pil ada">sudah ada</span></td></tr>
+          <tr><td>Limitasi</td><td>0,98</td><td>—</td><td><span class="pil ada">sudah ada</span></td></tr>
+        </table>
+        <p style="margin:12px 0 0;font-size:14px">Total dipilih: <b>2 elemen = 5 token</b></p>
+        <span class="tombol t-utama">Tambah elemen terpilih (5 token)</span>
+        <span class="tombol t-dua">Lanjut apa adanya</span>
+      </div>
+      <p class="catatan">Kalau sudah bayar: konversi TIDAK akan menahan elemen itu lagi
+         (sudah lunas) — hanya elemen yang belum dibayar yang ditanyakan.</p>
+    </div>
+  </div>
+
+  <!-- ══════════ PILIHAN B ══════════ -->
+  <div class="pilihan">
+    <h2>Pilihan B — Ringkasan + Satu Tombol Utama</h2>
+    <p class="ket">Ringkas di atas (status bab &amp; mutu dalam 2 baris), lalu SATU tombol besar
+       sesuai langkah berikutnya. Paling sedikit teks, cocok untuk HP.</p>
+    <div class="layar">
+      <div class="judul-kecil">Keadaan ② — bab lengkap, mutu kurang</div>
+      <div class="kotak">
+        <h3>Status naskah</h3>
+        <table>
+          <tr><td><span class="centang">✓</span> Bab I–V lengkap</td>
+              <td style="text-align:right"><span class="pil ada">siap</span></td></tr>
+          <tr><td><span class="silang">✗</span> Mutu artikel: 2 elemen belum ada
+                 (Gap 3 token · Novelty 2 token)</td>
+              <td style="text-align:right"><span class="pil kurang">perlu lengkap</span></td></tr>
+        </table>
+        <div style="margin-top:14px">
+          <span class="tombol t-utama">Tambah 2 elemen (5 token)</span>
+          <span class="tombol t-dua">Konversi apa adanya</span>
+        </div>
+        <p class="catatan">Setelah dilengkapi, konversi langsung jalan — tidak ditanya dua kali.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PILIHAN C ══════════ -->
+  <div class="pilihan">
+    <h2>Pilihan C — Dua Pintu Ditampilkan, Tapi Salah Satu MATI</h2>
+    <p class="ket">⚠️ Wulan TIDAK menyarankan ini (melanggar aturan Bos: dua tombol bisa bikin
+       bingung). Ditampilkan hanya sebagai pembanding supaya Bos lihat bedanya.</p>
+    <div class="layar">
+      <div class="judul-kecil">Keadaan ① — bab belum lengkap (tombol mutu dibuat mati)</div>
+      <div class="pesan henti"><b>!</b> Naskah belum lengkap: <b>BAB IV · BAB V</b></div>
+      <div style="margin-top:12px">
+        <span class="tombol t-utama">Lengkapi di Kolaborasi →</span>
+        <span class="tombol t-mati">Tambah Mutu (belum bisa — bab belum lengkap)</span>
+        <span class="tombol t-mati">Konversi (belum bisa)</span>
+      </div>
+      <p class="catatan">Terlihat jelas, tapi user tetap melihat 3 tombol ⇒ berisiko
+         salah pencet &amp; sistem bingung menentukan jalur.</p>
+    </div>
+  </div>
+
+  <!-- ══════════ CONTOH BOS ══════════ -->
+  <div class="pilihan">
+    <h2>🔍 Contoh persis seperti yang Bos minta</h2>
+    <p class="ket">Naskah lengkap · kurang 2 mutu (Gap + Novelty) · user bayar HANYA Gap (3 token).</p>
+    <div class="layar">
+      <div class="judul-kecil">Saat konversi — yang ditanyakan HANYA Novelty</div>
+      <div class="kotak">
+        <h3>Mutu artikel</h3>
+        <table>
+          <tr><th>Elemen</th><th>Nilai Jev</th><th>Status</th><th>Ditanyakan?</th></tr>
+          <tr><td>Gap</td><td>0,60</td>
+              <td><span class="tanda">SUDAH DIBAYAR · 3 token</span></td>
+              <td><span class="centang">tidak</span> (lunas)</td></tr>
+          <tr><td>Novelty</td><td>0,20</td>
+              <td><span class="pil kurang">belum dibayar</span></td>
+              <td><b>YA</b> — perbaiki (2 token) atau lanjut</td></tr>
+          <tr><td>Hook</td><td>0,94</td><td>—</td><td><span class="centang">tidak</span> (sudah bagus)</td></tr>
+        </table>
+        <div style="margin-top:12px">
+          <span class="tombol t-utama">Tambah Novelty (2 token)</span>
+          <span class="tombol t-dua">Konversi apa adanya</span>
+        </div>
+        <p class="catatan">Gap tidak muncul di pertanyaan — sudah lunas lewat tanda khusus.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="akhir">
+    <h2 style="margin-top:0">Alur keputusan (kaku, satu arah)</h2>
+    <div class="alur">Naskah masuk /artikel/{id}/konversi
+   │
+   ├─ ① BAB kurang?  ── YA ─→ [Lengkapi di Kolaborasi]     ← HANYA tombol ini
+   │                          (mutu & konversi DISEMBUNYIKAN)
+   │
+   └─ tidak
+        │
+        ├─ ② MUTU kurang? ── YA ─→ daftar elemen + harga (2/3/5)
+        │                          [Tambah terpilih]  [Lanjut apa adanya]
+        │
+        └─ tidak
+             │
+             └─ ③ [Konversi Sekarang]
+
+Saat konversi berjalan, tiap elemen diperiksa:
+   nilai ≥0,50              → tidak ditanya
+   nilai <0,50 · SUDAH BAYAR → tidak ditanya (tanda khusus, konversi lolos)
+   nilai <0,50 · BELUM BAYAR → DITANYAKAN</div>
+    <p class="catatan" style="margin-bottom:0">Tanda khusus disimpan per-elemen + sidik teks BAB
+       tempat elemen itu tinggal (putusan Bos: A). Naskah diubah di bab lain ⇒ tanda tetap sah.</p>
+  </div>
+
+  <div class="akhir" style="margin-top:20px">
+    <h2 style="margin-top:0">Rekomendasi Wulan</h2>
+    <div class="pemilih">
+      <div class="kartu-pilih rekomendasi">
+        <b>A — Kartu Bertingkat <span class="pil ada">pilihan Wulan</span></b>
+        <span>Paling sesuai aturan Bos: user hanya melihat satu jalur, tidak ada tombol mati yang
+              membingungkan, dan sistem tidak mungkin salah membaca keadaan naskah.</span>
+      </div>
+      <div class="kartu-pilih">
+        <b>B — Ringkas + 1 Tombol Utama</b>
+        <span>Lebih pendek, bagus untuk HP. Cocok kalau Bos ingin layar minimalis, tapi
+              kurang menjelaskan “kenapa” biayanya berbeda per elemen.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

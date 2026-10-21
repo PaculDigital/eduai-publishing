@@ -1,0 +1,31 @@
+[PROFIL] Paradigma=kuantitatif; Desain=survei (korelasional eksplanatori dengan pengujian model mediasi)
+
+[K1-KUTIP-ASLI]
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini dapat dipetakan sebagai berikut.
+[K1-GANTI-JADI]
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini dipetakan pada tabel berikut. Setiap butir perkembangan terkini yang dicantumkan disertai rujukan yang mendasarinya, sedangkan kolom terakhir menampilkan titik lanjut yang ditawarkan penelitian ini.
+
+[K2-KUTIP-ASLI]
+QWL terbukti meningkatkan kinerja melalui keterlibatan dan kontribusi karyawan (Leitão et al., 2019); QWL diuji bersama self-efficacy terhadap kinerja (Rahardhiansyah et al., 2026; Ayuni & Nuraeni, 2026)
+[K2-GANTI-JADI]
+Leitão et al. (2019) membuktikan bahwa QWL meningkatkan kinerja melalui keterlibatan dan kontribusi karyawan, sedangkan Rahardhiansyah et al. (2026) serta Ayuni dan Nuraeni (2026) menguji QWL bersama self-efficacy terhadap kinerja
+
+[K3-KUTIP-ASLI]
+DSE memediasi pengaruh transformasi digital terhadap kinerja (Sun & Yoon, 2025); DSE sebagai anteseden pembelajaran (Shahzad et al., 2025)
+[K3-GANTI-JADI]
+Sun dan Yoon (2025) menemukan bahwa DSE memediasi pengaruh transformasi digital terhadap kinerja, sementara Shahzad et al. (2025) memposisikan DSE sebagai anteseden pembelajaran
+
+[K4-KUTIP-ASLI]
+DR diuji sebagai anteseden kepuasan kerja (Palapa & Saragih, 2026); kerangka multi-level kesiapan digital (Trenerry et al., 2021)
+[K4-GANTI-JADI]
+Palapa dan Saragih (2026) menguji DR sebagai anteseden kepuasan kerja, sedangkan Trenerry et al. (2021) mengembangkan kerangka kesiapan digital yang bersifat multi-level
+
+[K5-KUTIP-ASLI]
+Taksonomi AP orisinal (Pulakos et al., 2000); penentu AP pada berbagai level (Setiyadi et al., 2024); AP di sektor logistik masih terbatas
+[K5-GANTI-JADI]
+Pulakos et al. (2000) menyusun taksonomi AP yang menjadi rujukan orisinal, sedangkan Setiyadi et al. (2024) menganalisis penentu AP pada berbagai level. Meskipun demikian, di antara rujukan yang ditelaah belum ditemukan kajian AP pada sektor logistik, sehingga AP pada sektor logistik masih terbatas
+
+[K6-KUTIP-ASLI]
+Kebaruan (novelty) penelitian ini terletak pada tiga hal: pertama, kebaruan konteks, yaitu Account Officer PT JNE Wilayah Lampung, yaitu sektor logistik ekspedisi Indonesia pada level individu di wilayah yang belum diteliti; kedua, kebaruan model, integrasi dua teori besar (COR dan SCT) dalam satu model mediasi parsimonius dengan digital readiness sebagai mediator tunggal; ketiga, kebaruan fenomena, menggeser fokus dari tingkat kinerja ke mekanisme konversi, yaitu menjelaskan bagaimana sumber daya menjadi kinerja, bukan sekadar apakah berpengaruh.
+[K6-GANTI-JADI]
+Kebaruan (novelty) penelitian ini terletak pada tiga hal. Pertama, kebaruan konteks, yakni pada level individu Account Officer PT JNE Wilayah Lampung, yang mewakili sektor logistik ekspedisi Indonesia di wilayah yang belum diteliti. Kedua, kebaruan model, yaitu integrasi dua teori besar, Conservation of Resources (COR) dan Social Cognitive Theory (SCT), yang landasan konseptualnya diuraikan pada Bab II, ke dalam satu model mediasi parsimonius dengan digital readiness sebagai mediator tunggal. Ketiga, kebaruan fenomena, yakni menggeser fokus dari tingkat kinerja ke mekanisme konversi, yaitu menjelaskan bagaimana sumber daya dikonversi menjadi kinerja, bukan sekadar apakah sumber daya berpengaruh terhadap kinerja.

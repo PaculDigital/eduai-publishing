@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketsa v2 — Halaman Pembimbing · EduAi</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#e8ebef;color:#1c2530;line-height:1.5;padding:16px}
+  .bungkus{max-width:1200px;margin:0 auto}
+  .kepala{background:#0f2e4a;color:#fff;padding:13px 20px;border-radius:11px;margin-bottom:5px}
+  .kepala h1{font-size:18px;font-weight:700}
+  .kepala p{font-size:12.5px;opacity:.85;margin-top:2px}
+  .ubah{background:#fff8e1;border-left:4px solid #f0b429;padding:9px 14px;border-radius:7px;font-size:12.5px;margin-bottom:16px}
+  .ubah b{color:#8a5a00}
+  .tag{background:#fff;color:#0f2e4a;font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:8px 8px 0 0;display:inline-block;border:1px solid #d5dde5;border-bottom:0}
+  .tag.hijau{background:#1c7a3d;color:#fff;border-color:#1c7a3d}
+  .tag.coklat{background:#8a4b1c;color:#fff;border-color:#8a4b1c}
+
+  .layar{background:#fff;border-radius:0 12px 12px 12px;border:1px solid #d5dde5;box-shadow:0 3px 14px rgba(15,46,74,.11);overflow:hidden;margin-bottom:26px}
+
+  /* ── bar tipis atas ── */
+  .bar{background:#12405f;color:#fff;padding:9px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .bar .kiri-atas b{font-size:14.5px}
+  .bar .kiri-atas small{font-size:11px;opacity:.8;display:block}
+  .bar .kanan-atas{display:flex;gap:7px;align-items:center;font-size:11.5px}
+  .pil{background:rgba(255,255,255,.16);padding:3px 10px;border-radius:20px}
+  .pil.buka{background:#1c7a3d}
+
+  /* ── naskah MENDOMINASI ── */
+  .naskah-area{padding:26px 40px;background:#fbfcfd}
+  .kertas{max-width:860px;margin:0 auto;background:#fff;padding:38px 46px;border:1px solid #e4e9ee;border-radius:4px;box-shadow:0 1px 5px rgba(0,0,0,.05);font-family:Georgia,"Times New Roman",serif;font-size:14.5px;line-height:1.85;color:#1f2933;min-height:400px}
+  .kertas h3{font-family:inherit;font-size:16px;text-align:center;margin-bottom:20px;font-weight:700}
+  .kertas h4{font-family:inherit;font-size:14.5px;margin:18px 0 8px;font-weight:700}
+  .kertas p{margin-bottom:12px;text-align:justify}
+  .sorot{background:#fff3cd;padding:1px 3px;border-radius:2px;cursor:pointer;border-bottom:1px solid #f0b429}
+  .sorot.pembimbing{background:#dcefff;border-bottom-color:#1a73c7}
+  .penanda{display:inline-block;font-family:sans-serif;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;vertical-align:2px;margin-left:5px}
+  .pn-kuning{background:#f0b429;color:#4a3200}
+  .pn-biru{background:#1a73c7;color:#fff}
+
+  /* ── bilah bawah melayang (tipis) ── */
+  .bilah{position:sticky;bottom:0;background:#fff;border-top:1px solid #e0e6ec;padding:10px 16px;display:flex;gap:9px;align-items:center;flex-wrap:wrap;box-shadow:0 -2px 9px rgba(15,46,74,.07)}
+  .bilah input{flex:1;min-width:200px;border:1px solid #ccd6e0;border-radius:8px;padding:9px 12px;font-family:inherit;font-size:13px}
+  .btn{background:#1a73c7;color:#fff;border:0;border-radius:8px;padding:9px 15px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .btn.hijau{background:#1c7a3d}
+  .btn.putih{background:#fff;color:#1a73c7;border:1px solid #b9d1e8}
+  .btn.abu{background:#fff;color:#5a6876;border:1px solid #ccd6e0}
+  .btn.ikon{padding:9px 11px;font-size:14px}
+
+  .kecil{font-size:11.5px;color:#6b7a8b}
+  .kotak-putih{background:#fff;border:1px solid #e0e6ec;border-radius:9px;padding:13px}
+
+  /* ── daftar ringkas (drawer samping) ── */
+  .drawer{position:absolute;right:0;top:0;bottom:0;width:290px;background:#fff;border-left:1px solid #e0e6ec;padding:14px;overflow-y:auto;box-shadow:-3px 0 12px rgba(15,46,74,.08)}
+  .relatif{position:relative}
+  .bagian{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:7px;font-size:12.5px;margin-bottom:5px;background:#f7f9fb;border:1px solid #e8edf2}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;margin-top:5px}
+  .d-kuning{background:#f0b429}
+  .d-biru{background:#1a73c7}
+  .d-hijau{background:#1c7a3d}
+
+  /* ── tabel log ── */
+  .tabel{width:100%;border-collapse:collapse;font-size:13px}
+  .tabel th{background:#f4f7fa;text-align:left;padding:10px 13px;font-size:11.5px;color:#4a5a6b;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #e0e6ec}
+  .tabel td{padding:12px 13px;border-bottom:1px solid #eef1f5;vertical-align:top}
+  .status{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+  .st-berubah{background:#e3f6e8;color:#1c7a3d}
+  .st-belum{background:#fdeaea;color:#a8322a}
+  .st-sendiri{background:#eef2f7;color:#4a5a6b}
+
+  .lampir{display:flex;gap:9px;align-items:center;padding:9px 11px;background:#f7f9fb;border:1px solid #e8edf2;border-radius:8px;margin-top:7px;font-size:12.5px}
+  .thumb{width:34px;height:34px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;background:linear-gradient(135deg,#1a73c7,#0f2e4a)}
+  .thumb.g{background:linear-gradient(135deg,#1c7a3d,#0f4a26)}
+
+  .kaki{margin-top:26px;padding:15px 18px;background:#fff;border-radius:11px;border-left:4px solid #1a73c7;font-size:12.5px}
+  .kaki h3{font-size:14px;margin-bottom:7px;color:#0f2e4a}
+
+  .hp-mini{max-width:340px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #d5dde5;box-shadow:0 3px 14px rgba(15,46,74,.11)}
+  .hp-naskah{padding:15px 17px;font-family:Georgia,serif;font-size:13px;line-height:1.8;color:#1f2933;max-height:260px;overflow-y:auto;background:#fbfcfd}
+</style>
+</head>
+<body>
+<div class="bungkus">
+
+<div class="kepala">
+  <h1>Sketsa v2 — Halaman Pembimbing</h1>
+  <p>Diulang mengikuti 3 koreksi Bos. Masih gambar HTML, belum kode.</p>
+</div>
+
+<div class="ubah">
+  <b>3 KOREKSI BOS YANG SUDAH DIPATUHI:</b><br>
+  1. <b>Naskah jadi raja</b> — porsi terbesar &amp; terlebar, seperti kerja di MS Word (bukan kolom sempit)<br>
+  2. <b>Dibuang yang ramai</b> — daftar bab tidak lagi makan kolom kiri; jadi daftar ringkas di sisi kanan<br>
+  3. <b>Kolom "Ditangani" tanpa nama EduAi</b> — jadi "Anda" / "Belum" saja
+</div>
+
+<!-- ═══════════ SKETSA 1 — LAYAR UTAMA (NASKAH BESAR) ═══════════ -->
+<div class="tag">SKETSA 1 — Layar pembimbing · naskah MENDOMINASI</div>
+<div class="layar">
+  <div class="bar">
+    <div class="kiri-atas">
+      <b>Skripsi — Siti Nurhaliza</b>
+      <small>BAB II Tinjauan Pustaka · 1.240 kata</small>
+    </div>
+    <div class="kanan-atas">
+      <span class="pil buka">👁 Hanya melihat</span>
+      <span class="pil">Prof. Ahmad</span>
+    </div>
+  </div>
+
+  <!-- NASKAH: lebar penuh, kertas putih di tengah, sisa ruang kiri-kanan -->
+  <div class="naskah-area">
+    <div class="kertas">
+      <h3>BAB II<br>TINJAUAN PUSTAKA</h3>
+
+      <h4>2.1 Landasan Teori</h4>
+      <p>Kepuasan pelanggan <span class="sorot">merupakan evaluasi menyeluruh atas pengalaman konsumsi yang terbentuk dari perbandingan antara harapan dan kinerja</span><span class="penanda pn-kuning">catatan 1</span>. Menurut Kotler (2021), kepuasan adalah tingkat perasaan seseorang setelah membandingkan kinerja yang dirasakan dengan harapannya.</p>
+
+      <p>Kualitas layanan menjadi salah satu faktor utama yang menentukan kepuasan pelanggan. Penelitian Sari (2023) menunjukkan bahwa dimensi keandalan dan daya tanggap memiliki kontribusi paling besar <span class="sorot pembimbing">terhadap terbentuknya kepuasan yang berkelanjutan</span><span class="penanda pn-biru">catatan 2</span>.</p>
+
+      <h4>2.2 Penelitian Terdahulu</h4>
+      <p>Wibowo (2022) menemukan bahwa harga berpengaruh positif signifikan terhadap keputusan pembelian pada sektor ritel modern. Sementara itu, Handoko (2021) menyimpulkan bahwa promosi yang konsisten mampu meningkatkan loyalitas pelanggan hingga 32 persen.</p>
+
+      <p>Terdapat celah penelitian yang belum banyak dibahas, yaitu bagaimana kedua variabel tersebut bekerja bersama-sama dalam konteks usaha mikro.</p>
+    </div>
+  </div>
+
+  <!-- BILAH BAWAH: tipis, tempat menulis komentar -->
+  <div class="bilah">
+    <span class="kecil" style="white-space:nowrap">Tulis catatan untuk mahasiswa:</span>
+    <input placeholder="Contoh: paragraf ini rujukannya belum ada — tolong tambahkan.">
+    <button class="btn ikon putih" title="Lampirkan gambar">🖼</button>
+    <button class="btn ikon putih" title="Sisipkan link">🔗</button>
+    <button class="btn ikon putih" title="Lampirkan berkas">📄</button>
+    <button class="btn hijau">Kirim</button>
+  </div>
+</div>
+
+<!-- ═══════════ SKETSA 2 — TANDA DARI SIAPA ═══════════ -->
+<div class="tag hijau">SKETSA 2 — Siapa yang memberi tanda kuning? (jawaban Bos)</div>
+<div class="layar">
+  <div style="padding:18px 22px">
+    <div class="kotak-putih" style="margin-bottom:14px">
+      <b style="font-size:13.5px;color:#0f2e4a">Dua jenis tanda, dua warna — tidak boleh dicampur</b>
+      <div style="margin-top:11px;font-size:13px;line-height:2">
+        <span class="sorot">teks disorot kuning</span><span class="penanda pn-kuning">catatan 1</span>
+        &nbsp;= <b>dari pembimbing</b> (Prof. Ahmad)<br>
+        <span class="sorot pembimbing">teks disorot biru</span><span class="penanda pn-biru">catatan 2</span>
+        &nbsp;= <b>dari mahasiswa sendiri</b> (penanda pribadi)
+      </div>
+    </div>
+
+    <div class="kotak-putih">
+      <b style="font-size:13.5px;color:#0f2e4a">Jawaban singkat: yang menyorot = ORANG yang menandai</b>
+      <div class="kecil" style="margin-top:7px;line-height:1.8">
+        Pembimbing menyorot teks lalu menulis catatan → sorot <b>kuning</b>, bertanda nama pembimbing.<br>
+        Mahasiswa menyorot teksnya sendiri → sorot <b>biru</b>, bertanda "penanda saya".<br>
+        Di daftar catatan (kanan layar) tertulis jelas siapa &amp; kapan.
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <b style="font-size:13px;color:#0f2e4a">Daftar catatan — terlihat siapa penandanya</b>
+      <div style="margin-top:9px">
+        <div class="bagian" style="background:#fff8e6;border-color:#f0d089">
+          <div style="display:flex;gap:8px">
+            <span class="dot d-kuning"></span>
+            <div><b>catatan 1</b> · paragraf 2.1<br><span class="kecil">Prof. Ahmad · 14 Sep 10:22</span></div>
+          </div>
+          <span class="status st-belum">Belum</span>
+        </div>
+        <div class="bagian" style="background:#eaf4ff;border-color:#a8cdf0">
+          <div style="display:flex;gap:8px">
+            <span class="dot d-biru"></span>
+            <div><b>catatan 2</b> · paragraf 2.1<br><span class="kecil">Siti (penanda sendiri) · 15 Sep 09:40</span></div>
+          </div>
+          <span class="status st-sendiri">Pribadi</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SKETSA 3 — DRAWER CATATAN (SISI KANAN) ═══════════ -->
+<div class="tag">SKETSA 3 — Panel catatan di sisi kanan (naskah tetap lebar)</div>
+<div class="layar relatif" style="min-height:430px">
+  <div class="bar">
+    <div class="kiri-atas">
+      <b>Skripsi — Siti Nurhaliza</b>
+      <small>BAB II Tinjauan Pustaka</small>
+    </div>
+    <div class="kanan-atas"><span class="pil buka">👁 Hanya melihat</span></div>
+  </div>
+
+  <div class="naskah-area" style="padding-right:320px">
+    <div class="kertas" style="max-width:none">
+      <h3>BAB II<br>TINJAUAN PUSTAKA</h3>
+      <h4>2.1 Landasan Teori</h4>
+      <p>Kepuasan pelanggan <span class="sorot">merupakan evaluasi menyeluruh atas pengalaman konsumsi</span><span class="penanda pn-kuning">catatan 1</span>. Menurut Kotler (2021)...</p>
+      <p>Kualitas layanan menjadi salah satu faktor utama <span class="sorot pembimbing">terhadap terbentuknya kepuasan yang berkelanjutan</span><span class="penanda pn-biru">catatan 2</span>.</p>
+      <h4>2.2 Penelitian Terdahulu</h4>
+      <p>Wibowo (2022) menemukan bahwa harga berpengaruh positif signifikan...</p>
+    </div>
+  </div>
+
+  <div class="drawer">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px">
+      <b style="font-size:13px;color:#0f2e4a">📋 Catatan</b>
+      <span class="kecil">2 catatan</span>
+    </div>
+
+    <div class="bagian" style="background:#fff8e6;border-color:#f0d089;display:block">
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <span class="dot d-kuning"></span>
+        <div style="flex:1">
+          <b style="font-size:12.5px">catatan 1</b>
+          <div style="font-size:12px;margin-top:3px">Paragraf ini rujukannya belum ada.</div>
+          <div class="kecil" style="margin-top:5px">Prof. Ahmad · 14 Sep</div>
+          <span class="status st-belum" style="margin-top:6px">Belum dikerjakan</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bagian" style="background:#eaf4ff;border-color:#a8cdf0;display:block">
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <span class="dot d-biru"></span>
+        <div style="flex:1">
+          <b style="font-size:12.5px">catatan 2</b>
+          <div style="font-size:12px;margin-top:3px">Cek ulang istilah "berkelanjutan".</div>
+          <div class="kecil" style="margin-top:5px">Siti · 15 Sep</div>
+          <span class="status st-sendiri" style="margin-top:6px">Penanda pribadi</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding-top:13px;border-top:1px solid #eef1f5">
+      <b style="font-size:12.5px;color:#0f2e4a">📎 Lampiran dari Prof. Ahmad</b>
+      <div class="lampir">
+        <div class="thumb">🖼</div>
+        <div><b style="font-size:12px">contoh_tabel.png</b><div class="kecil">14 Sep · 428 KB</div></div>
+      </div>
+      <div class="lampir">
+        <div class="thumb g">🔗</div>
+        <div><b style="font-size:12px">Contoh format tabel</b><div class="kecil">journal.uny.ac.id/...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SKETSA 4 — LOG REVISI (TANPA NAMA EDUAI) ═══════════ -->
+<div class="tag coklat">SKETSA 4 — Log Revisi · kolom "Ditangani" DIPERBAIKI</div>
+<div class="layar">
+  <div class="bar">
+    <div class="kiri-atas">
+      <b>📋 Log Revisi</b>
+      <small>Dilihat berdua — mahasiswa &amp; pembimbing, data sama</small>
+    </div>
+  </div>
+  <div style="padding:16px">
+    <div style="background:#e8f5ec;border-left:4px solid #1c7a3d;padding:9px 13px;border-radius:7px;font-size:12.5px;margin-bottom:13px">
+      <b>Sudah dipatuhi:</b> nama alat tidak lagi ditampilkan. Kolom "Ditangani" kini hanya menyebut <b>"Anda"</b> (mahasiswa) atau <b>"Belum"</b>. Cara mahasiswa mengerjakan = urusan pribadi, tidak dipamerkan di depan pembimbing.
+    </div>
+    <table class="tabel">
+      <tr>
+        <th style="width:29%">Permintaan Pembimbing</th>
+        <th style="width:14%">Status Naskah</th>
+        <th style="width:14%">Ditangani</th>
+        <th style="width:43%">Hasil / Catatan</th>
+      </tr>
+      <tr>
+        <td><b>Paragraf 2.1 — rujukan belum ada</b><div class="kecil" style="margin-top:3px">catatan 1 · 14 Sep 10:22</div></td>
+        <td><span class="status st-berubah">Berubah</span></td>
+        <td>Anda<div class="kecil" style="margin-top:3px">15 Sep 08:10</div></td>
+        <td>Paragraf diperbaiki, ditambah 3 rujukan.<div style="margin-top:6px"><a href="#" style="color:#1a73c7;font-weight:600;font-size:12.5px">Lihat hasil ▸</a></div></td>
+      </tr>
+      <tr>
+        <td><b>Tambahkan tabel penelitian terdahulu</b><div class="kecil" style="margin-top:3px">catatan 3 · 14 Sep 10:25</div></td>
+        <td><span class="status st-berubah">Berubah</span></td>
+        <td>Anda<div class="kecil" style="margin-top:3px">15 Sep 20:10</div></td>
+        <td>Tabel ditambahkan pada bagian 2.2.<div style="margin-top:6px"><a href="#" style="color:#1a73c7;font-weight:600;font-size:12.5px">Bandingkan versi ▸</a></div></td>
+      </tr>
+      <tr>
+        <td><b>Ringkas bagian metode</b><div class="kecil" style="margin-top:3px">catatan 4 · 15 Sep 09:00</div></td>
+        <td><span class="status st-belum">Belum</span></td>
+        <td>—</td>
+        <td>Naskah belum berubah sejak catatan ini.<div style="margin-top:6px"><a href="#" style="color:#1a73c7;font-weight:600;font-size:12.5px">Lihat bagian ▸</a></div></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════ SKETSA 5 — DARI HP ═══════════ -->
+<div class="tag">SKETSA 5 — Dari HP (pembimbing buka via link WA)</div>
+<div class="hp-mini" style="margin-bottom:26px">
+  <div class="bar" style="padding:9px 13px">
+    <div class="kiri-atas">
+      <b style="font-size:13px">Skripsi — Siti</b>
+      <small>Prof. Ahmad · hanya melihat</small>
+    </div>
+  </div>
+  <div class="hp-naskah">
+    <b style="font-family:sans-serif;font-size:12.5px">BAB II TINJAUAN PUSTAKA</b><br><br>
+    Kepuasan pelanggan <span class="sorot">merupakan evaluasi menyeluruh atas pengalaman konsumsi</span><span class="penanda pn-kuning">1</span>...
+    <br><br>
+    Kualitas layanan <span class="sorot pembimbing">terhadap terbentuknya kepuasan yang berkelanjutan</span><span class="penanda pn-biru">2</span>...
+  </div>
+  <div style="padding:11px 13px;border-top:1px solid #e0e6ec;background:#fff">
+    <input style="width:100%;border:1px solid #ccd6e0;border-radius:8px;padding:9px;font-family:inherit;font-size:12.5px" placeholder="Tulis catatan...">
+    <div style="display:flex;gap:7px;margin-top:8px">
+      <button class="btn ikon putih" style="flex:1">🖼</button>
+      <button class="btn ikon putih" style="flex:1">🔗</button>
+      <button class="btn hijau" style="flex:2">Kirim</button>
+    </div>
+  </div>
+</div>
+
+<div class="kaki">
+  <h3>❓ Yang perlu Bos putuskan</h3>
+  <div style="line-height:1.9">
+    1. <b>Naskah selebar ini sudah pas?</b> (kertas putih di tengah, sisa ruang kiri-kanan jadi bantalan)<br>
+    2. <b>Tanda kuning dari pembimbing / biru dari mahasiswa</b> — sudah jelas?<br>
+    3. <b>Panel catatan di kanan</b> — perlu, atau cukup bilah bawah saja?<br>
+    4. <b>Log Revisi</b> — kolom "Ditangani: Anda" sudah pantas?
+  </div>
+  <div style="margin-top:10px;color:#a8322a"><b>Jujur:</b> ini gambar HTML buatan tangan, <b>bukan tangkapan layar aplikasi</b>. Belum ada kode di baliknya.</div>
+</div>
+
+</div>
+</body>
+</html>

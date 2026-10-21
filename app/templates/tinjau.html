@@ -1,0 +1,1084 @@
+{#  Halaman TINJAU pembimbing (ACC Bos 23Sep26 — Tahap 1)
+    ═══════════════════════════════════════════════════════════════════════
+    ISI = RAJA. Naskah dapat porsi TERBESAR & LEBAR (seperti MS Word),
+    panel catatan sempit di kanan. Ini teguran Bos 23Sep26 — jangan diulang.
+    ═══════════════════════════════════════════════════════════════════════
+    WARNA: hanya 3 (kuning/hijau/biru). DILARANG teks bergaris/coret.
+    TIDAK ada nama alat/AI di kolom kerja. Tidak ada roda gigi/kuota.
+#}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tinjauan Naskah — {{ nama_mhs }}</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="stylesheet" href="/static/ikon.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--abu:#68666E;--garis:#E4E4E8;--kuning:#FFF3B8;--kuning-tepi:#E8C547;
+      --biru:#D8E9FB;--biru-tepi:#7FB3E8;--hijau-tanda:#CFEBD8;--hijau-tepi:#7DC194}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#F4F5F7;min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+/* ── kepala tipis ────────────────────────────────────────────────────── */
+.kepala{background:#fff;border-bottom:1px solid var(--garis);position:sticky;top:0;z-index:40}
+.kepala-isi{max-width:1500px;margin:0 auto;padding:13px 26px;display:flex;
+            align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.kiri{display:flex;align-items:center;gap:13px}
+.kiri img{height:38px}
+.kiri .teks b{display:block;font-size:15px;font-weight:700;letter-spacing:-.2px}
+.kiri .teks small{font-size:12.5px;color:var(--abu)}
+.kanan{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--abu)}
+.pil{background:var(--hijau-muda);color:#146B2C;font-weight:600;font-size:12.5px;
+     padding:6px 13px;border-radius:70px;white-space:nowrap}
+.pil.lewat{background:#FDECEC;color:#A32B2B}
+
+/* ── susunan: naskah BESAR, panel SEMPIT ─────────────────────────────── */
+.panggung{max-width:1500px;margin:0 auto;padding:22px 26px 60px;
+          display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:22px;
+          align-items:start}
+@media(max-width:1080px){.panggung{grid-template-columns:minmax(0,1fr)}}
+
+/* ── KERTAS NASKAH (seperti Word) ────────────────────────────────────── */
+.kertas{background:#fff;border:1px solid var(--garis);border-radius:10px;
+        padding:52px 62px 70px;box-shadow:0 1px 3px rgba(0,0,0,.04);
+        font-size:15.5px;line-height:1.85;min-height:70vh;
+        /*  URL/istilah tanpa spasi (±96 kar) menaikkan min-content →
+            grid 1fr terpaksa 539px di layar 390 (terukur 27Sep).
+            dipecah sendiri supaya halaman tidak bisa digeser ke samping. */
+        overflow-wrap:anywhere;min-width:0}
+@media(max-width:700px){.kertas{padding:30px 24px 44px;font-size:15px}}
+.kertas h1{font-size:19px;font-weight:700;text-align:center;margin-bottom:8px}
+.kertas .mhs{text-align:center;font-size:13.5px;color:var(--abu);margin-bottom:34px}
+.kertas h2{font-size:16.5px;font-weight:700;margin:30px 0 12px}
+.kertas p{margin-bottom:15px;text-align:justify}
+.kosong{color:var(--abu);font-style:italic;font-size:14px;text-align:center;
+        padding:56px 20px}
+
+/* 3 WARNA — tanpa coretan apa pun */
+.tk{background:var(--kuning);border-bottom:2px solid var(--kuning-tepi);
+    border-radius:2px;padding:1px 2px;cursor:pointer}
+.tb{background:var(--biru);border-bottom:2px solid var(--biru-tepi);
+    border-radius:2px;padding:1px 2px}
+.th{background:var(--hijau-tanda);border-bottom:2px solid var(--hijau-tepi);
+    border-radius:2px;padding:1px 2px}
+
+/* ── PANEL CATATAN (kanan, sempit) ───────────────────────────────────── */
+.panel{background:#fff;border:1px solid var(--garis);border-radius:10px;
+       position:sticky;top:82px;max-height:calc(100vh - 104px);
+       display:flex;flex-direction:column;overflow:hidden}
+.panel-kepala{padding:15px 18px;border-bottom:1px solid var(--garis)}
+.panel-kepala b{font-size:14.5px;font-weight:700}
+.angka{display:flex;gap:14px;margin-top:9px;font-size:12.5px;color:var(--abu);flex-wrap:wrap}
+.angka b{font-size:15px;color:var(--teks);font-weight:700}
+.angka .k b{color:#B8860B}
+.angka .h b{color:#146B2C}
+.panel-isi{overflow-y:auto;padding:6px 0 14px;flex:1}
+
+/*  arti warna — legenda kecil, biar tidak ada yang salah paham */
+.legenda{padding:11px 18px;background:#FAFAFB;border-bottom:1px solid var(--garis);
+         font-size:11.5px;color:var(--abu);display:flex;flex-direction:column;gap:5px}
+.legenda span{display:flex;align-items:center;gap:7px}
+.kotak{width:13px;height:13px;border-radius:3px;flex:none}
+
+/*  satu baris = satu masalah (compact, lapis 2) */
+.baris{padding:13px 18px;border-bottom:1px solid #F0F0F2;cursor:pointer}
+.baris:hover{background:#FAFAFB}
+.baris .atas{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.baris .bab{font-size:11.5px;font-weight:700;color:#146B2C;background:var(--hijau-muda);
+            padding:2px 8px;border-radius:5px}
+.baris .perbaikan{font-size:11px;color:var(--abu);background:#F0F0F2;padding:2px 7px;border-radius:5px}
+
+/* ── KEPALA BAB (Tahap 2.5, putusan Bos: desain A / akordeon) ───────────
+   KENAPA: 20 catatan bercampur antar bab = panel sempit tidak nyaman.
+   Sekarang tiap bab satu baris kepala; klik → daftar catatan bab itu.
+   Hanya SATU yang terbuka otomatis (paling banyak catatan baru). */
+.kepala-bab{display:flex;align-items:center;gap:8px;padding:11px 18px;
+  border-bottom:1px solid var(--garis);cursor:pointer;background:#FCFCFD;
+  user-select:none}
+.kepala-bab:hover{background:#F6F8F6}
+.kepala-bab:focus-visible{outline:2px solid var(--hijau);outline-offset:-2px}
+.kepala-bab .panah{font-size:10px;color:var(--abu);width:11px;flex:none}
+.kepala-bab .nama-bab{font-size:12.5px;font-weight:700;flex:1;line-height:1.35}
+.kepala-bab .jml{font-size:11.5px;color:var(--abu);background:#EFEFF2;
+  padding:2px 8px;border-radius:20px;font-weight:600;flex:none}
+.kepala-bab .baru{font-size:10.5px;background:var(--kuning);color:#8A6D0B;
+  padding:2px 7px;border-radius:20px;font-weight:700;flex:none}
+.kepala-bab.buka{background:var(--hijau-muda);border-bottom-color:#CDE7D6}
+.kepala-bab.buka .nama-bab{color:#146F2E}
+.isi-bab{border-bottom:1px solid var(--garis)}
+.isi-bab > .baris:last-child{border-bottom:0}
+/*  TANDA LAMPIRAN (Tahap 2.2, putusan Bos: opsi B).
+    Lampiran tetap terlipat, tapi baris WAJIB memberi tahu ada lampiran —
+    kalau tidak, pembimbing tidak akan pernah tahu gambarnya ada.
+    Ikonnya pakai entitas HTML (&#128206;), bukan emoji berkas luar. */
+.baris .tanda-lampiran{font-size:11px;line-height:1;background:#EEF6F0;
+  border:1px solid #D3E7DA;border-radius:5px;padding:2px 6px;cursor:help}
+.baris .warna{width:10px;height:10px;border-radius:50%;margin-left:auto;flex:none}
+.w-kuning{background:var(--kuning-tepi)} .w-hijau{background:var(--hijau-tepi)}
+.w-biru{background:var(--biru-tepi)}
+.baris .isi{font-size:13px;line-height:1.6;color:#3A3844;
+            display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.baris .detail{display:none;margin-top:10px;font-size:12.5px;color:var(--abu);
+               line-height:1.65;border-top:1px dashed var(--garis);padding-top:9px}
+.baris.buka .detail{display:block}
+.baris.buka .isi{-webkit-line-clamp:unset;display:block}
+.detail .teks-asli{background:#FFFDF0;border-left:3px solid var(--kuning-tepi);
+                   padding:8px 11px;margin:7px 0;border-radius:0 5px 5px 0;
+                   font-size:12px;color:#4A4429}
+.detail .hilang{background:#FFF6E8;border-left:3px solid var(--oranye)}
+.detail a{color:var(--hijau);font-weight:600}
+
+/* ── tulis catatan ───────────────────────────────────────────────────── */
+.tulis{border-top:1px solid var(--garis);padding:14px 18px;background:#FCFCFD}
+.tulis textarea{width:100%;font-family:inherit;font-size:13px;padding:10px 12px;
+                border:1.5px solid var(--garis);border-radius:8px;resize:vertical;
+                min-height:74px;color:var(--teks)}
+.tulis textarea:focus{outline:none;border-color:var(--hijau)}
+.tulis input{width:100%;font-family:inherit;font-size:12.5px;padding:8px 12px;
+             border:1.5px solid var(--garis);border-radius:8px;margin-top:7px;color:var(--teks)}
+.tulis input:focus{outline:none;border-color:var(--hijau)}
+
+/*  ══ TAHAP 3.1 (ACC Bos 24Sep26): SOROTAN KALIMAT ═════════════════════
+    ⚠️ AKAR BUG 24Sep26 (temuan MATA + ukur layar): Wulan menulis pemilih
+    `.isi-naskah p` — KELAS ITU TIDAK ADA di halaman. Wadah naskah yang
+    benar adalah `#isi-<idberkas>` (dibuat `tinjau.html` baris ~358).
+    AKIBATNYA: seluruh CSS ini TIDAK PERNAH KENA — naskah tak pernah
+    kuning, tanda 🟡 tak pernah muncul, dan JS `tempelSorotanTersimpan()`
+    mencari 0 paragraf (terukur: paragraf = 0, walau data sorotan = 7).
+    Uji teks tetap HIJAU karena HTML-nya benar; MATA yang menemukan.
+
+    KENAPA pakai `.kertas p` sekarang: seluruh paragraf naskah ada di
+    dalam wadah `.kertas`, apa pun id berkasnya. Jadi aturannya KOKOH
+    walau id berkas berubah. */
+.kertas p{cursor:pointer; position:relative; border-radius:4px;
+  transition:background-color .15s}
+.kertas p:hover{background:#fafaf5}
+.kertas p.par-terpilih{background:#e8f0fd;
+  box-shadow:inset 3px 0 0 #3b6fd4}
+.kertas p.par-ada-catatan{background:#fff9e0;
+  box-shadow:inset 3px 0 0 #e5b800}
+
+/*  Tanda 🟡 di awal paragraf yang punya catatan. */
+.tanda-catatan{font-size:11px; margin-right:4px; user-select:none}
+
+.sorot-kotak{background:#f4f8ff; border:1px solid #cfe0f7; border-radius:6px;
+  padding:8px 10px; margin-bottom:8px; font-size:12px}
+.sorot-kotak[hidden]{display:none}
+.sorot-kepala{display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:5px}
+.sorot-judul{font-weight:600; color:#25508f}
+.sorot-batal{background:none; border:none; color:#8a6d00; cursor:pointer;
+  font-size:11px; text-decoration:underline; padding:0}
+.sorot-kutipan{color:#2b2b2b; line-height:1.45; font-style:italic;
+  border-left:3px solid #e5b800; padding-left:7px}
+.sorot-kutipan:empty::before{content:'Klik satu kalimat di naskah sebelah '
+  'kiri untuk menandainya.'; color:#8b8b8b; font-style:normal}
+
+/*  Keadaan sorotan di panel catatan (Tahap 3.1). */
+.keadaan{margin-top:5px; font-size:11px; line-height:1.5; padding:4px 7px;
+  border-radius:4px}
+.keadaan-utuh{background:#eefaf0; color:#1d6b34}
+.keadaan-bergeser{background:#fff8e6; color:#8a6d00}
+.keadaan-hilang{background:#f7f0ef; color:#8a3b32}
+
+/*  ── TOMBOL "LIHAT DI NASKAH" (Tahap 2.5b, ACC Bos 24Sep26) ────────────
+    KENAPA: pembimbing tidak perlu scroll-scroll naskah lagi. Klik catatan
+    → naskah meluncur ke bagian yang dibahas.
+    Warna & bentuk disamakan dengan bahasa tampilan yang sudah ada supaya
+    tidak terasa seperti tambahan asing.                                  */
+.tunjuk-ada{margin:7px 0 2px}
+/*  ═══ MINTA LAGI REVISI YANG DILEWATI (Tahap 3.2, ACC Bos 24Sep26) ═══
+    Hanya muncul kalau mahasiswa memang melewatinya. Warnanya NETRAL-KUNING
+    (bukan merah): ini bukan masalah, hanya permintaan yang dihidupkan lagi.
+    Tombol sengaja BERTULISAN (bukan ikon) — ini sisi PEMBIMBING yang pakai
+    laptop dan butuh kalimat jelas, beda dari mahasiswa yang pakai HP. */
+.minta-lagi{background:#FFFBEF;border:1px solid #F0E2BE;border-radius:10px;
+  padding:9px 11px;margin-bottom:9px}
+.minta-ket{font-size:12px;color:#7A6520;line-height:1.45}
+.minta-ket b{color:#8A6D00}
+.tb-minta{margin-top:7px;background:#8A6D00;color:#fff;border:none;
+  border-radius:70px;padding:8px 17px;font-size:12.5px;font-weight:600;
+  font-family:inherit;cursor:pointer;transition:background .16s ease}
+.tb-minta:hover{background:#755C00}
+.tb-tunjuk{
+  background:var(--hijau-muda,#E8F3EF);color:var(--hijau,#2E7D6F);
+  border:1px solid var(--hijau,#2E7D6F);border-radius:7px;
+  padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:inherit;
+}
+.tb-tunjuk:hover{background:var(--hijau,#2E7D6F);color:#fff}
+.tunjuk-kutipan{
+  font-size:11px;color:var(--abu,#6B7280);margin-top:5px;line-height:1.5;
+  border-left:2px solid var(--kuning,#E4B363);padding-left:7px;
+}
+/*  JUJUR: kalau bagiannya tidak ketemu, katakan apa adanya — jangan diam. */
+.tunjuk-tidak,.tunjuk-gagal{
+  font-size:11px;color:var(--abu,#6B7280);margin-top:6px;line-height:1.5;
+  background:#F5F5F7;border-radius:6px;padding:6px 8px;
+}
+/*  Paragraf naskah yang sedang dituju — disorot SEBENTAR supaya mata
+    pembimbing langsung menangkap letaknya. */
+.kertas p.sedang-dilihat{
+  background:#FFF6D8;box-shadow:0 0 0 3px #FFF6D8;border-radius:3px;
+  transition:background .3s;
+}
+/*  DROPDOWN "Bagian mana?" (Tahap 2.5, putusan Bos 24Sep26) — disamakan
+    tampilannya dengan kotak ketik lama supaya pembimbing tidak kaget. */
+.tulis select{width:100%;font-family:inherit;font-size:12.5px;padding:8px 12px;
+              border:1.5px solid var(--garis);border-radius:8px;margin-top:7px;
+              color:var(--teks);background:#fff;cursor:pointer;
+              appearance:none;-webkit-appearance:none;
+              background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2368666E' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+              background-repeat:no-repeat;background-position:right 12px center;
+              padding-right:32px}
+.tulis select:focus{outline:none;border-color:var(--hijau)}
+.tulis .aksi{display:flex;justify-content:space-between;align-items:center;margin-top:9px;gap:10px}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LAMPIRAN GAMBAR (Tahap 2.2, ACC Bos 24Sep26)
+   Pembimbing kadang perlu MENUNJUKKAN (tangkapan SPSS, tabel, coretan).
+   ══════════════════════════════════════════════════════════════════════ */
+/*  Kotak pilih gambar — sengaja sederhana, bukan tombol besar.
+    (Tombol besar hanya untuk aksi UTAMA; ini opsional.) */
+.pilih-gambar{display:inline-flex;align-items:center;gap:8px;margin-top:2px;
+  padding:8px 14px;border:1.5px dashed #C9CFCB;border-radius:9px;
+  background:#fff;cursor:pointer;font-size:12.5px;color:#5A6570}
+.pilih-gambar:hover{border-color:var(--hijau);color:var(--hijau-tua)}
+.pilih-gambar input[type=file]{display:none}
+.pilih-gambar.ada{border-style:solid;border-color:var(--hijau);
+  background:#F2F8F4;color:var(--hijau-tua);font-weight:600}
+.salah-gambar{margin-top:8px;padding:9px 12px;border-radius:9px;
+  background:#FFF3F3;border:1px solid #F0C9C9;color:#8A3B3B;font-size:12.5px;
+  line-height:1.45}
+/*  Gambar yang tampil di catatan — dibatasi tingginya supaya TIDAK
+    menelan seluruh layar (naskah harus tetap porsi terbesar, kata Bos). */
+.lampiran{margin-top:9px}
+.lampiran img{max-width:100%;max-height:260px;border-radius:9px;
+  border:1px solid var(--garis);display:block;cursor:zoom-in}
+.lampiran small{display:block;font-size:11px;color:var(--teks-abu);
+  margin-top:4px}
+/*  Lampiran DOKUMEN (PDF/Word/Excel) — tidak dipaksa tampil, cukup tombol
+    Buka. Sengaja bukan tombol besar: ini pelengkap komentar, bukan aksi
+    utama. */
+.berkas-lampiran{display:inline-flex;align-items:center;gap:10px;
+  margin-top:2px;padding:9px 14px;border:1.5px solid var(--garis);
+  border-radius:9px;background:#fff;text-decoration:none;color:var(--teks);
+  font-size:12.5px;max-width:100%}
+.berkas-lampiran:hover{border-color:var(--hijau)}
+.berkas-lampiran .nama{font-weight:600;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+.berkas-lampiran .buka{color:var(--hijau-tua);font-weight:700;flex:none}
+.tulis small{font-size:11px;color:var(--abu)}
+.tombol{background:var(--hijau);color:#fff;font-weight:700;font-size:13px;
+        padding:9px 20px;border-radius:70px;border:none;font-family:inherit;
+        cursor:pointer;transition:.2s;white-space:nowrap}
+.tombol:hover{background:#17702F}
+.tombol:disabled{background:#BFD8C6;cursor:not-allowed}
+
+/* ── catatan kosong ──────────────────────────────────────────────────── */
+.hampa{padding:34px 20px;text-align:center;color:var(--abu);font-size:12.5px;line-height:1.7}
+.hampa b{display:block;color:var(--teks);font-size:13.5px;margin-bottom:5px}
+
+/* ── kartu sambutan pembimbing (identitas) ───────────────────────────── */
+.sambut{background:#fff;border:1px solid var(--garis);border-radius:10px;
+        padding:48px 44px;max-width:560px;margin:60px auto;text-align:center}
+.sambut .ikon{font-size:40px;margin-bottom:14px}
+.sambut h1{font-size:20px;font-weight:700;margin-bottom:14px;letter-spacing:-.3px}
+.sambut .gelar{font-size:14.5px;line-height:1.85;color:#3A3844;margin-bottom:22px}
+.sambut .gelar b{color:var(--teks)}
+.sambut .kotak2{background:var(--hijau-muda);border-radius:9px;padding:14px 18px;
+                font-size:12.5px;color:#146B2C;text-align:left;margin-bottom:22px;line-height:1.7}
+.sambut input{width:100%;font-family:inherit;font-size:14px;padding:13px 16px;
+              border:1.5px solid var(--garis);border-radius:9px;text-align:center;color:var(--teks)}
+.sambut input:focus{outline:none;border-color:var(--hijau)}
+.sambut .tombol{width:100%;margin-top:13px;padding:13px;font-size:14.5px}
+.sambut .kecil{font-size:11.5px;color:var(--abu);margin-top:15px;line-height:1.7}
+
+/* ── naskah: daftar bab ──────────────────────────────────────────────── */
+.pemilih{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.pemilih button{background:#fff;border:1.5px solid var(--garis);border-radius:70px;
+                padding:8px 16px;font-family:inherit;font-size:12.5px;font-weight:600;
+                color:var(--abu);cursor:pointer;transition:.18s}
+.pemilih button.aktif{background:var(--hijau-gelap);color:#fff;border-color:var(--hijau-gelap)}
+
+/* ── Alat pembimbing (03Okt26) — 3 warna saja, tanpa kata alat/AI ─────── */
+.alat-baca{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+           margin:12px 0 4px;padding:11px 14px;background:var(--hijau-muda);
+           border:1px solid var(--hijau-tepi);border-radius:12px}
+.tb-baca,.tb-periksa{font-family:inherit;font-size:13px;font-weight:600;
+                     border-radius:70px;padding:9px 18px;cursor:pointer;
+                     border:1.5px solid transparent;white-space:nowrap}
+.tb-baca{background:#fff;border-color:var(--hijau);color:var(--hijau-gelap);
+         display:inline-block;text-align:center}
+.tb-baca:hover{background:var(--hijau);color:#fff}
+.tb-periksa{background:var(--hijau);color:#fff}
+.tb-periksa:hover{background:var(--hijau-gelap)}
+.tb-catatan{font-size:12.5px;color:var(--abu)}
+@media (max-width:640px){
+  .alat-baca{padding:10px 12px}
+  .tb-baca,.tb-periksa{width:100%;text-align:center}
+  .tb-catatan{width:100%}
+}
+</style>
+</head>
+<body>
+
+{{ ikon_sprite() }}
+{# ── KARTU SAMBUTAN: nama mahasiswa + judul naskah + isi HP/email ────────
+   Bos minta pembimbing PERCAYA dulu: sebutkan siapa yang mengundang dan
+   naskah apa. Kampus TIDAK ditampilkan (putusan Bos: "nanti saja").
+   Setelah isi identitas, kartu ini tidak muncul lagi di kunjungan berikut. #}
+{% if not sudah_isi_identitas %}
+<div class="sambut">
+  <div class="ikon">{{ ikon('graduation-cap', 22) }}</div>
+  <h1>Undangan Kolaborasi Bimbingan</h1>
+  <div class="gelar">
+    Mahasiswa <b>{{ nama_mhs }}</b> mengundang Anda sebagai
+    <b>pembimbing</b> untuk berkolaborasi pada naskah
+    {% if berkas %}<b>&ldquo;{{ berkas[0].judul }}&rdquo;</b>{% else %}<b>naskah akademik</b>{% endif %}.
+  </div>
+  <div class="kotak2">
+    Anda dapat <b>membaca naskah</b> dan <b>memberi catatan</b> pada bagian yang
+    perlu ditinjau. Isi naskah tidak dapat diubah dari halaman ini.
+  </div>
+  <form method="post" action="/tinjau/{{ token }}/identitas">
+    <input type="text" name="identitas" required
+           placeholder="Nomor HP atau email Anda">
+    <button class="tombol" type="submit">Lanjut</button>
+  </form>
+  <div class="kecil">
+    Cukup diisi sekali. Berikutnya, klik ulang link dari mahasiswa —
+    Anda langsung masuk tanpa mengisi lagi.
+  </div>
+</div>
+
+{% else %}
+{# ── HALAMAN TINJAU SEBENARNYA ─────────────────────────────────────── #}
+<div class="kepala">
+  <div class="kepala-isi">
+    <div class="kiri">
+      <img src="/static/logo-96.png" alt="">
+      <div class="teks">
+        <b>Tinjauan Naskah</b>
+        <small>{{ nama_mhs }}{% if nama_pembimbing %} · untuk {{ nama_pembimbing }}{% endif %}</small>
+      </div>
+    </div>
+    <div class="kanan">
+      <span class="pil{% if sisa_hari <= 1 %} lewat{% endif %}">
+        Link berlaku {{ sisa_hari }} hari lagi
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="panggung">
+
+  {# ═══ KIRI: NASKAH (porsi terbesar & lebar) ═══ #}
+  <div>
+    {% if berkas|length > 1 %}
+    <div class="pemilih">
+      {% for bk in berkas %}
+      <button type="button" class="{% if loop.first %}aktif{% endif %}"
+              data-berkas="{{ bk.id }}">{{ bk.judul }}</button>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="kertas" id="kertas">
+      {% if berkas %}
+        {% for bk in berkas %}
+        <div class="bagian" data-berkas="{{ bk.id }}"
+             {% if not loop.first %}style="display:none"{% endif %}>
+          <h1>{{ bk.judul }}</h1>
+          <div class="mhs">{{ nama_mhs }}</div>
+
+          {# ── Alat pembimbing (03Okt26): ALAT SAMA dengan mahasiswa ──
+             Hanya muncul kalau saklar di server hidup. Alamat dilindungi
+             TOKEN + berkas diperiksa milik bimbingan ini di server. #}
+          {% if ai_aktif and bk.file_id %}
+          <div class="alat-baca">
+            <a class="tb-baca" href="/tinjau/{{ token }}/naskah-baca/{{ bk.id }}">
+              Buka di editor
+            </a>
+            <form method="post" action="/tinjau/{{ token }}/periksa-ai"
+                  style="display:inline">
+              <input type="hidden" name="berkas_id" value="{{ bk.id }}">
+              <button class="tb-periksa" type="submit">
+                Periksa dengan AI
+              </button>
+            </form>
+            <span class="tb-catatan">Ringkasan hasil masuk sebagai catatan di panel kanan.</span>
+          </div>
+          {% endif %}
+
+          <div id="isi-{{ bk.id }}"></div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="kosong">
+          Belum ada naskah yang dibagikan pada bimbingan ini.<br>
+          Minta mahasiswa menambahkan naskahnya, ya.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ═══ KANAN: PANEL CATATAN (sempit) ═══ #}
+  <div class="panel">
+    <div class="panel-kepala">
+      <b>Catatan Bimbingan</b>
+      <div class="angka">
+        <span class="k">Perlu ditinjau <b>{{ angka.belum }}</b></span>
+        <span class="h">Sudah oke <b>{{ angka.selesai }}</b></span>
+        <span>Semua <b>{{ angka.total }}</b></span>
+      </div>
+    </div>
+
+    <div class="legenda">
+      <span><i class="kotak" style="background:var(--kuning-tepi)"></i>
+            Kuning — catatan Anda, belum ditindaklanjuti</span>
+      <span><i class="kotak" style="background:var(--hijau-tepi)"></i>
+            Hijau — Anda sudah menyatakan oke</span>
+      <span><i class="kotak" style="background:var(--biru-tepi)"></i>
+            Biru — penanda pribadi mahasiswa</span>
+    </div>
+
+    <div class="panel-isi">
+      {% if kelompok %}
+        {#  ══ TAHAP 2.5 (ACC Bos 24Sep26): KELOMPOK PER BAB ══════════════
+            Masalah: catatan pembimbing lama-lama banyak → panel sempit jadi
+            panjang & bercampur antar bab. Selesai: catatan dikelompokkan,
+            SATU kelompok terbuka (yang paling banyak catatan baru), sisanya
+            terlipat. Putusan Bos: desain A (kepala bab / akordeon). #}
+        {% for grup in kelompok %}
+        <div class="kepala-bab{% if grup.buka %} buka{% endif %}"
+             onclick="bukaBab(this)" role="button" tabindex="0"
+             aria-expanded="{{ 'true' if grup.buka else 'false' }}">
+          <span class="panah">{% if grup.buka %}&#9662;{% else %}&#9656;{% endif %}</span>
+          <span class="nama-bab">{{ grup.label }}</span>
+          {% if grup.jumlah_baru %}
+          <span class="baru">{{ grup.jumlah_baru }} baru</span>
+          {% endif %}
+          <span class="jml">{{ grup.jumlah }}</span>
+        </div>
+
+        <div class="isi-bab"{% if not grup.buka %} hidden{% endif %}>
+        {% for simpul in grup.catatan %}
+        {#  ── TAHAP 2.5b (ACC Bos 24Sep26): KLIK CATATAN → NASKAH MELUNCUR ──
+            Perintah Bos: "saat klik revisi juga langsung menuju halaman
+            revisi yang dimaksud, jadi Pembimbing di mudahkan untuk cek
+            revisian naskah."
+
+            `petunjuk[simpul.id]` sudah DIHITUNG DI SERVER (bukan di browser)
+            supaya naskah 400rb karakter tidak perlu dikirim ke JS.
+            Isinya salah satu:
+              · dict  → {'kutipan':…, 'dasar':…, 'berkas_ke':…}  (KETEMU)
+              · None  → TIDAK ketemu → tombol TIDAK dipasang, dan pembimbing
+                        diberi tahu apa adanya (jangan diam-diam)  #}
+        {% set tunjuk = petunjuk.get(simpul.terbaru.id) %}
+        <div class="baris" onclick="bukaBaris(this)">
+          <div class="atas">
+            {% if simpul.jumlah_ronde > 1 %}
+            <span class="perbaikan">perbaikan &times;{{ simpul.jumlah_ronde }}</span>
+            {% endif %}
+            {#  TANDA LAMPIRAN (Tahap 2.2, putusan Bos 24Sep26: opsi B).
+                Lampiran tetap terlipat (hemat ruang), TAPI baris harus
+                memberi tahu ADA lampiran — kalau tidak, pembimbing tidak
+                akan pernah tahu gambar itu ada. #}
+            {% if simpul.terbaru.lampiran or simpul.terbaru.tautan %}
+            <span class="tanda-lampiran"
+                  title="{% if simpul.terbaru.lampiran %}Ada lampiran berkas{% endif %}{% if simpul.terbaru.lampiran and simpul.terbaru.tautan %} + {% endif %}{% if simpul.terbaru.tautan %}Ada tautan rujukan{% endif %}">&#128206;{% if simpul.terbaru.lampiran and simpul.terbaru.tautan %}&#128279;{% endif %}</span>
+            {% endif %}
+            <span class="warna w-{{ simpul.terbaru.warna }}"></span>
+          </div>
+          <div class="isi">{{ simpul.terbaru.isi }}</div>
+
+          <div class="detail">
+            {#  RANTAI: ronde 1 → 2 → 3 (lapis 3, baru muncul kalau dibuka) #}
+            <div><b>Perbaikan {{ simpul.kepala.ronde }}</b>
+              &middot; {{ simpul.kepala.dibuat.strftime('%d %b %Y') }}</div>
+            <div style="margin:3px 0 8px">{{ simpul.kepala.isi }}</div>
+
+            {% for anak in simpul.anak %}
+            <div><b>Perbaikan {{ anak.ronde }}</b>
+              &middot; {{ anak.dibuat.strftime('%d %b %Y') }}</div>
+            <div style="margin:3px 0 8px">{{ anak.isi }}</div>
+            {% endfor %}
+
+            {#  TEKS ASLI: catatan menempel pada KENANGAN teks, bukan sorotan.
+                Jadi walau sorotan hilang, pembimbing tetap tahu apa yang
+                dimaksud. (Andalan yang tidak rapuh — keputusan Bos.)
+
+                ── TAHAP 3.1 (ACC Bos 24Sep26): 3 KEADAAN SOROTAN ────────
+                `sorotan[simpul.terbaru.id]` = hasil pemeriksaan ULANG oleh
+                server saat halaman ini dibuka (putusan Bos: "selalu segar").
+                  utuh      → kalimat masih ada persis → "Masih menempel"
+                  bergeser  → teks sudah diedit mahasiswa → diberi tahu jujur
+                  hilang    → kalimat TIDAK ADA lagi → tombol "Lihat di naskah"
+                              diganti jadi penjelasan; catatan TETAP ada
+            #}
+            {% set sor = sorotan.get(simpul.terbaru.id) if sorotan else None %}
+            {% if simpul.terbaru.teks_asli %}
+            <div class="teks-asli">
+              <b>Yang ditandai:</b><br>{{ simpul.terbaru.teks_asli[:220] }}
+              {% if sor %}
+              <div class="keadaan keadaan-{{ sor.keadaan }}">
+                {%- if sor.keadaan == 'utuh' %}{{ ikon('check', 13) }} Teksnya masih ada di naskah.
+                {%- elif sor.keadaan == 'bergeser' %}{{ ikon('pencil', 13) }} Teksnya sudah diubah
+                  mahasiswa — ditandai pada bagian yang paling mirip.
+                {%- elif sor.keadaan == 'hilang' %}{{ ikon('folder', 13) }} Teks yang ditandai sudah
+                  tidak ada di naskah. Catatan ini tetap tersimpan.
+                {%- endif %}
+              </div>
+              {% endif %}
+            </div>
+            {% else %}
+            <div class="teks-asli hilang">
+              Catatan ini dititipkan pada bagian naskahnya, bukan pada
+              kalimat tertentu.
+            </div>
+            {% endif %}
+
+            {% if simpul.terbaru.tautan %}
+            <div>Tautan: <a href="{{ simpul.terbaru.tautan }}" target="_blank"
+                            rel="noopener">{{ simpul.terbaru.tautan[:60] }}</a></div>
+            {% endif %}
+
+            {# ── TAHAP 2.5b: TOMBOL "LIHAT DI NASKAH" (ACC Bos 24Sep26) ──
+                Ini yang membuat pembimbing TIDAK perlu scroll-scroll naskah.
+                Klik → naskah kiri meluncur ke bagian yang dibahas catatan.
+
+                ⚠️ JUJUR DUA ARAH:
+                  KETEMU   → tombol + kutipan singkat (pembimbing tahu APA
+                             yang akan dilihat, tidak kaget)
+                  TIDAK    → JANGAN pasang tombol palsu. Katakan apa adanya,
+                             supaya pembimbing tidak menunggu sesuatu yang
+                             tidak akan terjadi. #}
+            {% if tunjuk %}
+            <div class="tunjuk-ada">
+              <button type="button" class="tb-tunjuk"
+                      onclick="event.stopPropagation();luncurkanCatatan(this)"
+                      data-kutipan="{{ tunjuk.kutipan|tojson }}"
+                      data-berkas="{{ tunjuk.get('berkas_ke', 0) }}">
+                &#128269; Lihat di naskah
+              </button>
+              <div class="tunjuk-kutipan">…{{ tunjuk.kutipan[:110] }}…</div>
+            </div>
+            {% else %}
+            <div class="tunjuk-tidak">
+              Tidak ditemukan bagiannya di naskah — mungkin naskah sudah
+              berubah. Silakan cari manual.
+            </div>
+            {% endif %}
+
+            {#  LAMPIRAN (Tahap 2.2) — dikirim lewat rute ber-token, jadi tidak
+                bisa dibuka siapa pun yang tidak punya tautan.
+                Gambar → ditampilkan. Dokumen (PDF/Word/Excel) → tombol unduh
+                (tidak dipaksa tampil, karena browser tak selalu bisa). #}
+            {% if simpul.terbaru.lampiran %}
+            <div class="lampiran">
+              {% if simpul.terbaru.lampiran_nama and
+                    simpul.terbaru.lampiran.rsplit('.', 1)[-1].lower()
+                    in ('png','jpg','jpeg','webp','gif') %}
+              <img src="/tinjau/{{ token }}/lampiran/{{ simpul.terbaru.lampiran }}"
+                   alt="{{ simpul.terbaru.lampiran_nama }}"
+                   loading="lazy">
+              {% else %}
+              <a class="berkas-lampiran"
+                 href="/tinjau/{{ token }}/lampiran/{{ simpul.terbaru.lampiran }}"
+                 target="_blank" rel="noopener">
+                <span class="nama">{{ simpul.terbaru.lampiran_nama }}</span>
+                <span class="buka">Buka</span>
+              </a>
+              {% endif %}
+              <small>{{ simpul.terbaru.lampiran_nama }}</small>
+            </div>
+            {% endif %}
+
+            {#  BALAS RANTAI: pembimbing menandai ulang pada masalah yang sama.
+                Hasilnya catatan BARU (ronde berikutnya) — bukan menghidupkan
+                sorotan lama yang sudah mati. #}
+            {% if loop.first %}
+            <div style="margin-top:9px">
+              {#  ══ TAHAP 3.2 (ACC Bos 24Sep26): MINTA LAGI REVISI YANG
+                  DILEWATI ══════════════════════════════════════════════
+                  Aturan Bos verbatim: "...Dan bisa aktif lagi jika
+                  pembimbing klik revisi (khusus untuk revisi yang di
+                  lewati mahasiswa), jadi tetap Mahasiswa harus melakukan
+                  revisi lagi dan tombol jadi aktif lagi di dashboard
+                  mahasiswa."
+                  ⚠️ Muncul HANYA kalau mahasiswa memang melewatinya —
+                  jangan pasang tombol untuk hal yang tidak terjadi. #}
+              {% if simpul.kepala.dilewati %}
+              <div class="minta-lagi">
+                <div class="minta-ket">
+                  <b>Revisi Dilewati mahasiswa</b>
+                  {% if simpul.kepala.dilewati_pada %}
+                  · {{ simpul.kepala.dilewati_pada.strftime('%d %b %Y') }}
+                  {% endif %}
+                  — kalau mau diminta lagi, tekan tombol ini.
+                </div>
+                <form method="post" action="/tinjau/{{ token }}/aktifkan"
+                      onsubmit="kunciTombol(this)">
+                  <input type="hidden" name="catatan_id"
+                         value="{{ simpul.kepala.id }}">
+                  <button class="tb-minta" type="submit">
+                    &#8635; Minta lagi ke mahasiswa
+                  </button>
+                </form>
+              </div>
+              {% endif %}
+              <form method="post" action="/tinjau/{{ token }}/catatan">
+                <input type="hidden" name="induk_id" value="{{ simpul.terbaru.id }}">
+                <input type="hidden" name="section_id" value="{{ simpul.kepala.section_id }}">
+                <input type="hidden" name="section_judul" value="{{ simpul.kepala.section_judul }}">
+                <input type="text" name="isi" placeholder="Tandai ulang (masih belum)...">
+                <button class="tombol" type="submit"
+                        style="margin-top:7px;font-size:12px;padding:7px 16px">
+                  Kirim ulang</button>
+              </form>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+        </div>{#  /isi-bab — daftar catatan satu kelompok  #}
+        {% endfor %}
+      {% else %}
+        <div class="hampa">
+          <b>Belum ada catatan</b>
+          Catatan Anda akan muncul di sini, tersusun rapi per bab.
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="tulis" id="kolom-tulis">
+      <form method="post" action="/tinjau/{{ token }}/catatan"
+            enctype="multipart/form-data" onsubmit="kunciTombol(this)">
+        {#  ══ TAHAP 3.1 (ACC Bos 24Sep26): SOROTAN KALIMAT ══════════════
+            KENAPA ADA DI SINI: pembimbing KLIK satu kalimat di naskah
+            (kiri). JS mengisi kotak ini otomatis. Pembimbing TIDAK perlu
+            mengetik/menyalin apa pun — cukup lihat kalimatnya benar, lalu
+            tulis catatan.
+
+            ⚠️ `teks_asli` = kalimat yang BENAR-BENAR ada di naskah, diambil
+            oleh layar (bukan diketik pembimbing). Itu yang jadi KENANGAN
+            teks di DB — andalan yang tidak rapuh (keputusan Bos).
+
+            ⚠️ Terlihat kalau kosong? TIDAK. Kotak ini `hidden` sampai
+            pembimbing memilih kalimat. Tapi kalau pembimbing mau menulis
+            catatan per-BAB saja (tanpa menyorot), form tetap jalan seperti
+            dulu — sorotan itu OPSIONAL, bukan syarat. #}
+        <div id="petunjuk-sorot" class="sorot-kotak" hidden></div>
+        <div id="kotak-sorot" class="sorot-kotak">
+          <div class="sorot-kepala">
+            <span class="sorot-judul">Kalimat yang ditandai</span>
+            <button type="button" class="sorot-batal"
+                    onclick="batalkanSorot()">Batalkan tanda</button>
+          </div>
+          <div id="kutipan-terpilih" class="sorot-kutipan"></div>
+          <input type="hidden" name="teks_asli" id="teks-terpilih">
+          <input type="hidden" name="berkas_id" id="sorot-berkas">
+          <input type="hidden" name="nomor_paragraf" id="sorot-nomor">
+        </div>
+        <textarea name="isi" placeholder="Tulis catatan untuk mahasiswa..."
+                  required></textarea>
+        {#  ══ BAGIAN MANA? (Tahap 2.5, putusan Bos 24Sep26) ═══════════════
+            Dulu: kotak KETIK BEBAS → pembimbing bisa salah tulis
+            ("BAB 3" vs "BAB III" vs "Metode") → catatan terpecah jadi
+            kelompok palsu. Sekarang: DROPDOWN dari bab yang TERDETEKSI
+            di naskah, jadi tidak bisa salah tulis.
+            ⚠️ Kalau naskah TIDAK punya bab (perjanjian/nota/artikel jurnal),
+            dropdown diganti kotak ketik — supaya pembimbing TIDAK PERNAH
+            kehilangan cara menandai bagian. (Jalan keluar wajib ada.) #}
+        {% if bab_naskah %}
+        <select name="section_judul" aria-label="Bagian mana?">
+          <option value="">Bagian mana? (opsional)</option>
+          {% for b in bab_naskah %}
+          <option value="{{ b.label }}">{{ b.label }}</option>
+          {% endfor %}
+          <option value="Bagian lain">Bagian lain (bukan bab)</option>
+        </select>
+        {% else %}
+        <input type="text" name="section_judul"
+               placeholder="Bagian mana? (mis. Pasal 3 / halaman 2)">
+        {% endif %}
+        <input type="text" name="tautan"
+               placeholder="Tautan rujukan (opsional)">
+        {#  LAMPIRAN (Tahap 2.2) — ACC Bos 24Sep26: gambar + PDF + Word/Excel.
+            Fungsi: PELENGKAP KOMENTAR — pembimbing menunjuk sumber/contoh
+            yang dia maksud, supaya mahasiswa tidak perlu menebak. #}
+        <label class="pilih-gambar">
+          <input type="file" name="lampiran" id="pilih-gambar"
+                 onchange="namaGambar(this)">
+          <span id="teks-gambar">Lampirkan gambar / dokumen (opsional)</span>
+        </label>
+        {% if lampiran_ditolak %}
+        <div class="salah-gambar">
+          Lampiran tidak terkirim — jenis berkas belum didukung atau terlalu
+          besar (maks 10 MB). Catatan Anda tetap bisa dikirim tanpa lampiran.
+        </div>
+        {% endif %}
+        <div class="aksi">
+          <small>Catatan tidak mengubah naskah mahasiswa.</small>
+          <button class="tombol" type="submit">Kirim</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+//  Buka/tutup detail baris catatan (lapis 3 history).
+function bukaBaris(el){ el.classList.toggle('buka'); }
+
+//  ── TAHAP 2.5 (ACC Bos 24Sep26): buka/tutup kelompok bab ──────────────
+//  KENAPA HANYA SATU TERBUKA: supaya panel samping tetap kompak — begitu
+//  pembimbing membuka bab lain, bab sebelumnya menutup sendiri. Jadi tinggi
+//  panel tidak bertumpuk walau catatan sudah puluhan.
+//  ⚠️ Bab yang dibuka TIDAK diingat antar-muat ulang: setelah mengirim
+//  catatan halaman dimuat ulang, dan server sudah memilih bab dengan
+//  catatan baru terbanyak — itu justru yang pembimbing mau lihat.
+function bukaBab(el){
+  const isi = el.nextElementSibling;
+  if(!isi) return;
+  const akanBuka = isi.hidden;
+  //  tutup semua kelompok dulu
+  document.querySelectorAll('.kepala-bab').forEach(k => {
+    k.classList.remove('buka');
+    k.setAttribute('aria-expanded','false');
+    const p = k.querySelector('.panah');
+    if(p) p.innerHTML = '&#9656;';
+    const s = k.nextElementSibling;
+    if(s) s.hidden = true;
+  });
+  if(akanBuka){
+    el.classList.add('buka');
+    el.setAttribute('aria-expanded','true');
+    const p = el.querySelector('.panah');
+    if(p) p.innerHTML = '&#9662;';
+    isi.hidden = false;
+  }
+}
+//  Bisa dibuka dengan papan tuntas (aksesibilitas).
+document.querySelectorAll('.kepala-bab').forEach(k => {
+  k.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); bukaBab(k); }
+  });
+});
+
+//  Kunci tombol setelah diklik — cegah catatan dobel kalau double-click.
+//  (uji tahan gempa #5)
+function kunciTombol(f){
+  const t = f.querySelector('button[type=submit]');
+  if(t){ t.disabled = true; t.textContent = 'Mengirim...'; }
+}
+
+//  Tampilkan nama gambar yang dipilih (Tahap 2.2).
+//  Pembimbing perlu tahu berkas mana yang terpasang SEBELUM menekan Kirim —
+//  kalau bukan, dia bisa mengirim gambar yang salah tanpa sadar.
+function namaGambar(inp){
+  const kotak = inp.closest('.pilih-gambar');
+  const teks = inp.parentElement.querySelector('#teks-gambar')
+            || document.getElementById('teks-gambar');
+  if(!teks) return;
+  if(inp.files && inp.files.length){
+    const f = inp.files[0];
+    const mb = (f.size / 1024 / 1024).toFixed(1);
+    teks.textContent = f.name + ' (' + mb + ' MB) — ganti';
+    if(kotak) kotak.classList.add('ada');
+  } else {
+    teks.textContent = 'Lampirkan gambar (opsional)';
+    if(kotak) kotak.classList.remove('ada');
+  }
+}
+
+//  ── TAHAP 2.5b (ACC Bos 24Sep26): LUNCURKAN NASKAH KE BAGIAN CATATAN ──
+//  Pembimbing klik "Lihat di naskah" → naskah kiri meluncur ke bagian itu.
+//
+//  CARA KERJA: server sudah mengirim KUTIPAN pendek (bukan seluruh naskah).
+//  Di sini kita cari paragraf naskah yang memuat kutipan itu, lalu sorot
+//  sebentar + luncurkan. Pencarian dilakukan pada <p> yang sudah dirender.
+//
+//  ⚠️ Kalau tidak ketemu (naskah berubah setelah halaman dimuat / kutipan
+//  terpotong batas): BILANG APA ADANYA. Jangan diam — pembimbing akan
+//  mengira tombolnya rusak.
+function luncurkanCatatan(tb){
+  let kutipan = '';
+  try { kutipan = JSON.parse(tb.dataset.kutipan || '""'); } catch(e){ kutipan = ''; }
+
+  //  pindah ke berkas yang benar dulu (mahasiswa bisa membagi >1 naskah)
+  const ke = parseInt(tb.dataset.berkas || '0', 10) || 0;
+  const bagian = document.querySelectorAll('.bagian');
+  if(bagian[ke]){
+    document.querySelectorAll('.pemilih button').forEach(function(x){
+      if(x.dataset.berkas === bagian[ke].dataset.berkas) x.click();
+    });
+  }
+
+  //  cari paragraf yang memuat kutipan (bandingkan bentuk ternormalisasi)
+  const norm = s => (s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const kataKunci = norm(kutipan).slice(0, 120);
+  let kena = null;
+  const kertas = document.getElementById('kertas');
+  if(kertas && kataKunci){
+    const semua = kertas.querySelectorAll('p');
+    for (const p of semua){
+      if(norm(p.textContent).includes(kataKunci)){ kena = p; break; }
+    }
+    //  cadangan: potongan lebih pendek (kalau kutipan terpotong di batas)
+    if(!kena){
+      const pendek = kataKunci.slice(0, 60);
+      for (const p of semua){
+        if(norm(p.textContent).includes(pendek)){ kena = p; break; }
+      }
+    }
+  }
+
+  if(!kena){
+    tb.insertAdjacentHTML('afterend',
+      '<div class="tunjuk-gagal">Bagian ini tidak ketemu di naskah yang ' +
+      'sedang tampil — naskah mungkin sudah berubah. Silakan cari manual.</div>');
+    return;
+  }
+
+  kena.scrollIntoView({behavior: 'smooth', block: 'center'});
+  kena.classList.add('sedang-dilihat');
+  setTimeout(function(){ kena.classList.remove('sedang-dilihat'); }, 2600);
+}
+
+
+//  Isi naskah: diambil dari server lewat endpoint yang HANYA MEMBACA.
+//  Sengaja tidak ditanam di HTML supaya halaman pembimbing tetap ringan
+//  walau naskahnya besar (uji tahan gempa #11: naskah 400rb karakter).
+document.querySelectorAll('.pemilih button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.pemilih button').forEach(x=>x.classList.remove('aktif'));
+    b.classList.add('aktif');
+    const id = b.dataset.berkas;
+    document.querySelectorAll('.bagian').forEach(function(s){
+      s.style.display = (s.dataset.berkas === id) ? '' : 'none';
+    });
+  });
+});
+
+//  ═══════════════════════════════════════════════════════════════════════
+//  TAHAP 3.1 (ACC Bos 24Sep26) — PEMBIMBING MENYOROT KALIMAT
+//  ═══════════════════════════════════════════════════════════════════════
+//  Putusan Bos: "Cara menyorot = KLIK DI KALIMAT (paling mudah untuk
+//  pembimbing)".
+//
+//  CARA KERJA (4 langkah, sengaja sederhana):
+//    1. Pembimbing klik satu paragraf di naskah
+//    2. Paragraf itu ditandai di layar (biru muda) + muncul kotak kecil
+//       "Catatan untuk bagian ini" di panel kanan, TERISI otomatis
+//    3. Pembimbing tulis catatannya → Simpan
+//    4. Kalimat yang dipilih ikut dikirim sebagai `teks_asli`
+//
+//  ⚠️ KENAPA TIDAK PAKAI PILIHAN TEKS (blok seperti Word): di layar HP
+//  memblok teks itu menyiksa, dan pembimbing kita bukan orang teknis.
+//  Klik paragraf = satu gerakan, tidak salah.
+//
+//  ⚠️ YANG DIKIRIM KE SERVER: `berkas_id` + `nomor_paragraf` (dua angka)
+//  dan `teks_asli` (teks kalimat yang benar-benar ada di naskah). Server
+//  TIDAK menerima naskah utuh dan TIDAK percaya posisi dari browser —
+//  posisinya dihitung ulang di server (`rute_pembimbing.tambah_catatan`).
+
+//  ── Ambil KALIMAT dari paragraf yang diklik ────────────────────────────
+//  KENAPA kalimat, bukan paragraf utuh: satu paragraf bisa 8 baris. Kalau
+//  seluruhnya disimpan, pembimbing tidak tahu bagian MANA yang dimaksud,
+//  dan pencarian kemiripan jadi lambat. Kalimat = satuan yang manusia
+//  pakai untuk menunjuk ("yang ini, kalimat ini").
+function ambilKalimat(par, titikKlik){
+  const teks = par.textContent || '';
+  //  Pecah jadi kalimat. Titik di akhir kalimat WAJIB diikuti spasi/habis
+  //  supaya "1.1" atau "Rp 2.000" tidak dianggap akhir kalimat.
+  const batas = [];
+  let mulai = 0;
+  const pola = /[.!?](\s|$)/g;
+  let m;
+  while ((m = pola.exec(teks)) !== null){
+    batas.push([mulai, m.index + 1]);
+    mulai = m.index + 1;
+  }
+  if (mulai < teks.length) batas.push([mulai, teks.length]);
+  if (!batas.length) return teks.trim();
+
+  //  Cari kalimat yang mengandung titik klik (pakai Range dari titik itu).
+  let posisi = null;
+  try{
+    const r = document.caretRangeFromPoint
+      ? document.caretRangeFromPoint(titikKlik.clientX, titikKlik.clientY)
+      : null;
+    if (r && par.contains(r.startContainer)){
+      const pra = document.createRange();
+      pra.selectNodeContents(par);
+      pra.setEnd(r.startContainer, r.startOffset);
+      posisi = pra.toString().length;
+    }
+  }catch(e){ /* titik klik tidak terbaca → pakai kalimat pertama */ }
+
+  let potong = batas[0];
+  if (posisi !== null){
+    for (const b of batas){ if (posisi >= b[0] && posisi < b[1]){ potong = b; break; } }
+  }
+  return teks.slice(potong[0], potong[1]).trim();
+}
+
+//  ── Tandai paragraf yang sedang disorot pembimbing ─────────────────────
+let parTerpilih = null;
+function pilihParagraf(par, kalimat){
+  if (parTerpilih) parTerpilih.classList.remove('par-terpilih');
+  parTerpilih = par;
+  par.classList.add('par-terpilih');
+
+  //  Isi kotak catatan di panel kanan.
+  const kotakKutip = document.getElementById('kutipan-terpilih');
+  const kotakTeks  = document.getElementById('teks-terpilih');
+  if (kotakKutip && kotakTeks){
+    kotakTeks.value = kalimat;
+    kotakKutip.textContent = kalimat.length > 150
+      ? kalimat.slice(0, 150) + '…' : kalimat;
+  }
+  const bk = document.getElementById('sorot-berkas');
+  const np = document.getElementById('sorot-nomor');
+  if (bk) bk.value = par.dataset.berkas || '';
+  if (np) np.value = par.dataset.nomor || '0';
+
+  //  Beri tahu pembimbing, lalu arahkan pandangan ke kotak catatan.
+  const petunjuk = document.getElementById('petunjuk-sorot');
+  if (petunjuk){
+    petunjuk.hidden = false;
+    petunjuk.innerHTML = '<svg class="ik" width="14" height="14"><use href="#ik-edit-3"/></svg> Bagian ini dipilih. Tulis catatan Anda di '
+      + 'kotak bawah, lalu Simpan.';
+  }
+  const tulis = document.getElementById('kolom-tulis');
+  if (tulis) tulis.scrollIntoView({block: 'center', behavior: 'smooth'});
+}
+
+//  ── Pasang: klik pada naskah ───────────────────────────────────────────
+//  ⚠️ AKAR BUG 24Sep26: pemilihnya dulu `.isi-naskah p` — KELAS ITU TIDAK
+//  ADA. Wadah naskah yang benar = `#isi-<idberkas>` di dalam `.kertas`.
+//  Akibatnya klik pembimbing TIDAK PERNAH tertangkap (fungsi mati senyap).
+//  Sekarang: `.kertas p` — kokoh walau id berkas berubah.
+document.addEventListener('click', function(ev){
+  const par = ev.target.closest && ev.target.closest('.kertas p');
+  if (!par) return;
+  const kalimat = ambilKalimat(par, ev);
+  if (!kalimat) return;
+  pilihParagraf(par, kalimat);
+});
+
+//  ── Batalkan pilihan ───────────────────────────────────────────────────
+function batalkanSorot(){
+  if (parTerpilih){ parTerpilih.classList.remove('par-terpilih'); }
+  parTerpilih = null;
+  const kotakTeks = document.getElementById('teks-terpilih');
+  if (kotakTeks) kotakTeks.value = '';
+  const kutip = document.getElementById('kutipan-terpilih');
+  if (kutip) kutip.textContent = '';
+  const bk = document.getElementById('sorot-berkas');
+  const np = document.getElementById('sorot-nomor');
+  if (bk) bk.value = '';
+  if (np) np.value = '';
+  const petunjuk = document.getElementById('petunjuk-sorot');
+  if (petunjuk) petunjuk.hidden = true;
+}
+
+//  ── Tampilkan SOROTAN yang disimpan server (saat halaman dibuka) ───────
+//  Server sudah menghitung keadaan tiap catatan (`sorotan_per_catatan`).
+//  Di sini kita menempelkannya ke naskah supaya pembimbing LANGSUNG
+//  melihat di mana catatan-catatannya berada — tanpa klik apa pun.
+//
+//  ⚠️ Dipanggil SETELAH naskah selesai dimuat (paragrafnya belum ada
+//  sebelum itu). Karena itu dijalankan dari dalam fungsi pemuat naskah.
+function tempelSorotanTersimpan(){
+  const data = window.__SOROTAN__ || {};
+  //  ⚠️ AKAR BUG 24Sep26: dulu `.isi-naskah p` — kelas itu TIDAK ADA,
+  //  jadi querySelectorAll mengembalikan 0 paragraf → 0 tanda (senyap).
+  const paras = document.querySelectorAll('.kertas p[data-nomor]');
+  let sudah = 0;
+  paras.forEach(function(par){
+    const berkas = par.dataset.berkas;
+    Object.keys(data).forEach(function(cid){
+      const s = data[cid];
+      if (!s || s.nomor === null || s.keadaan === 'umum'
+          || s.keadaan === 'hilang') return;
+      //  ⚠️ JEBAKAN 24Sep26 (temuan MATA): dulu baris ini
+      //     `if (String(s.berkas) !== String(berkas)) return;`
+      //  dan karena server TIDAK mengirim `s.berkas`, perbandingan
+      //  `undefined !== "9"` selalu benar → semua paragraf dilewati →
+      //  tanda 🟡 TIDAK PERNAH muncul (gagal SENYAP, tanpa galat).
+      //  Kini: kalau `s.berkas` tidak ada, JANGAN dilewati — cukup
+      //  andalkan nomor paragraf. Lebih baik tanda muncul di dokumen
+      //  yang salah sedikit daripada tidak muncul sama sekali.
+      if (s.berkas !== undefined && s.berkas !== null
+          && String(s.berkas) !== String(berkas)) return;
+      if (String(s.nomor) !== String(par.dataset.nomor)) return;
+      par.classList.add('par-ada-catatan');
+      const tanda = document.createElement('span');
+      tanda.className = 'tanda-catatan';
+      tanda.innerHTML = '<svg class="ik" width="14" height="14"><use href="#ik-alert-triangle"/></svg>';
+      tanda.title = 'Ada catatan pembimbing di bagian ini';
+      par.insertBefore(tanda, par.firstChild);
+      sudah++;
+    });
+  });
+  //  Jejak untuk uji/diagnosa: berapa tanda yang benar-benar terpasang.
+  window.__TANDA_TERPASANG__ = sudah;
+}
+
+//  ⚠️ DATA SOROTAN dari server (Tahap 3.1). Ditaruh sebagai JSON di dalam
+//  <script> — BUKAN sebagai HTML — supaya isi naskah/kalimat tidak pernah
+//  diperlakukan sebagai kode. Nilai tak aman di-escape oleh `tojson`.
+window.__SOROTAN__ = {{ (sorotan or {})|tojson }};
+
+//  ⚠️ Naskah dimuat teks-polos (textContent) — DILARANG innerHTML naskah
+//  mentah, supaya isi naskah tidak bisa menyuntikkan kode ke halaman.
+(async function(){
+  const petakan = {};
+  document.querySelectorAll('.bagian').forEach(s=>{
+    petakan[s.dataset.berkas] = document.getElementById('isi-' + s.dataset.berkas);
+  });
+  for (const [id, el] of Object.entries(petakan)){
+    if(!el) continue;
+    try{
+      const r = await fetch('/tinjau/' + {{ token|tojson }} + '/naskah/' + id);
+      if(!r.ok){ el.textContent = 'Naskah belum dapat dimuat.'; continue; }
+      const t = await r.text();
+      if(!t.trim()){ el.textContent = 'Bagian ini masih kosong.'; continue; }
+      //  Pisahkan per baris → paragraf. textContent = aman dari injeksi.
+      el.textContent = '';
+      t.split(/\n{2,}/).forEach(function(p, noPar){
+        const par = document.createElement('p');
+        par.textContent = p.replace(/\n/g, ' ');
+        //  ── TAHAP 3.1 (ACC Bos 24Sep26): PENANDA PARAGRAF ─────────────
+        //  KENAPA perlu: pembimbing KLIK satu kalimat di naskah. Untuk
+        //  memberi tahu SERVER di mana kalimat itu berada, kita kirim
+        //  (a) id berkas, (b) nomor paragraf — DUA angka, bukan seluruh
+        //  naskah. Naskah 400 rb karakter tidak mungkin dikirim bolak-balik.
+        //
+        //  ⚠️ URUTAN PARAGRAF DI SINI HARUS SAMA dengan server
+        //  (`sorotan.pecah_paragraf()` = re.split(r'\n{2,}')). Kalau beda,
+        //  nomor paragraf menunjuk tempat yang salah. Dijaga uji
+        //  "_uji_sorotan.py: urutan paragraf sama dengan layar".
+        par.dataset.berkas = id;
+        par.dataset.nomor = noPar;
+        el.appendChild(par);
+      });
+    }catch(e){ el.textContent = 'Naskah belum dapat dimuat.'; }
+  }
+  //  ── TAHAP 3.1: tempelkan sorotan SETELAH paragraf selesai dibuat ────
+  //  KENAPA DI SINI: paragraf baru ada setelah naskah dimuat. Kalau
+  //  dipanggil lebih awal, tidak ada yang bisa ditandai.
+  try{ tempelSorotanTersimpan(); }catch(e){ /* sorotan = lapisan bantu */ }
+})();
+</script>
+</body>
+</html>

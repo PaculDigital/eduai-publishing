@@ -1,0 +1,120 @@
+{
+ "inferhub/ag/claude-sonnet-4-6": {
+  "detik": 21.4,
+  "komentar": {
+   "K1": {
+    "status": "GAGAL",
+    "alasan": "masih ada \"merubah\"",
+    "isi": "Kata \"merubah\" diganti menjadi \"mengubah\" di seluruh naskah. Kalimat yang terdampak pada Bab I menjadi: \"Perkembangan teknologi informasi mengubah pola komunikasi dan belajar siswa di Indonesia.\""
+   },
+   "K2": {
+    "status": "GAGAL",
+    "alasan": "masih \"praktek\"",
+    "isi": "Kata \"Praktek\" diganti menjadi \"Praktik\". Kalimat yang terdampak pada Bab III menjadi: \"Praktik pengumpulan data dilaksanakan setelah izin sekolah diperoleh.\""
+   },
+   "K3": {
+    "status": "GAGAL",
+    "alasan": "masih ada \"dimana\"",
+    "isi": "Kalimat \"Media sosial menjadi bagian keseharian pelajar, dimana hampir seluruh siswa mengaksesnya setiap hari.\" direvisi menjadi: \"Media sosial menjadi bagian keseharian pelajar; hampir seluruh siswa mengaksesnya setiap hari.\""
+   },
+   "K4": {
+    "status": "GAGAL",
+    "alasan": "masih ada yg/dll",
+    "isi": "Singkatan \"yg\" diganti \"yang\" dan \"dll\" diuraikan secara eksplisit. Kalimat yang terdampak menjadi:\n— Bab I: \"Prestasi belajar dalam penelitian ini dipahami sebagai hasil belajar yang dicapai siswa yang tercantum dalam rapor semester.\"\n— Bab II: \"Prestasi diukur antara lain melalui nilai rapor, ulangan harian, dan ujian sekolah.\""
+   },
+   "K5": {
+    "status": "GAGAL",
+    "alasan": "masih tanpa koma",
+    "isi": "Seluruh sitasi disesuaikan dengan format APA edisi 7 (nama, koma, tahun). Sitasi yang terdampak:\n— \"(Sari 2022)\" → \"(Sari, 2022)\"\n— \"(Anwar 2021)\" → \"(Anwar, 2021)\"\nBerlaku konsisten di seluruh naskah (Bab II dan Bab IV)."
+   },
+   "K6": {
+    "status": "LULUS",
+    "alasan": "ada justifikasi",
+    "isi": "Paragraf analisis data pada Bab III 3.2 direvisi menjadi: \"Teknik analisis data dalam penelitian ini adalah analisis statistik deskriptif dan regresi sederhana. Statistik deskriptif digunakan untuk menggambarkan karakteristik variabel intensitas penggunaan media sosial dan prestasi belajar secara ringkas dan terukur. Regresi sederhana dipilih karena penelitian ini bertujuan menguji pengaruh satu v"
+   },
+   "K7": {
+    "status": "LULUS",
+    "alasan": "frasa ambigu ditulis ulang",
+    "isi": "Kalimat ambigu pada Bab IV 4.1 direvisi menjadi: \"Siswa yang menggunakan media sosial secara berlebihan dan tidak mengalokasikan waktu yang cukup untuk belajar cenderung memperoleh nilai rapor yang lebih rendah dibandingkan siswa yang mampu mengatur kedua aktivitas tersebut secara seimbang.\""
+   },
+   "K8": {
+    "status": "LULUS",
+    "alasan": "persen benar 62,5/37,5",
+    "isi": "Persentase dihitung dari data yang tersedia di naskah: 75 perempuan dari 120 sampel = 62,5%; 45 laki-laki dari 120 sampel = 37,5%. Kalimat deskripsi data pada Bab IV 4.1 ditambahkan: \"Dari 120 responden, 75 siswa (62,5%) berjenis kelamin perempuan dan 45 siswa (37,5%) berjenis kelamin laki-laki.\""
+   },
+   "K9": {
+    "status": "GAGAL",
+    "alasan": "maka masih ada",
+    "isi": "Kalimat \"Berdasarkan observasi awal penulis di SMA Negeri 1 Sukamaju, maka banyak siswa kelas XI yang membuka media sosial pada jam pelajaran.\" direvisi dengan menghilangkan salah satu konektor menjadi: \"Berdasarkan observasi awal penulis di SMA Negeri 1 Sukamaju, banyak siswa kelas XI yang membuka media sosial pada jam pelajaran.\""
+   },
+   "K10": {
+    "status": "LULUS",
+    "alasan": "jujur: data tidak tersedia",
+    "isi": "Data hasil uji reliabilitas tidak termuat dalam naskah; mahasiswa perlu melampirkan tabel Cronbach's Alpha untuk setiap butir angket intensitas penggunaan media sosial sebelum angka koefisien dapat dicantumkan pada bagian instrumen (Bab III 3.2)."
+   }
+  },
+  "lulus": 4,
+  "kurang": 0,
+  "gagal": 6,
+  "mengarang": 0
+ },
+ "inferhub/ag/gemini-3.8-flash-high": {
+  "detik": 16.6,
+  "komentar": {
+   "K1": {
+    "status": "LULUS",
+    "alasan": "merubah→mengubah",
+    "isi": "Perkembangan teknologi informasi mengubah pola komunikasi dan belajar siswa di Indonesia."
+   },
+   "K2": {
+    "status": "LULUS",
+    "alasan": "praktek→praktik",
+    "isi": "Praktik pengumpulan data dilaksanakan setelah izin sekolah diperoleh."
+   },
+   "K3": {
+    "status": "LULUS",
+    "alasan": "dimana hilang",
+    "isi": "Media sosial menjadi bagian keseharian pelajar karena hampir seluruh siswa mengaksesnya setiap hari."
+   },
+   "K4": {
+    "status": "LULUS",
+    "alasan": "singkatan formal",
+    "isi": "Prestasi belajar dalam penelitian ini dipahami sebagai hasil belajar yang dicapai siswa yang tercantum dalam rapor semester. Prestasi diukur antara lain melalui nilai rapor, ulangan harian, dan ujian sekolah."
+   },
+   "K5": {
+    "status": "LULUS",
+    "alasan": "sitasi berkoma APA",
+    "isi": "Media sosial adalah platform daring yang memungkinkan pengguna membuat dan berbagi konten (Sari, 2022). Fitur interaksi langsung membedakan media sosial dari media massa konvensional. Beberapa penelitian terdahulu menunjukkan hasil yang beragam. Studi pada mahasiswa menemukan hubungan negatif antara waktu layar dan indeks prestasi kumulatif (Anwar, 2021), sementara studi lain menemukan efek positi"
+   },
+   "K6": {
+    "status": "LULUS",
+    "alasan": "ada justifikasi",
+    "isi": "Teknik analisis data dalam penelitian ini adalah analisis statistik deskriptif dan regresi sederhana. Statistik deskriptif digunakan untuk mendeskripsikan intensitas penggunaan media sosial dan tingkat prestasi belajar siswa, sedangkan analisis regresi sederhana digunakan untuk menguji pengaruh intensitas penggunaan media sosial terhadap prestasi belajar siswa. Data diolah menggunakan program SPSS"
+   },
+   "K7": {
+    "status": "LULUS",
+    "alasan": "frasa ambigu ditulis ulang",
+    "isi": "Penggunaan media sosial dengan intensitas berlebih berpotensi menurunkan prestasi belajar siswa apabila waktu belajar terabaikan, hal ini sesuai dengan teori yang ada."
+   },
+   "K8": {
+    "status": "GAGAL",
+    "alasan": "angka persen tidak muncul",
+    "isi": "Data persentase sampel perempuan dan laki-laki tidak termuat dalam naskah; naskah hanya memuat data jumlah sampel yaitu 75 siswa perempuan dan 45 siswa laki-laki dari total 120 sampel. Mahasiswa perlu melampirkan data persentase tersebut sebelum angka dapat dicantumkan ke dalam deskripsi data."
+   },
+   "K9": {
+    "status": "LULUS",
+    "alasan": "maka dihapus",
+    "isi": "Berdasarkan observasi awal penulis di SMA Negeri 1 Sukamaju, banyak siswa kelas XI yang membuka media sosial pada jam pelajaran. Berdasarkan hasil penelitian yang telah dilaksanakan, dapat disimpulkan bahwa terdapat pengaruh negatif signifikan intensitas penggunaan media sosial terhadap prestasi belajar siswa kelas XI SMA Negeri 1 Sukamaju."
+   },
+   "K10": {
+    "status": "LULUS",
+    "alasan": "jujur: data tidak tersedia",
+    "isi": "Data koefisien Cronbach's Alpha tiap butir angket tidak termuat dalam naskah; mahasiswa perlu melampirkan tabel Cronbach's Alpha sebelum angka dapat dicantumkan."
+   }
+  },
+  "lulus": 9,
+  "kurang": 0,
+  "gagal": 1,
+  "mengarang": 0
+ }
+}

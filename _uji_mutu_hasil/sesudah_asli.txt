@@ -1,0 +1,93 @@
+
+1.6  Kesenjangan Penelitian (Research Gap)
+
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini menunjukkan bahwa masing-masing konstruk telah memperoleh perhatian yang memadai, namun arah pengembangannya belum bertemu pada satu model yang utuh. Kesiapan digital, misalnya, lebih banyak diposisikan sebagai variabel independen maupun konsekuensi organisasi, bukan sebagai mekanisme yang menjembatani sumber daya psikologis dengan kinerja adaptif. Kondisi ini menimbulkan sejumlah kesenjangan yang perlu diidentifikasi secara sistematis. Melalui penelusuran terhadap penelitian terdahulu (Tabel 1.3), teridentifikasi lima kesenjangan utama yang menjadi dasar dilakukannya penelitian ini.
+
+1.6.1  Kesenjangan Konteks (Contextual Gap)
+
+Mayoritas penelitian mengenai adaptive performance dilakukan pada sektor pendidikan tinggi (Sun & Yoon, 2025), manufaktur, perbankan, dan layanan publik, sebagaimana terlihat pada tinjauan sistematis Setiyadi et al. (2024). Sementara itu, penelitian pada sektor logistik ekspedisi Indonesia masih terkonsentrasi pada level kinerja operasional perusahaan (Sitorus et al., 2026), belum menyentuh level individu pada posisi yang paling rentan terhadap ketidakpastian, yaitu Account Officer. Kajian pada PT JNE Wilayah Lampung sebagai konteks spesifik sejauh penelusuran penulis belum ditemukan.
+
+1.6.2  Kesenjangan Variabel Dependen (Outcome Gap)
+
+Penelitian terdahulu cenderung menggunakan kinerja organisasi (Leitão et al., 2019), kinerja operasional (Sitorus et al., 2026), kepuasan kerja (Palapa & Saragih, 2026), atau kinerja karyawan secara umum (Khusna & Pratiwi, 2022) sebagai variabel dependen. Penggunaan adaptive performance sebagai luaran spesifik yang menangkap dimensi adaptasi terhadap perubahan, bukan sekadar pencapaian target masih relatif terbatas, khususnya pada konteks Indonesia.
+
+1.6.3  Kesenjangan Posisi Variabel (Positional Gap)
+
+Digital readiness dalam berbagai penelitian diposisikan sebagai variabel independen yang memengaruhi kepuasan kerja (Palapa & Saragih, 2026), atau sebagai konsekuensi dari faktor organisasi (Trenerry et al., 2021). Perannya sebagai mekanisme mediasi yang menjembatani sumber daya psikologis menuju kinerja masih jarang diuji. Padahal, dalam kerangka COR Theory, kesiapan digital justru berfungsi sebagai simpul konversi, tempat sumber daya diubah menjadi kapasitas adaptif yang nyata.
+
+1.6.4  Kesenjangan Kombinasi Model (Structural Gap)
+
+Beberapa penelitian telah menguji mediasi dalam konteks digitalisasi, namun dengan konfigurasi yang berbeda: work engagement sebagai mediator (Fachruddin Syah et al., 2026), readiness to change sebagai mediator (Khusna & Pratiwi, 2022), atau task-technology fit sebagai moderator (Sun & Yoon, 2025). Belum ditemukan penelitian yang menguji quality of work life dan digital self-efficacy secara simultan dengan digital readiness sebagai mediator tunggal menuju adaptive performance. Konfigurasi inilah yang mencirikan kebaruan struktural penelitian ini.
+
+1.6.5  Kesenjangan Level Analisis (Level Gap)
+
+Studi terdahulu dominan menempatkan unit analisis pada level organisasi (Leitão et al., 2019; Sitorus et al., 2026) atau pada profesi tertentu seperti dosen (Sun & Yoon, 2025). Padahal, mekanisme konversi sumber daya menjadi kinerja adaptif pada hakikatnya berlangsung pada level individu. Penelitian ini secara eksplisit menempatkan Account Officer sebagai unit analisis sehingga mampu menangkap dinamika psikologis yang tidak terlihat pada studi level organisasi.
+
+Pemetaan penelitian terdahulu yang menjadi dasar identifikasi kesenjangan tersebut disajikan pada Tabel 1.3 berikut.
+
+
+Penelitian – Tahun
+
+Judul Penelitian
+
+Hasil Penelitian
+
+Kesenjangan dengan Penelitian Ini
+
+Leitão et al. (2019)
+
+Quality of Work Life and Organizational Performance: Workers' Feelings of Contributing, or Not, to the Organization's Productivity
+
+Quality of Work Life terbukti berpengaruh positif terhadap kinerja organisasi melalui keterlibatan dan kontribusi karyawan.
+
+Penelitian ini tidak menguji hubungan QWL dengan adaptive performance, tidak memasukkan kesiapan digital sebagai mediator, serta tidak dilakukan pada sektor logistik ekspedisi di Indonesia.
+
+Sun & Yoon (2025)
+
+The impact of digital transformation on faculty performance in higher education: the mediating role of digital self-efficacy and the moderating role of task-technology fit
+
+Digital Self-Efficacy terbukti memediasi hubungan antara transformasi digital dan kinerja dosen dengan efek positif yang signifikan.
+
+Penelitian hanya pada sektor pendidikan tinggi, bukan pada Account Officer di sektor logistik. DSE ditempatkan sebagai mediator, bukan sebagai variabel independen yang mendorong kesiapan digital dan kinerja adaptif.
+
+Palapa & Saragih (2026)
+
+Peran Kesiapan Digital, Work-Life Balance, dan Stres Kerja dalam Kepuasan Kerja Karyawan di Era Digital
+
+Kesiapan digital berpengaruh positif dan signifikan terhadap kepuasan kerja. Stres kerja tidak terbukti memediasi hubungan tersebut.
+
+Kesiapan digital diposisikan sebagai variabel independen, bukan mediator. Variabel dependen adalah kepuasan kerja, bukan adaptive performance. Konteks: karyawan umum, bukan Account Officer ekspedisi di Lampung.
+
+Setiyadi et al. (2024)
+
+Determinants of Adaptive Performance at Individual, Team, and Organizational Levels: A Systematic Review of Empirical Studies (2011–2022)
+
+Tinjauan terhadap 36 studi empiris mengidentifikasi faktor penentu adaptive performance, dominan pada level individu di sektor pendidikan dan manufaktur.
+
+Penelitian adaptive performance pada sektor logistik, khususnya pada level Account Officer perusahaan ekspedisi, masih sangat terbatas dan belum mengintegrasikan peran digital readiness sebagai mediator.
+
+Sitorus et al. (2026)
+
+Analysis of the Role of Digital Transformation, Infrastructure Availability, and Human Resource Competence on the Operational Performance of the Logistics Industry in Jakarta
+
+Transformasi digital berpengaruh positif dan signifikan terkuat terhadap kinerja operasional logistik, diikuti oleh kompetensi SDM.
+
+Penelitian berfokus pada kinerja operasional tingkat perusahaan di Jakarta, bukan pada kinerja adaptif individu Account Officer. Kajian di wilayah Lampung dan pada level SDM lapangan masih sangat terbatas.
+
+Fachruddin Syah et al. (2026)
+
+Pengaruh Digital Competence dan Learning Agility terhadap Adaptive Performance melalui Work Engagement
+
+Digital competence dan learning agility berpengaruh terhadap adaptive performance dengan work engagement sebagai mediator.
+
+Mediator yang digunakan adalah work engagement, bukan digital readiness. Konteks penelitian bukan pada Account Officer perusahaan ekspedisi, dan tidak menguji QWL sebagai anteseden.
+
+Khusna & Pratiwi (2022)
+
+Pengaruh digital transformation dan self-efficacy terhadap kinerja karyawan dengan kesiapan untuk berubah sebagai variabel mediasi
+
+Transformasi digital dan self-efficacy berpengaruh terhadap kinerja karyawan, dengan kesiapan untuk berubah memediasi hubungan tersebut.
+
+Model paling mendekati, tetapi: (a) tidak menguji QWL, (b) konteks bukan sektor logistik ekspedisi, (c) tidak mengukur adaptive performance secara spesifik, (d) mediatornya kesiapan untuk berubah (readiness to change), bukan kesiapan digital (digital readiness).
+
+Sumber: diolah peneliti berdasarkan penelusuran literatur (2026).

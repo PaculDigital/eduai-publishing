@@ -1,0 +1,66 @@
+{
+ "model": "cb/gpt-5.6-luna",
+ "naskah_kata": 4773,
+ "putaran": [
+  {
+   "no": 1,
+   "nama": "cek_kelengkapan",
+   "detik": 5.289787600049749,
+   "baik": true,
+   "in": 8638,
+   "think": 62,
+   "out": 118,
+   "cost": 1e-05
+  },
+  {
+   "no": 2,
+   "nama": "cek_alur_logika",
+   "detik": 11.459310370031744,
+   "baik": true,
+   "in": 8648,
+   "think": 344,
+   "out": 583,
+   "cost": 1e-05
+  },
+  {
+   "no": 3,
+   "nama": "cek_puebi",
+   "detik": 11.577327460981905,
+   "baik": true,
+   "in": 8640,
+   "think": 516,
+   "out": 643,
+   "cost": 1e-05
+  },
+  {
+   "no": 4,
+   "nama": "cek_istilah",
+   "detik": 9.432713920017704,
+   "baik": true,
+   "in": 8629,
+   "think": 248,
+   "out": 609,
+   "cost": 1e-05
+  },
+  {
+   "no": 5,
+   "nama": "laporan_akhir",
+   "detik": 9.15586706995964,
+   "baik": true,
+   "in": 900,
+   "think": 128,
+   "out": 684,
+   "cost": 1e-05
+  }
+ ],
+ "total_in": 35455,
+ "total_think": 1298,
+ "total_out": 2637,
+ "total_token": 38092,
+ "biaya_usd": 5e-05,
+ "durasi_detik": 46.916542045073584,
+ "saldo_awal": 9.826704,
+ "saldo_akhir": 9.826611,
+ "selisih_saldo": 9.299999999967667e-05,
+ "putaran_sukses": 5
+}

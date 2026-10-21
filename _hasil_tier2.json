@@ -1,0 +1,137 @@
+[
+ {
+  "model": "ali/glm-5.3",
+  "ok": 2,
+  "detik": 16.570025560999056,
+  "panjang": 281,
+  "mirip": 1.0,
+  "harga": 0.0112,
+  "supply": 18949
+ },
+ {
+  "model": "ali/glm-5.2",
+  "ok": 2,
+  "detik": 26.836464577001607,
+  "panjang": 274,
+  "mirip": 1.0,
+  "harga": 0.0112,
+  "supply": 18949
+ },
+ {
+  "model": "ali/kimi-k2.7-code",
+  "ok": 2,
+  "detik": 12.9691185949996,
+  "panjang": 278,
+  "mirip": 0.9388489208633094,
+  "harga": 0.00095,
+  "supply": 18949
+ },
+ {
+  "model": "ali/kimi-k3",
+  "ok": 2,
+  "detik": 17.55783201899976,
+  "panjang": 281,
+  "mirip": 1.0,
+  "harga": 0.114,
+  "supply": 18949
+ },
+ {
+  "model": "ali/qwen3.8-max",
+  "ok": 2,
+  "detik": 8.38593860149922,
+  "panjang": 277,
+  "mirip": 0.9873873873873874,
+  "harga": 0.002,
+  "supply": 18949
+ },
+ {
+  "model": "cbcn/kimi-k2.7",
+  "ok": 2,
+  "detik": 25.241347350496653,
+  "panjang": 282,
+  "mirip": 0.9805309734513274,
+  "harga": 0.0323,
+  "supply": 6714
+ },
+ {
+  "model": "cbcn/kimi-k2.6",
+  "ok": 2,
+  "detik": 3.5537721754990343,
+  "panjang": 268,
+  "mirip": 0.9236499068901304,
+  "harga": 0.0323,
+  "supply": 6714
+ },
+ {
+  "model": "cbcn/minimax-m3",
+  "ok": 2,
+  "detik": 5.148161240500485,
+  "panjang": 271,
+  "mirip": 0.9520295202952029,
+  "harga": 0.0102,
+  "supply": 6714
+ },
+ {
+  "model": "cbcn/minimax-m2.7",
+  "ok": 2,
+  "detik": 11.990611351498956,
+  "panjang": 273,
+  "mirip": 0.9706959706959707,
+  "harga": 0.0102,
+  "supply": 6714
+ },
+ {
+  "model": "cbcn/glm-5.3-flash",
+  "ok": 2,
+  "detik": 1.9717782580009953,
+  "panjang": 277,
+  "mirip": 0.8864864864864865,
+  "harga": 0.0051,
+  "supply": 6714
+ },
+ {
+  "model": "cbcn/glm-5.3",
+  "ok": 2,
+  "detik": 3.332033998998668,
+  "panjang": 275,
+  "mirip": 0.4254545454545455,
+  "harga": 0.0476,
+  "supply": 6714
+ },
+ {
+  "model": "cb/glm-5.3",
+  "ok": 2,
+  "detik": 4.771404353497928,
+  "panjang": 277,
+  "mirip": 0.9747292418772563,
+  "harga": 0.0168,
+  "supply": 861
+ },
+ {
+  "model": "cb/minimax-m3",
+  "ok": 2,
+  "detik": 10.049993462496786,
+  "panjang": 277,
+  "mirip": 0.9621621621621622,
+  "harga": 0.0144,
+  "supply": 861
+ },
+ {
+  "model": "cb/kimi-k3",
+  "ok": 2,
+  "detik": 19.774658266003826,
+  "panjang": 281,
+  "mirip": 0.99644128113879,
+  "harga": 0.036,
+  "supply": 861
+ },
+ {
+  "model": "cb/gpt-5.6-luna",
+  "ok": 2,
+  "detik": 6.330866104995948,
+  "panjang": 280,
+  "mirip": 0.9625668449197861,
+  "harga": 0.0096,
+  "supply": 861
+ }
+]

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setelan WhatsApp — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);border-bottom:1px solid rgba(255,255,255,.13);
+       position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;
+     display:flex;align-items:center;justify-content:space-between}
+.nav img{height:52px;width:auto}
+.nav-kanan{display:flex;align-items:center;gap:14px;font-size:14.5px}
+.nav-kanan .nama{color:rgba(255,255,255,.9)}
+.nav-kanan a{color:#fff;font-weight:600;border:1.5px solid rgba(255,255,255,.34);
+             padding:6px 15px;border-radius:70px;transition:.2s}
+.nav-kanan a:hover{background:rgba(255,255,255,.14)}
+
+.wadah{max-width:760px;margin:0 auto;padding:32px 22px 60px}
+h1{font-size:22px;font-weight:800;margin-bottom:6px}
+.sub{font-size:13.5px;color:var(--teks-abu);margin-bottom:20px;line-height:1.6}
+
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:16px;padding:20px 22px;margin-bottom:16px}
+.kartu h3{font-size:15.5px;font-weight:700;margin-bottom:4px}
+.kartu p.ket{font-size:13px;color:var(--teks-abu);line-height:1.65;margin-bottom:14px}
+
+label.kecil{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+input[type=text]{width:100%;max-width:380px;padding:11px 14px;border:1.5px solid var(--garis);
+                 border-radius:10px;font-family:inherit;font-size:14.5px;outline:none;transition:.2s}
+input[type=text]:focus{border-color:var(--hijau)}
+.hint{font-size:12.5px;color:var(--teks-abu);margin-top:7px}
+
+/* saklar */
+.saklar-baris{display:flex;align-items:flex-start;gap:14px;padding:13px 0;border-top:1px solid var(--garis)}
+.saklar-baris:first-of-type{border-top:none}
+.saklar-teks{flex:1;min-width:0}
+.saklar-teks b{display:block;font-size:14.5px;font-weight:600;margin-bottom:2px}
+.saklar-teks span{font-size:12.5px;color:var(--teks-abu);line-height:1.6;display:block}
+.saklar{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0;margin-top:3px}
+.saklar input{opacity:0;width:0;height:0}
+.geser{position:absolute;cursor:pointer;inset:0;background:#D6D6DC;border-radius:40px;transition:.2s}
+.geser:before{content:"";position:absolute;height:20px;width:20px;left:3px;top:3px;
+              background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.saklar input:checked + .geser{background:var(--hijau)}
+.saklar input:checked + .geser:before{transform:translateX(20px)}
+
+.tombol{display:inline-block;background:var(--hijau);color:#fff;font-family:inherit;
+        font-size:14.5px;font-weight:700;border:none;border-radius:10px;
+        padding:11px 26px;cursor:pointer;transition:.2s;margin-top:6px}
+.tombol:hover{background:var(--hijau-gelap)}
+
+.pesan{background:var(--hijau-muda);border:1px solid #C3E0CB;color:var(--hijau-gelap);
+       border-radius:12px;padding:13px 16px;font-size:13.5px;margin-bottom:16px;font-weight:500}
+.pesan.salah{background:#FDEEEE;border-color:#F2C4C4;color:#9B2C2C}
+
+@media (max-width:520px){
+  .nav{padding:0 14px;height:62px}
+  .nav img{height:42px}
+  .nav-kanan .nama{display:none}
+  .wadah{padding:22px 14px 50px}
+}
+</style>
+<link rel="stylesheet" href="/static/ikon.css">
+</head>
+<body>
+{{ ikon_sprite() }}
+
+<header>
+  <div class="nav">
+    <a href="/naskah"><img src="/static/logo-96.png" alt="EduAi Publishing"></a>
+    <div class="nav-kanan">
+      <span class="nama">{{ user.nama }}</span>
+      <a href="/naskah">Dokumen</a>
+      <a href="/keluar">Keluar</a>
+    </div>
+  </div>
+</header>
+
+<div class="wadah">
+  <h1>Setelan WhatsApp</h1>
+  <p class="sub">Pilih pesan apa saja yang ingin Anda terima lewat WhatsApp.
+     Kami hanya mengirim pesan penting — tidak ada spam.</p>
+
+  {% if pesan %}
+  <div class="pesan {% if tidak_bisa %}salah{% endif %}">{{ pesan }}</div>
+  {% endif %}
+
+  <form method="post" action="/setelan-wa">
+    <div class="kartu">
+      <h3>Nomor WhatsApp Anda</h3>
+      <p class="ket">Nomor tujuan pesan. Boleh ditulis format apa saja
+         (+62, 08, 62, spasi/strip) — otomatis dirapikan.</p>
+      <label class="kecil" for="wa">Nomor HP / WhatsApp</label>
+      <input type="text" id="wa" name="wa" value="{{ sw.wa }}"
+             placeholder="0812-3456-7890" autocomplete="tel" maxlength="24">
+      <div class="hint">Contoh yang benar: 081234567890 · +62 812-3456-7890 · 6281234567890</div>
+    </div>
+
+    <div class="kartu">
+      <h3>Pesan yang dikirim</h3>
+      <p class="ket">Saklar di bawah mengatur jenis pesan yang boleh dikirim ke nomor Anda.</p>
+
+      <div class="saklar-baris">
+        <div class="saklar-teks">
+          <b>Pembelian token</b>
+          <span>Konfirmasi pembelian berhasil atau belum terdeteksi —
+                dengan pesan yang menenangkan.</span>
+        </div>
+        <label class="saklar">
+          <input type="checkbox" name="pembelian" value="1"
+                 {% if sw.pembelian %}checked{% endif %}>
+          <span class="geser"></span>
+        </label>
+      </div>
+
+      <div class="saklar-baris">
+        <div class="saklar-teks">
+          <b>Undangan pembimbing</b>
+          <span>Salinan undangan kolaborasi yang Anda kirim ke pembimbing
+                (nama, judul naskah, dan tautan naskah).</span>
+        </div>
+        <label class="saklar">
+          <input type="checkbox" name="undangan" value="1"
+                 {% if sw.undangan %}checked{% endif %}>
+          <span class="geser"></span>
+        </label>
+      </div>
+
+      <div class="saklar-baris">
+        <div class="saklar-teks">
+          <b>Info revisi &amp; catatan</b>
+          <span>Notifikasi ketika ada hasil revisi atau catatan pembimbing.
+                Nonaktif secara bawaan karena bisa sering datang.</span>
+        </div>
+        <label class="saklar">
+          <input type="checkbox" name="revisi" value="1"
+                 {% if sw.revisi %}checked{% endif %}>
+          <span class="geser"></span>
+        </label>
+      </div>
+    </div>
+
+    <button type="submit" class="tombol">Simpan setelan</button>
+  </form>
+</div>
+</body>
+</html>

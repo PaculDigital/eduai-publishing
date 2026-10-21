@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketsa — Submit Artikel Jurnal (EduAi)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+         background: #eef1f0; color: #1c2b28; padding: 18px 12px 40px;
+         line-height: 1.5; }
+  .bungkus { max-width: 430px; margin: 0 auto; }
+  h1 { font-size: 19px; margin-bottom: 4px; letter-spacing: -.2px; }
+  .sub { font-size: 12.5px; color: #5c6b67; margin-bottom: 16px; }
+  .tanda { display: inline-block; font-size: 10.5px; font-weight: 700;
+           letter-spacing: .6px; padding: 3px 9px; border-radius: 20px;
+           background: #1c2b28; color: #fff; margin-bottom: 8px; }
+  .pilihan { background: #fff; border: 1px solid #d8e0dd; border-radius: 14px;
+             padding: 14px; margin-bottom: 16px; }
+  .pilihan h2 { font-size: 14px; margin-bottom: 3px; }
+  .pilihan p.alasan { font-size: 11.5px; color: #6c7a76; margin-bottom: 12px; }
+
+  /* ── kerangka HP ── */
+  .hp { background: #f7f9f8; border: 8px solid #10201c; border-radius: 26px;
+        padding: 0; overflow: hidden; margin-bottom: 6px; }
+  .bar { background: linear-gradient(100deg, #0d6b4f, #17936c);
+         color: #fff; padding: 9px 12px; display: flex;
+         align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+  .bar .logo { width: 22px; height: 22px; border-radius: 50%;
+               background: #fff; display: grid; place-items: center;
+               font-size: 11px; color: #0d6b4f; font-weight: 800; }
+  .bar .keluar { margin-left: auto; border: 1px solid rgba(255,255,255,.7);
+                 border-radius: 20px; padding: 2.5px 10px; font-size: 10.5px; }
+  .tab { display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
+         padding: 8px 10px; background: #fff; border-bottom: 1px solid #e6ebe9; }
+  .tab span { font-size: 10.5px; color: #4a5b57; padding: 4px 6px;
+              border-radius: 7px; }
+  .tab span.aktif { background: #d9f2e7; color: #0d6b4f; font-weight: 700; }
+  .isi { padding: 12px; }
+  .judul { font-size: 16px; font-weight: 800; margin-bottom: 3px; }
+  .ket { font-size: 11.5px; color: #5c6b67; margin-bottom: 12px; }
+
+  .kartu { background: #fff; border: 1px solid #dde5e2; border-radius: 12px;
+           padding: 12px; margin-bottom: 11px; }
+  .kartu .kepala { display: flex; align-items: center; gap: 7px;
+                   margin-bottom: 6px; }
+  .kartu .no { width: 20px; height: 20px; border-radius: 50%; background: #0d6b4f;
+               color: #fff; font-size: 11px; font-weight: 800;
+               display: grid; place-items: center; flex: 0 0 auto; }
+  .kartu .no.abu { background: #8b9a95; }
+  .kartu .nama { font-size: 13px; font-weight: 700; }
+  .kartu .tanda2 { font-size: 9.5px; font-weight: 700; padding: 2px 7px;
+                   border-radius: 10px; margin-left: auto; }
+  .t-hijau { background: #d9f2e7; color: #0d6b4f; }
+  .t-biru { background: #dceafc; color: #1b5fa8; }
+  .t-kuning { background: #fdf0d0; color: #8a6100; }
+  .kartu .kecil { font-size: 11px; color: #5c6b67; margin-bottom: 9px; }
+
+  .baris { display: flex; justify-content: space-between; font-size: 11.5px;
+           padding: 5px 0; border-bottom: 1px dashed #e8eeec; }
+  .baris:last-child { border-bottom: 0; }
+  .baris b { font-weight: 700; }
+  .input { border: 1px solid #d5dedb; border-radius: 8px; padding: 7px 9px;
+           font-size: 11.5px; color: #6c7a76; background: #fbfcfc;
+           margin-bottom: 7px; }
+  .input abu { color: #9aa8a4; }
+  .pilih { border: 1px solid #d5dedb; border-radius: 8px; padding: 7px 9px;
+           font-size: 11.5px; background: #fbfcfc; display: flex;
+           justify-content: space-between; margin-bottom: 7px; }
+  .pilih span:last-child { color: #9aa8a4; }
+  .centang { display: flex; gap: 7px; font-size: 11px; color: #375349;
+             background: #eef8f3; border: 1px solid #cfe9dc; border-radius: 8px;
+             padding: 7px 9px; margin-bottom: 9px; }
+  .kock { width: 13px; height: 13px; border-radius: 3px; background: #0d6b4f;
+          color: #fff; font-size: 9px; display: grid; place-items: center;
+          flex: 0 0 auto; margin-top: 1px; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .tbl th { text-align: left; font-size: 9.5px; text-transform: uppercase;
+            letter-spacing: .4px; color: #8b9a95; padding: 4px 5px;
+            border-bottom: 1px solid #e6ebe9; }
+  .tbl td { padding: 6px 5px; border-bottom: 1px solid #f0f4f2;
+            vertical-align: top; }
+  .tbl td:last-child { text-align: right; }
+  .titik { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+           margin-right: 5px; vertical-align: middle; }
+  .k-review { background: #2b7fd4; } .k-revisi { background: #e0a020; }
+  .k-terima { background: #0d6b4f; } .k-antre { background: #9aa8a4; }
+  .k-tolak { background: #c0392b; }
+
+  .tombol { display: block; width: 100%; text-align: center;
+            background: #0d6b4f; color: #fff; font-size: 12.5px; font-weight: 700;
+            padding: 9px; border-radius: 9px; border: 0; }
+  .tombol.putih { background: #fff; color: #0d6b4f;
+                  border: 1.5px solid #0d6b4f; }
+  .tombol.abu { background: #eef1f0; color: #8b9a95; }
+  .tombol.wa { background: #1faa53; }
+  .tawaran { background: #fff8e6; border: 1px solid #f0dca8; border-radius: 12px;
+             padding: 12px; }
+  .tawaran .harga { font-size: 21px; font-weight: 800; color: #0d6b4f; }
+  .tawaran .kecil { font-size: 11px; color: #6c7a76; }
+  .catatan { font-size: 10.5px; color: #8b9a95; margin-top: 10px;
+             line-height: 1.45; }
+  .pilihgaya { font-size: 12px; color: #5c6b67; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="bungkus">
+  <h1>Sketsa — Submit Artikel Jurnal</h1>
+  <p class="sub">Tab ke-7, di sebelah Uji Plagiarisme. 2 kartu submit + daftar artikel.</p>
+
+  <!-- ══════════ PILIHAN 1 ══════════ -->
+  <div class="pilihan">
+    <span class="tanda">PILIHAN 1 — DAFTAR ARTIKEL DI BAWAH (paling ringkas)</span>
+    <h2>3 kartu ditumpuk, daftar artikel paling bawah</h2>
+    <p class="alasan">Sesuai permintaan Bos: kartu 1 → kartu 2 → daftar artikel.
+       Paling mudah diikuti dari atas ke bawah. Daftar artikel hanya muncul
+       kalau user sudah pernah submit.</p>
+
+    <div class="hp">
+      <div class="bar">
+        <div class="logo">E</div><span>EduAi</span>
+        <span class="keluar">Keluar</span>
+      </div>
+      <div class="tab">
+        <span>Naskah Saya</span><span>Kolaborasi</span>
+        <span>Belajar</span><span>Referensi</span>
+        <span>Artikel Jurnal</span><span>Uji Plagiarisme</span>
+        <span class="aktif">⬤ Submit Artikel Jurnal</span><span>—</span>
+      </div>
+      <div class="isi">
+        <div class="judul">Submit Artikel Jurnal</div>
+        <div class="ket">Kirim artikelmu ke jurnal. Pilih jalurnya di bawah ini.</div>
+
+        <!-- KARTU 1 -->
+        <div class="kartu">
+          <div class="kepala">
+            <div class="no">1</div>
+            <div class="nama">Jurnal Nasional</div>
+            <div class="tanda2 t-hijau">Google Scholar · Garuda · ISSN</div>
+          </div>
+          <div class="kecil">Terindeks Google Scholar, Garuda, dan ber-ISSN.
+            Proses otomatis oleh EduAi.</div>
+          <div class="pilih">Naskah <span>pilih ▾</span></div>
+          <div class="baris"><span>Nama lengkap</span><b>Budi Santoso</b></div>
+          <div class="baris"><span>Email</span><b>budi@kampus.ac.id</b></div>
+          <div class="baris"><span>No. HP</span><b>0812-3456-7890</b></div>
+          <div class="input abu">Data di atas dari akunmu — ubah kalau perlu.</div>
+          <button class="tombol">Kirim &amp; Lanjut Bayar</button>
+        </div>
+
+        <!-- KARTU 2 -->
+        <div class="kartu">
+          <div class="kepala">
+            <div class="no">2</div>
+            <div class="nama">Terbit Jurnal Sinta</div>
+            <div class="tanda2 t-kuning">Negosiasi</div>
+          </div>
+          <div class="kecil">Pendampingan manual oleh admin. Bicara langsung
+            lewat WhatsApp.</div>
+          <div class="pilih">Naskah <span>pilih ▾</span></div>
+          <div class="pilih">Peringkat <span>Sinta 3 ▾</span></div>
+          <button class="tombol wa">Buka WhatsApp Admin</button>
+        </div>
+
+        <!-- KARTU 3 — DAFTAR ARTIKEL -->
+        <div class="kartu">
+          <div class="kepala">
+            <div class="no abu">≡</div>
+            <div class="nama">Artikel Saya di Tridarma</div>
+            <div class="tanda2 t-biru">2 artikel</div>
+          </div>
+          <table class="tbl">
+            <tr><th>Artikel</th><th>Status</th></tr>
+            <tr>
+              <td><b>Pengaruh Kualitas Layanan…</b><br>
+                  <span style="color:#8b9a95">#101 · 16 Okt 2026</span></td>
+              <td><span class="titik k-review"></span>Review</td>
+            </tr>
+            <tr>
+              <td><b>Analisis Kepuasan Pelanggan…</b><br>
+                  <span style="color:#8b9a95">#145 · 9 Okt 2026</span></td>
+              <td><span class="titik k-revisi"></span>Revisi</td>
+            </tr>
+          </table>
+          <div class="baris" style="margin-top:6px">
+            <span>Lupa sandi Tridarma?</span><b style="color:#0d6b4f">Reset ▸</b>
+          </div>
+          <div class="catatan">Sandi awal Tridarma-mu: <b>Pass1EduAi</b>.
+            Sudah diganti? Pakai tombol reset (tautan dikirim ke emailmu).</div>
+        </div>
+
+        <div class="catatan">Setiap submit butuh 1 AddOn Terbit Jurnal.
+          Artikel yang sama tidak dihitung dua kali.</div>
+      </div>
+    </div>
+    <p class="pilihgaya">Bos pilih: <b>1</b></p>
+  </div>
+
+  <!-- ══════════ PILIHAN 2 ══════════ -->
+  <div class="pilihan">
+    <span class="tanda">PILIHAN 2 — DAFTAR ARTIKEL DI ATAS (biar langsung terlihat)</span>
+    <h2>Daftar artikel naik ke atas, 2 kartu submit di bawah</h2>
+    <p class="alasan">Untuk user yang sudah punya artikel di Tridarma —
+       yang paling dia cari justru statusnya, jadi ditaruh paling atas.
+       Kalau belum punya artikel, bagian ini otomatis tidak tampil.</p>
+
+    <div class="hp">
+      <div class="bar">
+        <div class="logo">E</div><span>EduAi</span>
+        <span class="keluar">Keluar</span>
+      </div>
+      <div class="tab">
+        <span>Naskah Saya</span><span>Kolaborasi</span>
+        <span>Belajar</span><span>Referensi</span>
+        <span>Artikel Jurnal</span><span>Uji Plagiarisme</span>
+        <span class="aktif">⬤ Submit Artikel Jurnal</span><span>—</span>
+      </div>
+      <div class="isi">
+        <div class="judul">Submit Artikel Jurnal</div>
+        <div class="ket">Status artikelmu + kirim artikel baru.</div>
+
+        <div class="kartu">
+          <div class="kepala">
+            <div class="no abu">≡</div>
+            <div class="nama">Artikelmu di Tridarma</div>
+            <div class="tanda2 t-biru">2 artikel</div>
+          </div>
+          <table class="tbl">
+            <tr><th>Artikel</th><th>Status</th></tr>
+            <tr>
+              <td><b>Pengaruh Kualitas Layanan…</b><br>
+                  <span style="color:#8b9a95">#101 · 16 Okt</span></td>
+              <td><span class="titik k-review"></span>Review</td>
+            </tr>
+            <tr>
+              <td><b>Analisis Kepuasan…</b><br>
+                  <span style="color:#8b9a95">#145 · 9 Okt</span></td>
+              <td><span class="titik k-terima"></span>Diterima</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="kartu">
+          <div class="kepala">
+            <div class="no">1</div><div class="nama">Jurnal Nasional</div>
+            <div class="tanda2 t-hijau">Scholar · Garuda · ISSN</div>
+          </div>
+          <div class="pilih">Naskah <span>pilih ▾</span></div>
+          <div class="baris"><span>Nama</span><b>Budi Santoso</b></div>
+          <div class="baris"><span>Email</span><b>budi@kampus.ac.id</b></div>
+          <div class="baris"><span>No. HP</span><b>0812-3456-7890</b></div>
+          <button class="tombol">Kirim &amp; Lanjut Bayar</button>
+        </div>
+
+        <div class="kartu">
+          <div class="kepala">
+            <div class="no">2</div><div class="nama">Terbit Jurnal Sinta</div>
+            <div class="tanda2 t-kuning">Negosiasi</div>
+          </div>
+          <div class="pilih">Naskah <span>pilih ▾</span></div>
+          <div class="pilih">Peringkat <span>Sinta 3 ▾</span></div>
+          <button class="tombol wa">Buka WhatsApp Admin</button>
+        </div>
+      </div>
+    </div>
+    <p class="pilihgaya">Bos pilih: <b>2</b></p>
+  </div>
+
+  <!-- ══════════ PILIHAN 3 ══════════ -->
+  <div class="pilihan">
+    <span class="tanda">PILIHAN 3 — DAFTAR ARTIKEL DI BAWAH, GAYA KOMPAK</span>
+    <h2>Sama seperti pilihan 1, tapi daftar artikel lebih ringkas</h2>
+    <p class="alasan">Kalau artikelnya banyak (5+), bentuk ini lebih rapi —
+       hanya judul + lencana status, detail dibuka kalau di-klik.</p>
+
+    <div class="hp">
+      <div class="bar">
+        <div class="logo">E</div><span>EduAi</span>
+        <span class="keluar">Keluar</span>
+      </div>
+      <div class="tab">
+        <span>Naskah Saya</span><span>Kolaborasi</span>
+        <span>Belajar</span><span>Referensi</span>
+        <span>Artikel Jurnal</span><span>Uji Plagiarisme</span>
+        <span class="aktif">⬤ Submit Artikel Jurnal</span><span>—</span>
+      </div>
+      <div class="isi">
+        <div class="judul">Submit Artikel Jurnal</div>
+        <div class="ket">Kirim artikelmu ke jurnal. Pilih jalurnya di bawah.</div>
+
+        <div class="kartu">
+          <div class="kepala">
+            <div class="no">1</div><div class="nama">Jurnal Nasional</div>
+            <div class="tanda2 t-hijau">Scholar · Garuda · ISSN</div>
+          </div>
+          <div class="pilih">Naskah <span>pilih ▾</span></div>
+          <div class="baris"><span>Nama</span><b>Budi Santoso</b></div>
+          <div class="baris"><span>Email</span><b>budi@kampus.ac.id</b></div>
+          <div class="baris"><span>No. HP</span><b>0812-3456-7890</b></div>
+          <button class="tombol">Kirim &amp; Lanjut Bayar</button>
+        </div>
+
+        <div class="kartu">
+          <div class="kepala">
+            <div class="no">2</div><div class="nama">Terbit Jurnal Sinta</div>
+            <div class="tanda2 t-kuning">Negosiasi</div>
+          </div>
+          <div class="pilih">Naskah <span>pilih ▾</span></div>
+          <div class="pilih">Peringkat <span>Sinta 3 ▾</span></div>
+          <button class="tombol wa">Buka WhatsApp Admin</button>
+        </div>
+
+        <div class="kartu">
+          <div class="kepala">
+            <div class="no abu">≡</div>
+            <div class="nama">Artikel Saya di Tridarma</div>
+          </div>
+          <div class="baris">
+            <span><span class="titik k-review"></span>Kualitas Layanan… <b>#101</b></span>
+            <b style="color:#2b7fd4">Review ▸</b>
+          </div>
+          <div class="baris">
+            <span><span class="titik k-revisi"></span>Kepuasan Pelanggan… <b>#145</b></span>
+            <b style="color:#e0a020">Revisi ▸</b>
+          </div>
+          <div class="baris">
+            <span><span class="titik k-terima"></span>Strategi Pemasaran… <b>#178</b></span>
+            <b style="color:#0d6b4f">Diterima ▸</b>
+          </div>
+          <div class="baris">
+            <span><span class="titik k-tolak"></span>Analisis Biaya… <b>#190</b></span>
+            <b style="color:#c0392b">Ditolak ▸</b>
+          </div>
+          <div class="baris">
+            <span><span class="titik k-antre"></span>Manajemen Risiko… <b>#205</b></span>
+            <b style="color:#8b9a95">Antrean ▸</b>
+          </div>
+          <div class="catatan">Sandi awal Tridarma-mu: <b>Pass1EduAi</b> ·
+            <span style="color:#0d6b4f;font-weight:700">Lupa sandi? Reset ▸</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="pilihgaya">Bos pilih: <b>3</b></p>
+  </div>
+
+  <div class="pilihan">
+    <span class="tanda">CATATAN WULAN</span>
+    <p class="pilihgaya">
+      Isi ketiga pilihan <b>sama persis</b> — bedanya cuma <b>urutan &amp; bentuk</b>.<br><br>
+      • <b>Pilihan 1</b> = kartu 1 → kartu 2 → daftar artikel (persis permintaan Bos).<br>
+      • <b>Pilihan 2</b> = daftar artikel di atas.<br>
+      • <b>Pilihan 3</b> = seperti 1, tapi daftar artikel kompak (cocok kalau artikel banyak).<br><br>
+      Wulan sarankan <b>Pilihan 1</b> — paling sesuai kalimat Bos
+      "section/kartu khusus Daftar Artikel <b>di bawah</b> 2 kartu submit".
+    </p>
+  </div>
+</div>
+</body>
+</html>

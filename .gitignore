@@ -1,0 +1,81 @@
+# ═══════════════════════════════════════════════════════════════════════
+#  .gitignore — EduAi (eduai-publishing)
+#  Aturan: RAHASIA & BERKAS BESAR JANGAN MASUK REPO.
+#  Repo = KODE + DOKUMEN + ALAT UJI. Arsip & data besar tinggal di VPS.
+# ═══════════════════════════════════════════════════════════════════════
+
+# ── 🔴 RAHASIA — HARAM MASUK REPO ──────────────────────────────────────
+.env
+.env.*
+!.env.example
+.jwt_oo_secret
+*secret*
+*credential*
+*creds*.json
+data/*token*.json
+data/scite-token.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ── 🗄️ DATA USER & DB ──────────────────────────────────────────────────
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+uploads/
+_potret/
+_penyelamatan/
+
+# ── 📦 BESAR — arsip & contoh (835 MB → tinggal di VPS) ────────────────
+_arsip/
+_contoh-dokumen/
+_sketsa/ladang/
+_ladang-uji/
+
+# ── 🐍 Python ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+ENV/
+
+# ── 🐳 Docker & runtime ────────────────────────────────────────────────
+*.log
+logs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ── 🖥️ Editor & OS ─────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# ── 📄 Berkas kerja sementara ──────────────────────────────────────────
+*.tmp
+*.bak
+*.orig
+*.rej
+_tmp/
+tmp/
+
+# ── ⚠️ HASIL UJI BESAR (docx/xlsx hasil rakit) ─────────────────────────
+bukti_*/
+**/hasil_uji/*.docx
+**/hasil_uji/*.xlsx

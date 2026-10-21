@@ -1,0 +1,6 @@
+[PROFIL] Paradigma=kuantitatif; Desain=survei eksplanatori dengan pengujian model mediasi
+
+[K1-KUTIP-ASLI]
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini dapat dipetakan sebagai berikut.
+[K1-GANTI-JADI]
+Sejalan dengan agenda penelitian lanjutan tersebut, penelitian ini memetakan empat ranah yang menjadi fokus kajian untuk memperlihatkan posisi kebaruannya di antara perkembangan terkini. Hasil pemetaan tersebut disajikan pada tabel berikut, yang memuat capaian penelitian mutakhir beserta titik lanjut yang ditawarkan penelitian ini pada setiap ranah.

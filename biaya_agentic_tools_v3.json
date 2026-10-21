@@ -1,0 +1,190 @@
+{
+ "model": "cb/gpt-5.6-luna",
+ "putaran": [
+  {
+   "nama": "cek_kelengkapan",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8602,
+   "out": 104
+  },
+  {
+   "nama": "cek_alur_logika",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8596,
+   "out": 99
+  },
+  {
+   "nama": "cek_puebi",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8593,
+   "out": 1299
+  },
+  {
+   "nama": "cek_istilah",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8595,
+   "out": 682
+  },
+  {
+   "nama": "crossref_1",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "nilai_relevansi_1",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 344,
+   "out": 334
+  },
+  {
+   "nama": "crossref_2",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "nilai_relevansi_2",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 338,
+   "out": 260
+  },
+  {
+   "nama": "crossref_3",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "nilai_relevansi_3",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 351,
+   "out": 160
+  },
+  {
+   "nama": "scrape_web",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "ekstrak_scrape",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 111,
+   "out": 90
+  },
+  {
+   "nama": "cek_sitasi_silang",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "interpretasi_sitasi",
+   "kategori": "tools_sitasi",
+   "gagal": false,
+   "in": 149,
+   "out": 500
+  },
+  {
+   "nama": "siapkan_file",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "rakit_coba_1",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "verifikasi_1",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "qa_rakit_1",
+   "kategori": "tools_rakit",
+   "gagal": false,
+   "in": 56,
+   "out": 63
+  },
+  {
+   "nama": "render_pdf_1",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "audit_visual_1",
+   "kategori": "tools_rakit",
+   "gagal": false,
+   "in": 66,
+   "out": 143
+  },
+  {
+   "nama": "laporan_akhir",
+   "kategori": "laporan",
+   "gagal": false,
+   "in": 253,
+   "out": 716
+  }
+ ],
+ "per_kategori": {
+  "periksa": {
+   "n": 4,
+   "in": 34386,
+   "out": 2184
+  },
+  "TOOL_GRATIS": {
+   "n": 9,
+   "in": 0,
+   "out": 0
+  },
+  "tools_web": {
+   "n": 4,
+   "in": 1144,
+   "out": 844
+  },
+  "tools_sitasi": {
+   "n": 1,
+   "in": 149,
+   "out": 500
+  },
+  "tools_rakit": {
+   "n": 2,
+   "in": 122,
+   "out": 206
+  },
+  "laporan": {
+   "n": 1,
+   "in": 253,
+   "out": 716
+  }
+ },
+ "total_token": 40504,
+ "n_llm": 12,
+ "n_tool": 9,
+ "biaya_usd": 0.0004770000000000607,
+ "durasi_detik": 145.17724098311737,
+ "rakit_sukses": true
+}

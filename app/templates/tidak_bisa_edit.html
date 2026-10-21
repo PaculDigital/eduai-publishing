@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tidak Bisa Diedit — EduAi</title>
+<link rel="icon" href="/static/logo-96.png">
+<style>
+:root{--hijau:#198E3B;--oranye:#F4A025;--teks:#272530;--teks-abu:#68666e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;background:#F7F9F8;color:var(--teks);
+     min-height:100vh;display:grid;place-items:center;padding:22px}
+.kotak{background:#fff;border:1.5px solid #E4E8E6;border-radius:18px;padding:38px 30px;
+       max-width:440px;width:100%;text-align:center;
+       box-shadow:0 12px 34px rgba(0,0,0,.07)}
+.ikon{font-size:46px;margin-bottom:14px}
+h1{font-size:19px;font-weight:800;margin-bottom:10px}
+p{font-size:14px;color:var(--teks-abu);line-height:1.65;margin-bottom:9px}
+.nama{background:#F2F4F5;border-radius:9px;padding:11px 14px;font-size:13px;
+      word-break:break-all;margin:16px 0;text-align:left;
+      font-family:ui-monospace,monospace}
+a{display:inline-block;margin-top:12px;padding:12px 26px;border-radius:70px;
+  background:var(--oranye);color:#2E1B00;text-decoration:none;font-weight:700;font-size:14.5px}
+a:hover{background:#FFB63D}
+</style>
+<link rel="stylesheet" href="/static/ikon.css">
+</head>
+<body>
+<!-- IKON: sprite Lucide (ACC Bos 15Sep26) -->
+{{ ikon_sprite() }}
+
+<div class="kotak">
+{% if sebab_sampah %}
+  <div class="ikon">{{ ikon('trash-2', 30) }}</div>
+  <h1>Dokumen ini ada di Tong Sampah</h1>
+  <p>Dokumen yang sudah Anda hapus tidak bisa dibuka atau diedit.
+     Ia masih tersimpan {{ sampah_hari }} hari dan <b>bisa dikembalikan</b>.</p>
+  <div class="nama">{{ berkas.nama }}</div>
+  <p>Buka Tong Sampah, lalu klik <b>Pulihkan</b> kalau ingin mengeditnya lagi.</p>
+  <a href="/sampah">&larr; Buka Tong Sampah</a>
+{% else %}
+  <div class="ikon">{{ ikon('file-text', 30) }}</div>
+  <h1>Berkas ini belum bisa diedit online</h1>
+  <p>Editor hanya mendukung dokumen Word, Excel, PowerPoint, dan PDF.</p>
+  <div class="nama">{{ berkas.nama }}</div>
+  <p>Anda masih bisa mengunduhnya lalu mengedit di komputer, kemudian mengunggah kembali.</p>
+  <a href="/naskah">&larr; Kembali ke Naskah Saya</a>
+{% endif %}
+</div>
+</body>
+</html>

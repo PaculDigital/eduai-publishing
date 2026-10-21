@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SKETSA Mode Belajar — 3 Pilihan (Wulan 03Okt26)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#F3F6F4;padding:26px 14px 60px}
+.wadah{max-width:1000px;margin:0 auto}
+h1{font-size:26px;font-weight:800;margin-bottom:6px}
+.sub{color:var(--teks-abu);font-size:14px;margin-bottom:26px}
+.label{display:inline-block;background:var(--hijau-gelap);color:#fff;font-size:13px;
+       font-weight:700;padding:5px 14px;border-radius:70px;margin:34px 0 14px}
+.label b{color:#FFD98A}
+.ket{background:#fff;border-left:4px solid var(--oranye);padding:12px 16px;border-radius:0 12px 12px 0;
+     font-size:13.5px;color:var(--teks-abu);line-height:1.65;margin-bottom:16px}
+.ket b{color:var(--teks)}
+.kotak{background:#fff;border:1px solid var(--garis);border-radius:18px;padding:22px}
+header.less{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);
+     border-radius:14px 14px 0 0;padding:0 22px;height:64px;display:flex;align-items:center;justify-content:space-between}
+header.less img{height:44px}
+header.less .kanan{color:rgba(255,255,255,.9);font-size:13.5px;display:flex;gap:14px}
+
+/* ── kartu dasar ── */
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:16px;padding:18px}
+.kartu h3{font-size:17px;font-weight:800;margin-bottom:6px}
+.kartu p{font-size:13px;color:var(--teks-abu);line-height:1.65}
+
+/* ── V1: PITA TAB (paling hemat, mirip dashboard) ── */
+.pita{display:flex;gap:4px;padding:0 22px;background:#fff;border-bottom:1px solid var(--garis)}
+.pita a{padding:10px 18px;font-size:14px;font-weight:600;color:var(--teks-abu)}
+.pita a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);border-bottom:2px solid var(--hijau);margin-bottom:-2px}
+.v1-isi{padding:22px;background:#FCFDFC}
+.pohon{display:flex;flex-direction:column;gap:10px}
+.baris{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;
+       background:#fff;border:1px solid var(--garis)}
+.baris.ok{border-color:#B8E5C6;background:#F4FBF6}
+.baris.tunggu{opacity:.62;border-style:dashed}
+.bulat{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;
+       font-size:14px;flex:0 0 38px}
+.bulat.hijau{background:var(--hijau);color:#fff}
+.bulat.kosong{background:#EDEDF0;color:#9A98A0}
+.baris .teks b{display:block;font-size:14.5px;font-weight:700}
+.baris .teks small{color:var(--teks-abu);font-size:12.5px}
+.baris .kanan{margin-left:auto;font-size:13px;font-weight:700}
+.kanan.bisa{color:var(--hijau)}
+.kanan.tunggu{color:#A5A3AB}
+
+/* ── V2: KARTU BESAR PROGRES (paling jelas untuk pemula) ── */
+.v2-isi{padding:26px 22px;background:#FCFDFC}
+.jalur{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px}
+.tahap{background:#fff;border:1px solid var(--garis);border-radius:18px;padding:18px;position:relative}
+.tahap.buka{border:2px solid var(--hijau);box-shadow:0 6px 20px rgba(25,142,59,.12)}
+.tahap.kunci{background:#F7F7F9;opacity:.72}
+.tahap .nomor{width:30px;height:30px;border-radius:9px;background:var(--hijau);color:#fff;
+       display:grid;place-items:center;font-weight:800;font-size:14px;margin-bottom:10px}
+.tahap.kunci .nomor{background:#CFCDD5}
+.tahap h4{font-size:15.5px;font-weight:800;margin-bottom:5px}
+.tahap.p{font-size:12.5px;color:var(--teks-abu);line-height:1.6}
+.tahap .status{margin-top:12px;font-size:12px;font-weight:700;padding:5px 11px;border-radius:70px;display:inline-block}
+.s-buka{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.s-kunci{background:#EDEDF0;color:#8B8992}
+.bilah{background:#fff;border:1px solid var(--garis);border-radius:16px;padding:18px}
+.bilah-atas{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;margin-bottom:10px}
+.progres{height:12px;background:#EDEDF0;border-radius:70px;overflow:hidden}
+.progres span{display:block;height:100%;width:33%;background:linear-gradient(90deg,#198E3B,#3CB35F);border-radius:70px}
+.bilah small{display:block;margin-top:10px;font-size:12.5px;color:var(--teks-abu)}
+
+/* ── V3: DAFTAR RINGKAS + PANEL KANAN (paling padat) ── */
+.v3-isi{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;padding:22px;background:#FCFDFC}
+.daftar-bab{background:#fff;border:1px solid var(--garis);border-radius:16px;overflow:hidden}
+.item{display:flex;align-items:center;gap:13px;padding:15px 17px;border-bottom:1px solid var(--garis)}
+.item:last-child{border-bottom:none}
+.item.aktif{background:var(--hijau-muda)}
+.item .ikon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+       font-size:13px;font-weight:800;flex:0 0 34px;background:#EDEDF0;color:#8B8992}
+.item.selesai .ikon{background:var(--hijau);color:#fff}
+.item b{display:block;font-size:14px}
+.item small{color:var(--teks-abu);font-size:12px}
+.item .nilai{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--hijau)}
+.panel{background:#fff;border:1px solid var(--garis);border-radius:16px;padding:18px;height:fit-content}
+.panel h4{font-size:15px;font-weight:800;margin-bottom:12px}
+.panel .stat{display:flex;justify-content:space-between;font-size:13px;padding:9px 0;border-bottom:1px dashed var(--garis)}
+.panel .stat:last-of-type{border-bottom:none}
+.panel .stat b{color:var(--hijau)}
+.tbl{background:var(--oranye);color:#2E1B00;font-weight:700;font-size:13.5px;
+     padding:11px 18px;border-radius:70px;border:none;margin-top:14px;width:100%;cursor:pointer}
+.tbl2{background:#fff;color:var(--hijau);border:1.5px solid var(--hijau);font-weight:700;
+     font-size:13.5px;padding:10px 18px;border-radius:70px;margin-top:9px;width:100%;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wadah">
+  <h1>🎓 SKETSA — Halaman “Mode Belajar”</h1>
+  <p class="sub">3 pilihan desain (Wulan, 03Okt26) · pakai warna &amp; huruf asli EduAi · <b>belum ada kode aplikasi</b></p>
+
+  <div class="ket">
+    <b>Cara lihat:</b> Bos pilih satu (A / B / C), Wulan baru bangun. Boleh campur
+    (mis. “isi pakai A, warna pakai B”). Semua pakai hijau EduAi + Poppins, tidak ada warna baru.
+  </div>
+
+  <!-- ══════════ V1 ══════════ -->
+  <div class="label">PILIHAN <b>A</b> — PITA TAB + POHON BAB <span style="font-weight:500;opacity:.85">(paling hemat, mirip dashboard sekarang)</span></div>
+  <div class="ket">
+    Halaman menyatu dengan dashboard: ada pita tab <b>Naskah Saya | Kolaborasi | Belajar</b>.
+    Isinya <b>pohon bab</b> — tiap baris = satu bab, jelas mana yang sudah/belum terbuka.
+    <br><b>Kelebihan:</b> tidak menambah menu baru, user tidak bingung. <b>Kekurangan:</b> kurang “seru”, pita tab jadi 3.
+  </div>
+  <div style="border:1px solid var(--garis);border-radius:14px;overflow:hidden">
+    <header class="less">
+      <img src="/opt/data/services/eduai-publishing/app/static/logo-320.png" alt="EduAi">
+      <div class="kanan"><span>Siti N. <small>(Peneliti)</small></span><span>Keluar</span></div>
+    </header>
+    <div class="pita"><a class="aktif">Naskah Saya</a><a>Kolaborasi</a><a>🎓 Belajar</a></div>
+    <div class="v1-isi">
+      <div class="pohon">
+        <div class="baris ok"><div class="bulat hijau">I</div>
+          <div class="teks"><b>BAB I — Pendahuluan</b><small>Insight siap · 3 catatan belajar</small></div>
+          <div class="kanan bisa">Buka ▸</div></div>
+        <div class="baris ok"><div class="bulat hijau">II</div>
+          <div class="teks"><b>BAB II — Tinjauan Pustaka</b><small>Insight siap · 5 catatan belajar</small></div>
+          <div class="kanan bisa">Buka ▸</div></div>
+        <div class="baris ok"><div class="bulat hijau">III</div>
+          <div class="teks"><b>BAB III — Metodologi</b><small>Insight siap · soal ujian proposal terbuka</small></div>
+          <div class="kanan bisa">Buka ▸</div></div>
+        <div class="baris tunggu"><div class="bulat kosong">IV</div>
+          <div class="teks"><b>BAB IV — Hasil &amp; Pembahasan</b><small>Terbuka setelah BAB IV selesai kamu revisi</small></div>
+          <div class="kanan tunggu">Menunggu</div></div>
+        <div class="baris tunggu"><div class="bulat kosong">V</div>
+          <div class="teks"><b>BAB V — Kesimpulan</b><small>Terbuka setelah BAB V selesai kamu revisi</small></div>
+          <div class="kanan tunggu">Menunggu</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ V2 ══════════ -->
+  <div class="label">PILIHAN <b>B</b> — 3 KARTU TAHAP + BILAH PROGRES <span style="font-weight:500;opacity:.85">(paling jelas untuk pemula)</span></div>
+  <div class="ket">
+    Ditampilkan sebagai <b>perjalanan 3 tahap</b> menuju sidang: <b>Proposal → Hasil → Sidang</b>.
+    Kartu yang terbuka bercahaya hijau; yang terkunci abu-abu. Ada bilah progres “kamu di sini”.
+    <br><b>Kelebihan:</b> pemula langsung paham “saya harus ke mana”. <b>Kekurangan:</b> lebih tinggi/panjang di HP.
+  </div>
+  <div style="border:1px solid var(--garis);border-radius:14px;overflow:hidden">
+    <header class="less">
+      <img src="/opt/data/services/eduai-publishing/app/static/logo-320.png" alt="EduAi">
+      <div class="kanan"><span>Siti N. <small>(Peneliti)</small></span><span>Keluar</span></div>
+    </header>
+    <div class="v2-isi">
+      <div class="jalur">
+        <div class="tahap buka">
+          <div class="nomor">1</div>
+          <h4>Siap Proposal</h4>
+          <div class="p">Insight BAB I–III + soal latihan ujian proposal.</div>
+          <span class="status s-buka">✅ Terbuka</span>
+        </div>
+        <div class="tahap kunci">
+          <div class="nomor">2</div>
+          <h4>Siap Hasil</h4>
+          <div class="p">Terbuka saat BAB IV selesai kamu revisi.</div>
+          <span class="status s-kunci">🔒 Menunggu BAB IV</span>
+        </div>
+        <div class="tahap kunci">
+          <div class="nomor">3</div>
+          <h4>Siap Sidang</h4>
+          <div class="p">Terbuka saat BAB V selesai kamu revisi.</div>
+          <span class="status s-kunci">🔒 Menunggu BAB V</span>
+        </div>
+      </div>
+      <div class="bilah">
+        <div class="bilah-atas"><span>Perjalananmu</span><span style="color:var(--hijau)">1 dari 3 tahap</span></div>
+        <div class="progres"><span></span></div>
+        <small>Bab yang sudah kamu revisi otomatis membuka tahap berikutnya. Belajarmu tersimpan permanen — tidak hangus.</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ V3 ══════════ -->
+  <div class="label">PILIHAN <b>C</b> — DAFTAR BAB + PANEL SKOR <span style="font-weight:500;opacity:.85">(paling padat, untuk yang suka angka)</span></div>
+  <div class="ket">
+    Kiri = daftar bab (klik untuk masuk). Kanan = panel <b>skor penguasaan</b> + tombol mulai latihan.
+    Cocok kalau nanti skor mau ditunjukkan ke dosen pembimbing.
+    <br><b>Kelebihan:</b> banyak informasi sekaligus, rapi di layar besar. <b>Kekurangan:</b> di HP panel harus turun ke bawah, agak ramai.
+  </div>
+  <div style="border:1px solid var(--garis);border-radius:14px;overflow:hidden">
+    <header class="less">
+      <img src="/opt/data/services/eduai-publishing/app/static/logo-320.png" alt="EduAi">
+      <div class="kanan"><span>Siti N. <small>(Peneliti)</small></span><span>Keluar</span></div>
+    </header>
+    <div class="v3-isi">
+      <div class="daftar-bab">
+        <div class="item selesai"><div class="ikon">✓</div>
+          <div><b>BAB I — Pendahuluan</b><small>Insight siap</small></div><div class="nilai">85</div></div>
+        <div class="item selesai"><div class="ikon">✓</div>
+          <div><b>BAB II — Tinjauan Pustaka</b><small>Insight siap</small></div><div class="nilai">78</div></div>
+        <div class="item aktif"><div class="ikon">▸</div>
+          <div><b>BAB III — Metodologi</b><small>Insight siap · ujian proposal terbuka</small></div><div class="nilai">—</div></div>
+        <div class="item"><div class="ikon">IV</div>
+          <div><b>BAB IV — Hasil &amp; Pembahasan</b><small>Terkunci</small></div><div class="nilai" style="color:#A5A3AB">—</div></div>
+        <div class="item"><div class="ikon">V</div>
+          <div><b>BAB V — Kesimpulan</b><small>Terkunci</small></div><div class="nilai" style="color:#A5A3AB">—</div></div>
+      </div>
+      <div class="panel">
+        <h4>Penguasaan naskahmu</h4>
+        <div class="stat"><span>Bab terbuka</span><b>3 dari 5</b></div>
+        <div class="stat"><span>Rata-rata skor</span><b>82</b></div>
+        <div class="stat"><span>Soal terlatih</span><b>18</b></div>
+        <button class="tbl">Mulai Latihan Sidang</button>
+        <button class="tbl2">Lihat Insight Bab III</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ket" style="margin-top:30px">
+    <b>Catatan Wulan (jujur):</b> ketiganya memakai <b>data yang sudah ada</b> — tidak perlu tabel/DB baru.
+    Yang belum ada cuma tampilannya. Wulan sarankan <b>B</b> kalau mahasiswa banyak yang pemula
+    (langsung paham “harus ke mana”), atau <b>A</b> kalau Bos mau paling hemat &amp; menyatu dengan dashboard.
+  </div>
+</div>
+</body>
+</html>

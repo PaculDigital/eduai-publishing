@@ -1,0 +1,5226 @@
+{
+ "updatedAt": "2026-09-16T07:24:50.935Z",
+ "historyUpdatedAt": "2026-09-16T07:24:51.392Z",
+ "definitions": {
+  "currentWindowMinutes": 30,
+  "historyDays": 7,
+  "bucketMinutes": 120,
+  "operationalAtOrAbovePct": 95,
+  "degradedAtOrAbovePct": 80
+ },
+ "overall": {
+  "state": "operational",
+  "currentAvailabilityPct": 97.33,
+  "availability24hPct": 98.9,
+  "availability7dPct": 99.18,
+  "history": [
+   {
+    "start": "2026-09-09T08:00:00.000Z",
+    "availabilityPct": 99.78,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-09T10:00:00.000Z",
+    "availabilityPct": 99.67,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-09T12:00:00.000Z",
+    "availabilityPct": 99.76,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-09T14:00:00.000Z",
+    "availabilityPct": 99.81,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-09T16:00:00.000Z",
+    "availabilityPct": 99.8,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-09T18:00:00.000Z",
+    "availabilityPct": 99.78,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-09T20:00:00.000Z",
+    "availabilityPct": 99.85,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-09T22:00:00.000Z",
+    "availabilityPct": 99.89,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T00:00:00.000Z",
+    "availabilityPct": 99.78,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T02:00:00.000Z",
+    "availabilityPct": 99.52,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T04:00:00.000Z",
+    "availabilityPct": 99.82,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T06:00:00.000Z",
+    "availabilityPct": 99.34,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T08:00:00.000Z",
+    "availabilityPct": 99.66,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T10:00:00.000Z",
+    "availabilityPct": 99.73,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T12:00:00.000Z",
+    "availabilityPct": 99.43,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T14:00:00.000Z",
+    "availabilityPct": 99.57,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T16:00:00.000Z",
+    "availabilityPct": 99.69,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T18:00:00.000Z",
+    "availabilityPct": 99.75,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T20:00:00.000Z",
+    "availabilityPct": 99.83,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-10T22:00:00.000Z",
+    "availabilityPct": 99.69,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T00:00:00.000Z",
+    "availabilityPct": 99.69,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T02:00:00.000Z",
+    "availabilityPct": 96.85,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T04:00:00.000Z",
+    "availabilityPct": 98.87,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T06:00:00.000Z",
+    "availabilityPct": 99.49,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T08:00:00.000Z",
+    "availabilityPct": 99.13,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T10:00:00.000Z",
+    "availabilityPct": 99.15,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T12:00:00.000Z",
+    "availabilityPct": 98.9,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T14:00:00.000Z",
+    "availabilityPct": 98.92,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T16:00:00.000Z",
+    "availabilityPct": 98.48,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T18:00:00.000Z",
+    "availabilityPct": 98.65,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-11T20:00:00.000Z",
+    "availabilityPct": 91.08,
+    "state": "degraded"
+   },
+   {
+    "start": "2026-09-11T22:00:00.000Z",
+    "availabilityPct": 90.43,
+    "state": "degraded"
+   },
+   {
+    "start": "2026-09-12T00:00:00.000Z",
+    "availabilityPct": 99.59,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T02:00:00.000Z",
+    "availabilityPct": 99.73,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T04:00:00.000Z",
+    "availabilityPct": 99.87,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T06:00:00.000Z",
+    "availabilityPct": 99.45,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T08:00:00.000Z",
+    "availabilityPct": 99.58,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T10:00:00.000Z",
+    "availabilityPct": 99.68,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T12:00:00.000Z",
+    "availabilityPct": 99.87,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T14:00:00.000Z",
+    "availabilityPct": 99.84,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T16:00:00.000Z",
+    "availabilityPct": 99.83,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T18:00:00.000Z",
+    "availabilityPct": 99.76,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T20:00:00.000Z",
+    "availabilityPct": 99.86,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-12T22:00:00.000Z",
+    "availabilityPct": 99.82,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T00:00:00.000Z",
+    "availabilityPct": 99.85,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T02:00:00.000Z",
+    "availabilityPct": 99.92,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T04:00:00.000Z",
+    "availabilityPct": 99.93,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T06:00:00.000Z",
+    "availabilityPct": 99.93,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T08:00:00.000Z",
+    "availabilityPct": 99.85,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T10:00:00.000Z",
+    "availabilityPct": 99.8,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T12:00:00.000Z",
+    "availabilityPct": 99.76,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T14:00:00.000Z",
+    "availabilityPct": 99.8,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T16:00:00.000Z",
+    "availabilityPct": 99.84,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T18:00:00.000Z",
+    "availabilityPct": 99.72,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T20:00:00.000Z",
+    "availabilityPct": 99.82,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-13T22:00:00.000Z",
+    "availabilityPct": 99.85,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T00:00:00.000Z",
+    "availabilityPct": 99.72,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T02:00:00.000Z",
+    "availabilityPct": 99.6,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T04:00:00.000Z",
+    "availabilityPct": 99.75,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T06:00:00.000Z",
+    "availabilityPct": 99.34,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T08:00:00.000Z",
+    "availabilityPct": 93.1,
+    "state": "degraded"
+   },
+   {
+    "start": "2026-09-14T10:00:00.000Z",
+    "availabilityPct": 96.42,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T12:00:00.000Z",
+    "availabilityPct": 98.24,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T14:00:00.000Z",
+    "availabilityPct": 97.3,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T16:00:00.000Z",
+    "availabilityPct": 99.27,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T18:00:00.000Z",
+    "availabilityPct": 97.39,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T20:00:00.000Z",
+    "availabilityPct": 97.84,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-14T22:00:00.000Z",
+    "availabilityPct": 99.42,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T00:00:00.000Z",
+    "availabilityPct": 99.75,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T02:00:00.000Z",
+    "availabilityPct": 99.71,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T04:00:00.000Z",
+    "availabilityPct": 99.81,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T06:00:00.000Z",
+    "availabilityPct": 98.05,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T08:00:00.000Z",
+    "availabilityPct": 99.51,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T10:00:00.000Z",
+    "availabilityPct": 99.63,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T12:00:00.000Z",
+    "availabilityPct": 99.31,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T14:00:00.000Z",
+    "availabilityPct": 97.83,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T16:00:00.000Z",
+    "availabilityPct": 99.62,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T18:00:00.000Z",
+    "availabilityPct": 99.79,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T20:00:00.000Z",
+    "availabilityPct": 99.86,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-15T22:00:00.000Z",
+    "availabilityPct": 99.78,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-16T00:00:00.000Z",
+    "availabilityPct": 94.91,
+    "state": "degraded"
+   },
+   {
+    "start": "2026-09-16T02:00:00.000Z",
+    "availabilityPct": 99.6,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-16T04:00:00.000Z",
+    "availabilityPct": 99.05,
+    "state": "operational"
+   },
+   {
+    "start": "2026-09-16T06:00:00.000Z",
+    "availabilityPct": 95.86,
+    "state": "operational"
+   }
+  ]
+ },
+ "families": [
+  {
+   "slug": "antigravity",
+   "prefix": "ag",
+   "family": "Antigravity",
+   "state": "operational",
+   "currentAvailabilityPct": 98.7,
+   "availability24hPct": 99.56,
+   "p50DurationMs": 7500,
+   "p95DurationMs": 60000,
+   "avgTtftMs1h": 7775,
+   "avgTps1h": 60.4,
+   "availability7dPct": 98.7,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 99.12,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 89.82,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 97.11,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 97.69,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 94.52,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 98.33,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 97.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 99.72,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 99.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 99.8,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 99.4,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 97.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 99.34,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 99.69,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 98.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 99.51,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 98.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 99.65,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 99.33,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 99.41,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 99.35,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 99.28,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 99.11,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 99.56,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 97.75,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 97.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 97.36,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 98.34,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 99.48,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 99.57,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 99.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 99.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 99.61,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 98.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 97.24,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 95.89,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 95.07,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 96.27,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 95.45,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 93.54,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 94.81,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 95.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 96.66,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 99.25,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 99.63,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 99.27,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 99.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 98.32,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 98.62,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 98.08,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 98.6,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 99.77,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 98.21,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 99.01,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 99.84,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 98.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 98.1,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 97.14,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 96.88,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 97.88,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 97.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 99.4,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 99.53,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 99.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 98.39,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 98.67,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 99.73,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 99.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 99.17,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 99.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 99.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 98.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 99.88,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 99.66,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 99.6,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 99.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 99.22,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 99.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 98.56,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 98.97,
+     "state": "operational"
+    }
+   ]
+  },
+  {
+   "slug": "claude-code",
+   "prefix": "cc",
+   "family": "Claude Code",
+   "state": "degraded",
+   "currentAvailabilityPct": 93.75,
+   "availability24hPct": 99.41,
+   "p50DurationMs": 3000,
+   "p95DurationMs": 120000,
+   "avgTtftMs1h": 6832,
+   "avgTps1h": 45.4,
+   "availability7dPct": 98.05,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 84.51,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 99.81,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 92.27,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 97.61,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 97.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 86.62,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 96.09,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 98.27,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 99.66,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 93.52,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 92.56,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 99.25,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 99.66,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 99.83,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 99.71,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 99.65,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 99.66,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 89.22,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 99.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 99.82,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 99.65,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 99.58,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 99.8,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 99.63,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 98.7,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 98.71,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 89.36,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 97.24,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 89.84,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 99.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 77.51,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 98.81,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 97.57,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 99.7,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 99.52,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 98.87,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 99.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 99.72,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 99.82,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 99.82,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 99.27,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 92.85,
+     "state": "degraded"
+    }
+   ]
+  },
+  {
+   "slug": "cline-pass",
+   "prefix": "cp",
+   "family": "ClinePass",
+   "state": "operational",
+   "currentAvailabilityPct": 96.65,
+   "availability24hPct": 98.95,
+   "p50DurationMs": 7500,
+   "p95DurationMs": 60000,
+   "avgTtftMs1h": 4330,
+   "avgTps1h": 57.8,
+   "availability7dPct": 97.38,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 62.09,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 96.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 90.93,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 95.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 97.85,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 97.77,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 99.21,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 98.52,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 97.02,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 98.37,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 97.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 99.35,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 94.99,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 99.17,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 70.93,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 89.92,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 94.14,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 85.57,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 77.7,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 89.92,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 87.61,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 87.05,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 92.72,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 90.03,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 94.48,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 94.7,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 98.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 95.84,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 97.16,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 99.58,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 99.04,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 98.54,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 98.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 99.4,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 99.7,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 99.87,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 99.09,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 99.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 99.38,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 98.42,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 99.4,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 95.52,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 95.95,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 99.5,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 98.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 99.62,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 99.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 98.68,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 96.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 99.75,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 96.36,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 94.44,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 93.98,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 97.67,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 99.47,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 98.73,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 99.49,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 99.66,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 99.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 99.66,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 96.83,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 98.45,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 98.5,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 99.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 99.05,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 99.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 97.49,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 98.53,
+     "state": "operational"
+    }
+   ]
+  },
+  {
+   "slug": "codebuddy",
+   "prefix": "cb",
+   "family": "CodeBuddy",
+   "state": "major_outage",
+   "currentAvailabilityPct": 79.93,
+   "availability24hPct": 97.05,
+   "p50DurationMs": 7500,
+   "p95DurationMs": 60000,
+   "avgTtftMs1h": 7294,
+   "avgTps1h": 39.8,
+   "availability7dPct": 98.28,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 99.52,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 99.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 99.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 99.81,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 99.85,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 99.2,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 99.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 99.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 99.89,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 99.5,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 99.72,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 99.62,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 97.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 98.73,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 99.5,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 99.17,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 99.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 99.24,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 99.23,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 87.52,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 95.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 98.42,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 97.22,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 97.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 98.24,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 98.4,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 97.6,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 98.08,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 79.61,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 78.39,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 99.54,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 99.71,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 99.75,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 99.68,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 99.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 99.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 99.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 99.54,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 99.95,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 99.83,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 99.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 99.71,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 99.84,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 99.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 99.42,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 99.88,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 99.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 99.8,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 99.48,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 99.81,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 99.6,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 99.29,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 98.87,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 98.48,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 97.38,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 99.57,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 96.7,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 96.68,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 98.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 99.89,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 99.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 99.63,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 95.57,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 99.22,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 99.29,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 98.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 92.4,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 98.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 98.38,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 99.15,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 98.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 98.51,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 98.74,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 97.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 62.96,
+     "state": "major_outage"
+    }
+   ]
+  },
+  {
+   "slug": "codebuddy-cn",
+   "prefix": "cbcn",
+   "family": "CodeBuddy CN",
+   "state": "operational",
+   "currentAvailabilityPct": 99.68,
+   "availability24hPct": 99.45,
+   "p50DurationMs": 7500,
+   "p95DurationMs": 60000,
+   "avgTtftMs1h": 3791,
+   "avgTps1h": 70.5,
+   "availability7dPct": 99.62,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 99.95,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 99.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 99.95,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 99.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 99.6,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 99.95,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 99.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 99.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 99.87,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 99.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 99.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 99.88,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 99.88,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 99.89,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 99.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 99.41,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 99.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 99.95,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 99.95,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 99.32,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 87.89,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 94.99,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 97.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 96.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 99.15,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 97.85,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 98.17,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 99.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 99.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 99.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 99.68,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 99.81,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 92.48,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 99.61,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 99.54,
+     "state": "operational"
+    }
+   ]
+  },
+  {
+   "slug": "commandcode",
+   "prefix": "cmc",
+   "family": "Command Code",
+   "state": "operational",
+   "currentAvailabilityPct": 100,
+   "availability24hPct": 99.36,
+   "p50DurationMs": 7500,
+   "p95DurationMs": 60000,
+   "avgTtftMs1h": 10293,
+   "avgTps1h": 51.8,
+   "availability7dPct": 95.44,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 95.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 96.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 96.77,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 88.5,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 95.35,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 99.23,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 96.02,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 85.76,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 98.06,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 94.95,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 94.71,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 88.15,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 95.74,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 90.72,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 57.97,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 88.57,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 66.95,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 71.95,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 41.66,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 64.1,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 90.5,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 75,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 71.71,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 60.75,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 75,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 84.07,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 96.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 99.63,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 94.26,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 95.61,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 99.24,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 99.24,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 99.24,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 97.22,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 97.27,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 88.54,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 94.73,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 99.15,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 92.79,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 99.34,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 99.09,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 99.26,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 99.15,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 96.68,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 98.82,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 98.06,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 95.12,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 94.73,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 98.55,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 95.52,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 97.72,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 97.43,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 93.95,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 97.39,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 98.49,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 93.3,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 92.12,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 60.65,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 73.01,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 99.39,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 98.19,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 90.47,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 97.72,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 92.68,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 98.83,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 98.6,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 99.31,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 98.34,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    }
+   ]
+  },
+  {
+   "slug": "codex",
+   "prefix": "cx",
+   "family": "OpenAI Codex",
+   "state": "degraded",
+   "currentAvailabilityPct": 93.93,
+   "availability24hPct": 98.9,
+   "p50DurationMs": 15000,
+   "p95DurationMs": 120000,
+   "avgTtftMs1h": 8037,
+   "avgTps1h": 22.7,
+   "availability7dPct": 97.16,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 94.52,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 96.38,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 95.45,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 97.8,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 97.45,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 96.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 96.43,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 98.57,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 97.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 89.61,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 96.72,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 85.47,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 74.19,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 85.85,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 85.38,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 83.92,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 88.07,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 96.24,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 96.29,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 95.39,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 94.2,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 96.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 96.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 93.16,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 94.81,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 95.19,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 97.34,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 95.42,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 92.46,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 91.98,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 95.87,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 96.68,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 96.65,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 98.57,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 98.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 99.47,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 98.58,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 98.4,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 99.8,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 99.55,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 99.65,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 99.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 99.81,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 99.39,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 99.73,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 99.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 96.82,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 99.82,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 98.87,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 96.27,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 97.05,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 96.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 88.51,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 98.88,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 99.56,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 99.64,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 99.32,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 99.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 99.54,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 97.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 98.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 96.88,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 98.82,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 99.44,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 99.41,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 99.41,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 99.9,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 99.66,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 99.31,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 96.89,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 98.46,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 96.05,
+     "state": "operational"
+    }
+   ]
+  },
+  {
+   "slug": "opencode-go",
+   "prefix": "ocg",
+   "family": "OpenCode Go",
+   "state": "operational",
+   "currentAvailabilityPct": 98.95,
+   "availability24hPct": 99.53,
+   "p50DurationMs": 7500,
+   "p95DurationMs": 60000,
+   "avgTtftMs1h": 4140,
+   "avgTps1h": 55.1,
+   "availability7dPct": 89.95,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 0,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 0,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 0,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 0,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 0,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 0,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 0,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 10.71,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 68.78,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 51.18,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 42.42,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 53.17,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 47.58,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 65.24,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 56.19,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 67.96,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 65.55,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 67.41,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 66.05,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 70.52,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 66.28,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 46.56,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 84.76,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 89.85,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 80,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 68.42,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 63.24,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 95.83,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 79.06,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 98.87,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 94.64,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 97.18,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 96.02,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 91.91,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 93.82,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 97.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 98.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 98.21,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 98.63,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 98.6,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 90,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 68.98,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 98.19,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 99.29,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 99.77,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 99.1,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 99.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 83.09,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 99.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 98.32,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 99.01,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 99.71,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 99.77,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 99.5,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 98.91,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 97.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 99.02,
+     "state": "operational"
+    }
+   ]
+  },
+  {
+   "slug": "qwencloud-alibaba",
+   "prefix": "ali",
+   "family": "Qwencloud/Alibaba",
+   "state": "operational",
+   "currentAvailabilityPct": 99.75,
+   "availability24hPct": 99.78,
+   "p50DurationMs": 7500,
+   "p95DurationMs": 60000,
+   "avgTtftMs1h": 3703,
+   "avgTps1h": 63.4,
+   "availability7dPct": 99.7,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 98.82,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 99.7,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 98.83,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 99.15,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 99.42,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 99.41,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 99.63,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 99.43,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 99.58,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 99.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 99.3,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 98.68,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 98.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 98.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 98.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 99.28,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 99.85,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 99.6,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 99.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 99.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 99.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 99.33,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 99.49,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 99.2,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 99.68,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 99.65,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 99.87,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 99.51,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 99.48,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 99.86,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 99.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 99.7,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 99.72,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 99.84,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 98.85,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 99.89,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 99.93,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 99.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 97.72,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 99.99,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 99.97,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 99.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 99.69,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 99.98,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 99.96,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 99.8,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 99.89,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 98.94,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 99.86,
+     "state": "operational"
+    }
+   ]
+  },
+  {
+   "slug": "xiaomi-mimo",
+   "prefix": "mimo",
+   "family": "Xiaomi MiMo",
+   "state": "low_traffic",
+   "currentAvailabilityPct": null,
+   "availability24hPct": null,
+   "availability7dPct": null,
+   "p50DurationMs": null,
+   "p95DurationMs": null,
+   "avgTtftMs1h": null,
+   "avgTps1h": null,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": null,
+     "state": "low_traffic"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": null,
+     "state": "low_traffic"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": null,
+     "state": "low_traffic"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": null,
+     "state": "low_traffic"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": null,
+     "state": "no_data"
+    }
+   ]
+  },
+  {
+   "slug": "z-ai",
+   "prefix": "zai",
+   "family": "Z.AI GLM Coding Plan",
+   "state": "operational",
+   "currentAvailabilityPct": 98.84,
+   "availability24hPct": 96.04,
+   "p50DurationMs": 7500,
+   "p95DurationMs": 60000,
+   "avgTtftMs1h": 7911,
+   "avgTps1h": 21.2,
+   "availability7dPct": 95.3,
+   "history": [
+    {
+     "start": "2026-09-09T08:00:00.000Z",
+     "availabilityPct": 95.5,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T10:00:00.000Z",
+     "availabilityPct": 91.22,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T12:00:00.000Z",
+     "availabilityPct": 97.08,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T14:00:00.000Z",
+     "availabilityPct": 92.88,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T16:00:00.000Z",
+     "availabilityPct": 88.91,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T18:00:00.000Z",
+     "availabilityPct": 96.02,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-09T20:00:00.000Z",
+     "availabilityPct": 90.84,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-09T22:00:00.000Z",
+     "availabilityPct": 98.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T00:00:00.000Z",
+     "availabilityPct": 97.31,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T02:00:00.000Z",
+     "availabilityPct": 92.94,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T04:00:00.000Z",
+     "availabilityPct": 96.92,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T06:00:00.000Z",
+     "availabilityPct": 90.33,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T08:00:00.000Z",
+     "availabilityPct": 94.9,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T10:00:00.000Z",
+     "availabilityPct": 94.8,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T12:00:00.000Z",
+     "availabilityPct": 90.37,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T14:00:00.000Z",
+     "availabilityPct": 98.27,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T16:00:00.000Z",
+     "availabilityPct": 93.71,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T18:00:00.000Z",
+     "availabilityPct": 98.87,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-10T20:00:00.000Z",
+     "availabilityPct": 93.89,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-10T22:00:00.000Z",
+     "availabilityPct": 79.02,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-11T00:00:00.000Z",
+     "availabilityPct": 98.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T02:00:00.000Z",
+     "availabilityPct": 95.28,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T04:00:00.000Z",
+     "availabilityPct": 98.19,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T06:00:00.000Z",
+     "availabilityPct": 95.44,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T08:00:00.000Z",
+     "availabilityPct": 92.7,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T10:00:00.000Z",
+     "availabilityPct": 98.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T12:00:00.000Z",
+     "availabilityPct": 95.34,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T14:00:00.000Z",
+     "availabilityPct": 96.36,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T16:00:00.000Z",
+     "availabilityPct": 97.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T18:00:00.000Z",
+     "availabilityPct": 89.62,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-11T20:00:00.000Z",
+     "availabilityPct": 98.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-11T22:00:00.000Z",
+     "availabilityPct": 94.36,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-12T00:00:00.000Z",
+     "availabilityPct": 98.05,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T02:00:00.000Z",
+     "availabilityPct": 96.61,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T04:00:00.000Z",
+     "availabilityPct": 97.35,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T06:00:00.000Z",
+     "availabilityPct": 99.78,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T08:00:00.000Z",
+     "availabilityPct": 95.28,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T10:00:00.000Z",
+     "availabilityPct": 98.3,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T12:00:00.000Z",
+     "availabilityPct": 99.2,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T14:00:00.000Z",
+     "availabilityPct": 96.22,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T16:00:00.000Z",
+     "availabilityPct": 99.27,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T18:00:00.000Z",
+     "availabilityPct": 98.5,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T20:00:00.000Z",
+     "availabilityPct": 100,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-12T22:00:00.000Z",
+     "availabilityPct": 99.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T00:00:00.000Z",
+     "availabilityPct": 97.24,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T02:00:00.000Z",
+     "availabilityPct": 98.8,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T04:00:00.000Z",
+     "availabilityPct": 95.4,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T06:00:00.000Z",
+     "availabilityPct": 97.75,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T08:00:00.000Z",
+     "availabilityPct": 98.32,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T10:00:00.000Z",
+     "availabilityPct": 94.81,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-13T12:00:00.000Z",
+     "availabilityPct": 98.82,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T14:00:00.000Z",
+     "availabilityPct": 96.25,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T16:00:00.000Z",
+     "availabilityPct": 96.13,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T18:00:00.000Z",
+     "availabilityPct": 98.8,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-13T20:00:00.000Z",
+     "availabilityPct": 92.5,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-13T22:00:00.000Z",
+     "availabilityPct": 97.59,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T00:00:00.000Z",
+     "availabilityPct": 97.76,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T02:00:00.000Z",
+     "availabilityPct": 99.74,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T04:00:00.000Z",
+     "availabilityPct": 98.06,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T06:00:00.000Z",
+     "availabilityPct": 97.28,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T08:00:00.000Z",
+     "availabilityPct": 95.09,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T10:00:00.000Z",
+     "availabilityPct": 98.13,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T12:00:00.000Z",
+     "availabilityPct": 99.48,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-14T14:00:00.000Z",
+     "availabilityPct": 90.33,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T16:00:00.000Z",
+     "availabilityPct": 92.03,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T18:00:00.000Z",
+     "availabilityPct": 79.97,
+     "state": "major_outage"
+    },
+    {
+     "start": "2026-09-14T20:00:00.000Z",
+     "availabilityPct": 88.24,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-14T22:00:00.000Z",
+     "availabilityPct": 93.19,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-15T00:00:00.000Z",
+     "availabilityPct": 98.11,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T02:00:00.000Z",
+     "availabilityPct": 96.15,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T04:00:00.000Z",
+     "availabilityPct": 99.05,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T06:00:00.000Z",
+     "availabilityPct": 97.07,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T08:00:00.000Z",
+     "availabilityPct": 98.41,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T10:00:00.000Z",
+     "availabilityPct": 97.16,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T12:00:00.000Z",
+     "availabilityPct": 93.87,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-15T14:00:00.000Z",
+     "availabilityPct": 96.79,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T16:00:00.000Z",
+     "availabilityPct": 93.21,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-15T18:00:00.000Z",
+     "availabilityPct": 98.19,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T20:00:00.000Z",
+     "availabilityPct": 97.18,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-15T22:00:00.000Z",
+     "availabilityPct": 97.11,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T00:00:00.000Z",
+     "availabilityPct": 94.95,
+     "state": "degraded"
+    },
+    {
+     "start": "2026-09-16T02:00:00.000Z",
+     "availabilityPct": 95.47,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T04:00:00.000Z",
+     "availabilityPct": 95.55,
+     "state": "operational"
+    },
+    {
+     "start": "2026-09-16T06:00:00.000Z",
+     "availabilityPct": 98.91,
+     "state": "operational"
+    }
+   ]
+  }
+ ]
+}

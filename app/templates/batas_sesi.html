@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Batas Editor Tercapai — EduAi</title>
+<link rel="icon" href="/static/logo-96.png">
+<style>
+:root{--hijau:#198E3B;--oranye:#F4A025;--teks:#272530;--teks-abu:#68666e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;background:#F7F9F8;color:var(--teks);
+     min-height:100vh;display:grid;place-items:center;padding:22px}
+.kotak{background:#fff;border:1.5px solid #E4E8E6;border-radius:18px;padding:34px 30px;
+       max-width:520px;width:100%;box-shadow:0 12px 34px rgba(0,0,0,.07)}
+.ikon{font-size:44px;margin-bottom:12px;text-align:center}
+h1{font-size:19px;font-weight:800;margin-bottom:10px;text-align:center}
+p{font-size:14px;color:var(--teks-abu);line-height:1.65;margin-bottom:10px}
+p.tengah{text-align:center}
+.berkas-baru{background:#FFF6E6;border:1.5px solid #FFD89B;border-radius:11px;
+             padding:13px 15px;font-size:13.5px;margin:16px 0}
+.berkas-baru b{color:#8A5A00}
+.sub{font-size:12.5px;color:#8B8992;margin:18px 0 9px;font-weight:700;
+     text-transform:uppercase;letter-spacing:.5px}
+.baris{display:flex;align-items:center;gap:11px;padding:12px 14px;margin-bottom:9px;
+       background:#F7F9F8;border:1.5px solid #E4E8E6;border-radius:11px}
+.baris .nm{flex:1;font-size:13.5px;word-break:break-all;font-weight:600}
+.baris .umur{font-size:11.5px;color:#8B8992;white-space:nowrap}
+.baris button{padding:8px 15px;border:0;border-radius:70px;background:var(--hijau);
+               color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;
+               font-family:inherit;white-space:nowrap}
+.baris button:hover{background:#14722F}
+.baris button:disabled{background:#C3CAC6;cursor:wait}
+.aksi{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+a.pil{display:inline-block;padding:12px 24px;border-radius:70px;text-decoration:none;
+      font-weight:700;font-size:14px;background:#F2F4F5;color:var(--teks)}
+a.pil:hover{background:#E7EAE8}
+a.pil.oranye{background:var(--oranye);color:#2E1B00}
+a.pil.oranye:hover{background:#FFB63D}
+.pesan{display:none;margin-top:14px;padding:12px 15px;border-radius:11px;
+       font-size:13px;line-height:1.5}
+.pesan.err{display:block;background:#FFEDED;border:1.5px solid #FFC9C9;color:#8A1C1C}
+.pesan.ok{display:block;background:#EAF7EE;border:1.5px solid #B6E3C4;color:#14722F}
+</style>
+<link rel="stylesheet" href="/static/ikon.css">
+</head>
+<body>
+<!-- IKON: sprite Lucide (ACC Bos 15Sep26) -->
+{{ ikon_sprite() }}
+
+<div class="kotak">
+  <div class="ikon">{{ ikon('lock', 30) }}</div>
+  <h1>Batas {{ batas }} dokumen bersamaan tercapai</h1>
+  <p class="tengah">
+    Anda saat ini membuka <b>{{ sesi|length }} dari {{ batas }}</b> dokumen di editor.
+  </p>
+
+  <div class="berkas-baru">
+    <b>Ingin membuka:</b><br>{{ berkas.nama }}
+  </div>
+
+  <p>
+    Supaya server tetap cepat, maksimal <b>{{ batas }} dokumen</b> boleh terbuka
+    bersamaan. Simpan dan tutup salah satu dokumen di bawah, lalu buka lagi
+    berkas yang tadi.
+  </p>
+
+  <div class="sub">Dokumen yang sedang terbuka</div>
+  {% for s in sesi %}
+  <div class="baris" id="baris-{{ s.file_id }}">
+    <span class="nm">{{ s.nama }}</span>
+    <span class="umur">{{ s.menit }} mnt lalu</span>
+    <button onclick="tutupSatu({{ s.file_id }}, this)">Simpan &amp; Tutup</button>
+  </div>
+  {% endfor %}
+
+  <div id="pesan" class="pesan"></div>
+
+  <div class="aksi">
+    <a class="pil" href="/naskah">&larr; Kembali ke Naskah Saya</a>
+    <a class="pil oranye" id="tombolSemua" href="#" onclick="tutupSemua(event)">
+      Simpan &amp; Tutup Semua
+    </a>
+  </div>
+</div>
+
+<script>
+function tampilPesan(teks, jenis) {
+  const p = document.getElementById('pesan');
+  p.className = 'pesan ' + jenis;
+  p.textContent = teks;
+}
+
+// Tutup SATU dokumen. Server akan forcesave dulu supaya edit tidak hilang.
+async function tutupSatu(fid, tombol) {
+  tombol.disabled = true;
+  tombol.textContent = 'Menyimpan...';
+  tampilPesan('Menyimpan dokumen ke server, mohon tunggu...', 'ok');
+  try {
+    const r = await fetch('/api/sesi/tutup', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({file_id: fid})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      const baris = document.getElementById('baris-' + fid);
+      if (baris) baris.remove();
+      tampilPesan('Dokumen tersimpan & ditutup. Anda bisa membuka dokumen lain sekarang.', 'ok');
+      setTimeout(() => location.reload(), 1200);
+    } else {
+      tampilPesan(d.pesan || 'Gagal menutup dokumen.', 'err');
+      tombol.disabled = false;
+      tombol.textContent = 'Simpan & Tutup';
+    }
+  } catch (e) {
+    tampilPesan('Gagal menghubungi server: ' + e, 'err');
+    tombol.disabled = false;
+    tombol.textContent = 'Simpan & Tutup';
+  }
+}
+
+// Tutup SEMUA dokumen sekaligus.
+async function tutupSemua(ev) {
+  ev.preventDefault();
+  const t = document.getElementById('tombolSemua');
+  t.textContent = 'Menyimpan...';
+  tampilPesan('Menyimpan semua dokumen, mohon tunggu...', 'ok');
+  try {
+    const r = await fetch('/api/sesi/tutup-semua', {method: 'POST'});
+    const d = await r.json();
+    if (d.ok) {
+      tampilPesan('Semua dokumen tersimpan & ditutup.', 'ok');
+      setTimeout(() => location.href = '/naskah', 1200);
+    } else {
+      tampilPesan('Sebagian gagal ditutup (' + d.gagal + '). Coba simpan manual di editor.', 'err');
+      t.textContent = 'Simpan & Tutup Semua';
+    }
+  } catch (e) {
+    tampilPesan('Gagal menghubungi server: ' + e, 'err');
+    t.textContent = 'Simpan & Tutup Semua';
+  }
+}
+</script>
+</body>
+</html>

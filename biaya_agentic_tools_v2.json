@@ -1,0 +1,176 @@
+{
+ "model": "cb/gpt-5.6-luna",
+ "putaran": [
+  {
+   "nama": "cek_kelengkapan",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8602,
+   "out": 100
+  },
+  {
+   "nama": "cek_alur_logika",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8599,
+   "out": 285
+  },
+  {
+   "nama": "cek_puebi",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8593,
+   "out": 603
+  },
+  {
+   "nama": "crossref_search_1",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "nilai_relevansi_1",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 344,
+   "out": 268
+  },
+  {
+   "nama": "crossref_search_2",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "nilai_relevansi_2",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 337,
+   "out": 280
+  },
+  {
+   "nama": "scrape_web",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "ekstrak_info_scrape",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 221,
+   "out": 116
+  },
+  {
+   "nama": "cek_sitasi_silang",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "interpretasi_sitasi",
+   "kategori": "tools_sitasi",
+   "gagal": false,
+   "in": 171,
+   "out": 517
+  },
+  {
+   "nama": "siapkan_file",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "rakit_coba_1",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "diagnosa_gagal_1",
+   "kategori": "tools_rakit",
+   "gagal": false,
+   "in": 59,
+   "out": 374
+  },
+  {
+   "nama": "rakit_coba_2",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "diagnosa_gagal_2",
+   "kategori": "tools_rakit",
+   "gagal": false,
+   "in": 85,
+   "out": 164
+  },
+  {
+   "nama": "rakit_coba_3",
+   "kategori": "TOOL_GRATIS",
+   "gagal": false,
+   "in": 0,
+   "out": 0
+  },
+  {
+   "nama": "diagnosa_gagal_3",
+   "kategori": "tools_rakit",
+   "gagal": false,
+   "in": 85,
+   "out": 113
+  },
+  {
+   "nama": "laporan_akhir",
+   "kategori": "laporan",
+   "gagal": false,
+   "in": 237,
+   "out": 475
+  }
+ ],
+ "per_kategori": {
+  "periksa": {
+   "n": 3,
+   "in": 25794,
+   "out": 988
+  },
+  "TOOL_GRATIS": {
+   "n": 8,
+   "in": 0,
+   "out": 0
+  },
+  "tools_web": {
+   "n": 3,
+   "in": 902,
+   "out": 664
+  },
+  "tools_sitasi": {
+   "n": 1,
+   "in": 171,
+   "out": 517
+  },
+  "tools_rakit": {
+   "n": 3,
+   "in": 229,
+   "out": 651
+  },
+  "laporan": {
+   "n": 1,
+   "in": 237,
+   "out": 475
+  }
+ },
+ "total_token": 30628,
+ "n_llm": 11,
+ "n_tool": 8,
+ "biaya_usd": 0.00010999999999938836,
+ "durasi_detik": 171.17361092497595,
+ "rakit_sukses": false
+}

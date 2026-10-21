@@ -1,0 +1,36 @@
+{# ═══════════════════════════════════════════════════════════════════════════
+   MENU BERSAMA (pita tab) — SATU berkas, dipakai semua halaman.
+   ═══════════════════════════════════════════════════════════════════════════
+   KENAPA ADA (putusan Bos 07 Okt, pilihan 8A — SOT_KONVERSI_JURNAL.md §N):
+     Sebelum ini pita tab DISALIN di tiap template. Menambah satu tab (mis.
+     "Artikel Jurnal") berarti menyunting banyak berkas — berisiko ada yang
+     kelewat (tab hilang di 1 halaman). Sekarang: SATU berkas, semua halaman
+     memanggil.
+
+   CARA PAKAI (di template):
+       {% include '_menu.html' %}
+     opsional, sebelum include:
+       {% set menu_aktif = 'artikel' %}    ← tab yang disorot
+       {% set menu_kelas = 'pita' %}       ← default 'pita-tab'
+
+   NILAI menu_aktif yang sah:
+       'naskah' · 'kolaborasi' · 'belajar' · 'referensi' · 'artikel'
+   Bila tidak di-set → tidak ada tab yang disorot (aman).
+
+   ⚠️ KELAS CSS (`menu_kelas`): halaman Beranda/Belajar memakai `.pita-tab`,
+   halaman Kolaborasi/Referensi memakai `.pita`. Keduanya didefinisikan
+   terpisah di masing-masing template — karena itu kelasnya dibuat PILIHAN
+   supaya tampilan LAMA tidak berubah (aturan: jangan ubah yang tak diminta).
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% set _akt = menu_aktif|default('') %}
+{% set _kel = menu_kelas|default('pita-tab') %}
+<div class="{{ _kel }}">
+  <a href="/naskah"{% if _akt == 'naskah' %} class="aktif"{% endif %}>{{ ikon('file-text', 15) }} Naskah Saya</a>
+  <a href="/kolaborasi"{% if _akt == 'kolaborasi' %} class="aktif"{% endif %}>{{ ikon('users', 15) }} Kolaborasi</a>
+  <a href="/belajar"{% if _akt == 'belajar' %} class="aktif"{% endif %}>{{ ikon('graduation-cap', 15) }} Belajar</a>
+  <a href="/referensi"{% if _akt == 'referensi' %} class="aktif"{% endif %}>{{ ikon('book-open', 15) }} Referensi</a>
+  <a href="/artikel"{% if _akt == 'artikel' %} class="aktif"{% endif %}>{{ ikon('clipboard-check', 15) }} Artikel Jurnal</a>
+  <a href="/plagiarisme"{% if _akt == 'plagiarisme' %} class="aktif"{% endif %}>{{ ikon('search-check', 15) }} Uji Plagiarisme</a>
+  <a href="/submit-jurnal"{% if _akt == 'submit-jurnal' %} class="aktif"{% endif %}>{{ ikon('send', 15) }} Submit Artikel Jurnal</a>
+  <a href="/buku"{% if _akt == 'buku' %} class="aktif"{% endif %}>{{ ikon('book-open', 15) }} Publish Buku</a>
+</div>

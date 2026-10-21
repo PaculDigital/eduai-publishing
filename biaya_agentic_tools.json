@@ -1,0 +1,192 @@
+{
+ "model": "cb/gpt-5.6-luna",
+ "putaran": [
+  {
+   "nama": "cek_kelengkapan",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8602,
+   "out": 85,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 51,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "cek_alur_logika",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8599,
+   "out": 207,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 80,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "cek_puebi",
+   "kategori": "periksa",
+   "gagal": false,
+   "in": 8593,
+   "out": 898,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 827,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "nilai_relevansi_1",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 386,
+   "out": 192,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 35,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "nilai_relevansi_2",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 378,
+   "out": 298,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 122,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "nilai_relevansi_3",
+   "kategori": "tools_web",
+   "gagal": false,
+   "in": 387,
+   "out": 177,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 57,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "interpretasi_sitasi",
+   "kategori": "tools_sitasi",
+   "gagal": false,
+   "in": 144,
+   "out": 323,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 55,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "diagnosa_gagal_rakit_1",
+   "kategori": "tools_rakit",
+   "gagal": false,
+   "in": 58,
+   "out": 231,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 33,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "diagnosa_gagal_rakit_2",
+   "kategori": "tools_rakit",
+   "gagal": false,
+   "in": 58,
+   "out": 219,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 32,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "diagnosa_gagal_rakit_3",
+   "kategori": "tools_rakit",
+   "gagal": false,
+   "in": 58,
+   "out": 265,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 33,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  {
+   "nama": "laporan_akhir",
+   "kategori": "laporan",
+   "gagal": false,
+   "in": 176,
+   "out": 464,
+   "detail": {
+    "accepted_prediction_tokens": 0,
+    "audio_tokens": 0,
+    "cached_tokens": 0,
+    "reasoning_tokens": 61,
+    "rejected_prediction_tokens": 0
+   }
+  }
+ ],
+ "per_kategori": {
+  "periksa": {
+   "n": 3,
+   "in": 25794,
+   "out": 1190
+  },
+  "tools_web": {
+   "n": 3,
+   "in": 1151,
+   "out": 667
+  },
+  "tools_sitasi": {
+   "n": 1,
+   "in": 144,
+   "out": 323
+  },
+  "tools_rakit": {
+   "n": 3,
+   "in": 174,
+   "out": 715
+  },
+  "laporan": {
+   "n": 1,
+   "in": 176,
+   "out": 464
+  }
+ },
+ "total_token": 30798,
+ "biaya_usd": 0.0001600000000010482,
+ "durasi_detik": 101.31271675298922,
+ "saldo_awal": 9.822905,
+ "saldo_akhir": 9.822745,
+ "biaya_tanpa_tools": 0.000238
+}

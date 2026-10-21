@@ -1,0 +1,51 @@
+{#  Halaman ramah untuk link yang tidak bisa dibuka (ACC Bos 23Sep26).
+    ═══════════════════════════════════════════════════════════════════════
+    ATURAN BOS: DILARANG kata 'PERINGATAN/GAGAL/HABIS/BAHAYA'.
+    WAJIB kasih JALAN KELUAR. Halaman ini bukan jalan buntu.
+    ═══════════════════════════════════════════════════════════════════════ #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Link Tidak Dapat Dibuka</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="stylesheet" href="/static/ikon.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--teks:#272530;--abu:#68666E;--garis:#E4E4E8;--oranye:#F4A025}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
+     background:#F4F5F7;min-height:100vh;display:flex;align-items:center;
+     justify-content:center;padding:26px}
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:14px;
+       padding:46px 42px;max-width:520px;width:100%;text-align:center;
+       box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.ikon{font-size:38px;margin-bottom:16px}
+h1{font-size:19.5px;font-weight:700;margin-bottom:14px;letter-spacing:-.3px}
+.isi{font-size:14px;line-height:1.85;color:#3A3844;margin-bottom:22px}
+.jalan{background:#E9F6EE;border-radius:10px;padding:16px 20px;font-size:13.5px;
+       color:#146B2C;line-height:1.8;text-align:left;margin-bottom:22px}
+.jalan b{display:block;margin-bottom:4px;color:#104F22}
+.kaki{font-size:11.5px;color:var(--abu);line-height:1.7}
+.logo{height:40px;margin-bottom:22px;opacity:.9}
+</style>
+</head>
+<body>
+{{ ikon_sprite() }}
+<div class="kartu">
+  <img class="logo" src="/static/logo-96.png" alt="">
+  <div class="ikon">{{ ikon('external-link', 22) }}</div>
+  <h1>{{ k.judul }}</h1>
+  <div class="isi">{{ k.isi }}</div>
+  <div class="jalan">
+    <b>Yang bisa dilakukan sekarang</b>
+    {{ k.jalan }}
+  </div>
+  <div class="kaki">
+    Catatan yang sudah Anda tulis tetap tersimpan dan tidak hilang.
+  </div>
+</div>
+</body>
+</html>

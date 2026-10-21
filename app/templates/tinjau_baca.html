@@ -1,0 +1,177 @@
+{#  NASKAH MODE BACA untuk PEMBIMBING (ACC Bos 03Okt26)
+    ═══════════════════════════════════════════════════════════════════════
+    ALAT SAMA (putusan D7/D8): editor & halaman ini memakai OnlyOffice yang
+    SAMA dengan mahasiswa. Yang berbeda HANYA haknya:
+        mahasiswa   → tulis hidup (mode_baca=False)
+        pembimbing  → tulis mati, KOMENTAR + SOROT hidup (mode_baca=True)
+    TIDAK ada HTML/catatan pihak ketiga sebagai ganti editor.
+
+    ⚠️ JANGAN pakai mode='view' — terukur 03Okt26 mematikan komentar juga.
+       Hak baca diatur di app/onlyoffice.py (parameter `mode_baca`).
+
+    WARNA: hanya 3 (kuning/hijau/biru) mengikuti halaman tinjau.
+    TIDAK ada nama alat/AI di layar. Tidak ada roda gigi/kuota.
+#}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naskah — {{ nama_berkas }}</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="stylesheet" href="/static/ikon.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;
+      --teks:#272530;--abu:#68666E;--garis:#E4E4E8}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
+     background:#F4F5F7;display:flex;flex-direction:column}
+.kepala{background:#fff;border-bottom:1px solid var(--garis);flex:0 0 auto}
+.kepala-isi{max-width:1500px;margin:0 auto;padding:11px 22px;display:flex;
+            align-items:center;justify-content:space-between;gap:14px;
+            flex-wrap:wrap}
+.kiri{display:flex;align-items:center;gap:11px;min-width:0}
+.kiri b{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;
+        text-overflow:ellipsis;max-width:52vw}
+.kiri small{font-size:12px;color:var(--abu);display:block}
+.pil{background:var(--hijau-muda);color:#146B2C;font-weight:600;
+     font-size:12.5px;padding:5px 12px;border-radius:70px;white-space:nowrap}
+.kanan{display:flex;align-items:center;gap:9px}
+.tombol-kembali{background:#fff;border:1.5px solid var(--garis);
+                border-radius:70px;padding:8px 17px;font-size:13px;
+                font-weight:600;color:var(--teks);font-family:inherit;
+                cursor:pointer}
+.tombol-kembali:hover{border-color:var(--hijau);color:var(--hijau-gelap)}
+.pesan{background:#FFF3B8;border-bottom:1px solid #E8C547;padding:9px 22px;
+       font-size:13px;color:#7A5B00}
+#tempat-editor{flex:1 1 auto;position:relative;min-height:0}
+#tempat-editor iframe{width:100%;height:100%;border:none;display:block}
+
+/*  ── LAYAR TUNGGU BERMEREK (ACC Bos 03Okt26, "Opsi 1 + foto") ──────────
+    TITIPAN di halaman KITA, bukan mengubah OnlyOffice. Alasan (TERUKUR):
+    `customization.loaderLogo`/`loaderName` memindahkan OO ke
+    `index_loader.html` yang HANYA ADA di folder `mobile/`, TIDAK di
+    `main/` (editor desktop) → berisiko editor gagal memuat. Jadi
+    tunggu-menunggu diperindah di sini. BEBAN: nol (CSS+img lokal).
+    ✨ Logo = aset yang SUDAH ADA (/static/ikon-burung-about.png, 57 KB,
+    ter-cache browser). TIDAK ada nama alat/AI di layar (aturan Bos).     */
+.sibuk{position:absolute;inset:0;z-index:5;display:flex;align-items:center;
+       justify-content:center;flex-direction:column;gap:14px;
+       background:radial-gradient(circle at 50% 38%,#FFFFFF 0%,#F4F5F7 62%);
+       font-size:14px;color:var(--abu);text-align:center;padding:24px;
+       transition:opacity .35s ease}
+.sibuk.larut{opacity:0;pointer-events:none}
+.sibuk img{width:86px;height:86px;object-fit:contain;
+           animation:denyut 2.2s ease-in-out infinite}
+@keyframes denyut{0%,100%{transform:scale(1);opacity:.92}
+                  50%{transform:scale(1.05);opacity:1}}
+.sibuk b{font-size:16px;font-weight:600;color:var(--teks);max-width:420px}
+.sibuk .tunggu-baris{font-size:13px;color:var(--abu);max-width:400px;
+                     line-height:1.55}
+.sibuk .tip{margin-top:2px;font-size:12px;color:#8A8892;max-width:420px;
+            line-height:1.5;background:#fff;border:1px solid var(--garis);
+            border-radius:12px;padding:9px 14px}
+.putar{width:26px;height:26px;border:3px solid var(--garis);
+       border-top-color:var(--hijau);border-radius:50%;
+       animation:putar 0.9s linear infinite}
+@keyframes putar{to{transform:rotate(360deg)}}
+@media(max-width:520px){.sibuk img{width:70px;height:70px}}
+</style>
+</head>
+<body>
+
+{{ ikon_sprite() }}
+<div class="kepala">
+  <div class="kepala-isi">
+    <div class="kiri">
+      <span class="pil">Mode baca</span>
+      <div>
+        <b>{{ nama_berkas }}</b>
+        <small>{{ nama_mhs or 'Naskah mahasiswa' }}</small>
+      </div>
+    </div>
+    <div class="kanan">
+      <button type="button" class="tombol-kembali"
+              onclick="window.location.href='/tinjau/{{ token }}'">
+        Kembali ke tinjauan
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="pesan">
+  Anda dapat menandai dan menambah komentar. Isi naskah tidak berubah dari sini.
+</div>
+
+<div id="tempat-editor"></div>
+
+{#  ── LAYAR TUNGGU BERMEREK (ACC Bos 03Okt26, "Opsi 1 + foto") ──────────
+    ⚠️ PENTING: kotak ini WAJIB DI LUAR #tempat-editor. OnlyOffice
+    MENGGANTI seluruh isi #tempat-editor saat editor dibuat — kalau kotak
+    ini di dalam, ia IKUT TERHAPUS dan tidak pernah terlihat (terukur
+    03Okt26: `sibuk_ada: false`, `editor_anak: 0`). Pola ini mengikuti
+    halaman mahasiswa (editor.html `.lapisan`) yang sudah terbukti.
+    Logo = aset yang SUDAH ADA. TIDAK ada nama alat/AI di layar. #}
+<div class="sibuk" id="sibuk">
+  <img src="/static/ikon-burung-about.png" alt="">
+  <b>Naskahmu sedang disiapkan</b>
+  <div class="tunggu-baris">Sebentar ya, halaman naskah sedang dibuka.</div>
+  <div class="putar"></div>
+  <div class="tip">Naskah besar bisa butuh sedikit waktu.
+    Halaman ini akan terbuka sendiri.</div>
+</div>
+
+<script src="{{ api_js }}"></script>
+<script>
+  window.CFG = {{ cfg | tojson }};
+</script>
+<script>
+(function () {
+  var sudah = false;
+  function siap() {
+    if (sudah) return; sudah = true;
+    var s = document.getElementById('sibuk');
+    if (!s) return;
+    //  Larut halus, baru dilepas (ACC Bos 03Okt26) — tidak "menghilang kasar".
+    s.classList.add('larut');
+    setTimeout(function () { s.style.display = 'none'; }, 400);
+  }
+  try {
+    //  ⚠️ Pemanggil WAJIB menunggu DocsAPI benar-benar ada. Kalau api.js
+    //  belum selesai dimuat, `new DocsAPI.DocEditor` melempar dan layar
+    //  putih tanpa penjelasan.
+    var coba = 0;
+    (function tunggu() {
+      if (window.DocsAPI && window.DocsAPI.DocEditor) {
+        //  🔴 AKAR DIPERBAIKI 03Okt26 — WAJIB beri tahu DocsAPI di mana
+        //  server aset kita berada. TANPA opsi ketiga ini, DocsAPI memakai
+        //  path RELATIF dari halaman (/tinjau/<token>/naskah-baca/1) →
+        //  minta /web-apps/... → 404 → **iframe TIDAK PERNAH DIBUAT**
+        //  (terukur: 80 detik menunggu, iframe=false).
+        //  Akar yang sama sudah terverifikasi di editor mahasiswa 13Sep26.
+        new DocsAPI.DocEditor('tempat-editor', window.CFG,
+                              { documentServerUrl: '/oo/aset' });
+        setTimeout(siap, 1200);
+        return;
+      }
+      if (++coba > 120) {
+        var s = document.getElementById('sibuk');
+        if (s) s.innerHTML = '<div>Naskah belum bisa dibuka sekarang. ' +
+          'Silakan muat ulang halaman ini.</div>';
+        return;
+      }
+      setTimeout(tunggu, 250);
+    })();
+  } catch (e) {
+    var s = document.getElementById('sibuk');
+    if (s) s.innerHTML = '<div>Naskah belum bisa dibuka sekarang. ' +
+      'Silakan muat ulang halaman ini.</div>';
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+/* ===== RITME WARNA EDUAI (Opsi A) =====
+   Hero        -> HIJAU pekat
+   Fitur       -> putih hangat + pola lingkaran samar
+   Cara Kerja  -> HIJAU SANGAT MUDA
+   Harga       -> putih
+   Keunggulan  -> HIJAU pekat (sudah ada)
+   Testimoni   -> HIJAU SANGAT MUDA
+   CTA         -> gradien hijau lembut
+   Footer      -> gelap
+
+   TIDAK ADA dua section putih besar berdampingan.
+*/
+
+:root{
+  --putih-hangat:#FBFCFD;
+  --hijau-lembut:#F1F9F4;
+  --hijau-lembut-2:#E7F5EC;
+}
+
+/* ---------- FITUR: putih hangat + pola lingkaran samar ---------- */
+#fitur{
+  background:var(--putih-hangat);
+  position:relative;
+  overflow:hidden;
+}
+#fitur::before{
+  content:'';position:absolute;width:620px;height:620px;border-radius:50%;
+  background:rgba(25,142,59,.045);top:-280px;right:-220px;pointer-events:none;
+}
+#fitur::after{
+  content:'';position:absolute;width:420px;height:420px;border-radius:50%;
+  background:rgba(244,160,37,.05);bottom:-220px;left:-160px;pointer-events:none;
+}
+#fitur .wadah{position:relative;z-index:1}
+
+/* ---------- CARA KERJA: hijau sangat muda ---------- */
+.cara{
+  background:var(--hijau-lembut);
+  position:relative;
+  overflow:hidden;
+}
+.cara::before{
+  content:'';position:absolute;width:520px;height:520px;border-radius:50%;
+  background:rgba(25,142,59,.06);bottom:-300px;right:-180px;pointer-events:none;
+}
+.cara .wadah{position:relative;z-index:1}
+.cara .langkah-nomor{background:#FFFFFF;box-shadow:0 3px 12px rgba(25,142,59,.14)}
+
+/* ---------- HARGA: putih bersih (kontras dgn atas & bawah) ---------- */
+#harga{background:#FFFFFF}
+
+/* ---------- TESTIMONI: hijau sangat muda ---------- */
+#testimoni{
+  background:var(--hijau-lembut);
+  position:relative;
+  overflow:hidden;
+}
+#testimoni::before{
+  content:'';position:absolute;width:560px;height:560px;border-radius:50%;
+  background:rgba(25,142,59,.055);top:-300px;left:-220px;pointer-events:none;
+}
+#testimoni .wadah{position:relative;z-index:1}
+#testimoni .testi{background:#FFFFFF;border-color:#DCEDE3}
+
+/* ---------- CTA: gradien hijau lembut ---------- */
+.cta{
+  background:linear-gradient(135deg,#EAF7EF 0%,#F6FBF8 55%,#FDF7EE 100%);
+  border:1px solid #D5EBDE;
+}
+
+/* ---------- kartu & paket: penyesuaian agar tidak "tenggelam" ---------- */
+#fitur .kartu{background:#FFFFFF;box-shadow:0 2px 10px rgba(39,37,48,.045)}
+.paket{background:#FFFFFF}

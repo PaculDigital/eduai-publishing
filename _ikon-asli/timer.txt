@@ -1,0 +1,1 @@
+line:|line:|circle:cx=12 cy=14 r=8

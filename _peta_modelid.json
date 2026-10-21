@@ -1,0 +1,821 @@
+{
+ "ag/Claude Opus 4.6": {
+  "id": "a79dcdc9-8666-488d-9a61-0ee18e3a7399",
+  "label": "Claude Opus 4.6",
+  "upstream": "claude-opus-4-6-thinking",
+  "aktif": 636,
+  "status": "available"
+ },
+ "ag/Claude Sonnet 4.6": {
+  "id": "c7b4a6c0-274c-42a6-a8cb-aeb4d48f285e",
+  "label": "Claude Sonnet 4.6",
+  "upstream": "claude-sonnet-4-6",
+  "aktif": 636,
+  "status": "available"
+ },
+ "ag/Gemini 3.6 Flash": {
+  "id": "b8553fe5-cfd8-4ead-9c81-98ceb50f4a2b",
+  "label": "Gemini 3.6 Flash",
+  "upstream": "gemini-3.6-flash-high",
+  "aktif": 636,
+  "status": "available"
+ },
+ "ag/Gemini 3.7 Flash": {
+  "id": "7bedf558-9893-4b74-a896-ff90fd5fb8e8",
+  "label": "Gemini 3.7 Flash",
+  "upstream": "gemini-3.7-flash-high",
+  "aktif": 636,
+  "status": "available"
+ },
+ "ag/Gemini 3.8 Flash": {
+  "id": "ac47f58c-b5ee-4e9c-a8e7-333e6659a1b4",
+  "label": "Gemini 3.8 Flash",
+  "upstream": "gemini-3.8-flash-high",
+  "aktif": 636,
+  "status": "available"
+ },
+ "ag/Gemini 3.1 Pro": {
+  "id": "f6d88a17-137d-4aeb-a4b3-ca211e3d761a",
+  "label": "Gemini 3.1 Pro",
+  "upstream": "gemini-pro-agent",
+  "aktif": 636,
+  "status": "available"
+ },
+ "cc/": {
+  "id": "e5bf4043-65dc-4f6d-ac09-1c4137422c2e",
+  "label": "",
+  "upstream": "claude-sonnet-5",
+  "aktif": 9,
+  "status": "available"
+ },
+ "cc/Claude Fable 5.1": {
+  "id": "70cfd249-9284-4fe6-a8a4-dd17b75a3f55",
+  "label": "Claude Fable 5.1",
+  "upstream": "claude-fable-5-1",
+  "aktif": 9,
+  "status": "available"
+ },
+ "cc/Claude Opus 4.6": {
+  "id": "98c879be-fb0a-44ae-bd2b-ff8b6005c9f4",
+  "label": "Claude Opus 4.6",
+  "upstream": "claude-opus-4-6",
+  "aktif": 9,
+  "status": "available"
+ },
+ "cc/Claude Opus 4.7": {
+  "id": "ccb57c43-af1a-438e-b2ce-c673c49a6827",
+  "label": "Claude Opus 4.7",
+  "upstream": "claude-opus-4-7",
+  "aktif": 9,
+  "status": "available"
+ },
+ "cc/Claude Opus 4.8": {
+  "id": "61e13de1-be53-4f13-8b0e-6930e7f3d890",
+  "label": "Claude Opus 4.8",
+  "upstream": "claude-opus-4-8",
+  "aktif": 9,
+  "status": "available"
+ },
+ "cc/Claude Opus 5": {
+  "id": "3fd44dc3-f0fd-44fa-9e80-888e4c61e087",
+  "label": "Claude Opus 5",
+  "upstream": "claude-opus-5",
+  "aktif": 9,
+  "status": "available"
+ },
+ "cc/Claude Sonnet 4.6": {
+  "id": "efb0438a-50fd-4367-a210-9f1d18ae78e1",
+  "label": "Claude Sonnet 4.6",
+  "upstream": "claude-sonnet-4-6",
+  "aktif": 9,
+  "status": "available"
+ },
+ "cp/DeepSeek V4 Flash": {
+  "id": "4b21b917-151c-42f9-9c68-44142a2e7285",
+  "label": "DeepSeek V4 Flash",
+  "upstream": "cline-pass/deepseek-v4-flash",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/DeepSeek V4 Pro": {
+  "id": "0a0aad33-ec34-48b0-a7e1-08c01c4237f5",
+  "label": "DeepSeek V4 Pro",
+  "upstream": "cline-pass/deepseek-v4-pro",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/GLM 5.2": {
+  "id": "99bc0459-bb39-4c7a-bdab-d044e8c56068",
+  "label": "GLM 5.2",
+  "upstream": "cline-pass/glm-5.2",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/GLM 5.3": {
+  "id": "fbfc33df-a6bd-4840-b3e6-6bc49cdc4318",
+  "label": "GLM 5.3",
+  "upstream": "cline-pass/glm-5.3",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/Kimi K2.6": {
+  "id": "f6ee36d9-acdf-492e-9fc0-985a8c820677",
+  "label": "Kimi K2.6",
+  "upstream": "cline-pass/kimi-k2.6",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/Kimi K2.7 Code": {
+  "id": "b6b27609-4cbe-4073-89fa-67ccb5e35fd2",
+  "label": "Kimi K2.7 Code",
+  "upstream": "cline-pass/kimi-k2.7-code",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/Kimi K3": {
+  "id": "dccdb335-c1c1-4f08-b4b9-9412540554c3",
+  "label": "Kimi K3",
+  "upstream": "cline-pass/kimi-k3",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/MiMo V2.5": {
+  "id": "cead2d8e-9129-4dd9-a7ce-94fc319bcd7e",
+  "label": "MiMo V2.5",
+  "upstream": "cline-pass/mimo-v2.5",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/MiMo V2.5 Pro": {
+  "id": "62d2cc95-2290-494d-9536-f3d10c3b9eeb",
+  "label": "MiMo V2.5 Pro",
+  "upstream": "cline-pass/mimo-v2.5-pro",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/MiniMax M3": {
+  "id": "cc30ba56-5ffa-4af2-87a3-ca632f3fd888",
+  "label": "MiniMax M3",
+  "upstream": "cline-pass/minimax-m3",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/Qwen3.7 Max": {
+  "id": "18e7d23e-77ca-4904-9187-33cab266daa3",
+  "label": "Qwen3.7 Max",
+  "upstream": "cline-pass/qwen3.7-max",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/Qwen3.7 Plus": {
+  "id": "101d0b0b-a640-4d19-9883-38b0bce86233",
+  "label": "Qwen3.7 Plus",
+  "upstream": "cline-pass/qwen3.7-plus",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/Qwen3.8 Max": {
+  "id": "391514ce-1485-40f0-8074-39ac9e98efeb",
+  "label": "Qwen3.8 Max",
+  "upstream": "cline-pass/qwen3.8-max",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/Grok 4.5": {
+  "id": "225006c6-19bf-4abf-8d30-b188c24c3999",
+  "label": "Grok 4.5",
+  "upstream": "xai/grok-4.5",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/Grok 4.6": {
+  "id": "4c20f8d3-b01f-436e-a228-88584653c797",
+  "label": "Grok 4.6",
+  "upstream": "xai/grok-4.6",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cp/GLM 5.3 Flash": {
+  "id": "d8678211-b872-486b-99bd-1865286e4990",
+  "label": "GLM 5.3 Flash",
+  "upstream": "zai/glm-5.3-flash",
+  "aktif": 40,
+  "status": "available"
+ },
+ "cb/Claude Opus 4.6": {
+  "id": "cf829cf0-0ed4-4481-89cf-d6a1569ef2f2",
+  "label": "Claude Opus 4.6",
+  "upstream": "claude-opus-4.6",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/Claude Opus 4.7 (1M)": {
+  "id": "2b28c4ed-005b-41e4-8127-e945c558c2fe",
+  "label": "Claude Opus 4.7 (1M)",
+  "upstream": "claude-opus-4.7-1m",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/Claude Opus 5": {
+  "id": "f3191e00-7c4a-4f94-bae9-3db23606f48b",
+  "label": "Claude Opus 5",
+  "upstream": "claude-opus-5",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/DeepSeek V4.1 Flash": {
+  "id": "03c70ea8-f964-4b71-8737-b44e88d8a3d5",
+  "label": "DeepSeek V4.1 Flash",
+  "upstream": "deepseek-v4.1-flash",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/Gemini 2.5 Flash Image": {
+  "id": "7db908e9-7e90-476a-bd36-5b180788be07",
+  "label": "Gemini 2.5 Flash Image",
+  "upstream": "gemini-2.5-flash-image",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/Gemini 3.0 Pro Image": {
+  "id": "e5c4fa54-3dfe-4919-91d0-3213e75fead7",
+  "label": "Gemini 3.0 Pro Image",
+  "upstream": "gemini-3.0-pro-image",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/Gemini 3.1 Flash Image": {
+  "id": "27aa1e04-374a-436d-b5f8-ccb32de168b0",
+  "label": "Gemini 3.1 Flash Image",
+  "upstream": "gemini-3.1-flash-image",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/Gemini 3.1 Pro": {
+  "id": "5fc5de52-181d-4a83-b330-196c597fea68",
+  "label": "Gemini 3.1 Pro",
+  "upstream": "gemini-3.1-pro",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GLM 5.2": {
+  "id": "e6cc4e61-848b-43db-a94f-927948ba211f",
+  "label": "GLM 5.2",
+  "upstream": "glm-5.2",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GLM 5.3": {
+  "id": "d1651300-6b5b-4e4c-9623-f23f3729def1",
+  "label": "GLM 5.3",
+  "upstream": "glm-5.3",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GPT 5.3 Codex": {
+  "id": "d5d597b6-b2a7-4d9c-bb12-b8558d249222",
+  "label": "GPT 5.3 Codex",
+  "upstream": "gpt-5.3-codex",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GPT 5.4": {
+  "id": "8dede576-7aeb-4fe5-bb9d-a7b56b30209c",
+  "label": "GPT 5.4",
+  "upstream": "gpt-5.4",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GPT 5.5": {
+  "id": "c543dca3-16b3-456b-af8d-deb92a0cc94b",
+  "label": "GPT 5.5",
+  "upstream": "gpt-5.5",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GPT 5.6 Luna": {
+  "id": "305b22b3-6189-4e56-9cf2-98ecbfbb9729",
+  "label": "GPT 5.6 Luna",
+  "upstream": "gpt-5.6-luna",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GPT 5.6 Sol": {
+  "id": "458b5f20-8ffb-4c25-bf4e-77512765a757",
+  "label": "GPT 5.6 Sol",
+  "upstream": "gpt-5.6-sol",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GPT 5.6 Terra": {
+  "id": "10b2ad63-3f60-4ac3-b377-03b790ebaf9d",
+  "label": "GPT 5.6 Terra",
+  "upstream": "gpt-5.6-terra",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GPT 6 Astra": {
+  "id": "d05ab1b6-e437-462a-87ce-e11417010378",
+  "label": "GPT 6 Astra",
+  "upstream": "gpt-6-astra",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/GPT Image 2": {
+  "id": "84d7e8d5-bda0-4cf3-a83a-2c017d10ead2",
+  "label": "GPT Image 2",
+  "upstream": "gpt-image-2",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/Kimi K3": {
+  "id": "49bcab06-5915-4698-8051-df1dfa089493",
+  "label": "Kimi K3",
+  "upstream": "kimi-k3",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cb/MiniMax M3": {
+  "id": "81e71c44-14dd-455f-b4e9-4dea02c62136",
+  "label": "MiniMax M3",
+  "upstream": "minimax-m3",
+  "aktif": 1023,
+  "status": "available"
+ },
+ "cbcn/DeepSeek V4 Flash": {
+  "id": "a0724bba-3985-4269-8ba8-15ae470ce3e5",
+  "label": "DeepSeek V4 Flash",
+  "upstream": "deepseek-v4-flash",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/DeepSeek V4 Pro": {
+  "id": "b5a72ecd-5ecc-4265-a096-abe541b7ec60",
+  "label": "DeepSeek V4 Pro",
+  "upstream": "deepseek-v4-pro",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/DeepSeek V4.1 Flash": {
+  "id": "5169de6c-e24e-4a9c-ba7c-885c7ad83e02",
+  "label": "DeepSeek V4.1 Flash",
+  "upstream": "deepseek-v4.1-flash",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/GLM 5.2": {
+  "id": "33a9feef-3427-49e8-a64b-68c44d0b7db9",
+  "label": "GLM 5.2",
+  "upstream": "glm-5.2",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/GLM 5.3": {
+  "id": "9f723dc1-f914-468e-9071-bd7bd27f60ac",
+  "label": "GLM 5.3",
+  "upstream": "glm-5.3",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/GLM 5.3 Flash": {
+  "id": "d765518d-aac5-466d-949f-a2fed0c025e9",
+  "label": "GLM 5.3 Flash",
+  "upstream": "glm-5.3-flash",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/Kimi K2.6": {
+  "id": "20d3b89e-fd0a-4f08-8c86-b39fb217bc1c",
+  "label": "Kimi K2.6",
+  "upstream": "kimi-k2.6",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/Kimi K2.7 Code": {
+  "id": "0c3ec056-0f24-4e30-8826-0de40690f216",
+  "label": "Kimi K2.7 Code",
+  "upstream": "kimi-k2.7",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/Kimi K3": {
+  "id": "5e9966e4-6f5b-4a84-9cd1-f643fdee5472",
+  "label": "Kimi K3",
+  "upstream": "kimi-k3",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/MiniMax M2.7": {
+  "id": "d5318e2a-6643-46bd-88d6-9563b6f3d26b",
+  "label": "MiniMax M2.7",
+  "upstream": "minimax-m2.7",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cbcn/MiniMax M3": {
+  "id": "f38d8d52-32c3-454f-8d57-106224da5865",
+  "label": "MiniMax M3",
+  "upstream": "minimax-m3",
+  "aktif": 6736,
+  "status": "available"
+ },
+ "cmc/MiniMax M2.5": {
+  "id": "a2883875-caf7-42aa-a556-ce202c96bb08",
+  "label": "MiniMax M2.5",
+  "upstream": "MiniMaxAI/MiniMax-M2.5",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/MiniMax M2.7": {
+  "id": "10691642-c9d4-43e2-9a90-e23dda0732d3",
+  "label": "MiniMax M2.7",
+  "upstream": "MiniMaxAI/MiniMax-M2.7",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Qwen 3.6 Max Preview": {
+  "id": "37083944-1011-4c98-b03e-622af1ca369b",
+  "label": "Qwen 3.6 Max Preview",
+  "upstream": "Qwen/Qwen3.6-Max-Preview",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/DeepSeek V4 Flash": {
+  "id": "4fa0a56e-55a7-41ae-9846-90c2f5b68f93",
+  "label": "DeepSeek V4 Flash",
+  "upstream": "deepseek/deepseek-v4-flash",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/DeepSeek V4 Pro": {
+  "id": "b6905739-897b-4d5e-8ed7-c9154240e0d2",
+  "label": "DeepSeek V4 Pro",
+  "upstream": "deepseek/deepseek-v4-pro",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Muse Spark 1.2": {
+  "id": "bdb704de-2fbb-432d-a856-5ebf11096e08",
+  "label": "Muse Spark 1.2",
+  "upstream": "meta/muse-spark-1.2",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Muse Spark 1.2 Contributor": {
+  "id": "cff25790-5fff-48e3-a782-74bde669f39c",
+  "label": "Muse Spark 1.2 Contributor",
+  "upstream": "meta/muse-spark-1.2-contributor",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Muse Spark 1.3": {
+  "id": "ae8dd603-4059-4048-b657-ea37b447a58e",
+  "label": "Muse Spark 1.3",
+  "upstream": "meta/muse-spark-1.3",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Muse Spark 1.3 Contributor": {
+  "id": "7f98e3fc-6f03-4c56-be28-9a11810f27ae",
+  "label": "Muse Spark 1.3 Contributor",
+  "upstream": "meta/muse-spark-1.3-contributor",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Kimi K2.6": {
+  "id": "e068c8f7-0992-4dc4-9457-37d422360912",
+  "label": "Kimi K2.6",
+  "upstream": "moonshotai/Kimi-K2.6",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Kimi K2.7 Code": {
+  "id": "84b48251-db8a-41f5-a060-215a312fa97b",
+  "label": "Kimi K2.7 Code",
+  "upstream": "moonshotai/Kimi-K2.7-Code",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Kimi K3": {
+  "id": "ff88c91c-8425-495d-b9ed-24193cb30754",
+  "label": "Kimi K3",
+  "upstream": "moonshotai/Kimi-K3",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Grok 4.5": {
+  "id": "b6ec3125-56dc-46f9-a93f-4d4eff849e6f",
+  "label": "Grok 4.5",
+  "upstream": "xai/grok-4.5",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/Grok 4.6": {
+  "id": "2da4d9a0-fcc5-458c-bf4e-07c8472c5d44",
+  "label": "Grok 4.6",
+  "upstream": "xai/grok-4.6",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/GLM 5.3 Flash": {
+  "id": "d38f6c5f-813e-45d6-a625-e6c976d91ed2",
+  "label": "GLM 5.3 Flash",
+  "upstream": "z-ai/glm-5.3-flash",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/GLM 5.1": {
+  "id": "44a9665a-2d86-4685-9f35-0f00431e6532",
+  "label": "GLM 5.1",
+  "upstream": "zai-org/GLM-5.1",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cmc/": {
+  "id": "b4905e06-aca8-4bb1-898b-47b14052d8ed",
+  "label": "",
+  "upstream": "zai-org/GLM-5.2",
+  "aktif": 19,
+  "status": "available"
+ },
+ "cx/GPT 5.5": {
+  "id": "23d25c92-4350-44f7-811f-4326b8c0d8d4",
+  "label": "GPT 5.5",
+  "upstream": "gpt-5.5",
+  "aktif": 52,
+  "status": "available"
+ },
+ "cx/GPT 5.6 Luna": {
+  "id": "d07c9157-17e4-4221-ab5d-b1d49b2c666c",
+  "label": "GPT 5.6 Luna",
+  "upstream": "gpt-5.6-luna",
+  "aktif": 52,
+  "status": "available"
+ },
+ "cx/GPT 5.6 Sol": {
+  "id": "deb60b62-f6d3-44ea-aa5a-9ea9e5c302e2",
+  "label": "GPT 5.6 Sol",
+  "upstream": "gpt-5.6-sol",
+  "aktif": 52,
+  "status": "available"
+ },
+ "cx/Terra": {
+  "id": "a95294f3-85c8-4ca9-8c5a-e2ae923c1183",
+  "label": "Terra",
+  "upstream": "gpt-5.6-terra",
+  "aktif": 52,
+  "status": "available"
+ },
+ "cx/GPT 6 Astra": {
+  "id": "e8d556be-f933-4b3d-b9ef-1fe07619d442",
+  "label": "GPT 6 Astra",
+  "upstream": "gpt-6-astra",
+  "aktif": 52,
+  "status": "available"
+ },
+ "ocg/DeepSeek V4 Flash": {
+  "id": "664443d6-2add-46c7-ad3b-ea72d66d996d",
+  "label": "DeepSeek V4 Flash",
+  "upstream": "deepseek-v4-flash",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/GLM-5.1": {
+  "id": "b1a028c3-a870-480c-bd84-332d29f406b9",
+  "label": "GLM-5.1",
+  "upstream": "glm-5.1",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/GLM 5.2": {
+  "id": "72a4790e-fa3c-4a67-a1b4-755f70a1884f",
+  "label": "GLM 5.2",
+  "upstream": "glm-5.2",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/GLM 5.3": {
+  "id": "c30f4bb8-8fd6-45e6-97d9-3e499a8ea8af",
+  "label": "GLM 5.3",
+  "upstream": "glm-5.3",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/GLM 5.3 Flash": {
+  "id": "c22176f8-64df-4745-ad1e-f20be7edb233",
+  "label": "GLM 5.3 Flash",
+  "upstream": "glm-5.3-flash",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/GPT 5.6 Luna": {
+  "id": "0dd107bd-f8e6-444c-9004-7536f9bd79dc",
+  "label": "GPT 5.6 Luna",
+  "upstream": "gpt-5.6-luna",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/Grok 4.5": {
+  "id": "01c59d2c-878e-4c99-888f-4c11332ab5cc",
+  "label": "Grok 4.5",
+  "upstream": "grok-4.5",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/Kimi K2.6": {
+  "id": "c6c81776-35ff-4711-8f66-2f212bdc07f1",
+  "label": "Kimi K2.6",
+  "upstream": "kimi-k2.6",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/Kimi K2.7 Code": {
+  "id": "1a0dd230-b771-4403-8a71-9021aa074013",
+  "label": "Kimi K2.7 Code",
+  "upstream": "kimi-k2.7-code",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/Kimi K3": {
+  "id": "883690cc-822f-460b-a584-16591b6526ea",
+  "label": "Kimi K3",
+  "upstream": "kimi-k3",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/MiMo V2.5": {
+  "id": "ad2ef62f-b271-4128-91d9-341218be25b3",
+  "label": "MiMo V2.5",
+  "upstream": "mimo-v2.5",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/MiMo V2.5 Pro": {
+  "id": "4b90cbfa-6f9a-43a0-a546-32ebc34afde8",
+  "label": "MiMo V2.5 Pro",
+  "upstream": "mimo-v2.5-pro",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/MiniMax M2.5": {
+  "id": "19818448-2531-4bd1-9d35-43800fa55b7e",
+  "label": "MiniMax M2.5",
+  "upstream": "minimax-m2.5",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/MiniMax M2.7": {
+  "id": "0aae9d33-2ee0-479d-b3cb-d674efa226fe",
+  "label": "MiniMax M2.7",
+  "upstream": "minimax-m2.7",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/MiniMax M3": {
+  "id": "c075ecb1-08c3-4318-972a-fd527cda8b2f",
+  "label": "MiniMax M3",
+  "upstream": "minimax-m3",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/Qwen3.7 Plus": {
+  "id": "48ae5791-6df2-4d4a-83e3-88166e8bceef",
+  "label": "Qwen3.7 Plus",
+  "upstream": "qwen3.7-plus",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ocg/Qwen3.8 Max": {
+  "id": "6929c471-38d5-4258-8757-775d630599de",
+  "label": "Qwen3.8 Max",
+  "upstream": "qwen3.8-max",
+  "aktif": 8,
+  "status": "available"
+ },
+ "ali/DeepSeek V4 Flash 0731": {
+  "id": "b8f44095-dd95-4026-81b4-1cf6859e6d1d",
+  "label": "DeepSeek V4 Flash 0731",
+  "upstream": "deepseek-v4-flash-0731",
+  "aktif": 19114,
+  "status": "available"
+ },
+ "ali/DeepSeek V4 Pro 0813": {
+  "id": "725aa7ec-4995-4bb6-9b64-97f8dcfce805",
+  "label": "DeepSeek V4 Pro 0813",
+  "upstream": "deepseek-v4-pro-0813",
+  "aktif": 19114,
+  "status": "available"
+ },
+ "ali/DeepSeek V4.1 Flash": {
+  "id": "3959e8fb-ab97-47b4-86fe-dd8779c0da28",
+  "label": "DeepSeek V4.1 Flash",
+  "upstream": "deepseek-v4.1-flash",
+  "aktif": 19114,
+  "status": "available"
+ },
+ "ali/GLM 5.2": {
+  "id": "802730d4-0f0e-4f22-aa1c-8edb75d44186",
+  "label": "GLM 5.2",
+  "upstream": "glm-5.2",
+  "aktif": 19114,
+  "status": "available"
+ },
+ "ali/GLM 5.3": {
+  "id": "99023784-0dde-4f5a-8aaa-4d9e31428e2f",
+  "label": "GLM 5.3",
+  "upstream": "glm-5.3",
+  "aktif": 19114,
+  "status": "available"
+ },
+ "ali/Kimi K2.7 Code": {
+  "id": "86ab6e20-88e7-47ee-b62f-78a0df05f835",
+  "label": "Kimi K2.7 Code",
+  "upstream": "kimi-k2.7-code",
+  "aktif": 19114,
+  "status": "available"
+ },
+ "ali/Kimi K3": {
+  "id": "822895c9-cd6e-4a16-b1c6-75f1a13f2312",
+  "label": "Kimi K3",
+  "upstream": "kimi-k3",
+  "aktif": 19114,
+  "status": "available"
+ },
+ "ali/Qwen 3.8 Max": {
+  "id": "ccd66097-0cfb-42f4-b450-5f15aacb15e4",
+  "label": "Qwen 3.8 Max",
+  "upstream": "qwen3.8-max",
+  "aktif": 19114,
+  "status": "available"
+ },
+ "mimo/MiMo V2.5": {
+  "id": "877687f7-423d-4fbb-9511-5fbeed9a0266",
+  "label": "MiMo V2.5",
+  "upstream": "mimo-v2.5",
+  "aktif": 1,
+  "status": "available"
+ },
+ "mimo/MiMo V2.5 Pro": {
+  "id": "9f88d6f1-a3fa-4cf2-8891-f7e8d57a2689",
+  "label": "MiMo V2.5 Pro",
+  "upstream": "mimo-v2.5-pro",
+  "aktif": 1,
+  "status": "available"
+ },
+ "zai/GLM-4.6V (vision)": {
+  "id": "ef2eb58e-b419-4a1c-b2c8-53738258dfcb",
+  "label": "GLM-4.6V (vision)",
+  "upstream": "glm-4.6v",
+  "aktif": 26,
+  "status": "available"
+ },
+ "zai/GLM-4.7": {
+  "id": "0c05850c-c4ce-4150-a70f-75770ee2148c",
+  "label": "GLM-4.7",
+  "upstream": "glm-4.7",
+  "aktif": 26,
+  "status": "available"
+ },
+ "zai/GLM-5": {
+  "id": "c72efc68-96dd-4f49-b9d0-452c9ce2546b",
+  "label": "GLM-5",
+  "upstream": "glm-5",
+  "aktif": 26,
+  "status": "available"
+ },
+ "zai/GLM-5 Turbo (fast)": {
+  "id": "507bd64d-7f7b-439a-bf54-06faa8ec8fc7",
+  "label": "GLM-5 Turbo (fast)",
+  "upstream": "glm-5-turbo",
+  "aktif": 26,
+  "status": "available"
+ },
+ "zai/GLM-5.1 (flagship)": {
+  "id": "e9fb1b48-7078-4ef9-a582-91b925aaf26c",
+  "label": "GLM-5.1 (flagship)",
+  "upstream": "glm-5.1",
+  "aktif": 26,
+  "status": "available"
+ },
+ "zai/": {
+  "id": "8ee47d01-0b02-44d3-b9f9-d8b89be2951b",
+  "label": "",
+  "upstream": "glm-5.2",
+  "aktif": 26,
+  "status": "available"
+ },
+ "zai/GLM 5.3": {
+  "id": "8bbd87be-ef92-40cf-936c-59f600d57188",
+  "label": "GLM 5.3",
+  "upstream": "glm-5.3",
+  "aktif": 26,
+  "status": "available"
+ },
+ "zai/GLM 5.3 Flash": {
+  "id": "e47fb22f-b053-4082-b204-878ae8091069",
+  "label": "GLM 5.3 Flash",
+  "upstream": "glm-5.3-flash",
+  "aktif": 26,
+  "status": "available"
+ }
+}

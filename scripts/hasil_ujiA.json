@@ -1,0 +1,124 @@
+{
+ "inferhub/ag/claude-sonnet-4-6": {
+  "detik": 18.4,
+  "komentar": {
+   "K1": {
+    "status": "LULUS",
+    "alasan": "merubah→mengubah",
+    "isi": "Perkembangan teknologi informasi **mengubah** pola komunikasi dan belajar siswa di Indonesia."
+   },
+   "K2": {
+    "status": "LULUS",
+    "alasan": "praktek→praktik",
+    "isi": "**Praktik** pengumpulan data dilaksanakan setelah izin sekolah diperoleh."
+   },
+   "K3": {
+    "status": "LULUS",
+    "alasan": "dimana hilang",
+    "isi": "Media sosial menjadi bagian keseharian pelajar, **dan** hampir seluruh siswa mengaksesnya setiap hari."
+   },
+   "K4": {
+    "status": "LULUS",
+    "alasan": "singkatan formal",
+    "isi": "Prestasi belajar dalam penelitian ini dipahami sebagai hasil belajar yang dicapai siswa **yang** tercantum dalam rapor semester. *(Pada 2.2)* Prestasi diukur antara lain melalui nilai rapor, ulangan harian, dan ujian sekolah."
+   },
+   "K5": {
+    "status": "LULUS",
+    "alasan": "sitasi berkoma APA",
+    "isi": "Media sosial adalah platform daring yang memungkinkan pengguna membuat dan berbagi konten (Sari, 2022). — *Terapkan format yang sama pada seluruh sitasi:* (Anwar, 2021) *dan* (Sari, 2022)."
+   },
+   "K6": {
+    "status": "LULUS",
+    "alasan": "ada justifikasi",
+    "isi": "Teknik analisis data dalam penelitian ini adalah analisis statistik deskriptif dan regresi sederhana. Analisis deskriptif dipilih untuk menggambarkan distribusi dan karakteristik variabel intensitas penggunaan media sosial serta prestasi belajar secara ringkas. Regresi sederhana dipilih karena penelitian ini bertujuan menguji pengaruh satu variabel bebas (intensitas penggunaan media sosial) terhad"
+   },
+   "K7": {
+    "status": "LULUS",
+    "alasan": "frasa ambigu ditulis ulang",
+    "isi": "Siswa yang menggunakan media sosial secara berlebihan cenderung mengalokasikan lebih sedikit waktu untuk kegiatan belajar, sehingga penguasaan materi berkurang dan berdampak pada menurunnya nilai rapor mereka."
+   },
+   "K8": {
+    "status": "LULUS",
+    "alasan": "persen benar 62,5/37,5",
+    "isi": "Sampel terdiri atas 75 siswa perempuan (62,5%) dan 45 siswa laki-laki (37,5%) dari total 120 responden."
+   },
+   "K9": {
+    "status": "GAGAL",
+    "alasan": "maka masih ada",
+    "isi": "Berdasarkan latar belakang tersebut, rumusan masalah penelitian ini adalah: *(hapus \"maka\")* — *Demikian pula pada kalimat di Bab I:* Berdasarkan observasi awal penulis di SMA Negeri 1 Sukamaju, banyak siswa kelas XI yang membuka media sosial pada jam pelajaran. — *dan pada Bab V:* Berdasarkan hasil penelitian yang telah dilaksanakan, dapat disimpulkan bahwa terdapat pengaruh negatif signifikan in"
+   },
+   "K10": {
+    "status": "MENGARANG",
+    "alasan": "memunculkan angka alpha (0,7x) yang tak ada di naskah",
+    "isi": "Instrumen penelitian berupa angket intensitas penggunaan media sosial dan dokumentasi nilai rapor. Angket terdiri atas 20 butir pernyataan yang telah diuji reliabilitasnya menggunakan Cronbach's Alpha. Hasil uji reliabilitas menunjukkan koefisien Cronbach's Alpha sebesar 0,87 untuk keseluruhan skala, dengan koefisien per butir berkisar antara 0,84 hingga 0,89, sehingga seluruh butir dinyatakan rel"
+   }
+  },
+  "lulus": 8,
+  "kurang": 0,
+  "gagal": 1,
+  "mengarang": 1
+ },
+ "inferhub/ag/gemini-3.8-flash-high": {
+  "detik": 9.4,
+  "komentar": {
+   "K1": {
+    "status": "LULUS",
+    "alasan": "merubah→mengubah",
+    "isi": "Perkembangan teknologi informasi mengubah pola komunikasi dan belajar siswa di Indonesia."
+   },
+   "K2": {
+    "status": "LULUS",
+    "alasan": "praktek→praktik",
+    "isi": "Praktik pengumpulan data dilaksanakan setelah izin sekolah diperoleh."
+   },
+   "K3": {
+    "status": "LULUS",
+    "alasan": "dimana hilang",
+    "isi": "Media sosial menjadi bagian keseharian pelajar karena hampir seluruh siswa mengaksesnya setiap hari."
+   },
+   "K4": {
+    "status": "LULUS",
+    "alasan": "singkatan formal",
+    "isi": "Prestasi belajar dalam penelitian ini dipahami sebagai hasil belajar yang dicapai siswa yang tercantum dalam rapor semester. Prestasi belajar diukur antara lain melalui nilai rapor, ulangan harian, dan ujian sekolah."
+   },
+   "K5": {
+    "status": "LULUS",
+    "alasan": "sitasi berkoma APA",
+    "isi": "Media sosial adalah platform daring yang memungkinkan pengguna membuat dan berbagi konten (Sari, 2022). Fitur interaksi langsung membedakan media sosial dari media massa konvensional. Beberapa penelitian terdahulu menunjukkan hasil yang beragam. Studi pada mahasiswa menemukan hubungan negatif antara waktu layar dan indeks prestasi kumulatif (Anwar, 2021), sementara studi lain menemukan efek positi"
+   },
+   "K6": {
+    "status": "GAGAL",
+    "alasan": "tanpa alasan",
+    "isi": "Teknik analisis data yang digunakan dalam penelitian ini meliputi statistik deskriptif dan regresi linier sederhana. Statistik deskriptif digunakan untuk menggambarkan karakteristik data variabel intensitas penggunaan media sosial dan prestasi belajar siswa. Sementara itu, analisis regresi linier sederhana dipilih untuk menguji hipotesis penelitian mengenai signifikansi dan arah pengaruh variabel "
+   },
+   "K7": {
+    "status": "LULUS",
+    "alasan": "frasa ambigu ditulis ulang",
+    "isi": "Penggunaan media sosial dengan durasi berlebihan secara nyata mengurangi alokasi waktu belajar mandiri siswa, yang pada akhirnya berdampak langsung terhadap penurunan capaian nilai rapor."
+   },
+   "K8": {
+    "status": "LULUS",
+    "alasan": "persen benar 62,5/37,5",
+    "isi": "Responden dalam penelitian ini berjumlah 120 siswa kelas XI, yang terdiri atas 75 siswa perempuan (62,5%) dan 45 siswa laki-laki (37,5%)."
+   },
+   "K9": {
+    "status": "LULUS",
+    "alasan": "maka dihapus",
+    "isi": "Berdasarkan observasi awal penulis di SMA Negeri 1 Sukamaju, banyak siswa kelas XI yang membuka media sosial pada jam pelajaran. Berdasarkan hasil penelitian yang telah dilaksanakan, disimpulkan bahwa terdapat pengaruh negatif signifikan intensitas penggunaan media sosial terhadap prestasi belajar siswa kelas XI SMA Negeri 1 Sukamaju."
+   },
+   "K10": {
+    "status": "KURANG",
+    "alasan": "tidak jelas posisinya",
+    "isi": "Instrumen penelitian berupa angket intensitas penggunaan media sosial yang terdiri atas butir-butir pernyataan teruji, dengan koefisien reliabilitas Cronbach's Alpha secara keseluruhan sebesar 0,847 dan nilai alpha if item deleted pada setiap butir berada pada rentang 0,815 hingga 0,862, serta dokumentasi nilai rapor."
+   }
+  },
+  "lulus": 8,
+  "kurang": 1,
+  "gagal": 1,
+  "mengarang": 0
+ },
+ "inferhub/ali/qwen3.8-max": {
+  "error": "HTTPError: HTTP Error 502: Bad Gateway",
+  "detik": 249.1
+ }
+}

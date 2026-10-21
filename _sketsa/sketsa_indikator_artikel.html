@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SKETSA — Indikator Artikel (Scopus + Scite)</title>
+<style>
+  :root{--hijau:#166534;--hijau-muda:#dcfce7;--kuning:#a16207;--kuning-muda:#fef3c7;
+        --merah:#b91c1c;--merah-muda:#fee2e2;--abu:#6b7280;--abu-muda:#f3f4f6;
+        --garis:#e5e7eb;--teks:#111827}
+  *{box-sizing:border-box}
+  body{margin:0;padding:18px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+       background:#f9fafb;color:var(--teks);font-size:14px;line-height:1.5}
+  h1{font-size:17px;margin:0 0 4px}
+  .sub{color:var(--abu);font-size:12px;margin-bottom:18px}
+  .pilihan{background:#fff;border:1px solid var(--garis);border-radius:12px;padding:14px;margin-bottom:20px}
+  .label{display:inline-block;background:var(--teks);color:#fff;font-size:11px;font-weight:700;
+         padding:3px 9px;border-radius:20px;margin-bottom:10px}
+  .label.b{background:#7c3aed}.label.c{background:#0891b2}
+  .jd{font-weight:700;font-size:14px;margin-bottom:3px}
+  .mt{color:var(--abu);font-size:12px;margin-bottom:8px}
+  .baris{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .mini{font-size:11px;border:1px solid var(--garis);background:#fff;border-radius:6px;
+        padding:3px 8px;color:var(--abu)}
+  .mutu{font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px}
+  .mutu-kuat{background:var(--hijau-muda);color:var(--hijau)}
+  .mutu-sedang{background:var(--kuning-muda);color:var(--kuning)}
+  .angka{font-size:11px;color:var(--abu)}
+  .sitasi{font-size:11px;background:var(--abu-muda);border-radius:6px;padding:3px 8px;color:#374151}
+  .dukung{font-size:11px;font-weight:600;background:var(--hijau-muda);color:var(--hijau);
+          border-radius:6px;padding:3px 8px}
+  .bantah{font-size:11px;font-weight:600;background:var(--merah-muda);color:var(--merah);
+          border-radius:6px;padding:3px 8px}
+  /* PITA (pilihan B) */
+  .pita-atas{display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+             padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid var(--garis)}
+  /* KOTAK (pilihan C) */
+  .kotak-indikator{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;padding:8px 10px;
+                   background:#f9fafb;border:1px dashed var(--garis);border-radius:8px}
+  .sel{display:flex;flex-direction:column;gap:2px}
+  .sel b{font-size:12px;font-weight:700}
+  .sel i{font-size:10px;color:var(--abu);font-style:normal}
+  .catatan{margin-top:14px;padding:10px 12px;background:#eff6ff;border-left:3px solid #2563eb;
+           border-radius:6px;font-size:12px;color:#1e40af}
+  .tidak{border:1px solid var(--garis);border-radius:12px;padding:14px;background:#fff;
+         margin-bottom:20px;opacity:.85}
+  .kosong{font-size:11px;color:var(--abu);font-style:italic}
+</style>
+</head>
+<body>
+<h1>📐 Sketsa — Indikator Artikel di Hasil Pencarian</h1>
+<div class="sub">Angka di bawah = DATA NYATA (uji 12 Okt 2026), bukan contoh karangan.</div>
+
+<!-- A -->
+<div class="pilihan">
+  <span class="label">PILIHAN A — Satu baris (paling ringkas)</span>
+  <div class="jd">Effects of mindfulness on athletic performance</div>
+  <div class="mt">Smith, J. (2019). British Journal of Sports Medicine.</div>
+  <div class="baris">
+    <span class="mutu mutu-kuat">Jurnal Kuat</span>
+    <span class="angka">SJR 4.847 · CiteScore 22.1</span>
+    <span class="sitasi">📊 dikutip 3.208×</span>
+    <span class="dukung">🟢 98 didukung</span>
+    <span class="bantah">🔴 10 dibantah</span>
+    <span class="mini">Scopus</span>
+    <span class="mini">unduh</span>
+  </div>
+</div>
+
+<!-- B -->
+<div class="pilihan">
+  <span class="label b">PILIHAN B — Pita indikator di atas judul</span>
+  <div class="pita-atas">
+    <span class="mutu mutu-kuat">Jurnal Kuat</span>
+    <span class="jumlah">📊 3.208 sitasi</span>
+    <span class="dukung">🟢 98</span>
+    <span class="bantah">🔴 10</span>
+  </div>
+  <div class="jd">Effects of mindfulness on athletic performance</div>
+  <div class="mt">Smith, J. (2019). British Journal of Sports Medicine.</div>
+  <div class="baris">
+    <span class="mini">Scopus</span>
+    <span class="mini">unduh</span>
+  </div>
+</div>
+
+<!-- C -->
+<div class="pilihan">
+  <span class="label c">PILIHAN C — Kotak "Kenapa layak dipakai?"</span>
+  <div class="jd">Effects of mindfulness on athletic performance</div>
+  <div class="mt">Smith, J. (2019). British Journal of Sports Medicine.</div>
+  <div class="baris">
+    <span class="mutu mutu-kuat">Jurnal Kuat</span>
+    <span class="mini">Scopus</span>
+    <span class="mini">unduh</span>
+  </div>
+  <div class="kotak-indikator">
+    <div class="sel"><i>Mutu jurnal</i><b>Kuat</b></div>
+    <div class="sel"><i>SJR · CiteScore</i><b>4.847 · 22.1</b></div>
+    <div class="sel"><i>Dikutip</i><b>3.208×</b></div>
+    <div class="sel"><i>Didukung</i><b>98</b></div>
+    <div class="sel"><i>Dibantah</i><b>10</b></div>
+  </div>
+</div>
+
+<!-- TANPA DATA -->
+<div class="tidak">
+  <span class="label" style="background:#9ca3af">CONTOH — kalau data tidak ada</span>
+  <div class="jd">Pengaruh Motivasi terhadap Hasil Belajar Siswa</div>
+  <div class="mt">Sutrisno (2022). Jurnal Pendidikan Indonesia.</div>
+  <div class="baris">
+    <span class="mutu mutu-sedang">Jurnal Sedang</span>
+    <span class="angka">SJR 0.52 · CiteScore 1.1</span>
+    <span class="mini">Garuda</span>
+    <span class="mini">unduh</span>
+  </div>
+  <div class="kosong">(Scite tidak punya data → tidak ditampilkan apa-apa. Bukan "0", bukan error.)</div>
+</div>
+
+<div class="catatan">
+  <b>Cara kerjanya:</b> tiap indikator muncul <b>hanya kalau datanya ada</b>.
+  Kalau jurnal tidak terdaftar Scopus → kota mutu blok abu ("belum terdaftar") dan indikatornya DISEMBUNYIKAN.
+  Tujuan: memudahkan user memilih artikel yang layak dipakai, tanpa menambah kebingungan.
+</div>
+
+</body>
+</html>

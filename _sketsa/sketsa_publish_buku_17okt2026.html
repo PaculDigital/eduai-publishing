@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sketsa Publish Buku — EduAi</title>
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA;--merah:#C0392B;
+      --biru:#2B7FD4;--kuning:#8A6100}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#EDF1EF;padding:26px 16px 70px}
+.bungkus{max-width:1120px;margin:0 auto}
+.judul-utama{text-align:center;margin-bottom:6px;font-size:23px;font-weight:800;color:var(--hijau-gelap)}
+.sub-utama{text-align:center;color:var(--teks-abu);font-size:13.5px;margin-bottom:30px}
+
+.label-pil{display:flex;align-items:center;gap:11px;margin:34px 0 13px}
+.label-pil .huruf{width:34px;height:34px;border-radius:50%;background:var(--hijau);color:#fff;
+  font-weight:800;font-size:16px;display:grid;place-items:center;flex:none}
+.label-pil .nama{font-size:16px;font-weight:800;color:var(--hijau-gelap)}
+.label-pil .ket{font-size:12.5px;color:var(--teks-abu);font-weight:500}
+
+.panggung{background:#FAFCFB;border:1px solid var(--garis);border-radius:16px;padding:24px 22px;
+  box-shadow:0 2px 12px rgba(16,79,34,.05)}
+
+.pita-tab{display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--garis);flex-wrap:wrap}
+.pita-tab a{padding:9px 15px;border-radius:10px 10px 0 0;font-size:12.5px;font-weight:600;
+  color:var(--teks-abu);background:transparent}
+.pita-tab a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);border-bottom:2px solid var(--hijau);margin-bottom:-2px}
+
+h1.hal{font-size:21px;font-weight:800;margin-bottom:5px}
+p.sub{font-size:13px;color:var(--teks-abu);margin-bottom:20px;line-height:1.6}
+
+.grid-a{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:16px}
+.kartu-a{background:#fff;border:1.5px solid var(--garis);border-radius:16px;padding:0;overflow:hidden;
+  transition:.16s;cursor:pointer;display:flex;flex-direction:column}
+.kartu-a:hover{border-color:var(--hijau);box-shadow:0 6px 20px rgba(25,142,59,.13);transform:translateY(-2px)}
+.kepala-a{background:linear-gradient(135deg,#104F22,#198E3B);padding:17px 18px;display:flex;align-items:center;gap:12px}
+.ikon-a{width:42px;height:42px;border-radius:11px;background:rgba(255,255,255,.16);display:grid;place-items:center;flex:none}
+.ikon-a svg{width:21px;height:21px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nama-a{color:#fff;font-size:15px;font-weight:700;line-height:1.25}
+.nama-a small{display:block;font-size:10.5px;font-weight:500;opacity:.82;margin-top:2px;letter-spacing:.3px}
+.isi-a{padding:15px 18px 17px;flex:1;display:flex;flex-direction:column}
+.tanya-a{font-size:12.5px;color:var(--hijau-gelap);font-weight:600;background:var(--hijau-muda);
+  border-radius:8px;padding:9px 11px;margin-bottom:11px;line-height:1.5}
+.daftar-a{list-style:none;font-size:12px;color:var(--teks-abu);line-height:1.75;margin-bottom:13px;flex:1}
+.daftar-a li::before{content:"✓";color:var(--hijau);font-weight:800;margin-right:6px}
+.kaki-a{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:11px;
+  border-top:1px solid #F0F4F2}
+.lencana{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px}
+.l-hijau{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.l-kuning{background:#FDF3DD;color:var(--kuning)}
+.l-biru{background:#E4EEFB;color:#1B5FA8}
+.tombol-a{font-size:12px;font-weight:700;color:#fff;background:var(--hijau);border:none;
+  padding:7px 15px;border-radius:8px}
+
+.daftar-b{display:flex;flex-direction:column;gap:11px}
+.baris-b{background:#fff;border:1.5px solid var(--garis);border-radius:13px;padding:15px 17px;
+  display:flex;align-items:center;gap:15px;cursor:pointer;transition:.16s}
+.baris-b:hover{border-color:var(--hijau);background:#FDFEFD}
+.nomor-b{width:46px;height:46px;border-radius:12px;background:var(--hijau-muda);color:var(--hijau-gelap);
+  font-size:19px;font-weight:800;display:grid;place-items:center;flex:none}
+.teks-b{flex:1;min-width:0}
+.teks-b b{display:block;font-size:14.5px;margin-bottom:2px}
+.teks-b .tanya{font-size:12px;color:var(--teks-abu);line-height:1.5}
+.teks-b .tanya em{color:var(--hijau-gelap);font-style:normal;font-weight:600}
+.panah-b{color:#B9C4C0;flex:none}
+.panah-b svg{width:19px;height:19px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+.langkah-c{display:flex;align-items:center;gap:9px;margin-bottom:18px;flex-wrap:wrap}
+.langkah-c .ln{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;
+  color:var(--teks-abu)}
+.langkah-c .ln .bulat{width:23px;height:23px;border-radius:50%;background:#E4E9E7;color:#8B9A95;
+  display:grid;place-items:center;font-size:11px}
+.langkah-c .ln.aktif{color:var(--hijau-gelap)}
+.langkah-c .ln.aktif .bulat{background:var(--hijau);color:#fff}
+.langkah-c .garis-c{width:24px;height:2px;background:#E4E9E7;flex:none}
+
+.grid-c{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.kartu-c{background:#fff;border:1.5px solid var(--garis);border-radius:13px;padding:16px 13px;
+  text-align:center;cursor:pointer;transition:.16s}
+.kartu-c:hover{border-color:var(--hijau);box-shadow:0 4px 14px rgba(25,142,59,.11)}
+.kartu-c .ik-c{width:38px;height:38px;margin:0 auto 9px;border-radius:10px;background:var(--hijau-muda);
+  display:grid;place-items:center}
+.kartu-c .ik-c svg{width:19px;height:19px;stroke:var(--hijau-gelap);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.kartu-c b{display:block;font-size:12.5px;line-height:1.3;margin-bottom:4px}
+.kartu-c span{font-size:10.5px;color:var(--teks-abu);line-height:1.45;display:block}
+.kartu-c.baru{border-style:dashed;border-color:var(--oranye);background:#FFFCF7}
+.kartu-c.baru .ik-c{background:#FDF3DD}
+.kartu-c.baru .ik-c svg{stroke:var(--kuning)}
+.tanda-baru{display:inline-block;font-size:9px;font-weight:800;background:var(--oranye);color:#fff;
+  padding:2px 7px;border-radius:20px;margin-bottom:6px;letter-spacing:.4px}
+
+.catatan{margin-top:36px;background:#fff;border-left:4px solid var(--oranye);border-radius:0 12px 12px 0;
+  padding:17px 20px;font-size:12.5px;line-height:1.75;color:var(--teks-abu)}
+.catatan b{color:var(--teks)}
+.catatan code{background:#F7FAF8;border:1px solid var(--garis);padding:1px 5px;border-radius:4px;
+  font-size:11.5px;color:var(--hijau-gelap)}
+</style>
+</head>
+<body>
+<div class="bungkus">
+
+<h1 class="judul-utama">Sketsa Fitur “Publish Buku” — EduAi</h1>
+<p class="sub-utama">3 pilihan tampilan · 5 kartu · Bos pilih satu huruf</p>
+
+<div class="label-pil">
+  <div class="huruf">A</div>
+  <div>
+    <div class="nama">Kartu Bergambar</div>
+    <div class="ket">Kartu besar 2 kolom — judul, pertanyaan pemandu, isi, dan tombol</div>
+  </div>
+</div>
+<div class="panggung">
+  <div class="pita-tab">
+    <a>Naskah Saya</a><a>Kolaborasi</a><a>Belajar</a><a>Referensi</a>
+    <a>Artikel Jurnal</a><a>Uji Plagiarisme</a><a>Submit Artikel Jurnal</a>
+    <a class="aktif">Publish Buku</a>
+  </div>
+  <h1 class="hal">Publish Buku</h1>
+  <p class="sub">Pilih jenis buku yang mau kamu terbitkan. Tiap jenis punya susunan sendiri — jangan sampai salah pilih.</p>
+
+  <div class="grid-a">
+
+    <div class="kartu-a">
+      <div class="kepala-a">
+        <div class="ikon-a"><svg><use href="#i-cap"/></svg></div>
+        <div class="nama-a">Buku Ajar<small>BERBASIS RPS · OBE</small></div>
+      </div>
+      <div class="isi-a">
+        <div class="tanya-a">Punya RPS mata kuliah? Jadi buku ajar lengkap.</div>
+        <ul class="daftar-a">
+          <li>Tujuan pembelajaran (TIU/TIK)</li>
+          <li>Latihan + checklist tiap bab</li>
+          <li>Siap cetak A5</li>
+        </ul>
+        <div class="kaki-a"><span class="lencana l-hijau">Perlu RPS</span><button class="tombol-a">Mulai</button></div>
+      </div>
+    </div>
+
+    <div class="kartu-a">
+      <div class="kepala-a">
+        <div class="ikon-a"><svg><use href="#i-book"/></svg></div>
+        <div class="nama-a">Buku Umum<small>NON-FIKSI · NARATIF</small></div>
+      </div>
+      <div class="isi-a">
+        <div class="tanya-a">Mau tulis buku yang enak dibaca siapa saja?</div>
+        <ul class="daftar-a">
+          <li>Hukum, ekonomi, bisnis, psikologi</li>
+          <li>Tone naratif, tidak kaku</li>
+          <li>Hook kuat di tiap bab</li>
+        </ul>
+        <div class="kaki-a"><span class="lencana l-biru">Tema bebas</span><button class="tombol-a">Mulai</button></div>
+      </div>
+    </div>
+
+    <div class="kartu-a">
+      <div class="kepala-a">
+        <div class="ikon-a"><svg><use href="#i-clip"/></svg></div>
+        <div class="nama-a">Buku Monograf<small>HASIL PENELITIAN</small></div>
+      </div>
+      <div class="isi-a">
+        <div class="tanya-a">Punya skripsi/tesis yang mau jadi buku?</div>
+        <ul class="daftar-a">
+          <li>Analisis novelty 5 lapis</li>
+          <li>Debat pro-kontra akademik</li>
+          <li>A5 · 150–180 halaman</li>
+        </ul>
+        <div class="kaki-a"><span class="lencana l-kuning">Perlu naskah</span><button class="tombol-a">Mulai</button></div>
+      </div>
+    </div>
+
+    <div class="kartu-a">
+      <div class="kepala-a">
+        <div class="ikon-a"><svg><use href="#i-file"/></svg></div>
+        <div class="nama-a">Book Chapter<small>SATU BAB · ANTOLOGI</small></div>
+      </div>
+      <div class="isi-a">
+        <div class="tanya-a">Ikut buku kolaborasi? Cukup satu bab.</div>
+        <ul class="daftar-a">
+          <li>1 bab utuh siap terbit</li>
+          <li>8 referensi terverifikasi</li>
+          <li>Diagram otomatis</li>
+        </ul>
+        <div class="kaki-a"><span class="lencana l-biru">Perlu judul bab</span><button class="tombol-a">Mulai</button></div>
+      </div>
+    </div>
+
+    <div class="kartu-a">
+      <div class="kepala-a">
+        <div class="ikon-a"><svg><use href="#i-list"/></svg></div>
+        <div class="nama-a">Buku Referensi<small>KUMPULAN TEORI</small></div>
+      </div>
+      <div class="isi-a">
+        <div class="tanya-a">Butuh buku rujukan teori &amp; konsep?</div>
+        <ul class="daftar-a">
+          <li>Teori + definisi dari sumber nyata</li>
+          <li>Sitasi padat (≥15 per bab)</li>
+          <li>Tema bebas atau bahan sendiri</li>
+        </ul>
+        <div class="kaki-a"><span class="lencana l-kuning">Segera</span><button class="tombol-a">Mulai</button></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="label-pil">
+  <div class="huruf">B</div>
+  <div>
+    <div class="nama">Daftar Ringkas</div>
+    <div class="ket">Baris bernomor, hemat ruang — semua terlihat tanpa geser jauh</div>
+  </div>
+</div>
+<div class="panggung">
+  <h1 class="hal">Publish Buku</h1>
+  <p class="sub">Pilih jenis buku yang mau kamu terbitkan.</p>
+  <div class="daftar-b">
+    <div class="baris-b"><div class="nomor-b">1</div><div class="teks-b"><b>Buku Ajar</b>
+      <div class="tanya"><em>Punya RPS mata kuliah?</em> Jadi buku ajar dengan tujuan pembelajaran &amp; latihan.</div></div>
+      <div class="panah-b"><svg><use href="#i-next"/></svg></div></div>
+    <div class="baris-b"><div class="nomor-b">2</div><div class="teks-b"><b>Buku Umum</b>
+      <div class="tanya"><em>Mau tulis buku yang enak dibaca?</em> Non-fiksi naratif — hukum, ekonomi, bisnis, psikologi.</div></div>
+      <div class="panah-b"><svg><use href="#i-next"/></svg></div></div>
+    <div class="baris-b"><div class="nomor-b">3</div><div class="teks-b"><b>Buku Monograf</b>
+      <div class="tanya"><em>Skripsi/tesis jadi buku?</em> Ada analisis novelty + debat pro-kontra akademik.</div></div>
+      <div class="panah-b"><svg><use href="#i-next"/></svg></div></div>
+    <div class="baris-b"><div class="nomor-b">4</div><div class="teks-b"><b>Book Chapter</b>
+      <div class="tanya"><em>Ikut antologi?</em> Cukup satu bab utuh untuk buku kolaborasi.</div></div>
+      <div class="panah-b"><svg><use href="#i-next"/></svg></div></div>
+    <div class="baris-b"><div class="nomor-b">5</div><div class="teks-b"><b>Buku Referensi</b>
+      <div class="tanya"><em>Butuh buku rujukan teori?</em> Kumpulan teori &amp; konsep dengan sitasi padat.</div></div>
+      <div class="panah-b"><svg><use href="#i-next"/></svg></div></div>
+  </div>
+</div>
+
+<div class="label-pil">
+  <div class="huruf">C</div>
+  <div>
+    <div class="nama">Bertahap</div>
+    <div class="ket">Pilih dulu bahannya, baru jenis bukunya — paling anti-bingung</div>
+  </div>
+</div>
+<div class="panggung">
+  <h1 class="hal">Publish Buku</h1>
+  <p class="sub">Mau mulai dari mana?</p>
+
+  <div class="langkah-c">
+    <div class="ln aktif"><span class="bulat">1</span> Pilih bahan</div>
+    <div class="garis-c"></div>
+    <div class="ln"><span class="bulat">2</span> Pilih jenis buku</div>
+    <div class="garis-c"></div>
+    <div class="ln"><span class="bulat">3</span> Susun &amp; terbitkan</div>
+  </div>
+
+  <div class="grid-c">
+    <div class="kartu-c"><div class="ik-c"><svg><use href="#i-cap"/></svg></div>
+      <b>Punya RPS</b><span>Buku Ajar</span></div>
+    <div class="kartu-c"><div class="ik-c"><svg><use href="#i-file"/></svg></div>
+      <b>Punya skripsi/tesis</b><span>Buku Monograf</span></div>
+    <div class="kartu-c"><div class="ik-c"><svg><use href="#i-clip"/></svg></div>
+      <b>Punya 1 bab</b><span>Book Chapter</span></div>
+    <div class="kartu-c"><div class="ik-c"><svg><use href="#i-book"/></svg></div>
+      <b>Punya tema</b><span>Buku Umum</span></div>
+    <div class="kartu-c baru"><span class="tanda-baru">BARU</span>
+      <div class="ik-c"><svg><use href="#i-list"/></svg></div>
+      <b>Butuh teori</b><span>Buku Referensi</span></div>
+  </div>
+</div>
+
+<div class="catatan">
+  <b>Catatan Wulan untuk Bos:</b><br>
+  • Pilihan <b>A</b> — paling jelas, cocok user baru. Tiap kartu menyebut <i>kapan dipakai</i>.<br>
+  • Pilihan <b>B</b> — paling ringkas, 5 kartu muat satu layar HP tanpa geser jauh.<br>
+  • Pilihan <b>C</b> — paling anti-bingung: user pilih <b>bahannya dulu</b> (“saya punya RPS / skripsi / tema”), bukan memilih nama buku yang mungkin tak dikenal.<br>
+  • Ikon di sketsa ini <b>hanya contoh</b>. Yang dipakai nanti diambil dari <code>lucide.svg</code> (68 ikon, sudah diperiksa ada semua).<br>
+  • <b>Buku Referensi</b> diberi tanda <b>Segera</b> karena skill-nya belum ada — bisa dinyalakan belakangan tanpa ubah tampilan.
+</div>
+
+</div>
+
+<svg style="display:none">
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v6h6"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+</svg>
+</body>
+</html>

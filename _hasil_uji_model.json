@@ -1,0 +1,122 @@
+[
+ {
+  "model": "ag/gemini-3.8-flash-high",
+  "supply": 633,
+  "harga": 0.0008,
+  "catatan": "gemini - tercepat kemarin",
+  "ok": 2,
+  "detik": 4.9377760530042,
+  "panjang": 275,
+  "mirip": 0.9945553539019963,
+  "tok_in": 82,
+  "tok_out": 909
+ },
+ {
+  "model": "ag/gemini-3.7-flash-high",
+  "supply": 633,
+  "harga": 0.0008,
+  "catatan": "gemini - termurah",
+  "ok": 2,
+  "detik": 3.395659624999098,
+  "panjang": 277,
+  "mirip": 0.9873873873873874,
+  "tok_in": 82,
+  "tok_out": 834
+ },
+ {
+  "model": "cb/gemini-3.1-pro",
+  "supply": 861,
+  "harga": 0.096,
+  "catatan": "gemini - supply terbanyak",
+  "ok": 2,
+  "detik": 8.828489084000466,
+  "panjang": 281,
+  "mirip": 1.0,
+  "tok_in": 71,
+  "tok_out": 687
+ },
+ {
+  "model": "ag/gemini-3.6-flash-high",
+  "supply": 633,
+  "harga": 0.0037,
+  "catatan": "gemini - lama",
+  "ok": 2,
+  "detik": 10.309126652999112,
+  "panjang": 275,
+  "mirip": 0.9963636363636363,
+  "tok_in": 82,
+  "tok_out": 1043
+ },
+ {
+  "model": "ali/deepseek-v4.1-flash",
+  "supply": 18949,
+  "harga": 0.0043,
+  "catatan": "deepseek - SUPPLY TERBANYAK",
+  "ok": 2,
+  "detik": 4.347838697001862,
+  "panjang": 274,
+  "mirip": 0.97632058287796,
+  "tok_in": 134,
+  "tok_out": 1553
+ },
+ {
+  "model": "ali/deepseek-v4-flash-0731",
+  "supply": 18949,
+  "harga": 0.0064,
+  "catatan": "deepseek - supply 18949",
+  "ok": 2,
+  "detik": 12.2084113814999,
+  "panjang": 277,
+  "mirip": 0.9873873873873874,
+  "tok_in": 187,
+  "tok_out": 727
+ },
+ {
+  "model": "cbcn/deepseek-v4.1-flash",
+  "supply": 6714,
+  "harga": 0.0051,
+  "catatan": "deepseek - median termurah",
+  "ok": 2,
+  "detik": 12.16434532150015,
+  "panjang": 276,
+  "mirip": 1.0,
+  "tok_in": 125,
+  "tok_out": 1551
+ },
+ {
+  "model": "cb/deepseek-v4.1-flash",
+  "supply": 861,
+  "harga": 0.0029,
+  "catatan": "deepseek - min termurah",
+  "ok": 2,
+  "detik": 6.59780638200391,
+  "panjang": 275,
+  "mirip": 0.96,
+  "tok_in": 125,
+  "tok_out": 2067
+ },
+ {
+  "model": "ali/kimi-k2.7-code",
+  "supply": 18949,
+  "harga": 0.0009,
+  "catatan": "kimi - supply 18949",
+  "ok": 2,
+  "detik": 14.1623947784974,
+  "panjang": 281,
+  "mirip": 1.0,
+  "tok_in": 124,
+  "tok_out": 674
+ },
+ {
+  "model": "zai/glm-4.7",
+  "supply": 26,
+  "harga": 0.0006,
+  "catatan": "termurah absolut (supply kecil)",
+  "ok": 0,
+  "detik": 0,
+  "panjang": 0,
+  "mirip": 0.0,
+  "tok_in": 0,
+  "tok_out": 0
+ }
+]

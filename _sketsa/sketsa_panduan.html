@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>SKETSA — Unggah Panduan Penulisan (3 DESAIN)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--oranye:#F4A025;--abu:#5B6B7C;--bg:#F4F8F5;--teks:#1B2A33}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',system-ui,sans-serif;background:var(--bg);color:var(--teks);padding:26px}
+h1{font-size:19px;margin-bottom:4px}
+.sub{font-size:13px;color:var(--abu);margin-bottom:22px}
+.desain{background:#fff;border:1.5px solid #DCE7E0;border-radius:14px;padding:18px 20px;margin-bottom:26px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.judul-d{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.badge{background:var(--hijau);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.06em}
+.badge.b2{background:var(--oranye)}
+.judul-d h2{font-size:15.5px}
+.judul-d span{font-size:12px;color:var(--abu)}
+/* ── konten tiruan layar ── */
+.layar{border:1px solid #E4EDE7;border-radius:10px;padding:14px;background:#FAFCFB}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.bar b{font-size:13.5px}
+.pil{background:#fff;border:1.5px solid #DCE7E0;border-radius:10px;padding:11px 13px;margin-bottom:9px;font-size:12.5px;line-height:1.5}
+.pil.aktif{border-color:var(--hijau);box-shadow:0 0 0 2px rgba(25,142,59,.14)}
+.pil .cap{font-size:11px;color:var(--abu);letter-spacing:.05em;font-weight:700;text-transform:uppercase}
+.kartu-panduan{border:1.5px dashed var(--oranye);background:#FFF9EF;border-radius:10px;padding:13px 14px;margin-top:6px}
+.kartu-panduan h4{font-size:13px;color:#8A5A00;margin-bottom:5px}
+.kartu-panduan p{font-size:12px;color:var(--abu);line-height:1.55;margin-bottom:9px}
+.tombol{display:inline-block;font-size:12.5px;font-weight:700;padding:7px 15px;border-radius:8px;border:1.5px solid var(--hijau);color:var(--hijau);background:#fff;margin-right:8px;cursor:pointer}
+.tombol.utama{background:var(--hijau);color:#fff}
+.tombol.oy{border-color:var(--oranye);color:#B87400}
+.tombol.tanpa-bingkai{border:none;color:var(--abu)}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;background:#E9F5EC;color:var(--hijau);padding:4px 10px;border-radius:20px;margin-bottom:8px}
+.status.oy{background:#FDF1DC;color:#B87400}
+.tabel-aturan{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.tabel-aturan td{padding:5px 7px;border-bottom:1px solid #EDF3EF}
+.tabel-aturan td:first-child{color:var(--abu);width:44%}
+.tabel-aturan td:last-child{font-weight:700}
+.catatan-bawah{font-size:11.5px;color:var(--abu);margin-top:10px;padding-top:9px;border-top:1px dashed #DCE7E0;line-height:1.6}
+.dua{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label-medan{display:block}
+.medan{font-size:12px;color:var(--abu);margin-bottom:4px}
+.isian{border:1px solid #DCE7E0;border-radius:8px;padding:8px 10px;font-size:12.5px;background:#fff;color:#9AA9B4}
+.aksi-baris{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<h1>SKETSA — Layar "Panduan Penulisan" (3 DESAIN)</h1>
+<p class="sub">EduAi · standar penulisan default + unggah panduan kampus · Bos pilih satu, baru Wulan koding</p>
+
+<!-- ══════════ DESAIN A ══════════ -->
+<div class="desain">
+  <div class="judul-d"><span class="badge">DESAIN A</span>
+    <h2>Baris tambahan di Langkah 1 (Alur /mulai)</h2>
+    <span>— tempel di layar identitas yang sudah ada, opsional</span></div>
+  <div class="layar">
+    <div class="bar"><b>LANGKAH 1 DARI 4 · Identitas</b><span style="font-size:12px;color:var(--abu)">GRATIS</span></div>
+    <div class="pil aktif"><span class="cap">Nama &amp; NIM</span><br>Rina Amelia · 2021110045</div>
+    <div class="pil"><span class="cap">Kampus &amp; Prodi</span><br>Univ. Pelita Bangsa · Manajemen</div>
+    <div class="kartu-panduan">
+      <span class="status oy">opsional — boleh dilewati</span>
+      <h4>📑 Panduan penulisan dari kampusmu?</h4>
+      <p>Unggah buku panduan/skripsi panduan (PDF atau DOCX) supaya AI menulis
+         mengikuti gaya kampusmu — margin, spasi, inden, penomoran, sitasi.
+         <b>Belum ada? Tidak apa-apa</b> — kami pakai standar bawaan EduAi.</p>
+      <span class="tombol oy">📎 Unggah panduan</span>
+      <span class="tombol tanpa-bingkai">Lewati dulu →</span>
+    </div>
+    <div class="aksi-baris" style="justify-content:flex-end"><span class="tombol utama">Simpan &amp; lanjut →</span></div>
+  </div>
+  <p class="catatan-bawah">✅ Kelebihan: sekali jalan saat user baru, tak ada layar tambahan.<br>
+     ⚠️ Risiko: user lewat cepat tanpa baca; panduan nanti susah dicari lagi.</p>
+</div>
+
+<!-- ══════════ DESAIN B ══════════ -->
+<div class="desain">
+  <div class="judul-d"><span class="badge b2">DESAIN B</span>
+    <h2>Modal "Profil Naskah" dari dashboard (naskah.html)</h2>
+    <span>— "catatan profil dokumen" sesuai ucapan Bos, bisa dibuka kapan saja</span></div>
+  <div class="layar">
+    <div class="bar"><b>Profil Naskah — "Skripsi Rina"</b><span style="font-size:12px;color:var(--abu)">✕</span></div>
+    <table class="tabel-aturan">
+      <tr><td>Jenjang · Bidang</td><td>S1 · Manajemen &amp; Bisnis</td></tr>
+      <tr><td>Identitas cover</td><td>Rina Amelia · Univ. Pelita Bangsa</td></tr>
+      <tr><td>Asal naskah</td><td>EduAi (ditulis dari baru)</td></tr>
+    </table>
+    <div class="kartu-panduan" style="margin-top:12px">
+      <span class="status">✓ Aktif: Standar bawaan EduAi</span>
+      <h4>Template penulisan</h4>
+      <p>Sumber aturan format yang dipakai AI untuk naskah ini.</p>
+      <table class="tabel-aturan" style="background:#fff;border-radius:8px;overflow:hidden">
+        <tr><td>Kertas &amp; margin</td><td>A4 · 4-3-4-3 cm</td></tr>
+        <tr><td>Spasi · huruf</td><td>1,5 · Times New Roman 12</td></tr>
+        <tr><td>Judul gambar</td><td>rata tengah, di bawah gambar</td></tr>
+        <tr><td>Sitasi</td><td>(Nama, tahun:halaman)</td></tr>
+      </table>
+      <div class="aksi-baris">
+        <span class="tombol oy">📎 Unggah panduan kampus</span>
+        <span class="tombol">Lihat aturan lengkap</span>
+      </div>
+    </div>
+    <div class="aksi-baris" style="justify-content:flex-end"><span class="tombol utama">Tutup</span></div>
+  </div>
+  <p class="catatan-bawah">✅ Kelebihan: paling lengkap — user bisa cek aturan aktif &amp; ganti kapan saja per naskah.<br>
+     ⚠️ Risiko: butuh tombol baru di dashboard ("Profil Naskah") + 1 modal.</p>
+</div>
+
+<!-- ══════════ DESAIN C ══════════ -->
+<div class="desain">
+  <div class="judul-d"><span class="badge">DESAIN C</span>
+    <h2>Tab di Panel Asisten AI (editor.html)</h2>
+    <span>— tepat di samping AI saat menulis</span></div>
+  <div class="layar">
+    <div class="bar"><b>Panel AI</b><span style="font-size:12px;color:var(--abu)">/edit/42</span></div>
+    <div class="pil aktif" style="display:flex;gap:16px;font-size:12.5px;font-weight:800">
+      <span style="color:var(--hijau);border-bottom:2.5px solid var(--hijau);padding-bottom:4px">💬 Asisten</span>
+      <span style="color:var(--abu)">📐 Standar penulisan</span>
+    </div>
+    <div class="kartu-panduan" style="border-style:solid;border-color:#DCE7E0;background:#fff">
+      <span class="status">✓ Sumber: Standar bawaan EduAi</span>
+      <p>Aturan ini ikut di setiap tulisan AI untuk naskah ini.</p>
+      <table class="tabel-aturan">
+        <tr><td>Margin</td><td>4-3-4-3 cm (A4)</td></tr>
+        <tr><td>Paragraf</td><td>justified, inden 1 tab</td></tr>
+        <tr><td>Tabel / Gambar</td><td>judul kiri-atas / tengah-bawah</td></tr>
+        <tr><td>Bahasa</td><td>pasif, tanpa "saya/aku/kita"</td></tr>
+      </table>
+      <div class="aksi-baris">
+        <span class="tombol oy">📎 Unggah panduan kampus</span>
+        <span class="tombol tanpa-bingkai">Ganti sumber ▾</span>
+      </div>
+    </div>
+  </div>
+  <p class="catatan-bawah">✅ Kelebihan: dekat momen AI menulis; user sadar aturan saat minta tulis.<br>
+     ⚠️ Risiko: editor sudah ramai (chat + komentar); tab baru bisa terlewat.</p>
+</div>
+
+<p class="sub">SKETSA — belum ada kode produksi. Wulan tunggu pilihan Bos.</p>
+</body>
+</html>

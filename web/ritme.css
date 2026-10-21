@@ -1,0 +1,89 @@
+/* ===== RITME WARNA EDUAI (Opsi A — v2) ====
+   Masalah v1: Fitur + Cara Kerja + Harga berturut-turut terang -> monoton.
+
+   RITME BARU (berselang-seling tegas):
+     Hero        -> HIJAU pekat
+     Fitur       -> putih hangat
+     Cara Kerja  -> HIJAU LEMBUT      <-- pembatas
+     Harga       -> putih
+     Keunggulan  -> HIJAU pekat
+     Testimoni   -> HIJAU LEMBUT
+     CTA         -> putih hangat
+     Footer      -> gelap
+*/
+
+:root{
+  --putih-hangat:#FAFCFB;
+  --hijau-lembut:#E9F6EE;
+}
+
+/* warna dasar body = putih hangat (bukan putih polos) */
+body{background:var(--putih-hangat)}
+
+/* ---------- FITUR: putih hangat ---------- */
+#fitur{background:var(--putih-hangat)}
+
+/* ---------- CARA KERJA: HIJAU LEMBUT (pembatas) ---------- */
+.cara{
+  background:var(--hijau-lembut);
+  position:relative;
+  overflow:hidden;
+  padding:96px 0;
+}
+.cara::before{
+  content:'';position:absolute;width:600px;height:600px;border-radius:50%;
+  background:rgba(25,142,59,.07);top:-330px;right:-200px;pointer-events:none;
+}
+.cara::after{
+  content:'';position:absolute;width:380px;height:380px;border-radius:50%;
+  background:rgba(25,142,59,.05);bottom:-220px;left:-140px;pointer-events:none;
+}
+.cara .wadah{position:relative;z-index:1}
+.cara .langkah-nomor{
+  background:#FFFFFF;
+  border-color:var(--hijau);
+  box-shadow:0 4px 14px rgba(25,142,59,.16);
+}
+
+/* ---------- HARGA: putih bersih (kontras dgn Cara Kerja) ---------- */
+#harga{background:#FFFFFF;padding:96px 0}
+
+/* ---------- KEUNGGULAN: hijau pekat ---------- */
+.keunggulan{
+  background:linear-gradient(150deg,#198E3B 0%,#104F22 100%);
+}
+.keunggulan .unggul{background:rgba(255,255,255,.11)}
+.keunggulan .unggul-ikon{font-size:32px}
+
+/* ---------- TESTIMONI: hijau lembut ---------- */
+#testimoni{
+  background:var(--hijau-lembut);
+  position:relative;overflow:hidden;
+}
+#testimoni::before{
+  content:'';position:absolute;width:580px;height:580px;border-radius:50%;
+  background:rgba(25,142,59,.06);top:-310px;left:-210px;pointer-events:none;
+}
+#testimoni .wadah{position:relative;z-index:1}
+#testimoni .testi{background:#FFFFFF;border-color:#D6EBDD}
+
+/* ---------- CTA: putih hangat ---------- */
+.cta{
+  background:linear-gradient(135deg,#FFFFFF 0%,#F4FBF7 100%);
+  border:1px solid #D9EDE1;
+  position:relative;overflow:hidden;
+}
+.cta::before{
+  content:'';position:absolute;width:420px;height:420px;border-radius:50%;
+  background:rgba(25,142,59,.055);top:-240px;right:-160px;pointer-events:none;
+}
+.cta>*{position:relative;z-index:1}
+
+/* ---------- kartu: sedikit bayangan agar tidak "tenggelam" ---------- */
+#fitur .kartu{background:#FFFFFF;box-shadow:0 2px 12px rgba(39,37,48,.05)}
+.paket{background:#FFFFFF}
+
+/* ---------- badge "PALING DIMINATI": jangan bikin kartu naik canggung ---------- */
+.grid-harga{align-items:stretch}
+.paket.populer{transform:none}
+.paket.populer:hover{transform:translateY(-5px)}

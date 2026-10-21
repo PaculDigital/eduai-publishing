@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>SKETSA — Hasil Mini Insight (2 pilihan)</title>
+<style>
+:root{--hijau:#0f7a4d;--hijau-muda:#e8f5ee;--abu:#64748b;--garis:#e2e8f0;--emas:#c2820a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',system-ui,sans-serif;background:#f6f8f7;color:#1c2b25;padding:26px;font-size:14px}
+h2.judul-sketsa{font-size:19px;margin:0 0 4px;color:var(--hijau)}
+p.sub{color:var(--abu);font-size:12.5px;margin-bottom:20px}
+.bungkus{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.label-pil{background:var(--hijau);color:#fff;display:inline-block;padding:4px 13px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:10px}
+.kotak{background:#fff;border:1px solid var(--garis);border-radius:14px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.kotak h3{font-size:15.5px;margin-bottom:2px}
+.kotak .berkas{color:var(--abu);font-size:11.5px;margin-bottom:14px}
+
+/* ── kartu insight ── */
+.ins{background:var(--hijau-muda);border-left:3px solid var(--hijau);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.ins .tema{font-weight:600;font-size:12.5px;color:var(--hijau);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.ins .isi{font-size:13px;line-height:1.62}
+.ins .sumber{display:block;margin-top:8px;font-size:11.5px;color:var(--abu);font-style:italic;border-top:1px dashed var(--garis);padding-top:7px}
+
+/* ── A: bertumpuk ── */
+.opsiA .bar{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.chip{background:#fff;border:1px solid var(--garis);border-radius:20px;padding:5px 12px;font-size:11.5px;color:var(--abu);cursor:default}
+.chip.ada{border-color:var(--hijau);color:var(--hijau);font-weight:600;background:var(--hijau-muda)}
+.chip.aktif{background:var(--hijau);color:#fff;border-color:var(--hijau)}
+
+/* ── B: 2 kolom ── */
+.opsiB .dua{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.opsiB .kiri{border-right:1px solid var(--garis);padding-right:16px}
+.bab-pil{display:block;padding:9px 11px;border:1px solid var(--garis);border-radius:9px;margin-bottom:7px;font-size:12.5px}
+.bab-pil.on{background:var(--hijau-muda);border-color:var(--hijau);font-weight:600;color:var(--hijau)}
+.bab-pil .angka{color:var(--abu);font-size:11px;float:right}
+.siap{background:#fff8e6;border:1px solid #f0d68a;border-radius:9px;padding:11px;font-size:12px;color:#7a5a00;margin-top:12px}
+.tombol{display:inline-block;background:var(--emas);color:#fff;border-radius:8px;padding:9px 17px;font-size:12.5px;font-weight:600;margin-top:10px}
+.tombol.hijau{background:var(--hijau)}
+.tombol.mati{background:#e2e8f0;color:#94a3b8}
+.mini{font-size:11.5px;color:var(--abu);margin-top:9px;line-height:1.55}
+</style>
+</head>
+<body>
+<h2 class="judul-sketsa">🎓 Hasil Mini Insight — 2 pilihan bentuk</h2>
+<p class="sub">Yang mahasiswa lihat setelah klik “Mulai Belajar” pada kartu tahap. Data: naskah SKRIPSI S1 (5 bab, sudah direvisi).</p>
+
+<div class="bungkus">
+
+  <!-- ══ PILIHAN A ══ -->
+  <div>
+    <span class="label-pil">PILIHAN A — Satu bab, penuh</span>
+    <div class="kotak opsiA">
+      <h3>🎓 Belajar — BAB I</h3>
+      <div class="berkas">SKRIPSI-S1-unmul-fazrigading.docx · BAB I Pendahuluan</div>
+
+      <div class="bar">
+        <span class="chip aktif">BAB I</span>
+        <span class="chip ada">BAB II</span>
+        <span class="chip ada">BAB III</span>
+        <span class="chip">BAB IV</span>
+        <span class="chip">BAB V</span>
+      </div>
+
+      <div class="ins">
+        <div class="tema">Inti bab ini</div>
+        <div class="isi">Kamu meneliti pengaruh <b>kualitas produk</b> dan <b>harga</b> terhadap keputusan
+          pembelian. Masalah utamanya: penjualan turun 18% walau anggaran promosi naik.</div>
+        <span class="sumber">📄 “penjualan mengalami penurunan sebesar 18%…” — BAB I, paragraf 3</span>
+      </div>
+
+      <div class="ins">
+        <div class="tema">Kenapa ini penting</div>
+        <div class="isi">Kalau kamu tidak bisa menjelaskan <i>kenapa</i> variabel ini yang dipilih,
+          penguji biasanya mencecar di bagian ini.</div>
+        <span class="sumber">📄 “Berdasarkan fenomena tersebut, peneliti tertarik…” — BAB I, paragraf 5</span>
+      </div>
+
+      <div class="mini">Insight tersimpan permanen — tidak hangus, tidak perlu bayar ulang untuk naskah ini.</div>
+      <div class="tombol hijau">Lihat Bank Pertanyaan ▸</div>
+    </div>
+  </div>
+
+  <!-- ══ PILIHAN B ══ -->
+  <div>
+    <span class="label-pil">PILIHAN B — Semua bab, 2 kolom</span>
+    <div class="kotak opsiB">
+      <h3>🎓 Belajar — SKRIPSI S1</h3>
+      <div class="berkas">Insight lengkap semua bab yang sudah kamu revisi</div>
+
+      <div class="dua">
+        <div class="kiri">
+          <div class="bab-pil on">BAB I Pendahuluan <span class="angka">3 insight</span></div>
+          <div class="bab-pil">BAB II Tinjauan Pustaka <span class="angka">3 insight</span></div>
+          <div class="bab-pil">BAB III Metodologi <span class="angka">4 insight</span></div>
+          <div class="bab-pil">BAB IV Hasil <span class="angka">— belum</span></div>
+          <div class="bab-pil">BAB V Kesimpulan <span class="angka">— belum</span></div>
+
+          <div class="siap">
+            <b>Belum ada skor</b><br>
+            Skor muncul setelah kamu jawab soal latihan.
+          </div>
+        </div>
+
+        <div>
+          <div class="ins">
+            <div class="tema">Inti BAB I</div>
+            <div class="isi">Pengaruh kualitas produk & harga terhadap keputusan pembelian.</div>
+            <span class="sumber">📄 BAB I, paragraf 3</span>
+          </div>
+          <div class="ins">
+            <div class="tema">Inti BAB I</div>
+            <div class="isi">Penurunan penjualan 18% jadi dasar urgensinya.</div>
+            <span class="sumber">📄 BAB I, paragraf 5</span>
+          </div>
+          <div class="tombol">Mulai Bank Pertanyaan</div>
+        </div>
+      </div>
+
+      <div class="mini">Klik bab di kiri untuk pindah. Semua tersimpan permanen.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

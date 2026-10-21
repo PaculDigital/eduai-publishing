@@ -1,0 +1,251 @@
+{# SKETSA TAHAP 2 — tombol "Bagikan ke Pembimbing" (23Sep26)
+   ═══════════════════════════════════════════════════════════════════════
+   INI SKETSA, BUKAN APLIKASI. Hanya untuk Bos lihat bentuknya.
+   Permintaan Bos verbatim:
+     · "Tombol harus jelas dan Agak besar"
+     · "Mahasiswa isi Nama dan No wa"
+     · "Dapat link, ada tombol copy dan tombol kirim"
+     · "Muncul konfirmasi ok atau batal"
+   ═══════════════════════════════════════════════════════════════════════ #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sketsa Tahap 2 — Bagikan ke Pembimbing</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--abu:#68666E;--garis:#E4E4E8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#F4F5F7;padding:26px}
+.kotak-sketsa{max-width:900px;margin:0 auto 30px;background:#fff;border:1px solid var(--garis);
+              border-radius:12px;padding:26px 30px}
+.label{display:inline-block;background:var(--hijau-gelap);color:#fff;font-size:11.5px;
+       font-weight:700;padding:4px 12px;border-radius:5px;margin-bottom:16px;letter-spacing:.3px}
+.judul{font-size:16px;font-weight:800;margin-bottom:6px}
+.catatan{font-size:12.5px;color:var(--abu);line-height:1.7;margin-bottom:18px}
+
+/* ══════════ TOMBOL UTAMA (permintaan: JELAS & AGAK BESAR) ══════════ */
+.tombol-bagikan{display:inline-flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,#17702F,#198E3B);color:#fff;
+  font-family:inherit;font-size:16.5px;font-weight:700;
+  padding:17px 32px;border-radius:70px;border:none;cursor:pointer;
+  box-shadow:0 6px 20px rgba(25,142,59,.32);transition:.2s;letter-spacing:-.2px}
+.tombol-bagikan:hover{transform:translateY(-2px);box-shadow:0 9px 26px rgba(25,142,59,.4)}
+.tombol-bagikan .ikon-b{width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.22);display:flex;align-items:center;
+  justify-content:center;font-size:18px;flex:none}
+.tombol-bagikan .teks-b{display:flex;flex-direction:column;align-items:flex-start}
+.tombol-bagikan .teks-b small{font-size:11.5px;font-weight:400;opacity:.88;margin-top:1px}
+
+/* versi HP — tetap besar, penuh lebar */
+@media(max-width:520px){
+  .tombol-bagikan{width:100%;justify-content:center;padding:16px 20px;font-size:15.5px}
+}
+
+/* ══════════ MODAL ══════════ */
+.latar{background:rgba(16,30,20,.5);border-radius:12px;padding:30px 20px;
+       display:flex;justify-content:center;margin-top:18px}
+.modal{background:#fff;border-radius:16px;max-width:460px;width:100%;
+       overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.modal-kepala{padding:22px 26px 0}
+.modal-kepala h3{font-size:17.5px;font-weight:800;margin-bottom:5px}
+.modal-kepala p{font-size:13px;color:var(--abu);line-height:1.65}
+.modal-isi{padding:20px 26px}
+.medan{margin-bottom:15px}
+.medan label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+.medan input,.medan select{width:100%;font-family:inherit;font-size:14px;
+  padding:12px 14px;border:1.5px solid var(--garis);border-radius:9px;color:var(--teks)}
+.medan input:focus,.medan select:focus{outline:none;border-color:var(--hijau)}
+.medan small{display:block;font-size:11px;color:var(--abu);margin-top:5px}
+.modal-kaki{padding:0 26px 24px;display:flex;gap:10px}
+.tb-batal{flex:1;background:#fff;color:var(--abu);font-weight:700;font-size:14px;
+  padding:13px;border-radius:70px;border:1.5px solid var(--garis);font-family:inherit;cursor:pointer}
+.tb-ok{flex:1.6;background:var(--hijau);color:#fff;font-weight:700;font-size:14px;
+  padding:13px;border-radius:70px;border:none;font-family:inherit;cursor:pointer}
+
+/* ══════════ HASIL: LINK + COPY + KIRIM ══════════ */
+.hasil{background:var(--hijau-muda);border:1px solid #BFE3CB;border-radius:12px;
+       padding:18px;margin-top:6px}
+.hasil-judul{font-size:13px;font-weight:700;color:#104F22;margin-bottom:10px;
+             display:flex;align-items:center;gap:7px}
+.link-kotak{background:#fff;border:1.5px dashed #9CC9AC;border-radius:9px;
+  padding:13px 15px;font-family:monospace;font-size:12px;color:#146B2C;
+  word-break:break-all;line-height:1.6}
+.tombol-baris{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
+.tb-copy{flex:1;min-width:130px;background:#fff;color:var(--hijau);font-weight:700;
+  font-size:13.5px;padding:12px;border-radius:70px;border:1.5px solid #9CC9AC;
+  font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.tb-kirim{flex:1;min-width:130px;background:#25D366;color:#fff;font-weight:700;
+  font-size:13.5px;padding:12px;border-radius:70px;border:none;font-family:inherit;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.berlaku{font-size:11.5px;color:#146B2C;margin-top:11px;text-align:center}
+
+/* ══════════ LEGENDA ══════════ */
+.legenda{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.leg{background:#FAFAFB;border:1px solid var(--garis);border-radius:9px;padding:13px 15px}
+.leg b{display:block;font-size:12.5px;margin-bottom:5px}
+.leg span{font-size:11.5px;color:var(--abu);line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ══════ 1. DI HALAMAN NASKAH — tombolnya ══════ -->
+<div class="kotak-sketsa">
+  <span class="label">1 · DI HALAMAN NASKAH SAYA</span>
+  <div class="judul">Tombol "Bagikan ke Pembimbing"</div>
+  <div class="catatan">
+    Tombol <b>jelas &amp; agak besar</b> (sesuai permintaan Bos), dengan tulisan
+    pendamping kecil supaya mahasiswa tahu gunanya tanpa perlu diklik dulu.
+    Di HP tombol jadi penuh lebar — tetap besar, tidak mengecil.
+  </div>
+  <button class="tombol-bagikan" type="button">
+    <span class="ikon-b">🎓</span>
+    <span class="teks-b">
+      Bagikan ke Pembimbing
+      <small>Kirim naskah untuk ditinjau</small>
+    </span>
+  </button>
+</div>
+
+<!-- ══════ 2. FORM — nama + no wa ══════ -->
+<div class="kotak-sketsa">
+  <span class="label">2 · SETELAH TOMBOL DIKLIK — ISI NAMA &amp; NO. WA</span>
+  <div class="judul">Isi data pembimbing</div>
+  <div class="catatan">
+    Cukup <b>2 kolom</b> (permintaan Bos). Masa berlaku link dipilih di kolom ketiga —
+    tombol "Lanjut" <b>terkunci</b> sampai Nama &amp; No. WA terisi, supaya mahasiswa
+    tidak bisa lanjut dengan kolom kosong.
+  </div>
+
+  <div class="latar">
+    <div class="modal">
+      <div class="modal-kepala">
+        <h3>Bagikan Naskah ke Pembimbing</h3>
+        <p>Naskah yang dibagikan: <b>BAB I — Pendahuluan</b></p>
+      </div>
+      <div class="modal-isi">
+        <div class="medan">
+          <label>Nama pembimbing</label>
+          <input type="text" value="Prof. Ahmad Subandi">
+          <small>Nama ini yang tampil di halaman tinjauan.</small>
+        </div>
+        <div class="medan">
+          <label>Nomor WhatsApp</label>
+          <input type="text" value="0812-3456-7890">
+          <small>Dipakai untuk mengirim link. Bisa juga diganti email.</small>
+        </div>
+        <div class="medan">
+          <label>Link berlaku selama</label>
+          <select><option>30 hari (disarankan)</option><option>7 hari</option></select>
+        </div>
+      </div>
+      <div class="modal-kaki">
+        <button class="tb-batal" type="button">Batal</button>
+        <button class="tb-ok" type="button">Lanjut</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ 3. KONFIRMASI ══════ -->
+<div class="kotak-sketsa">
+  <span class="label">3 · KONFIRMASI — OK ATAU BATAL</span>
+  <div class="judul">Muncul konfirmasi sebelum link dibuat</div>
+  <div class="catatan">
+    Sesuai permintaan Bos: <b>"Muncul konfirmasi ok atau batal"</b>.
+    Semua yang akan terjadi ditulis apa adanya — supaya mahasiswa tahu
+    persis apa yang dia kirim, <b>sebelum</b> link dibuat.
+  </div>
+
+  <div class="latar">
+    <div class="modal">
+      <div class="modal-kepala">
+        <h3>Kirim undangan ke Prof. Ahmad Subandi?</h3>
+        <p>Periksa dulu sebelum dikirim.</p>
+      </div>
+      <div class="modal-isi">
+        <div style="background:#FAFAFB;border:1px solid var(--garis);border-radius:9px;padding:14px 16px">
+          <div style="font-size:12.5px;line-height:2">
+            <div><b style="display:inline-block;width:110px;color:var(--abu)">Pembimbing</b> Prof. Ahmad Subandi</div>
+            <div><b style="display:inline-block;width:110px;color:var(--abu)">WhatsApp</b> 0812-3456-7890</div>
+            <div><b style="display:inline-block;width:110px;color:var(--abu)">Naskah</b> BAB I — Pendahuluan</div>
+            <div><b style="display:inline-block;width:110px;color:var(--abu)">Berlaku</b> 30 hari</div>
+          </div>
+        </div>
+        <div style="background:#FFF9E8;border:1px solid #F0D89A;border-radius:9px;
+                    padding:11px 14px;margin-top:13px;font-size:11.5px;color:#7A5A10;line-height:1.7">
+          Pembimbing hanya dapat <b>membaca</b> dan <b>memberi catatan</b>.
+          Naskah tidak dapat diubah dari halaman itu.
+        </div>
+      </div>
+      <div class="modal-kaki">
+        <button class="tb-batal" type="button">Batal</button>
+        <button class="tb-ok" type="button">Ya, Buat Link</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ 4. HASIL: LINK + COPY + KIRIM ══════ -->
+<div class="kotak-sketsa">
+  <span class="label">4 · LINK JADI — TOMBOL COPY &amp; KIRIM</span>
+  <div class="judul">Link siap dikirim</div>
+  <div class="catatan">
+    Sesuai permintaan Bos: ada <b>tombol Copy</b> dan <b>tombol Kirim</b>.
+    Tombol Kirim sekarang membuka WhatsApp dengan pesan siap — nanti
+    (setelah webhook disambung) bisa kirim langsung dari sistem.
+  </div>
+
+  <div class="hasil">
+    <div class="hasil-judul">✅ Link untuk Prof. Ahmad Subandi</div>
+    <div class="link-kotak">https://eduai.bikinaja.id/tinjau/mcpXSkkTybKXXim0hX2xcDnBgG-uQfzPRopf-k-k55U</div>
+    <div class="tombol-baris">
+      <button class="tb-copy" type="button">📋 Copy Link</button>
+      <button class="tb-kirim" type="button">💬 Kirim via WhatsApp</button>
+    </div>
+    <div class="berlaku">Berlaku sampai 23 Oktober 2026 · bisa dicabut kapan saja</div>
+  </div>
+</div>
+
+<!-- ══════ 5. DAFTAR PEMBIMBING ══════ -->
+<div class="kotak-sketsa">
+  <span class="label">5 · DAFTAR PEMBIMBING YANG PERNAH DIBAGIKAN</span>
+  <div class="judul">Mahasiswa bisa lihat &amp; cabut sendiri</div>
+  <div class="catatan">
+    Supaya mahasiswa tidak bingung "sudah pernah bagikan ke siapa saja".
+    Tombol <b>Cabut</b> mematikan link tanpa menghapus catatan pembimbing.
+  </div>
+
+  <div style="border:1px solid var(--garis);border-radius:10px;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--garis)">
+      <div style="flex:1">
+        <div style="font-size:13.5px;font-weight:700">Prof. Ahmad Subandi</div>
+        <div style="font-size:11.5px;color:var(--abu);margin-top:3px">
+          0812-3456-7890 · berlaku sampai 23 Okt 2026 · <b style="color:#146B2C">Aktif</b>
+        </div>
+      </div>
+      <button style="background:#fff;border:1.5px solid #E7C4C4;color:#A32B2B;font-weight:700;
+                     font-size:12px;padding:8px 16px;border-radius:70px;font-family:inherit;cursor:pointer">Cabut</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+      <div style="flex:1">
+        <div style="font-size:13.5px;font-weight:700">Dr. Sari Melati</div>
+        <div style="font-size:11.5px;color:var(--abu);margin-top:3px">
+          sari@kampus.ac.id · sudah lewat masa · <b style="color:#A32B2B">Tidak aktif</b>
+        </div>
+      </div>
+      <button style="background:#fff;border:1.5px solid var(--garis);color:var(--abu);font-weight:700;
+                     font-size:12px;padding:8px 16px;border-radius:70px;font-family:inherit;cursor:pointer">Buat baru</button>
+    </div>
+  </div>
+  <div class="legenda">
+    <div class="leg"><b>Kenapa ada daftar ini?</b><span>Mahasiswa tidak perlu mengingat link mana yang masih hidup.</span></div>
+    <div class="leg"><b>Cabut ≠ hapus</b><span>Catatan pembimbing tetap tersimpan, hanya link-nya mati.</span></div>
+    <div class="leg"><b>Bisa buat lagi</b><span>Kalau link mati, tinggal buat link baru untuk pembimbing yang sama.</span></div>
+  </div>
+</div>
+
+</body>
+</html>

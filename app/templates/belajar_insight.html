@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Belajar — {{ label_bab }} · EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="stylesheet" href="/static/ikon.css">
+<style>
+:root{--hijau:#0f7a4d;--hijau-muda:#e8f5ee;--abu:#64748b;--garis:#e2e8f0;--emas:#c2820a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins',system-ui,-apple-system,sans-serif;background:#f6f8f7;color:#1c2b25;font-size:14.5px}
+.atas{background:var(--hijau);color:#fff;padding:13px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.atas .merek{display:flex;align-items:center;gap:9px;font-weight:600;font-size:16px}
+.atas .merek img{height:26px}
+.atas .kanan{display:flex;align-items:center;gap:14px;font-size:14px}
+/*  ⚠️ 04Okt26: TANPA aturan ini tombol <a> dapat gaya BAWAAN browser
+    (kotak putih kosong di pojok header). Gaya disamakan dengan naskah.html. */
+.atas .kanan .nama{color:rgba(255,255,255,.9);font-size:14px}
+.atas .kanan a{color:#fff;text-decoration:none;font-weight:600;border:1.5px solid rgba(255,255,255,.34);padding:6px 15px;border-radius:70px;font-size:13.5px;transition:.2s}
+.atas .kanan a:hover{background:rgba(255,255,255,.14)}
+.pita{background:#fff;border-bottom:1px solid var(--garis);display:flex;gap:4px;padding:0 14px;overflow-x:auto}
+.pita a{padding:12px 15px;text-decoration:none;color:var(--abu);font-size:13.5px;font-weight:500;border-bottom:3px solid transparent;white-space:nowrap}
+.pita a.aktif{color:var(--hijau);border-bottom-color:var(--hijau);font-weight:600}
+.wadah{max-width:1120px;margin:0 auto;padding:20px 16px 44px}
+.judul{font-size:19px;font-weight:600;margin-bottom:3px}
+.sub{color:var(--abu);font-size:12.5px;margin-bottom:18px}
+.dua{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
+.kiri{background:#fff;border:1px solid var(--garis);border-radius:13px;padding:14px}
+.kiri .judul-kecil{font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--abu);margin-bottom:10px;font-weight:600}
+.bab-pil{display:block;padding:10px 12px;border:1px solid var(--garis);border-radius:9px;margin-bottom:8px;font-size:13px;text-decoration:none;color:#1c2b25}
+.bab-pil.on{background:var(--hijau-muda);border-color:var(--hijau);font-weight:600;color:var(--hijau)}
+.bab-pil .angka{float:right;color:var(--abu);font-size:11px;font-weight:400}
+.bab-pil .angka.ada{color:var(--hijau)}
+.kolom-kanan{background:#fff;border:1px solid var(--garis);border-radius:13px;padding:18px}
+.ins{background:var(--hijau-muda);border-left:3px solid var(--hijau);border-radius:9px;padding:13px 15px;margin-bottom:12px}
+.ins .tema{font-weight:600;font-size:12.5px;color:var(--hijau);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.ins .isi{font-size:13.5px;line-height:1.65}
+.ins .kutipan{display:block;margin-top:9px;font-size:12px;color:var(--abu);font-style:italic;border-top:1px dashed var(--garis);padding-top:8px}
+.tombol{display:inline-block;background:var(--emas);color:#fff;border:0;border-radius:9px;padding:11px 20px;font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:none;font-family:inherit}
+.tombol.hijau{background:var(--hijau)}
+.kotak-tenang{background:#f1f7f4;border:1px solid #cfe6da;border-radius:10px;padding:13px;font-size:12.5px;color:#33544a;margin-top:14px;line-height:1.6}
+
+/*  ── L2 BANK SOAL (04Okt26) — kelas BARU, jangan bentrok dengan yang ada ── */
+.bank{margin-top:22px;border-top:1px dashed #d8e5df;padding-top:20px}
+.bank-kepala{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.bank-judul{font-size:16px;font-weight:700;color:#1c2b25}
+.bank-sub{font-size:12.5px;color:var(--abu);margin-top:3px;line-height:1.6}
+.tombol.kecil{padding:7px 14px;font-size:12.5px;background:#fff;color:#2f6e59;border:1px solid #cfe6da}
+.soal{background:#fff;border:1px solid var(--garis);border-left:4px solid #cfe6da;border-radius:11px;padding:14px 16px;margin-bottom:11px}
+.soal.lv-dasar{border-left-color:#7cc4a4}
+.soal.lv-menengah{border-left-color:#4f9d80}
+.soal.lv-tajam{border-left-color:#2f6e59}
+.soal.lv-jebakan{border-left-color:#b8862f}
+.soal-atas{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.lencana{background:#eef6f1;color:#2f6e59;border-radius:20px;padding:3px 11px;font-size:11px;font-weight:700;text-transform:capitalize;letter-spacing:.02em}
+.soal.lv-jebakan .lencana{background:#fbf2e0;color:#8a6420}
+.soal-no{font-size:11.5px;color:var(--abu)}
+.soal-tanya{font-size:14.5px;font-weight:600;color:#1c2b25;line-height:1.6}
+.soal-tumpu{font-size:12.5px;color:#33544a;margin-top:9px;line-height:1.6;background:#f7faf8;border-radius:8px;padding:9px 11px}
+.soal-kunci{font-size:12.5px;color:#3c5a4f;margin-top:9px;line-height:1.65;background:#f1f7f4;border-radius:8px;padding:9px 11px}
+.kosong2{background:#f7faf8;border:1px dashed #cfe6da;border-radius:11px;padding:20px 16px;text-align:center;color:var(--abu)}
+
+/*  ── L4 PANEL KESIAPAN SIDANG + L3 SIMULASI (04Okt26) — kelas BARU ── */
+.siap{display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff;border:1px solid var(--garis);border-radius:13px;padding:16px 18px;margin-bottom:18px}
+.siap-kiri{flex:1;min-width:0}
+.siap-judul{font-size:14.5px;font-weight:700;color:#1c2b25}
+.siap-sub{font-size:12px;color:var(--abu);margin:3px 0 9px}
+.bar{height:8px;background:#eaf1ee;border-radius:5px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--hijau);border-radius:5px}
+.siap-kaki{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.siap-lv{background:#eef6f1;color:#2f6e59;border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:600;text-transform:capitalize}
+.siap-angka{display:flex;align-items:baseline;gap:3px;flex:0 0 auto}
+.siap-angka b{font-size:31px;color:var(--hijau-tua);line-height:1}
+.siap-angka span{font-size:12px;color:var(--abu)}
+.nilai-kecil{margin-left:auto;background:var(--hijau);color:#fff;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700}
+.form-uji,.ulang form{margin-top:12px;border-top:1px dashed #e3ece8;padding-top:12px}
+.petunjuk{font-size:11.5px;color:var(--abu);margin-bottom:7px}
+.jawab{width:100%;border:1px solid #cfd9d4;border-radius:9px;padding:11px;font-size:13px;font-family:inherit;color:#1c2b25;background:#fcfdfc;resize:vertical;line-height:1.6}
+.jawab:focus{outline:none;border-color:var(--hijau);background:#fff}
+.nilai-kartu{border:1px solid var(--garis);border-radius:11px;padding:13px;margin-top:13px;background:#fcfdfc}
+.nilai-kepala{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.bulat{width:48px;height:48px;border-radius:50%;background:#eef6f1;color:var(--hijau);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex:0 0 auto}
+.bulat.sedang{background:#fbf2e0;color:#8a6420}
+.bulat.baik{background:#eef6f1;color:#2f6e59}
+.nilai-judul{font-size:13.5px;font-weight:700;color:#1c2b25}
+.nilai-sub{font-size:11.5px;color:var(--abu)}
+.nilai-isi{font-size:12.5px;color:#3c5a4f;background:#f7faf8;border-radius:8px;padding:9px 11px;margin-top:8px;line-height:1.65}
+.ulang{margin-top:10px}
+.ulang summary{font-size:12.5px;color:var(--hijau);cursor:pointer;font-weight:600}
+.tombol.hijau{margin-top:11px}
+.kosong{text-align:center;padding:34px 16px;color:var(--abu)}
+.kosong .ikon{font-size:30px;margin-bottom:9px}
+.kembali{display:inline-block;margin-bottom:14px;color:var(--abu);text-decoration:none;font-size:12.5px}
+
+/*  ── HP: satu bab saja, kolom kiri jadi pita mendatar (Opsi C) ── */
+@media (max-width:760px){
+  .dua{grid-template-columns:1fr}
+  .kiri{padding:11px}
+  .kiri .judul-kecil{display:none}
+  .kiri .daftar-bab{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
+  .bab-pil{margin-bottom:0;white-space:nowrap;font-size:12px;padding:8px 12px}
+  .bab-pil .angka{display:none}
+  .judul{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+{{ ikon_sprite() }}
+<div class="atas">
+  <div class="merek">
+    <img src="/static/logo-320.png" alt="EduAi Publishing">
+    <span>EduAi Publishing</span>
+  </div>
+  <div class="kanan">
+    <span class="nama">{{ user.nama or user.email }}</span>
+    <a href="/keluar">Keluar</a>
+  </div>
+</div>
+
+<div class="pita">
+  {{ ikon('file-text', 15) }} Naskah Saya
+  {{ ikon('users', 15) }} Kolaborasi
+  <a href="/belajar" class="aktif">{{ ikon('graduation-cap', 15) }} Belajar</a>
+</div>
+
+<div class="wadah">
+  <a href="/belajar?naskah={{ fid }}" class="kembali">← Kembali ke Mode Belajar</a>
+  <div class="judul">{{ ikon('graduation-cap', 20) }} Belajar — {{ label_bab }}</div>
+  <div class="sub">{{ nama or 'Naskah kamu' }} · pemahaman bab ini</div>
+
+  {#  ── L4 PANEL KESIAPAN SIDANG (skor HANYA dari menjawab, bukan baca) ── #}
+  {% if skor.terjawab %}
+  <div class="siap">
+    <div class="siap-kiri">
+      <div class="siap-judul">Kesiapan Sidang kamu</div>
+      <div class="siap-sub">{{ label_bab }} · {{ skor.terjawab }} dari {{ skor.total }} pertanyaan terjawab</div>
+      <div class="bar"><i style="width:{{ skor.skor }}%"></i></div>
+      <div class="siap-kaki">
+        {% for nama_lv, angka in skor.per_level.items() %}
+          <span class="siap-lv">{{ nama_lv }} {{ angka }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="siap-angka">
+      <b>{{ skor.skor }}</b><span>/100</span>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="dua">
+    <div class="kiri">
+      <div class="judul-kecil">Bab yang sudah kamu revisi</div>
+      <div class="daftar-bab">
+        {% for b in baris_bab %}
+        <a href="/belajar/insight/{{ fid }}?bab={{ b.no }}"
+           class="bab-pil {% if b.no == bab %}on{% endif %}">
+          {{ b.label }} <span class="angka {% if b.ada %}ada{% endif %}">{{ b.jml if b.ada else 'belum' }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="kolom-kanan">
+      {% if butir %}
+        {% for t in butir %}
+        <div class="ins">
+          <div class="tema">{{ t.tema }}</div>
+          <div class="isi">{{ t.isi }}</div>
+          {% if t.kutipan %}
+          <span class="kutipan">“{{ t.kutipan }}” — {{ label_bab }}</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="kotak-tenang">
+          Pemahaman ini <b>tersimpan permanen</b> untuk naskah ini —
+          bisa kamu buka kapan saja.
+        </div>
+
+      {% else %}
+        <div class="kosong">
+          <div class="ikon">{{ ikon('book-open', 22) }}</div>
+          <div style="font-weight:600;color:#1c2b25;margin-bottom:6px">
+            Pemahaman {{ label_bab }} belum dibuat
+          </div>
+          <div style="font-size:13px;margin-bottom:16px">
+            Klik di bawah, nanti kamu dapat inti bab ini dalam bahasa sederhana,
+            lengkap dengan kutipan dari naskahmu sendiri.
+          </div>
+          <form method="post" action="/belajar/insight/{{ fid }}">
+            <input type="hidden" name="bab" value="{{ bab }}">
+            <button class="tombol hijau" type="submit">Buat Pemahaman {{ label_bab }}</button>
+          </form>
+        </div>
+      {% endif %}
+
+      {#  ── L2 BANK SOAL (titip di halaman yang SUDAH ADA, bukan halaman baru) ── #}
+      <div class="bank">
+        <div class="bank-kepala">
+          <div>
+            <div class="bank-judul">{{ ikon('landmark', 18) }} Bank Soal Ujian</div>
+            <div class="bank-sub">
+              Pertanyaan yang biasa ditanyakan penguji — {{ label_bab }},
+              4 tingkat: dasar · menengah · tajam · jebakan.
+            </div>
+          </div>
+          {% if ada_soal %}
+          <form method="post" action="/belajar/insight/{{ fid }}">
+            <input type="hidden" name="bab" value="{{ bab }}">
+            <input type="hidden" name="minta" value="soal">
+            <button class="tombol kecil" type="submit">Susun ulang</button>
+          </form>
+          {% endif %}
+        </div>
+
+        {% if soal %}
+          {% for s in soal %}
+          <div class="soal lv-{{ s.level }}">
+            <div class="soal-atas">
+              <span class="lencana">{{ s.level }}</span>
+              <span class="soal-no">Soal {{ loop.index }}</span>
+              {% set sudah = uji.get((loop.index0)|string) %}
+              {% if sudah and sudah.nilai is not none %}
+              <span class="nilai-kecil">{{ sudah.nilai }}/100</span>
+              {% endif %}
+            </div>
+            <div class="soal-tanya">{{ s.tanya }}</div>
+            {% if s.tumpu %}
+            <div class="soal-tumpu">{{ ikon('file-text', 14) }} “{{ s.tumpu }}”</div>
+            {% endif %}
+            {% if s.kunci %}
+            <div class="soal-kunci">
+              <b>Arah jawaban:</b> {{ s.kunci }}
+            </div>
+            {% endif %}
+
+            {#  ── L3 SIMULASI: mahasiswa menjawab → AI menilai ── #}
+            {% if sudah and sudah.nilai is not none %}
+              <div class="nilai-kartu">
+                <div class="nilai-kepala">
+                  <div class="bulat {% if sudah.nilai >= 75 %}baik{% elif sudah.nilai >= 45 %}sedang{% endif %}">{{ sudah.nilai }}</div>
+                  <div>
+                    <div class="nilai-judul">{{ sudah.judul }}</div>
+                    <div class="nilai-sub">jawabanmu sudah dinilai</div>
+                  </div>
+                </div>
+                {% if sudah.tepat %}
+                <div class="nilai-isi"><b>Yang sudah tepat:</b> {{ sudah.tepat }}</div>
+                {% endif %}
+                {% if sudah.tambah %}
+                <div class="nilai-isi"><b>Yang bisa ditambah:</b> {{ sudah.tambah }}</div>
+                {% endif %}
+              </div>
+              <details class="ulang">
+                <summary>Jawab ulang soal ini</summary>
+                <form method="post" action="/belajar/uji/{{ fid }}">
+                  <input type="hidden" name="bab" value="{{ bab }}">
+                  <input type="hidden" name="soal_ke" value="{{ loop.index0 }}">
+                  <textarea class="jawab" name="jawaban" rows="3" placeholder="Tulis jawabanmu dengan kata sendiri...">{{ sudah.jawaban or '' }}</textarea>
+                  <button class="tombol hijau" type="submit">Kirim Jawaban</button>
+                </form>
+              </details>
+            {% else %}
+              <form method="post" action="/belajar/uji/{{ fid }}" class="form-uji">
+                <input type="hidden" name="bab" value="{{ bab }}">
+                <input type="hidden" name="soal_ke" value="{{ loop.index0 }}">
+                <div class="petunjuk">Tulis jawabanmu dengan kata sendiri — nanti dinilai seperti di sidang:</div>
+                <textarea class="jawab" name="jawaban" rows="3" placeholder="Tulis jawabanmu dengan kata sendiri..."></textarea>
+                <button class="tombol hijau" type="submit">Kirim Jawaban</button>
+              </form>
+            {% endif %}
+          </div>
+          {% endfor %}
+
+          <div class="kotak-tenang">
+            Soal-soal ini <b>tersimpan permanen</b> untuk naskah ini —
+            tinggal dibuka kapan pun kamu mau.
+          </div>
+
+        {% else %}
+          <div class="kosong2">
+            <div style="font-size:13px;margin-bottom:14px">
+              Belum ada soal untuk {{ label_bab }}. Klik di bawah, nanti kamu
+              dapat pertanyaan yang biasa ditanyakan penguji — lengkap dengan
+              arah jawabannya, bersumber dari naskahmu sendiri.
+            </div>
+            <form method="post" action="/belajar/insight/{{ fid }}">
+              <input type="hidden" name="bab" value="{{ bab }}">
+              <input type="hidden" name="minta" value="soal">
+              <button class="tombol hijau" type="submit">Susun Soal {{ label_bab }}</button>
+            </form>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

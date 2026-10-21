@@ -1,0 +1,1907 @@
+==============================================================================
+KUMPULAN BUKTI UJI — HAKIM + POLA PENULISAN (09 Okt 2026)
+==============================================================================
+
+##############################################################################
+# BERKAS: HASIL_U5_BASELINE_115.json
+##############################################################################
+{
+ "fid": 115,
+ "sub": [
+  2,
+  380,
+  402,
+  406,
+  407,
+  473,
+  508,
+  509,
+  622,
+  638,
+  658,
+  692,
+  777,
+  783,
+  877,
+  3486,
+  5825,
+  5826,
+  7911,
+  7914,
+  7929,
+  7930,
+  7947,
+  7948,
+  7978,
+  7997,
+  7998,
+  7999,
+  8013,
+  8019,
+  8028,
+  8029,
+  8039,
+  8050,
+  8075,
+  8103,
+  8143,
+  8144,
+  8172,
+  8211,
+  8252,
+  8254,
+  8340,
+  8341,
+  8356,
+  8371,
+  8426,
+  8434,
+  8443,
+  8448,
+  8449,
+  8453,
+  8458,
+  8464,
+  8468,
+  8473,
+  8477,
+  8480,
+  8485,
+  8490,
+  8493,
+  8499,
+  8502,
+  8523,
+  8554,
+  8571,
+  8597,
+  8621,
+  8622,
+  8623,
+  8697,
+  8708,
+  8709,
+  8710,
+  8736
+ ],
+ "bab": [
+  459,
+  468
+ ],
+ "par": [
+  32,
+  46,
+  155,
+  248,
+  368,
+  391,
+  408,
+  426,
+  437,
+  447,
+  448,
+  449,
+  484,
+  510,
+  523,
+  524,
+  529,
+  534,
+  539,
+  577,
+  595,
+  607,
+  639,
+  649,
+  659,
+  676,
+  685,
+  693,
+  882,
+  894,
+  1279,
+  1562,
+  1632,
+  1720,
+  1878,
+  1915,
+  2110,
+  2119,
+  2153,
+  2907,
+  3112,
+  3593,
+  3594,
+  4788,
+  4896,
+  4898,
+  5000,
+  5147,
+  5262,
+  5280,
+  5324,
+  5430,
+  5441,
+  5453,
+  5559,
+  5589,
+  5673,
+  5685,
+  5791,
+  5982,
+  6172,
+  6184,
+  6186,
+  6310,
+  6312,
+  6397,
+  6533,
+  7271,
+  7272,
+  7546,
+  7686,
+  7885,
+  7892,
+  7898,
+  7940,
+  7979,
+  8020,
+  8090,
+  8097,
+  8104,
+  8111,
+  8122,
+  8149,
+  8158,
+  8194,
+  8255,
+  8275,
+  8288,
+  8307,
+  8413,
+  8414,
+  8503
+ ],
+ "sis": [
+  451,
+  454,
+  459,
+  463,
+  468
+ ],
+ "gabung": {
+  "0": [
+   "BAB I",
+   "PENDAHULUAN"
+  ],
+  "471": [
+   "BAB II",
+   "TINJAUAN PUSTAKA"
+  ],
+  "7927": [
+   "BAB III",
+   "METODOLOGI PENELITIAN"
+  ],
+  "8141": [
+   "BAB VI",
+   "HASIL PENELITIAN DAN PEMBAHASAN"
+  ]
+ },
+ "detail": [
+  {
+   "no": 1,
+   "i": 2,
+   "teks": "1.1 LATAR BELAKANG",
+   "atas": "PENDAHULUAN"
+  },
+  {
+   "no": 2,
+   "i": 380,
+   "teks": "1.2 Rumusan Masalah",
+   "atas": "Terhadap Kelayakan Usaha Accessories Hijab Tape AyuMeera"
+  },
+  {
+   "no": 3,
+   "i": 402,
+   "teks": "1.3 Tujuan Penelitian",
+   "atas": "strategis mengenai pengembangan usaha di masa mendatang."
+  },
+  {
+   "no": 4,
+   "i": 406,
+   "teks": "Tape AyuMeera berdasarkan analisis SWOT.",
+   "atas": "2. Untuk mengetahui layak atau tidak layak dijalankan Us"
+  },
+  {
+   "no": 5,
+   "i": 407,
+   "teks": "1.4 Manfaat Penelitian",
+   "atas": "Tape AyuMeera berdasarkan analisis SWOT."
+  },
+  {
+   "no": 6,
+   "i": 473,
+   "teks": "2.1 Landasan Teori",
+   "atas": "TINJAUAN PUSTAKA"
+  },
+  {
+   "no": 7,
+   "i": 508,
+   "teks": "Threats (Decision-Making Theory).",
+   "atas": "Weakness (Competitive Advantage Theory), Opportunities ("
+  },
+  {
+   "no": 8,
+   "i": 509,
+   "teks": "2.1.1 Pengertian Analisis SWOT",
+   "atas": "Threats (Decision-Making Theory)."
+  },
+  {
+   "no": 9,
+   "i": 622,
+   "teks": "2.1.2 Fungsi dan Tujuan Analisis SWOT",
+   "atas": "ketidakpastian dan persaingan yang ketat."
+  },
+  {
+   "no": 10,
+   "i": 638,
+   "teks": "2020).",
+   "atas": "keputusan, berikut seluruh perubahannya dalam menghadapi"
+  },
+  {
+   "no": 11,
+   "i": 658,
+   "teks": "SWOT (Strengths, Weaknesses, Opportunities, dan Threats).",
+   "atas": "menganalisis kelayakan bisnis aksesoris hijab dengan men"
+  },
+  {
+   "no": 12,
+   "i": 692,
+   "teks": "(David, 2010) dalam (Andika, 2020).",
+   "atas": "kondisi perusahaan, konsumen, dan pesaing serta faktor a"
+  },
+  {
+   "no": 13,
+   "i": 777,
+   "teks": "0,5% tingkat engagement.",
+   "atas": "pengeluaran Influencer Marketing dikaitkan dengan pening"
+  },
+  {
+   "no": 14,
+   "i": 783,
+   "teks": "(Mahardhani,2023)",
+   "atas": "kemampuan buat berkomunikasi pada gaya yang akrab dan bi"
+  },
+  {
+   "no": 15,
+   "i": 877,
+   "teks": "4. Threats (Ancaman)",
+   "atas": "ini."
+  },
+  {
+   "no": 16,
+   "i": 3486,
+   "teks": "5 Adyatma",
+   "atas": "46"
+  },
+  {
+   "no": 17,
+   "i": 5825,
+   "teks": "Rismawati BR.",
+   "atas": "Ermawanti,"
+  },
+  {
+   "no": 18,
+   "i": 5826,
+   "teks": "PENGARUH",
+   "atas": "Rismawati BR."
+  },
+  {
+   "no": 19,
+   "i": 7911,
+   "teks": "2.3 Kerangka Berfikir",
+   "atas": "57"
+  },
+  {
+   "no": 20,
+   "i": 7914,
+   "teks": "Berfikir",
+   "atas": "Gambar 2. 2 Kerangka"
+  },
+  {
+   "no": 21,
+   "i": 7929,
+   "teks": "3.1 Jenis dan Waktu Penelitian",
+   "atas": "METODOLOGI PENELITIAN"
+  },
+  {
+   "no": 22,
+   "i": 7930,
+   "teks": "3.1.1 Jenis Penelitian",
+   "atas": "3.1 Jenis dan Waktu Penelitian"
+  },
+  {
+   "no": 23,
+   "i": 7947,
+   "teks": "AyuMeera’.",
+   "atas": "mendalam tentang Analisis Kelayakan Bisnis pada Usaha ‘H"
+  },
+  {
+   "no": 24,
+   "i": 7948,
+   "teks": "3.1.2 Jenis Data",
+   "atas": "AyuMeera’."
+  },
+  {
+   "no": 25,
+   "i": 7978,
+   "teks": "AyuMeera beserta kumpulan data hasil kuesioner.",
+   "atas": "AyuMeera pada tahun 2024, data ini langsung didapatkan d"
+  },
+  {
+   "no": 26,
+   "i": 7997,
+   "teks": "6 Sidang Skripsi",
+   "atas": "5 Menganalisis Data"
+  },
+  {
+   "no": 27,
+   "i": 7998,
+   "teks": "3.2 Subyek dan Obyek Penelitian",
+   "atas": "6 Sidang Skripsi"
+  },
+  {
+   "no": 28,
+   "i": 7999,
+   "teks": "3.2.2 Subyek Penelitian",
+   "atas": "3.2 Subyek dan Obyek Penelitian"
+  },
+  {
+   "no": 29,
+   "i": 8013,
+   "teks": "(Erliningtias, 2020).",
+   "atas": "dan pembahasan dalam penelitian kualitatif (Martha dan K"
+  },
+  {
+   "no": 30,
+   "i": 8019,
+   "teks": "4 Mbak April Konsumen",
+   "atas": "3 Ibu Anie Div. Chemical"
+  },
+  {
+   "no": 31,
+   "i": 8028,
+   "teks": "Mulya, Kecamatan Medan Satria, Kota Bekasi, Jawa Barat.",
+   "atas": "yang berlokasi di Jl. Jend. Sudirman No.23 Blok C, RT.00"
+  },
+  {
+   "no": 32,
+   "i": 8029,
+   "teks": "3.3 Metode Pengumpulan Data",
+   "atas": "Mulya, Kecamatan Medan Satria, Kota Bekasi, Jawa Barat."
+  },
+  {
+   "no": 33,
+   "i": 8039,
+   "teks": "2. Wawancara",
+   "atas": "pada usaha Hijab Tape AyuMeera."
+  },
+  {
+   "no": 34,
+   "i": 8050,
+   "teks": "3. Tinjauan Literatur",
+   "atas": "aspek finansial dari usaha tersebut."
+  },
+  {
+   "no": 35,
+   "i": 8075,
+   "teks": "3.4.2 Tahapan – Tahapan Analisis Data",
+   "atas": "penelitian ini."
+  },
+  {
+   "no": 36,
+   "i": 8103,
+   "teks": "Data yang dikategorikan ini lebih mudah untuk dianalisis dan diteliti.",
+   "atas": "mengidentifikasi pola dan hubungan baru antara elemen da"
+  },
+  {
+   "no": 37,
+   "i": 8143,
+   "teks": "4.1 Gambaran Umum Perusahaan dan Objek Penelitian",
+   "atas": "HASIL PENELITIAN DAN PEMBAHASAN"
+  },
+  {
+   "no": 38,
+   "i": 8144,
+   "teks": "4.1.1 Sejarah Perusahaan",
+   "atas": "4.1 Gambaran Umum Perusahaan dan Objek Penelitian"
+  },
+  {
+   "no": 39,
+   "i": 8172,
+   "teks": "4.1.2 Perkembangan Usaha Accessories Hijab Tape AyuMeera AyuMeera",
+   "atas": "66"
+  },
+  {
+   "no": 40,
+   "i": 8211,
+   "teks": "4.1.3 Visi dan Misi",
+   "atas": "Mandiri berhasil menghadapi pesaingnya yang cukup banyak"
+  },
+  {
+   "no": 41,
+   "i": 8252,
+   "teks": "Aprilia",
+   "atas": "Kania"
+  },
+  {
+   "no": 42,
+   "i": 8254,
+   "teks": "4.2 Deskripsi Data",
+   "atas": "68"
+  },
+  {
+   "no": 43,
+   "i": 8340,
+   "teks": "Faktor – Faktor Penentu Strategi Bersaing",
+   "atas": "yang akan diimplementasikan oleh perusahaan atau organis"
+  },
+  {
+   "no": 44,
+   "i": 8341,
+   "teks": "4.3.2.1 Faktor Internal",
+   "atas": "Faktor – Faktor Penentu Strategi Bersaing"
+  },
+  {
+   "no": 45,
+   "i": 8356,
+   "teks": "4.3.2.2 Faktor Eksternal",
+   "atas": "e. Keterbatasan promosi offline."
+  },
+  {
+   "no": 46,
+   "i": 8371,
+   "teks": "Kekuatan (Strength)",
+   "atas": "Tabel 4. 1 Tabel Analisis SWOT Hijab Tape AyuMeera"
+  },
+  {
+   "no": 47,
+   "i": 8426,
+   "teks": "1. Informan (Ulan – Pengelola AyuMeera)",
+   "atas": "Berikut hasil reduksi data dari 4 (empat) informan yang "
+  },
+  {
+   "no": 48,
+   "i": 8434,
+   "teks": "- Pengaruh peran media sosial",
+   "atas": "Bergabung dengan komunitas"
+  },
+  {
+   "no": 49,
+   "i": 8443,
+   "teks": "- Mayoritas penduduk Indonesia beragama muslim",
+   "atas": "- Pemanfaatan marketplace dan media sosial"
+  },
+  {
+   "no": 50,
+   "i": 8448,
+   "teks": "- Perubahan tren hijab anti meleyot",
+   "atas": "- Plagiasi design"
+  },
+  {
+   "no": 51,
+   "i": 8449,
+   "teks": "2. Informan (Regina – Div. AyuMeera)",
+   "atas": "- Perubahan tren hijab anti meleyot"
+  },
+  {
+   "no": 52,
+   "i": 8453,
+   "teks": "- Peran media sosial meningkatkan penjualan",
+   "atas": "- Pelanggan yang datang dari komunitas"
+  },
+  {
+   "no": 53,
+   "i": 8458,
+   "teks": "Harga produk masih dianggap sedikit tinggi",
+   "atas": "- Respon pelanggan yang membutuhkan waktu implementasi -"
+  },
+  {
+   "no": 54,
+   "i": 8464,
+   "teks": "- Hijab adalah kebutuhan harian",
+   "atas": "74"
+  },
+  {
+   "no": 55,
+   "i": 8468,
+   "teks": "3. Informan (Anie – Div. Chemical)",
+   "atas": "- Tren hijab anti meleyot"
+  },
+  {
+   "no": 56,
+   "i": 8473,
+   "teks": "- Zaman yang serba media sosial",
+   "atas": "- Ikut serta komunitas lokal"
+  },
+  {
+   "no": 57,
+   "i": 8477,
+   "teks": "- Ketidak tahuan customer tentang produk AyuMeera",
+   "atas": "- Bekas lem dihijab"
+  },
+  {
+   "no": 58,
+   "i": 8480,
+   "teks": "Hijab yang menjadi trend",
+   "atas": "- Kerjasama dengan influencer, blogger, artis atau MUA M"
+  },
+  {
+   "no": 59,
+   "i": 8485,
+   "teks": "4. Informan (April – Konsumen)",
+   "atas": "- Tren hijab anti meleyot"
+  },
+  {
+   "no": 60,
+   "i": 8490,
+   "teks": "- Peran media sosial yang signifikan",
+   "atas": "- Pelayanan customer offline dan online yang baik"
+  },
+  {
+   "no": 61,
+   "i": 8493,
+   "teks": "- Belum dikenal luas oleh masyarakat Indonesia",
+   "atas": "- Pengunaan hijab tape AyuMeera sedikit susah"
+  },
+  {
+   "no": 62,
+   "i": 8499,
+   "teks": "- Mayoritas masyarakat Indonesia beragama islam",
+   "atas": "- Peran media sosial"
+  },
+  {
+   "no": 63,
+   "i": 8502,
+   "teks": "- Tren hijab anti meleyot",
+   "atas": "- Adanya competitor dengan harga yang lebih murah"
+  },
+  {
+   "no": 64,
+   "i": 8523,
+   "teks": "- Pengaruh peran media",
+   "atas": "komunitas"
+  },
+  {
+   "no": 65,
+   "i": 8554,
+   "teks": "AyuMeera)",
+   "atas": "(Ulan – Pengelola"
+  },
+  {
+   "no": 66,
+   "i": 8571,
+   "teks": "AyuMeera)",
+   "atas": "(Ulan – Pengelola"
+  },
+  {
+   "no": 67,
+   "i": 8597,
+   "teks": "AyuMeera)",
+   "atas": "(Ulan – Pengelola"
+  },
+  {
+   "no": 68,
+   "i": 8621,
+   "teks": "AyuMeera)",
+   "atas": "(Ulan – Pengelola"
+  },
+  {
+   "no": 69,
+   "i": 8622,
+   "teks": "Kategori Hasil Kutipan Informan",
+   "atas": "AyuMeera)"
+  },
+  {
+   "no": 70,
+   "i": 8623,
+   "teks": "(Divisi AyuMeera)",
+   "atas": "Kategori Hasil Kutipan Informan"
+  },
+  {
+   "no": 71,
+   "i": 8697,
+   "teks": "(Regina – Div AyuMeera)",
+   "atas": "dicari.”"
+  },
+  {
+   "no": 72,
+   "i": 8708,
+   "teks": "(Regina – Div AyuMeera)",
+   "atas": "tren hijab berubah.”"
+  },
+  {
+   "no": 73,
+   "i": 8709,
+   "teks": "Kategori Hasil Kutipan Informan",
+   "atas": "(Regina – Div AyuMeera)"
+  },
+  {
+   "no": 74,
+   "i": 8710,
+   "teks": "(Divisi Chemical)",
+   "atas": "Kategori Hasil Kutipan Informan"
+  },
+  {
+   "no": 75,
+   "i": 8736,
+   "teks": "(Anie – Div Chemical)",
+   "atas": "serba ada di medsos.”"
+  }
+ ],
+ "baris_total": 8755,
+ "kandidat": 8555,
+ "goyang": 0
+}
+
+##############################################################################
+# BERKAS: HASIL_U4_KALIBRASI.json
+##############################################################################
+[
+ {
+  "i": 4,
+  "kunci": "subbab",
+  "pilihan": [
+   "subbab",
+   "subbab",
+   "subbab"
+  ],
+  "conf_jev": [
+   0.83,
+   0.85,
+   0.77
+  ],
+  "utama": "subbab",
+  "sepakat": 1.0,
+  "conf": 0.82,
+  "benar": true
+ },
+ {
+  "i": 48,
+  "kunci": "subbab",
+  "pilihan": [
+   "subbab",
+   "subbab",
+   "subbab"
+  ],
+  "conf_jev": [
+   0.84,
+   0.85,
+   0.84
+  ],
+  "utama": "subbab",
+  "sepakat": 1.0,
+  "conf": 0.84,
+  "benar": true
+ },
+ {
+  "i": 67,
+  "kunci": "subbab",
+  "pilihan": [
+   "subbab",
+   "subbab",
+   "subbab"
+  ],
+  "conf_jev": [
+   0.79,
+   0.84,
+   0.8
+  ],
+  "utama": "subbab",
+  "sepakat": 1.0,
+  "conf": 0.81,
+  "benar": true
+ },
+ {
+  "i": 151,
+  "kunci": "subbab",
+  "pilihan": [
+   "subbab",
+   "subbab",
+   "subbab"
+  ],
+  "conf_jev": [
+   0.91,
+   0.91,
+   0.91
+  ],
+  "utama": "subbab",
+  "sepakat": 1.0,
+  "conf": 0.91,
+  "benar": true
+ },
+ {
+  "i": 165,
+  "kunci": "subbab",
+  "pilihan": [
+   "subbab",
+   "subbab",
+   "subbab"
+  ],
+  "conf_jev": [
+   0.91,
+   0.93,
+   0.92
+  ],
+  "utama": "subbab",
+  "sepakat": 1.0,
+  "conf": 0.92,
+  "benar": true
+ },
+ {
+  "i": 175,
+  "kunci": "subbab",
+  "pilihan": [
+   "subbab",
+   "subbab",
+   "subbab"
+  ],
+  "conf_jev": [
+   0.96,
+   0.96,
+   0.95
+  ],
+  "utama": "subbab",
+  "sepakat": 1.0,
+  "conf": 0.96,
+  "benar": true
+ },
+ {
+  "i": 20,
+  "kunci": "biasa",
+  "pilihan": [
+   "biasa",
+   "biasa",
+   "biasa"
+  ],
+  "conf_jev": [
+   0.88,
+   0.83,
+   0.85
+  ],
+  "utama": "biasa",
+  "sepakat": 1.0,
+  "conf": 0.85,
+  "benar": true
+ },
+ {
+  "i": 38,
+  "kunci": "biasa",
+  "pilihan": [
+   "paragraf",
+   "paragraf",
+   "paragraf"
+  ],
+  "conf_jev": [
+   0.37,
+   0.32,
+   0.39
+  ],
+  "utama": "paragraf",
+  "sepakat": 1.0,
+  "conf": 0.36,
+  "benar": false
+ },
+ {
+  "i": 44,
+  "kunci": "biasa",
+  "pilihan": [
+   "biasa",
+   "biasa",
+   "biasa"
+  ],
+  "conf_jev": [
+   0.77,
+   0.73,
+   0.75
+  ],
+  "utama": "biasa",
+  "sepakat": 1.0,
+  "conf": 0.75,
+  "benar": true
+ },
+ {
+  "i": 57,
+  "kunci": "biasa",
+  "pilihan": [
+   "biasa",
+   "biasa",
+   "biasa"
+  ],
+  "conf_jev": [
+   0.95,
+   0.95,
+   0.96
+  ],
+  "utama": "biasa",
+  "sepakat": 1.0,
+  "conf": 0.95,
+  "benar": true
+ },
+ {
+  "i": 58,
+  "kunci": "biasa",
+  "pilihan": [
+   "biasa",
+   "biasa",
+   "biasa"
+  ],
+  "conf_jev": [
+   0.96,
+   0.95,
+   0.96
+  ],
+  "utama": "biasa",
+  "sepakat": 1.0,
+  "conf": 0.96,
+  "benar": true
+ },
+ {
+  "i": 59,
+  "kunci": "biasa",
+  "pilihan": [
+   "biasa",
+   "biasa",
+   "biasa"
+  ],
+  "conf_jev": [
+   0.95,
+   0.95,
+   0.93
+  ],
+  "utama": "biasa",
+  "sepakat": 1.0,
+  "conf": 0.94,
+  "benar": true
+ }
+]
+
+##############################################################################
+# BERKAS: HASIL_U1_ADVERSARIAL.json
+##############################################################################
+[
+ {
+  "kode": "A1",
+  "judul": "nomor halaman \"30\" jadi BAB palsu",
+  "pilih": [
+   "biasa",
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.89,
+  "benar": true,
+  "seharusnya_judul": false,
+  "dianggap_judul": false
+ },
+ {
+  "kode": "A2",
+  "judul": "nomor halaman \"65\" jadi BAB palsu",
+  "pilih": [
+   "biasa",
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.83,
+  "benar": true,
+  "seharusnya_judul": false,
+  "dianggap_judul": false
+ },
+ {
+  "kode": "A3",
+  "judul": "typo \"BAB VI\" (setelah BAB III) — harus SETIA",
+  "pilih": [
+   "bab",
+   "bab",
+   "bab"
+  ],
+  "utama": "bab",
+  "conf": 0.99,
+  "benar": true,
+  "seharusnya_judul": true,
+  "dianggap_judul": true
+ },
+ {
+  "kode": "A4",
+  "judul": "butir daftar \"f. Pelayanan pelanggan\" jadi sub-bab",
+  "pilih": [
+   "biasa",
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.97,
+  "benar": true,
+  "seharusnya_judul": false,
+  "dianggap_judul": false
+ },
+ {
+  "kode": "A5",
+  "judul": "\"PENDAHULUAN\" (judul bab) dianggap sub-bab",
+  "pilih": [
+   "bab",
+   "bab",
+   "bab"
+  ],
+  "utama": "bab",
+  "conf": 0.43,
+  "benar": true,
+  "seharusnya_judul": true,
+  "dianggap_judul": true
+ },
+ {
+  "kode": "A6",
+  "judul": "butir \"1. Apakah…\" dianggap sub-bab",
+  "pilih": [
+   "biasa",
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.81,
+  "benar": true,
+  "seharusnya_judul": false,
+  "dianggap_judul": false
+ }
+]
+
+##############################################################################
+# BERKAS: HASIL_UKUNCI.json
+##############################################################################
+[
+ {
+  "i": 2,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 1.0
+ },
+ {
+  "i": 380,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.99
+ },
+ {
+  "i": 402,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.985
+ },
+ {
+  "i": 407,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.96
+ },
+ {
+  "i": 473,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.995
+ },
+ {
+  "i": 509,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.995
+ },
+ {
+  "i": 622,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 1.0
+ },
+ {
+  "i": 7911,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 1.0
+ },
+ {
+  "i": 7929,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.95
+ },
+ {
+  "i": 7930,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 1.0
+ },
+ {
+  "i": 7948,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 1.0
+ },
+ {
+  "i": 7998,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.96
+ },
+ {
+  "i": 7999,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.99
+ },
+ {
+  "i": 8029,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 1.0
+ },
+ {
+  "i": 8075,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 1.0
+ },
+ {
+  "i": 8143,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.945
+ },
+ {
+  "i": 8144,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 1.0
+ },
+ {
+  "i": 8172,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 1.0
+ },
+ {
+  "i": 8211,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.99
+ },
+ {
+  "i": 8254,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.92
+ },
+ {
+  "i": 8340,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.915
+ },
+ {
+  "i": 8341,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.99
+ },
+ {
+  "i": 8356,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.97
+ },
+ {
+  "i": 8371,
+  "jenis": "asli",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.47
+ },
+ {
+  "i": 406,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.23
+ },
+ {
+  "i": 508,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.69
+ },
+ {
+  "i": 638,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.795
+ },
+ {
+  "i": 658,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.35
+ },
+ {
+  "i": 692,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.65
+ },
+ {
+  "i": 777,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.915
+ },
+ {
+  "i": 783,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.955
+ },
+ {
+  "i": 877,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.995
+ },
+ {
+  "i": 3486,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.395
+ },
+ {
+  "i": 5825,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.345
+ },
+ {
+  "i": 5826,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.445
+ },
+ {
+  "i": 7914,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.42
+ },
+ {
+  "i": 7947,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.585
+ },
+ {
+  "i": 7978,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.34
+ },
+ {
+  "i": 7997,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.255
+ },
+ {
+  "i": 8013,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.84
+ },
+ {
+  "i": 8019,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.4
+ },
+ {
+  "i": 8028,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.81
+ },
+ {
+  "i": 8039,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.925
+ },
+ {
+  "i": 8050,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.93
+ },
+ {
+  "i": 8103,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.695
+ },
+ {
+  "i": 8252,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.685
+ },
+ {
+  "i": 8426,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.6
+ },
+ {
+  "i": 8434,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.595
+ },
+ {
+  "i": 8443,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.46
+ },
+ {
+  "i": 8448,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "biasa"
+  ],
+  "utama": "subbab",
+  "conf": 0.36
+ },
+ {
+  "i": 8449,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.645
+ },
+ {
+  "i": 8453,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.55
+ },
+ {
+  "i": 8458,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.86
+ },
+ {
+  "i": 8464,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.265
+ },
+ {
+  "i": 8468,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.62
+ },
+ {
+  "i": 8473,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.45
+ },
+ {
+  "i": 8477,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.355
+ },
+ {
+  "i": 8480,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.625
+ },
+ {
+  "i": 8485,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.84
+ },
+ {
+  "i": 8490,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.5
+ },
+ {
+  "i": 8493,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.455
+ },
+ {
+  "i": 8499,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.43
+ },
+ {
+  "i": 8502,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.365
+ },
+ {
+  "i": 8523,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.695
+ },
+ {
+  "i": 8554,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.825
+ },
+ {
+  "i": 8571,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.7
+ },
+ {
+  "i": 8597,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.695
+ },
+ {
+  "i": 8621,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.64
+ },
+ {
+  "i": 8622,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.73
+ },
+ {
+  "i": 8623,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.67
+ },
+ {
+  "i": 8697,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.515
+ },
+ {
+  "i": 8708,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.59
+ },
+ {
+  "i": 8709,
+  "jenis": "palsu",
+  "pilih": [
+   "subbab",
+   "subbab"
+  ],
+  "utama": "subbab",
+  "conf": 0.74
+ },
+ {
+  "i": 8710,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.615
+ },
+ {
+  "i": 8736,
+  "jenis": "palsu",
+  "pilih": [
+   "biasa",
+   "biasa"
+  ],
+  "utama": "biasa",
+  "conf": 0.83
+ }
+]
+
+##############################################################################
+# BERKAS: HASIL_UJI_P_POLA.json
+##############################################################################
+[
+ {
+  "fid": 78,
+  "i": 358,
+  "kunci": "judul_isi",
+  "pilih": [
+   "paragraf",
+   "paragraf",
+   "paragraf"
+  ],
+  "utama": "paragraf",
+  "conf": 0.54,
+  "benar": false,
+  "keterangan": "1.2 Rumusan Masalah (judul sub-bab)"
+ },
+ {
+  "fid": 78,
+  "i": 606,
+  "kunci": "judul_isi",
+  "pilih": [
+   "paragraf",
+   "paragraf",
+   "paragraf"
+  ],
+  "utama": "paragraf",
+  "conf": 0.79,
+  "benar": false,
+  "keterangan": "1.3 Tujuan Penelitian (judul sub-bab)"
+ },
+ {
+  "fid": 78,
+  "i": 620,
+  "kunci": "judul_isi",
+  "pilih": [
+   "paragraf",
+   "paragraf",
+   "tabel"
+  ],
+  "utama": "paragraf",
+  "conf": 0.42,
+  "benar": false,
+  "keterangan": "1.4 Manfaat (judul sub-bab)"
+ },
+ {
+  "fid": 78,
+  "i": 638,
+  "kunci": "judul_isi",
+  "pilih": [
+   "tabel",
+   "tabel",
+   "tabel"
+  ],
+  "utama": "tabel",
+  "conf": 0.48,
+  "benar": false,
+  "keterangan": "sub-bab berikutnya"
+ },
+ {
+  "fid": 115,
+  "i": 2,
+  "kunci": "judul_isi",
+  "pilih": [
+   "judul_isi",
+   "judul_isi",
+   "judul_isi"
+  ],
+  "utama": "judul_isi",
+  "conf": 0.9,
+  "benar": true,
+  "keterangan": "1.1 LATAR BELAKANG (judul sub-bab)"
+ },
+ {
+  "fid": 115,
+  "i": 877,
+  "kunci": "paragraf_butir",
+  "pilih": [
+   "judul_isi",
+   "judul_isi",
+   "judul_isi"
+  ],
+  "utama": "judul_isi",
+  "conf": 0.53,
+  "benar": false,
+  "keterangan": "4. Threats (Ancaman) — butir dlm ancaman"
+ },
+ {
+  "fid": 115,
+  "i": 3486,
+  "kunci": "tabel",
+  "pilih": [
+   "tabel",
+   "tabel",
+   "tabel"
+  ],
+  "utama": "tabel",
+  "conf": 0.57,
+  "benar": true,
+  "keterangan": "5 Adyatma — baris tabel"
+ },
+ {
+  "fid": 115,
+  "i": 7997,
+  "kunci": "tabel",
+  "pilih": [
+   "tabel",
+   "tabel",
+   "tabel"
+  ],
+  "utama": "tabel",
+  "conf": 0.39,
+  "benar": true,
+  "keterangan": "6 Sidang Skripsi — baris tabel langkah"
+ },
+ {
+  "fid": 115,
+  "i": 8019,
+  "kunci": "tabel",
+  "pilih": [
+   "tabel",
+   "tabel",
+   "tabel"
+  ],
+  "utama": "tabel",
+  "conf": 0.38,
+  "benar": true,
+  "keterangan": "4 Mbak April Konsumen — baris tabel informan"
+ },
+ {
+  "fid": 115,
+  "i": 555,
+  "kunci": "paragraf",
+  "pilih": [
+   "tabel",
+   "tabel",
+   "tabel"
+  ],
+  "utama": "tabel",
+  "conf": 0.57,
+  "benar": false,
+  "keterangan": "paragraf isi biasa"
+ },
+ {
+  "fid": 115,
+  "i": 4000,
+  "kunci": "paragraf",
+  "pilih": [
+   "butir",
+   "butir",
+   "butir"
+  ],
+  "utama": "butir",
+  "conf": 0.58,
+  "benar": false,
+  "keterangan": "paragraf isi biasa (tengah)"
+ },
+ {
+  "fid": 115,
+  "i": 6000,
+  "kunci": "paragraf",
+  "pilih": [
+   "tabel",
+   "tabel",
+   "tabel"
+  ],
+  "utama": "tabel",
+  "conf": 0.6,
+  "benar": false,
+  "keterangan": "paragraf isi biasa (jauh)"
+ }
+]

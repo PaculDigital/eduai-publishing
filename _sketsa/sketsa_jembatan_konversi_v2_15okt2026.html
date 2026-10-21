@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sketsa v2 — Jembatan Konversi Jurnal (istilah Done/UnDone)</title>
+<style>
+  :root{
+    --hijau:#1a7f4b; --hijau-muda:#e8f5ee; --merah:#b3261e; --merah-muda:#fdecea;
+    --kuning:#8a6d00; --kuning-muda:#fff8e1; --biru:#14548c; --biru-muda:#e8f1fa;
+    --abu:#5f6368; --abu-muda:#f4f5f7; --garis:#e3e6ea; --teks:#202124;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef1f4;color:var(--teks);
+       font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  .bungkus{max-width:900px;margin:0 auto;padding:20px 14px 60px}
+  h1{font-size:20px;margin:6px 0 4px}
+  .kepala{background:#202124;color:#fff;padding:14px 16px;border-radius:12px;margin-bottom:18px}
+  .kepala p{margin:4px 0 0;font-size:13px;color:#c9ccd1}
+  .pilihan{background:#fff;border:1px solid var(--garis);border-radius:14px;
+           padding:16px;margin-bottom:22px}
+  .pilihan > h2{margin:0 0 4px;font-size:17px}
+  .pilihan > .ket{margin:0 0 14px;font-size:13px;color:var(--abu)}
+  .layar{border:2px dashed #c3c8ce;border-radius:12px;padding:16px;background:#fbfcfd}
+  .layar .judul-kecil{font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+                      color:var(--abu);margin-bottom:10px;font-weight:700}
+  .pesan{border-radius:9px;padding:11px 13px;margin:10px 0;font-size:14px;display:flex;gap:8px}
+  .pesan.henti{background:var(--merah-muda);color:#8a2418;border:1px solid #f5c6c0}
+  .pesan.tidak{background:var(--kuning-muda);color:var(--kuning);border:1px solid #f0e0a8}
+  .pesan.ya{background:var(--hijau-muda);color:var(--hijau);border:1px solid #bfe5cd}
+  .pesan.info{background:var(--biru-muda);color:var(--biru);border:1px solid #c7dcf0}
+  .kotak{border:1px solid var(--garis);border-radius:10px;padding:13px;margin:12px 0;background:#fff}
+  .kotak h3{margin:0 0 10px;font-size:14px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px;border-bottom:1px solid var(--garis)}
+  th{background:var(--abu-muda);font-size:12.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--abu)}
+  .tok{font-weight:700;color:var(--biru);white-space:nowrap}
+  .pil{display:inline-block;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
+  .pil.done{background:var(--hijau-muda);color:var(--hijau)}
+  .pil.undone{background:var(--merah-muda);color:#8a2418}
+  .pil.na{background:var(--abu-muda);color:var(--abu)}
+  .tombol{display:inline-block;border-radius:9px;padding:10px 15px;font-weight:700;
+          font-size:14px;margin:6px 8px 0 0;border:1px solid transparent;cursor:default}
+  .t-utama{background:var(--hijau);color:#fff}
+  .t-dua{background:#fff;color:var(--teks);border-color:#c3c8ce}
+  .catatan{font-size:12.5px;color:var(--abu);margin-top:10px;font-style:italic}
+  .pemilih{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
+  .kartu-pilih{flex:1 1 260px;border:2px solid var(--garis);border-radius:11px;padding:13px;background:#fff}
+  .kartu-pilih.rekomendasi{border-color:var(--hijau);box-shadow:0 3px 12px rgba(26,127,75,.12)}
+  .kartu-pilih b{display:block;margin-bottom:4px;font-size:14.5px}
+  .kartu-pilih span{font-size:13px;color:var(--abu)}
+  .centang{color:var(--hijau);font-weight:800}
+  .silang{color:var(--merah);font-weight:800}
+  .akhir{background:#fff;border-radius:12px;padding:16px;border:1px solid var(--garis)}
+  .alur{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;
+        background:#202124;color:#e6e8eb;border-radius:10px;padding:14px;overflow-x:auto;
+        white-space:pre;line-height:1.55}
+</style>
+</head>
+<body>
+<div class="bungkus">
+
+  <div class="kepala">
+    <h1>🧩 Sketsa v2 — Jembatan Konversi Jurnal</h1>
+    <p>Perbaikan dari Bos: <b>nilai Jev, harga, &amp; istilah “sudah dibayar / lunas” TIDAK
+       ditampilkan</b>. Status cukup <b>Done</b> / <b>UnDone</b>.
+       Aturan kaku: tombol bab &amp; tombol mutu TIDAK PERNAH muncul bersama.</p>
+  </div>
+
+  <!-- ══════════ PILIHAN A ══════════ -->
+  <div class="pilihan">
+    <h2>Pilihan A — Kartu Bertingkat <span class="pil done" style="font-size:11px">pilihan Bos</span></h2>
+    <p class="ket">Layar menampilkan SATU kartu saja sesuai keadaan naskah.</p>
+    <div class="layar">
+      <div class="judul-kecil">Keadaan ① — bab belum lengkap</div>
+      <div class="pesan henti"><b>!</b> Naskah belum lengkap. Bagian yang belum ada:
+        <b>BAB IV</b> · <b>BAB V</b></div>
+      <div class="kotak">
+        <h3>Langkah berikutnya</h3>
+        <p style="margin:0 0 10px;font-size:14px">Lengkapi dulu bab yang belum ada, lalu kembali
+           ke sini untuk konversi.</p>
+        <span class="tombol t-utama">Lengkapi di Kolaborasi →</span>
+      </div>
+
+      <div class="judul-kecil" style="margin-top:20px">Keadaan ② — bab lengkap, mutu belum</div>
+      <div class="pesan ya"><b>✓</b> Semua bab sudah lengkap. Langkah berikutnya: kelengkapan artikel.</div>
+      <div class="kotak">
+        <h3>Kelengkapan artikel jurnal</h3>
+        <table>
+          <tr><th>Bagian</th><th>Status</th><th>Pilih untuk dilengkapi</th></tr>
+          <tr><td>Gap</td><td><span class="pil undone">UnDone</span></td>
+              <td><span class="centang">☑</span></td></tr>
+          <tr><td>Novelty</td><td><span class="pil undone">UnDone</span></td>
+              <td><span class="centang">☑</span></td></tr>
+          <tr><td>Hook</td><td><span class="pil done">Done</span></td><td>—</td></tr>
+          <tr><td>Limitasi</td><td><span class="pil done">Done</span></td><td>—</td></tr>
+        </table>
+        <div style="margin-top:14px">
+          <span class="tombol t-utama">Lengkapi 2 bagian terpilih</span>
+          <span class="tombol t-dua">Lanjut apa adanya</span>
+        </div>
+        <p class="catatan">Biaya ditampilkan di layar konfirmasi sebelum dipotong.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PILIHAN B ══════════ -->
+  <div class="pilihan">
+    <h2>Pilihan B — Ringkas + 1 Tombol Utama</h2>
+    <p class="ket">Ringkas 2 baris + satu tombol besar. Paling sedikit teks.</p>
+    <div class="layar">
+      <div class="judul-kecil">Keadaan ②</div>
+      <div class="kotak">
+        <h3>Status naskah</h3>
+        <table>
+          <tr><td><span class="centang">✓</span> Bab I–V lengkap</td>
+              <td style="text-align:right"><span class="pil done">Done</span></td></tr>
+          <tr><td>Kelengkapan artikel: 2 bagian belum</td>
+              <td style="text-align:right"><span class="pil undone">UnDone</span></td></tr>
+        </table>
+        <div style="margin-top:14px">
+          <span class="tombol t-utama">Lengkapi 2 bagian</span>
+          <span class="tombol t-dua">Konversi apa adanya</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PILIHAN C ══════════ -->
+  <div class="pilihan">
+    <h2>Pilihan C — Tampilkan Semua dari Awal (jadwal bertahap)</h2>
+    <p class="ket">Semua bagian ditampilkan sejak awal, tapi yang belum bisa dikerjakan
+       terkunci. ⚠️ Wulan kurang sarankan (kotak terkunci bisa bikin bingung).</p>
+    <div class="layar">
+      <div class="judul-kecil">Keadaan ①</div>
+      <div class="kotak">
+        <table>
+          <tr><th>Bagian</th><th>Status</th></tr>
+          <tr><td>BAB I–III</td><td><span class="pil done">Done</span></td></tr>
+          <tr><td>BAB IV · BAB V</td><td><span class="pil undone">UnDone</span></td></tr>
+          <tr><td>Kelengkapan artikel</td><td><span class="pil na">terkunci</span></td></tr>
+        </table>
+        <div style="margin-top:12px">
+          <span class="tombol t-utama">Lengkapi di Kolaborasi →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CONTOH BOS ══════════ -->
+  <div class="pilihan">
+    <h2>🔍 Contoh permintaan Bos</h2>
+    <p class="ket">Bab lengkap · 2 bagian UnDone (Gap &amp; Novelty) · user lengkapi HANYA 1 (Gap).</p>
+    <div class="layar">
+      <div class="judul-kecil">Saat konversi — hanya yang belum dilengkapi yang ditanyakan</div>
+      <div class="kotak">
+        <h3>Kelengkapan artikel jurnal</h3>
+        <table>
+          <tr><th>Bagian</th><th>Status</th><th>Aksi</th></tr>
+          <tr><td>Gap</td><td><span class="pil done">Done</span></td>
+              <td>— (tidak ditanyakan lagi)</td></tr>
+          <tr><td>Novelty</td><td><span class="pil undone">UnDone</span></td>
+              <td><b>lengkapi</b> atau <b>lanjut</b></td></tr>
+          <tr><td>Hook</td><td><span class="pil done">Done</span></td><td>—</td></tr>
+        </table>
+        <div style="margin-top:12px">
+          <span class="tombol t-utama">Lengkapi Novelty</span>
+          <span class="tombol t-dua">Konversi apa adanya</span>
+        </div>
+        <p class="catatan">Yang sudah Done tidak muncul lagi sebagai pertanyaan.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="akhir">
+    <h2 style="margin-top:0">Alur keputusan (kaku, satu arah)</h2>
+    <div class="alur">Naskah masuk
+   │
+   ├─ ① BAB kurang?  ── YA ─→ [Lengkapi di Kolaborasi]     ← HANYA tombol ini
+   │
+   └─ tidak
+        │
+        ├─ ② ada bagian UnDone? ── YA ─→ daftar bagian (Done/UnDone)
+        │                                 [Lengkapi terpilih]  [Lanjut apa adanya]
+        │
+        └─ tidak
+             │
+             └─ ③ [Konversi Sekarang]
+
+Saat konversi:
+   bagian Done   → tidak ditanyakan
+   bagian UnDone → DITANYAKAN (lengkapi / lanjut apa adanya)</div>
+  </div>
+
+  <div class="akhir" style="margin-top:20px">
+    <h2 style="margin-top:0">Rekomendasi Wulan</h2>
+    <div class="pemilih">
+      <div class="kartu-pilih rekomendasi">
+        <b>A — Kartu Bertingkat <span class="pil done">pilihan Wulan</span></b>
+        <span>User hanya melihat satu jalur. Tidak ada kotak terkunci, tidak ada angka teknis.</span>
+      </div>
+      <div class="kartu-pilih">
+        <b>B — Ringkas + 1 Tombol</b>
+        <span>Paling pendek untuk HP, tapi kurang menjelaskan bagian mana yang UnDone.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

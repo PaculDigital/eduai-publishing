@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naskah Saya — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+/* navbar hijau tua (permintaan Bos 11Sep26) */
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);border-bottom:1px solid rgba(255,255,255,.13);
+       position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;
+     display:flex;align-items:center;justify-content:space-between}
+.nav img{height:52px;width:auto}
+.nav-kanan{display:flex;align-items:center;gap:16px;font-size:14.5px}
+.nav-kanan .nama{color:rgba(255,255,255,.9)}
+.nav-kanan .keluar{color:#fff;font-weight:600;border:1.5px solid rgba(255,255,255,.34);padding:6px 15px;border-radius:70px;transition:.2s}
+.nav-kanan .setelan-wa{color:rgba(255,255,255,.92);font-weight:600;font-size:13.5px;padding:6px 13px;border:1.5px solid rgba(255,255,255,.22);border-radius:70px;transition:.2s}
+.nav-kanan .setelan-wa:hover{background:rgba(255,255,255,.14)}
+.nav-kanan .keluar:hover{background:rgba(255,255,255,.14)}
+
+.wadah{max-width:1080px;margin:0 auto;padding:32px 22px 60px}
+
+/* --- kartu kuota --- */
+.kuota{background:#fff;border:1px solid var(--garis);border-radius:16px;
+       padding:24px 26px;margin-bottom:26px}
+.kuota-atas{display:flex;justify-content:space-between;align-items:baseline;
+            flex-wrap:wrap;gap:10px;margin-bottom:14px}
+/* 🤝 pita tab (T5.1 Opsi A) — gaya sama dgn kolaborasi.html */
+.pita-tab{display:flex;gap:8px;margin:0 0 10px;width:100%;border-bottom:2px solid var(--garis);flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:2px}
+.pita-tab a{padding:9px 18px;border-radius:10px 10px 0 0;font-size:14px;font-weight:600;color:var(--teks-abu);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pita-tab a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);border-bottom:2px solid var(--hijau);margin-bottom:-2px}
+.kuota-atas h1{font-size:21px;font-weight:800;letter-spacing:-.3px}
+.kuota-angka{font-size:15px;color:var(--teks-abu)}
+.kuota-angka b{color:var(--hijau);font-size:17px}
+.bar{height:10px;background:#EDEEF1;border-radius:6px;overflow:hidden}
+.bar span{display:block;height:100%;background:linear-gradient(90deg,#198E3B,#2FB055);
+          border-radius:6px;transition:width .4s}
+.bar.penuh span{background:linear-gradient(90deg,#E08F12,#F4A025)}
+.kuota-bawah{display:flex;justify-content:space-between;align-items:center;
+             margin-top:14px;flex-wrap:wrap;gap:12px}
+.kuota-bawah small{color:var(--teks-abu);font-size:13.5px}
+/* 17Sep26: tombol Riwayat Transaksi di samping Tambah Kuota */
+.kuota-aksi{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.tombol-riwayat{background:#fff;color:var(--hijau);font-weight:700;font-size:13.5px;
+                padding:10px 18px;border-radius:70px;border:1.5px solid #CFE7D6;
+                font-family:inherit;cursor:pointer;transition:.2s;white-space:nowrap}
+.tombol-riwayat:hover{background:var(--hijau-muda);border-color:var(--hijau);
+                      transform:translateY(-1px)}
+.tombol-topup{background:var(--oranye);color:#2E1B00;font-weight:700;font-size:14px;
+              padding:10px 22px;border-radius:70px;border:none;font-family:inherit;
+              cursor:pointer;transition:.2s;box-shadow:0 5px 16px rgba(244,160,37,.28)}
+.tombol-topup:hover{background:#FFB63D;transform:translateY(-1px)}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TOMBOL "BAGIKAN KE PEMBIMBING" (Tahap 2, ACC Bos 23Sep26)
+   Permintaan Bos: "Tombol harus jelas dan Agak besar."
+   → dibuat LEBIH BESAR dari tombol lain di baris ini (bukan sekadar variasi
+     warna), supaya jadi aksi utama yang kelihatan tanpa dicari.
+   ══════════════════════════════════════════════════════════════════════ */
+.tombol-bagikan{display:inline-flex;align-items:center;gap:11px;
+  background:linear-gradient(135deg,#17702F,#198E3B);color:#fff;
+  font-family:inherit;font-size:15px;font-weight:700;
+  padding:13px 24px;border-radius:70px;border:none;cursor:pointer;
+  box-shadow:0 6px 18px rgba(25,142,59,.3);transition:.2s;letter-spacing:-.2px}
+.tombol-bagikan:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(25,142,59,.38)}
+.tombol-bagikan .tb-ikon{width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.2);display:flex;align-items:center;
+  justify-content:center;flex:none}
+.tombol-bagikan .tb-teks{display:flex;flex-direction:column;align-items:flex-start;
+  line-height:1.25}
+.tombol-bagikan .tb-teks small{font-size:11px;font-weight:500;color:#FFFFFF;
+  /*  ⚠️ TEMUAN MATA 24Sep26: dulu `opacity:.9` → teks jadi hijau redup di
+      atas hijau tua, SULIT DIBACA. Sekarang PUTIH PENUH + weight 500 supaya
+      kontras cukup (aturan aksesibilitas: teks kecil butuh kontras tinggi). */
+  opacity:1}
+
+/* ══════════ TOMBOL "MULAI BARU" (ACC Bos 26Sep26) ══════════
+   Tombol ini MEMBAWA user ke halaman /mulai (pintu 2 kartu + 4 langkah).
+   Gayanya sengaja MENIRU .tombol-bagikan supaya sebaris rapi, TAPI warna
+   ORANYE — memberi tanda "ini pintu masuk naskah baru", bukan aksi
+   mengirim naskah (hijau). Alasan: dua tombol hijau bersebelahan bikin
+   user salah klik. */
+a.tombol-mulaibaru{display:inline-flex;align-items:center;gap:11px;
+  background:linear-gradient(135deg,#E08E10,#F4A025);color:#2E1B00;
+  font-family:inherit;font-size:15px;font-weight:700;text-decoration:none;
+  padding:13px 24px;border-radius:70px;border:none;cursor:pointer;
+  box-shadow:0 6px 18px rgba(244,160,37,.32);transition:.2s;letter-spacing:-.2px}
+a.tombol-mulaibaru:hover{transform:translateY(-2px);box-shadow:0 9px 24px rgba(244,160,37,.42)}
+a.tombol-mulaibaru .tb-ikon{width:32px;height:32px;border-radius:50%;
+  background:rgba(46,27,0,.13);display:flex;align-items:center;
+  justify-content:center;flex:none}
+a.tombol-mulaibaru .tb-teks{display:flex;flex-direction:column;align-items:flex-start;
+  line-height:1.25}
+a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;opacity:.82}
+
+/* ══════════ PANEL BAGIKAN (modal) ══════════ */
+.latar-bagikan{position:fixed;inset:0;background:rgba(16,30,20,.55);
+  display:none;align-items:center;justify-content:center;z-index:9900;
+  padding:18px;overflow-y:auto}
+.latar-bagikan.buka{display:flex}
+.kotak-bagikan{background:#fff;border-radius:16px;width:100%;max-width:470px;
+  box-shadow:0 20px 60px rgba(0,0,0,.28);overflow:hidden;margin:auto}
+.kb-kepala{padding:22px 26px 0}
+.kb-kepala h3{font-size:17.5px;font-weight:800;margin-bottom:5px;color:var(--teks)}
+.kb-kepala p{font-size:13px;color:var(--teks-abu);line-height:1.6}
+.kb-isi{padding:18px 26px 6px}
+.kb-medan{margin-bottom:14px}
+.kb-medan label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+.kb-medan input,.kb-medan select{width:100%;font-family:inherit;font-size:14px;
+  padding:12px 14px;border:1.5px solid #E4E4E8;border-radius:9px;color:var(--teks);
+  background:#fff}
+.kb-medan input:focus,.kb-medan select:focus{outline:none;border-color:var(--hijau)}
+.kb-medan small{display:block;font-size:11px;color:var(--teks-abu);margin-top:5px}
+.kb-kaki{padding:8px 26px 22px;display:flex;gap:10px}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LOG REVISI COMPACT — 3 lapis lipatan (Tahap 2.3, ACC Bos 24Sep26)
+   Permintaan Bos: "Log Revisi compact (3 lapis lipatan)".
+   Ringkas = penting (Bos benci layar ramai). Ronde disembunyikan dulu.
+   ══════════════════════════════════════════════════════════════════════ */
+.kb-log-judul{font-size:12px;font-weight:700;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--teks-abu);margin-bottom:9px}
+/*  LAPIS 1 — 4 angka. Dibuat 2×2 supaya di HP tetap terbaca. */
+.kb-log-angka{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;
+  margin-bottom:13px}
+.kb-log-angka .sel{background:#F6F7F6;border:1px solid #E4E7E4;
+  border-radius:10px;padding:9px 11px}
+.kb-log-angka .sel b{display:block;font-size:19px;line-height:1.15;
+  color:var(--hijau-tua)}
+.kb-log-angka .sel span{font-size:11px;color:var(--teks-abu)}
+.kb-log-angka .sel.belum b{color:#B8860B}
+.kb-log-angka .sel.selesai b{color:#2E7D32}
+/*  LAPIS 2 — 1 baris per MASALAH. Bisa diklik → buka LAPIS 3. */
+.kb-log-baris .masalah{background:#fff;border:1px solid #E4E7E4;
+  border-radius:11px;margin-bottom:8px;overflow:hidden}
+.kb-log-baris .masalah>b{display:block;padding:11px 13px;font-size:13.5px;}
+.kb-log-kepala{display:flex;align-items:flex-start;gap:9px;padding:11px 13px;
+  cursor:pointer;user-select:none}
+.kb-log-kepala:hover{background:#FAFBFA}
+.kb-log-nomor{flex:none;width:22px;height:22px;border-radius:50%;
+  background:#EFEFEF;color:#666;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;margin-top:1px}
+.kb-log-teks{flex:1;min-width:0}
+.kb-log-teks .isi{font-size:13.5px;line-height:1.45;color:var(--teks)}
+.kb-log-teks .bagian{font-size:11px;color:var(--teks-abu);margin-top:3px}
+.kb-log-lencana{flex:none;font-size:11px;font-weight:600;padding:3px 8px;
+  border-radius:20px;background:#FFF7E0;color:#8A6D00}
+.kb-log-lencana.selesai{background:#E8F5E9;color:#2E7D32}
+.kb-log-lencana.hilang{background:#F3F3F3;color:#777}
+/*  'Catatan umum' = catatan tanpa sorotan. Netral, TIDAK menakutkan. */
+.kb-log-lencana.umum{background:#EEF1F4;color:#5A6570}
+/*  ═══ "REVISI DILEWATI" (Tahap 3.2, ACC Bos 24Sep26) ═══
+    Netral-jujur: abu lama, BUKAN hijau (jangan sampai terbaca "selesai")
+    dan BUKAN merah (bukan salah — mahasiswa hanya minta lewat). */
+.kb-log-lencana.lewat{background:#EDEDED;color:#6B6B6B}
+.kb-log-lencana.dibuka{background:#FFF7E0;color:#8A6D00}
+
+/*  ═══ IKON AKSI CATATAN (Desain B soft, ACC Bos 24Sep26) ═══
+    Permintaan Bos verbatim:
+      "Saya mau bukan tombol, terlalu panjang dan besar. Saya mau icon
+       tombol beserta tool tip, keterangan."
+      "ikon sparkles ... harusnya seperti lucide.dev/icons/sparkles"
+      "ikon pencil bukan biru tapi ganti hijau"
+      "Semua warna soft, bukan solid"
+    ✦ sparkles = kuning soft → Revisi dengan AI
+    ✎ pencil   = hijau soft  → Dikerjakan sendiri
+    ✕ x        = merah soft  → Lewati revisi ini
+    ⚠️ Bentuk ikon diambil dari sprite app (ik-sparkles/ik-pencil/ik-x),
+       JANGAN digambar sendiri — pernah salah jadi seperti matahari. */
+.kb-aksi{display:flex;gap:7px;align-items:center;flex:none;margin-top:1px}
+.kb-ik{width:32px;height:32px;border-radius:50%;padding:0;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;position:relative;
+  border:1px solid transparent;background:none;font-family:inherit;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),
+             box-shadow .18s ease,background .18s ease,border-color .18s ease;
+  will-change:transform}
+.kb-ik.ai{background:#FDF8EC;border-color:#F0E3C4;color:#C08A16}
+.kb-ik.manual{background:#EFF8F2;border-color:#CFE7D8;color:#2C7A4B}
+.kb-ik.lewat{background:#FDF1F1;border-color:#F2D2D2;color:#C0392B}
+.kb-ik:hover{transform:translateY(-4px) scale(1.14)}
+.kb-ik.ai:hover{background:#FBF0D6;border-color:#E8D3A8;
+  box-shadow:0 7px 15px rgba(192,138,22,.20)}
+.kb-ik.manual:hover{background:#E4F3EA;border-color:#B6DCC6;
+  box-shadow:0 7px 15px rgba(44,122,75,.18)}
+.kb-ik.lewat:hover{background:#FBE4E4;border-color:#EABDBD;
+  box-shadow:0 7px 15px rgba(192,57,43,.18)}
+.kb-ik:active{transform:translateY(-1px) scale(1.02)}
+.kb-ik:focus-visible{outline:2.5px solid #22301F;outline-offset:3px}
+/*  Kalau catatan sedang dilewati → ikon pudar & tidak bisa diklik
+    (mahasiswa tak bisa buka sendiri; itu hak pembimbing).
+    ⚠️ Dipakai kelas `.kb-mati`, BUKAN atribut `disabled`: kalau memakai
+    `disabled`, tooltip (::after/::before) ikut mati di sebagian browser →
+    mahasiswa tidak dapat keterangan apa pun. Dengan kelas ini tooltip
+    TETAP muncul menjelaskan kenapa. */
+.kb-ik.kb-mati{opacity:.34;cursor:not-allowed;filter:grayscale(.55);
+  pointer-events:auto}
+.kb-ik.kb-mati:hover{transform:none;box-shadow:none}
+/*  Tooltip kotak gelap (bukan title bawaan) supaya rapi & ikut tema. */
+.kb-ik[data-tip]::after{content:attr(data-tip);position:absolute;
+  bottom:calc(100% + 9px);left:50%;transform:translateX(-50%) scale(.9);
+  background:#22301F;color:#fff;font-size:11.5px;font-weight:500;
+  padding:5px 10px;border-radius:7px;white-space:nowrap;opacity:0;
+  pointer-events:none;transition:.16s ease;box-shadow:0 6px 16px rgba(0,0,0,.22);
+  z-index:9}
+.kb-ik[data-tip]::before{content:"";position:absolute;
+  bottom:calc(100% + 3px);left:50%;transform:translateX(-50%) scale(.9);
+  border:5px solid transparent;border-top-color:#22301F;opacity:0;
+  pointer-events:none;transition:.16s ease;z-index:9}
+.kb-ik:hover::after,.kb-ik:hover::before,
+.kb-ik:focus-visible::after,.kb-ik:focus-visible::before{
+  opacity:1;transform:translateX(-50%) scale(1)}
+@media(max-width:420px){
+  .kb-ik{width:29px;height:29px}
+  .kb-aksi{gap:5px}
+}
+.kb-log-buka{font-size:11px;color:var(--hijau);margin-left:6px}
+/*  LAPIS 3 — ronde-ronde masalah ini. Tersembunyi dulu.
+    ⚠️ BUG DIPERBAIKI 24Sep26 (temuan potret + mata): dulu selektornya
+    `.kb-log-baris .masalah.buka .kb-log-ronde` — padahal `.kb-log-baris`
+    itu ID (`id="kb-log-baris"`), BUKAN kelas! Selektor tidak pernah cocok
+    → ronde TIDAK PERNAH bisa dibuka walau kelas `buka` sudah dipasang.
+    Terukur di browser: `.kb-log-baris` = 0 elemen, display tetap 'none'.
+    Sekarang: cukup `.masalah.buka .kb-log-ronde` (tanpa wadah). */
+.kb-log-ronde{display:none;padding:0 13px 11px 44px}
+.masalah.buka .kb-log-ronde{display:block}
+.kb-log-ronde .ronde{border-left:2px solid #E4E7E4;padding:0 0 9px 11px;
+  font-size:12.5px;line-height:1.5;color:var(--teks-abu);position:relative}
+.kb-log-ronde .ronde:last-child{padding-bottom:0}
+.kb-log-ronde .ronde b{color:var(--teks);font-weight:600}
+.kb-log-ronde .ronde .tandai{display:block;font-size:11px;margin-top:2px}
+.kb-log-kosong{text-align:center;color:var(--teks-abu);font-size:12.5px;
+  padding:16px 8px}
+@media(max-width:420px){
+  .kb-log-angka{grid-template-columns:1fr 1fr}
+  .kb-log-angka .sel b{font-size:17px}
+}
+/* ══════════════════════════════════════════════════════════════════════
+   C3 (ACC Bos 24Sep26) — KARTU "CATATAN PEMBIMBING" DI DASHBOARD
+   Kotak ini DULU terkurung di dalam panel "Bagikan ke Pembimbing" sehingga
+   mahasiswa harus menekan "Bagikan" hanya untuk MELIHAT catatan. Kini
+   berdiri sendiri di dashboard. Gaya SOFT, sejalan dengan kartu lain.
+   ══════════════════════════════════════════════════════════════════════ */
+.kartu-log{background:#fff;border:1px solid #E6E3D8;border-left:3px solid #C9A227;
+  border-radius:12px;padding:14px 15px 11px;margin-bottom:16px}
+.kartu-log .kb-log-judul{display:flex;align-items:center;gap:8px;
+  text-transform:none;letter-spacing:0;font-size:14.5px;color:var(--teks);
+  margin-bottom:10px}
+.kartu-log .kb-log-judul .kb-log-ikon{color:#B07D0A;display:inline-flex}
+.kb-log-lencana-jml{font-size:11.5px;font-weight:700;color:#6B6B6B;
+  background:#F4F4F2;border-radius:20px;padding:2px 9px}
+.kb-log-lencana-jml.ada{background:#FDF6E3;color:#9A6C05}
+.kb-log-sembunyi{margin-left:auto;background:none;border:0;cursor:pointer;
+  color:var(--teks-abu);font-size:12px;padding:2px 6px;border-radius:6px}
+.kb-log-sembunyi:hover{background:#F4F4F2}
+/*  Lipatan: sembunyikan isi, sisakan kepala kartu.  */
+.kartu-log.lipat .kb-log-angka,
+.kartu-log.lipat #kb-log-baris,
+.kartu-log.lipat #kb-log-kosong,
+.kartu-log.lipat .kartu-log-kaki{display:none}
+.kartu-log-kaki{border-top:1px solid #F1EFE8;margin-top:10px;padding-top:9px;
+  text-align:right}
+.kartu-log-tautan{font-size:12.5px;color:#8A6A0A;font-weight:600;
+  text-decoration:none}
+.kartu-log-tautan:hover{text-decoration:underline}
+/*  ═══ KUNCI NASKAH + ARSIP (Tahap 3.3, ACC Bos 06Okt26 "A") ═══  */
+.kb-kunci{border-top:1px solid #F1EFE8;margin-top:10px;padding-top:10px}
+.kb-kunci-baris{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  justify-content:space-between}
+.kb-kunci-teks{font-size:12.5px;color:var(--teks-abu);line-height:1.5;
+  flex:1;min-width:150px}
+.kb-kunci-tombol{flex:none;background:#fff;color:#7A5A0A;font-weight:700;
+  font-size:12.5px;padding:8px 15px;border-radius:70px;
+  border:1.5px solid #E8D9A8;font-family:inherit;cursor:pointer;
+  transition:.2s;white-space:nowrap}
+.kb-kunci-tombol:hover{background:#FFF9E8;border-color:#DBAE4A}
+.kb-kunci-tombol.aktif{background:#7A5A0A;color:#fff;border-color:#7A5A0A}
+.kb-kunci-pesan{margin-top:9px;font-size:12.5px;line-height:1.55;
+  background:#FFF9E8;border:1px solid #F0D89A;border-radius:9px;
+  padding:10px 12px;color:#6B5410}
+.kb-kunci-pesan.baik{background:#EEF7F1;border-color:#BFD9C7;color:#1E5C34}
+.kb-arsip{margin-top:10px;border-top:1px dashed #E4E4E8;padding-top:9px}
+.kb-arsip-judul{background:none;border:none;font-family:inherit;cursor:pointer;
+  font-size:12.5px;font-weight:700;color:var(--teks-abu);
+  text-decoration:none;padding:0}
+.kb-arsip-judul:hover{text-decoration:underline}
+.kb-arsip-isi{margin-top:8px;font-size:12px;color:var(--teks-abu);
+  line-height:1.6}
+.kb-arsip-butir{padding:6px 0;border-bottom:1px solid #F6F5F1}
+.kb-arsip-butir:last-child{border-bottom:none}
+.kb-batal{flex:1;background:#fff;color:var(--teks-abu);font-weight:700;font-size:14px;
+  padding:13px;border-radius:70px;border:1.5px solid #E4E4E8;font-family:inherit;
+  cursor:pointer}
+.kb-ok{flex:1.7;background:var(--hijau);color:#fff;font-weight:700;font-size:14px;
+  padding:13px;border-radius:70px;border:none;font-family:inherit;cursor:pointer;
+  transition:.2s}
+.kb-ok:hover{background:#17702F}
+.kb-ok:disabled{background:#BFD9C7;cursor:not-allowed}
+.kb-ringkas{background:#FAFAFB;border:1px solid #E4E4E8;border-radius:9px;
+  padding:14px 16px;font-size:12.5px;line-height:2}
+.kb-ringkas b{display:inline-block;width:104px;color:var(--teks-abu);font-weight:600}
+.kb-catatan{background:#FFF9E8;border:1px solid #F0D89A;border-radius:9px;
+  padding:11px 14px;margin-top:12px;font-size:11.5px;color:#7A5A10;line-height:1.7}
+.kb-salah{background:#FDECEC;border:1px solid #F0BFBF;color:#A32B2B;
+  border-radius:9px;padding:10px 14px;font-size:12px;margin-bottom:13px;display:none}
+
+/* ══════════ HASIL: LINK + COPY + KIRIM ══════════ */
+.kb-hasil{background:var(--hijau-muda);border:1px solid #BFE3CB;border-radius:11px;
+  padding:17px}
+.kb-hasil-judul{font-size:13px;font-weight:700;color:#104F22;margin-bottom:10px;
+  display:flex;align-items:center;gap:7px}
+.kb-link{background:#fff;border:1.5px dashed #9CC9AC;border-radius:9px;
+  padding:12px 14px;font-family:ui-monospace,monospace;font-size:11.5px;
+  color:#146B2C;word-break:break-all;line-height:1.6}
+.kb-tombol{display:flex;gap:9px;margin-top:11px;flex-wrap:wrap}
+.kb-copy{flex:1;min-width:120px;background:#fff;color:var(--hijau);font-weight:700;
+  font-size:13px;padding:12px;border-radius:70px;border:1.5px solid #9CC9AC;
+  font-family:inherit;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:7px;transition:.2s}
+.kb-copy:hover{background:#fff;border-color:var(--hijau)}
+.kb-kirim{flex:1;min-width:120px;background:#25D366;color:#fff;font-weight:700;
+  font-size:13px;padding:12px;border-radius:70px;border:none;font-family:inherit;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:.2s;text-decoration:none}
+.kb-kirim:hover{background:#1EB855}
+.kb-berlaku{font-size:11px;color:#146B2C;margin-top:10px;text-align:center}
+
+/* ══════════ DAFTAR PEMBIMBING ══════════ */
+.kb-baris{display:flex;align-items:center;gap:12px;padding:13px 15px;
+  border-top:1px solid #EEEEF1}
+.kb-baris:first-child{border-top:none}
+.kb-nama{font-size:13.5px;font-weight:700}
+.kb-ket{font-size:11.5px;color:var(--teks-abu);margin-top:3px;line-height:1.55}
+.kb-cabut{background:#fff;border:1.5px solid #E7C4C4;color:#A32B2B;font-weight:700;
+  font-size:11.5px;padding:8px 15px;border-radius:70px;font-family:inherit;
+  cursor:pointer;white-space:nowrap}
+.kb-cabut:hover{background:#FDECEC}
+.kb-lencana{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;
+  white-space:nowrap}
+.kb-lencana.aktif{background:#E9F6EE;color:#146B2C}
+.kb-lencana.mati{background:#F2F2F4;color:#77757E}
+.kb-tanya{background:var(--hijau-muda);border-radius:9px;padding:12px 14px;
+  font-size:11.5px;color:#146B2C;line-height:1.7;margin:0 0 12px}
+
+/* HP: panel jadi penuh, tombol tetap besar */
+@media(max-width:520px){
+  .tombol-bagikan{width:100%;justify-content:center;padding:13px 18px;font-size:14.5px}
+  .kotak-bagikan{max-width:100%}
+  .kb-link{font-size:11px}
+}
+
+/* --- area unggah ---
+   🐛 BUG DIPERBAIKI (11Sep26): `.zon` adalah <label> yang default-nya
+   `display:inline`. Dengan inline, border/padding TIDAK membungkus konten ->
+   garis dashed melenceng ke tepi layar & menabrak teks di bawahnya (kacau di HP).
+   WAJIB: display:block + box-sizing:border-box. */
+.zon{display:block;box-sizing:border-box;width:100%;
+     background:#fff;border:2px dashed #CDE4D6;border-radius:16px;
+     padding:38px 24px;text-align:center;margin-bottom:26px;transition:.24s;cursor:pointer}
+.zon:hover,.zon.aktif{border-color:var(--hijau);background:#F7FCF9}
+.zon-ikon{font-size:38px;margin-bottom:12px}
+.zon h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.zon p{color:var(--teks-abu);font-size:14px}
+/* 🐛 12Sep26: JANGAN pakai display:none — sebagian WebView Android menolak
+   membuka file picker kalau input-nya benar-benar tidak dirender. Pakai teknik
+   "visually hidden" (ukuran 1px, opacity 0) supaya input tetap ada di layout
+   dan picker native terpanggil normal, termasuk membuka File Manager. */
+.zon input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+           overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;opacity:0}
+
+/* ═══ FOLDER workspace (ACC Bos 15Sep26) ══════════════════════════════
+   Folder = alat kerapian yang BIKIN user unggah lebih banyak (storage naik
+   = untung) sekaligus alasan upgrade (jatah folder dibatasi per paket).
+   Ukuran folder DITAMPILKAN, tapi tawaran AddOn TIDAK di halaman ini. */
+.fd-bar{display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin:0 0 12px;flex-wrap:wrap}
+.fd-bar-kiri{display:flex;align-items:baseline;gap:9px;font-size:15px}
+.fd-jatah{font-size:12.5px;color:var(--teks-abu);background:#fff;
+  border:1px solid var(--garis);border-radius:999px;padding:2px 10px}
+.fd-tombol-baru{background:var(--hijau);color:#fff;border:0;border-radius:10px;
+  padding:9px 15px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.fd-tombol-baru:hover{filter:brightness(1.07)}
+.fd-tombol-baru:disabled{background:#C9CFC9;cursor:not-allowed}
+
+.fd-notif{border-radius:10px;padding:10px 13px;font-size:13px;margin-bottom:10px;
+  line-height:1.5}
+.fd-notif-ok{background:#E9F7EF;border:1px solid #B8E2C9;color:#1E6B41}
+.fd-notif-galat{background:#FDECEC;border:1px solid #F3C2C2;color:#93292B}
+.fd-notif-info{background:#FFF9ED;border:1px solid #F2DDB4;color:#7A5C15}
+
+/* ═══ TOMBOL ADDON DI PERINGATAN JATAH FOLDER (ACC Bos 15Sep26) ══════════
+   Tujuan: saat jatah folder habis, user ditawari ADDON (murah, bisa dibeli
+   berulang) — bukan disuruh pindah paket. Ini mesin uang, jadi tombolnya
+   harus menonjol tapi tidak norak. */
+.fd-tombol-addon{display:inline-flex;align-items:center;gap:6px;margin-left:8px;
+  background:var(--hijau);color:#fff;border:0;border-radius:9px;
+  padding:7px 13px;font-size:12.5px;font-weight:700;font-family:inherit;
+  cursor:pointer;transition:.18s;vertical-align:middle}
+.fd-tombol-addon:hover{background:#14722E;transform:translateY(-1px);
+  box-shadow:0 3px 10px rgba(25,142,59,.22)}
+.fd-ket-addon{display:block;margin-top:6px;font-size:11.5px;color:#8A7238}
+
+/* ═══ AJAK UPGRADE (paket gratis) — ACC Bos 15Sep26 ══════════════════════
+   User gratis tidak bisa beli AddOn. Daripada menampilkan popup yang
+   tombolnya mati (bikin bingung), tampilkan ajakan jelas + jalan keluar. */
+.ajak-upgrade{background:#F4F7FF;border:1.5px solid #CDDAF5;border-radius:14px;
+  padding:16px 18px;margin-bottom:14px}
+.ajak-judul{display:block;font-size:15px;color:#1C3A6E;margin-bottom:6px}
+.ajak-sebab{font-size:13px;color:#3A4C6B;line-height:1.55;margin-bottom:8px}
+.ajak-ket{font-size:12.5px;color:#5A6B82;line-height:1.55;margin-bottom:12px}
+
+.fd-item{background:#fff;border:1px solid var(--garis);border-radius:14px;
+  margin-bottom:9px;overflow:hidden}
+.fd-item:hover{border-color:var(--hijau)}
+.fd-kepala{display:flex;align-items:center;gap:13px;padding:13px 15px;cursor:pointer}
+.fd-ikon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;
+  justify-content:center;font-size:20px;background:#EEF3EF;flex:0 0 auto}
+/* warna folder — supaya user "sayang" workspace-nya */
+.fd-hijau .fd-ikon{background:#E4F3E9}
+.fd-biru .fd-ikon{background:#E4EEF9}
+.fd-kuning .fd-ikon{background:#FBF1DC}
+.fd-merah .fd-ikon{background:#FBE6E6}
+.fd-ungu .fd-ikon{background:#EFE7F8}
+.fd-abu .fd-ikon{background:#EEF0F2}
+.fd-teks{flex:1;min-width:0}
+.fd-nama{font-size:14.5px;font-weight:600;margin-bottom:3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fd-info{font-size:12.3px;color:var(--teks-abu)}
+.fd-panah{font-size:12px;color:var(--teks-abu);transition:.18s}
+.fd-panah.buka{transform:rotate(90deg)}
+
+.fd-isi{border-top:1px solid var(--garis);padding:10px 15px 13px;background:#FCFCFC}
+.fd-berkas{display:flex;align-items:center;gap:9px;padding:7px 0;
+  border-bottom:1px dashed #EDEDED;font-size:13.3px}
+.fd-berkas:last-child{border-bottom:0}
+.fd-berkas-nama{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.fd-berkas-ukuran{font-size:11.8px;color:var(--teks-abu);flex:0 0 auto}
+.fd-mini{text-decoration:none;font-size:13px;padding:2px 5px;border-radius:7px;
+  border:1px solid var(--garis);background:#fff;cursor:pointer;line-height:1.3}
+.fd-mini:hover{border-color:var(--hijau)}
+.fd-keluar{color:#8A6D1F}
+.fd-kosong{font-size:12.8px;color:var(--teks-abu);padding:6px 0}
+.fd-aksi{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.fd-mini2{background:#fff;border:1px solid var(--garis);border-radius:9px;
+  padding:7px 13px;font-size:12.7px;font-weight:600;cursor:pointer;
+  font-family:inherit}
+.fd-mini2:hover{border-color:var(--hijau)}
+.fd-hapus{color:#A63030;border-color:#EFC9C9}
+.fd-hapus:hover{background:#FDECEC}
+.fd-pilih{font-size:12.5px;border:1px solid var(--garis);border-radius:8px;
+  padding:5px 8px;background:#fff;font-family:inherit;max-width:150px}
+
+/* modal buat/ubah folder */
+.fd-lapis{position:fixed;inset:0;background:rgba(28,27,34,.42);display:none;
+  align-items:center;justify-content:center;z-index:50;padding:18px}
+.fd-lapis.tampil{display:flex}
+.fd-kartu{background:#fff;border-radius:16px;padding:20px;width:100%;
+  max-width:380px;box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.fd-kartu h3{font-size:16px;margin:0 0 15px}
+.fd-kartu label{display:block;font-size:12.6px;color:var(--teks-abu);
+  margin:11px 0 5px;font-weight:600}
+.fd-kartu input[type=text]{width:100%;border:1px solid var(--garis);
+  border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;
+  box-sizing:border-box}
+.fd-pil{display:flex;gap:7px;flex-wrap:wrap}
+.fd-pil label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--garis);
+  border-radius:999px;padding:6px 12px;cursor:pointer;font-size:12.6px;margin:0;
+  color:var(--teks);font-weight:500}
+.fd-pil input{display:none}
+.fd-pil input:checked + span{font-weight:700}
+.fd-pil label:has(input:checked){border-color:var(--hijau);background:#F0F8F2}
+.fd-titik{width:13px;height:13px;border-radius:50%;display:inline-block}
+.fd-t-hijau{background:#5FA777}.fd-t-biru{background:#5E8FC7}.fd-t-kuning{background:#DBAE4A}
+.fd-t-merah{background:#C86B6B}.fd-t-ungu{background:#9273C4}.fd-t-abu{background:#9AA3AB}
+.fd-kartu-aksi{display:flex;gap:9px;margin-top:18px}
+.fd-kartu-aksi button{flex:1;border-radius:10px;padding:11px;font-size:13.5px;
+  font-weight:600;cursor:pointer;font-family:inherit;border:0}
+.fd-batal{background:#F1F1F1;color:var(--teks)}
+.fd-simpan{background:var(--hijau);color:#fff}
+
+@media(max-width:520px){
+  .fd-kepala{padding:12px}
+  .fd-ikon{width:37px;height:37px;font-size:18px}
+  .fd-nama{font-size:13.8px}
+  .fd-pilih{max-width:112px}
+}
+
+/* --- daftar berkas --- */
+.judul-bagian{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.judul-bagian h2{font-size:18px;font-weight:800}
+.judul-bagian span{color:var(--teks-abu);font-size:14px}
+
+.berkas{display:flex;align-items:center;gap:15px;background:#fff;
+        border:1px solid var(--garis);border-radius:13px;padding:16px 18px;
+        margin-bottom:11px;transition:.2s}
+.berkas:hover{border-color:var(--hijau);box-shadow:0 5px 18px rgba(39,37,48,.07)}
+.berkas-ikon{width:44px;height:44px;border-radius:11px;background:var(--hijau-muda);
+             display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.berkas-isi{flex:1;min-width:0}
+.berkas-nama{font-size:15px;font-weight:600;margin-bottom:3px;
+             overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.berkas-info{font-size:12.5px;color:var(--teks-abu)}
+.aksi{display:flex;gap:8px;flex-shrink:0}
+.aksi a,.aksi button{padding:8px 15px;border-radius:8px;font-size:13px;font-weight:600;
+                     border:1px solid var(--garis);background:#fff;cursor:pointer;
+                     font-family:inherit;transition:.2s;color:var(--teks)}
+.aksi a:hover{border-color:var(--hijau);color:var(--hijau)}
+.aksi button.hapus:hover{border-color:#E5484D;color:#E5484D}
+
+/* --- tong sampah (ACC Bos 14Sep26) --- */
+.judul-baris{display:flex;align-items:center;justify-content:space-between;gap:14px;
+             flex-wrap:wrap;margin-bottom:16px}
+.tombol-sampah{background:#fff;color:var(--teks-abu);font-weight:600;font-size:13.5px;
+               border:1.5px solid var(--garis);padding:9px 16px;border-radius:70px;
+               cursor:pointer;font-family:inherit;transition:.2s;
+               display:inline-flex;align-items:center;gap:8px}
+.tombol-sampah:hover{border-color:var(--hijau);color:var(--hijau);background:var(--hijau-muda)}
+.tombol-sampah .lonceng{background:var(--oranye);color:#2E1B00;font-size:11.5px;
+                        font-weight:800;border-radius:70px;padding:2px 8px}
+
+.kosong{text-align:center;padding:56px 24px;background:#fff;border:1px solid var(--garis);
+        border-radius:16px}
+.kosong-ikon{font-size:44px;margin-bottom:14px;opacity:.5}
+.kosong h3{font-size:17px;font-weight:700;margin-bottom:7px}
+.kosong p{color:var(--teks-abu);font-size:14.5px}
+
+/* --- notifikasi --- */
+#notif{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);
+       background:var(--teks);color:#fff;padding:14px 26px;border-radius:70px;
+       font-size:14.5px;font-weight:500;transition:.3s;z-index:100;
+       box-shadow:0 10px 34px rgba(0,0,0,.24);max-width:90vw;text-align:center}
+#notif.tampil{transform:translateX(-50%) translateY(0)}
+#notif.gagal{background:#B3261E}
+
+@media(max-width:620px){
+  .nav{height:68px;padding:0 16px}
+  .nav img{height:42px}
+  .nav-kanan{gap:10px;font-size:13.5px}
+  .nav-kanan .nama{padding:5px 11px;border-radius:70px;background:rgba(255,255,255,.16);
+                   max-width:96px;overflow:hidden;text-overflow:ellipsis;
+                   white-space:nowrap}
+  .nav-kanan .keluar{padding:5px 13px;border-radius:70px}
+  .nav-kanan .setelan-wa{padding:5px 11px;font-size:12.5px}
+  .wadah{padding:20px 16px 48px}
+  .kuota{padding:20px 18px;border-radius:14px}
+  .kuota-atas h1{font-size:18px}
+  .kuota-angka{font-size:13.5px}
+  .kuota-angka b{font-size:15px}
+  .kuota-bawah{flex-direction:column;align-items:stretch;gap:12px}
+  .kuota-aksi{flex-direction:column;align-items:stretch;gap:9px}
+  .tombol-riwayat{width:100%;padding:12px}
+  .tombol-topup{width:100%;padding:12px}
+  .zon{padding:30px 18px}
+  .zon-ikon{font-size:32px}
+  .zon h3{font-size:15.5px}
+  .zon p{font-size:13px;line-height:1.5}
+  .judul-bagian h2{font-size:16.5px}
+  .berkas{padding:14px;gap:12px;flex-wrap:wrap}
+  .berkas-ikon{width:38px;height:38px;font-size:18px;border-radius:9px}
+  .berkas-nama{font-size:14px}
+  .aksi{width:100%;justify-content:flex-end;gap:7px;margin-top:4px}
+  .aksi a.edit{background:var(--hijau);color:#fff;border-color:var(--hijau);font-weight:700}
+  .aksi a.edit:hover{background:var(--hijau-tua);border-color:var(--hijau-tua)}
+  .aksi a,.aksi button{padding:9px 16px;font-size:13px;flex:1;text-align:center;
+                        min-height:40px;display:inline-flex;align-items:center;
+                        justify-content:center}
+  .kosong{padding:44px 20px}
+}
+
+/* ── kotak info sesi editor (permintaan Bos 12Sep26) ── */
+.sesi-kotak{display:flex;align-items:center;justify-content:space-between;gap:14px;
+            background:#F2F8F4;border:1.5px solid #CFE7D6;border-radius:13px;
+            padding:14px 17px;margin-bottom:18px;flex-wrap:wrap}
+.sesi-kiri{display:flex;align-items:flex-start;gap:12px;flex:1;min-width:220px}
+.sesi-ikon{font-size:21px;line-height:1.3}
+.sesi-judul{font-size:13.5px;font-weight:700;color:#14722F}
+.sesi-daftar{font-size:12.5px;color:#5C6B62;margin-top:3px;line-height:1.5}
+.sesi-tutup{padding:10px 18px;border:0;border-radius:70px;background:#198E3B;color:#fff;
+            font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
+.sesi-tutup:hover{background:#14722F}
+.sesi-tutup:disabled{background:#C3CAC6;cursor:wait}
+@media(max-width:520px){.sesi-tutup{width:100%}}
+</style>
+<link rel="stylesheet" href="/static/ikon.css">
+</head>
+<body>
+<!-- IKON: sprite Lucide (ACC Bos 15Sep26) -->
+{{ ikon_sprite() }}
+
+
+<header>
+  <div class="nav">
+    <a href="/naskah"><img src="/static/logo-320.png" alt="EduAi Publishing"></a>
+    <div class="nav-kanan">
+      <span class="nama">{{ user.nama }}</span>
+      <a href="/setelan-wa" class="setelan-wa" title="Setelan WhatsApp">WhatsApp</a>
+      <a href="/keluar" class="keluar">Keluar</a>
+    </div>
+  </div>
+</header>
+
+<div class="wadah">
+
+  <!-- KUOTA -->
+  {% set persen = (user.terpakai_mb / user.kuota_mb * 100) if user.kuota_mb else 0 %}
+  <div class="kuota">
+    <div class="kuota-atas">
+      <!-- 🤝 PITA TAB (T5.1 Opsi A, ACC Bos 27Sep26): satu dasbor 2 tab -->
+      {% set menu_aktif = 'naskah' %}
+      {% include '_menu.html' %}
+      <h1>Naskah Saya</h1>
+      <div class="kuota-angka">
+        <b>{{ '%.1f'|format(user.terpakai_mb) }} MB</b> dari {{ user.kuota_mb }} MB
+      </div>
+    </div>
+    <div class="bar {% if persen >= 90 %}penuh{% endif %}">
+      <span style="width:{{ [persen, 100]|min }}%"></span>
+    </div>
+    <div class="kuota-bawah">
+      <small>Sisa {{ '%.1f'|format(user.sisa_mb) }} MB</small>
+      <div class="kuota-aksi">
+        <!-- MULAI BARU (ACC Bos 26Sep26): pintu masuk naskah baru —
+             diarahkan ke halaman /mulai (pintu 2 kartu + 4 langkah).
+             Alasan ditaruh di sini: user sudah melihat "Naskah Saya",
+             jadi tombol untuk menambah naskah baru wajar di baris aksi. -->
+        <a class="tombol-mulaibaru" href="/mulai"
+           title="Susun naskah baru dari awal — dipandu langkah demi langkah">
+          <span class="tb-ikon">{{ ikon('file-plus', 17) }}</span>
+          <span class="tb-teks">
+            Mulai Baru
+            <small>Naskah baru dari awal</small>
+          </span>
+        </a>
+        <button type="button" class="tombol-bagikan" onclick="bukaBagikan()"
+                title="Kirim naskah ke pembimbing untuk ditinjau">
+          <span class="tb-ikon">{{ ikon('users', 17) }}</span>
+          <span class="tb-teks">
+            Bagikan ke Pembimbing
+            <small>Kirim naskah untuk ditinjau</small>
+          </span>
+        </button>
+        <button type="button" class="tombol-riwayat" onclick="bukaRiwayat()"
+                title="Lihat semua transaksi top-up Anda">
+          {{ ikon('receipt', 15) }} Riwayat Transaksi
+        </button>
+        <button type="button" class="tombol-topup" onclick="bukaTopup()">
+          + Tambah Kuota
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       📋 CATATAN PEMBIMBING — KARTU SENDIRI DI DASHBOARD (C3, ACC Bos 24Sep26)
+
+       KENAPA DIPINDAH (masalah yang Bos tangkap):
+         Dulu kotak ini (#kb-log) TERKURUNG di dalam panel "Bagikan ke
+         Pembimbing" — panel itu isinya FORM membagi tautan. Akibatnya
+         mahasiswa harus menekan tombol "Bagikan" hanya untuk MELIHAT
+         catatan pembimbing. Padahal "bagikan" != "lihat revisi" — dua
+         maksud berbeda dijejalkan di satu tempat.
+
+       KINI: kartu ini berdiri sendiri, SELALU TERLIHAT di dashboard.
+         • Ada catatan  -> muncul dengan angka + baris masalah + ikon aksi
+         • Belum ada    -> kartu HILANG TOTAL (tidak makan tempat sama sekali)
+           (aturan Bos: "suka ringkas", jangan tumpuk blok)
+
+       ISI & GAYA TIDAK DIUBAH: struktur, kelas, dan fungsi JS
+       (kbMuatLog/kbBukaMasalah/kbRevisiAI/...) SAMA seperti sebelumnya —
+       hanya PINDAH TEMPAT + dipanggil saat halaman dibuka.
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div id="kb-log" class="kartu-log" style="display:none">
+    <div class="kb-log-judul">
+      <span class="kb-log-ikon">{{ ikon('clipboard-check', 17) }}</span>
+      <span>Catatan Pembimbing</span>
+      <span class="kb-log-lencana-jml" id="kb-log-lencana"></span>
+      <button type="button" class="kb-log-sembunyi" id="kb-log-sembunyi"
+              onclick="kbLipatLog()" title="Sembunyikan daftar">&#9650;</button>
+    </div>
+
+    {# LAPIS 1 — RINGKASAN #}
+    <div class="kb-log-angka" id="kb-log-angka"></div>
+
+    {# LAPIS 2 — SATU BARIS PER MASALAH #}
+    <div id="kb-log-baris"></div>
+
+    <div id="kb-log-kosong" style="display:none" class="kb-log-kosong">
+      Belum ada catatan dari pembimbing. Bila pembimbing sudah menulis
+      catatan, semuanya akan muncul di sini.
+    </div>
+
+    <div class="kartu-log-kaki">
+      <a class="kartu-log-tautan" href="javascript:void(0)"
+         onclick="bukaBagikanDariLog()">
+        Undang / kelola pembimbing &rarr;
+      </a>
+    </div>
+
+    <!-- ═══ KUNCI NASKAH + ARSIP (Tahap 3.3, ACC Bos 06Okt26 "A") ═══
+         MASALAH: naskah sudah ke penguji tapi masih ada sorotan kuning →
+         skripsi terlihat DRAFT. Solusi: kunci → sorotan disembunyikan.
+         Catatan TIDAK dihapus. Boleh dikunci walau masih ada yang belum
+         selesai; hanya muncul PERINGATAN (putusan Bos "A"). -->
+    <div class="kb-kunci" id="kb-kunci">
+      <div class="kb-kunci-baris">
+        <span class="kb-kunci-teks" id="kb-kunci-teks"></span>
+        <button type="button" class="kb-kunci-tombol" id="kb-kunci-tombol"
+                onclick="kbKunciNaskah()"></button>
+      </div>
+      <div class="kb-kunci-pesan" id="kb-kunci-pesan" style="display:none"></div>
+      <div class="kb-arsip" id="kb-arsip" style="display:none">
+        <button type="button" class="kb-arsip-judul" id="kb-arsip-judul"
+                onclick="kbArsipLipat()"></button>
+        <div class="kb-arsip-isi" id="kb-arsip-isi" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNGGAH -->
+  <form id="form-unggah" method="post" action="/unggah" enctype="multipart/form-data">
+    <label class="zon" id="zon" tabindex="0" role="button"
+           aria-label="Pilih berkas untuk diunggah">
+      <div class="zon-ikon">{{ ikon('upload', 30) }}</div>
+      <h3>Klik atau tarik berkas ke sini</h3>
+      <p>DOCX, PDF, XLSX, PPTX, gambar &middot; maks {{ max_mb }} MB per berkas</p>
+      <!-- 🐛 12Sep26: `accept` DIBUANG TOTAL (meniru Google Drive).
+           Di Chrome Android, begitu `accept` memuat image/* atau .jpg/.png, Android
+           menyimpulkan "user cuma mau gambar" lalu HANYA menampilkan Kamera + Galeri
+           dan MENGHILANGKAN opsi File Explorer umum.
+           Tanpa `accept`, Android membuka File Explorer penuh -> user bisa pilih
+           DOCX/PDF/XLSX dari mana saja (termasuk Google Drive, WhatsApp, dsb).
+           Filter tetap ada di 2 lapis: validasi klien (JS) + BE (EKSTENSI_DIIZINKAN). -->
+      <input type="file" id="pilih" name="berkas">
+    </label>
+  </form>
+
+  <!-- DAFTAR -->
+  <div class="judul-bagian judul-baris">
+    <h2>Berkas Tersimpan</h2>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span>
+        {{ jumlah_file }} / {{ max_file }} berkas
+        {% if jumlah_file >= max_file %} <b style="color:#8A1C1C">(penuh)</b>{% endif %}
+      </span>
+      {# TONG SAMPAH (ACC Bos 14Sep26) — selalu tampil, biar user tahu ada sampah #}
+      <a href="/sampah" class="tombol-sampah" title="Dokumen yang dihapus masih bisa dipulihkan {{ sampah_hari }} hari">
+        {{ ikon('trash-2', 15) }} Tong Sampah
+        {% if jumlah_sampah %}<span class="lonceng">{{ jumlah_sampah }}</span>{% endif %}
+      </a>
+    </div>
+  </div>
+
+  {% if sesi_aktif or batas_sesi %}
+  <div class="sesi-kotak">
+    <div class="sesi-kiri">
+      <span class="sesi-ikon">{{ ikon('monitor', 19) }}</span>
+      <div>
+        <div class="sesi-judul">
+          Editor aktif: <b>{{ sesi_aktif|length }} / {{ batas_sesi }}</b>
+        </div>
+        {% if sesi_aktif %}
+        <div class="sesi-daftar">
+          {% for s in sesi_aktif %}{{ s.nama }} ({{ s.menit }} mnt){% if not loop.last %} &middot; {% endif %}{% endfor %}
+        </div>
+        {% else %}
+        <div class="sesi-daftar">Tidak ada dokumen yang sedang dibuka.</div>
+        {% endif %}
+      </div>
+    </div>
+    {% if sesi_aktif %}
+    <button class="sesi-tutup" onclick="tutupSemuaSesi(this)">Simpan &amp; Tutup Semua</button>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ═══════════ FOLDER workspace (ACC Bos 15Sep26) ═══════════
+     Tujuan: workspace rapi → user betah unggah → storage naik → untung.
+     Ukuran folder DITAMPILKAN (sadar storage); tawaran AddOn TIDAK di sini. #}
+  <div class="fd-bar">
+    <div class="fd-bar-kiri">
+      <b>Folder</b>
+      <span class="fd-jatah">
+        {{ jumlah_folder }}{% if jatah_folder %} / {{ jatah_folder }}{% else %} · tak terbatas{% endif %}
+      </span>
+    </div>
+    <button type="button" class="fd-tombol-baru" onclick="fdBukaBuat()"
+            {% if sisa_jatah is not none and sisa_jatah <= 0 %}disabled title="Jatah folder paket Anda sudah penuh"{% endif %}>
+      + Folder baru
+    </button>
+  </div>
+
+  {% if request.query_params.get('pesan') %}
+  <div class="fd-notif fd-notif-ok">{{ request.query_params.get('pesan') }}</div>
+  {% endif %}
+  {% if request.query_params.get('galat') %}
+  <div class="fd-notif fd-notif-galat">{{ request.query_params.get('galat') }}</div>
+  {% endif %}
+
+  {# ── AJAK UPGRADE (paket gratis) — ACC Bos 15Sep26 ──────────────────────
+     User gratis TIDAK ditampilkan popup AddOn (tidak boleh beli). Yang
+     muncul: pesan JELAS + tombol ke daftar paket. Muncul dari JS. #}
+  <div class="ajak-upgrade" id="ajak-upgrade" hidden>
+    <div class="ajak-isi">
+      <strong class="ajak-judul">Butuh kuota lebih besar?</strong>
+      <p class="ajak-sebab" id="ajak-sebab"></p>
+      <p class="ajak-ket">Paket berbayar menambah storage, jatah folder, dan
+        kuota AI setiap bulan.</p>
+      <button type="button" class="fd-tombol-addon" id="ajak-tombol">
+        Lihat paket berbayar
+      </button>
+    </div>
+  </div>
+
+  {% if sisa_jatah is not none and sisa_jatah <= 0 %}
+  {# ═══ GERBANG JATAH FOLDER HABIS (ACC Bos 15Sep26) ═══════════════════
+     Strategi Bos: tawarkan ADDON (mesin uang), BUKAN upgrade paket.
+     AddOn storage = +50 MB & +10 folder — satu beli, dua masalah selesai.
+     Tombol ini membuka popup Tambah Kuota (isinya kartu AddOn).
+     Paket gratis tidak boleh beli AddOn → tombol diganti ajakan upgrade. #}
+  <div class="fd-notif fd-notif-info">
+    <b>{{ jumlah_folder }} of {{ jatah_folder }} Folder Anda sudah Tercapai.</b>
+    {% if boleh_addon %}
+    Tambah AddOn Storage &amp; Folder (+10 folder) — Rp 25.000, sekaligus
+    +50 MB storage. Berlaku permanen.
+    <button type="button" class="fd-tombol-addon" onclick="bukaTopup()">
+      Tambah 10 folder — Rp 25.000
+    </button>
+    {% else %}
+    Tingkatkan paket untuk menambah Storage dan Folder Anda.
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ── Daftar folder ── #}
+  {% for fd in folder %}
+  <div class="fd-item fd-{{ fd.warna }}">
+    <div class="fd-kepala" onclick="fdBukaTutup({{ fd.id }})">
+      <div class="fd-ikon">
+        {%- if fd.ikon == 'buku' %}{{ ikon('book-open', 20) }}
+        {%- elif fd.ikon == 'dokumen' %}{{ ikon('file-text', 20) }}
+        {%- elif fd.ikon == 'bintang' %}{{ ikon('sparkles', 20) }}
+        {%- elif fd.ikon == 'arsip' %}{{ ikon('archive-restore', 20) }}
+        {%- else %}{{ ikon('folder', 20) }}{% endif -%}
+      </div>
+      <div class="fd-teks">
+        <div class="fd-nama">{{ fd.nama }}</div>
+        <div class="fd-info">
+          {{ fd.jumlah_berkas }} dokumen &middot;
+          {{ '%.1f'|format(fd.ukuran_bytes / 1024 / 1024) }} MB
+        </div>
+      </div>
+      <div class="fd-panah" id="fd-panah-{{ fd.id }}">▸</div>
+    </div>
+
+    <div class="fd-isi" id="fd-isi-{{ fd.id }}" hidden>
+      {% set isif = fd.berkas|selectattr('di_sampah','equalto',false)|list %}
+      {% if isif %}
+        {% for f in isif %}
+        <div class="fd-berkas">
+          <span class="fd-berkas-nama" title="{{ f.nama }}">{{ f.nama }}</span>
+          <span class="fd-berkas-ukuran">{{ '%.1f'|format(f.ukuran / 1024 / 1024) }} MB</span>
+          <a href="/edit/{{ f.id }}" class="fd-mini" title="Sunting">{{ ikon('pencil', 15) }}</a>
+          <a href="/unduh/{{ f.id }}" class="fd-mini" title="Unduh">{{ ikon('download', 15) }}</a>
+          <button type="button" class="fd-mini fd-keluar"
+                  onclick="fdPindah({{ f.id }}, '')" title="Keluarkan dari folder">{{ ikon('arrow-left', 15) }}</button>
+          <button type="button" class="fd-mini"
+                  onclick="bukaProfilNaskah({{ f.id }})"
+                  title="Profil naskah &amp; template penulisan">{{ ikon('book-open', 15) }}</button>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="fd-kosong">Belum ada dokumen di folder ini.</div>
+      {% endif %}
+
+      <div class="fd-aksi">
+        <button type="button" class="fd-mini2" onclick="fdBukaUbah({{ fd.id }}, '{{ fd.nama|e }}', '{{ fd.warna }}', '{{ fd.ikon }}')">Ubah</button>
+        <form method="post" action="/folder/hapus" style="display:inline"
+              onsubmit="return confirm('Hapus folder {{ fd.nama|e }}? Dokumen di dalamnya TIDAK terhapus — akan dipindah ke Tanpa folder.')">
+          <input type="hidden" name="folder_id" value="{{ fd.id }}">
+          <button type="submit" class="fd-mini2 fd-hapus">Hapus folder</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+  {% if tanpa_folder %}
+  <div class="fd-item fd-abu">
+    <div class="fd-kepala" onclick="fdBukaTutup('luar')">
+      <div class="fd-ikon">{{ ikon('file', 20) }}</div>
+      <div class="fd-teks">
+        <div class="fd-nama">Tanpa folder</div>
+        <div class="fd-info">{{ tanpa_folder|length }} dokumen</div>
+      </div>
+      <div class="fd-panah" id="fd-panah-luar">▸</div>
+    </div>
+    <div class="fd-isi" id="fd-isi-luar" hidden>
+      {% for f in tanpa_folder %}
+      <div class="fd-berkas">
+        <span class="fd-berkas-nama" title="{{ f.nama }}">{{ f.nama }}</span>
+        <span class="fd-berkas-ukuran">{{ '%.1f'|format(f.ukuran / 1024 / 1024) }} MB</span>
+        {% if folder %}
+        <select class="fd-pilih" onchange="fdPindah({{ f.id }}, this.value)">
+          <option value="">Pindahkan ke…</option>
+          {% for fd in folder %}
+          <option value="{{ fd.id }}">{{ fd.nama }}</option>
+          {% endfor %}
+        </select>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if berkas %}
+    {% for f in berkas %}
+    <div class="berkas">
+      <div class="berkas-ikon">
+        {% set e = f.nama.split('.')[-1]|lower %}
+        {% if e in ['docx','doc','odt','rtf'] %}{{ ikon('file-text', 21) }}
+        {% elif e in ['xlsx','xls','ods','csv'] %}{{ ikon('file-spreadsheet', 21) }}
+        {% elif e in ['pptx','ppt','odp'] %}{{ ikon('presentation', 21) }}
+        {% elif e == 'pdf' %}{{ ikon('file-type', 21) }}
+        {% elif e in ['png','jpg','jpeg'] %}{{ ikon('file-image', 21) }}
+        {% else %}{{ ikon('file', 21) }}{% endif %}
+      </div>
+      <div class="berkas-isi">
+        <div class="berkas-nama" title="{{ f.nama }}">{{ f.nama }}</div>
+        <div class="berkas-info">
+          {{ '%.1f'|format(f.ukuran / 1024 / 1024) }} MB &middot;
+          {{ f.diubah.strftime('%d %b %Y, %H:%M') }}
+        </div>
+      </div>
+      <div class="aksi">
+        {% if f.bisa_edit %}
+        <a href="/edit/{{ f.id }}" class="edit" title="Edit langsung di browser">
+          {{ ikon('pencil', 15) }} Edit
+        </a>
+        {% endif %}
+        <a href="/unduh/{{ f.id }}">{{ ikon('download', 15) }} Unduh</a>
+        <button onclick="bukaProfilNaskah({{ f.id }})">{{ ikon('book-open', 15) }} Profil</button>
+        <button class="hapus" onclick="hapusBerkas({{ f.id }}, '{{ f.nama|e }}')">{{ ikon('trash-2', 15) }} Hapus</button>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="kosong">
+      <div class="kosong-ikon">{{ ikon('folder-open', 34) }}</div>
+      <h3>Belum ada berkas</h3>
+      <p>Unggah naskah pertama Anda dengan mengklik kotak di atas.</p>
+    </div>
+  {% endif %}
+
+</div>
+
+<div id="notif"></div>
+
+{# ── MODAL BUAT / UBAH FOLDER (ACC Bos 15Sep26) ── #}
+<div class="fd-lapis" id="fd-lapis">
+  <div class="fd-kartu">
+    <h3 id="fd-judul">Folder baru</h3>
+    <form method="post" action="/folder/buat" id="fd-form">
+      <input type="hidden" name="folder_id" id="fd-fid" value="">
+      <label for="fd-nama">Nama folder</label>
+      <input type="text" name="nama" id="fd-nama" maxlength="100"
+             placeholder="Contoh: Skripsi S2" autocomplete="off" required>
+
+      <label>Warna</label>
+      <div class="fd-pil" id="fd-warna-pil">
+        {% for k, v in folder_warna.items() %}
+        <label>
+          <input type="radio" name="warna" value="{{ k }}" {% if k == 'hijau' %}checked{% endif %}>
+          <span class="fd-titik fd-t-{{ k }}"></span><span>{{ v }}</span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <label>Ikon</label>
+      <div class="fd-pil" id="fd-ikon-pil">
+        {% set peta = {'folder':'folder','buku':'book-open','dokumen':'file-text','bintang':'sparkles','arsip':'archive-restore'} %}
+        {% for k, v in folder_ikon.items() %}
+        <label>
+          <input type="radio" name="ikon" value="{{ k }}" {% if k == 'folder' %}checked{% endif %}>
+          <span>{{ ikon(peta.get(k, 'folder'), 16) }}</span><span>{{ v }}</span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <div class="fd-kartu-aksi">
+        <button type="button" class="fd-batal" onclick="fdTutup()">Batal</button>
+        <button type="submit" class="fd-simpan" id="fd-simpan">Buat folder</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ── FOLDER: buka/tutup, buat, ubah, pindah (ACC Bos 15Sep26) ── */
+function fdBukaTutup(id) {
+  var isi = document.getElementById('fd-isi-' + id);
+  var panah = document.getElementById('fd-panah-' + id);
+  if (!isi) return;
+  var buka = isi.hasAttribute('hidden');
+  if (buka) { isi.removeAttribute('hidden'); } else { isi.setAttribute('hidden', ''); }
+  if (panah) { panah.classList.toggle('buka', buka); }
+}
+
+function fdLapis(tampil) {
+  var l = document.getElementById('fd-lapis');
+  if (l) { l.classList.toggle('tampil', tampil); }
+}
+
+function fdBukaBuat() {
+  document.getElementById('fd-judul').textContent = 'Folder baru';
+  document.getElementById('fd-form').action = '/folder/buat';
+  document.getElementById('fd-simpan').textContent = 'Buat folder';
+  document.getElementById('fd-fid').value = '';
+  document.getElementById('fd-nama').value = '';
+  fdPilih('warna', 'hijau'); fdPilih('ikon', 'folder');
+  fdLapis(true);
+  setTimeout(function(){ document.getElementById('fd-nama').focus(); }, 60);
+}
+
+function fdBukaUbah(id, nama, warna, ikon) {
+  document.getElementById('fd-judul').textContent = 'Ubah folder';
+  document.getElementById('fd-form').action = '/folder/ubah';
+  document.getElementById('fd-simpan').textContent = 'Simpan';
+  document.getElementById('fd-fid').value = id;
+  document.getElementById('fd-nama').value = nama;
+  fdPilih('warna', warna); fdPilih('ikon', ikon);
+  fdLapis(true);
+  setTimeout(function(){ document.getElementById('fd-nama').focus(); }, 60);
+}
+
+function fdPilih(nama, nilai) {
+  var pil = document.querySelectorAll('input[name="' + nama + '"]');
+  for (var i = 0; i < pil.length; i++) { pil[i].checked = (pil[i].value === nilai); }
+}
+
+function fdTutup() { fdLapis(false); }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { fdTutup(); }
+});
+
+/* Pindahkan dokumen ke folder (atau keluarkan kalau folderId kosong). */
+function fdPindah(fileId, folderId) {
+  fetch('/folder/pindah', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ file_id: fileId, folder_id: folderId || null })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (d.ok) { location.reload(); }
+    else { fdPesan(d.pesan || 'Gagal memindahkan dokumen.'); }
+  }).catch(function(){ fdPesan('Gagal memindahkan dokumen.'); });
+}
+
+function fdPesan(t) {
+  if (window.notif) { notif(t, 'galat'); return; }
+  alert(t);
+}
+</script>
+
+<script>
+const zon = document.getElementById('zon');
+const pilih = document.getElementById('pilih');
+const form = document.getElementById('form-unggah');
+const notif = document.getElementById('notif');
+
+// Dipakai gerbang AddOn otomatis: paket gratis tidak boleh beli AddOn,
+// jadi jangan buka popup yang sia-sia — cukup arahkan upgrade paket.
+window.BOLEH_ADDON = {{ 'true' if boleh_addon else 'false' }};
+// Batas ukuran berkas — SATU SUMBER dari server (config.MAX_UPLOAD_BYTES).
+// Jangan hardcode di JS: batas JS ≠ batas server bikin gerbang tak kejadian.
+window.MAX_MB = {{ max_mb }};
+const MAX_MB = window.MAX_MB;
+// `sebab` = kenapa popup/ajakan muncul. Dipakai server untuk menyusun
+// kartu "SARAN UNTUK ANDA" (folder penuh ≠ storage habis ≠ klik sendiri).
+window.SEBAB_ADDON = {{ sebab_addon|tojson }};
+
+function pesan(teks, gagal) {
+  notif.textContent = teks;
+  notif.className = 'tampil' + (gagal ? ' gagal' : '');
+  clearTimeout(notif._t);
+  notif._t = setTimeout(() => notif.className = '', 4200);
+}
+
+// klik zona -> buka pemilih berkas
+// 🐛 BUG DIPERBAIKI (12Sep26): sebelumnya `<label>` (otomatis memicu input) PLUS
+//    `pilih.click()` di sini = DOUBLE TRIGGER. Di Android, klik ganda membuat
+//    pemilih native jatuh ke mode default -> muncul KAMERA/GALERI, bukan file manager,
+//    sehingga dokumen (docx/pdf) tidak bisa dipilih.
+//    SOLUSI: matikan perilaku label (preventDefault) dan biarkan JS satu-satunya
+//    pemicu. Klik dari keyboard (Enter/Space) tetap didukung.
+zon.addEventListener('click', e => {
+  // kalau user klik langsung input-nya, biarkan native (jangan rekursi)
+  if (e.target === pilih) return;
+  e.preventDefault();      // cegah label memicu input kedua kali
+  pilih.click();           // satu-satunya pemicu
+});
+// Aksesibilitas: Enter/Space saat zona fokus
+zon.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pilih.click(); }
+});
+pilih.addEventListener('change', () => { if (pilih.files.length) kirim(pilih.files[0]); });
+
+// drag & drop
+['dragenter','dragover'].forEach(ev => zon.addEventListener(ev, e => {
+  e.preventDefault(); zon.classList.add('aktif');
+}));
+['dragleave','drop'].forEach(ev => zon.addEventListener(ev, e => {
+  e.preventDefault(); zon.classList.remove('aktif');
+}));
+zon.addEventListener('drop', e => {
+  if (e.dataTransfer.files.length) kirim(e.dataTransfer.files[0]);
+});
+
+async function kirim(file) {
+  // 12Sep26: karena `accept` dibuang (agar Android membuka File Explorer umum,
+  // bukan Kamera/Galeri), validasi DI SINI menjadi saringan utama sebelum server.
+  // BE tetap memvalidasi ulang sebagai lapis kedua.
+  const IZIN = ['docx','doc','pdf','xlsx','xls','pptx','ppt','txt','rtf',
+                'odt','ods','odp','csv','png','jpg','jpeg','zip'];
+  const nama = (file.name || '').toLowerCase();
+  const titik = nama.lastIndexOf('.');
+  const ext = titik >= 0 ? nama.slice(titik + 1) : '';
+  if (!ext || !IZIN.includes(ext)) {
+    pesan('Jenis berkas' + (ext ? ' .' + ext : ' ini') +
+          ' tidak didukung. Yang bisa diunggah: DOCX, DOC, PDF, XLSX, XLS, ' +
+          'PPTX, PPT, TXT, RTF, ODT, ODS, ODP, CSV, PNG, JPG, ZIP.', true);
+    pilih.value = '';
+    return;
+  }
+  // ⚠ JANGAN hardcode batas di sini — ambil dari server (`max_mb`), kalau
+  //   tidak, batas JS dan batas server bisa BEDA (bug 15Sep26: JS 25 MB
+  //   sementara server 30 MB → gerbang storage tak pernah kejadian).
+  if (file.size > MAX_MB * 1024 * 1024) {
+    pesan('Berkas terlalu besar (' + (file.size / 1024 / 1024).toFixed(1) +
+          ' MB). Maksimal ' + MAX_MB + ' MB.', true);
+    pilih.value = '';
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append('berkas', file);
+  pesan('Mengunggah ' + file.name + '…');
+  try {
+    const r = await fetch('/unggah', { method: 'POST', body: fd });
+    const j = await r.json();
+    if (j.ok) {
+      pesan(j.pesan);
+      setTimeout(() => location.reload(), 900);
+    } else if (j.tawarkan === 'ADDON') {
+      // ── GERBANG STORAGE HABIS (ACC Bos 15Sep26) ──────────────────────
+      // Server menolak karena kuota tidak cukup. Jangan cuma menyuruh user
+      // hapus berkas: buka popup Tambah Kuota OTOMATIS dengan AddOn storage
+      // (+50 MB & +10 folder) siap dibeli. User bisa lanjut unggah sekarang.
+      pesan(j.pesan, true);
+      tawarkanAddon(j.pesan);
+    } else {
+      pesan(j.pesan, true);
+    }
+  } catch (err) {
+    pesan('Gagal mengunggah. Periksa koneksi Anda.', true);
+  } finally {
+    pilih.value = '';
+  }
+}
+
+// ═══ GERBANG ADDON OTOMATIS (ACC Bos 15Sep26) ═══════════════════════════
+// Tujuan Bos: AddOn muncul SENDIRI saat user kena batas — bukan cuma kalau
+// dia menekan "Tambah Kuota". Dua pemicu:
+//   (1) upload ditolak karena kuota tidak cukup (server balas tawarkan=ADDON)
+//   (2) jatah folder habis (server redirect ke /naskah?addon=storage)
+// AddOn storage = +50 MB & +10 folder → sekali beli, dua masalah selesai.
+function tawarkanAddon(sebab) {
+  // ── PAKET GRATIS: JANGAN tampilkan popup (ACC Bos 15Sep26) ─────────────
+  // User gratis tidak boleh beli AddOn. Menampilkan katalog 5 AddOn hanya
+  // bikin bingung + salah paham ("kok tidak bisa diklik?"). Yang benar:
+  // arahkan ke paket berbayar dengan pesan JELAS + tunjukkan jalan keluarnya.
+  if (!window.BOLEH_ADDON) {
+    tampilAjakUpgrade(sebab);
+    return;
+  }
+  // Beri jeda singkat supaya pesan galat terbaca dulu, baru popup muncul.
+  setTimeout(() => { if (window.bukaTopup) window.bukaTopup(); }, 700);
+}
+
+// Ajak upgrade untuk paket gratis — pesan jelas + tombol lihat paket.
+function tampilAjakUpgrade(sebab) {
+  const p = document.getElementById('ajak-upgrade');
+  if (!p) { pesan(sebab || '', true); return; }
+  document.getElementById('ajak-sebab').textContent =
+    sebab || 'Fitur ini butuh kuota lebih besar.';
+  p.hidden = false;
+  // Tombol "Lihat paket" membuka popup TAPI hanya berisi paket (AddOn
+  // otomatis tersembunyi karena boleh_beli=false di server).
+  document.getElementById('ajak-tombol').onclick = function () {
+    p.hidden = true;
+    if (window.bukaTopup) window.bukaTopup();
+  };
+}
+
+// Pemicu dari URL — DIBEDAKAN PER PAKET (ACC Bos 15Sep26):
+//   (1) ?addon=storage  → paket BERBAYAR: buka popup kartu AddOn
+//   (2) ?upgrade=folder → paket GRATIS: tampilkan AJAKAN UPGRADE PAKET
+// Paket gratis TIDAK PERNAH ditawari AddOn (MASTER_PLAN §4.10).
+(function pemicuDariURL() {
+  const q = new URLSearchParams(location.search);
+  const addon = q.get('addon');
+  const upgrade = q.get('upgrade');
+  if (addon !== 'storage' && !upgrade) return;
+  // Bersihkan URL supaya refresh tidak mengulang.
+  history.replaceState({}, '', location.pathname);
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (upgrade) {
+        // GRATIS → ajakan upgrade. tawarkanAddon() otomatis mengarahkan ke
+        // tampilAjakUpgrade() karena BOLEH_ADDON=false.
+        tawarkanAddon('Tingkatkan paket untuk menambah Storage dan Folder Anda.');
+      } else if (window.BOLEH_ADDON && window.bukaTopup) {
+        window.bukaTopup();
+      }
+    }, 400);
+  });
+})();
+
+async function hapusBerkas(id, nama) {
+  // KONFIRMASI (ACC Bos 14Sep26): cegah salah klik. Dokumen masuk Tong
+  // Sampah dulu — masih bisa dipulihkan {{ sampah_hari }} hari.
+  const ok = confirm('Pindahkan "' + nama + '" ke Tong Sampah?\\n\\n'
+    + 'Dokumen TIDAK langsung hilang. Masih bisa dipulihkan selama '
+    + '{{ sampah_hari }} hari di Tong Sampah.');
+  if (!ok) return;
+  try {
+    const r = await fetch('/hapus/' + id, { method: 'POST' });
+    const j = await r.json();
+    if (j.ok) { pesan(j.pesan || 'Dokumen dipindahkan ke Tong Sampah.'); setTimeout(() => location.reload(), 900); }
+    else { pesan(j.detail || 'Gagal memindahkan dokumen.', true); }
+  } catch (err) {
+    pesan('Gagal memindahkan dokumen.', true);
+  }
+}
+
+// ── Tutup SEMUA sesi editor dari halaman daftar (permintaan Bos 12Sep26) ──
+// Server akan forcesave tiap dokumen dulu supaya hasil edit tidak hilang.
+async function tutupSemuaSesi(tombol) {
+  if (!confirm('Simpan & tutup semua dokumen yang sedang terbuka di editor?')) return;
+  tombol.disabled = true;
+  const teksAsli = tombol.textContent;
+  tombol.textContent = 'Menyimpan...';
+  try {
+    const r = await fetch('/api/sesi/tutup-semua', { method: 'POST' });
+    const d = await r.json();
+    if (d.ok) {
+      pesan('Semua dokumen tersimpan & ditutup.');
+      setTimeout(() => location.reload(), 900);
+    } else {
+      pesan('Sebagian gagal ditutup (' + d.gagal + '). Simpan manual di editor.', true);
+      tombol.disabled = false;
+      tombol.textContent = teksAsli;
+    }
+  } catch (err) {
+    pesan('Gagal menghubungi server.', true);
+    tombol.disabled = false;
+    tombol.textContent = teksAsli;
+  }
+}
+</script>
+
+{% include "_topup_popup.html" %}
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   BAGIKAN KE PEMBIMBING (Tahap 2, ACC Bos 23Sep26)
+   Permintaan Bos: "Muncul konfirmasi ok atau batal" → 3 tahap:
+     1) isi  2) konfirmasi  3) hasil (tautan + Salin + Kirim WhatsApp)
+
+   ⚠️ ATURAN: batas & validasi WAJIB ada DI SERVER juga (rute_bagikan.py).
+   Yang di sini hanya supaya mahasiswa tidak menunggu — BUKAN pengaman.
+   ⚠️ Tautan hanya ditampilkan SEKALI. JANGAN simpan ke localStorage.
+   ══════════════════════════════════════════════════════════════════════════ */
+var kbHasil = null;   // jawaban server (tautan, kirim, id, ...)
+
+function kb(el) { return document.getElementById(el); }
+
+function kbTampilkan(nama) {
+  ['kb-tahap-isi', 'kb-tahap-konfirmasi', 'kb-tahap-hasil', 'kb-tahap-daftar']
+    .forEach(function (id) { kb(id).style.display = (id === nama) ? '' : 'none'; });
+  kb('latar-bagikan').scrollTop = 0;
+}
+
+function bukaBagikan() {
+  kb('kb-salah').style.display = 'none';
+  kb('kb-nama').value = '';
+  kb('kb-wa').value = '';
+  var n = kb('kb-naskah');
+  if (n) n.value = '0';
+  kb('kb-hari').value = '30';
+  kb('kb-lanjut').disabled = false;
+  kb('kb-lanjut').textContent = 'Lanjut';
+  kbTampilkan('kb-tahap-isi');
+  kb('latar-bagikan').classList.add('buka');
+  setTimeout(function () { kb('kb-nama').focus(); }, 120);
+  kbMuatDaftar();
+}
+
+function tutupBagikan() {
+  kb('latar-bagikan').classList.remove('buka');
+  kbHasil = null;
+}
+
+function kbPesanSalah(teks) {
+  var s = kb('kb-salah');
+  s.textContent = teks;
+  s.style.display = 'block';
+}
+
+function kbKeIsi() {
+  kb('kb-salah').style.display = 'none';
+  kbTampilkan('kb-tahap-isi');
+}
+
+/* ── TAHAP 1 → 2: periksa isian lalu tampilkan KONFIRMASI ── */
+function kbKeKonfirmasi() {
+  var nama = (kb('kb-nama').value || '').trim();
+  var wa = (kb('kb-wa').value || '').trim();
+  if (!nama) { kbPesanSalah('Nama pembimbing belum diisi.'); kb('kb-nama').focus(); return; }
+  if (!wa) { kbPesanSalah('Nomor WhatsApp belum diisi.'); kb('kb-wa').focus(); return; }
+  if (wa.replace(/[^0-9]/g, '').length < 9) {
+    kbPesanSalah('Nomor WhatsApp kurang lengkap — periksa lagi ya.');
+    kb('kb-wa').focus();
+    return;
+  }
+  kb('kb-salah').style.display = 'none';
+
+  var selNaskah = kb('kb-naskah');
+  kb('kb-r-nama').textContent = nama;
+  kb('kb-r-wa').textContent = wa;
+  kb('kb-r-naskah').textContent =
+    (selNaskah && selNaskah.selectedIndex >= 0)
+      ? selNaskah.options[selNaskah.selectedIndex].text : 'Semua naskah saya';
+  kb('kb-r-hari').textContent = kb('kb-hari').value + ' hari';
+  kb('kb-tanya-judul').textContent = 'Buat tautan untuk ' + nama + '?';
+  kbTampilkan('kb-tahap-konfirmasi');
+}
+
+/* ── TAHAP 2 → 3: kirim ke server, tampilkan tautan ── */
+async function kbBuat() {
+  var tombol = kb('kb-buat');
+  tombol.disabled = true;                 // cegah klik dobel
+  tombol.textContent = 'Membuat tautan...';
+  try {
+    var data = new URLSearchParams();
+    data.append('nama', kb('kb-nama').value.trim());
+    data.append('wa', kb('kb-wa').value.trim());
+    data.append('hari', kb('kb-hari').value);
+    data.append('file_id', kb('kb-naskah').value || '0');
+
+    var r = await fetch('/pembimbing/bagikan', { method: 'POST', body: data });
+    var d = await r.json();
+    if (!d.ok) {
+      kbTampilkan('kb-tahap-isi');
+      kbPesanSalah(d.pesan || 'Tautan belum bisa dibuat. Coba lagi.');
+      return;
+    }
+    kbHasil = d;
+    kb('kb-hasil-judul').textContent = 'Tautan untuk ' + d.nama;
+    kb('kb-link').textContent = d.link;
+    kb('kb-berlaku').textContent = 'Berlaku ' + d.sisa_hari +
+      ' hari · bisa dimatikan kapan saja';
+    var k = kb('kb-kirim');
+    if (d.kirim) { k.href = d.kirim; k.style.display = ''; }
+    else { k.style.display = 'none'; }
+    kbTampilkan('kb-tahap-hasil');
+    kbMuatDaftar();
+  } catch (err) {
+    kbTampilkan('kb-tahap-isi');
+    kbPesanSalah('Tidak bisa menghubungi server. Periksa sambungan lalu coba lagi.');
+  } finally {
+    tombol.disabled = false;
+    tombol.textContent = 'Ya, Buat Tautan';
+  }
+}
+
+/* ── Salin tautan (dengan cadangan untuk peramban lama & WebView HP) ── */
+async function kbSalin() {
+  if (!kbHasil || !kbHasil.link) return;
+  var t = kbHasil.link;
+  var ok = false;
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(t);
+      ok = true;
+    }
+  } catch (e) { ok = false; }
+  if (!ok) {
+    //  Cadangan WAJIB: halaman ini juga dibuka di WebView HP yang tidak
+    //  mengizinkan navigator.clipboard.
+    var a = document.createElement('textarea');
+    a.value = t;
+    a.setAttribute('readonly', '');
+    a.style.position = 'fixed';
+    a.style.left = '-9999px';
+    document.body.appendChild(a);
+    a.select();
+    a.setSelectionRange(0, t.length);
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(a);
+  }
+  var b = kb('kb-copy');
+  if (ok) {
+    b.innerHTML = 'Tersalin <svg class="ik" width="13" height="13"><use href="#ik-check"/></svg>';
+    setTimeout(function () { b.innerHTML = 'Salin Tautan'; }, 2200);
+  } else {
+    //  Jangan diam: pilih teksnya supaya mahasiswa bisa salin manual.
+    b.innerHTML = 'Pilih teks di atas, lalu salin';
+    var kotak = kb('kb-link');
+    var r = document.createRange();
+    r.selectNodeContents(kotak);
+    var s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+  }
+}
+
+/* ── Daftar pembimbing ── */
+async function kbMuatDaftar() {
+  var wadah = kb('kb-daftar-isi');
+  try {
+    var r = await fetch('/pembimbing/daftar');
+    var d = await r.json();
+    if (!d.ok) { wadah.innerHTML = ''; return; }
+    if (!d.daftar.length) {
+      wadah.innerHTML = '<div style="text-align:center;color:#77757E;' +
+        'font-size:12.5px;padding:14px">Belum ada pembimbing yang dibagikan.</div>';
+      return;
+    }
+    var html = '<div style="border:1px solid #E4E4E8;border-radius:10px;overflow:hidden">';
+    d.daftar.forEach(function (b) {
+      var lencana = b.aktif
+        ? '<span class="kb-lencana aktif">Aktif</span>'
+        : '<span class="kb-lencana mati">Tidak aktif</span>';
+      var ket = [];
+      if (b.wa) ket.push(b.wa);
+      if (b.email) ket.push(b.email);
+      if (b.aktif) ket.push('berlaku ' + b.sisa_hari + ' hari lagi');
+      else if (b.dicabut) ket.push('dimatikan mahasiswa');
+      else ket.push('sudah lewat masa');
+      if (b.jumlah_catatan) ket.push(b.jumlah_catatan + ' catatan');
+      if (b.dibuka_pada) ket.push('dibuka ' + b.dibuka_pada);
+      var aman = (b.nama || '').replace(/'/g, '');
+      var tombol = b.aktif
+        ? '<button type="button" class="kb-cabut" onclick="kbCabut(' + b.id +
+          ',\'' + aman + '\')">Matikan</button>'
+        : '';
+      html += '<div class="kb-baris"><div style="flex:1">' +
+        '<div class="kb-nama">' + b.nama + ' ' + lencana + '</div>' +
+        '<div class="kb-ket">' + ket.join(' · ') + '</div></div>' + tombol + '</div>';
+    });
+    html += '</div>';
+    wadah.innerHTML = html;
+
+    //  Ikut memuat LOG REVISI (3 lapis lipatan) begitu daftar terbuka.
+    //  Dipanggil setelah daftar tampil supaya kalau log gagal, daftar
+    //  pembimbing tetap terlihat (jangan satu kerusakan mematikan semua).
+    kbMuatLog();
+  } catch (e) {
+    wadah.innerHTML = '';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   LOG REVISI COMPACT — 3 lapis lipatan (Tahap 2.3, ACC Bos 24Sep26)
+   Permintaan Bos: "Log Revisi compact (3 lapis lipatan)".
+     LAPIS 1  angka ringkasan (selalu tampil)
+     LAPIS 2  1 baris = 1 MASALAH
+     LAPIS 3  ronde-ronde masalah itu (dibuka dengan klik)
+   ⚠️ HANYA MEMBACA. Tidak ada satu pun permintaan yang mengubah data.
+   ⚠️ Angka batas TIDAK ditulis di sini — datang dari server (`batas_tampil`).
+   ══════════════════════════════════════════════════════════════════════ */
+function kbLolos(t) {
+  return (t == null ? '' : String(t))
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* ═══ IKON UNTUK JS (Tahap 3.2, ACC Bos 24Sep26) ═══════════════════════
+   Sprite Lucide dimuat SEKALI di <body> ({{ ikon_sprite() }}). Di sisi
+   server ikon ditulis lewat makro `ikon()`, tapi Log Revisi digambar oleh
+   JS — jadi butuh jalur yang SAMA supaya tidak ada dua cara berbeda.
+   ⚠️ Nama disaring ketat (hanya huruf kecil, angka, minus) — sama seperti
+   penyaring di server. Tanpa ini, nama dari luar bisa jadi celah markup. */
+function ikonSvg(nama, ukuran) {
+  if (!/^[a-z0-9-]{1,40}$/.test(String(nama || ''))) return '';
+  var u = parseInt(ukuran, 10) || 16;
+  return '<svg class="ik" width="' + u + '" height="' + u +
+         '" aria-hidden="true"><use href="#ik-' + nama + '"></use></svg>';
+}
+
+/* ── AKSI 1: Revisi dengan AI (ikon sparkles kuning) ────────────────────
+   ⚠️ JUJUR soal alur: panel Asisten AI ada DI HALAMAN EDITOR (/edit/<id>),
+   bukan di halaman ini. Jadi ikon ini MEMBAWA mahasiswa ke sana — dan
+   komentar pembimbing yang dipilih ikut dibawa lewat sessionStorage,
+   supaya mahasiswa TIDAK menyalin ulang (itu kerja dua kali yang Bos
+   keluhkan: "kenapa mahasiswa saat revisi harus copy paste komentar").
+   ⚠️ Berkas mana yang dituju: diambil dari data baris Log Revisi —
+   berkas yang LEBIH DULU dipakai pembimbing (b.berkas_id). Kalau kosong,
+   pakai naskah pertama yang sudah tampil di halaman. */
+/* Lampiran semua ronde rantai catatan ini (nama disk, maks 3) — dibawa ke
+   panel AI supaya AI membaca contoh PDF/gambar dari pembimbing (27Sep26). */
+function kbLampiranKumpul(b) {
+  var l = [];
+  ((b && b.ronde) || []).forEach(function (rn) {
+    ((rn && rn.lampiran) || []).forEach(function (nm) {
+      if (nm && l.indexOf(nm) < 0) l.push(nm);
+    });
+  });
+  return l.slice(0, 3);
+}
+
+async function kbRevisiAI(catatanId) {
+  var b = kbBarisCari(catatanId);
+  if (!b) return;
+  try {
+  sessionStorage.setItem('kb_komentar_bawa', JSON.stringify({
+    id: b.id, isi: b.masalah || '', bagian: b.bagian || '',
+    lampiran: kbLampiranKumpul(b)
+  }));
+  } catch (e) { /* mode privat → tetap lanjut tanpa membawa */ }
+
+  var fid = b.berkas_id || 0;
+  if (!fid) {
+    //  Ambil dari naskah pertama yang tampil (atau tanya server).
+    var el = document.querySelector('[data-naskah-fid]');
+    if (el) fid = el.getAttribute('data-naskah-fid');
+  }
+  if (!fid) {
+    try {
+      var r = await fetch('/pembimbing/daftar');
+      var j = await r.json();
+      if (j.ok && j.daftar && j.daftar.length &&
+          j.daftar[0].berkas && j.daftar[0].berkas.length) {
+        fid = j.daftar[0].berkas[0].id;
+      }
+    } catch (e) { /* dibiarkan di bawah */ }
+  }
+  if (fid) {
+    location.href = '/edit/' + fid + '?dari=catatan';
+  } else {
+    kbPesanBaik('Buka naskahnya dulu lewat tombol Edit, lalu ikon ini ' +
+                'membawa komentarnya ke panel Asisten AI.');
+  }
+}
+
+/* ── AKSI 2: Dikerjakan sendiri (ikon pencil hijau) ─────────────────────
+   Mahasiswa menyatakan akan mengerjakan sendiri. TIDAK memotong Token
+   Revisi (aturan lama 17Sep26). Ditandai "dikerjakan sendiri" di layar. */
+function kbManual(catatanId) {
+  var b = kbBarisCari(catatanId);
+  if (!b) return;
+  kbPesanBaik('Baik, revisi ini kamu kerjakan sendiri. ' +
+              'Tidak memakai Token Revisi.');
+}
+
+/* ── AKSI 3: Lewati revisi ini (ikon x merah) ───────────────────────────
+   ATURAN BOS (24Sep26): muncul keterangan "Revisi Dilewati", WAJIB
+   tercatat di riwayat, dan bisa aktif lagi HANYA kalau pembimbing
+   memintanya. Jadi mahasiswa tidak bisa membukanya sendiri. */
+async function kbLewati(catatanId) {
+  //  ⚠️ Penjaga: catatan yang SUDAH dilewati tidak boleh dilewati lagi.
+  //  Tampilan saja tidak cukup (tombol CSS bisa dilewati); pagar wajib
+  //  ada di sisi kerja juga. Ini bukan pagar biaya — hanya pagar aturan.
+  var b0 = kbBarisCari(catatanId);
+  if (b0 && (b0.dilewati || 0) === 1) {
+    kbPesanBaik('Revisi ini sudah ditandai dilewati. Pembimbing yang bisa ' +
+                'memintanya lagi.');
+    return;
+  }
+  if (!kbYakin('Lewati revisi ini?\n\nRevisi akan ditandai "Revisi Dilewati" ' +
+               'dan tersimpan di riwayat. Pembimbing bisa memintanya lagi ' +
+               'kapan saja — kalau itu terjadi, kamu tetap wajib ' +
+               'mengerjakannya.')) return;
+  var d0 = await fetch('/pembimbing/daftar');
+  var j0 = await d0.json();
+  if (!j0.ok || !j0.daftar || !j0.daftar.length) return;
+  //  🐛 FIX 27Sep26: jangan kirim daftar[0] — bimbingan yang BENAR adalah
+  //  yang catatannya sedang ditampilkan (_kbLogId). Kalau id itu tak ada
+  //  di daftar (mis. baru dibatalkan), BARU jatuh ke daftar pertama.
+  var idKirim = (typeof _kbLogId === 'number' && _kbLogId > 0 &&
+                 j0.daftar.some(function (x) { return x.id === _kbLogId; }))
+    ? _kbLogId : j0.daftar[0].id;
+  var data = new FormData();
+  data.append('bimbingan_id', idKirim);
+  data.append('catatan_id', catatanId);
+  var r = await fetch('/pembimbing/lewati', { method: 'POST', body: data });
+  var j = await r.json();
+  kbPesanBaik(j.pesan || 'Tersimpan.');
+  kbMuatLog();
+}
+
+/*  Cari baris Log Revisi dari nomor catatan (data terakhir yang dimuat). */
+var _kbBaris = [];
+var _kbLogId = null;   // C3: id bimbingan yang catatannya sedang ditampilkan
+//  Tahap 3.3 (ACC Bos 06Okt26 "A"): keadaan panel Kunci Naskah + arsip.
+var _kbKunciId = null;        // bimbingan yang sedang dikelola kuncinya
+var _kbKunciPaksa = false;    // true = klik berikutnya menyetujui peringatan
+var _kbKunciTerkunci = false; // true = naskah sedang terkunci
+var _kbArsipData = null;      // simpan butir arsip supaya lipat tak fetch ulang
+function kbBarisCari(catatanId) {
+  for (var i = 0; i < _kbBaris.length; i++) {
+    if (String(_kbBaris[i].id) === String(catatanId)) return _kbBaris[i];
+  }
+  return null;
+}
+
+/*  Pilih Ya/Tidak dengan kalimat sendiri (bukan confirm bawaan browser).
+    KENAPA: confirm() bawaan memakai gaya browser (beda di tiap HP) dan
+    tulisannya kaku. ini ikut tema + bisa memuat kalimat panjang. */
+function kbYakin(teks) {
+  return window.confirm(teks);
+}
+
+/*  Pesan ramah (TIDAK ada kata gagal/error — aturan bahasa Wulan). */
+function kbPesanBaik(teks) {
+  var el = document.getElementById('kb-pesan-baik');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'kb-pesan-baik';
+    el.style.cssText = 'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);' +
+      'background:#22301F;color:#fff;font-size:13px;padding:11px 16px;border-radius:10px;' +
+      'box-shadow:0 8px 24px rgba(0,0,0,.26);z-index:9999;max-width:86vw;text-align:center';
+    document.body.appendChild(el);
+  }
+  el.textContent = teks;
+  el.style.display = '';
+  clearTimeout(el._t);
+  el._t = setTimeout(function () { el.style.display = 'none'; }, 4200);
+}
+
+
+async function kbMuatLog() {
+  var kotak = kb('kb-log');
+  if (!kotak) return;
+  try {
+    //  Ambil bimbingan yang masih ada (aktif atau tidak) — mahasiswa
+    //  berhak melihat catatan walaupun tautannya sudah dimatikan.
+    var r0 = await fetch('/pembimbing/daftar');
+    var d0 = await r0.json();
+    if (!d0.ok || !d0.daftar || !d0.daftar.length) {
+      kotak.style.display = 'none';
+      return;
+    }
+
+    // ═══ C3 (ACC Bos 24Sep26) — PILIH BIMBINGAN YANG PUNYA CATATAN ═══
+    //  DULU: `var id = d0.daftar[0].id;` → ambil bimbingan PERTAMA.
+    //  AKIBATNYA (TERUKUR 24Sep26): kalau bimbingan pertama belum punya
+    //  catatan, kartu ini SELALU tersembunyi walaupun bimbingan lain
+    //  punya banyak catatan → mahasiswa tidak pernah tahu ada catatan.
+    //  KINI: periksa satu per satu, pakai yang jumlah catatannya paling
+    //  banyak. Kalau SEMUA kosong → sembunyikan (memang belum ada).
+    var d = null, idTerbaik = null, jmlTerbanyak = -1;
+    for (var i = 0; i < d0.daftar.length; i++) {
+      var idc = d0.daftar[i].id;
+      try {
+        var rc = await fetch('/pembimbing/log/' + idc);
+        var dc = await rc.json();
+      } catch (e) { continue; }
+      if (!dc || !dc.ok) continue;
+      var jumlah = (dc.baris || []).length;
+      if (jumlah > jmlTerbanyak) { jmlTerbanyak = jumlah; d = dc; idTerbaik = idc; }
+    }
+    if (!d) { kotak.style.display = 'none'; return; }
+
+    //  Belum ada catatan sama sekali di SEMUA bimbingan → sembunyikan
+    //  kartu (aturan Bos: ringkas, jangan tumpuk blok kosong).
+    if (jmlTerbanyak <= 0) { kotak.style.display = 'none'; return; }
+
+    kotak.style.display = '';
+    _kbLogId = idTerbaik;   // dipakai panel "Bagikan" bila perlu menyegarkan
+
+    //  ═══ KUNCI NASKAH + ARSIP (Tahap 3.3, ACC Bos 06Okt26 "A") ═══
+    kbMuatKunci(idTerbaik);
+
+    //  LAPIS 1 — angka ringkasan. Angka jujur termasuk yang terlipat.
+    var a = d.angka || {};
+    kb('kb-log-angka').innerHTML =
+      '<div class="sel"><b>' + (a.total || 0) + '</b><span>Total catatan</span></div>' +
+      '<div class="sel belum"><b>' + (a.belum || 0) + '</b><span>Belum selesai</span></div>' +
+      '<div class="sel selesai"><b>' + (a.selesai || 0) + '</b><span>Sudah oke</span></div>' +
+      '<div class="sel"><b>' + ((a.umum || 0) + (a.dilewati || 0)) + '</b><span>Perlu perhatian</span></div>';
+
+    //  Lencana jumlah di kepala kartu — supaya langsung terlihat.
+    var lenc = kb('kb-log-lencana');
+    if (lenc) {
+      var perlu = (a.belum || 0);
+      lenc.textContent = perlu > 0 ? (perlu + ' menunggu') : 'semua beres';
+      lenc.className = 'kb-log-lencana-jml' + (perlu > 0 ? ' ada' : '');
+    }
+
+    //  Kalau belum ada catatan sama sekali — jangan tampilkan kotak kosong.
+    if (!d.baris || !d.baris.length) {
+      kb('kb-log-baris').innerHTML = '';
+      kb('kb-log-kosong').style.display = '';
+      return;
+    }
+    kb('kb-log-kosong').style.display = 'none';
+
+    //  LAPIS 2 — satu baris per MASALAH.
+    //  ⚠️ Disimpan supaya ikon aksi (Revisi AI / Manual / Lewati) bisa
+    //  menemukan catatannya lagi tanpa meminta ulang ke server.
+    _kbBaris = d.baris || [];
+    var html = '';
+    d.baris.forEach(function (b, i) {
+      var lewat = (b.dilewati || 0) === 1;
+      var kelas = lewat ? 'lewat'
+                : (b.warna === 'hijau' ? 'selesai'
+                : (b.keadaan === 'hilang' ? 'hilang'
+                : (b.keadaan === 'umum' ? 'umum' : '')));
+      var label = lewat ? 'Revisi Dilewati'
+                : (b.warna === 'hijau' ? 'Sudah oke'
+                : (b.keadaan === 'hilang' ? 'Naskah berubah'
+                : (b.keadaan === 'umum' ? 'Catatan umum' : 'Belum selesai')));
+      //  ═══ IKON AKSI (Desain B soft, ACC Bos 24Sep26) ═══
+      //  ✦ sparkles kuning = Revisi dengan AI
+      //  ✎ pencil   hijau  = Dikerjakan sendiri
+      //  ✕ x        merah  = Lewati revisi ini
+      //  ⚠️ Selama catatan DILEWATI, ketiga ikon MATI — mahasiswa tidak
+      //     bisa membukanya sendiri; itu hak pembimbing (aturan Bos).
+      var mati = lewat ? ' kb-mati' : '';
+      var aksi = '<div class="kb-aksi">' +
+        '<button type="button" class="kb-ik ai' + mati +
+          '" data-tip="Revisi dengan AI" title="Revisi dengan AI"' +
+          ' onclick="event.stopPropagation();kbRevisiAI(' + b.id + ')">' +
+          ikonSvg('sparkles', 16) + '</button>' +
+        '<button type="button" class="kb-ik manual' + mati +
+          '" data-tip="Dikerjakan sendiri" title="Dikerjakan sendiri"' +
+          ' onclick="event.stopPropagation();kbManual(' + b.id + ')">' +
+          ikonSvg('pencil', 15) + '</button>' +
+        '<button type="button" class="kb-ik lewat' + mati +
+          '" data-tip="Lewati revisi ini" title="Lewati revisi ini"' +
+          ' onclick="event.stopPropagation();kbLewati(' + b.id + ')">' +
+          ikonSvg('x', 15) + '</button>' +
+        '</div>';
+      html += '<div class="masalah" id="kb-masalah-' + i + '">' +
+        '<div class="kb-log-kepala" onclick="kbBukaMasalah(' + i + ')">' +
+          '<div class="kb-log-nomor">' + (i + 1) + '</div>' +
+          '<div class="kb-log-teks">' +
+            '<div class="isi">' + kbLolos(b.masalah) + '</div>' +
+            (b.bagian ? '<div class="bagian">' + kbLolos(b.bagian) + '</div>' : '') +
+          '</div>' +
+          aksi +
+          '<div class="kb-log-lencana ' + kelas + '">' + label + '</div>' +
+        '</div>';
+
+      //  LAPIS 3 — ronde-ronde masalah ini.
+      if (b.ronde && b.ronde.length) {
+        html += '<div class="kb-log-ronde">';
+        b.ronde.forEach(function (rn) {
+          var tandai = rn.warna === 'hijau' ? 'Ditandai sudah oke'
+                     : (rn.keadaan === 'hilang' ? 'Naskah berubah sejak itu'
+                                                : 'Ditandai belum selesai');
+          html += '<div class="ronde">' +
+            '<b>Perbaikan ' + rn.ronde + '</b> — ' + kbLolos(rn.isi) +
+            '<span class="tandai">' + tandai + '</span>' +
+            (rn.tautan ? '<span class="tandai">Rujukan: ' +
+                          kbLolos(rn.tautan) + '</span>' : '') +
+            '</div>';
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    kb('kb-log-baris').innerHTML = html;
+  } catch (e) {
+    //  Jangan menghalangi: kalau log gagal dimuat, sembunyikan saja.
+    var k = kb('kb-log');
+    if (k) k.style.display = 'none';
+  }
+}
+
+//  Buka/tutup LAPIS 3 (ronde) untuk satu masalah.
+function kbBukaMasalah(i) {
+  var m = kb('kb-masalah-' + i);
+  if (m) m.classList.toggle('buka');
+}
+
+async function kbCabut(id, nama) {
+  if (!confirm('Matikan tautan untuk ' + nama + '?\n\n' +
+               'Catatan pembimbing TETAP tersimpan, hanya tautannya yang mati.')) return;
+  var data = new URLSearchParams();
+  data.append('bimbingan_id', id);
+  try {
+    var r = await fetch('/pembimbing/cabut', { method: 'POST', body: data });
+    var d = await r.json();
+    pesan(d.pesan || (d.ok ? 'Tautan dimatikan.' : 'Tautan belum bisa dimatikan.'),
+          !d.ok);
+    kbMuatDaftar();
+  } catch (e) {
+    pesan('Tidak bisa menghubungi server.', true);
+  }
+}
+
+/*  Klik latar gelap / tombol Esc = Batal (kebiasaan umum, tidak mengunci). */
+document.addEventListener('DOMContentLoaded', function () {
+  var l = kb('latar-bagikan');
+  if (l) l.addEventListener('click', function (e) {
+    if (e.target === l) tutupBagikan();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && l && l.classList.contains('buka')) tutupBagikan();
+  });
+
+  // ═══ C3 (ACC Bos 24Sep26) — MUAT CATATAN PEMBIMBING SAAT HALAMAN DIBUKA ═══
+  //  DULU kartu Log Revisi hanya dimuat saat panel "Bagikan" dibuka, jadi
+  //  mahasiswa tidak pernah tahu ada catatan. KINI dimuat di awal halaman.
+  //  Aman kalau gagal: fungsi kbMuatLog() menelan galat + menyembunyikan kartu.
+  kbMuatLog();
+});
+
+/*  C3 — Lipat/buka daftar di dalam kartu Catatan Pembimbing.  */
+function kbLipatLog() {
+  var kotak = kb('kb-log');
+  var tombol = kb('kb-log-sembunyi');
+  if (!kotak || !tombol) return;
+  var lipat = kotak.classList.toggle('lipat');
+  tombol.innerHTML = lipat ? '&#9660;' : '&#9650;';
+  tombol.title = lipat ? 'Tampilkan daftar' : 'Sembunyikan daftar';
+}
+
+/*  C3 — Dari kartu Catatan Pembimbing ke panel undang/kelola pembimbing.
+    Dipisah supaya "lihat catatan" dan "bagikan" tidak tercampur lagi.
+    ⚠️ JANGAN panggil fungsi yang belum diperiksa ada: `kbTampilkan` yang
+    benar (bukan `kbKeDaftar` — fungsi itu tidak pernah ada).  */
+function bukaBagikanDariLog() {
+  bukaBagikan();
+  //  Langsung ke tahap DAFTAR (kelola) — mahasiswa yang sudah punya
+  //  pembimbing tidak perlu disuruh mengisi form lagi.
+  setTimeout(function () { kbTampilkan('kb-tahap-daftar'); }, 30);
+}
+
+/*  ═══════════════════════════════════════════════════════════════════════
+    KUNCI NASKAH + ARSIP (Tahap 3.3, ACC Bos 06Okt26 "A")
+
+    MASALAH: naskah sudah dikirim ke penguji tapi masih ada sorotan kuning →
+    skripsi terlihat DRAFT. Solusi: kunci → sorotan pembimbing disembunyikan.
+    Catatan TIDAK dihapus, bisa dibuka lagi.
+    ATURAN BOS ("A"): tetap boleh dikunci walau masih ada catatan belum
+    selesai — yang muncul hanya PERINGATAN, bukan larangan.
+    ═══════════════════════════════════════════════════════════════════════ */
+
+async function kbMuatKunci(bimbinganId) {
+  var kotak = kb('kb-kunci');
+  if (!kotak) return;
+  if (!bimbinganId) { kotak.style.display = 'none'; return; }
+  _kbKunciId = bimbinganId;
+  _kbKunciPaksa = false;
+  try {
+    var r = await fetch('/pembimbing/kunci/' + bimbinganId);
+    var d = await r.json();
+    if (!d || !d.ok) { kotak.style.display = 'none'; return; }
+    kotak.style.display = '';
+    kbGambarKunci(d);
+    kbMuatArsip(bimbinganId);
+  } catch (e) {
+    kotak.style.display = 'none';
+  }
+}
+
+/*  Gambar keadaan kunci: teks + label tombol + pesan (kalau ada).  */
+function kbGambarKunci(d) {
+  var teks = kb('kb-kunci-teks');
+  var tombol = kb('kb-kunci-tombol');
+  var pesan = kb('kb-kunci-pesan');
+  if (!teks || !tombol || !pesan) return;
+  if (d.terkunci) {
+    var kapan = d.pada ? String(d.pada).slice(0, 10) : '';
+    teks.innerHTML = '<b>Naskah terkunci.</b> Catatan pembimbing ' +
+      'disembunyikan' + (kapan ? ' sejak ' + kapan : '') + '.';
+    tombol.textContent = 'Buka kunci';
+    tombol.className = 'kb-kunci-tombol aktif';
+    _kbKunciTerkunci = true;
+  } else {
+    teks.innerHTML = 'Serahkan naskah ke penguji? Kunci dulu supaya ' +
+      'catatan pembimbing tidak terlihat.';
+    tombol.textContent = 'Kunci naskah';
+    tombol.className = 'kb-kunci-tombol';
+    _kbKunciTerkunci = false;
+  }
+}
+
+async function kbKunciNaskah() {
+  if (!_kbKunciId) return;
+  var pesan = kb('kb-kunci-pesan');
+  try {
+    if (_kbKunciTerkunci) {
+      //  ── BUKA KUNCI ──
+      var rb = await fetch('/pembimbing/buka-kunci', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'bimbingan_id=' + encodeURIComponent(_kbKunciId)
+      });
+      var db = await rb.json();
+      if (!db.ok) { kbTampilKunciPesan(db.pesan || 'Gagal membuka kunci.', false); return; }
+      kbTampilKunciPesan(db.pesan, true);
+      await kbMuatKunci(_kbKunciId);
+      kbMuatLog();                       // catatan muncul lagi
+      return;
+    }
+    //  ── KUNCI (klik-1 = coba; klik-2 setelah peringatan = paksa) ──
+    var r = await fetch('/pembimbing/kunci', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'bimbingan_id=' + encodeURIComponent(_kbKunciId) +
+            '&paksa=' + (_kbKunciPaksa ? 1 : 0)
+    });
+    var d = await r.json();
+    if (d.butuh_konfirmasi) {
+      //  Putusan Bos "A": PERINGATAN, bukan larangan. Tampilkan, lalu
+      //  klik berikutnya = menyetujui (paksa=1).
+      _kbKunciPaksa = true;
+      kbTampilKunciPesan(d.pesan + ' Tekan sekali lagi untuk tetap mengunci.', false);
+      var t = kb('kb-kunci-tombol');
+      if (t) t.textContent = 'Ya, tetap kunci';
+      return;
+    }
+    if (!d.ok) { kbTampilKunciPesan(d.pesan || 'Gagal mengunci.', false); return; }
+    kbTampilKunciPesan(d.pesan, true);
+    _kbKunciPaksa = false;
+    await kbMuatKunci(_kbKunciId);
+    kbMuatLog();
+  } catch (e) {
+    kbTampilKunciPesan('Gagal menghubungi server. Coba lagi.', false);
+  }
+}
+
+function kbTampilKunciPesan(teks, baik) {
+  var p = kb('kb-kunci-pesan');
+  if (!p) return;
+  p.textContent = teks || '';
+  p.className = 'kb-kunci-pesan' + (baik ? ' baik' : '');
+  p.style.display = teks ? '' : 'none';
+}
+
+/*  ── ARSIP: catatan selesai & >60 hari (terlipat) ── */
+async function kbMuatArsip(bimbinganId) {
+  var kotak = kb('kb-arsip');
+  if (!kotak) return;
+  try {
+    var r = await fetch('/pembimbing/arsip/' + bimbinganId);
+    var d = await r.json();
+    if (!d || !d.ok || !d.jumlah) { kotak.style.display = 'none'; return; }
+    kotak.style.display = '';
+    _kbArsipData = d;
+    var j = kb('kb-arsip-judul');
+    if (j) j.innerHTML = '<svg class="ik" width="13" height="13"><use href="#ik-archive"/></svg> Arsip (' + d.jumlah + ' catatan selesai &gt;' +
+                           d.hari + ' hari)';
+  } catch (e) {
+    kotak.style.display = 'none';
+  }
+}
+
+function kbArsipLipat() {
+  var isi = kb('kb-arsip-isi');
+  if (!isi) return;
+  var buka = isi.style.display === 'none';
+  if (buka) {
+    var d = _kbArsipData || { butir: [] };
+    isi.innerHTML = (d.butir || []).map(function (b) {
+      var kapan = b.selesai_pada ? String(b.selesai_pada).slice(0, 10) : '';
+      return '<div class="kb-arsip-butir">' +
+        '<b>' + kbLolos(b.masalah) + '</b>' +
+        (b.bagian ? ' <span>— ' + kbLolos(b.bagian) + '</span>' : '') +
+        (kapan ? ' <span>· selesai ' + kapan + '</span>' : '') +
+        '</div>';
+    }).join('');
+    isi.style.display = '';
+  } else {
+    isi.style.display = 'none';
+  }
+  var j = kb('kb-arsip-judul');
+  if (j && _kbArsipData) {
+    j.innerHTML = '<svg class="ik" width="13" height="13"><use href="#ik-archive"/></svg> Arsip (' + _kbArsipData.jumlah + ' catatan selesai &gt;' +
+                    _kbArsipData.hari + ' hari) ' + (buka ? '▾' : '▸');
+  }
+}
+</script>
+
+{# ═══════════════════════════════════════════════════════════════════════
+   PANEL BAGIKAN KE PEMBIMBING (Tahap 2, ACC Bos 23Sep26)
+   Permintaan Bos: "Muncul konfirmasi ok atau batal" → ada 3 tahap:
+     1. isi (nama + no WA + lama)   2. konfirmasi   3. hasil link
+   ═══════════════════════════════════════════════════════════════════════ #}
+<div class="latar-bagikan" id="latar-bagikan" role="dialog" aria-modal="true"
+     aria-labelledby="kb-judul">
+  <div class="kotak-bagikan">
+
+    <!-- TAHAP 1: ISI -->
+    <div id="kb-tahap-isi">
+      <div class="kb-kepala">
+        <h3 id="kb-judul">Bagikan Naskah ke Pembimbing</h3>
+        <p>Pembimbing dapat <b>membaca</b> naskah dan <b>memberi catatan</b>.
+           Naskah tidak dapat diubah dari halaman itu.</p>
+      </div>
+      <div class="kb-isi">
+        <div class="kb-salah" id="kb-salah"></div>
+        <div class="kb-medan">
+          <label for="kb-nama">Nama pembimbing</label>
+          <input type="text" id="kb-nama" placeholder="mis. Prof. Ahmad Subandi"
+                 autocomplete="off" maxlength="120">
+          <small>Nama ini yang tampil di halaman tinjauan.</small>
+        </div>
+        <div class="kb-medan">
+          <label for="kb-wa">Nomor WhatsApp</label>
+          <input type="tel" id="kb-wa" placeholder="mis. 0812-3456-7890"
+                 autocomplete="off" maxlength="24" inputmode="tel">
+          <small>Dipakai untuk mengirim tautan naskah.</small>
+        </div>
+        <div class="kb-medan">
+          <label for="kb-naskah">Naskah yang dibagikan</label>
+          <select id="kb-naskah">
+            <option value="0">Semua naskah saya</option>
+            {% for b in berkas %}
+            <option value="{{ b.id }}">{{ b.nama }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="kb-medan">
+          <label for="kb-hari">Tautan berlaku selama</label>
+          <select id="kb-hari">
+            <option value="30">30 hari (disarankan)</option>
+            <option value="7">7 hari</option>
+          </select>
+        </div>
+      </div>
+      <div class="kb-kaki">
+        <button type="button" class="kb-batal" onclick="tutupBagikan()">Batal</button>
+        <button type="button" class="kb-ok" id="kb-lanjut" onclick="kbKeKonfirmasi()">
+          Lanjut
+        </button>
+      </div>
+    </div>
+
+    <!-- TAHAP 2: KONFIRMASI (permintaan Bos: "ok atau batal") -->
+    <div id="kb-tahap-konfirmasi" style="display:none">
+      <div class="kb-kepala">
+        <h3 id="kb-tanya-judul">Buat tautan untuk pembimbing?</h3>
+        <p>Periksa dulu sebelum tautan dibuat.</p>
+      </div>
+      <div class="kb-isi">
+        <div class="kb-ringkas">
+          <div><b>Pembimbing</b> <span id="kb-r-nama">—</span></div>
+          <div><b>WhatsApp</b> <span id="kb-r-wa">—</span></div>
+          <div><b>Naskah</b> <span id="kb-r-naskah">—</span></div>
+          <div><b>Berlaku</b> <span id="kb-r-hari">—</span></div>
+        </div>
+        <div class="kb-catatan">
+          Pembimbing hanya dapat membaca dan memberi catatan.
+          Naskah tidak dapat diubah dari halaman itu.
+        </div>
+      </div>
+      <div class="kb-kaki">
+        <button type="button" class="kb-batal" onclick="kbKeIsi()">Batal</button>
+        <button type="button" class="kb-ok" id="kb-buat" onclick="kbBuat()">
+          Ya, Buat Tautan
+        </button>
+      </div>
+    </div>
+
+    <!-- TAHAP 3: HASIL (link + copy + kirim) -->
+    <div id="kb-tahap-hasil" style="display:none">
+      <div class="kb-kepala">
+        <h3>Tautan siap dikirim</h3>
+        <p>Salin tautan ini lalu kirim ke pembimbing. Tautan hanya ditampilkan
+           <b>sekali ini</b> — simpan atau kirim sekarang.</p>
+      </div>
+      <div class="kb-isi">
+        <div class="kb-hasil">
+          <div class="kb-hasil-judul" id="kb-hasil-judul">Tautan naskah</div>
+          <div class="kb-link" id="kb-link">—</div>
+          <div class="kb-tombol">
+            <button type="button" class="kb-copy" id="kb-copy" onclick="kbSalin()">
+              {{ ikon('clipboard-check', 15) }} Salin Tautan
+            </button>
+            <a class="kb-kirim" id="kb-kirim" href="#" target="_blank"
+               rel="noopener">{{ ikon('external-link', 15) }} Kirim via WhatsApp</a>
+          </div>
+          <div class="kb-berlaku" id="kb-berlaku"></div>
+        </div>
+        <div class="kb-tanya" style="margin-top:13px">
+          <b>Sudah dikirim?</b> Mahasiswa tidak perlu mengingat tautan ini —
+          daftar pembimbing &amp; statusnya selalu ada di tombol yang sama.
+        </div>
+      </div>
+      <div class="kb-kaki">
+        <button type="button" class="kb-ok" style="flex:1"
+                onclick="tutupBagikan()">Selesai</button>
+      </div>
+    </div>
+
+    <!-- TAHAP 4: DAFTAR PEMBIMBING -->
+    <div id="kb-tahap-daftar" style="display:none">
+      <div class="kb-kepala">
+        <h3>Pembimbing yang Pernah Dibagikan</h3>
+        <p>Lihat status tautan dan matikan bila sudah tidak diperlukan.</p>
+      </div>
+      <div class="kb-isi">
+        <div class="kb-tanya">
+          <b>Mematikan tautan tidak menghapus catatan.</b> Catatan pembimbing
+          tetap tersimpan dan tetap terlihat mahasiswa.
+        </div>
+        <div id="kb-daftar-isi"></div>
+
+        {# ═══ LOG REVISI — DIPINDAH KE DASHBOARD (C3, ACC Bos 24Sep26) ═══
+           Kotak Log Revisi TIDAK LAGI di sini. Alasannya: panel ini isinya
+           FORM membagi tautan; menaruh catatan revisi di sini membuat
+           mahasiswa harus "Bagikan" hanya untuk MELIHAT catatan.
+           Letak barunya: kartu `#kb-log` di dashboard (di atas pengunggah)
+           — kode & kelasnya SAMA, hanya pindah tempat.
+           Benang merah ke tempat baru: tombol "Bagikan ke Pembimbing". #}
+        <div class="kb-tanya" style="margin-top:13px">
+          <b>Catatan pembimbing tidak lagi di sini.</b>
+          Semua catatan &amp; status revisi kini tampil langsung di
+          <b>dashboard</b> — tutup panel ini untuk melihatnya.
+        </div>
+      </div>
+      <div class="kb-kaki">
+        <button type="button" class="kb-ok" style="flex:1"
+                onclick="kbKeIsi()">Bagikan ke pembimbing lain</button>
+        <button type="button" class="kb-batal" style="flex:1"
+                onclick="tutupBagikan()">Tutup</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- ══════════════════════════════════════════════════════════════════
+     MODAL "PROFIL NASKAH" (OPSI B — ACC Bos 26Sep26)
+     Ringkas profil naskah + KARTU TEMPLATE PENULISAN (sumber aturan
+     yang dipakai AI) + unggah panduan penulisan kampus sendiri.
+     API: /api/ai/v1/profil-naskah (rute_alur.py) — SEMUA GRATIS.
+     Pembacaan panduan = ekstraksi teks biasa TANPA AI (Rp 0).
+══════════════════════════════════════════════════════════════════ -->
+<style>
+.pn-tirai{position:fixed;inset:0;background:rgba(18,36,26,.52);display:flex;
+  align-items:center;justify-content:center;z-index:940;padding:16px}
+.pn-kartu{background:#fff;border-radius:16px;width:min(560px,100%);
+  max-height:88vh;overflow:auto;box-shadow:0 18px 50px rgba(0,0,0,.28)}
+.pn-kepala{display:flex;justify-content:space-between;align-items:center;
+  padding:15px 18px;border-bottom:1px solid #EDF3EF}
+.pn-kepala b{font-size:15px}
+.pn-x{border:none;background:#F2F6F3;border-radius:8px;width:30px;height:30px;
+  font-size:16px;cursor:pointer;color:#5B6B7C}
+.pn-badan{padding:15px 18px 6px}
+.pn-tabel{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}
+.pn-tabel td{padding:7px 4px;border-bottom:1px solid #F0F5F1;vertical-align:top}
+.pn-tabel td:first-child{color:#5B6B7C;width:38%}
+.pn-tabel td:last-child{font-weight:600}
+.pn-kartu2{border:1.5px dashed var(--oranye,#F4A025);background:#FFFBF3;
+  border-radius:12px;padding:13px 14px;margin-bottom:14px}
+.pn-lencana{display:inline-flex;align-items:center;gap:6px;font-size:12px;
+  font-weight:700;background:#E9F5EC;color:#198E3B;padding:4px 11px;
+  border-radius:20px;margin-bottom:8px}
+.pn-lencana.oy{background:#FDF1DC;color:#B87400}
+.pn-judul2{font-size:13.5px;font-weight:800;color:#8A5A00;margin-bottom:4px}
+.pn-ket{font-size:12.5px;color:#5B6B7C;line-height:1.6;margin-bottom:9px}
+.pn-tabel2{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;
+  border:1px solid #F0E4CE;border-radius:8px;overflow:hidden;margin-bottom:11px}
+.pn-tabel2 td{padding:6px 9px;border-bottom:1px solid #F5EEE1}
+.pn-tabel2 td:first-child{color:#7A8794;width:44%}
+.pn-tabel2 td:last-child{font-weight:700;color:#1B2A33}
+.pn-aksi{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pn-tombol{font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:8px;
+  border:1.5px solid var(--hijau,#198E3B);color:#198E3B;background:#fff;
+  cursor:pointer;font-family:inherit}
+.pn-tombol.oy{border-color:#F4A025;color:#B87400}
+.pn-tombol.halus{border-color:#DCE7E0;color:#5B6B7C}
+.pn-tombol.bahaya{border-color:#E5484D;color:#E5484D}
+.pn-pesan{font-size:12.5px;line-height:1.6;margin-top:9px;padding:8px 11px;
+  border-radius:8px;background:#EFF7F1;color:#14602C;display:none}
+.pn-pesan.gagal{background:#FDF0F0;color:#B3261E}
+.pn-blok{display:none;margin-top:9px;background:#10231A;color:#D6F2E0;
+  font-size:11.5px;line-height:1.65;border-radius:8px;padding:11px 12px;
+  white-space:pre-wrap;max-height:240px;overflow:auto;font-family:ui-monospace,monospace}
+.pn-kaki{display:flex;justify-content:flex-end;gap:9px;padding:13px 18px;
+  border-top:1px solid #EDF3EF}
+</style>
+
+<div class="pn-tirai" id="pn-tirai" hidden onclick="if(event.target===this)pnTutup()">
+  <div class="pn-kartu" role="dialog" aria-modal="true">
+    <div class="pn-kepala">
+      <b>Profil Naskah — <span id="pn-nama">…</span></b>
+      <button type="button" class="pn-x" onclick="pnTutup()" title="Tutup">&times;</button>
+    </div>
+    <div class="pn-badan">
+      <table class="pn-tabel">
+        <tr><td>Jenjang &amp; bidang</td><td id="pn-jenjang">…</td></tr>
+        <tr><td>Identitas</td><td id="pn-identitas">…</td></tr>
+        <tr><td>Asal naskah</td><td id="pn-asal">…</td></tr>
+      </table>
+
+      <div class="pn-kartu2">
+        <span class="pn-lencana" id="pn-lencana">{{ ikon('check', 13) }} Standar bawaan EduAi</span>
+        <div class="pn-judul2">{{ ikon('file-text', 16) }} Template penulisan</div>
+        <div class="pn-ket" id="pn-ket">
+          Aturan format yang selalu diikuti AI saat menulis naskah ini —
+          kertas, margin, spasi, penomoran, tabel, gambar, sampai sitasi.
+        </div>
+        <table class="pn-tabel2" id="pn-aturan">
+          <tr><td>Memuat…</td><td>—</td></tr>
+        </table>
+        <div class="pn-aksi">
+          <label class="pn-tombol oy" style="cursor:pointer">
+            {{ ikon('paperclip', 15) }} Unggah panduan kampus
+            <input type="file" id="pn-file" accept=".pdf,.docx" hidden
+                   onchange="pnUnggah(this)">
+          </label>
+          <button type="button" class="pn-tombol halus" onclick="pnBlok()">Lihat aturan AI</button>
+          <button type="button" class="pn-tombol bahaya" id="pn-lepas"
+                  onclick="pnHapus()" hidden>Lepas panduan</button>
+        </div>
+        <div class="pn-pesan" id="pn-pesan"></div>
+        <pre class="pn-blok" id="pn-blok"></pre>
+      </div>
+    </div>
+    <div class="pn-kaki">
+      <button type="button" class="pn-tombol" onclick="pnTutup()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══ PROFIL NASKAH (OPSI B) — semua endpoint GRATIS ═══ */
+var PN_FID = 0;
+
+function pnEsc(t){ return (t==null?'':String(t)).replace(/&/g,'&amp;')
+  .replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function pnPesan(teks, gagal){
+  var e = document.getElementById('pn-pesan');
+  if(!teks){ e.style.display='none'; return; }
+  e.textContent = teks; e.className = 'pn-pesan' + (gagal?' gagal':'');
+  e.style.display = 'block';
+}
+
+function pnTutup(){ document.getElementById('pn-tirai').hidden = true; }
+
+async function bukaProfilNaskah(fid){
+  PN_FID = fid;
+  var tirai = document.getElementById('pn-tirai');
+  tirai.hidden = false;
+  document.getElementById('pn-nama').textContent = '…';
+  document.getElementById('pn-pesan').style.display = 'none';
+  document.getElementById('pn-blok').style.display = 'none';
+  pnMuat();
+}
+
+async function pnMuat(){
+  try{
+    var r = await fetch('/api/ai/v1/profil-naskah?file_id=' + PN_FID);
+    var d = await r.json();
+    if(!d.ok){
+      var msg = (d.detail && d.detail.pesan) ? d.detail.pesan : 'Gagal memuat profil naskah.';
+      pnPesan(msg, true); return;
+    }
+    pnRender(d);
+  }catch(e){ pnPesan('Koneksi bermasalah — coba lagi ya.', true); }
+}
+
+function pnRender(d){
+  var p = d.profil || {};
+  document.getElementById('pn-nama').textContent = d.nama_berkas || '—';
+  var jenjang = p.jenjang ? (p.jenjang + (p.bidang ? ' · ' + p.bidang : '')) : (p.bidang || '—');
+  document.getElementById('pn-jenjang').textContent = jenjang;
+  var idt = [];
+  if(p.nama_lengkap) idt.push(p.nama_lengkap);
+  if(p.nim) idt.push('NIM ' + p.nim);
+  if(p.nama_kampus) idt.push(p.nama_kampus);
+  document.getElementById('pn-identitas').textContent = idt.length ? idt.join(' · ') : 'belum diisi';
+  document.getElementById('pn-asal').textContent =
+    (p.asal_naskah === 'eduai') ? 'EduAi (ditulis dari baru)' : 'Naskah bawaan sendiri';
+
+  // lencana sumber aturan
+  var lan = document.getElementById('pn-lencana');
+  if(d.sumber === 'panduan_user'){
+    lan.className = 'pn-lencana oy';
+    lan.innerHTML = '<svg class="ik" width="13" height="13"><use href="#ik-check"/></svg> Aktif: ' + (d.nama_panduan || 'Panduan kampus');
+    document.getElementById('pn-lepas').hidden = false;
+  }else{
+    lan.className = 'pn-lencana';
+    lan.innerHTML = '<svg class="ik" width="13" height="13"><use href="#ik-check"/></svg> Aktif: Standar bawaan EduAi';
+    document.getElementById('pn-lepas').hidden = true;
+  }
+
+  // tabel aturan — dari data server (ikut panduan user bila ada)
+  var a = d.aturan || {}, baris = [];
+  var margin = a.margin_cm ? ('atas ' + a.margin_cm.atas + ' · bawah ' + a.margin_cm.bawah +
+      ' · kiri ' + a.margin_cm.kiri + ' · kanan ' + a.margin_cm.kanan + ' cm') : '—';
+  var ks = a.kertas ? (a.kertas.ukuran || '—') : '—';
+  baris.push(['Kertas & margin', ks + ' · ' + margin]);
+  var hur = a.huruf ? a.huruf.isi : '—';
+  var spa = a.spasi ? a.spasi.isi_paragraf : '—';
+  baris.push(['Spasi & huruf', hur + ' · spasi ' + spa]);
+  if(a.gambar) baris.push(['Judul gambar', a.gambar.judul]);
+  if(a.sitasi) baris.push(['Sitasi', a.sitasi.bentuk]);
+  if(a.jumlah_halaman) baris.push(['Jumlah halaman', 'minimal ' + a.jumlah_halaman.total_minimal + ' halaman']);
+  var tb = '';
+  for(var i=0;i<baris.length;i++){
+    tb += '<tr><td>' + pnEsc(baris[i][0]) + '</td><td>' + pnEsc(baris[i][1]) + '</td></tr>';
+  }
+  document.getElementById('pn-aturan').innerHTML = tb;
+  document.getElementById('pn-blok').textContent = d.blok_ai || '';
+}
+
+function pnBlok(){
+  var b = document.getElementById('pn-blok');
+  b.style.display = (b.style.display === 'block') ? 'none' : 'block';
+}
+
+async function pnUnggah(input){
+  var f = input.files && input.files[0];
+  if(!f) return;
+  pnPesan('Membaca panduan… (tanpa AI, langsung jadi)', false);
+  var fd = new FormData();
+  fd.append('file_id', PN_FID);
+  fd.append('berkas', f);
+  try{
+    var r = await fetch('/api/ai/v1/profil-naskah/panduan', {method:'POST', body:fd});
+    var d = await r.json();
+    if(!d.ok){
+      var msg = (d.detail && d.detail.pesan) ? d.detail.pesan : 'Panduan belum bisa dibaca.';
+      pnPesan(msg, true); input.value=''; return;
+    }
+    pnPesan('<svg class="ik" width="13" height="13"><use href="#ik-check"/></svg> ' + d.pesan, false);
+    await pnMuat();
+  }catch(e){ pnPesan('Koneksi bermasalah — coba lagi ya.', true); }
+  input.value = '';
+}
+
+async function pnHapus(){
+  if(!confirm('Lepas panduan kampus? Naskah ini kembali memakai standar bawaan EduAi.')) return;
+  var fd = new FormData();
+  fd.append('file_id', PN_FID);
+  try{
+    var r = await fetch('/api/ai/v1/profil-naskah/panduan/hapus', {method:'POST', body:fd});
+    var d = await r.json();
+    if(!d.ok){ pnPesan('Belum bisa dilepas — coba lagi ya.', true); return; }
+    pnPesan('<svg class="ik" width="13" height="13"><use href="#ik-check"/></svg> ' + d.pesan, false);
+    await pnMuat();
+  }catch(e){ pnPesan('Koneksi bermasalah — coba lagi ya.', true); }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SKETSA — Tanda Mutu Jurnal di Hasil Pencarian EduAi</title>
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA;--merah:#C0392B}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;
+     padding:22px 16px 60px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto}
+h1{font-size:19px;margin-bottom:4px}
+.sub{font-size:13px;color:var(--teks-abu);margin-bottom:20px}
+.pil{background:#fff;border:2px solid var(--garis);border-radius:14px;padding:16px;
+     margin-bottom:22px}
+.pil.juara{border-color:var(--hijau)}
+.lbl{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.4px;
+     padding:3px 11px;border-radius:70px;background:var(--hijau-muda);
+     color:var(--hijau-gelap);margin-bottom:10px}
+.pil.juara .lbl{background:var(--hijau);color:#fff}
+.nama{font-size:15px;font-weight:700;margin-bottom:3px}
+.ket{font-size:12.5px;color:var(--teks-abu);margin-bottom:13px}
+/* kartu hasil — sama spt produksi */
+.art{background:#fff;border:1px solid var(--garis);border-radius:12px;
+     padding:13px 15px;margin-bottom:9px}
+.art .jd{font-size:13.5px;font-weight:600;line-height:1.4;margin-bottom:4px}
+.art .mt{font-size:12px;color:var(--teks-abu);line-height:1.5}
+.art .baris{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
+.mini{font-size:11.5px;padding:5px 12px;border-radius:70px;
+      border:1.5px solid var(--garis);background:#fff;color:var(--teks-abu)}
+/* CONTOH WARNA */
+
+/* ── PILIHAN A: lencana angka di baris tombol ── */
+.a-mutu{font-size:11.5px;padding:5px 11px;border-radius:70px;font-weight:600;
+        border:1.5px solid;display:inline-flex;align-items:center;gap:5px}
+.a-kuat{background:var(--hijau-muda);border-color:#9BD8B2;color:var(--hijau-gelap)}
+.a-sedang{background:#FFF6E5;border-color:#F3D08A;color:#8A5A08}
+.a-kecil{background:#F4F4F6;border-color:#DCDCE2;color:var(--teks-abu)}
+
+/* ── PILIHAN B: pita tepi kiri kartu ── */
+.b-pita{border-left:5px solid;padding-left:11px}
+.b-kuat{border-left-color:var(--hijau)}
+.b-sedang{border-left-color:var(--oranye)}
+.b-kecil{border-left-color:#D6D6DC}
+.b-teks{font-size:11.5px;font-weight:600;margin-top:6px;display:flex;
+        align-items:center;gap:5px;flex-wrap:wrap}
+.b-teks .angka{font-weight:400;color:var(--teks-abu)}
+
+/* ── PILIHAN C: baris mutu DI ATAS judul (paling jelas) ── */
+.c-head{display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap}
+.c-pil{font-size:11px;font-weight:700;padding:3.5px 10px;border-radius:70px;
+       display:inline-flex;align-items:center;gap:5px}
+.c-kuat{background:var(--hijau);color:#fff}
+.c-sedang{background:#F4A025;color:#fff}
+.c-kecil{background:#E4E4E9;color:#54525A}
+.c-angka{font-size:11px;color:var(--teks-abu)}
+.c-rinci{font-size:10.5px;color:var(--teks-abu);border-bottom:1px dotted #bbb;cursor:help}
+
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+td,th{border:1px solid var(--garis);padding:6px 9px;text-align:left}
+th{background:#F7F9F8;font-weight:600}
+.cat{font-size:12px;color:var(--teks-abu);background:#FFFBF0;border-left:3px solid var(--oranye);
+     padding:9px 12px;border-radius:8px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Tanda Mutu Jurnal di Hasil Pencarian</h1>
+<div class="sub">3 pilihan tampilan. Semua pakai data NYATA (SJR/CiteScore dari Scopus).
+Angka di bawah ini diambil dari uji 12 Okt 2026 — bukan contoh karangan.</div>
+
+<!-- ═══════════ PILIHAN A ═══════════ -->
+<div class="pil">
+  <span class="lbl">PILIHAN A — LENCANA ANGKA</span>
+  <div class="nama">Tanda kecil di deretan tombol, isinya ANGKA</div>
+  <div class="ket">Paling ringkas. Angka SJR yang “bicara sendiri” — tanpa kata sifat.</div>
+
+  <div class="art">
+    <div class="jd">Managing customer relationships in emerging markets: a systematic review</div>
+    <div class="mt">Penulis A, Penulis B (2026). Journal of Service Theory and Practice.</div>
+    <div class="baris">
+      <button class="mini">Scopus</button>
+      <span class="a-mutu a-kuat">SJR 1.42 · CiteScore 9.4</span>
+      <button class="mini">unduh ke workspace</button>
+    </div>
+  </div>
+
+  <div class="art">
+    <div class="jd">Relationship marketing and customer satisfaction: an empirical study</div>
+    <div class="mt">Penulis C (2025). Journal of Hospitality and Tourism.</div>
+    <div class="baris">
+      <button class="mini">Scopus</button>
+      <span class="a-mutu a-sedang">SJR 1.28 · CiteScore 11.2</span>
+      <button class="mini">unduh ke workspace</button>
+    </div>
+  </div>
+
+  <div class="art">
+    <div class="jd">Agri-Food Enterprises and Relationship Marketing</div>
+    <div class="mt">Penulis D (2024). Journal of International Food and Agribusiness.</div>
+    <div class="baris">
+      <button class="mini">Scopus</button>
+      <span class="a-mutu a-kecil">SJR 0.43 · CiteScore 5.3</span>
+      <button class="mini">unduh ke workspace</button>
+    </div>
+  </div>
+
+  <div class="cat"><b>Kelebihan:</b> sangat rapi, tidak menambah baris, angka jujur apa adanya.<br>
+  <b>Kekurangan:</b> orang awam belum tentu tahu SJR 1,42 itu bagus atau tidak.</div>
+</div>
+
+<!-- ═══════════ PILIHAN B ═══════════ -->
+<div class="pil">
+  <span class="lbl">PILIHAN B — PITA TEPI KARTU</span>
+  <div class="nama">Garis warna di tepi kiri + keterangan kecil di bawah</div>
+  <div class="ket">Bahasa awam: “Jurnal kuat / sedang / kecil”. Angka jadi keterangan tambahan.</div>
+
+  <div class="art b-pita b-kuat">
+    <div class="jd">Managing customer relationships in emerging markets: a systematic review</div>
+    <div class="mt">Penulis A, Penulis B (2026). Journal of Service Theory and Practice.</div>
+    <div class="b-teks" style="color:var(--hijau-gelap)">
+      Jurnal kuat <span class="angka">· SJR 1.42 · CiteScore 9.4 · Scopus</span>
+    </div>
+    <div class="baris"><button class="mini">unduh ke workspace</button></div>
+  </div>
+
+  <div class="art b-pita b-sedang">
+    <div class="jd">Relationship marketing and customer satisfaction: an empirical study</div>
+    <div class="mt">Penulis C (2025). Journal of Hospitality and Tourism.</div>
+    <div class="b-teks" style="color:#8A5A08">
+      Jurnal sedang <span class="angka">· SJR 1.28 · CiteScore 11.2 · Scopus</span>
+    </div>
+    <div class="baris"><button class="mini">unduh ke workspace</button></div>
+  </div>
+
+  <div class="art b-pita b-kecil">
+    <div class="jd">Agri-Food Enterprises and Relationship Marketing</div>
+    <div class="mt">Penulis D (2024). Journal of International Food and Agribusiness.</div>
+    <div class="b-teks" style="color:var(--teks-abu)">
+      Jurnal kecil <span class="angka">· SJR 0.43 · CiteScore 5.3 · Scopus</span>
+    </div>
+    <div class="baris"><button class="mini">unduh ke workspace</button></div>
+  </div>
+
+  <div class="cat"><b>Kelebihan:</b> orang awam langsung paham lewat kata; warna terbaca dari jauh.
+  <br><b>Kekurangan:</b> menambah satu baris di tiap kartu (kartu jadi lebih tinggi).
+  <br>⚠️ Kata “kuat/sedang/kecil” = <b>penilaian</b>. Harus disepakati ambangnya dulu (usul Wulan: 1,0 / 0,4).</div>
+</div>
+
+<!-- ═══════════ PILIHAN C ═══════════ -->
+<div class="pil juara">
+  <span class="lbl">PILIHAN C — PITA DI ATAS JUDUL (usul Wulan)</span>
+  <div class="nama">Mutu muncul PALING ATAS, sebelum mata membaca judul</div>
+  <div class="ket">Sinergi A+B: ada kata awam + angka rinci. Paling cepat dinilai saat menyapu daftar.</div>
+
+  <div class="art">
+    <div class="c-head">
+      <span class="c-pil c-kuat">JURNAL KUAT</span>
+      <span class="c-angka">SJR 1.42 · CiteScore 9.4</span>
+      <span class="c-rinci" title="SJR 1.416 · SNIP 1.21 · CiteScore 9.4 · Penerbit: Emerald">rincian</span>
+    </div>
+    <div class="jd">Managing customer relationships in emerging markets: a systematic review</div>
+    <div class="mt">Penulis A, Penulis B (2026). Journal of Service Theory and Practice.</div>
+    <div class="baris"><button class="mini">Scopus</button><button class="mini">unduh ke workspace</button></div>
+  </div>
+
+  <div class="art">
+    <div class="c-head">
+      <span class="c-pil c-sedang">JURNAL SEDANG</span>
+      <span class="c-angka">SJR 1.28 · CiteScore 11.2</span>
+      <span class="c-rinci" title="SJR 1.279 · SNIP 1.44 · CiteScore 11.2">rincian</span>
+    </div>
+    <div class="jd">Relationship marketing and customer satisfaction: an empirical study</div>
+    <div class="mt">Penulis C (2025). Journal of Hospitality and Tourism.</div>
+    <div class="baris"><button class="mini">Scopus</button><button class="mini">unduh ke workspace</button></div>
+  </div>
+
+  <div class="art">
+    <div class="c-head">
+      <span class="c-pil c-kecil">JURNAL KECIL</span>
+      <span class="c-angka">SJR 0.43 · CiteScore 5.3</span>
+      <span class="c-rinci" title="SJR 0.426 · SNIP 0.71 · CiteScore 5.3">rincian</span>
+    </div>
+    <div class="jd">Agri-Food Enterprises and Relationship Marketing</div>
+    <div class="mt">Penulis D (2024). Journal of International Food and Agribusiness.</div>
+    <div class="baris"><button class="mini">Scopus</button><button class="mini">unduh ke workspace</button></div>
+  </div>
+
+  <div class="cat"><b>Kelebihan:</b> saat user menyapu daftar cepat, mutu langsung terlihat <b>sebelum</b> baca judul.
+  Bisa juga jadi penanda saat menyaring “cari yang jurnalnya kuat saja”.<br>
+  <b>Kekurangan:</b> paling menambah tinggi kartu; ada istilah “rincian” (butuh 1 klik/tap).</div>
+</div>
+
+<!-- ═══════════ PERBANDINGAN ═══════════ -->
+<h1 style="font-size:15px;margin:22px 0 8px">Perbandingan</h1>
+<table>
+<tr><th>Hal</th><th>A — Lencana angka</th><th>B — Pita tepi</th><th>C — Pita atas</th></tr>
+<tr><td>Ringkas</td><td>★★★</td><td>★★</td><td>★</td></tr>
+<tr><td>Awam langsung paham</td><td>★</td><td>★★★</td><td>★★★</td></tr>
+<tr><td>Cepat dinilai saat menyapu daftar</td><td>★★</td><td>★★</td><td>★★★</td></tr>
+<tr><td>Tambah tinggi kartu</td><td>nol (sebaris)</td><td>1 baris</td><td>2 baris</td></tr>
+<tr><td>Jujur (tanpa menilai)</td><td>★★★</td><td>★ (ada kata “kuat”)</td><td>★ (ada kata “kuat”)</td></tr>
+</table>
+
+<div class="cat" style="margin-top:16px">
+<b>Catatan jujur dari Wulan:</b><br>
+1. Pilihan B &amp; C memakai kata penilaian (“kuat/sedang/kecil”). Itu <b>bukan</b> data resmi Scopus —
+   itu <b>ambang buatan kita</b>. Harus Bos putuskan angkanya, dan sebaiknya ada keterangan kecil
+   di halaman (“penilaian memakai SJR”) supaya tidak dianggap vonis resmi.<br>
+2. Artikel dari Garuda (jurnal Indonesia) &amp; sebagian OpenAlex <b>tidak punya ISSN Scopus</b> →
+   tandanya tidak muncul. Jangan dipaksa/dikarang.<br>
+3. Waktu tambahan: 5 hasil ≈ 2,5 detik sebelum pakai cache. Perlu cache supaya tidak berulang.
+</div>
+
+</div>
+</body>
+</html>

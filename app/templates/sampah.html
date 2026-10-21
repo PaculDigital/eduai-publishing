@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tong Sampah — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);border-bottom:1px solid rgba(255,255,255,.13);
+       position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;
+     display:flex;align-items:center;justify-content:space-between}
+.nav img{height:52px;width:auto}
+.nav-kanan{display:flex;align-items:center;gap:16px;font-size:14.5px}
+.nav-kanan .nama{color:rgba(255,255,255,.9)}
+.nav-kanan a{color:#fff;font-weight:600;border:1.5px solid rgba(255,255,255,.34);
+             padding:6px 15px;border-radius:70px;transition:.2s}
+.nav-kanan a:hover{background:rgba(255,255,255,.14)}
+
+.wadah{max-width:1080px;margin:0 auto;padding:32px 22px 60px}
+
+/* --- kartu penjelasan --- */
+.kotak-info{background:#FFF9EC;border:1px solid #F3DFB5;border-radius:14px;
+            padding:16px 20px;margin-bottom:22px;display:flex;gap:14px;align-items:flex-start}
+.kotak-info .ikon{font-size:22px;line-height:1.3}
+.kotak-info h3{font-size:15px;font-weight:700;margin-bottom:5px}
+.kotak-info p{font-size:13.5px;color:#7A6320;line-height:1.6}
+
+.judul-baris{display:flex;align-items:center;justify-content:space-between;gap:14px;
+             flex-wrap:wrap;margin-bottom:16px}
+h1{font-size:22px;font-weight:800}
+.judul-baris .meta{font-size:13.5px;color:var(--teks-abu)}
+
+/* --- kartu berkas sampah --- */
+.berkas{display:flex;align-items:center;gap:15px;background:#fff;
+        border:1px solid var(--garis);border-radius:14px;padding:16px 18px;
+        margin-bottom:12px;transition:.2s}
+.berkas:hover{border-color:#C9C9CF;box-shadow:0 5px 18px rgba(39,37,48,.06)}
+.berkas-ikon{width:44px;height:44px;border-radius:11px;background:#F2F2F4;
+             display:grid;place-items:center;font-size:20px;flex-shrink:0;filter:grayscale(.5)}
+.berkas-isi{flex:1;min-width:0}
+.berkas-nama{font-size:15px;font-weight:600;margin-bottom:3px;
+             white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--teks-abu)}
+.berkas-info{font-size:12.5px;color:var(--teks-abu)}
+.sisa{display:inline-block;background:#FDF0DC;color:#8A5A00;font-size:11.5px;
+      font-weight:700;border-radius:70px;padding:2px 9px;margin-left:7px}
+.aksi{display:flex;gap:8px;flex-shrink:0}
+.aksi button{border-radius:70px;padding:8px 15px;font-size:13px;font-weight:600;
+             border:1.5px solid var(--garis);background:#fff;cursor:pointer;
+             font-family:inherit;transition:.2s;color:var(--teks)}
+.aksi button.pulih{border-color:var(--hijau);color:var(--hijau)}
+.aksi button.pulih:hover{background:var(--hijau-muda)}
+.aksi button.musnah:hover{border-color:#E5484D;color:#E5484D}
+
+.kosong{text-align:center;padding:56px 24px;background:#fff;border:1px solid var(--garis);
+        border-radius:16px}
+.kosong-ikon{font-size:44px;margin-bottom:14px;opacity:.5}
+.kosong h3{font-size:17px;font-weight:700;margin-bottom:7px}
+.kosong p{color:var(--teks-abu);font-size:14.5px}
+
+#notif{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);
+       background:var(--teks);color:#fff;padding:14px 26px;border-radius:70px;
+       font-size:14.5px;font-weight:500;transition:.3s;z-index:100;
+       box-shadow:0 10px 34px rgba(0,0,0,.24);max-width:90vw;text-align:center}
+#notif.tampil{transform:translateX(-50%) translateY(0)}
+#notif.gagal{background:#B3261E}
+
+/* --- dialog konfirmasi --- */
+#tirai{position:fixed;inset:0;background:rgba(20,18,26,.55);display:none;
+       place-items:center;z-index:200;padding:22px}
+#tirai.tampil{display:grid}
+.dialog{background:#fff;border-radius:18px;padding:28px 26px;max-width:420px;width:100%;
+        text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.dialog .ikon{font-size:42px;margin-bottom:12px}
+.dialog h3{font-size:18px;font-weight:800;margin-bottom:9px}
+.dialog p{font-size:14px;color:var(--teks-abu);line-height:1.65;margin-bottom:20px}
+.dialog .tombol{display:flex;gap:10px}
+.dialog button{flex:1;padding:12px;border-radius:70px;font-size:14px;font-weight:700;
+               cursor:pointer;font-family:inherit;border:none;transition:.2s}
+.dialog .batal{background:#F2F2F4;color:var(--teks)}
+.dialog .batal:hover{background:#E7E7EA}
+.dialog .ya{background:#E5484D;color:#fff}
+.dialog .ya:hover{background:#C93A3F}
+
+@media(max-width:620px){
+  .wadah{padding:22px 16px 50px}
+  .berkas{padding:14px;gap:12px;flex-wrap:wrap}
+  .aksi{width:100%}
+  .aksi button{flex:1}
+  .judul-baris{align-items:flex-start}
+}
+</style>
+<link rel="stylesheet" href="/static/ikon.css">
+</head>
+<body>
+<!-- IKON: sprite Lucide (ACC Bos 15Sep26) -->
+{{ ikon_sprite() }}
+
+
+<header>
+  <div class="nav">
+    <img src="/static/logo-96.png" alt="EduAi Publishing">
+    <div class="nav-kanan">
+      <span class="nama">{{ user.email }}</span>
+      <a href="/naskah">{{ ikon('arrow-left', 15) }} Dokumen Saya</a>
+    </div>
+  </div>
+</header>
+
+<div class="wadah">
+
+  <div class="kotak-info">
+    <div class="ikon">{{ ikon('trash-2', 30) }}</div>
+    <div>
+      <h3>Tong Sampah</h3>
+      <p>Dokumen di sini <b>belum hilang</b>. Bisa Anda kembalikan kapan saja
+         dalam <b>{{ sampah_hari }} hari</b>. Setelah itu dihapus permanen
+         otomatis. Selama di sini, dokumen <b>tetap menghitung kuota</b>.</p>
+    </div>
+  </div>
+
+  {% if auto_dibersihkan %}
+  <div class="kotak-info" style="background:#EAF4EC;border-color:#C3E0CB">
+    <div class="ikon">{{ ikon('eraser', 30) }}</div>
+    <div><h3>Bersih otomatis</h3>
+      <p>{{ auto_dibersihkan }} dokumen sudah lewat {{ sampah_hari }} hari dan
+         dihapus permanen. Backup database dibuat otomatis sebelum dihapus.</p></div>
+  </div>
+  {% endif %}
+
+  <div class="judul-baris">
+    <h1>Tong Sampah</h1>
+    <div class="meta">
+      {{ jumlah }} dokumen &middot; {{ '%.1f'|format(ukuran_mb) }} MB
+      {% if jumlah %}
+      &middot; <a href="#" onclick="kosongkan();return false"
+                  style="color:#B3261E;font-weight:700">Kosongkan</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if berkas %}
+    {% for f in berkas %}
+    <div class="berkas" id="b{{ f.id }}">
+      <div class="berkas-ikon">{{ ikon('file-text', 21) }}</div>
+      <div class="berkas-isi">
+        <div class="berkas-nama">{{ f.nama }}</div>
+        <div class="berkas-info">
+          {{ '%.0f'|format((f.ukuran or 0) / 1024) }} KB
+          &middot; dihapus {{ f.terhapus_pada.strftime('%d %b %Y, %H:%M') if f.terhapus_pada else '' }}
+          <span class="sisa">sisa {{ f.sisa_hari }} hari</span>
+        </div>
+      </div>
+      <div class="aksi">
+        <button class="pulih" onclick="pulihkan({{ f.id }}, '{{ f.nama|e }}')">{{ ikon('archive-restore', 15) }} Pulihkan</button>
+        <button class="musnah" onclick="musnah({{ f.id }}, '{{ f.nama|e }}')">Hapus permanen</button>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="kosong">
+      <div class="kosong-ikon">{{ ikon('trash-2', 34) }}</div>
+      <h3>Tong Sampah kosong</h3>
+      <p>Dokumen yang Anda hapus akan muncul di sini dan bisa dipulihkan.</p>
+    </div>
+  {% endif %}
+
+</div>
+
+<div id="notif"></div>
+
+<!-- dialog konfirmasi hapus permanen -->
+<div id="tirai">
+  <div class="dialog">
+    <div class="ikon">{{ ikon('alert-triangle', 30) }}</div>
+    <h3>Hapus permanen?</h3>
+    <p id="d-teks"></p>
+    <div class="tombol">
+      <button class="batal" onclick="tutupDialog()">Batal</button>
+      <button class="ya" id="d-ya">Ya, hapus permanen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const notif = document.getElementById('notif');
+let timer;
+function pesan(t, gagal) {
+  notif.textContent = t;
+  notif.classList.toggle('gagal', !!gagal);
+  notif.classList.add('tampil');
+  clearTimeout(timer);
+  timer = setTimeout(() => notif.classList.remove('tampil'), 3600);
+}
+
+async function pulihkan(id, nama) {
+  try {
+    const r = await fetch('/pulihkan/' + id, { method: 'POST' });
+    const j = await r.json();
+    if (j.ok) { pesan(j.pesan || 'Dokumen dikembalikan.'); setTimeout(() => location.reload(), 800); }
+    else { pesan(j.detail || 'Gagal memulihkan.', true); }
+  } catch (e) { pesan('Gagal memulihkan.', true); }
+}
+
+let aksiYa = null;
+function bukaDialog(teks, fn) {
+  document.getElementById('d-teks').innerHTML = teks;
+  document.getElementById('tirai').classList.add('tampil');
+  aksiYa = fn;
+}
+function tutupDialog() {
+  document.getElementById('tirai').classList.remove('tampil');
+  aksiYa = null;
+}
+document.getElementById('d-ya').onclick = () => { if (aksiYa) aksiYa(); };
+
+function musnah(id, nama) {
+  bukaDialog('"' + nama + '" akan dihapus <b>permanen</b> dan tidak bisa '
+    + 'dikembalikan lagi.<br><br>Database di-backup otomatis sebelum dihapus.',
+    async () => {
+      tutupDialog();
+      try {
+        const r = await fetch('/hapus-permanen/' + id, { method: 'POST' });
+        const j = await r.json();
+        if (j.ok) { pesan(j.pesan || 'Dihapus permanen.'); setTimeout(() => location.reload(), 900); }
+        else { pesan(j.detail || 'Gagal menghapus.', true); }
+      } catch (e) { pesan('Gagal menghapus.', true); }
+    });
+}
+
+function kosongkan() {
+  bukaDialog('SEMUA dokumen di Tong Sampah akan dihapus <b>permanen</b> '
+    + 'dan tidak bisa dikembalikan.<br><br>Database di-backup otomatis lebih dulu.',
+    async () => {
+      tutupDialog();
+      try {
+        const r = await fetch('/sampah/kosongkan', { method: 'POST' });
+        const j = await r.json();
+        if (j.ok) { pesan(j.pesan || 'Tong Sampah dikosongkan.'); setTimeout(() => location.reload(), 900); }
+        else { pesan(j.detail || 'Gagal mengosongkan.', true); }
+      } catch (e) { pesan('Gagal mengosongkan.', true); }
+    });
+}
+</script>
+
+</body>
+</html>

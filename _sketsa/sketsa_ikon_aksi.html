@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Sketsa — Ikon Aksi Catatan Pembimbing</title>
+<style>
+  :root{
+    --hijau:#1E7A45; --hijau-muda:#E8F5EE; --kuning:#B7791F; --kuning-muda:#FDF6E3;
+    --tinta:#22301F; --tinta-2:#5A6A57; --garis:#E4E7E4; --kertas:#FBFAF7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:26px 20px 60px;background:var(--kertas);color:var(--tinta);
+       font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  h1{font-size:20px;margin:0 0 4px}
+  .kepala-kecil{color:var(--tinta-2);font-size:13px;margin-bottom:26px}
+  h2{font-size:15.5px;margin:34px 0 4px;display:flex;align-items:center;gap:8px}
+  h2 .penanda{background:var(--tinta);color:#fff;font-size:11.5px;padding:2px 9px;
+              border-radius:20px;font-weight:600;letter-spacing:.4px}
+  .catatan{color:var(--tinta-2);font-size:13px;margin:0 0 14px}
+
+  /* ── kerangka baris masalah (meniru app) ── */
+  .masalah{background:#fff;border:1px solid var(--garis);border-radius:11px;
+           margin-bottom:11px;overflow:hidden;box-shadow:0 1px 2px rgba(20,40,20,.04)}
+  .kepala{display:flex;gap:11px;align-items:flex-start;padding:12px 13px}
+  .nomor{width:23px;height:23px;border-radius:50%;background:var(--kuning-muda);
+         color:var(--kuning);display:flex;align-items:center;justify-content:center;
+         font-size:12.5px;font-weight:700;flex:0 0 auto;border:1px solid #F0E2BE}
+  .teks{flex:1;min-width:0}
+  .teks .isi{font-size:13.5px;line-height:1.5}
+  .teks .bagian{font-size:12px;color:var(--tinta-2);margin-top:3px}
+  .lencana{font-size:11.5px;padding:3px 9px;border-radius:20px;white-space:nowrap;
+           background:var(--kuning-muda);color:var(--kuning);border:1px solid #F0E2BE}
+  .lencana.selesai{background:var(--hijau-muda);color:var(--hijau);border-color:#C6E5D3}
+
+  /* ── IKON SVG (Lucide, diambil dari sprite app) ── */
+  .ik{display:inline-block;vertical-align:-0.155em;flex:0 0 auto;
+      stroke-width:2;fill:none;stroke:currentColor;
+      stroke-linecap:round;stroke-linejoin:round}
+
+  /* ═══ A. IKON BERJAJAR (paling rapat) ═══ */
+  .aksi-baris{display:flex;gap:6px;align-items:center;margin-left:8px}
+  .ib{width:30px;height:30px;border-radius:8px;border:1px solid var(--garis);
+      background:#fff;display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;color:var(--tinta-2);transition:.15s;padding:0}
+  .ib:hover{transform:translateY(-1px)}
+  .ib.ai:hover{border-color:var(--hijau);color:var(--hijau);background:var(--hijau-muda)}
+  .ib.manual:hover{border-color:#1E5F8A;color:#1E5F8A;background:#EAF2F9}
+  .ib.lewati:hover{border-color:#9AA39A;color:#5A6A57;background:#F2F4F2}
+  /* warna tetap (bukan hanya hover) — versi A2 */
+  .ib.ai.tetap{color:var(--hijau);border-color:#C6E5D3;background:var(--hijau-muda)}
+  .ib.manual.tetap{color:#1E5F8A;border-color:#C8DEF0;background:#EAF2F9}
+  .ib.lewati.tetap{color:#88918A;border-color:var(--garis);background:#F6F7F6}
+
+  /* ═══ B. IKON BUNDAR DI DALAM KEPALA (menempel kanan) ═══ */
+  .aksi-bundar{display:flex;gap:5px;align-items:center}
+  .ib-bundar{width:29px;height:29px;border-radius:50%;border:1px solid var(--garis);
+      background:#fff;display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;color:#fff;padding:0;border:none}
+  .ib-bundar.ai{background:var(--hijau)}
+  .ib-bundar.manual{background:#1E5F8A}
+  .ib-bundar.lewati{background:#fff;color:#88918A;border:1px solid var(--garis)}
+
+  /* ═══ C. SATU TOMBOL UTAMA + 2 IKON KECIL ═══ */
+  .aksi-campur{display:flex;gap:6px;align-items:center}
+  .utama{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;
+      border-radius:8px;border:1px solid #C6E5D3;background:var(--hijau-muda);
+      color:var(--hijau);font-size:12.5px;font-weight:600;cursor:pointer}
+  .kecil{width:30px;height:30px;border-radius:8px;border:1px solid var(--garis);
+      background:#fff;display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;color:var(--tinta-2);padding:0}
+
+  /* tooltip gaya app (title) — kita tirukan visualnya */
+  .tooltip-demo{position:relative;display:inline-block}
+
+  .kotak-banding{display:flex;flex-direction:column;gap:0}
+  .kaki{margin-top:6px;font-size:12.5px;color:var(--tinta-2)}
+  .cocok{display:inline-block;background:var(--hijau-muda);color:var(--hijau);
+         font-size:11.5px;padding:2px 8px;border-radius:20px;margin-left:6px}
+</style>
+</head>
+<body>
+
+<h1>Ikon Aksi untuk Catatan Pembimbing</h1>
+<div class="kepala-kecil">
+  Tiga desain. Ikon dari sprite Lucide app (bukan emoji) — <b>sparkles</b> = Revisi dengan AI ·
+  <b>pencil</b> = Kerjakan sendiri · <b>x</b> = Lewati. Semua pakai <code>tooltip</code> (title).
+</div>
+
+<!-- ═══════════ A ═══════════ -->
+<h2><span class="penanda">DESAIN A</span> Ikon berjajar di kanan — warna saat disentuh</h2>
+<p class="catatan">Paling rapat & tenang. Ikon abu saat diam, berwarna saat kursor menyentuh. Cocok kalau layar sempit.</p>
+
+<div class="masalah">
+  <div class="kepala">
+    <div class="nomor">1</div>
+    <div class="teks">
+      <div class="isi">Rumusan masalah terlalu umum, persempit fokusnya.</div>
+      <div class="bagian">BAB I · 1.2 Rumusan Masalah</div>
+    </div>
+    <div class="aksi-baris">
+      <button class="ib ai" title="Revisi dengan AI — 1 Token Revisi">
+        <svg class="ik" width="16" height="16" viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+      <button class="ib manual" title="Dikerjakan sendiri — 0 Token Revisi">
+        <svg class="ik" width="16" height="16" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+      </button>
+      <button class="ib lewati" title="Lewati revisi ini">
+        <svg class="ik" width="16" height="16" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<h2><span class="penanda">DESAIN A2</span> Ikon berjajar — warna tetap (selalu terlihat)</h2>
+<p class="catatan">Sama seperti A, tapi tiap ikon punya warnanya sendiri sejak awal → <b>mahasiswa langsung paham</b> tanpa menyentuh. Ikon hijau = AI, biru = manual, abu = lewati.</p>
+
+<div class="masalah">
+  <div class="kepala">
+    <div class="nomor">2</div>
+    <div class="teks">
+      <div class="isi">Tambahkan rujukan pada landasan teori BAB II, minimal 3 sumber terbaru.</div>
+      <div class="bagian">BAB I · 1.1 Latar Belakang</div>
+    </div>
+    <div class="aksi-baris">
+      <button class="ib ai tetap" title="Revisi dengan AI — 1 Token Revisi">
+        <svg class="ik" width="16" height="16" viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+      <button class="ib manual tetap" title="Dikerjakan sendiri — 0 Token Revisi">
+        <svg class="ik" width="16" height="16" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+      </button>
+      <button class="ib lewati tetap" title="Lewati revisi ini">
+        <svg class="ik" width="16" height="16" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ B ═══════════ -->
+<h2><span class="penanda">DESAIN B</span> Ikon bundar berwarna (padat)</h2>
+<p class="catatan">Ikon bulat penuh warna — paling <b>kelihatan</b>, tapi paling "ramai". Hijau pekat = AI, biru = manual, putih = lewati.</p>
+
+<div class="masalah">
+  <div class="kepala">
+    <div class="nomor">3</div>
+    <div class="teks">
+      <div class="isi">Ringkas bagian metode penelitian, terlalu panjang dan berulang.</div>
+      <div class="bagian">BAB III · 3.2 Metode Analisis</div>
+    </div>
+    <div class="aksi-bundar">
+      <button class="ib-bundar ai" title="Revisi dengan AI — 1 Token Revisi">
+        <svg class="ik" width="15" height="15" viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+      <button class="ib-bundar manual" title="Dikerjakan sendiri — 0 Token Revisi">
+        <svg class="ik" width="15" height="15" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+      </button>
+      <button class="ib-bundar lewati" title="Lewati revisi ini">
+        <svg class="ik" width="15" height="15" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ C ═══════════ -->
+<h2><span class="penanda">DESAIN C</span> Satu tombol utama + 2 ikon kecil</h2>
+<p class="catatan">Menonjolkan <b>Revisi dengan AI</b> (mesin uang), sisanya kecil. Tombol utama bertulisan pendek supaya jelas.</p>
+
+<div class="masalah">
+  <div class="kepala">
+    <div class="nomor">4</div>
+    <div class="teks">
+      <div class="isi">Perbaiki kalimat pada paragraf kedua, masih tidak nyambung dengan paragraf sebelumnya.</div>
+      <div class="bagian">BAB II · 2.1 Kajian Teori</div>
+    </div>
+    <div class="aksi-campur">
+      <button class="utama" title="Revisi dengan AI — 1 Token Revisi">
+        <svg class="ik" width="15" height="15" viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+        Revisi AI
+      </button>
+      <button class="kecil" title="Dikerjakan sendiri — 0 Token Revisi">
+        <svg class="ik" width="15" height="15" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+      </button>
+      <button class="kecil" title="Lewati revisi ini">
+        <svg class="ik" width="15" height="15" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<h2><span class="penanda">CATATAN</span> Kenapa 3 ikon ini</h2>
+<div class="kotak-banding">
+  <div class="kaki"><b>sparkles</b> (✨ kilau) = Revisi dengan AI <span class="cocok">sudah dipakai app untuk penanda "bintang"</span></div>
+  <div class="kaki"><b>pencil</b> (✏️ pensil) = dikerjakan sendiri <span class="cocok">sudah dipakai app untuk "Sunting/Edit"</span></div>
+  <div class="kaki"><b>x</b> (✕ silang) = Lewati <span class="cocok">sudah dipakai app untuk "Hapus"</span></div>
+  <div class="kaki" style="margin-top:9px">Semua <b>sudah ada di sprite</b> (56 ikon) — tidak perlu tambah ikon baru, tidak pakai emoji.</div>
+</div>
+
+</body>
+</html>

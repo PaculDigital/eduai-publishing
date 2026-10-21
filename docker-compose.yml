@@ -1,0 +1,42 @@
+# EduAi Publishing — docker-compose.yml (single source of truth)
+#
+# Arsitektur:
+#   eduai-app  -> web portal FastAPI (auth + berkas + kuota)
+#   eduai-web  -> nginx (pelengkap; opsional, untuk aset statis)
+#
+# Data PERSISTEN via bind-mount (BUKAN named volume):
+#   ./data     -> SQLite DB (eduai.db + WAL)
+#   ./uploads  -> berkas client (folder per user id)
+#
+# PELAJARAN dari UPB WA Blast (06Sep26): named volume bisa MENYEMBUNYI
+# bind-mount (container lihat data lama). Maka bind-mount = satu-satunya
+# sumber kebenaran di sini.
+
+services:
+  eduai-app:
+    image: eduai-app:v1
+    build: .
+    container_name: eduai-app
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    networks:
+      - eduai-net
+    ports:
+      # 127.0.0.1 supaya TIDAK terekspos ke internet.
+      # Akses publik lewat Cloudflare Tunnel (ingress -> 172.17.0.x:8000).
+      - "127.0.0.1:8100:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+networks:
+  eduai-net:
+    name: eduai-net

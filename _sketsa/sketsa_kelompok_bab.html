@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>SKETSA — Kelompok Catatan per BAB (Tahap 2.5)</title>
+<style>
+/*  SKETSA INI BUKAN KODE PRODUKSI.
+    Tujuan: Bos melihat 3 cara mengelompokkan catatan pembimbing,
+    lalu memilih satu. Semua gaya & nama kelas meniru tinjau.html asli. */
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+  --teks:#272530;--abu:#68666E;--garis:#E4E4E8;--kuning:#FFF3B8;--kuning-tepi:#E8C547;
+  --biru-tepi:#5B9BD5;--hijau-tepi:#4CAF50}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#F4F5F7;
+     color:var(--teks);font-size:14px;padding:24px}
+h1.petunjuk{font-size:20px;margin-bottom:6px}
+p.petunjuk{color:var(--abu);margin-bottom:22px;font-size:13.5px;line-height:1.6}
+.kotak-sketsa{background:#fff;border:1px solid var(--garis);border-radius:12px;
+  padding:18px 20px;margin-bottom:26px}
+.kotak-sketsa > h2{font-size:16px;margin-bottom:4px}
+.kotak-sketsa > .ket{color:var(--abu);font-size:12.5px;margin-bottom:15px;line-height:1.55}
+.bagian-atas{background:var(--hijau-muda);border:1px solid #CDE7D6;color:#146B2C;
+  border-radius:8px;padding:9px 12px;font-size:12.5px;margin-bottom:13px}
+
+/* ── panel catatan (meniru .panel asli, 372px) ── */
+.panel{width:372px;background:#fff;border:1px solid var(--garis);border-radius:10px;
+  overflow:hidden;font-family:inherit}
+.panel-kepala{padding:15px 18px;border-bottom:1px solid var(--garis)}
+.panel-kepala b{font-size:14.5px}
+.angka{display:flex;gap:14px;margin-top:9px;font-size:12.5px;color:var(--abu);flex-wrap:wrap}
+.angka b{font-size:15px;color:var(--teks)}
+.angka .k b{color:#B8860B} .angka .h b{color:#146B2C}
+.legenda{padding:11px 18px;background:#FAFAFB;border-bottom:1px solid var(--garis);
+  font-size:11.5px;color:var(--abu);display:flex;flex-direction:column;gap:5px}
+.legenda span{display:flex;align-items:center;gap:7px}
+.kotak{width:10px;height:10px;border-radius:3px;display:inline-block}
+.panel-isi{padding:6px 0 14px;max-height:420px;overflow-y:auto}
+/*  Desain B & C butuh tinggi lebih supaya SEMUA catatan contoh terlihat.
+    Sketsa harus bisa dibandingkan adil — kalau Desain B terpotong,
+    seolah-olah desain itu yang jelek padahal cuma batas tinggi. */
+#isi-b,#isi-c{max-height:640px}
+.panel-isi::-webkit-scrollbar{width:9px}
+.panel-isi::-webkit-scrollbar-thumb{background:#D5D5DA;border-radius:5px}
+.panel-isi::-webkit-scrollbar-track{background:#F4F4F6}
+
+/* ── .baris asli (1 masalah) ── */
+.baris{padding:11px 18px;border-bottom:1px solid #F1F1F4;cursor:pointer}
+.baris:hover{background:#FAFAFB}
+.baris .atas{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.baris .bab{font-size:11.5px;font-weight:700;color:#146B2C;background:var(--hijau-muda);
+  padding:2px 8px;border-radius:5px}
+.baris .perbaikan{font-size:11px;color:var(--abu);background:#F0F0F2;padding:2px 7px;border-radius:5px}
+.baris .tanda-lampiran{font-size:11px;background:#EEF6F0;border:1px solid #D3E7DA;
+  border-radius:5px;padding:2px 6px}
+.baris .warna{width:10px;height:10px;border-radius:50%;margin-left:auto;flex:none}
+.w-kuning{background:var(--kuning-tepi)} .w-hijau{background:var(--hijau-tepi)}
+.baris .teks{font-size:12.5px;color:var(--abu);line-height:1.5}
+
+/* ════════════════════════════════════════════════════════════════
+   DESAIN A — KEPALA BAB (baris lipat, gaya "akordeon" penuh)
+   ════════════════════════════════════════════════════════════════ */
+.bab-kepala{display:flex;align-items:center;gap:9px;padding:12px 18px;
+  border-bottom:1px solid var(--garis);cursor:pointer;background:#FCFCFD}
+.bab-kepala:hover{background:#F6F8F6}
+.bab-kepala .tanda{font-size:11px;color:var(--abu);width:12px;flex:none}
+.bab-kepala .nama{font-size:13px;font-weight:700;flex:1}
+.bab-kepala .jml{font-size:11.5px;color:var(--abu);background:#EFEFF2;
+  padding:2px 8px;border-radius:20px;font-weight:600}
+.bab-kepala.buka{background:var(--hijau-muda);border-bottom-color:#CDE7D6}
+.bab-kepala.buka .nama{color:#146F2E}
+.bab-kepala .baru{font-size:10.5px;background:#FFF3B8;color:#8A6D0B;
+  padding:2px 7px;border-radius:20px;font-weight:700;border:1px solid #E8C547}
+
+/* ════════════════════════════════════════════════════════════════
+   DESAIN B — GARIS TEPI BERWARNA (bab = blok dengan pita kiri)
+   ════════════════════════════════════════════════════════════════ */
+.blok-bab{border-left:4px solid var(--garis);margin:10px 12px;border-radius:8px;
+  overflow:hidden;background:#fff;border-top:1px solid #F1F1F4;border-right:1px solid #F1F1F4;
+  border-bottom:1px solid #F1F1F4}
+.blok-bab.ada-baru{border-left-color:var(--kuning-tepi)}
+.blok-bab.beres{border-left-color:var(--hijau-tepi)}
+.blok-bab .kepala-blok{display:flex;align-items:center;gap:9px;padding:11px 14px;
+  cursor:pointer;background:#FCFCFD}
+.blok-bab .kepala-blok .nama{font-size:12.5px;font-weight:700;flex:1}
+.blok-bab .kepala-blok .jml{font-size:11px;color:#fff;background:#9AA0A6;
+  padding:1px 8px;border-radius:20px;font-weight:700}
+.blok-bab.ada-baru .kepala-blok .jml{background:#B8860B}
+.blok-bab.beres .kepala-blok .jml{background:#2E7D32}
+.blok-bab .isi-blok{padding:0 14px;border-top:1px solid #F1F1F4}
+
+/* ════════════════════════════════════════════════════════════════
+   DESAIN C — PILIHAN BAB (baris chip di atas + daftar bab terpilih)
+   ════════════════════════════════════════════════════════════════ */
+.chip-baris{display:flex;gap:6px;padding:11px 14px;overflow-x:auto;
+  border-bottom:1px solid var(--garis);background:#FCFCFD}
+.chip{white-space:nowrap;font-size:11.5px;font-weight:600;padding:5px 11px;
+  border-radius:20px;border:1.5px solid var(--garis);background:#fff;color:var(--abu);cursor:pointer}
+.chip.aktif{background:var(--hijau-muda);border-color:#9BD3AE;color:#146F2E}
+.chip .n{font-size:10.5px;background:#EFEFF2;padding:0 5px;border-radius:10px;margin-left:5px}
+.chip.aktif .n{background:#CDE7D6}
+.chip-baris ~ .judul-terpilih{padding:11px 18px 4px;font-size:12px;font-weight:700;
+  color:#146F2E;display:flex;align-items:center;gap:7px}
+</style>
+</head>
+<body>
+
+<h1 class="petunjuk">SKETSA — Cara Mengelompokkan Catatan Pembimbing</h1>
+<p class="petunjuk">
+  Masalahnya: kalau catatan sudah banyak (mis. 20), panel samping yang sempit jadi
+  terlalu panjang dan bercampur antar bab. Tiga desain di bawah ini adalah cara
+  yang berbeda untuk membuatnya <b>kompak</b>.<br>
+  Semua memakai putusan Bos: kelompok <b>per BAB</b>, <b>satu bab terbuka</b>
+  (yang paling banyak catatan baru), sisanya ditutup, dan bisa diklik.
+</p>
+
+<div class="bagian-atas">
+  <b>Data contoh yang sama dipakai di ketiga desain:</b>
+  BAB I (2 catatan: 2 baru) · BAB II (1 catatan: 0 baru) ·
+  BAB III (5 catatan: 3 baru) · BAB IV (4 catatan: 1 baru) — total 12 catatan.
+  <br>Menurut putusan Bos, yang otomatis terbuka = <b>BAB III</b> (3 catatan baru, terbanyak).
+</div>
+
+<!-- ═══════════════════ DESAIN A ═══════════════════ -->
+<div class="kotak-sketsa">
+  <h2>Desain A — Kepala Bab (lipat penuh, satu per satu)</h2>
+  <div class="ket">
+    Setiap bab jadi <b>satu baris kepala</b> yang menutupi seluruh lebar panel.
+    Klik kepala → daftar catatan bab itu muncul di bawahnya. Paling <b>rapi & paling
+    mirip pola yang sudah ada</b> (persis cara Log Revisi bekerja sekarang).
+    Kekurangan: nama bab panjang bisa terpotong di panel 372px.
+  </div>
+
+  <div class="panel">
+    <div class="panel-kepala">
+      <b>Catatan Bimbingan</b>
+      <div class="angka">
+        <span class="k">Perlu ditinjau <b>6</b></span>
+        <span class="h">Sudah oke <b>1</b></span>
+        <span>Semua <b>12</b></span>
+      </div>
+    </div>
+    <div class="legenda">
+      <span><i class="kotak" style="background:var(--kuning-tepi)"></i>Kuning — belum ditindaklanjuti</span>
+      <span><i class="kotak" style="background:var(--hijau-tepi)"></i>Hijau — Anda sudah menyatakan oke</span>
+    </div>
+    <div class="panel-isi">
+
+      <div class="bab-kepala"><span class="tanda">▸</span>
+        <span class="nama">BAB I — Pendahuluan</span>
+        <span class="baru">2 baru</span><span class="jml">2</span></div>
+
+      <div class="bab-kepala"><span class="tanda">▸</span>
+        <span class="nama">BAB II — Tinjauan Pustaka</span>
+        <span class="jml">1</span></div>
+
+      <div class="bab-kepala buka"><span class="tanda">▾</span>
+        <span class="nama">BAB III — Metode</span>
+        <span class="baru">3 baru</span><span class="jml">5</span></div>
+      <div class="baris">
+        <div class="atas"><span class="perbaikan">perbaikan ×3</span>
+          <span class="tanda-lampiran">📎</span>
+          <span class="warna w-kuning"></span></div>
+        <div class="teks">Penulisan tabel sebaiknya seperti ini, lihat contoh.</div>
+      </div>
+      <div class="baris">
+        <div class="atas"><span class="warna w-kuning"></span></div>
+        <div class="teks">Metode sampling belum dijelaskan (acak atau purposif?).</div>
+      </div>
+      <div class="baris">
+        <div class="atas"><span class="tanda-lampiran">📎</span>
+          <span class="warna w-kuning"></span></div>
+        <div class="teks">Pakai rujukan ini untuk instrumen penelitian.</div>
+      </div>
+      <div class="baris">
+        <div class="atas"><span class="warna w-kuning"></span></div>
+        <div class="teks">Bandingkan dengan lampiran, mohon disesuaikan.</div>
+      </div>
+      <div class="baris">
+        <div class="atas"><span class="warna w-hijau"></span></div>
+        <div class="teks">Sudah oke.</div>
+      </div>
+
+      <div class="bab-kepala"><span class="tanda">▸</span>
+        <span class="nama">BAB IV — Hasil dan Pembahasan</span>
+        <span class="baru">1 baru</span><span class="jml">4</span></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ DESAIN B ═══════════════════ -->
+<div class="kotak-sketsa">
+  <h2>Desain B — Blok Berpita Warna (bab langsung terlihat keadaannya)</h2>
+  <div class="ket">
+    Setiap bab jadi <b>kartu dengan pita warna di tepi kiri</b>: kuning = ada yang
+    belum selesai, hijau = semua sudah oke. Jadi pembimbing <b>langsung tahu bab mana
+    yang bermasalah</b> tanpa membuka. Paling <b>enak dilihat</b>, tapi memakan lebih
+    banyak ruang karena ada jarak antar blok.
+    <br><b>Catatan:</b> supaya lencana tidak terlalu lebar di panel sempit, desain ini
+    memakai <b>angka saja</b> (tanpa kata &ldquo;baru&rdquo;) — beda dari Desain A.
+  </div>
+
+  <div class="panel">
+    <div class="panel-kepala">
+      <b>Catatan Bimbingan</b>
+      <div class="angka">
+        <span class="k">Perlu ditinjau <b>6</b></span>
+        <span class="h">Sudah oke <b>1</b></span>
+        <span>Semua <b>12</b></span>
+      </div>
+    </div>
+    <div class="panel-isi" id="isi-b" style="padding-top:2px">
+
+      <div class="blok-bab ada-baru">
+        <div class="kepala-blok"><span class="tanda">▸</span>
+          <span class="nama">BAB I — Pendahuluan</span>
+          <span class="jml">2</span></div>
+      </div>
+
+      <div class="blok-bab beres">
+        <div class="kepala-blok"><span class="tanda">▸</span>
+          <span class="nama">BAB II — Tinjauan Pustaka</span>
+          <span class="jml">1</span></div>
+      </div>
+
+      <div class="blok-bab ada-baru">
+        <div class="kepala-blok"><span class="tanda">▾</span>
+          <span class="nama">BAB III — Metode</span>
+          <span class="jml">5</span></div>
+        <div class="isi-blok">
+          <div class="baris">
+            <div class="atas"><span class="perbaikan">perbaikan ×3</span>
+              <span class="tanda-lampiran">📎</span>
+              <span class="warna w-kuning"></span></div>
+            <div class="teks">Penulisan tabel sebaiknya seperti ini, lihat contoh.</div>
+          </div>
+          <div class="baris">
+            <div class="atas"><span class="warna w-kuning"></span></div>
+            <div class="teks">Metode sampling belum dijelaskan (acak atau purposif?).</div>
+          </div>
+          <div class="baris">
+            <div class="atas"><span class="tanda-lampiran">📎</span>
+              <span class="warna w-kuning"></span></div>
+            <div class="teks">Pakai rujukan ini untuk instrumen penelitian.</div>
+          </div>
+          <div class="baris">
+            <div class="atas"><span class="warna w-kuning"></span></div>
+            <div class="teks">Bandingkan dengan lampiran, mohon disesuaikan.</div>
+          </div>
+          <div class="baris">
+            <div class="atas"><span class="warna w-hijau"></span></div>
+            <div class="teks">Sudah oke.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="blok-bab ada-baru">
+        <div class="kepala-blok"><span class="tanda">▸</span>
+          <span class="nama">BAB IV — Hasil dan Pembahasan</span>
+          <span class="jml">4</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ DESAIN C ═══════════════════ -->
+<div class="kotak-sketsa">
+  <h2>Desain C — Chip Pilihan Bab (paling hemat ruang, satu bab aktif)</h2>
+  <div class="ket">
+    Semua bab jadi <b>chip kecil berjajar di atas</b> (bisa digeser ke samping).
+    Yang dipilih = chip hijau, dan <b>hanya isi bab itu</b> yang tampil di bawahnya.
+    Paling <b>hemat ruang</b> — kepala bab tidak memakan tempat sama sekali, jadi
+    naskah di kiri tetap dapat porsi terbesar. Kekurangan: jumlah catatan per bab
+    tidak langsung terlihat (harus lihat angka kecil di chip).
+  </div>
+
+  <div class="panel">
+    <div class="panel-kepala">
+      <b>Catatan Bimbingan</b>
+      <div class="angka">
+        <span class="k">Perlu ditinjau <b>6</b></span>
+        <span class="h">Sudah oke <b>1</b></span>
+        <span>Semua <b>12</b></span>
+      </div>
+    </div>
+    <div class="chip-baris">
+      <span class="chip">BAB I<span class="n">2</span></span>
+      <span class="chip">BAB II<span class="n">1</span></span>
+      <span class="chip aktif">BAB III<span class="n">5</span></span>
+      <span class="chip">BAB IV<span class="n">4</span></span>
+    </div>
+    <div class="judul-terpilih">▾ BAB III — Metode</div>
+    <div class="panel-isi" id="isi-c" style="padding-top:0">
+      <div class="baris">
+        <div class="atas"><span class="perbaikan">perbaikan ×3</span>
+          <span class="tanda-lampiran">📎</span>
+          <span class="warna w-kuning"></span></div>
+        <div class="teks">Penulisan tabel sebaiknya seperti ini, lihat contoh.</div>
+      </div>
+      <div class="baris">
+        <div class="atas"><span class="warna w-kuning"></span></div>
+        <div class="teks">Metode sampling belum dijelaskan (acak atau purposif?).</div>
+      </div>
+      <div class="baris">
+        <div class="atas"><span class="tanda-lampiran">📎</span>
+          <span class="warna w-kuning"></span></div>
+        <div class="teks">Pakai rujukan ini untuk instrumen penelitian.</div>
+      </div>
+      <div class="baris">
+        <div class="atas"><span class="warna w-kuning"></span></div>
+        <div class="teks">Bandingkan dengan lampiran, mohon disesuaikan.</div>
+      </div>
+      <div class="baris">
+        <div class="atas"><span class="warna w-hijau"></span></div>
+        <div class="teks">Sudah oke.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bagian-atas" style="background:#FFF8E6;border-color:#F0DCA8;color:#7A6216">
+  <b>Catatan tambahan (semua desain):</b> kalau ada catatan yang bab-nya belum
+  ditulis pembimbing (kosong), catatan itu masuk kelompok terakhir bernama
+  <b>“Belum disebut bab-nya”</b> — supaya tidak ada catatan yang HILANG dari layar.
+</div>
+
+</body>
+</html>

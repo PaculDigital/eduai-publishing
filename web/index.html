@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduAi Publishing — Naskah Anda, di Mana Saja</title>
+<meta name="description" content="Platform penyimpanan dan kolaborasi naskah akademik. Upload, edit online, dan kelola tesis, skripsi, buku, serta artikel jurnal Anda — dari mana saja.">
+<link rel="icon" href="/assets/logo-eduai-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --hijau:#198E3B;
+  --hijau-gelap:#104F22;
+  --hijau-muda:#E8F5EC;
+  --oranye:#F4A025;
+  --maroon:#AD232A;
+  --teks:#272530;
+  --teks-abu:#68666E;
+  --garis:#E7E7EA;
+  --radius:14px;
+  --bayang:0 4px 20px rgba(25,142,59,.08);
+  --bayang-besar:0 14px 40px rgba(39,37,48,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Poppins',system-ui,-apple-system,sans-serif;
+  color:var(--teks);background:#fff;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wadah{max-width:1160px;margin:0 auto;padding:0 24px}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+
+/* ---------- TOMBOL ---------- */
+.tombol{
+  display:inline-flex;align-items:center;gap:8px;justify-content:center;
+  padding:13px 28px;border-radius:70px;font-weight:600;font-size:15px;
+  border:2px solid transparent;cursor:pointer;transition:.22s;white-space:nowrap;
+}
+.tombol-utama{background:var(--hijau);color:#fff;box-shadow:0 6px 18px rgba(25,142,59,.28)}
+.tombol-utama:hover{background:var(--hijau-gelap);transform:translateY(-2px);box-shadow:0 10px 26px rgba(25,142,59,.34)}
+.tombol-oranye{background:var(--oranye);color:#3A2600;box-shadow:0 6px 18px rgba(244,160,37,.3)}
+.tombol-oranye:hover{background:#E08F12;transform:translateY(-2px)}
+.tombol-garis{border-color:var(--hijau);color:var(--hijau);background:#fff}
+.tombol-garis:hover{background:var(--hijau-muda)}
+.tombol-putih{background:#fff;color:var(--hijau);border-color:#fff}
+.tombol-putih:hover{background:var(--hijau-muda)}
+
+/* ---------- HEADER ---------- */
+header{
+  position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--garis);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:74px}
+.nav-logo img{height:38px;width:auto}
+.nav-menu{display:flex;align-items:center;gap:34px}
+.nav-menu a{font-size:15px;font-weight:500;color:var(--teks-abu);transition:.2s}
+.nav-menu a:hover{color:var(--hijau)}
+.nav-aksi{display:flex;align-items:center;gap:12px}
+.nav-aksi .tombol{padding:10px 22px;font-size:14px}
+.burger{display:none;background:none;border:none;font-size:26px;color:var(--teks);cursor:pointer}
+
+/* ---------- HERO ---------- */
+.hero{
+  background:linear-gradient(165deg,#F4FBF6 0%,#FFFFFF 55%);
+  padding:76px 0 88px;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(25,142,59,.09),transparent 68%);
+  top:-190px;right:-130px;
+}
+.hero-isi{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;position:relative;z-index:1}
+.lencana{
+  display:inline-flex;align-items:center;gap:9px;background:var(--hijau-muda);
+  color:var(--hijau-gelap);padding:8px 18px;border-radius:70px;
+  font-size:13.5px;font-weight:600;margin-bottom:22px;
+}
+.hero h1{font-size:clamp(32px,4.4vw,52px);line-height:1.16;font-weight:800;letter-spacing:-.6px;margin-bottom:20px}
+.hero h1 .sorot{color:var(--hijau);position:relative;display:inline-block}
+.hero h1 .sorot::after{
+  content:'';position:absolute;left:-2px;bottom:2px;width:calc(100% + 4px);height:9px;
+  background:rgba(244,160,37,.30);border-radius:3px;z-index:-1;
+}
+.hero p.ket{font-size:17.5px;color:var(--teks-abu);margin-bottom:32px;max-width:540px}
+.hero-aksi{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.hero-catatan{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--teks-abu)}
+.hero-catatan svg{flex-shrink:0}
+
+/* kartu pratinjau */
+.pratinjau{
+  background:#fff;border-radius:18px;box-shadow:var(--bayang-besar);
+  overflow:hidden;border:1px solid var(--garis);
+}
+.pratinjau-atas{
+  background:#F7F8FA;padding:12px 16px;display:flex;align-items:center;gap:7px;
+  border-bottom:1px solid var(--garis);
+}
+.titik{width:11px;height:11px;border-radius:50%}
+.titik:nth-child(1){background:#FF5F57}
+.titik:nth-child(2){background:#FEBC2E}
+.titik:nth-child(3){background:#28C840}
+.pratinjau-judul{margin-left:8px;font-size:12.5px;color:var(--teks-abu);font-weight:500}
+.pratinjau-isi{padding:20px}
+.berkas{
+  display:flex;align-items:center;gap:13px;padding:13px 15px;
+  border:1px solid var(--garis);border-radius:11px;margin-bottom:10px;transition:.2s;
+}
+.berkas:hover{border-color:var(--hijau);background:#FAFDFA}
+.berkas-ikon{
+  width:38px;height:38px;border-radius:9px;background:var(--hijau-muda);
+  display:grid;place-items:center;font-size:17px;flex-shrink:0;
+}
+.berkas-ikon.oranye{background:#FEF4E4}
+.berkas-ikon.maroon{background:#FBECED}
+.berkas-nama{font-size:13.5px;font-weight:600;margin-bottom:2px}
+.berkas-info{font-size:11.5px;color:var(--teks-abu)}
+.progres{margin-top:6px;height:5px;background:#EDEEF1;border-radius:3px;overflow:hidden;width:130px}
+.progres span{display:block;height:100%;background:var(--hijau);border-radius:3px}
+
+/* ---------- SEKSI UMUM ---------- */
+section{padding:86px 0}
+.seksi-kepala{text-align:center;max-width:660px;margin:0 auto 54px}
+.seksi-tanda{
+  display:inline-block;color:var(--hijau);font-weight:700;font-size:13.5px;
+  letter-spacing:1.4px;text-transform:uppercase;margin-bottom:13px;
+}
+.seksi-kepala h2{font-size:clamp(26px,3.3vw,38px);font-weight:800;line-height:1.24;letter-spacing:-.4px;margin-bottom:15px}
+.seksi-kepala p{color:var(--teks-abu);font-size:16.5px}
+
+/* ---------- FITUR ---------- */
+.grid-fitur{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.kartu{
+  padding:34px 28px;border:1px solid var(--garis);border-radius:var(--radius);
+  background:#fff;transition:.26s;
+}
+.kartu:hover{transform:translateY(-5px);box-shadow:var(--bayang-besar);border-color:transparent}
+.kartu-ikon{
+  width:56px;height:56px;border-radius:15px;background:var(--hijau-muda);
+  display:grid;place-items:center;font-size:25px;margin-bottom:20px;
+}
+.kartu-ikon.oranye{background:#FEF4E4}
+.kartu-ikon.maroon{background:#FBECED}
+.kartu h3{font-size:18.5px;font-weight:700;margin-bottom:10px}
+.kartu p{color:var(--teks-abu);font-size:14.8px}
+.kartu ul{list-style:none;margin-top:14px}
+.kartu ul li{
+  font-size:13.8px;color:var(--teks-abu);padding-left:22px;position:relative;margin-bottom:7px;
+}
+.kartu ul li::before{
+  content:'✓';position:absolute;left:0;color:var(--hijau);font-weight:700;
+}
+
+/* ---------- CARA KERJA ---------- */
+.cara{background:#FAFBFC}
+.grid-cara{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.langkah{text-align:center;position:relative}
+.langkah-nomor{
+  width:60px;height:60px;border-radius:50%;background:#fff;border:2px solid var(--hijau);
+  color:var(--hijau);font-weight:800;font-size:21px;display:grid;place-items:center;
+  margin:0 auto 18px;position:relative;z-index:1;
+}
+.langkah h4{font-size:16.5px;font-weight:700;margin-bottom:9px}
+.langkah p{font-size:14.2px;color:var(--teks-abu)}
+.langkah::after{
+  content:'';position:absolute;top:30px;left:calc(50% + 42px);width:calc(100% - 84px);
+  height:2px;background:repeating-linear-gradient(90deg,var(--hijau) 0 6px,transparent 6px 12px);
+  opacity:.4;
+}
+.langkah:last-child::after{display:none}
+
+/* ---------- HARGA ---------- */
+.grid-harga{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;align-items:stretch}
+.paket{
+  border:2px solid var(--garis);border-radius:18px;padding:30px 24px;
+  display:flex;flex-direction:column;transition:.26s;background:#fff;position:relative;
+}
+.paket:hover{transform:translateY(-5px);box-shadow:var(--bayang-besar)}
+.paket.populer{border-color:var(--hijau);box-shadow:var(--bayang)}
+.pita{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  background:var(--oranye);color:#3A2600;font-size:11.5px;font-weight:700;
+  padding:5px 15px;border-radius:70px;white-space:nowrap;letter-spacing:.4px;
+}
+.paket-nama{font-size:17px;font-weight:700;margin-bottom:6px}
+.paket-kuota{font-size:13.5px;color:var(--teks-abu);margin-bottom:18px}
+.paket-harga{font-size:29px;font-weight:800;color:var(--hijau);line-height:1.1}
+.paket-harga small{font-size:14px;font-weight:500;color:var(--teks-abu);display:block;margin-top:5px}
+.paket ul{list-style:none;margin:22px 0;flex-grow:1}
+.paket ul li{
+  font-size:14px;color:var(--teks-abu);padding-left:24px;position:relative;margin-bottom:10px;
+}
+.paket ul li::before{
+  content:'✓';position:absolute;left:0;color:var(--hijau);font-weight:700;
+}
+.paket .tombol{width:100%;padding:12px 20px;font-size:14.5px}
+.paket.gratis .paket-harga{color:var(--teks)}
+
+/* ---------- KEUNGGULAN ---------- */
+.keunggulan{background:linear-gradient(150deg,var(--hijau) 0%,var(--hijau-gelap) 100%);color:#fff}
+.keunggulan .seksi-tanda{color:#9FE8B8}
+.keunggulan .seksi-kepala h2{color:#fff}
+.keunggulan .seksi-kepala p{color:rgba(255,255,255,.83)}
+.grid-unggul{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.unggul{
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);
+  border-radius:var(--radius);padding:28px 24px;backdrop-filter:blur(6px);
+}
+.unggul-ikon{font-size:27px;margin-bottom:14px}
+.unggul h4{font-size:17px;font-weight:700;margin-bottom:9px}
+.unggul p{font-size:14.3px;color:rgba(255,255,255,.82)}
+
+/* ---------- TESTIMONI ---------- */
+.grid-testi{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.testi{
+  background:#fff;border:1px solid var(--garis);border-radius:var(--radius);
+  padding:30px 26px;position:relative;
+}
+.testi-kutip{
+  font-size:44px;color:var(--hijau-muda);font-weight:800;line-height:1;
+  position:absolute;top:16px;right:24px;
+}
+.testi p{font-size:14.8px;color:var(--teks-abu);font-style:italic;margin-bottom:20px;position:relative;z-index:1}
+.testi-orang{display:flex;align-items:center;gap:13px}
+.testi-avatar{
+  width:44px;height:44px;border-radius:50%;background:var(--hijau-muda);
+  color:var(--hijau);display:grid;place-items:center;font-weight:700;font-size:16px;flex-shrink:0;
+}
+.testi-nama{font-size:14.5px;font-weight:700}
+.testi-jab{font-size:12.8px;color:var(--teks-abu)}
+
+/* ---------- CTA ---------- */
+.cta{
+  background:linear-gradient(135deg,#F4FBF6,#EAF7EF);border-radius:24px;
+  padding:62px 44px;text-align:center;border:1px solid #D8EEE0;
+}
+.cta h2{font-size:clamp(25px,3.2vw,36px);font-weight:800;margin-bottom:15px;letter-spacing:-.4px}
+.cta p{color:var(--teks-abu);font-size:16.5px;max-width:580px;margin:0 auto 30px}
+.cta-aksi{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- FOOTER ---------- */
+footer{background:#1B1A22;color:#C9C8D1;padding:60px 0 26px;font-size:14.5px}
+.footer-isi{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:44px;margin-bottom:40px}
+.footer-logo{height:40px;margin-bottom:18px}
+.footer-tentang p{color:#8E8D98;font-size:14px;max-width:330px;margin-bottom:20px}
+.footer-kontak{display:flex;flex-direction:column;gap:9px}
+.footer-kontak a{color:#C9C8D1;display:flex;align-items:center;gap:9px;transition:.2s;font-size:14px}
+.footer-kontak a:hover{color:#fff}
+footer h5{color:#fff;font-size:15px;font-weight:700;margin-bottom:17px}
+.footer-link{display:flex;flex-direction:column;gap:11px}
+.footer-link a{color:#8E8D98;transition:.2s;font-size:14px}
+.footer-link a:hover{color:#fff}
+.footer-bawah{
+  border-top:1px solid #2E2D38;padding-top:24px;text-align:center;
+  color:#7A7984;font-size:13.5px;
+}
+
+/* ---------- RESPONSIF ---------- */
+@media(max-width:980px){
+  .hero-isi{grid-template-columns:1fr;gap:44px}
+  .grid-fitur,.grid-unggul,.grid-testi{grid-template-columns:1fr 1fr}
+  .grid-cara{grid-template-columns:1fr 1fr;gap:32px}
+  .langkah:nth-child(2)::after{display:none}
+  .grid-harga{grid-template-columns:1fr 1fr}
+  .footer-isi{grid-template-columns:1fr 1fr;gap:34px}
+}
+@media(max-width:640px){
+  .nav-menu{display:none}
+  .burger{display:block}
+  .nav-aksi .tombol:first-child{display:none}
+  .wadah{padding:0 18px}
+  .hero{padding:50px 0 62px}
+  section{padding:60px 0}
+  .grid-fitur,.grid-unggul,.grid-testi,.grid-cara,.grid-harga{grid-template-columns:1fr}
+  .langkah::after{display:none}
+  .footer-isi{grid-template-columns:1fr}
+  .cta{padding:44px 24px}
+  .seksi-kepala{margin-bottom:38px}
+  .nav-logo img{height:32px}
+}
+</style>
+<link rel="stylesheet" href="/assets/cta.css">
+<link rel="stylesheet" href="/assets/ritme.css">
+<link rel="stylesheet" href="/assets/hero.css">
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="wadah nav">
+    <a href="/" class="nav-logo">
+      <img src="/assets/logo-eduai-header-320.png" alt="EduAi Publishing">
+    </a>
+    <nav class="nav-menu">
+      <a href="#fitur">Fitur</a>
+      <a href="#cara">Cara Kerja</a>
+      <a href="#harga">Harga</a>
+      <a href="#tentang">Tentang</a>
+    </nav>
+    <div class="nav-aksi">
+      <a href="#harga" class="tombol tombol-garis">Lihat Paket</a>
+      <a href="/masuk" class="tombol tombol-utama">Masuk</a>
+      <button class="burger" aria-label="Menu">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wadah hero-isi">
+    <div>
+      <span class="lencana">🚀 Gratis 30 MB untuk memulai</span>
+      <h1>Naskah Anda, <span class="sorot">di Mana Saja</span>, Kapan Saja</h1>
+      <p class="ket">
+        Simpan tesis, skripsi, buku, dan artikel jurnal Anda di satu tempat.
+        Upload sekali, buka dari perangkat apa pun, dan edit langsung di browser —
+        tanpa install, tanpa ribet.
+      </p>
+      <div class="hero-aksi">
+        <a href="/daftar" class="tombol tombol-utama tombol-shimmer">Daftar Gratis Sekarang</a>
+        <a href="#harga" class="tombol tombol-garis">Lihat Paket Kuota</a>
+      </div>
+      <div class="hero-catatan">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#198E3B" stroke-width="2.4">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Tanpa kartu kredit. Tanpa batas waktu. Langsung pakai.
+      </div>
+    </div>
+
+    <div class="pratinjau">
+      <div class="pratinjau-atas">
+        <span class="titik"></span><span class="titik"></span><span class="titik"></span>
+        <span class="pratinjau-judul">eduai.bikinaja.id/naskah</span>
+      </div>
+      <div class="pratinjau-isi">
+        <div class="berkas">
+          <div class="berkas-ikon">📄</div>
+          <div style="flex:1">
+            <div class="berkas-nama">Tesis_Bab_1-2_Final.docx</div>
+            <div class="berkas-info">2,4 MB · diedit 5 menit lalu</div>
+          </div>
+          <div class="progres"><span style="width:68%"></span></div>
+        </div>
+        <div class="berkas">
+          <div class="berkas-ikon oranye">📊</div>
+          <div style="flex:1">
+            <div class="berkas-nama">Data_Olah_SPSS.xlsx</div>
+            <div class="berkas-info">1,1 MB · diedit 2 jam lalu</div>
+          </div>
+          <div class="progres"><span style="width:41%"></span></div>
+        </div>
+        <div class="berkas">
+          <div class="berkas-ikon maroon">📕</div>
+          <div style="flex:1">
+            <div class="berkas-nama">Artikel_Jurnal_Scopus.pdf</div>
+            <div class="berkas-info">3,0 MB · diunggah kemarin</div>
+          </div>
+          <div class="progres"><span style="width:52%"></span></div>
+        </div>
+        <div style="margin-top:16px;padding-top:15px;border-top:1px solid var(--garis);
+                    display:flex;justify-content:space-between;align-items:center;font-size:12.5px">
+          <span style="color:var(--teks-abu)">Kuota terpakai</span>
+          <span style="font-weight:700;color:var(--hijau)">12,7 MB / 30 MB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FITUR ================= -->
+<section id="fitur">
+  <div class="wadah">
+    <div class="seksi-kepala">
+      <span class="seksi-tanda">Fitur Utama</span>
+      <h2>Semua yang Anda Butuhkan untuk Kelola Naskah</h2>
+      <p>Dari simpan berkas sampai kolaborasi — dalam satu platform yang sederhana.</p>
+    </div>
+    <div class="grid-fitur">
+      <div class="kartu">
+        <div class="kartu-ikon">☁️</div>
+        <h3>Simpan &amp; Akses dari Mana Saja</h3>
+        <p>Upload naskah sekali, lalu buka kapan pun dari laptop, tablet, atau ponsel. Berkas Anda tersimpan aman di server kami.</p>
+        <ul>
+          <li>Tersimpan permanen</li>
+          <li>Kuota jelas &amp; transparan</li>
+          <li>Tidak hilang walau ganti perangkat</li>
+        </ul>
+      </div>
+      <div class="kartu">
+        <div class="kartu-ikon oranye">✏️</div>
+        <h3>Edit Langsung di Browser</h3>
+        <p>Buka dan sunting DOCX, XLSX, atau PPTX langsung di browser — seperti Microsoft Word, tanpa perlu install apa pun.</p>
+        <ul>
+          <li>Kompatibel format Office</li>
+          <li>Simpan otomatis</li>
+          <li>Riwayat versi dokumen</li>
+        </ul>
+      </div>
+      <div class="kartu">
+        <div class="kartu-ikon maroon">🤝</div>
+        <h3>Kolaborasi &amp; Pendampingan AI</h3>
+        <p>Kerjakan naskah bersama tim atau pembimbing. Asisten AI kami siap membantu merapikan format dan mengecek konsistensi.</p>
+        <ul>
+          <li>Beberapa orang sekaligus</li>
+          <li>Komentar di dalam dokumen</li>
+          <li>Bantuan format akademik</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CARA KERJA ================= -->
+<section class="cara" id="cara">
+  <div class="wadah">
+    <div class="seksi-kepala">
+      <span class="seksi-tanda">Cara Kerja</span>
+      <h2>Mulai dalam 4 Langkah Sederhana</h2>
+      <p>Tidak perlu keahlian teknis. Semudah itu.</p>
+    </div>
+    <div class="grid-cara">
+      <div class="langkah">
+        <div class="langkah-nomor">1</div>
+        <h4>Daftar Akun</h4>
+        <p>Cukup email dan kata sandi. Langsung dapat 30 MB gratis.</p>
+      </div>
+      <div class="langkah">
+        <div class="langkah-nomor">2</div>
+        <h4>Upload Naskah</h4>
+        <p>Tarik berkas DOCX, PDF, atau Excel Anda ke dalam browser.</p>
+      </div>
+      <div class="langkah">
+        <div class="langkah-nomor">3</div>
+        <h4>Edit &amp; Kelola</h4>
+        <p>Buka dan sunting langsung. Semua perubahan tersimpan otomatis.</p>
+      </div>
+      <div class="langkah">
+        <div class="langkah-nomor">4</div>
+        <h4>Bagikan</h4>
+        <p>Berikan akses ke pembimbing atau tim jika diperlukan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HARGA ================= -->
+<section id="harga">
+  <div class="wadah">
+    <div class="seksi-kepala">
+      <span class="seksi-tanda">Harga</span>
+      <h2>Pilih Kuota Sesuai Kebutuhan Anda</h2>
+      <p>Mulai gratis. Tambah kuota kapan pun lewat QRIS — cepat dan aman.</p>
+    </div>
+    <div class="grid-harga">
+
+      <div class="paket gratis">
+        <div class="paket-nama">Gratis</div>
+        <div class="paket-kuota">30 MB penyimpanan</div>
+        <div class="paket-harga">Rp 0<small>selamanya</small></div>
+        <ul>
+          <li>30 MB penyimpanan</li>
+          <li>Upload &amp; edit online</li>
+          <li>Akses dari mana saja</li>
+          <li>Cocok untuk 1 tesis/skripsi</li>
+        </ul>
+        <a href="/daftar" class="tombol tombol-garis">Mulai Gratis</a>
+      </div>
+
+      <div class="paket populer">
+        <span class="pita">PALING DIMINATI</span>
+        <div class="paket-nama">Penulis</div>
+        <div class="paket-kuota">100 MB penyimpanan</div>
+        <div class="paket-harga">Rp 50.000<small>sekali bayar</small></div>
+        <ul>
+          <li>100 MB penyimpanan</li>
+          <li>Semua fitur Gratis</li>
+          <li>Riwayat versi dokumen</li>
+          <li>Cocok untuk 1 buku / beberapa naskah</li>
+        </ul>
+        <a href="/daftar?paket=penulis" class="tombol tombol-utama">Pilih Paket</a>
+      </div>
+
+      <div class="paket">
+        <div class="paket-nama">Peneliti</div>
+        <div class="paket-kuota">300 MB penyimpanan</div>
+        <div class="paket-harga">Rp 100.000<small>sekali bayar</small></div>
+        <ul>
+          <li>300 MB penyimpanan</li>
+          <li>Semua fitur Penulis</li>
+          <li>Banyak artikel &amp; referensi</li>
+          <li>Cocok untuk dosen / peneliti aktif</li>
+        </ul>
+        <a href="/daftar?paket=peneliti" class="tombol tombol-utama">Pilih Paket</a>
+      </div>
+
+      <div class="paket">
+        <div class="paket-nama">Penerbit</div>
+        <div class="paket-kuota">1 GB penyimpanan</div>
+        <div class="paket-harga">Rp 300.000<small>sekali bayar</small></div>
+        <ul>
+          <li>1 GB penyimpanan</li>
+          <li>Semua fitur Peneliti</li>
+          <li>Kapasitas besar untuk arsip</li>
+          <li>Cocok untuk penerbit / tim</li>
+        </ul>
+        <a href="/daftar?paket=penerbit" class="tombol tombol-utama">Pilih Paket</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= KEUNGGULAN ================= -->
+<section class="keunggulan">
+  <div class="wadah">
+    <div class="seksi-kepala">
+      <span class="seksi-tanda">Mengapa EduAi</span>
+      <h2>Dibuat untuk Penulis Akademik Indonesia</h2>
+      <p>Kami paham kebutuhan penulisan ilmiah — dari draft pertama sampai naskah siap terbit.</p>
+    </div>
+    <div class="grid-unggul">
+      <div class="unggul">
+        <div class="unggul-ikon">🇮🇩</div>
+        <h4>Server di Indonesia</h4>
+        <p>Data naskah tersimpan di infrastruktur kami sendiri. Akses cepat, dan Anda pegang kendali penuh atas berkas.</p>
+      </div>
+      <div class="unggul">
+        <div class="unggul-ikon">🔒</div>
+        <h4>Terpisah &amp; Aman</h4>
+        <p>Setiap akun punya ruang sendiri. Naskah Anda tidak dapat dilihat oleh pengguna lain.</p>
+      </div>
+      <div class="unggul">
+        <div class="unggul-ikon">💳</div>
+        <h4>Bayar Mudah via QRIS</h4>
+        <p>Tambah kuota tanpa kartu kredit — cukup scan QRIS dari aplikasi bank atau e-wallet Anda.</p>
+      </div>
+      <div class="unggul">
+        <div class="unggul-ikon">📱</div>
+        <h4>Tanpa Install</h4>
+        <p>Cukup buka browser. Tidak ada aplikasi tambahan, tidak ada pembaruan manual.</p>
+      </div>
+      <div class="unggul">
+        <div class="unggul-ikon">🧠</div>
+        <h4>Didampingi AI</h4>
+        <p>Asisten AI membantu merapikan format, memeriksa konsistensi sitasi, dan menyiapkan naskah Anda.</p>
+      </div>
+      <div class="unggul">
+        <div class="unggul-ikon">🎓</div>
+        <h4>Fokus Akademik</h4>
+        <p>Dirancang untuk tesis, skripsi, buku ajar, monograf, dan artikel jurnal — bukan sekadar penyimpanan biasa.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTIMONI ================= -->
+<section id="testimoni">
+  <div class="wadah">
+    <div class="seksi-kepala">
+      <span class="seksi-tanda">Testimoni</span>
+      <h2>Cerita dari Pengguna</h2>
+      <p>Dipercaya penulis, dosen, dan mahasiswa di seluruh Indonesia.</p>
+    </div>
+    <div class="grid-testi">
+      <div class="testi">
+        <span class="testi-kutip">&rdquo;</span>
+        <p>Saya tidak perlu lagi bawa flashdisk ke kampus. Naskah ada di mana-mana, buka lewat HP pun bisa.</p>
+        <div class="testi-orang">
+          <div class="testi-avatar">RA</div>
+          <div>
+            <div class="testi-nama">Rina A.</div>
+            <div class="testi-jab">Mahasiswa Magister</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi">
+        <span class="testi-kutip">&rdquo;</span>
+        <p>Kirim revisi ke mahasiswa jadi gampang. Mereka buka langsung, saya lihat perubahannya.</p>
+        <div class="testi-orang">
+          <div class="testi-avatar">BS</div>
+          <div>
+            <div class="testi-nama">Dr. Budi S.</div>
+            <div class="testi-jab">Dosen Pembimbing</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi">
+        <span class="testi-kutip">&rdquo;</span>
+        <p>Paket 100 MB sudah lebih dari cukup untuk satu naskah buku beserta lampirannya. Harganya masuk akal.</p>
+        <div class="testi-orang">
+          <div class="testi-avatar">SW</div>
+          <div>
+            <div class="testi-nama">Sri W.</div>
+            <div class="testi-jab">Penulis Buku Ajar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section id="tentang" style="padding-top:0">
+  <div class="wadah">
+    <div class="cta">
+      <h2>Siap Memulai?</h2>
+      <p>Daftar sekarang dan dapatkan 30 MB penyimpanan gratis. Tidak perlu kartu kredit.</p>
+      <div class="cta-aksi">
+        <a href="/daftar" class="tombol tombol-utama tombol-shimmer">Daftar Gratis Sekarang</a>
+        <a href="mailto:eduai@bikinaja.id" class="tombol tombol-garis">Hubungi Kami</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wadah">
+    <div class="footer-isi">
+      <div class="footer-tentang">
+        <img src="/assets/logo-eduai-320.png" alt="EduAi Publishing" class="footer-logo">
+        <p>Platform penyimpanan dan kolaborasi naskah akademik untuk penulis, dosen, dan mahasiswa Indonesia.</p>
+        <div class="footer-kontak">
+          <a href="mailto:eduai@bikinaja.id">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M22 7l-10 6L2 7"></path>
+            </svg>
+            eduai@bikinaja.id
+          </a>
+        </div>
+      </div>
+      <div>
+        <h5>Produk</h5>
+        <div class="footer-link">
+          <a href="#fitur">Fitur</a>
+          <a href="#harga">Harga</a>
+          <a href="#cara">Cara Kerja</a>
+          <a href="/daftar">Daftar</a>
+        </div>
+      </div>
+      <div>
+        <h5>Bantuan</h5>
+        <div class="footer-link">
+          <a href="mailto:eduai@bikinaja.id">Hubungi Kami</a>
+          <a href="/masuk">Masuk</a>
+          <a href="#tentang">Tentang</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bawah">
+      &copy; 2026 EduAi Publishing. Seluruh hak cipta dilindungi.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

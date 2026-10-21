@@ -1,0 +1,78 @@
+/* ===== CTA WARNA + SHIMMER (Opsi B) =====
+   Semua tombol AKSI utama = ORANYE #F4A025
+   Tombol "Daftar" (CTA terpenting) = oranye + efek SHIMMER bergerak
+   Tombol "Masuk"/navigasi tetap HIJAU (bukan aksi konversi)
+*/
+
+/* ---------- TOMBOL UTAMA = ORANYE (menyeluruh) ---------- */
+.tombol-utama{
+  background:var(--oranye);
+  color:#2E1B00;
+  box-shadow:0 6px 18px rgba(244,160,37,.32);
+}
+.tombol-utama:hover{
+  background:#FFB63D;
+  color:#2E1B00;
+  transform:translateY(-2px);
+  box-shadow:0 10px 26px rgba(244,160,37,.4);
+}
+
+/* tombol "Masuk" di navbar tetap hijau (identitas brand, bukan konversi) */
+.nav-aksi .tombol-utama{
+  background:var(--hijau);
+  color:#FFFFFF;
+  box-shadow:0 5px 16px rgba(25,142,59,.28);
+}
+.nav-aksi .tombol-utama:hover{background:var(--hijau-gelap);color:#fff}
+
+/* ---------- EFEK SHIMMER untuk tombol "Daftar Gratis" ---------- */
+.tombol-shimmer{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+}
+.tombol-shimmer::before{
+  content:'';
+  position:absolute;
+  top:0;left:-75%;
+  width:55%;height:100%;
+  background:linear-gradient(
+    100deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.45) 45%,
+    rgba(255,255,255,.85) 50%,
+    rgba(255,255,255,.45) 55%,
+    rgba(255,255,255,0) 100%
+  );
+  transform:skewX(-22deg);
+  animation:kilau 2.8s ease-in-out infinite;
+  pointer-events:none;
+  z-index:2;
+}
+@keyframes kilau{
+  0%{left:-75%}
+  55%{left:125%}
+  100%{left:125%}
+}
+/* hormati preferensi pengguna yang tidak suka animasi */
+@media (prefers-reduced-motion: reduce){
+  .tombol-shimmer::before{animation:none;display:none}
+}
+
+/* tombol utama oranye di atas background hijau -> bayangan lebih tegas */
+.hero .tombol-utama{box-shadow:0 8px 24px rgba(0,0,0,.22)}
+.hero .tombol-utama:hover{box-shadow:0 12px 32px rgba(0,0,0,.28)}
+
+/* tombol "Pilih Paket" di kartu harga (oranye) tetap kontras di latar putih */
+.paket .tombol-utama{box-shadow:0 4px 14px rgba(244,160,37,.28)}
+
+/* tombol outline hijau -> pertahankan, tapi sesuaikan di atas hijau */
+.hero .tombol-garis{
+  border-color:rgba(255,255,255,.7);
+  color:#FFFFFF;
+  background:transparent;
+}
+.hero .tombol-garis:hover{
+  background:rgba(255,255,255,.16);
+  border-color:#fff;
+}

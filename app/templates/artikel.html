@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Artikel Jurnal — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/ikon.css">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);
+       border-bottom:1px solid rgba(255,255,255,.13);position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;
+     display:flex;align-items:center;justify-content:space-between}
+.nav img{height:34px}
+.nav-kanan{display:flex;align-items:center;gap:16px;color:#fff;font-size:13.5px}
+.nav-kanan .nama{opacity:.9}
+.keluar{color:#fff;opacity:.85;font-weight:600;font-size:13px}
+.keluar:hover{opacity:1}
+.wadah{max-width:1080px;margin:0 auto;padding:22px}
+.pita-tab{display:flex;gap:8px;margin:0 0 20px;width:100%;border-bottom:2px solid var(--garis);
+          overflow-x:auto}
+.pita-tab a{padding:9px 18px;border-radius:10px 10px 0 0;font-size:14px;font-weight:600;
+            color:var(--teks-abu);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pita-tab a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);
+                  border-bottom:2px solid var(--hijau);margin-bottom:-2px}
+h1{font-size:21px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px}
+.sub{font-size:13.5px;color:var(--teks-abu);margin-bottom:22px}
+.kartu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.kartu{background:#fff;border:1.5px solid var(--garis);border-radius:16px;padding:22px;
+       display:flex;flex-direction:column;gap:10px;transition:border-color .18s,transform .18s}
+.kartu:hover{border-color:var(--hijau);transform:translateY(-2px)}
+.kartu .ikon{width:44px;height:44px;border-radius:12px;background:var(--hijau-muda);
+             display:flex;align-items:center;justify-content:center;color:var(--hijau)}
+.kartu h2{font-size:16.5px;font-weight:700}
+.kartu p{font-size:13.5px;color:var(--teks-abu);line-height:1.6}
+.kartu .kuota{font-size:13px;font-weight:600;color:var(--hijau-gelap);
+              background:var(--hijau-muda);padding:6px 12px;border-radius:8px;
+              display:inline-block;width:fit-content}
+.tbl{width:100%;border-collapse:collapse;background:#fff;border:1.5px solid var(--garis);
+     border-radius:14px;overflow:hidden;margin-top:8px}
+.tbl th{background:var(--hijau-muda);color:var(--hijau-gelap);font-size:12.5px;
+        text-transform:uppercase;letter-spacing:.4px;padding:12px 14px;text-align:left}
+.tbl td{padding:12px 14px;font-size:13.5px;border-top:1px solid var(--garis)}
+.tbl tr:hover td{background:#FAFCFB}
+.pil{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:9px;
+     font-size:13px;font-weight:600;background:var(--hijau);color:#fff}
+.pil.abn{background:#EFEFF2;color:var(--teks-abu)}
+.kosong{background:#fff;border:1.5px dashed var(--garis);border-radius:14px;
+        padding:30px;text-align:center;color:var(--teks-abu);font-size:13.5px}
+.pesan{padding:12px 16px;border-radius:10px;font-size:13.5px;margin-bottom:16px}
+.pesan.ya{background:var(--hijau-muda);color:var(--hijau-gelap);border:1px solid #BFE3CC}
+.pesan.tidak{background:#FFF3E0;color:#8A5200;border:1px solid #FFD9A6}
+.seksi{margin-top:28px}
+.seksi h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.seksi .ket{font-size:12.5px;color:var(--teks-abu);margin-bottom:12px}
+</style>
+</head>
+<body>
+{{ ikon_sprite() }}
+<header>
+  <div class="nav">
+    <a href="/naskah"><img src="/static/logo-320.png" alt="EduAi Publishing"></a>
+    <div class="nav-kanan">
+      <span class="nama">{{ user.nama or user.email }}</span>
+      <a href="/keluar" class="keluar">Keluar</a>
+    </div>
+  </div>
+</header>
+
+<div class="wadah">
+  {% set menu_aktif = 'artikel' %}
+  {% include '_menu.html' %}
+
+  <h1>{{ ikon('clipboard-check', 22) }} Artikel Jurnal</h1>
+  <p class="sub">Ubah naskahmu menjadi artikel jurnal siap kirim — lengkap dengan
+     abstrak dua bahasa, 11 elemen mutu, dan grafik yang tepat tempat.</p>
+
+  {% if pesan %}<div class="pesan {{ 'ya' if berhasil else 'tidak' }}">{{ pesan }}</div>{% endif %}
+
+  {# ── DUA KARTU (pilihan A Bos): Konversi · Cek Uji Mirip (fitur terpisah) ── #}
+  <div class="kartu-grid">
+    <div class="kartu">
+      <div class="ikon">{{ ikon('sparkles', 22) }}</div>
+      <h2>Konversi Naskah → Artikel Jurnal</h2>
+      <p>Pilih naskahmu, Wulan susun ulang jadi satu artikel jurnal utuh (IMRAD):
+         Pendahuluan · Metode · Hasil & Pembahasan · Kesimpulan, plus abstrak
+         Indonesia + Inggris.</p>
+      <div class="kuota">
+        {% if jatah.sisa > 0 %}
+          Sisa jatah: {{ jatah.sisa }}× konversi
+        {% else %}
+          Belum ada jatah — beli AddOn Konversi (Rp100.000 = 1× konversi)
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="kartu">
+      <div class="ikon">{{ ikon('search', 22) }}</div>
+      <h2>Cek Uji Mirip (Turnitin)</h2>
+      <p>Cek kemiripan artikel dengan sumber lain sebelum dikirim ke jurnal.
+         Bisa cek naskahmu di sini, atau unggah artikel jadi.</p>
+      <div class="kuota abn">{{ ikon('shield-check', 14) }} Fitur terpisah — segera hadir</div>
+    </div>
+  </div>
+
+  {# ── NASKAH SAYA + status konversi ── #}
+  <div class="seksi">
+    <h3>Pilih naskah untuk dikonversi</h3>
+    <div class="ket">Nama dan email penulis wajib ada di dalam naskah — kalau belum ada,
+       lengkapi dulu di naskahmu, konversi baru bisa jalan.</div>
+
+    {% if daftar %}
+    <table class="tbl">
+      <thead><tr><th>Naskah</th><th>Status</th><th>Jenis</th><th></th></tr></thead>
+      <tbody>
+      {% for n in daftar %}
+        <tr>
+          <td>{{ ikon('file-text', 15) }} {{ n.nama }}</td>
+          <td>
+            {% if n.status == 'beres' %}{{ ikon('check-check', 14) }} Sudah jadi artikel
+            {% elif n.status == 'proses' %}{{ ikon('timer', 14) }} Sedang diproses
+            {% elif n.status == 'gagal' %}{{ ikon('alert-triangle', 14) }} Gagal — jatah dikembalikan
+            {% elif n.status == 'belum' %}— Belum dikonversi
+            {% else %}—{% endif %}
+          </td>
+          <td>{% if n.jenis %}{{ n.jenis }}{% else %}—{% endif %}</td>
+          <td>
+            {% if n.status == 'beres' %}
+              <a class="pil" href="/artikel/{{ n.id }}">{{ ikon('book-open', 14) }} Buka artikel</a>
+            {% else %}
+              <a class="pil" href="/artikel/{{ n.id }}/konversi">{{ ikon('sparkles', 14) }} Konversi</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="kosong">
+      Belum ada naskah. Buat atau unggah naskah dulu di
+      <a href="/naskah" style="color:var(--hijau);font-weight:700">Naskah Saya</a>.
+    </div>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

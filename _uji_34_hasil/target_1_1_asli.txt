@@ -1,0 +1,116 @@
+
+1.9  Sistematika Penulisan
+
+Penelitian ini disusun dalam lima bab yang saling berkaitan, dengan sistematika sebagai berikut.
+
+Bab I Pendahuluan. Bab ini menguraikan latar belakang masalah yang mendasari pentingnya penelitian, rumusan masalah yang menjadi fokus kajian, tujuan yang hendak dicapai, manfaat penelitian bagi pengembangan ilmu dan praktik, pemetaan state of the art penelitian, kesenjangan penelitian yang mendasari kebaruan kajian, kerangka pemikiran beserta pengembangan hipotesis, batasan dan asumsi penelitian, serta sistematika penulisan laporan.
+
+Bab II Kajian Pustaka. Bab ini menyajikan landasan teori yang menjadi pijakan penelitian, mencakup grand theory (Conservation of Resources Theory dan Social Cognitive Theory) serta teori pendukung mengenai quality of work life, digital self-efficacy, digital readiness, dan adaptive performance. Bab ini juga memuat kajian penelitian terdahulu, kerangka pemikiran, dan pengembangan hipotesis.
+
+Bab III Metode Penelitian. Bab ini menjelaskan metodologi penelitian yang digunakan, meliputi jenis dan pendekatan penelitian, lokasi dan waktu penelitian, definisi operasional dan pengukuran variabel, populasi dan teknik penentuan sampel, metode pengumpulan data, serta teknik analisis data dengan pendekatan Partial Least Squares Structural Equation Modeling (PLS-SEM) menggunakan perangkat lunak SmartPLS.
+
+Bab IV Hasil Penelitian dan Pembahasan. Bab ini menyajikan hasil pengolahan data, mencakup karakteristik responden, evaluasi model pengukuran (outer model), evaluasi model struktural (inner model), pengujian hipotesis langsung dan tidak langsung, serta pembahasan yang menghubungkan temuan dengan teori dan penelitian terdahulu, disertai implikasi manajerial.
+
+Bab V Kesimpulan dan Saran. Bab ini memuat kesimpulan atas hasil pengujian hipotesis, keterbatasan penelitian, serta saran bagi manajemen, bagi penelitian selanjutnya, dan bagi pemangku kepentingan terkait.
+
+DAFTAR PUSTAKA
+
+Abdi, R., et al. (2022). The MSMEs digital readiness in Indonesia: A test of moderating effect of intrinsic motivation and digital literacy. Strategic Entrepreneurial Ecosystems and Business Model Innovation, 187–203. https://doi.org/10.1108/978-1-80382-137-520221010
+
+Aini, I. N., Emilisa, N., Rahma, A., & [dkk]. (2025). Anteseden adaptive performance karyawan Gen Z industri perbankan swasta di Jakarta Selatan. Journal of Economic, Business and Accounting (COSTING).
+
+Alrawahi, S., et al. (2020). The application of Herzberg's two-factor theory of motivation to job satisfaction. Heliyon, 6(9), e04829. https://doi.org/10.1016/j.heliyon.2020.e04829
+
+Ayuni, N. A., & Nuraeni. (2026). Pengaruh quality of work life, self efficacy, dan work life balance terhadap kinerja karyawan. Surplus: Jurnal Ekonomi dan Bisnis, 5(1).
+
+Bakker, A. B., Demerouti, E., & Sanz-Vergel, A. (2022). Job demands–resources theory: Ten years later. Annual Review of Organizational Psychology and Organizational Behavior, 10, 25–53. https://doi.org/10.1146/annurev-orgpsych-120920-053933
+
+Bandura, A. (2001). Social cognitive theory: An agentic perspective. Annual Review of Psychology, 52(1), 1–26. https://doi.org/10.1146/annurev.psych.52.1.1
+
+Bandura, A. (2019). Applying theory for human betterment. Perspectives on Psychological Science, 14(1), 12–15.
+
+Bartsch, S., et al. (2021). Leadership matters in crisis-induced digital transformation: How to lead service employees effectively during the COVID-19 pandemic. Journal of Service Management, 32(1), 71–85.
+
+Budiarti. (2025). Pengaruh digital learning capability dan professional development support terhadap kinerja talenta dosen dengan self-efficacy sebagai mediasi. Jurnal Ekonomi dan Bisnis Indonesia, 10(1), 31–38. https://doi.org/10.37673/jebi.v10i1.6068
+
+Cetindamar Kozanoglu, D., & Abedin, B. (2021). Understanding the role of employees in digital transformation. JEIM, 34(6). https://doi.org/10.1108/JEIM-01-2020-0010
+
+Cetindamar Kozanoglu, D., & Abedin, B. (2021). Understanding the role of employees in digital transformation: Conceptualization of digital literacy of employees as a multi-dimensional organizational affordance. Journal of Enterprise Information Management, 34(6), 1649–1672. https://doi.org/10.1108/JEIM-01-2020-0010
+
+Chahyono, et al. (2024). Work engagement and person-job fit as catalysts for employee performance excellence in Indonesia. Journal of Logistics, Informatics and Service Science. https://doi.org/10.33168/JLISS.2024.1006
+
+Cheng, B., et al. (2023). Challenge or hindrance? How and when organizational artificial intelligence adoption influences employee adaptive performance. Journal of Business Research. https://doi.org/10.1016/j.jbusres.2023.113987
+
+Demerouti, E., Bakker, A. B., Nachreiner, F., & Schaufeli, W. B. (2001). The job demands-resources model of burnout. Journal of Applied Psychology, 86(3), 499–512. https://doi.org/10.1037/0021-9010.86.3.499
+
+Dwivedi, Y. K., Rana, N. P., Jeyaraj, A., Clement, M., & Williams, M. D. (2019). Re-examining the UTAUT: Towards a revised theoretical model. Information Systems Frontiers, 21(3), 719–734. https://doi.org/10.1007/s10796-017-9774-y
+
+Dâmbean, G. M., & Gabor, M. R. (2022). Adaptability, burnout and coping mechanisms present in the machine manufacturing industry. Acta Marisiensis. Seria Oeconomica, 16(1), 25–40. https://doi.org/10.2478/amso-2022-0003
+
+Fachruddin Syah, S., Lantang, D. V., Afdal, M., & [dkk]. (2026). Pengaruh digital competence dan learning agility terhadap adaptive performance melalui work engagement. Jurnal Ilmiah METANSI: Manajemen dan Akuntansi, 9(1).
+
+Fernandes, R. B., Martins, B., & Pereira, A. (2017). Quality of work life: An evaluation of Walton model with analysis of structural equation. [Jurnal].
+
+Gorostiaga, A., Balluerka, N., Rodríguez-López, A., & Haranburu, M. (2022). Assessment of adaptive performance and its role as a moderator of the relationship between organizational justice and job satisfaction. Psicothema, 34(2), 233–241. https://doi.org/10.7334/psicothema2021.310
+
+Hobfoll, S. E. (1989). Conservation of resources: A new attempt at conceptualizing stress. American Psychologist, 44(3), 513–524. https://doi.org/10.1037/0003-066X.44.3.513
+
+Hobfoll, S. E., Halbesleben, J., Neveu, J. P., & Westman, M. (2018). Conservation of resources in the organizational context: The reality of resources and their consequences. Annual Review of Organizational Psychology and Organizational Behavior, 5, 103–128. https://doi.org/10.1146/annurev-orgpsych-032117-104640
+
+Karliena, Y., Diantoro, E., Najiullah, A., & Suheri. (2026). Transformasi digital dan tantangan kepemimpinan: Studi kualitatif tentang digital leadership, adaptabilitas, dan kinerja karyawan. RIGGS: Journal of Artificial Intelligence and Digital Business, 4(4), 10974–10981. https://doi.org/10.31004/riggs.v4i4.5225
+
+Khusna, M., & Pratiwi, R. (2022). Pengaruh digital transformation dan self efficacy terhadap kinerja karyawan dengan kesiapan untuk berubah sebagai variabel mediasi. Stability: Journal of Management and Business, 5(1), 28–45.
+
+Kurnia Sari, R., Aidil Salam, B. G., & Al...[dkk]. (2025). Strategi manajemen perubahan holistik dalam membentuk adaptabilitas karyawan berbasis digital. Fatih: Journal of Contemporary Research, 2(1).
+
+Leitão, J., Pereira, D., & Gonçalves, Â. (2019). Quality of work life and organizational performance. International Journal of Environmental Research and Public Health, 16(20), 3803. https://doi.org/10.3390/ijerph16203803
+
+Lubis, A. S., & Lumbanraja, P. (2022). Human resource competency 4.0 and its impact on Bank Indonesia employees' readiness for transformational change. Journal of Organizational Change Management, 35(6), 871–889. https://doi.org/10.1108/JOCM-02-2021-0045
+
+Mahmud, M. F., & Tesniwati, R. (2023). Peningkatan kinerja melalui transformasi digital layanan publik kepabeanan. Jurnal Ilmiah Ekonomi Bisnis, 28(2), 161–182. https://doi.org/10.35760/eb.2023.v28i2.7004
+
+Masudi, B., Ilham, R., & Suharto. (2025). Digital talent management: Adaptive strategies in the era of Industry 4.0 transformation. JUMBIWIRA, 4(1), 436–448. https://doi.org/10.56910/jumbiwira.v4i1.2735
+
+Meria, L., & Wulandari, D. A. (2022). The role of transformational leadership and self-efficacy on readiness to change through work engagement. Aptisi Transactions on Technopreneurship, 4(1), 19–25. https://doi.org/10.34306/att.v4i1.242
+
+Metris, D., Daelami, P. A., & Amirudin. (2025). Peran kompetensi digital, pelatihan, perilaku individu, dan adaptasi teknologi dengan moderasi budaya organisasi. Journal Development, 13(2), 348–376. https://doi.org/10.53978/jd.v13i2.612
+
+Mutmainnah, M., Kadiyono, A. L., & Sulas...[dkk]. (2026). Peran psychological empowerment dalam meningkatkan adaptive performance karyawan pada masa transformasi. ARMADA: Jurnal Penelitian Multidisiplin, 4(6).
+
+Nugroho, A., & Wulandhari, O. (2026). Kompetensi digital praktisi SDM sebagai faktor kesiapan organisasi. Indonesian Journal of Entrepreneurship, Finance and Business.
+
+Nursesa, P. C. P., & Achmad, N. (2026). Pengaruh digital skill readiness dan work-life integration terhadap kinerja karyawan di PT. X. Community Engagement and Emergence Journal, 7.
+
+Palapa, W., & Saragih, S. (2026). Peran kesiapan digital, work-life balance, dan stres kerja dalam kepuasan kerja karyawan era digital. Journal of Management and Digital Business, 6(1), 359–379. https://doi.org/10.53088/jmdb.v6i1.2759
+
+Pan, X. (2020). Technology acceptance, technological self-efficacy, and attitude toward technology-based self-service. Frontiers in Psychology, 11, 564294. https://doi.org/10.3389/fpsyg.2020.564294
+
+Park, Y., Lim, D. H., Kim, W., & Kang, H. (2020). Organizational support and adaptive performance: The revolving structural relationships between job crafting, work engagement, and adaptive performance. Sustainability, 12(12), 4872. https://doi.org/10.3390/su12124872
+
+Polk, D. M. (2022). Equity theory: Evaluating fairness. [Book chapter]. https://doi.org/10.1002/9781394266616.ch9
+
+Pulakos, E. D., Arad, S., Donovan, M. A., & Plamondon, K. E. (2000). Adaptability in the workplace: Development of a taxonomy of adaptive performance. Journal of Applied Psychology, 85(4), 612–624. https://doi.org/10.1037/0021-9010.85.4.612
+
+Rahardhiansyah, A. D., Endratno, H., & Darmawan, A. (2026). Pengaruh self efficacy, work life balance dan quality of work life terhadap kinerja karyawan. Jurnal Ilmiah Edunomika, 10(1).
+
+Setiyadi, D., et al. (2024). Determinants of adaptive performance at individual, team, and organizational levels: A systematic review (2011–2022). Journal of Logistics, Informatics and Service Science, 11(12), 39–70. https://doi.org/10.33168/jliss.2024.1203
+
+Shahzad, M. F., Xu, S., Lim, W. M., Yang, X., & Khan, Q. R. (2025). Exploring the impact of generative AI-based technologies on learning performance through self-efficacy, motivation, and engagement. Education and Information Technologies. https://doi.org/10.1007/s10639-024-12949-9
+
+Sidanta, G. K., Wulandari, A., & Sapruwan, M. (2026). Analisis strategi komunikasi dan nilai budaya kerja dalam meningkatkan employee engagement. Sains Manajemen: Jurnal Manajemen Unsera, 12(1).
+
+Sitorus, R., Immamah, E., & Adiazmil, A. (2026). Analysis of the role of digital transformation, infrastructure availability, and human resource competence on the operational performance of the logistics industry in Jakarta. West Science Interdisciplinary Studies, 4(2), 309–318. https://doi.org/10.58812/wsis.v4i02.2649
+
+Srimulyani, V. A., & Wardani, D. T. (2026). Peran mediasi kepuasan kerja dalam hubungan work-life balance dan adaptive performance pada karyawan. Jurnal Ilmu Manajemen dan Bisnis, 2(2).
+
+Sun, T., & Yoon, M. (2025). The impact of digital transformation on faculty performance in higher education: The mediating role of digital self-efficacy and the moderating role of task-technology fit. Frontiers in Psychology, 16, 1693375. https://doi.org/10.3389/fpsyg.2025.1693375
+
+Sunarto, S., Manurung, Y. C., & Aulia, I. P. (2026). Peran human AI-collaboration dalam meningkatkan adaptive performance karyawan. Indo-MathEdu Intellectuals Journal, 7(3).
+
+Venkatesh, V., & Davis, F. D. (2000). A theoretical extension of the technology acceptance model. Management Science, 46(2), 186–204. https://doi.org/10.1287/mnsc.46.2.186.11926
+
+Wijaya, F. (2025). Pengaruh work passion dan organization support terhadap adaptive performance karyawan. Jurnal Jejama Manajemen Malahayati, 5(2).
+
+Xanthopoulou, D., Bakker, A. B., Demerouti, E., & Schaufeli, W. B. (2007). The role of personal resources in the job demands-resources model. International Journal of Stress Management, 14(2), 121–141. https://doi.org/10.1037/1072-5245.14.2.121
+
+Zhao, N., Hong, J., & Lau, K. H. (2023). Impact of supply chain digitalization on supply chain resilience and performance. International Journal of Production Economics. https://doi.org/10.1016/j.ijpe.2023.108817

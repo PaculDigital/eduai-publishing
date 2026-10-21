@@ -1,0 +1,41 @@
+[
+ {
+  "bab": "BAB I",
+  "kata": 4773,
+  "putaran": 4,
+  "sukses": 4,
+  "token_in": 34419,
+  "token_out": 2015,
+  "total_token": 36434,
+  "saldo_awal": 9.82547,
+  "saldo_akhir": 9.825232,
+  "biaya_usd": 0.00023799999999951638,
+  "durasi_detik": 34.07066298392601
+ },
+ {
+  "bab": "BAB II",
+  "kata": 12998,
+  "putaran": 4,
+  "sukses": 4,
+  "token_in": 88787,
+  "token_out": 4126,
+  "total_token": 92913,
+  "saldo_awal": 9.825232,
+  "saldo_akhir": 9.824984,
+  "biaya_usd": 0.0002479999999991378,
+  "durasi_detik": 53.58886671019718
+ },
+ {
+  "bab": "BAB III",
+  "kata": 3634,
+  "putaran": 5,
+  "sukses": 5,
+  "token_in": 38995,
+  "token_out": 3172,
+  "total_token": 42167,
+  "saldo_awal": 9.824984,
+  "saldo_akhir": 9.824934,
+  "biaya_usd": 4.999999999988347e-05,
+  "durasi_detik": 49.39936360204592
+ }
+]

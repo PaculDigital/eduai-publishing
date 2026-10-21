@@ -1,0 +1,282 @@
+{
+  "aturan_pakai": "Agen AI HANYA boleh memakai teori dari file ini. Jika teori yang dibutuhkan tidak ada di bank, agen WAJIB menjawab 'tidak ada di bank teori — butuh verifikasi manual', dan DILARANG mengarang nama pengarang, tahun, atau DOI.",
+  "catatan": "File mesin (dibaca aplikasi/AI). Isi IDENTIK dengan bank_teori.md (file manusia). Jangan edit manual — edit bank_teori.md lalu sinkronkan. Semua DOI dicek ke api.crossref.org pada 2026-10-13. Entri tanpa DOI = buku, validasi manual.",
+  "teori": [
+    {
+      "cocok_untuk": [
+        "model mediasi perilaku konsumen",
+        "live streaming commerce",
+        "impulse buying"
+      ],
+      "doi": null,
+      "id": "SOR",
+      "istilah_en": "consumer behavior",
+      "istilah_id": "perilaku konsumen",
+      "logika": "Stimulus (faktor lingkungan) -> Organism (keadaan internal: kognitif/afektif) -> Response (perilaku). Cocok untuk model mediasi X -> Z -> Y.",
+      "nama": "Stimulus-Organism-Response (S-O-R)",
+      "pencetus": "Mehrabian & Russell",
+      "sinonim_en": [
+        "stimulus-organism-response",
+        "consumer behavior"
+      ],
+      "sitasi": "Mehrabian, A., & Russell, J. A. (1974). An Approach to Environmental Psychology. MIT Press.",
+      "tahun": 1974,
+      "tipe": "grand_theory",
+      "verifikasi": "buku_tanpa_doi_validasi_manual"
+    },
+    {
+      "cocok_untuk": [
+        "adopsi aplikasi",
+        "penerimaan teknologi",
+        "niat penggunaan"
+      ],
+      "doi": "10.2307/249008",
+      "id": "TAM",
+      "istilah_en": "technology acceptance",
+      "istilah_id": "penerimaan teknologi",
+      "logika": "Persepsi kemanfaatan + persepsi kemudahan -> sikap -> niat -> penggunaan aktual.",
+      "nama": "Technology Acceptance Model (TAM)",
+      "pencetus": "Davis",
+      "sinonim_en": [
+        "technology acceptance",
+        "perceived usefulness",
+        "perceived ease of use"
+      ],
+      "sitasi": "Davis, F. D. (1989). Perceived usefulness, perceived ease of use, and user acceptance of information technology. MIS Quarterly, 13(3), 249-275.",
+      "tahun": 1989,
+      "tipe": "grand_theory",
+      "verifikasi": "terverifikasi_crossref_2026-10-13"
+    },
+    {
+      "cocok_untuk": [
+        "adopsi teknologi oleh konsumen",
+        "aplikasi mobile",
+        "e-commerce"
+      ],
+      "doi": "10.2307/41410412",
+      "id": "UTAUT2",
+      "istilah_en": "technology acceptance",
+      "istilah_id": "penerimaan teknologi konsumen",
+      "logika": "Ekspektasi kinerja, ekspektasi usaha, pengaruh sosial, kondisi pendukung, motivasi hedonis, nilai harga, kebiasaan -> niat & perilaku.",
+      "nama": "UTAUT2 (Extended Unified Theory of Acceptance and Use of Technology)",
+      "pencetus": "Venkatesh, Thong & Xu",
+      "sinonim_en": [
+        "UTAUT2",
+        "technology acceptance",
+        "behavioral intention"
+      ],
+      "sitasi": "Venkatesh, V., Thong, J. Y. L., & Xu, X. (2012). Consumer acceptance and use of information technology: Extending the unified theory of acceptance and use of technology. MIS Quarterly, 36(1), 157-178.",
+      "tahun": 2012,
+      "tipe": "grand_theory",
+      "verifikasi": "terverifikasi_crossref_2026-10-13"
+    },
+    {
+      "cocok_untuk": [
+        "niat beli",
+        "perilaku konsumen",
+        "keputusan pembelian"
+      ],
+      "doi": "10.1016/0749-5978(91)90020-t",
+      "id": "TPB",
+      "istilah_en": "behavioral intention",
+      "istilah_id": "niat perilaku",
+      "logika": "Sikap + norma subjektif + kontrol perilaku persepsian -> niat -> perilaku.",
+      "nama": "Theory of Planned Behavior (TPB)",
+      "pencetus": "Ajzen",
+      "sinonim_en": [
+        "theory of planned behavior",
+        "behavioral intention"
+      ],
+      "sitasi": "Ajzen, I. (1991). The theory of planned behavior. Organizational Behavior and Human Decision Processes, 50(2), 179-211.",
+      "tahun": 1991,
+      "tipe": "grand_theory",
+      "verifikasi": "terverifikasi_crossref_2026-10-13"
+    },
+    {
+      "cocok_untuk": [
+        "hubungan streamer-penonton",
+        "loyalitas",
+        "interaksi sosial"
+      ],
+      "doi": null,
+      "id": "SET",
+      "istilah_en": "social exchange",
+      "istilah_id": "pertukaran sosial",
+      "logika": "Interaksi sosial = pertukaran timbal-balik; hubungan bertahan bila manfaat dirasa seimbang.",
+      "nama": "Social Exchange Theory",
+      "pencetus": "Blau",
+      "sinonim_en": [
+        "social exchange theory"
+      ],
+      "sitasi": "Blau, P. M. (1964). Exchange and Power in Social Life. Wiley.",
+      "tahun": 1964,
+      "tipe": "grand_theory",
+      "verifikasi": "buku_tanpa_doi_validasi_manual"
+    },
+    {
+      "cocok_untuk": [
+        "motif menonton live streaming",
+        "keterlibatan audiens media"
+      ],
+      "doi": "10.1086/268109",
+      "id": "UG",
+      "istilah_en": "uses and gratifications",
+      "istilah_id": "motif penggunaan media",
+      "logika": "Audiens aktif memilih media untuk memenuhi kebutuhan: informasi, hiburan, interaksi sosial, identitas.",
+      "nama": "Uses and Gratifications",
+      "pencetus": "Katz, Blumler & Gurevitch",
+      "sinonim_en": [
+        "uses and gratifications",
+        "media gratifications"
+      ],
+      "sitasi": "Katz, E., Blumler, J. G., & Gurevitch, M. (1973). Uses and gratifications research. The Public Opinion Quarterly, 37(4), 509-523.",
+      "tahun": 1973,
+      "tipe": "grand_theory",
+      "verifikasi": "terverifikasi_crossref_2026-10-13"
+    },
+    {
+      "cocok_untuk": [
+        "X: keaslian streamer",
+        "streamer authenticity",
+        "influencer marketing"
+      ],
+      "doi": "10.1016/j.jbusres.2018.07.008",
+      "id": "AUTH",
+      "istilah_en": "streamer authenticity",
+      "istilah_id": "keaslian streamer",
+      "konstruksi_utama": "keaslian/otentisitas influencer — passion intrinsik, transparansi, konsistensi",
+      "nama": "Influencer Authenticity",
+      "pencetus": "Audrezet, de Kerviler & Moulard",
+      "sinonim_en": [
+        "streamer authenticity",
+        "influencer authenticity",
+        "perceived authenticity"
+      ],
+      "sitasi": "Audrezet, V., de Kerviler, G., & Moulard, J. G. (2020). Authenticity under threat: When social media influencers need to go beyond self-presentation. Journal of Business Research, 117, 557-569.",
+      "tahun": 2020,
+      "tipe": "teori_variabel",
+      "verifikasi": "terverifikasi_crossref_2026-10-13"
+    },
+    {
+      "cocok_untuk": [
+        "X: interaksi parasosial",
+        "streamer/influencer",
+        "live streaming"
+      ],
+      "doi": "10.1080/00332747.1956.11023049",
+      "id": "PSI",
+      "istilah_en": "parasocial interaction",
+      "istilah_id": "interaksi parasosial",
+      "konstruksi_utama": "interaksi parasosial — hubungan satu arah yang terasa intim antara penonton dan figur media",
+      "nama": "Parasocial Interaction Theory",
+      "pencetus": "Horton & Wohl",
+      "sinonim_en": [
+        "parasocial interaction",
+        "parasocial relationship"
+      ],
+      "sitasi": "Horton, D., & Wohl, R. R. (1956). Mass communication and para-social interaction: Observations on intimacy at a distance. Psychiatry, 19(3).",
+      "tahun": 1956,
+      "tipe": "teori_variabel",
+      "verifikasi": "terverifikasi_crossref_2026-10-13"
+    },
+    {
+      "cocok_untuk": [
+        "Z: keterlibatan pelanggan (mediator)",
+        "customer engagement"
+      ],
+      "doi": "10.1177/1094670511411703",
+      "id": "CE",
+      "istilah_en": "customer engagement",
+      "istilah_id": "keterlibatan pelanggan",
+      "konstruksi_utama": "keterlibatan pelanggan — keadaan psikologis interaktif dengan dimensi kognitif, emosional, perilaku",
+      "nama": "Customer Engagement (fondasi konseptual)",
+      "pencetus": "Brodie, Hollebeek, Juric & Ilic",
+      "sinonim_en": [
+        "customer engagement",
+        "consumer engagement"
+      ],
+      "sitasi": "Brodie, R. J., Hollebeek, L. D., Juric, B., & Ilic, A. (2011). Customer engagement: Conceptual domain, fundamental propositions, and implications for research. Journal of Service Research.",
+      "tahun": 2011,
+      "tipe": "teori_variabel",
+      "verifikasi": "terverifikasi_crossref_2026-10-13"
+    },
+    {
+      "cocok_untuk": [
+        "Y: pembelian impulsif",
+        "impulse buying"
+      ],
+      "doi": "10.1086/209105",
+      "id": "IB",
+      "istilah_en": "impulse buying",
+      "istilah_id": "pembelian impulsif",
+      "konstruksi_utama": "pembelian impulsif — dorongan tiba-tiba, kuat, dan mendesak untuk membeli",
+      "nama": "Buying Impulse",
+      "pencetus": "Rook",
+      "sinonim_en": [
+        "impulse buying",
+        "impulsive buying",
+        "impulse purchase",
+        "unplanned buying"
+      ],
+      "sitasi": "Rook, D. W. (1987). The buying impulse. Journal of Consumer Research, 14(2), 189-199.",
+      "tahun": 1987,
+      "tipe": "teori_variabel",
+      "verifikasi": "terverifikasi_crossref_2026-10-13"
+    },
+    {
+      "id": "JDR",
+      "nama": "Job Demands-Resources Model (JD-R)",
+      "tipe": "grand_theory",
+      "pencetus": "Bakker & Demerouti",
+      "tahun": 2007,
+      "sitasi": "Bakker, A. B., & Demerouti, E. (2007). The job demands-resources model: State of the art. Journal of Managerial Psychology, 22(3), 309-328.",
+      "doi": "10.1108/02683940710733115",
+      "verifikasi": "terverifikasi_crossref_2026-10-13",
+      "logika": "Tuntutan kerja (job demands) menguras energi -> kelelahan/stres; sumber daya kerja (job resources) memberi energi -> keterikatan. Dua jalur berjalan bersamaan.",
+      "istilah_id": "tuntutan dan sumber daya kerja",
+      "istilah_en": "job demands and resources",
+      "sinonim_en": [
+        "job demands-resources",
+        "job demands",
+        "job resources",
+        "burnout",
+        "work engagement"
+      ],
+      "cocok_untuk": [
+        "stres kerja",
+        "kelelahan/burnout",
+        "keterikatan kerja (work engagement)",
+        "kesehatan kerja perawat",
+        "beban kerja"
+      ]
+    },
+    {
+      "id": "KARASEK",
+      "nama": "Job Demand-Control Model",
+      "tipe": "grand_theory",
+      "pencetus": "Karasek",
+      "tahun": 1979,
+      "sitasi": "Karasek, R. A. (1979). Job demands, job decision latitude, and mental strain: Implications for job redesign. Administrative Science Quarterly, 24(2), 285-308.",
+      "doi": "10.2307/2392498",
+      "verifikasi": "terverifikasi_crossref_2026-10-13",
+      "logika": "Stres kerja muncul dari gabungan TUNTUTAN kerja tinggi + KENDALI (keleluasaan memutuskan) rendah. Kendali tinggi meredam dampak tuntutan.",
+      "istilah_id": "tuntutan dan kendali kerja",
+      "istilah_en": "job demand and control",
+      "sinonim_en": [
+        "job demand-control",
+        "job strain",
+        "decision latitude",
+        "mental strain"
+      ],
+      "cocok_untuk": [
+        "stres kerja",
+        "ketegangan kerja (job strain)",
+        "kendali kerja",
+        "beban kerja",
+        "kesehatan kerja"
+      ]
+    }
+  ],
+  "versi": "2026-10-13",
+  "sumber": "bank_teori.md (file manusia) - Bos; JSON = cermin mesin"
+}

@@ -1,0 +1,22 @@
+{
+ "inferhub/ag/gemini-3.8-flash-high": {
+  "median": 10.6,
+  "min": 10.4,
+  "benar": "3/3"
+ },
+ "Byn/gemini-3.8-flash-high": {
+  "median": 10.5,
+  "min": 10.4,
+  "benar": "3/3"
+ },
+ "inferhub/deepseek-v4.1-flash": {
+  "median": 10.8,
+  "min": 10.1,
+  "benar": "3/3"
+ },
+ "Byn/deepseek-v4.1-flash": {
+  "median": 2.5,
+  "min": 2.4,
+  "benar": "3/3"
+ }
+}

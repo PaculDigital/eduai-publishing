@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketsa — Pintu Periksa Naskah (EduAi)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tinta:#16302B; --tinta2:#5B6B67; --garis:#E3E8E6; --bg:#F6F8F7;
+  --hijau:#0E7C66; --hijau2:#E6F4EF; --kuning:#B7791F; --kuning2:#FDF6E3;
+  --merah:#C53030; --merah2:#FDECEC;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Poppins,system-ui,sans-serif;color:var(--tinta);
+     padding:18px 12px 40px;line-height:1.55}
+.wrap{max-width:520px;margin:0 auto}
+h1{font-size:20px;font-weight:800;margin:0 0 4px;text-align:center}
+.ket{font-size:12.5px;color:var(--tinta2);text-align:center;margin:0 0 18px}
+.label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+       color:var(--tinta2);margin:26px 0 8px}
+.hp{background:#fff;border:1px solid var(--garis);border-radius:16px;padding:16px;
+    box-shadow:0 1px 3px rgba(20,40,35,.05)}
+.judul{font-size:16px;font-weight:800;margin:0 0 2px}
+.sub{font-size:12px;color:var(--tinta2);margin:0 0 14px}
+.det{background:var(--bg);border:1px solid var(--garis);border-radius:12px;padding:12px;margin:0 0 12px}
+.det .b{font-weight:700;font-size:14px;display:block;margin-bottom:2px}
+.det .i{font-size:12px;color:var(--tinta2)}
+.baik{background:var(--hijau2);border-color:#BFE3D8}
+.baik .b{color:var(--hijau)}
+.rawan{background:var(--kuning2);border-color:#EFDDA9}
+.rawan .b{color:var(--kuning)}
+.rusak{background:var(--merah2);border-color:#F5C6C6}
+.rusak .b{color:var(--merah)}
+.aksi{display:flex;gap:8px;flex-wrap:wrap}
+.tb{flex:1;min-width:140px;border-radius:10px;padding:11px;font-size:13.5px;font-weight:700;
+    font-family:inherit;cursor:pointer;border:1.5px solid var(--garis);background:#fff;color:var(--tinta)}
+.tb-utama{background:var(--hijau);border-color:var(--hijau);color:#fff}
+.angka{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 0}
+.angka div{background:#fff;border:1px solid var(--garis);border-radius:10px;padding:9px 11px}
+.angka b{display:block;font-size:17px;font-weight:800;line-height:1.2}
+.angka span{font-size:11px;color:var(--tinta2)}
+.tanda{font-size:11px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block}
+.t-hijau{background:var(--hijau2);color:var(--hijau)}
+.t-kuning{background:var(--kuning2);color:var(--kuning)}
+.t-merah{background:var(--merah2);color:var(--merah)}
+hr{border:0;border-top:1px dashed var(--garis);margin:22px 0}
+.catatan{font-size:12px;color:var(--tinta2);background:#fff;border-left:3px solid var(--hijau);
+         border-radius:8px;padding:10px 12px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Sketsa — Pintu Periksa Naskah</h1>
+<p class="ket">Titip di pintu “Lanjutkan naskah saya” yang <b>sudah ada</b>.<br>
+Tidak ada halaman baru. Hanya 1 layar tambahan setelah unggah.</p>
+
+<!-- ══════════ HASIL 1: NASKAH SEHAT ══════════ -->
+<p class="label">Layar 1a — naskah sehat (Asih)</p>
+<div class="hp">
+  <p class="judul">Naskah sudah diperiksa</p>
+  <p class="sub">Gratis · tidak memakai Token</p>
+
+  <div class="det baik">
+    <span class="b">✅ Naskah terbaca baik</span>
+    <span class="i">Semua baris utuh. Langsung lanjut memetakan bab.</span>
+  </div>
+
+  <div class="angka">
+    <div><b>1.221</b><span>baris terbaca</span></div>
+    <div><b>37</b><span>huruf rata-rata / baris</span></div>
+  </div>
+
+  <div class="aksi" style="margin-top:12px">
+    <button class="tb tb-utama">Lanjut — peta bab →</button>
+  </div>
+</div>
+
+<!-- ══════════ HASIL 2: NASKAH RUSAK (PDF) ══════════ -->
+<p class="label">Layar 1b — naskah pecah akibat konversi (Wulandari-PDF)</p>
+<div class="hp">
+  <p class="judul">Naskah sudah diperiksa</p>
+  <p class="sub">Gratis · tidak memakai Token</p>
+
+  <div class="det rusak">
+    <span class="b">⚠️ Naskah ini tampaknya rusak akibat konversi</span>
+    <span class="i">Ada 4.989 bagian yang isinya hanya 1 huruf
+      (mis. “D”, “i”, “n”, “a”) — biasanya terjadi kalau file
+      dikonversi dari PDF. Peta bab bisa jadi kurang rapi.</span>
+  </div>
+
+  <div class="aksi">
+    <button class="tb tb-utama">Kirim file .docx aslinya (disarankan)</button>
+    <button class="tb">Tetap lanjutkan</button>
+  </div>
+
+  <div class="catatan">
+    <b>Kenapa disarankan kirim .docx?</b><br>
+    Kalau naskah diketik di Word, file .docx-nya masih utuh.
+    PDF biasanya memecah teks jadi potongan kecil.
+  </div>
+</div>
+
+<!-- ══════════ HASIL 3: NASKAH BARIS PENDEK (DISERTASI) ══════════ -->
+<p class="label">Layar 1c — naskah barisnya pendek (Disertasi)</p>
+<div class="hp">
+  <p class="judul">Naskah sudah diperiksa</p>
+  <p class="sub">Gratis · tidak memakai Token</p>
+
+  <div class="det rawan">
+    <span class="b">ℹ️ Naskah terbaca, tapi barisnya pendek-pendek</span>
+    <span class="i">Rata-rata hanya 15 huruf per baris (umumnya 60–70).
+      Teksnya tetap utuh — hanya pemetaan bab perlu lebih teliti.</span>
+  </div>
+
+  <div class="angka">
+    <div><b>12.528</b><span>baris terbaca</span></div>
+    <div><b>15</b><span>huruf rata-rata / baris</span></div>
+  </div>
+
+  <div class="aksi" style="margin-top:12px">
+    <button class="tb tb-utama">Lanjut — peta bab →</button>
+  </div>
+</div>
+
+<hr>
+
+<p class="label">Ringkas — 3 jenis hasil pemeriksaan</p>
+<div class="hp">
+  <p class="sub" style="margin-bottom:10px">Semua berbasis <b>fakta yang dihitung kode</b>,
+  bukan tebakan bentuk naskah.</p>
+  <table style="width:100%;border-collapse:collapse;font-size:12px">
+    <tr style="text-align:left;color:var(--tinta2)">
+      <th style="padding:6px 4px">Yang dihitung</th>
+      <th style="padding:6px 4px">Sehat</th>
+      <th style="padding:6px 4px">Rusak (PDF)</th>
+      <th style="padding:6px 4px">Baris pendek</th>
+    </tr>
+    <tr style="border-top:1px solid var(--garis)">
+      <td style="padding:6px 4px">Baris isi 1 huruf</td>
+      <td style="padding:6px 4px">1</td>
+      <td style="padding:6px 4px"><b style="color:var(--merah)">4.989</b></td>
+      <td style="padding:6px 4px">1</td>
+    </tr>
+    <tr style="border-top:1px solid var(--garis)">
+      <td style="padding:6px 4px">Baris ≤2 karakter</td>
+      <td style="padding:6px 4px">0%</td>
+      <td style="padding:6px 4px"><b style="color:var(--merah)">64%</b></td>
+      <td style="padding:6px 4px">3%</td>
+    </tr>
+    <tr style="border-top:1px solid var(--garis)">
+      <td style="padding:6px 4px">Huruf rata-rata/baris</td>
+      <td style="padding:6px 4px">37</td>
+      <td style="padding:6px 4px"><b style="color:var(--merah)">1</b></td>
+      <td style="padding:6px 4px">15</td>
+    </tr>
+    <tr style="border-top:1px solid var(--garis)">
+      <td style="padding:6px 4px">Tindakan</td>
+      <td style="padding:6px 4px"><span class="tanda t-hijau">Lanjut</span></td>
+      <td style="padding:6px 4px"><span class="tanda t-merah">Tawarkan .docx</span></td>
+      <td style="padding:6px 4px"><span class="tanda t-kuning">Lanjut + info</span></td>
+    </tr>
+  </table>
+</div>
+
+<p class="catatan">
+<b>Prinsip yang dijaga:</b><br>
+① <b>Tidak memblokir</b> — user tetap boleh lanjut (jawaban Bos: pola “beri tahu”, bukan pagar keras).<br>
+② <b>Tidak menebak bentuk naskah</b> — hanya menghitung fakta (jumlah huruf tunggal).<br>
+③ <b>Tidak ada halaman baru</b> — menempel di pintu “Lanjutkan naskah saya” yang sudah ada.<br>
+④ <b>Gratis</b> — bagian ini belum memakai Token, sama seperti baca naskah sekarang.
+</p>
+
+</div>
+</body>
+</html>

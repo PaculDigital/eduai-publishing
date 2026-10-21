@@ -1,0 +1,38 @@
+
+1.4  Manfaat Penelitian
+
+Penelitian ini diharapkan memberikan kontribusi baik pada tataran pengembangan ilmu pengetahuan maupun pada tataran praktik manajerial, serta memperkaya khazanah akademik mengenai pengelolaan sumber daya manusia di era digital. Secara rinci, manfaat penelitian ini diuraikan ke dalam manfaat teoretis, manfaat praktis, dan manfaat akademis sebagai berikut.
+
+1.4.1  Manfaat Teoretis
+
+Penelitian ini diharapkan memperkaya khazanah keilmuan manajemen sumber daya manusia, khususnya pada kajian tentang bagaimana kondisi kerja dan kapasitas diri karyawan ditransformasikan menjadi kinerja adaptif dalam era transformasi digital. Selama ini literatur cenderung menempatkan adaptive performance sebagai luaran yang dipengaruhi secara langsung oleh faktor individual maupun organisasional, tanpa banyak menyingkap mekanisme konversi yang menjembatani keduanya. Penelitian ini mengisi celah tersebut dengan memposisikan digital readiness sebagai mekanisme penjelas.
+
+Kontribusi berikutnya terletak pada pengujian dan perluasan penerapan Conservation of Resources Theory (Hobfoll, 1989) dalam konteks organisasi jasa pengiriman di Indonesia. COR Theory memandang individu berupaya mempertahankan dan mengakumulasi sumber daya; namun teori ini belum banyak diuji secara empiris pada level tenaga penjualan (account officer) di sektor logistik. Penelitian ini menawarkan pembacaan COR dalam logika investasi sumber daya: quality of work life dan digital self-efficacy diposisikan sebagai sumber daya yang harus dikonversi terlebih dahulu menjadi kesiapan digital agar berbuah kinerja adaptif. Logika ini menegaskan proposisi penting COR bahwa kepemilikan sumber daya saja tidak cukup tanpa kapasitas mengaktivasinya.
+
+Pijakan teoretis kedua yang diperluas adalah Social Cognitive Theory (Bandura, 2001) sebagai penjelas jalur digital self-efficacy. SCT menegaskan bahwa keyakinan diri memengaruhi pilihan tindakan, intensitas usaha, dan ketekunan menghadapi hambatan. Dengan menempatkan digital readiness sebagai konsekuensi kognitif dari keyakinan diri, penelitian ini memperlihatkan bahwa efikasi diri digital bekerja melalui pembentukan kesiapan psikologis, bukan semata-mata melalui jalur langsung menuju kinerja.
+
+Model struktural yang dibangun dalam penelitian ini menempatkan satu variabel mediasi (digital readiness) dalam menjembatani dua anteseden berbeda (quality of work life dan digital self-efficacy) menuju adaptive performance. Model ini menawarkan parsimoni teoretis: alih-alih mengakumulasi mediator, penelitian ini menguji apakah satu mekanisme konversi mampu menjelaskan pengaruh kedua anteseden secara simultan. Pendekatan ini sekaligus menghindari risiko tumpang tindih konseptual antar-mediator yang kerap terjadi pada model mediasi ganda.
+
+Gagasan-gagasan tersebut pada akhirnya diharapkan menjadi acuan dan bahan perbandingan bagi peneliti berikutnya yang tertarik mengkaji topik serupa, baik pada objek, sektor industri, maupun konteks kewilayahan yang berbeda, serta membuka ruang bagi pengembangan model dengan penambahan variabel relevan lain dalam konteks digitalisasi organisasi.
+
+1.4.2  Manfaat Praktis
+
+Manajemen PT JNE Wilayah Lampung dapat memanfaatkan temuan penelitian ini sebagai masukan strategis dalam merancang kebijakan peningkatan adaptive performance account officer. Hasil penelitian dapat menunjukkan apakah intervensi sebaiknya difokuskan pada perbaikan kualitas kehidupan kerja, penguatan efikasi diri digital, atau justru pada program percepatan kesiapan digital sebagai simpul konversi. Dengan demikian, alokasi sumber daya pengembangan SDM dapat lebih tepat sasaran.
+
+Account officer dapat menjadikan temuan penelitian ini sebagai bahan refleksi mengenai pentingnya kesiapan digital sebagai jembatan antara kenyamanan bekerja dan keyakinan diri dengan kemampuan beradaptasi terhadap perubahan tuntutan kerja, terutama ketika sistem, prosedur, dan ekspektasi pelanggan berubah cepat.
+
+Industri logistik dan ekspedisi memperoleh gambaran tentang dinamika kesiapan digital tenaga penjualan di lini depan. Mengingat account officer adalah ujung tombak yang berinteraksi langsung dengan pelanggan dan menghadapi ketidakpastian permintaan, pemahaman mengenai mekanisme konversi sumber daya menjadi kinerja adaptif memiliki nilai strategis bagi pengelolaan SDM sektor ini secara lebih luas.
+
+Akademisi dan penulis turut memperoleh manfaat melalui contoh penerapan PLS-SEM dalam menguji efek mediasi melalui prosedur specific indirect effects dengan bootstrapping, sekaligus memperlihatkan pentingnya kehati-hatian dalam menetapkan spesifikasi model mediasi.
+
+1.4.3  Manfaat Akademis
+
+Penelitian ini diharapkan memperkaya khazanah literatur akademik mengenai manajemen sumber daya manusia di era digital, khususnya pada konteks tenaga penjualan jasa logistik di Indonesia. Selama ini kajian mengenai adaptive performance lebih banyak berkembang pada sektor pendidikan, manufaktur, dan perbankan, sehingga bukti empiris dari sektor logistik nasional masih terbatas. Penelitian ini menawarkan tambahan bukti empiris yang dapat dirujuk oleh kajian berikutnya.
+
+Kontribusi akademis berikutnya tampak pada integrasi lintas teori. Penelitian ini memadukan Conservation of Resources Theory dan Social Cognitive Theory dalam satu model yang saling melengkapi, sehingga memperlihatkan bagaimana sumber daya kontekstual dan keyakinan diri diproses secara bersama-sama menuju luaran kinerja. Pemaduan semacam ini jarang dijumpai dalam studi yang memisahkan kedua perspektif tersebut.
+
+Materi ajar turut memperoleh manfaat dari penelitian ini karena tersedia contoh kasus yang dapat digunakan dalam pembelajaran mata kuliah manajemen sumber daya manusia, perilaku organisasi, dan metodologi penelitian kuantitatif. Kasus mengenai mekanisme konversi sumber daya menjadi kesiapan digital dapat dijadikan bahan diskusi mahasiswa mengenai bagaimana teori organisasi diterapkan pada persoalan nyata di perusahaan jasa logistik.
+
+Pengembangan metode penelitian juga mendapat sumbangan melalui contoh penerapan PLS-SEM dalam menguji efek mediasi tunggal yang dibatasi secara sengaja (single-mediator specification). Pilihan ini memberikan gambaran bahwa parsimoni model dapat menjadi pertimbangan metodologis yang sah, bukan sekadar keterbatasan, sepanjang dilandasi argumen teoretis yang jelas.
+
+Lebih jauh, temuan penelitian ini diharapkan membuka ruang bagi penyusunan agenda penelitian lanjutan, misalnya pengujian pada sektor jasa lain dengan karakter ketidakpastian serupa, penggunaan desain longitudinal untuk menelusuri dinamika kesiapan digital, atau perluasan model dengan variabel kontekstual lain.

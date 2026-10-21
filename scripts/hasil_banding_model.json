@@ -1,0 +1,54 @@
+{
+ "inferhub/ag/gemini-3.8-flash-high": {
+  "detik": 6.0,
+  "profil": true,
+  "K1": "KURANG",
+  "K2": "LULUS",
+  "K3": "LULUS",
+  "skor": 2,
+  "blok": {
+   "K1": "Revisi kata tidak baku \"merubah\" menjadi \"mengubah\" pada Paragraf 1 Latar Belakang:\nPerkembangan teknologi informasi mengubah pola belajar siswa. Media sosial diakses hampir seluruh siswa setiap hari, dengan sebagian besarnya membuka media sosial pada jam pelajaran.",
+   "K2": "Revisi deskripsi komposisi sampel pada Bab III Metode Penelitian dengan mencantumkan persentase:\nPopulasi berjumlah 180 siswa dengan sampel *simple random sampling* sebanyak 120 siswa, yang terdiri atas 75 perempuan (62,5%) dan 45 laki-laki (37,5%).",
+   "K3": "Data koefisien *Cronbach's Alpha* tiap butir angket tidak termuat dalam naskah; mahasiswa perlu melampirkan hasil uji validitas dan reliabilitas instrumen sebelum angka tersebut dapat dicantumkan pada Bab III."
+  }
+ },
+ "inferhub/deepseek-v4.1-flash": {
+  "detik": 13.2,
+  "profil": true,
+  "K1": "LULUS",
+  "K2": "LULUS",
+  "K3": "LULUS",
+  "skor": 3,
+  "blok": {
+   "K1": "Perkembangan teknologi informasi mengubah pola belajar siswa. Media sosial diakses hampir seluruh siswa setiap hari, dan sebagian besar dari mereka membuka media sosial pada jam pelajaran.",
+   "K2": "Sampel penelitian ini berjumlah 120 siswa, terdiri atas 75 siswa perempuan (62,5%) dan 45 siswa laki-laki (37,5%).",
+   "K3": "Data koefisien Cronbach Alpha tiap butir angket tidak termuat dalam naskah; mahasiswa perlu melampirkan hasil uji reliabilitas instrumen (output SPSS atau tabel Cronbach Alpha per butir) sebelum angka dapat dicantumkan pada bagian instrumen."
+  }
+ },
+ "inferhub/zai/glm-5.3-flash": {
+  "detik": 15.2,
+  "profil": true,
+  "K1": "KURANG",
+  "K2": "LULUS",
+  "K3": "LULUS",
+  "skor": 2,
+  "blok": {
+   "K1": "Perbaikan ejaan baku (PUEBI): kata \"merubah\" diganti menjadi \"mengubah\". Kalimat pada Bab I hasil revisi:\n\"Perkembangan teknologi informasi mengubah pola belajar siswa. Media sosial diakuisisi hampir seluruh siswa setiap hari; sebagian besar di antaranya membuka media sosial pada jam pelajaran.\"\nCatatan: bentuk baku yang benar adalah \"mengubah\" (kata dasar \"ubah\"), karena awalan \"me-\" berubah bent",
+   "K2": "Persentase boleh dihitung dari angka yang sudah ada di naskah (75 dan 45 dari 120). Kalimat siap pakai untuk Bab III setelah kalimat komposisi sampel:\n\"Sampel sebanyak 120 siswa terdiri atas 75 siswa perempuan (62,5%) dan 45 siswa laki-laki (37,5%).\"\nPerhitungan: 75/120 × 100% = 62,5%; 45/120 × 100% = 37,5%.",
+   "K3": "Data koefisien Cronbach Alpha per butir angket tidak termuat dalam naskah; naskah baru menyebutkan teknik analisis (statistik deskriptif dan regresi sederhana) tanpa hasil uji reliabilitas. Mahasiswa perlu melakukan uji reliabilitas angket dan melampirkan hasilnya (nilai Cronbach Alpha keseluruhan instrumen, dan bila diminta dosen, nilai per butir/based on standardized items) sebelum angka tersebu"
+  }
+ },
+ "inferhub/glm-5.3": {
+  "detik": 9.7,
+  "profil": true,
+  "K1": "KURANG",
+  "K2": "LULUS",
+  "K3": "LULUS",
+  "skor": 2,
+  "blok": {
+   "K1": "Perbaikan kata tidak baku pada kalimat latar belakang (BAB I, 1.1), sekaligus perbaikan \"dimana\" menjadi \"di mana\" agar sesuai PUEBI. Hasil revisi siap pakai:\n\n\"Perkembangan teknologi informasi mengubah pola belajar siswa. Media sosial diakses hampir seluruh siswa setiap hari, di mana sebagian besarnya membuka media sosial pada jam pelajaran.\"\n\nCatatan untuk diterapkan sepanjang naskah: ganti semu",
+   "K2": "Persentase dapat dihitung dari angka yang sudah ada di naskah (75 dari 120 = 62,5%; 45 dari 120 = 37,5%). Hasil revisi pada BAB III (bagian populasi dan sampel) siap pakai:\n\n\"Penelitian ini menggunakan pendekatan kuantitatif dengan desain survei. Populasi penelitian berjumlah 180 siswa, dengan sampel 120 siswa yang ditentukan melalui teknik simple random sampling. Sampel terdiri atas 75 siswa pere",
+   "K3": "Data koefisien *Cronbach's Alpha* tiap butir angket tidak termuat dalam naskah; mahasiswa perlu melampirkan tabel hasil uji validitas dan reliabilitas instrumen (output SPSS/Excel) sebelum angka dapat dicantumkan. Kerangka kalimat siap pakai untuk bagian instrumen BAB III, angka tinggal diisi dari hasil uji yang sebenarnya:\n\n\"Validitas dan reliabilitas instrumen angket diuji menggunakan koefisen *"
+  }
+ }
+}

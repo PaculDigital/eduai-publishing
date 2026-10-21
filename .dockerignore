@@ -1,0 +1,30 @@
+# .dockerignore — EDUAI PUBLISHING
+#
+# Kelahiran 04Okt26: 5 berkas `_uji*` ikut ke image produksi karena Wulan
+# menaruhnya di `app/` (Dockerfile = `COPY app ./app`). Tempat BENAR untuk
+# berkas uji = ROOT proyek (seperti 87 berkas `_uji_*.py` yang lain) —
+# root TIDAK di-COPY ke image, jadi otomatis tidak ikut.
+#
+# Isi berkas ini HANYA yang benar-benar aman (diperiksa 04Okt26).
+
+# ── Sampah Python ────────────────────────────────────────────────────────
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*~
+**/.DS_Store
+
+# ── Salinan kerja berkas produksi (mis. app/ai.py.bak-langkahab) ─────────
+#    Berkasnya TETAP ADA di source untuk jejak — cuma tidak ikut image.
+app/*.bak
+app/*.bak-*
+app/**/*.bak
+app/**/*.bak-*
+
+# ── Log kerja di dalam app/ ──────────────────────────────────────────────
+app/*.log
+
+# ⚠️ JANGAN tambahkan `app/data/`, `app/uploads/`, `data/`, `uploads/`:
+#    - `app/data/` & `app/uploads/` TIDAK ADA di source (bind-mount container)
+#    - menulis polanya berisiko kalau struktur berubah
+#    (diperiksa: ls -d app/data app/uploads → keduanya TIDAK ADA) ✅

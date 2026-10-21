@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Konversi Artikel — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/ikon.css">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --merah:#C0392B;--merah-muda:#FDECEA;--teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);
+       border-bottom:1px solid rgba(255,255,255,.13);position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;
+     display:flex;align-items:center;justify-content:space-between}
+.nav img{height:34px}
+.nav-kanan{display:flex;align-items:center;gap:16px;color:#fff;font-size:13.5px}
+.nav-kanan .nama{opacity:.9}
+.keluar{color:#fff;opacity:.85;font-weight:600;font-size:13px}
+.wadah{max-width:1080px;margin:0 auto;padding:22px}
+h1{font-size:21px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px}
+.sub{font-size:13.5px;color:var(--teks-abu);margin-bottom:20px}
+.kembali{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;
+         color:var(--hijau-gelap);margin-bottom:14px}
+.pesan{padding:12px 16px;border-radius:10px;font-size:13.5px;margin-bottom:18px;line-height:1.6}
+.pesan.ya{background:var(--hijau-muda);color:var(--hijau-gelap);border:1px solid #BFE3CC}
+.pesan.tidak{background:#FFF3E0;color:#8A5200;border:1px solid #FFD9A6}
+.pesan.henti{background:var(--merah-muda);color:#8A2418;border:1px solid #F5C6C0}
+.kotak{background:#fff;border:1.5px solid var(--garis);border-radius:16px;padding:22px;margin-bottom:16px}
+.kotak h2{font-size:16px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.baris{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--garis);font-size:13.5px;
+       align-items:flex-start}
+.baris:last-child{border-bottom:0}
+.baris .label{flex:0 0 190px;color:var(--teks-abu);font-weight:600}
+.baris .isi{flex:1}
+.pil{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;
+     font-size:12.5px;font-weight:600}
+.pil.ada{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.pil.kurang{background:var(--merah-muda);color:#8A2418}
+.pil.ragu{background:#FFF3E0;color:#8A5200}
+.mutu-head{display:flex;align-items:center;justify-content:space-between;
+           flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.skor{font-size:13px;color:var(--teks-abu)}
+.skor b{font-size:19px;color:var(--hijau-gelap)}
+.daftar-poin{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px}
+.poin{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;
+      background:#FAFCFB;border:1px solid var(--garis);font-size:13px}
+.poin .nama{flex:1}
+.poin .angka{font-size:11.5px;color:var(--teks-abu);font-variant-numeric:tabular-nums}
+.baris-tombol{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.tbl-aksi{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:10px;
+          font-size:13.5px;font-weight:700;background:var(--hijau);color:#fff;border:0;cursor:pointer}
+.tbl-aksi.abn{background:#EFEFF2;color:var(--teks-abu);cursor:not-allowed}
+.tbl-aksi.kedua{background:#fff;color:var(--hijau-gelap);border:1.5px solid var(--hijau)}
+.kosong{background:#fff;border:1.5px dashed var(--garis);border-radius:14px;
+        padding:30px;text-align:center;color:var(--teks-abu);font-size:13.5px}
+.catatan{font-size:12.5px;color:var(--teks-abu);line-height:1.6;margin-top:16px}
+.catatan b{color:var(--hijau-gelap)}
+/* ── REVISI (08 Okt 2026) — 2 token per item, SATU dompet ── */
+.itm{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+     background:#FAFCFB;border:1.5px solid var(--garis);font-size:13px;cursor:pointer;
+     transition:border-color .15s,background .15s}
+.itm:hover{border-color:var(--hijau)}
+.itm.pilih{border-color:var(--hijau);background:var(--hijau-muda)}
+.itm input{accent-color:var(--hijau);width:16px;height:16px;flex:0 0 auto}
+.itm .nama{flex:1}
+.itm .harga{font-size:11.5px;color:var(--teks-abu);font-weight:600;white-space:nowrap}
+/* ── TIKET LOLOS (Lapis 3, 16 Okt 2026) — elemen sudah dibayar & makna tetap ── */
+.itm.done{background:#F2F7F4;border-color:#CFE4D8;border-style:dashed;
+          cursor:default;opacity:.85}
+.itm.done:hover{border-color:#CFE4D8}
+.itm .tanda-done{display:flex;align-items:center;justify-content:center;
+                 width:16px;height:16px;flex:0 0 auto;border-radius:50%;
+                 background:var(--hijau);color:#fff}
+.itm .done-label{color:var(--hijau-gelap);text-transform:uppercase;
+                 letter-spacing:.4px;font-size:10.5px}
+.daftar-itm{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+#kotakHitung{display:flex;align-items:center;justify-content:space-between;gap:12px;
+             flex-wrap:wrap;margin-top:16px;padding:12px 16px;border-radius:10px;
+             background:var(--hijau-muda);border:1px solid #BFE3CC;font-size:13.5px}
+#kotakHitung b{font-size:17px;color:var(--hijau-gelap)}
+textarea#catatanRev{width:100%;margin-top:12px;padding:11px 13px;border-radius:10px;
+     border:1.5px solid var(--garis);font-family:inherit;font-size:13px;resize:vertical;
+     min-height:70px;color:var(--teks)}
+textarea#catatanRev:focus{outline:0;border-color:var(--hijau)}
+</style>
+</head>
+<body>
+{{ ikon_sprite() }}
+<header>
+  <div class="nav">
+    <a href="/naskah"><img src="/static/logo-320.png" alt="EduAi Publishing"></a>
+    <div class="nav-kanan">
+      <span class="nama">{{ user.nama or user.email }}</span>
+      <a href="/keluar" class="keluar">Keluar</a>
+    </div>
+  </div>
+</header>
+
+<div class="wadah">
+  {% set menu_aktif = 'artikel' %}
+  {% include '_menu.html' %}
+
+  <a href="/artikel" class="kembali">{{ ikon('arrow-left', 15) }} Kembali ke Artikel Jurnal</a>
+  <h1>{{ ikon('sparkles', 22) }} Konversi ke Artikel Jurnal</h1>
+  <p class="sub">{{ berkas.nama or 'Naskah' }}</p>
+
+  {% if not naskah_ada %}
+    <div class="pesan tidak">{{ ikon('info', 15) }} {{ pesan }}</div>
+    <div class="kosong">Naskah yang bisa dikonversi harus punya teks
+      (.docx · .odt · .txt · .md).</div>
+
+  {% else %}
+
+    {# ══ PAGAR ①②③ — hasil dari periksa_sebelum_konversi ══ #}
+    {% if siap.henti %}
+      <div class="pesan henti">{{ ikon('shield-alert', 15) }} {{ siap.pesan }}</div>
+
+    {% elif not siap.boleh %}
+      <div class="pesan tidak">{{ ikon('info', 15) }}
+        {{ siap.pesan or 'Naskah belum siap dikonversi.' }}</div>
+
+    {% else %}
+
+      {# ══ JEMBATAN BAB KURANG (15 Okt 2026) — putusan Bos: TOMBOL SALAH SATU ══
+         Kalau bab belum lengkap → layar HANYA menampilkan jalan ke perbaikan.
+         Tombol konversi & revisi DISEMBUNYIKAN (jangan dua tombol bersamaan:
+         user bingung + sistem salah identifikasi naskah). #}
+      {% set kurang_bab = siap.kelengkapan.kurang if siap.kelengkapan else [] %}
+      {% if kurang_bab %}
+        <div class="kotak">
+          <h2>{{ ikon('shield-alert', 17) }} Naskah Belum Lengkap</h2>
+          <div class="pesan tidak" style="margin-top:0">
+            {{ ikon('info', 15) }} Bagian yang belum ada di naskah:
+            <b>{{ kurang_bab | map('label_bagian') | join(' · ') }}</b>
+          </div>
+          <p class="catatan" style="font-style:normal">
+            Lengkapi dulu bagian di atas, lalu kembali ke halaman ini untuk
+            mengubah naskah menjadi artikel jurnal. Naskah yang lengkap
+            menghasilkan artikel yang utuh.
+          </p>
+          <div class="baris-tombol">
+            <a class="tbl-aksi" href="/kolaborasi">{{ ikon('users', 15) }} Perbaiki</a>
+            <a class="tbl-aksi kedua" href="/artikel">{{ ikon('arrow-left', 15) }} Kembali</a>
+          </div>
+        </div>
+
+      {% else %}
+
+      {# ── IDENTITAS (pagar ②) ── #}
+      <div class="kotak">
+        <h2>{{ ikon('users', 17) }} Identitas Penulis</h2>
+        <div class="baris">
+          <span class="label">Nama</span>
+          <span class="isi">{{ siap.identitas.nama or '—' }}</span>
+        </div>
+        <div class="baris">
+          <span class="label">Email</span>
+          <span class="isi">{{ siap.identitas.email or '—' }}</span>
+        </div>
+      </div>
+
+      {# ── JENIS NASKAH (otomatis, bisa ditimpa) ── #}
+      <div class="kotak">
+        <h2>{{ ikon('search', 17) }} Jenis Naskah</h2>
+        <div class="baris">
+          <span class="label">Terdeteksi</span>
+          <span class="isi">
+            <span class="pil ada">{{ label_jenis.get(siap.jenis.jenis or '', siap.jenis.jenis or '—') }}</span>
+            {% if siap.jenis.yakin is defined %}
+              <span class="angka"> (keyakinan mesin {{ '%.2f'|format(siap.jenis.yakin or 0) }})</span>
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      {# ══ PESAN MUTU — JEV SEBAGAI MATA (bukan hakim) ══ #}
+      <div class="kotak">
+        <div class="mutu-head">
+          <h2 style="margin:0">{{ ikon('clipboard-check', 17) }} Pemeriksaan Mutu Artikel</h2>
+          {% if mutu and mutu.ok %}
+            <span class="skor">Kesiapan: <b>{{ '%.0f'|format((mutu.skor or 0) * 100) }}%</b>
+              · {{ mutu.detik }} detik</span>
+          {% endif %}
+        </div>
+
+        {% if mutu and mutu.ok %}
+          {% if mutu_pesan %}
+            <div class="pesan {{ 'ya' if mutu.keputusan == 'bersih' else 'tidak' }}"
+                 style="margin-bottom:16px">{{ ikon('info', 15) }} {{ mutu_pesan }}</div>
+          {% endif %}
+
+          <div class="daftar-poin">
+            {% for nama, nilai in mutu.ada.items() %}
+              {% set kel = 'kurang' if nilai < 0.35 else ('ragu' if nilai < 0.5 else 'ada') %}
+              <div class="poin">
+                {% if kel == 'ada' %}{{ ikon('check-check', 15) }}
+                {% elif kel == 'ragu' %}{{ ikon('info', 15) }}
+                {% else %}{{ ikon('alert-triangle', 15) }}{% endif %}
+                <span class="nama">{{ nama }}</span>
+                <span class="angka">{{ '%.2f'|format(nilai) }}</span>
+              </div>
+            {% endfor %}
+          </div>
+
+          <p class="catatan">
+            {{ ikon('info', 13) }} Pemeriksaan ini <b>melaporkan apa yang ada</b>, bukan
+            menilai bagus/tidak. Yang <b>“perlu diperiksa”</b> artinya Wulan (Jev) kurang
+            yakin — silakan putuskan sendiri.
+          </p>
+
+        {% elif mutu and mutu.keputusan == 'mati' %}
+          <div class="pesan tidak" style="margin:0">{{ ikon('info', 15) }}
+            Pemeriksaan mutu sedang tidak tersedia ({{ mutu.alasan }}).
+            <b>Konversi tetap bisa dilanjutkan</b> — pemeriksaan ini hanya tambahan.</div>
+
+        {% else %}
+          <div class="pesan tidak" style="margin:0">{{ ikon('info', 15) }}
+            Pemeriksaan mutu belum bisa dijalankan untuk naskah ini.
+            <b>Konversi tetap bisa dilanjutkan.</b></div>
+        {% endif %}
+      </div>
+
+      {# ── JATAH + LANJUT ── #}
+      <div class="kotak">
+        <h2>{{ ikon('sparkles', 17) }} Lanjut Konversi</h2>
+        <div class="baris">
+          <span class="label">Sisa jatah</span>
+          <span class="isi">
+            {% if jatah.sisa > 0 %}{{ jatah.sisa }}× konversi
+            {% else %}Belum ada — beli AddOn Konversi (Rp100.000 = 1× konversi){% endif %}
+          </span>
+        </div>
+        <div class="baris">
+          <span class="label">Kalau perlu direvisi</span>
+          <span class="isi">{{ token_per_revisi }} Token per 1× revisi</span>
+        </div>
+
+        <div class="baris-tombol">
+          {% if jatah.sisa > 0 %}
+            <form method="post" action="/artikel/{{ berkas.id }}/konversi" style="margin:0">
+              <button type="submit" class="tbl-aksi">
+                {{ ikon('sparkles', 15) }} Mulai Konversi (1 jatah)
+              </button>
+            </form>
+          {% else %}
+            <span class="tbl-aksi abn">{{ ikon('lock', 15) }} Jatah habis</span>
+          {% endif %}
+          <a class="tbl-aksi kedua" href="/artikel">{{ ikon('arrow-left', 15) }} Batal</a>
+        </div>
+
+        <p class="catatan">
+          {{ ikon('info', 13) }} Hasil konversi <b>langsung bisa dilihat (preview)</b>.
+          Jatah terpakai saat preview dibuka. Kalau mau diubah, revisi memakai
+          <b>Token Revisi</b>.
+        </p>
+      </div>
+
+      {# ══ REVISI PER-BAGIAN — harga ikut `it.token` (bertingkat 2/3/5) ══ #}
+      {% if artikel_ada and daftar_revisi %}
+      <div class="kotak">
+        <h2>{{ ikon('sparkles', 17) }} Perbaiki Sebagian (Revisi)</h2>
+        <p class="catatan" style="margin-top:0;margin-bottom:14px">
+          Pilih bagian yang mau diperbaiki. Biaya tiap bagian <b>tertulis di
+          sebelahnya</b> — bagian yang <i>tidak</i> dipilih tidak akan disentuh.
+          Saldomu sekarang: <b>{{ saldo_revisi }}</b> Token.
+        </p>
+
+        <div class="daftar-itm">
+          {% for it in daftar_revisi %}
+            {% if it.ada and it.done %}
+            {#  ☑ DONE — sudah dibayar & makna bab masih sama (Tiket Lolos,
+                Lapis 3, putusan Bos 16 Okt 2026). TETAP DITAMPILKAN supaya
+                user tahu sudah lunas, TANPA kotak centang (tidak bisa
+                dipilih lagi). #}
+            <div class="itm done" title="Sudah termasuk revisi yang kamu bayar">
+              <span class="tanda-done">{{ ikon('check', 14) }}</span>
+              <span class="nama">{{ it.label }}</span>
+              <span class="harga done-label">Done</span>
+            </div>
+            {% elif it.ada %}
+            <label class="itm" data-token="{{ it.token }}">
+              <input type="checkbox" value="{{ it.kunci }}" class="centangRev">
+              <span class="nama">{{ it.label }}</span>
+              <span class="harga">{{ it.token }} Token</span>
+            </label>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <textarea id="catatanRev" placeholder="Catatan tambahan (boleh dikosongkan) — misal: 'pakai bahasa lebih sederhana'"></textarea>
+
+        <div id="kotakHitung">
+          <span>Terpilih: <b id="jmlItem">0</b> bagian ·
+            biaya <b id="jmlToken">0</b> Token Revisi</span>
+          <button type="button" class="tbl-aksi" id="btnRev">
+            {{ ikon('sparkles', 15) }} Perbaiki Bagian Terpilih
+          </button>
+        </div>
+
+        <p class="catatan" id="pesanRev" style="display:none"></p>
+        <p class="catatan">
+          {{ ikon('info', 13) }} Token dipotong di server saat revisi mulai.
+          Kalau gagal <b>teknis</b>, token dikembalikan penuh. Hasil revisi
+          langsung jadi artikel sekarang — <b>tidak ada tombol batal</b>.
+        </p>
+      </div>
+      {% endif %}
+
+      {% endif %}{# ← tutup JEMBATAN BAB KURANG (15 Okt 2026) #}
+
+    {% endif %}
+  {% endif %}
+</div>
+
+{% if artikel_ada and daftar_revisi %}
+<script>
+(function () {
+  var kotak = document.querySelectorAll('.centangRev');
+  var jmlItem = document.getElementById('jmlItem');
+  var jmlToken = document.getElementById('jmlToken');
+  var btn = document.getElementById('btnRev');
+  var pesan = document.getElementById('pesanRev');
+
+  function hitung() {
+    var n = 0, t = 0;
+    kotak.forEach(function (c) {
+      var induk = c.closest('.itm');
+      if (c.checked) {
+        n += 1;
+        t += parseInt(induk.dataset.token || '0', 10);
+        induk.classList.add('pilih');
+      } else {
+        induk.classList.remove('pilih');
+      }
+    });
+    jmlItem.textContent = n;
+    jmlToken.textContent = t;
+    btn.disabled = n === 0;
+    btn.classList.toggle('abn', n === 0);
+    return n;
+  }
+
+  kotak.forEach(function (c) { c.addEventListener('change', hitung); });
+  hitung();
+
+  btn.addEventListener('click', function () {
+    var pilih = [];
+    kotak.forEach(function (c) { if (c.checked) pilih.push(c.value); });
+    if (!pilih.length) { return; }
+
+    var biaya = jmlToken.textContent;
+    if (!confirm('Perbaiki ' + pilih.length + ' bagian dengan biaya ' +
+                 biaya + ' Token Revisi?\n\nToken dipotong sekarang dan ' +
+                 'tidak bisa dibatalkan.')) { return; }
+
+    btn.disabled = true;
+    pesan.style.display = 'block';
+    pesan.textContent = 'Sedang memperbaiki… jangan tutup halaman ini.';
+
+    fetch('/artikel/{{ berkas.id }}/revisi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pilihan: pilih,
+        catatan: (document.getElementById('catatanRev') || {}).value || ''
+      })
+    }).then(function (r) {
+      return r.json().then(function (j) { return { ok: r.ok, isi: j }; });
+    }).then(function (h) {
+      if (h.ok && h.isi.ok) {
+        pesan.textContent = h.isi.pesan || 'Revisi selesai.';
+        //  Muat ulang supaya hasil baru tampil (naskah & artikel dari server).
+        setTimeout(function () { location.reload(); }, 1200);
+      } else {
+        var d = h.isi.detail || h.isi || {};
+        pesan.textContent = d.pesan || 'Revisi belum berhasil.';
+        btn.disabled = false;
+      }
+    }).catch(function (e) {
+      pesan.textContent = 'Koneksi bermasalah: ' + e.message;
+      btn.disabled = false;
+    });
+  });
+})();
+</script>
+{% endif %}
+</body>
+</html>

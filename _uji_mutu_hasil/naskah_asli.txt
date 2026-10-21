@@ -1,0 +1,893 @@
+PENGARUH KUALITAS KEHIDUPAN KERJA DAN EFIKASI
+
+DIRI DIGITAL TERHADAP KINERJA ADAPTIF DENGAN
+
+KESIAPAN DIGITAL SEBAGAI VARIABEL MEDIASI
+
+(Studi pada Account Officer PT JNE Wilayah Lampung)
+
+PROPOSAL TESIS
+
+Diajukan sebagai salah satu syarat untuk memperoleh gelar Magister Manajemen
+
+Disusun oleh:
+
+GORAS KARINDRA SIDANTA
+
+NIM : 202420061
+
+PROGRAM STUDI MAGISTER MANAJEMEN
+
+FAKULTAS EKONOMI DAN BISNIS
+
+UNIVERSITAS PELITA BANGSA
+
+CIKARANG
+
+2026
+
+LEMBAR PERSETUJUAN PEMBIMBING
+
+Yang bertanda tangan di bawah ini, Dosen Pembimbing Tesis:
+
+Nama Mahasiswa
+
+: Goras Karindra Sidanta
+
+NIM
+
+: 202420061
+
+Program Studi
+
+: Magister Manajemen
+
+Fakultas
+
+: Ekonomi dan Bisnis
+
+Judul Tesis
+
+: Peran Digital Readiness dalam Memediasi Pengaruh Quality of Work Life dan Digital Self-Efficacy terhadap Adaptive Performance Account Officer PT JNE Wilayah Lampung
+
+Menyatakan bahwa, berdasarkan proses dan hasil bimbingan selama ini, serta dilakukan perbaikan, maka yang bersangkutan dapat mendaftarkan diri untuk mengikuti Sidang Tesis pada Program Studi Magister Manajemen Fakultas Ekonomi dan Bisnis Universitas Pelita Bangsa.
+
+Bekasi, (......)
+
+Pembimbing,
+
+(......)
+
+NIDN: (......)
+
+LEMBAR PENGESAHAN TESIS
+
+TESIS
+
+PERAN DIGITAL READINESS DALAM MEMEDIASI PENGARUH QUALITY OF WORK LIFE DAN DIGITAL SELF-EFFICACY TERHADAP ADAPTIVE PERFORMANCE ACCOUNT OFFICER PT JNE WILAYAH LAMPUNG
+
+(Studi pada Account Officer PT JNE Wilayah Lampung)
+
+Dipersiapkan dan disusun oleh:
+
+Goras Karindra Sidanta
+
+202420061
+
+Telah dipertahankan di depan Dewan Penguji Tesis pada (......) dan dinyatakan telah diterima sebagai salah satu persyaratan untuk memperoleh gelar Magister Manajemen.
+
+SUSUNAN DEWAN PENGUJI TESIS
+
+Ketua Penguji
+
+(......)
+
+NIDN: (......)
+
+Penguji I
+
+(......)
+
+NIDN: (......)
+
+Penguji II
+
+(......)
+
+NIDN: (......)
+
+Pembimbing
+
+(......)
+
+NIDN: (......)
+
+Mengetahui,
+
+Dekan Fakultas Ekonomi dan Bisnis
+
+(......)
+
+NIDN: (......)
+
+Ketua Program Studi Magister Manajemen
+
+(......)
+
+NIDN: (......)
+
+PERNYATAAN KEASLIAN TESIS
+
+Saya yang bertanda tangan di bawah ini:
+
+Nama
+
+: Goras Karindra Sidanta
+
+NIM
+
+: 202420061
+
+Program Studi
+
+: Magister Manajemen
+
+Fakultas
+
+: Ekonomi dan Bisnis
+
+Menyatakan dengan sesungguhnya bahwa tesis yang saya susun sebagai syarat untuk memperoleh gelar Magister Manajemen pada Universitas Pelita Bangsa seluruhnya merupakan hasil karya saya sendiri.
+
+Adapun bagian-bagian tertentu dalam penulisan tesis yang saya kutip dari hasil karya orang lain telah dituliskan sumbernya secara jelas sesuai dengan norma, kaidah, dan etika penulisan ilmiah.
+
+Apabila di kemudian hari ditemukan seluruh atau sebagian tesis ini bukan hasil karya saya sendiri atau adanya plagiat dalam bagian-bagian tertentu, saya bersedia menerima sanksi pencabutan gelar akademik yang saya sandang dan sanksi-sanksi lainnya sesuai dengan peraturan perundang-undangan yang berlaku.
+
+Bekasi, (......)
+
+Yang menyatakan,
+
+Goras Karindra Sidanta
+
+NIM: 202420061
+
+MOTTO DAN PERSEMBAHAN
+
+“Sesungguhnya sesudah kesulitan itu ada kemudahan, maka apabila kamu telah selesai (dari sesuatu urusan), kerjakanlah dengan sungguh-sungguh (urusan) yang lain, dan hanya kepada Tuhanmulah hendaknya kamu berharap.”
+
+(QS. Al-Insyirah: 6-8)
+
+“Ilmu tanpa amal bagaikan pohon tanpa buah. Belajar bukan sekadar mengetahui, melainkan menyiapkan diri agar setiap langkah membawa manfaat bagi sesama.”
+
+Karya tesis ini penulis persembahkan kepada:
+
+1.  Allah SWT, atas segala rahmat, hidayah, dan kekuatan yang tiada henti diberikan sehingga penulis mampu menyelesaikan penyusunan tesis ini.
+
+2.  Kedua orang tua tercinta, Ayahanda (......) dan Ibunda (......), yang tiada henti memanjatkan doa, memberikan kasih sayang, serta menjadi sumber kekuatan terbesar dalam setiap langkah penulis.
+
+3.  Istri tercinta, (......), yang senantiasa mendampingi, menguatkan, dan sabar menemani penulis melewati seluruh proses penyusunan tesis ini.
+
+4.  Anak tersayang, (......), yang menjadi penyemangat dan alasan penulis untuk terus melangkah serta menyelesaikan setiap tanggung jawab dengan sebaik-baiknya.
+
+5.  Rektor, Dekan Fakultas Ekonomi dan Bisnis, Ketua Program Studi Magister Manajemen, beserta seluruh jajaran Universitas Pelita Bangsa atas kesempatan, fasilitas, dan dukungan yang diberikan selama masa perkuliahan.
+
+6.  Dosen pembimbing, (......), atas bimbingan, arahan, koreksi, dan kesabaran yang diberikan sehingga tesis ini dapat diselesaikan dengan baik.
+
+7.  Para dosen dan staf pengajar Program Studi Magister Manajemen Fakultas Ekonomi dan Bisnis Universitas Pelita Bangsa atas ilmu dan wawasan yang telah dibagikan.
+
+8.  Saudara, keluarga, sahabat, serta rekan-rekan seperjuangan yang telah memberikan semangat, bantuan, dan doa selama proses penyusunan tesis ini.
+
+KATA PENGANTAR
+
+Puji dan syukur penulis panjatkan kepada Allah SWT atas segala rahmat dan karunia-Nya sehingga penulis dapat menyelesaikan tesis yang berjudul “Peran Digital Readiness dalam Memediasi Pengaruh Quality of Work Life dan Digital Self-Efficacy terhadap Adaptive Performance Account Officer PT JNE Wilayah Lampung”. Penyusunan tesis ini merupakan salah satu persyaratan untuk memperoleh gelar Magister Manajemen pada Program Studi Magister Manajemen Fakultas Ekonomi dan Bisnis Universitas Pelita Bangsa.
+
+Penulis menyadari bahwa tesis ini dapat diselesaikan berkat dukungan dari berbagai pihak. Oleh karena itu, penulis mengucapkan terima kasih dan penghargaan yang setinggi-tingginya kepada:
+
+1.  Rektor Universitas Pelita Bangsa, (......), beserta seluruh jajaran pimpinan atas kesempatan dan fasilitas yang diberikan selama masa perkuliahan.
+
+2.  Dekan Fakultas Ekonomi dan Bisnis Universitas Pelita Bangsa, (......), atas izin, dukungan, dan fasilitas yang diberikan kepada penulis.
+
+3.  Ketua Program Studi Magister Manajemen, (......), beserta seluruh staf atas arahan dan kemudahan yang diberikan selama proses penyusunan tesis ini.
+
+4.  Dosen pembimbing, (......), atas bimbingan, arahan, koreksi, kesabaran, serta motivasi yang diberikan sehingga tesis ini dapat diselesaikan dengan baik.
+
+5.  Seluruh dosen dan staf pengajar Program Studi Magister Manajemen Fakultas Ekonomi dan Bisnis Universitas Pelita Bangsa atas ilmu dan wawasan yang telah dibagikan.
+
+6.  Kedua orang tua tercinta, beserta istri dan anak penulis, atas doa, kasih sayang, dan dukungan yang tiada henti sehingga penulis mampu menyelesaikan studi ini.
+
+7.  Rekan-rekan seperjuangan serta semua pihak yang tidak dapat penulis sebutkan satu per satu, atas semangat, bantuan, dan doa yang diberikan.
+
+Penulis menyadari bahwa tesis ini masih memiliki keterbatasan. Oleh karena itu, saran dan kritik yang membangun sangat penulis harapkan demi penyempurnaan karya ini. Semoga tesis ini memberikan manfaat bagi pengembangan ilmu pengetahuan dan praktik manajemen sumber daya manusia.
+
+Bekasi, (......)
+
+Penulis,
+
+Goras Karindra Sidanta
+
+NIM: 202420061
+
+DAFTAR ISI
+
+LEMBAR PERSETUJUAN PEMBIMBING2
+
+LEMBAR PENGESAHAN TESIS3
+
+PERNYATAAN KEASLIAN TESIS4
+
+MOTTO DAN PERSEMBAHAN5
+
+KATA PENGANTAR7
+
+DAFTAR ISI...
+
+DAFTAR GAMBAR10
+
+DAFTAR TABEL11
+
+BAB I  PENDAHULUAN12
+
+1.1  Latar Belakang Masalah12
+
+1.2  Rumusan Masalah22
+
+1.3  Tujuan Penelitian23
+
+1.4  Manfaat Penelitian24
+
+1.5  State of the Art Penelitian29
+
+1.6  Kesenjangan Penelitian (Research Gap)30
+
+1.7  Kerangka Pemikiran dan Pengembangan Hipotesis34
+
+1.8  Batasan dan Asumsi Penelitian40
+
+1.9  Sistematika Penulisan41
+
+DAFTAR PUSTAKA43
+
+DAFTAR GAMBAR
+
+Gambar 1.1Nilai PDB Pergudangan, Jasa Penunjang Angkutan, Pos dan Kurir Indonesia, 2015–2024 3
+
+Gambar 1.2Proyeksi Pendapatan Pasar Logistik Indonesia 2020–2029 4
+
+Gambar 1.3Kerangka Pemikiran Penelitian 25
+
+DAFTAR TABEL
+
+Tabel 1.1Hasil Pra-Survey terhadap 40 Account Officer PT JNE Wilayah Lampung 9
+
+Tabel 1.2State of the Art Penelitian 19
+
+Tabel 1.3Kesenjangan Penelitian 22
+
+BAB I
+
+PENDAHULUAN
+
+1.1  Latar Belakang Masalah
+
+Perkembangan pesat teknologi dan transformasi digital telah mengubah lanskap kerja organisasi secara mendasar dalam satu dekade terakhir. Organisasi di seluruh dunia dituntut memastikan karyawannya memiliki kapabilitas adaptif yang tinggi agar tetap relevan dan berkelanjutan di tengah perubahan yang berlangsung cepat (Metris et al., 2025). Pergeseran paradigma ini menegaskan urgensi pengembangan sumber daya manusia yang tidak hanya kompeten secara teknis, tetapi juga resilien terhadap perubahan serta mampu mengoptimalkan perangkat digital untuk mencapai kinerja yang optimal (Kurnia Sari et al., 2025). Dengan kata lain, kemampuan beradaptasi telah bergeser dari sekadar kompetensi pelengkap menjadi prasyarat utama keberlangsungan organisasi.
+
+Pergeseran tersebut berdampak langsung pada sektor jasa, khususnya logistik dan ekspedisi, yang berperan sebagai tulang punggung perekonomian nasional. Dinamika pertumbuhan sektor ini dapat dilihat dari nilai Produk Domestik Bruto (PDB) pergudangan, jasa penunjang angkutan, pos, dan kurir sepanjang sepuluh tahun terakhir, sebagaimana disajikan pada Gambar 1.1.
+
+Gambar 1.1.  Nilai PDB Pergudangan, Jasa Penunjang Angkutan, Pos dan Kurir 2015–2024
+
+Sumber: Badan Pusat Statistik (BPS), dipublikasikan Techinasia (2025)
+
+Gambar 1.1 memperlihatkan tren pertumbuhan yang konsisten pada nilai PDB sektor logistik Indonesia. Pada tahun 2015 nilai PDB tercatat sebesar Rp93,5 triliun dan terus meningkat hingga mencapai Rp153,1 triliun pada 2019. Tahun 2020 sempat mengalami penurunan menjadi Rp131,6 triliun akibat pembatasan mobilitas selama pandemi COVID-19, namun sektor ini segera pulih, sebagaimana tercermin pada angka Rp141,5 triliun di 2021 dan Rp208,5 triliun di 2022. Lonjakan paling signifikan terjadi pada periode 2022–2024, ketika nilai PDB melesat dari Rp208,5 triliun menjadi Rp282,9 triliun. Pola pemulihan yang cepat ini menegaskan bahwa aktivitas logistik justru menjadi penopang utama perekonomian digital ketika saluran perdagangan bergeser ke ranah daring.
+
+Prospek sektor ini diperkirakan akan terus menguat. Proyeksi pendapatan pasar logistik Indonesia untuk periode 2020–2029 disajikan pada Gambar 1.2.
+
+Gambar 1.2.  Proyeksi Pendapatan Pasar Logistik Indonesia 2020–2029
+
+Sumber: Statista Market Insight, dipublikasikan Techinasia (2025)
+
+Gambar 1.2 menunjukkan bahwa pendapatan pasar logistik Indonesia dimulai dari US$233 miliar pada 2020, melonjak tajam menjadi US$350,4 miliar pada 2021 sebagai puncak adaptasi digital ketika ketergantungan masyarakat pada pengiriman barang mencapai titik tertinggi. Tahun 2022 terjadi normalisasi menjadi US$293,5 miliar seiring dibukanya kembali aktivitas luring pasca-pandemi, sebelum akhirnya bergerak stabil pada kisaran US$301,4 miliar (2023) dan diproyeksikan terus tumbuh hingga mencapai US$344,2 miliar pada 2029. Pola ini menandakan bahwa pertumbuhan sektor logistik bukanlah fenomena sesaat, melainkan struktur ekonomi yang telah mapan.
+
+Konsekuensinya, perusahaan logistik tidak hanya dituntut memiliki infrastruktur yang kuat, tetapi juga sumber daya manusia yang mampu beradaptasi cepat terhadap perubahan perilaku konsumen dan perkembangan teknologi (Dâmbean & Gabor, 2022). Tuntutan ganda inilah yang menjadikan kapabilitas adaptif sumber daya manusia sebagai faktor penentu daya saing perusahaan logistik.
+
+Kapabilitas tersebut diwujudkan pada level individu dalam bentuk adaptive performance, yaitu seperangkat keterampilan multidimensi yang mencakup fleksibilitas kognitif, pemecahan masalah, kreativitas, efektivitas interpersonal, dan pengaturan emosi (Pulakos et al., 2000). Kemampuan ini tidak terbentuk secara otomatis, melainkan didorong oleh faktor-faktor fundamental dari sisi kondisi kerja maupun kapasitas diri individu. Dua faktor yang menjadi fokus penelitian ini adalah quality of work life dan digital self-efficacy.
+
+Quality of work life (QWL) mencerminkan kelayakan fasilitas kerja, kompensasi yang adil, jaminan keamanan, serta keseimbangan antara kehidupan kerja dan pribadi. Ketika karyawan merasa didukung secara psikologis melalui lingkungan kerja yang kondusif, mereka cenderung lebih terbuka terhadap perubahan dan lebih siap menghadapi tantangan baru (Leitão et al., 2019). Dalam kerangka Conservation of Resources (COR) Theory, QWL berfungsi sebagai sumber daya kondisional yang memungkinkan karyawan menginvestasikan energi ke dalam perilaku kerja adaptif, alih-alih menghabiskannya untuk bertahan menghadapi tekanan.
+
+Faktor kedua yang menjadi fokus penelitian ini adalah digital self-efficacy mencerminkan keyakinan individu terhadap kemampuannya mengoperasikan teknologi, memecahkan masalah teknis, dan memanfaatkan sistem digital dalam pekerjaan. Keyakinan ini memperkuat kepercayaan diri karyawan dalam menghadapi pembaruan sistem dan perubahan prosedur berbasis teknologi (Sun & Yoon, 2025). Merujuk Social Cognitive Theory (Bandura, 2001), efikasi diri merupakan penentu utama tindakan individu: karyawan dengan keyakinan diri digital yang tinggi lebih mungkin mengambil inisiatif, menguasai sistem baru, dan menyesuaikan cara kerja mereka ketika menghadapi tuntutan yang berubah.
+
+QWL dan digital self-efficacy secara bersama-sama mendorong terbentuknya digital readiness, yaitu kapasitas dan kemauan karyawan untuk mengadopsi serta memanfaatkan teknologi digital guna meningkatkan performa (Nasution et al., 2018). Dalam model penelitian ini, digital readiness ditempatkan sebagai variabel mediasi yang menjembatani kondisi kerja dan kapasitas diri karyawan dengan adaptive performance.
+
+Terdapat tiga argumen yang mendasari penempatan tersebut. Pertama, dalam kerangka COR Theory, digital readiness berperan sebagai sumber daya digital yang memungkinkan karyawan mengubah sumber daya yang dimiliki, berupa kondisi kerja yang kondusif, menjadi perilaku yang bernilai, yaitu adaptive performance. Karyawan yang memiliki QWL baik tetapi tidak memiliki kesiapan digital akan kesulitan mengaktualisasikan potensinya dalam menghadapi perubahan teknologi. Kedua, mengacu pada Social Cognitive Theory, jalur efikasi diri → kesiapan → tindakan menjelaskan bahwa keyakinan diri digital saja tidak cukup; ia perlu dikonversi menjadi kesiapan nyata untuk mengadopsi sistem baru sebelum akhirnya tampil dalam performa adaptif. Ketiga, secara empiris, penelitian sebelumnya cenderung menempatkan digital readiness sebagai variabel independen atau dependen (Palapa & Saragih, 2026; Nasution et al., 2018), bukan sebagai mediator dalam hubungan antara kondisi kerja dan kinerja adaptif individu. Posisi digital readiness dalam model ini karenanya merupakan penelusuran mekanisme yang belum banyak dikaji.
+
+Mekanisme konversi yang belum banyak dikaji tersebut pada akhirnya bermuara pada satu pertanyaan empiris: bagaimana ia bekerja pada karyawan yang menghadapi perubahan sistem dan tuntutan pelanggan secara langsung. Untuk menjawabnya, penelitian ini memilih setting yang relevan, yaitu perusahaan logistik ekspedisi. PT Tiki Jalur Nugraha Ekakurir (JNE), berdiri sejak 1990, merupakan salah satu pemain utama industri logistik Indonesia dengan jaringan distribusi lebih dari 6.000 titik layanan serta layanan unggulan seperti JNE REG, YES (Yakin Esok Sampai), dan JTR (JNE Trucking). Sebagai pintu gerbang Pulau Sumatera, Provinsi Lampung memiliki posisi geopolitik krusial dalam arus distribusi barang nasional sehingga peran JNE menjadi sangat vital. PT JNE Wilayah Lampung berpusat di Kota Bandar Lampung dengan 18 cabang di setiap kabupaten dan mempekerjakan total 335 karyawan, 45% di antaranya (sekitar 150 orang) berperan sebagai Account Officer.
+
+Account Officer (AO) menempati posisi sentral karena menjadi penghubung antara kepentingan perusahaan dengan pengguna jasa. Di lingkungan bisnis logistik, AO tidak hanya bertugas mencari pelanggan baru dan menutup kesepakatan, tetapi juga memelihara hubungan jangka panjang, memastikan layanan sesuai kebutuhan pelanggan, dan mendorong pertumbuhan bisnis. Dalam era yang dinamis, AO dihadapkan pada tekanan target yang tinggi dan perubahan sistem digital yang konstan. Tanpa adaptive performance yang memadai, AO berisiko mengalami penurunan efektivitas kerja dan kegagalan merespons kebutuhan pasar, yang pada akhirnya mengancam keberlanjutan bisnis.
+
+Kondisi awal pada objek penelitian dipetakan melalui pra-survey kepada 40 orang Account Officer PT JNE Wilayah Lampung. Hasil pra-survey (Tabel 1.1) menunjukkan bahwa secara umum modal awal karyawan tergolong kuat: 96,30% responden menyatakan kompensasi dan jaminan keamanan kerja sebanding dengan beban tugas, 96,30% merasakan keseimbangan kerja-hidup yang baik, serta 100% merasa yakin mampu mengoperasikan sistem atau aplikasi baru yang diperkenalkan perusahaan. Pada skala 1–5, dimensi quality of work life memperoleh skor rata-rata 4,11 (82,2%), digital self-efficacy 4,17 (83,5%), dan adaptive performance justru memperoleh skor tertinggi, yaitu 4,41 (88,1%), sebuah temuan yang perlu dibaca secara cermat sebab tingginya skor persepsi kinerja adaptif tidak otomatis menghapus kebutuhan menguji mekanisme pembentuknya.
+
+Pra-survey tersebut juga mengungkap titik lemah yang signifikan. Pada aspek kecepatan mempelajari peran atau tanggung jawab baru saat terjadi rotasi atau perubahan struktur, indikator yang mencerminkan kesiapan digital, tercatat 25,93% responden menyatakan ragu-ragu, angka keraguan tertinggi di antara seluruh sepuluh indikator yang diukur. Indikator tersebut hanya memperoleh skor 3,96 (79,3%) dengan proporsi setuju dan sangat setuju sebesar 73,80%, terendah di antara semua indikator. Selain itu, 11,11% responden menyatakan ketidakpuasan terhadap fasilitas kerja dan 11,11% meragukan efektivitas pelatihan teknologi yang diberikan perusahaan.
+
+Tabel 1.1  Hasil Pra-Survey terhadap 40 Account Officer PT JNE Wilayah Lampung
+
+No
+
+Pertanyaan
+
+Var.
+
+STS
+
+TS
+
+RG
+
+S
+
+SS
+
+1
+
+Fasilitas dan lingkungan kerja sudah mendukung kenyamanan bekerja secara maksimal
+
+QWL
+
+3,70%
+
+7,41%
+
+7,41%
+
+59,26%
+
+22,22%
+
+2
+
+Perusahaan memberikan kompensasi dan jaminan keamanan kerja yang sebanding dengan beban tugas
+
+QWL
+
+0,00%
+
+3,70%
+
+0,00%
+
+55,56%
+
+40,74%
+
+3
+
+Keseimbangan yang baik antara waktu bekerja dan waktu pribadi (work-life balance)
+
+QWL
+
+0,00%
+
+3,70%
+
+0,00%
+
+77,78%
+
+18,52%
+
+4
+
+Keyakinan mampu mengoperasikan sistem atau aplikasi baru tanpa kendala berarti
+
+DSE
+
+0,00%
+
+0,00%
+
+0,00%
+
+74,07%
+
+25,93%
+
+5
+
+Kemampuan memecahkan masalah teknis (troubleshooting) sederhana pada perangkat digital kerja
+
+DSE
+
+0,00%
+
+0,00%
+
+3,70%
+
+74,07%
+
+22,22%
+
+6
+
+Pelatihan teknologi yang diberikan sudah cukup meningkatkan kepercayaan diri bekerja secara digital
+
+DSE
+
+0,00%
+
+3,70%
+
+11,11%
+
+59,26%
+
+25,93%
+
+7
+
+Tetap bekerja efektif meskipun terjadi perubahan prosedur kerja secara mendadak
+
+AP
+
+0,00%
+
+0,00%
+
+3,70%
+
+51,85%
+
+44,44%
+
+8
+
+Aktif mencari cara atau metode baru saat sistem logistik mengalami pembaruan
+
+AP
+
+0,00%
+
+0,00%
+
+3,70%
+
+51,85%
+
+44,44%
+
+9
+
+Tetap tenang dan fokus menyelesaikan target meski di bawah tekanan tinggi
+
+AP
+
+0,00%
+
+0,00%
+
+3,70%
+
+51,85%
+
+44,44%
+
+10
+
+Kecepatan mempelajari peran atau tanggung jawab baru saat rotasi atau perubahan struktur
+
+DR
+
+0,00%
+
+0,00%
+
+25,93%
+
+51,58%
+
+22,22%
+
+Sumber: Data primer diolah peneliti (2026). STS = Sangat Tidak Setuju; TS = Tidak Setuju; RG = Ragu-ragu; S = Setuju; SS = Sangat Setuju. Skala Likert 1–5; n = 40.
+
+Temuan ini mengindikasikan bahwa meskipun quality of work life dan digital self-efficacy Account Officer relatif baik, masih terdapat kesenjangan pada aspek kesiapan digital, khususnya kemampuan mengonversi keyakinan diri menjadi kelincahan belajar dalam menghadapi perubahan peran. Inilah celah yang diduga menjembatani modal awal karyawan dengan adaptive performance mereka.
+
+Kajian literatur menunjukkan bahwa penelitian mengenai adaptive performance terus berkembang, namun menyisakan beberapa kesenjangan signifikan. Pertama, sebagian besar penelitian menempatkan kesiapan digital sebagai variabel independen atau dependen, bukan sebagai mediator dalam hubungan antara kondisi kerja dan kinerja karyawan. Kedua, studi adaptive performance masih dominan pada sektor pendidikan dan manufaktur, sementara konteks sektor logistik, khususnya pada level tenaga penjualan lapangan, masih terbatas (Setiyadi et al., 2024; Sitorus et al., 2026). Ketiga, penelitian yang berfokus pada Account Officer perusahaan ekspedisi di wilayah Lampung hampir tidak ditemukan dalam literatur.
+
+Kebaruan penelitian ini terletak pada tiga hal. Pertama, dari sisi konteks, penelitian ini mengkaji adaptive performance pada Account Officer perusahaan ekspedisi di Provinsi Lampung, sebuah konteks yang belum banyak diteliti. Kedua, dari sisi kombinasi model, penelitian ini menguji quality of work life sebagai faktor kondisi kerja dan digital self-efficacy sebagai faktor kapasitas diri secara simultan dalam memengaruhi adaptive performance melalui digital readiness, kombinasi yang belum banyak diuji secara bersama-sama. Ketiga, dari sisi teori, penelitian ini mengintegrasikan Conservation of Resources Theory dan Social Cognitive Theory untuk menjelaskan mekanisme konversi sumber daya dalam pembentukan kinerja adaptif pada level individu.
+
+Berdasarkan uraian tersebut, peneliti tertarik untuk mengkaji secara mendalam bagaimana quality of work life dan digital self-efficacy memengaruhi adaptive performance melalui mediasi digital readiness pada Account Officer PT JNE Wilayah Lampung. Maka penelitian ini diberi judul:
+
+"Peran Digital Readiness dalam Memediasi Pengaruh Quality of Work Life dan Digital Self-Efficacy terhadap Adaptive Performance Account Officer PT JNE Wilayah Lampung"
+
+1.2  Rumusan Masalah
+
+Berdasarkan uraian latar belakang, penelitian ini mengkaji bagaimana quality of work life dan digital self-efficacy memengaruhi adaptive performance secara langsung maupun tidak langsung, dengan digital readiness sebagai variabel mediasi. Pokok permasalahan dirumuskan sebagai berikut:
+
+1.Apakah quality of work life berpengaruh terhadap adaptive performance Account Officer PT JNE Wilayah Lampung?
+
+2.Apakah digital self-efficacy berpengaruh terhadap adaptive performance Account Officer PT JNE Wilayah Lampung?
+
+3.Apakah quality of work life berpengaruh terhadap digital readiness Account Officer PT JNE Wilayah Lampung?
+
+4.Apakah digital self-efficacy berpengaruh terhadap digital readiness Account Officer PT JNE Wilayah Lampung?
+
+5.Apakah digital readiness berpengaruh terhadap adaptive performance Account Officer PT JNE Wilayah Lampung?
+
+6.Apakah digital readiness memediasi pengaruh quality of work life terhadap adaptive performance Account Officer PT JNE Wilayah Lampung?
+
+7.Apakah digital readiness memediasi pengaruh digital self-efficacy terhadap adaptive performance Account Officer PT JNE Wilayah Lampung?
+
+1.3  Tujuan Penelitian
+
+Tujuan dari penelitian ini adalah menganalisis secara empiris bagaimana quality of work life dan digital self-efficacy memengaruhi adaptive performance melalui mediasi digital readiness pada Account Officer PT JNE Wilayah Lampung. Berdasarkan rumusan masalah di atas, tujuan yang ingin dicapai adalah:
+
+1.Menganalisis dan membuktikan pengaruh quality of work life terhadap adaptive performance Account Officer PT JNE Wilayah Lampung.
+
+2.Menganalisis dan membuktikan pengaruh digital self-efficacy terhadap adaptive performance Account Officer PT JNE Wilayah Lampung.
+
+3.Menganalisis dan membuktikan pengaruh quality of work life terhadap digital readiness Account Officer PT JNE Wilayah Lampung.
+
+4.Menganalisis dan membuktikan pengaruh digital self-efficacy terhadap digital readiness Account Officer PT JNE Wilayah Lampung.
+
+5.Menganalisis dan membuktikan pengaruh digital readiness terhadap adaptive performance Account Officer PT JNE Wilayah Lampung.
+
+6.Menganalisis dan membuktikan peran digital readiness dalam memediasi pengaruh quality of work life terhadap adaptive performance Account Officer PT JNE Wilayah Lampung.
+
+7.Menganalisis dan membuktikan peran digital readiness dalam memediasi pengaruh digital self-efficacy terhadap adaptive performance Account Officer PT JNE Wilayah Lampung.
+
+1.4  Manfaat Penelitian
+
+Penelitian ini diharapkan memberikan kontribusi baik pada tataran pengembangan ilmu pengetahuan maupun pada tataran praktik manajerial, serta memperkaya khazanah akademik mengenai pengelolaan sumber daya manusia di era digital. Secara rinci, manfaat penelitian ini diuraikan ke dalam manfaat teoretis, manfaat praktis, dan manfaat akademis sebagai berikut.
+
+1.4.1  Manfaat Teoretis
+
+Penelitian ini diharapkan memperkaya khazanah keilmuan manajemen sumber daya manusia, khususnya pada kajian tentang bagaimana kondisi kerja dan kapasitas diri karyawan ditransformasikan menjadi kinerja adaptif dalam era transformasi digital. Selama ini literatur cenderung menempatkan adaptive performance sebagai luaran yang dipengaruhi secara langsung oleh faktor individual maupun organisasional, tanpa banyak menyingkap mekanisme konversi yang menjembatani keduanya. Penelitian ini mengisi celah tersebut dengan memposisikan digital readiness sebagai mekanisme penjelas.
+
+Kontribusi berikutnya terletak pada pengujian dan perluasan penerapan Conservation of Resources Theory (Hobfoll, 1989) dalam konteks organisasi jasa pengiriman di Indonesia. COR Theory memandang individu berupaya mempertahankan dan mengakumulasi sumber daya; namun teori ini belum banyak diuji secara empiris pada level tenaga penjualan (account officer) di sektor logistik. Penelitian ini menawarkan pembacaan COR dalam logika investasi sumber daya: quality of work life dan digital self-efficacy diposisikan sebagai sumber daya yang harus dikonversi terlebih dahulu menjadi kesiapan digital agar berbuah kinerja adaptif. Logika ini menegaskan proposisi penting COR bahwa kepemilikan sumber daya saja tidak cukup tanpa kapasitas mengaktivasinya.
+
+Pijakan teoretis kedua yang diperluas adalah Social Cognitive Theory (Bandura, 2001) sebagai penjelas jalur digital self-efficacy. SCT menegaskan bahwa keyakinan diri memengaruhi pilihan tindakan, intensitas usaha, dan ketekunan menghadapi hambatan. Dengan menempatkan digital readiness sebagai konsekuensi kognitif dari keyakinan diri, penelitian ini memperlihatkan bahwa efikasi diri digital bekerja melalui pembentukan kesiapan psikologis, bukan semata-mata melalui jalur langsung menuju kinerja.
+
+Model struktural yang dibangun dalam penelitian ini menempatkan satu variabel mediasi (digital readiness) dalam menjembatani dua anteseden berbeda (quality of work life dan digital self-efficacy) menuju adaptive performance. Model ini menawarkan parsimoni teoretis: alih-alih mengakumulasi mediator, penelitian ini menguji apakah satu mekanisme konversi mampu menjelaskan pengaruh kedua anteseden secara simultan. Pendekatan ini sekaligus menghindari risiko tumpang tindih konseptual antar-mediator yang kerap terjadi pada model mediasi ganda.
+
+Gagasan-gagasan tersebut pada akhirnya diharapkan menjadi acuan dan bahan perbandingan bagi peneliti berikutnya yang tertarik mengkaji topik serupa, baik pada objek, sektor industri, maupun konteks kewilayahan yang berbeda, serta membuka ruang bagi pengembangan model dengan penambahan variabel relevan lain dalam konteks digitalisasi organisasi.
+
+1.4.2  Manfaat Praktis
+
+Manajemen PT JNE Wilayah Lampung dapat memanfaatkan temuan penelitian ini sebagai masukan strategis dalam merancang kebijakan peningkatan adaptive performance account officer. Hasil penelitian dapat menunjukkan apakah intervensi sebaiknya difokuskan pada perbaikan kualitas kehidupan kerja, penguatan efikasi diri digital, atau justru pada program percepatan kesiapan digital sebagai simpul konversi. Dengan demikian, alokasi sumber daya pengembangan SDM dapat lebih tepat sasaran.
+
+Account officer dapat menjadikan temuan penelitian ini sebagai bahan refleksi mengenai pentingnya kesiapan digital sebagai jembatan antara kenyamanan bekerja dan keyakinan diri dengan kemampuan beradaptasi terhadap perubahan tuntutan kerja, terutama ketika sistem, prosedur, dan ekspektasi pelanggan berubah cepat.
+
+Industri logistik dan ekspedisi memperoleh gambaran tentang dinamika kesiapan digital tenaga penjualan di lini depan. Mengingat account officer adalah ujung tombak yang berinteraksi langsung dengan pelanggan dan menghadapi ketidakpastian permintaan, pemahaman mengenai mekanisme konversi sumber daya menjadi kinerja adaptif memiliki nilai strategis bagi pengelolaan SDM sektor ini secara lebih luas.
+
+Akademisi dan penulis turut memperoleh manfaat melalui contoh penerapan PLS-SEM dalam menguji efek mediasi melalui prosedur specific indirect effects dengan bootstrapping, sekaligus memperlihatkan pentingnya kehati-hatian dalam menetapkan spesifikasi model mediasi.
+
+1.4.3  Manfaat Akademis
+
+Penelitian ini diharapkan memperkaya khazanah literatur akademik mengenai manajemen sumber daya manusia di era digital, khususnya pada konteks tenaga penjualan jasa logistik di Indonesia. Selama ini kajian mengenai adaptive performance lebih banyak berkembang pada sektor pendidikan, manufaktur, dan perbankan, sehingga bukti empiris dari sektor logistik nasional masih terbatas. Penelitian ini menawarkan tambahan bukti empiris yang dapat dirujuk oleh kajian berikutnya.
+
+Kontribusi akademis berikutnya tampak pada integrasi lintas teori. Penelitian ini memadukan Conservation of Resources Theory dan Social Cognitive Theory dalam satu model yang saling melengkapi, sehingga memperlihatkan bagaimana sumber daya kontekstual dan keyakinan diri diproses secara bersama-sama menuju luaran kinerja. Pemaduan semacam ini jarang dijumpai dalam studi yang memisahkan kedua perspektif tersebut.
+
+Materi ajar turut memperoleh manfaat dari penelitian ini karena tersedia contoh kasus yang dapat digunakan dalam pembelajaran mata kuliah manajemen sumber daya manusia, perilaku organisasi, dan metodologi penelitian kuantitatif. Kasus mengenai mekanisme konversi sumber daya menjadi kesiapan digital dapat dijadikan bahan diskusi mahasiswa mengenai bagaimana teori organisasi diterapkan pada persoalan nyata di perusahaan jasa logistik.
+
+Pengembangan metode penelitian juga mendapat sumbangan melalui contoh penerapan PLS-SEM dalam menguji efek mediasi tunggal yang dibatasi secara sengaja (single-mediator specification). Pilihan ini memberikan gambaran bahwa parsimoni model dapat menjadi pertimbangan metodologis yang sah, bukan sekadar keterbatasan, sepanjang dilandasi argumen teoretis yang jelas.
+
+Lebih jauh, temuan penelitian ini diharapkan membuka ruang bagi penyusunan agenda penelitian lanjutan, misalnya pengujian pada sektor jasa lain dengan karakter ketidakpastian serupa, penggunaan desain longitudinal untuk menelusuri dinamika kesiapan digital, atau perluasan model dengan variabel kontekstual lain.
+
+1.5  State of the Art Penelitian
+
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini dapat dipetakan sebagai berikut.
+
+Tabel 1.2  State of the Art Penelitian
+
+Ranah
+
+Perkembangan Terkini
+
+Titik Lanjut yang Ditawarkan Penelitian Ini
+
+Quality of Work Life (QWL)
+
+QWL terbukti meningkatkan kinerja melalui keterlibatan dan kontribusi karyawan (Leitão et al., 2019); QWL diuji bersama self-efficacy terhadap kinerja (Rahardhiansyah et al., 2026; Ayuni & Nuraeni, 2026)
+
+Menguji QWL sebagai sumber daya psikologis yang dikonversi melalui kesiapan digital, bukan jalur langsung
+
+Digital Self-Efficacy (DSE)
+
+DSE memediasi pengaruh transformasi digital terhadap kinerja (Sun & Yoon, 2025); DSE sebagai anteseden pembelajaran (Shahzad et al., 2025)
+
+Memposisikan DSE sebagai anteseden kesiapan digital, bukan mediator
+
+Digital Readiness (DR)
+
+DR diuji sebagai anteseden kepuasan kerja (Palapa & Saragih, 2026); kerangka multi-level kesiapan digital (Trenerry et al., 2021)
+
+Menempatkan DR sebagai simpul konversi (mediator) antara sumber daya dan kinerja
+
+Adaptive Performance (AP)
+
+Taksonomi AP orisinal (Pulakos et al., 2000); penentu AP pada berbagai level (Setiyadi et al., 2024); AP di sektor logistik masih terbatas
+
+Menguji AP pada level individu account officer di sektor logistik Indonesia
+
+Sumber: diolah peneliti (2026).
+
+Kebaruan (novelty) penelitian ini terletak pada tiga hal: pertama, kebaruan konteks, yaitu Account Officer PT JNE Wilayah Lampung, yaitu sektor logistik ekspedisi Indonesia pada level individu di wilayah yang belum diteliti; kedua, kebaruan model, integrasi dua teori besar (COR dan SCT) dalam satu model mediasi parsimonius dengan digital readiness sebagai mediator tunggal; ketiga, kebaruan fenomena, menggeser fokus dari tingkat kinerja ke mekanisme konversi, yaitu menjelaskan bagaimana sumber daya menjadi kinerja, bukan sekadar apakah berpengaruh.
+
+1.6  Kesenjangan Penelitian (Research Gap)
+
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini menunjukkan bahwa masing-masing konstruk telah memperoleh perhatian yang memadai, namun arah pengembangannya belum bertemu pada satu model yang utuh. Kesiapan digital, misalnya, lebih banyak diposisikan sebagai variabel independen maupun konsekuensi organisasi, bukan sebagai mekanisme yang menjembatani sumber daya psikologis dengan kinerja adaptif. Kondisi ini menimbulkan sejumlah kesenjangan yang perlu diidentifikasi secara sistematis. Melalui penelusuran terhadap penelitian terdahulu (Tabel 1.3), teridentifikasi lima kesenjangan utama yang menjadi dasar dilakukannya penelitian ini.
+
+1.6.1  Kesenjangan Konteks (Contextual Gap)
+
+Mayoritas penelitian mengenai adaptive performance dilakukan pada sektor pendidikan tinggi (Sun & Yoon, 2025), manufaktur, perbankan, dan layanan publik, sebagaimana terlihat pada tinjauan sistematis Setiyadi et al. (2024). Sementara itu, penelitian pada sektor logistik ekspedisi Indonesia masih terkonsentrasi pada level kinerja operasional perusahaan (Sitorus et al., 2026), belum menyentuh level individu pada posisi yang paling rentan terhadap ketidakpastian, yaitu Account Officer. Kajian pada PT JNE Wilayah Lampung sebagai konteks spesifik sejauh penelusuran penulis belum ditemukan.
+
+1.6.2  Kesenjangan Variabel Dependen (Outcome Gap)
+
+Penelitian terdahulu cenderung menggunakan kinerja organisasi (Leitão et al., 2019), kinerja operasional (Sitorus et al., 2026), kepuasan kerja (Palapa & Saragih, 2026), atau kinerja karyawan secara umum (Khusna & Pratiwi, 2022) sebagai variabel dependen. Penggunaan adaptive performance sebagai luaran spesifik yang menangkap dimensi adaptasi terhadap perubahan, bukan sekadar pencapaian target masih relatif terbatas, khususnya pada konteks Indonesia.
+
+1.6.3  Kesenjangan Posisi Variabel (Positional Gap)
+
+Digital readiness dalam berbagai penelitian diposisikan sebagai variabel independen yang memengaruhi kepuasan kerja (Palapa & Saragih, 2026), atau sebagai konsekuensi dari faktor organisasi (Trenerry et al., 2021). Perannya sebagai mekanisme mediasi yang menjembatani sumber daya psikologis menuju kinerja masih jarang diuji. Padahal, dalam kerangka COR Theory, kesiapan digital justru berfungsi sebagai simpul konversi, tempat sumber daya diubah menjadi kapasitas adaptif yang nyata.
+
+1.6.4  Kesenjangan Kombinasi Model (Structural Gap)
+
+Beberapa penelitian telah menguji mediasi dalam konteks digitalisasi, namun dengan konfigurasi yang berbeda: work engagement sebagai mediator (Fachruddin Syah et al., 2026), readiness to change sebagai mediator (Khusna & Pratiwi, 2022), atau task-technology fit sebagai moderator (Sun & Yoon, 2025). Belum ditemukan penelitian yang menguji quality of work life dan digital self-efficacy secara simultan dengan digital readiness sebagai mediator tunggal menuju adaptive performance. Konfigurasi inilah yang mencirikan kebaruan struktural penelitian ini.
+
+1.6.5  Kesenjangan Level Analisis (Level Gap)
+
+Studi terdahulu dominan menempatkan unit analisis pada level organisasi (Leitão et al., 2019; Sitorus et al., 2026) atau pada profesi tertentu seperti dosen (Sun & Yoon, 2025). Padahal, mekanisme konversi sumber daya menjadi kinerja adaptif pada hakikatnya berlangsung pada level individu. Penelitian ini secara eksplisit menempatkan Account Officer sebagai unit analisis sehingga mampu menangkap dinamika psikologis yang tidak terlihat pada studi level organisasi.
+
+Pemetaan penelitian terdahulu yang menjadi dasar identifikasi kesenjangan tersebut disajikan pada Tabel 1.3 berikut.
+
+Tabel 1.3  Kesenjangan Penelitian
+
+Penelitian – Tahun
+
+Judul Penelitian
+
+Hasil Penelitian
+
+Kesenjangan dengan Penelitian Ini
+
+Leitão et al. (2019)
+
+Quality of Work Life and Organizational Performance: Workers' Feelings of Contributing, or Not, to the Organization's Productivity
+
+Quality of Work Life terbukti berpengaruh positif terhadap kinerja organisasi melalui keterlibatan dan kontribusi karyawan.
+
+Penelitian ini tidak menguji hubungan QWL dengan adaptive performance, tidak memasukkan kesiapan digital sebagai mediator, serta tidak dilakukan pada sektor logistik ekspedisi di Indonesia.
+
+Sun & Yoon (2025)
+
+The impact of digital transformation on faculty performance in higher education: the mediating role of digital self-efficacy and the moderating role of task-technology fit
+
+Digital Self-Efficacy terbukti memediasi hubungan antara transformasi digital dan kinerja dosen dengan efek positif yang signifikan.
+
+Penelitian hanya pada sektor pendidikan tinggi, bukan pada Account Officer di sektor logistik. DSE ditempatkan sebagai mediator, bukan sebagai variabel independen yang mendorong kesiapan digital dan kinerja adaptif.
+
+Palapa & Saragih (2026)
+
+Peran Kesiapan Digital, Work-Life Balance, dan Stres Kerja dalam Kepuasan Kerja Karyawan di Era Digital
+
+Kesiapan digital berpengaruh positif dan signifikan terhadap kepuasan kerja. Stres kerja tidak terbukti memediasi hubungan tersebut.
+
+Kesiapan digital diposisikan sebagai variabel independen, bukan mediator. Variabel dependen adalah kepuasan kerja, bukan adaptive performance. Konteks: karyawan umum, bukan Account Officer ekspedisi di Lampung.
+
+Setiyadi et al. (2024)
+
+Determinants of Adaptive Performance at Individual, Team, and Organizational Levels: A Systematic Review of Empirical Studies (2011–2022)
+
+Tinjauan terhadap 36 studi empiris mengidentifikasi faktor penentu adaptive performance, dominan pada level individu di sektor pendidikan dan manufaktur.
+
+Penelitian adaptive performance pada sektor logistik, khususnya pada level Account Officer perusahaan ekspedisi, masih sangat terbatas dan belum mengintegrasikan peran digital readiness sebagai mediator.
+
+Sitorus et al. (2026)
+
+Analysis of the Role of Digital Transformation, Infrastructure Availability, and Human Resource Competence on the Operational Performance of the Logistics Industry in Jakarta
+
+Transformasi digital berpengaruh positif dan signifikan terkuat terhadap kinerja operasional logistik, diikuti oleh kompetensi SDM.
+
+Penelitian berfokus pada kinerja operasional tingkat perusahaan di Jakarta, bukan pada kinerja adaptif individu Account Officer. Kajian di wilayah Lampung dan pada level SDM lapangan masih sangat terbatas.
+
+Fachruddin Syah et al. (2026)
+
+Pengaruh Digital Competence dan Learning Agility terhadap Adaptive Performance melalui Work Engagement
+
+Digital competence dan learning agility berpengaruh terhadap adaptive performance dengan work engagement sebagai mediator.
+
+Mediator yang digunakan adalah work engagement, bukan digital readiness. Konteks penelitian bukan pada Account Officer perusahaan ekspedisi, dan tidak menguji QWL sebagai anteseden.
+
+Khusna & Pratiwi (2022)
+
+Pengaruh digital transformation dan self-efficacy terhadap kinerja karyawan dengan kesiapan untuk berubah sebagai variabel mediasi
+
+Transformasi digital dan self-efficacy berpengaruh terhadap kinerja karyawan, dengan kesiapan untuk berubah memediasi hubungan tersebut.
+
+Model paling mendekati, tetapi: (a) tidak menguji QWL, (b) konteks bukan sektor logistik ekspedisi, (c) tidak mengukur adaptive performance secara spesifik, (d) mediatornya kesiapan untuk berubah (readiness to change), bukan kesiapan digital (digital readiness).
+
+Sumber: diolah peneliti berdasarkan penelusuran literatur (2026).
+
+1.7  Kerangka Pemikiran dan Pengembangan Hipotesis
+
+1.7.1  Logika Teoretis Hubungan Antar Variabel
+
+Kerangka pemikiran penelitian ini dibangun di atas dua pijakan teoretis utama. Conservation of Resources Theory (Hobfoll, 1989) menjelaskan bahwa individu berupaya memperoleh, mempertahankan, dan mengakumulasi sumber daya yang bernilai. Proposisi kunci teori ini bukan pada kepemilikan sumber daya semata, melainkan pada kemampuan menginvestasikan sumber daya tersebut untuk memperoleh sumber daya lain yang lebih bernilai. Dalam konteks penelitian ini, quality of work life dan digital self-efficacy dipandang sebagai sumber daya yang dimiliki Account Officer, sementara adaptive performance adalah sumber daya hasil yang ingin dicapai. Pertanyaan kuncinya adalah: apa mekanisme yang mengubah sumber daya menjadi hasil?
+
+Social Cognitive Theory (Bandura, 2001) melengkapi penjelasan tersebut dengan menegaskan bahwa keyakinan diri (self-efficacy) merupakan penentu penting atas pilihan tindakan, besarnya usaha, dan ketekunan seseorang saat menghadapi hambatan. Dalam konteks digital, keyakinan diri digital mendorong individu untuk lebih terbuka, lebih siap, dan lebih cepat beradaptasi terhadap sistem kerja berbasis teknologi. Kedua teori ini bertemu pada satu titik: kesiapan digital (digital readiness) sebagai kondisi psikologis yang menghubungkan kepemilikan sumber daya dengan kemampuan berkinerja secara adaptif.
+
+Berdasarkan logika teoretis tersebut, kerangka pemikiran penelitian ini digambarkan sebagai berikut.
+
+Gambar 1.3.  Kerangka Pemikiran Penelitian
+
+Sumber: diolah peneliti (2026). Garis solid menunjukkan pengaruh langsung (H1–H5); garis putus-putus menunjukkan pengaruh tidak langsung melalui mediasi (H6–H7).
+
+Gambar 1.3 menampilkan kerangka pemikiran penelitian yang terdiri atas empat konstruk. Dua konstruk eksogen berada di sisi kiri: Quality of Work Life (X₁) pada posisi atas dan Digital Self-Efficacy (X₂) pada posisi bawah. Konstruk mediasi, yaitu Digital Readiness (M), ditempatkan di bagian tengah. Konstruk endogen, Adaptive Performance (Y), berada di sisi kanan sebagai luaran akhir yang dijelaskan model.
+
+Diagram tersebut memuat tujuh jalur pengaruh yang dikelompokkan ke dalam dua jenis garis. Pertama, lima jalur bergaris solid merepresentasikan pengaruh langsung yang diuji melalui koefisien jalur (path coefficient): H₁ dari Quality of Work Life menuju Adaptive Performance; H₂ dari Digital Self-Efficacy menuju Adaptive Performance; H₃ dari Quality of Work Life menuju Digital Readiness; H₄ dari Digital Self-Efficacy menuju Digital Readiness; dan H₅ dari Digital Readiness menuju Adaptive Performance. Kedua, dua jalur bergaris putus-putus merepresentasikan pengaruh tidak langsung melalui mediasi: H₆ untuk peran Digital Readiness dalam memediasi pengaruh Quality of Work Life terhadap Adaptive Performance, dan H₇ untuk peran Digital Readiness dalam memediasi pengaruh Digital Self-Efficacy terhadap Adaptive Performance.
+
+Perlu ditegaskan bahwa kedua jalur putus-putus tidak menggambarkan lintasan kausal yang berbeda dari jalur solid. Jalur tidak langsung pada hakikatnya merupakan gabungan dua jalur langsung, yaitu H₆ terbentuk dari perkalian jalur H₃ dan H₅, sedangkan H₇ terbentuk dari perkalian jalur H₄ dan H₅. Keduanya divisualisasikan secara terpisah semata-mata agar alur mediasi mudah ditelusuri oleh pembaca. Pengujiannya dilakukan melalui prosedur specific indirect effects dengan metode bootstrapping, bukan lewat penambahan panah pada model struktural. Rincian ketujuh hipotesis beserta jenis dan arah pengaruhnya disajikan pada tabel yang menyertai diagram pada Gambar 1.3.
+
+1.7.2  Pengembangan Hipotesis
+
+a.Pengaruh Quality of Work Life terhadap Adaptive Performance (H1)
+
+Quality of work life mencerminkan persepsi karyawan atas sejauh mana lingkungan kerjanya memenuhi kebutuhan pribadi dan profesional, meliputi kompensasi yang layak, kondisi kerja yang aman, kesempatan berkembang, dan keseimbangan kehidupan kerja. Dalam kerangka COR Theory, QWL merupakan sumber daya yang bernilai; individu dengan QWL tinggi memiliki energi psikologis yang lebih besar untuk menghadapi tuntutan kerja yang berubah. Penelitian Leitão et al. (2019) membuktikan bahwa QWL berpengaruh positif terhadap kinerja melalui keterlibatan karyawan. Dengan demikian:
+
+H1:Quality of Work Life berpengaruh positif terhadap Adaptive Performance.
+
+b.Pengaruh Digital Self-Efficacy terhadap Adaptive Performance (H2)
+
+Digital self-efficacy adalah keyakinan individu atas kemampuannya menggunakan teknologi digital untuk menyelesaikan pekerjaan. SCT (Bandura, 2001) menyatakan bahwa individu dengan efikasi diri tinggi cenderung memilih tugas yang menantang, mencurahkan usaha lebih besar, dan bertahan lebih lama saat menghadapi hambatan. Pada era transformasi digital, keyakinan ini menjadi prasyarat penting bagi kemampuan beradaptasi terhadap perubahan sistem dan prosedur kerja. Shahzad et al. (2025) menemukan bahwa efikasi diri berperan penting dalam menghubungkan teknologi dengan performa. Dengan demikian:
+
+H2:Digital Self-Efficacy berpengaruh positif terhadap Adaptive Performance.
+
+c.Pengaruh Quality of Work Life terhadap Digital Readiness (H3)
+
+Kesiapan digital tidak tumbuh dalam ruang hampa. Individu yang merasa kebutuhan dasar dan kesejahteraan kerjanya terpenuhi memiliki keluasan kognitif (cognitive bandwidth) yang lebih besar untuk mempelajari hal baru, termasuk teknologi. Sebaliknya, ketika kesejahteraan kerja terancam, energi psikologis cenderung tersedot untuk mempertahankan sumber daya yang ada, sebagaimana ditegaskan COR Theory bahwa kehilangan sumber daya mengakibatkan resource depletion dan berkurangnya kapasitas investasi pada sumber daya baru. Dengan demikian:
+
+H3:Quality of Work Life berpengaruh positif terhadap Digital Readiness.
+
+d.Pengaruh Digital Self-Efficacy terhadap Digital Readiness (H4)
+
+SCT menegaskan bahwa efikasi diri merupakan fondasi kesiapan psikologis dalam menghadapi tuntutan baru. Individu yang yakin atas kemampuan digitalnya lebih mungkin memandang teknologi baru sebagai tantangan yang dapat diatasi daripada ancaman sehingga lebih cepat membentuk kesiapan untuk berubah. Studi Khusna & Pratiwi (2022) menunjukkan bahwa self-efficacy berpengaruh signifikan terhadap kesiapan untuk berubah, meskipun yang diukur adalah kesiapan perubahan organisasi, bukan kesiapan digital. Dengan demikian:
+
+H4:Digital Self-Efficacy berpengaruh positif terhadap Digital Readiness.
+
+e.Pengaruh Digital Readiness terhadap Adaptive Performance (H5)
+
+Kesiapan digital mencerminkan kesiapan individu dalam hal literasi data, kemampuan beradaptasi dengan sistem baru, kepercayaan diri menggunakan alat digital, dan kemandirian belajar. Dalam situasi kerja yang dinamis, individu yang siap secara digital lebih mampu menyesuaikan cara kerjanya saat prosedur, platform, atau ekspektasi berubah. Sebagai kondisi psikologis yang memfasilitasi adaptasi, kesiapan digital berfungsi sebagai anteseden langsung kinerja adaptif. Dengan demikian:
+
+H5:Digital Readiness berpengaruh positif terhadap Adaptive Performance.
+
+f.Peran Mediasi Digital Readiness pada Pengaruh QWL terhadap Adaptive Performance (H6)
+
+Logika sentral penelitian ini adalah bahwa hubungan antara kepemilikan sumber daya dan kinerja adaptif tidak bersifat otomatis. QWL yang baik menyediakan sumber daya psikologis (energi, motivasi, kelapangan mental), namun sumber daya tersebut harus dikonversi terlebih dahulu menjadi kapasitas kesiapan digital agar termanifestasi dalam perilaku adaptif. Digital readiness berperan sebagai simpul konversi ini: QWL yang tinggi memungkinkan pembentukan kesiapan digital yang lebih baik (H3), yang pada gilirannya mendorong kinerja adaptif yang lebih tinggi (H5). Dengan demikian:
+
+H6:Digital Readiness memediasi pengaruh Quality of Work Life terhadap Adaptive Performance.
+
+g.Peran Mediasi Digital Readiness pada Pengaruh DSE terhadap Adaptive Performance (H7)
+
+Demikian pula, keyakinan diri digital tidak secara otomatis berbuah kinerja adaptif. Keyakinan tersebut perlu dikristalisasi menjadi kesiapan yang nyata, berupa literasi data yang memadai, kemampuan beradaptasi dengan sistem baru, dan kemandirian dalam menghadapi perubahan. Ketika keyakinan diri telah bertransformasi menjadi kesiapan digital, individu memiliki pijakan yang lebih mantap untuk berperilaku adaptif. Dengan demikian, kesiapan digital berperan sebagai mekanisme yang menjelaskan mengapa dan bagaimana efikasi diri digital berdampak pada kinerja adaptif:
+
+H7:Digital Readiness memediasi pengaruh Digital Self-Efficacy terhadap Adaptive Performance.
+
+Pengujian kedua hipotesis mediasi (H6 dan H7) dilakukan melalui prosedur specific indirect effects dengan metode bootstrapping pada analisis PLS-SEM.
+
+1.8  Batasan dan Asumsi Penelitian
+
+Penelitian ini memiliki sejumlah batasan yang perlu dikemukakan agar ruang lingkup temuan dapat dipahami secara tepat. Pertama, ruang lingkup subjek penelitian dibatasi pada Account Officer PT JNE Wilayah Lampung, sehingga temuan tidak dapat digeneralisasi secara langsung pada jabatan lain di dalam organisasi maupun pada perusahaan ekspedisi di wilayah lain yang memiliki karakteristik operasional berbeda. Kedua, penelitian ini menggunakan rancangan cross-sectional, yaitu data dikumpulkan pada satu titik waktu tertentu, sehingga hubungan yang teridentifikasi menggambarkan keterkaitan antar variabel pada periode pengamatan dan tidak dimaksudkan untuk menangkap dinamika perubahan perilaku dalam jangka panjang. Ketiga, pengukuran keempat konstruk, yaitu quality of work life, digital self-efficacy, digital readiness, dan adaptive performance, bertumpu pada persepsi diri responden melalui kuesioner, sehingga hasil yang diperoleh merefleksikan penilaian subjektif Account Officer atas kondisi kerjanya, bukan data objektif kinerja yang terdokumentasi pada sistem penilaian perusahaan. Keempat, penelitian ini tidak memasukkan variabel demografis seperti usia, masa kerja, atau tingkat pendidikan sebagai variabel yang diuji dalam model, meskipun variabel tersebut tetap dilaporkan secara deskriptif untuk menggambarkan karakteristik responden.
+
+Sejalan dengan batasan tersebut, penelitian ini bertumpu pada beberapa asumsi yang berfungsi sebagai prasyarat berlakunya hasil analisis. Pertama, Account Officer yang menjadi responden memahami setiap pernyataan dalam kuesioner dan menjawabnya sesuai dengan kondisi kerja yang sebenarnya, tanpa pengaruh maupun tekanan dari pihak lain. Kedua, Account Officer yang terpilih sebagai sampel merepresentasikan karakteristik seluruh Account Officer di PT JNE Wilayah Lampung, sehingga hasil penelitian dapat digeneralisasi pada populasi tersebut. Ketiga, skala Likert yang digunakan mampu mengukur keempat konstruk penelitian secara valid dan konsisten, sehingga skor yang diperoleh mencerminkan tingkat konstruk yang sesungguhnya dimiliki responden. Keempat, hubungan antarvariabel dalam model bersifat linear, dan model yang dikembangkan telah mencakup variabel-variabel utama yang berperan dalam menjelaskan adaptive performance, sehingga tidak terdapat variabel perancu (confounding variable) di luar model yang mengganggu estimasi jalur pengaruh langsung maupun pengaruh tidak langsung. Kelima, kondisi kerja, kebijakan organisasi, dan sistem kerja digital di PT JNE Wilayah Lampung relatif stabil selama periode pengumpulan data sehingga jawaban responden tidak terpengaruh oleh perubahan mendasar yang terjadi pada saat pengisian kuesioner.
+
+1.9  Sistematika Penulisan
+
+Penelitian ini disusun dalam lima bab yang saling berkaitan, dengan sistematika sebagai berikut.
+
+Bab I Pendahuluan. Bab ini menguraikan latar belakang masalah yang mendasari pentingnya penelitian, rumusan masalah yang menjadi fokus kajian, tujuan yang hendak dicapai, manfaat penelitian bagi pengembangan ilmu dan praktik, pemetaan state of the art penelitian, kesenjangan penelitian yang mendasari kebaruan kajian, kerangka pemikiran beserta pengembangan hipotesis, batasan dan asumsi penelitian, serta sistematika penulisan laporan.
+
+Bab II Kajian Pustaka. Bab ini menyajikan landasan teori yang menjadi pijakan penelitian, mencakup grand theory (Conservation of Resources Theory dan Social Cognitive Theory) serta teori pendukung mengenai quality of work life, digital self-efficacy, digital readiness, dan adaptive performance. Bab ini juga memuat kajian penelitian terdahulu, kerangka pemikiran, dan pengembangan hipotesis.
+
+Bab III Metode Penelitian. Bab ini menjelaskan metodologi penelitian yang digunakan, meliputi jenis dan pendekatan penelitian, lokasi dan waktu penelitian, definisi operasional dan pengukuran variabel, populasi dan teknik penentuan sampel, metode pengumpulan data, serta teknik analisis data dengan pendekatan Partial Least Squares Structural Equation Modeling (PLS-SEM) menggunakan perangkat lunak SmartPLS.
+
+Bab IV Hasil Penelitian dan Pembahasan. Bab ini menyajikan hasil pengolahan data, mencakup karakteristik responden, evaluasi model pengukuran (outer model), evaluasi model struktural (inner model), pengujian hipotesis langsung dan tidak langsung, serta pembahasan yang menghubungkan temuan dengan teori dan penelitian terdahulu, disertai implikasi manajerial.
+
+Bab V Kesimpulan dan Saran. Bab ini memuat kesimpulan atas hasil pengujian hipotesis, keterbatasan penelitian, serta saran bagi manajemen, bagi penelitian selanjutnya, dan bagi pemangku kepentingan terkait.
+
+DAFTAR PUSTAKA
+
+Abdi, R., et al. (2022). The MSMEs digital readiness in Indonesia: A test of moderating effect of intrinsic motivation and digital literacy. Strategic Entrepreneurial Ecosystems and Business Model Innovation, 187–203. https://doi.org/10.1108/978-1-80382-137-520221010
+
+Aini, I. N., Emilisa, N., Rahma, A., & [dkk]. (2025). Anteseden adaptive performance karyawan Gen Z industri perbankan swasta di Jakarta Selatan. Journal of Economic, Business and Accounting (COSTING).
+
+Alrawahi, S., et al. (2020). The application of Herzberg's two-factor theory of motivation to job satisfaction. Heliyon, 6(9), e04829. https://doi.org/10.1016/j.heliyon.2020.e04829
+
+Ayuni, N. A., & Nuraeni. (2026). Pengaruh quality of work life, self efficacy, dan work life balance terhadap kinerja karyawan. Surplus: Jurnal Ekonomi dan Bisnis, 5(1).
+
+Bakker, A. B., Demerouti, E., & Sanz-Vergel, A. (2022). Job demands–resources theory: Ten years later. Annual Review of Organizational Psychology and Organizational Behavior, 10, 25–53. https://doi.org/10.1146/annurev-orgpsych-120920-053933
+
+Bandura, A. (2001). Social cognitive theory: An agentic perspective. Annual Review of Psychology, 52(1), 1–26. https://doi.org/10.1146/annurev.psych.52.1.1
+
+Bandura, A. (2019). Applying theory for human betterment. Perspectives on Psychological Science, 14(1), 12–15.
+
+Bartsch, S., et al. (2021). Leadership matters in crisis-induced digital transformation: How to lead service employees effectively during the COVID-19 pandemic. Journal of Service Management, 32(1), 71–85.
+
+Budiarti. (2025). Pengaruh digital learning capability dan professional development support terhadap kinerja talenta dosen dengan self-efficacy sebagai mediasi. Jurnal Ekonomi dan Bisnis Indonesia, 10(1), 31–38. https://doi.org/10.37673/jebi.v10i1.6068
+
+Cetindamar Kozanoglu, D., & Abedin, B. (2021). Understanding the role of employees in digital transformation. JEIM, 34(6). https://doi.org/10.1108/JEIM-01-2020-0010
+
+Cetindamar Kozanoglu, D., & Abedin, B. (2021). Understanding the role of employees in digital transformation: Conceptualization of digital literacy of employees as a multi-dimensional organizational affordance. Journal of Enterprise Information Management, 34(6), 1649–1672. https://doi.org/10.1108/JEIM-01-2020-0010
+
+Chahyono, et al. (2024). Work engagement and person-job fit as catalysts for employee performance excellence in Indonesia. Journal of Logistics, Informatics and Service Science. https://doi.org/10.33168/JLISS.2024.1006
+
+Cheng, B., et al. (2023). Challenge or hindrance? How and when organizational artificial intelligence adoption influences employee adaptive performance. Journal of Business Research. https://doi.org/10.1016/j.jbusres.2023.113987
+
+Demerouti, E., Bakker, A. B., Nachreiner, F., & Schaufeli, W. B. (2001). The job demands-resources model of burnout. Journal of Applied Psychology, 86(3), 499–512. https://doi.org/10.1037/0021-9010.86.3.499
+
+Dwivedi, Y. K., Rana, N. P., Jeyaraj, A., Clement, M., & Williams, M. D. (2019). Re-examining the UTAUT: Towards a revised theoretical model. Information Systems Frontiers, 21(3), 719–734. https://doi.org/10.1007/s10796-017-9774-y
+
+Dâmbean, G. M., & Gabor, M. R. (2022). Adaptability, burnout and coping mechanisms present in the machine manufacturing industry. Acta Marisiensis. Seria Oeconomica, 16(1), 25–40. https://doi.org/10.2478/amso-2022-0003
+
+Fachruddin Syah, S., Lantang, D. V., Afdal, M., & [dkk]. (2026). Pengaruh digital competence dan learning agility terhadap adaptive performance melalui work engagement. Jurnal Ilmiah METANSI: Manajemen dan Akuntansi, 9(1).
+
+Fernandes, R. B., Martins, B., & Pereira, A. (2017). Quality of work life: An evaluation of Walton model with analysis of structural equation. [Jurnal].
+
+Gorostiaga, A., Balluerka, N., Rodríguez-López, A., & Haranburu, M. (2022). Assessment of adaptive performance and its role as a moderator of the relationship between organizational justice and job satisfaction. Psicothema, 34(2), 233–241. https://doi.org/10.7334/psicothema2021.310
+
+Hobfoll, S. E. (1989). Conservation of resources: A new attempt at conceptualizing stress. American Psychologist, 44(3), 513–524. https://doi.org/10.1037/0003-066X.44.3.513
+
+Hobfoll, S. E., Halbesleben, J., Neveu, J. P., & Westman, M. (2018). Conservation of resources in the organizational context: The reality of resources and their consequences. Annual Review of Organizational Psychology and Organizational Behavior, 5, 103–128. https://doi.org/10.1146/annurev-orgpsych-032117-104640
+
+Karliena, Y., Diantoro, E., Najiullah, A., & Suheri. (2026). Transformasi digital dan tantangan kepemimpinan: Studi kualitatif tentang digital leadership, adaptabilitas, dan kinerja karyawan. RIGGS: Journal of Artificial Intelligence and Digital Business, 4(4), 10974–10981. https://doi.org/10.31004/riggs.v4i4.5225
+
+Khusna, M., & Pratiwi, R. (2022). Pengaruh digital transformation dan self efficacy terhadap kinerja karyawan dengan kesiapan untuk berubah sebagai variabel mediasi. Stability: Journal of Management and Business, 5(1), 28–45.
+
+Kurnia Sari, R., Aidil Salam, B. G., & Al...[dkk]. (2025). Strategi manajemen perubahan holistik dalam membentuk adaptabilitas karyawan berbasis digital. Fatih: Journal of Contemporary Research, 2(1).
+
+Leitão, J., Pereira, D., & Gonçalves, Â. (2019). Quality of work life and organizational performance. International Journal of Environmental Research and Public Health, 16(20), 3803. https://doi.org/10.3390/ijerph16203803
+
+Lubis, A. S., & Lumbanraja, P. (2022). Human resource competency 4.0 and its impact on Bank Indonesia employees' readiness for transformational change. Journal of Organizational Change Management, 35(6), 871–889. https://doi.org/10.1108/JOCM-02-2021-0045
+
+Mahmud, M. F., & Tesniwati, R. (2023). Peningkatan kinerja melalui transformasi digital layanan publik kepabeanan. Jurnal Ilmiah Ekonomi Bisnis, 28(2), 161–182. https://doi.org/10.35760/eb.2023.v28i2.7004
+
+Masudi, B., Ilham, R., & Suharto. (2025). Digital talent management: Adaptive strategies in the era of Industry 4.0 transformation. JUMBIWIRA, 4(1), 436–448. https://doi.org/10.56910/jumbiwira.v4i1.2735
+
+Meria, L., & Wulandari, D. A. (2022). The role of transformational leadership and self-efficacy on readiness to change through work engagement. Aptisi Transactions on Technopreneurship, 4(1), 19–25. https://doi.org/10.34306/att.v4i1.242
+
+Metris, D., Daelami, P. A., & Amirudin. (2025). Peran kompetensi digital, pelatihan, perilaku individu, dan adaptasi teknologi dengan moderasi budaya organisasi. Journal Development, 13(2), 348–376. https://doi.org/10.53978/jd.v13i2.612
+
+Mutmainnah, M., Kadiyono, A. L., & Sulas...[dkk]. (2026). Peran psychological empowerment dalam meningkatkan adaptive performance karyawan pada masa transformasi. ARMADA: Jurnal Penelitian Multidisiplin, 4(6).
+
+Nugroho, A., & Wulandhari, O. (2026). Kompetensi digital praktisi SDM sebagai faktor kesiapan organisasi. Indonesian Journal of Entrepreneurship, Finance and Business.
+
+Nursesa, P. C. P., & Achmad, N. (2026). Pengaruh digital skill readiness dan work-life integration terhadap kinerja karyawan di PT. X. Community Engagement and Emergence Journal, 7.
+
+Palapa, W., & Saragih, S. (2026). Peran kesiapan digital, work-life balance, dan stres kerja dalam kepuasan kerja karyawan era digital. Journal of Management and Digital Business, 6(1), 359–379. https://doi.org/10.53088/jmdb.v6i1.2759
+
+Pan, X. (2020). Technology acceptance, technological self-efficacy, and attitude toward technology-based self-service. Frontiers in Psychology, 11, 564294. https://doi.org/10.3389/fpsyg.2020.564294
+
+Park, Y., Lim, D. H., Kim, W., & Kang, H. (2020). Organizational support and adaptive performance: The revolving structural relationships between job crafting, work engagement, and adaptive performance. Sustainability, 12(12), 4872. https://doi.org/10.3390/su12124872
+
+Polk, D. M. (2022). Equity theory: Evaluating fairness. [Book chapter]. https://doi.org/10.1002/9781394266616.ch9
+
+Pulakos, E. D., Arad, S., Donovan, M. A., & Plamondon, K. E. (2000). Adaptability in the workplace: Development of a taxonomy of adaptive performance. Journal of Applied Psychology, 85(4), 612–624. https://doi.org/10.1037/0021-9010.85.4.612
+
+Rahardhiansyah, A. D., Endratno, H., & Darmawan, A. (2026). Pengaruh self efficacy, work life balance dan quality of work life terhadap kinerja karyawan. Jurnal Ilmiah Edunomika, 10(1).
+
+Setiyadi, D., et al. (2024). Determinants of adaptive performance at individual, team, and organizational levels: A systematic review (2011–2022). Journal of Logistics, Informatics and Service Science, 11(12), 39–70. https://doi.org/10.33168/jliss.2024.1203
+
+Shahzad, M. F., Xu, S., Lim, W. M., Yang, X., & Khan, Q. R. (2025). Exploring the impact of generative AI-based technologies on learning performance through self-efficacy, motivation, and engagement. Education and Information Technologies. https://doi.org/10.1007/s10639-024-12949-9
+
+Sidanta, G. K., Wulandari, A., & Sapruwan, M. (2026). Analisis strategi komunikasi dan nilai budaya kerja dalam meningkatkan employee engagement. Sains Manajemen: Jurnal Manajemen Unsera, 12(1).
+
+Sitorus, R., Immamah, E., & Adiazmil, A. (2026). Analysis of the role of digital transformation, infrastructure availability, and human resource competence on the operational performance of the logistics industry in Jakarta. West Science Interdisciplinary Studies, 4(2), 309–318. https://doi.org/10.58812/wsis.v4i02.2649
+
+Srimulyani, V. A., & Wardani, D. T. (2026). Peran mediasi kepuasan kerja dalam hubungan work-life balance dan adaptive performance pada karyawan. Jurnal Ilmu Manajemen dan Bisnis, 2(2).
+
+Sun, T., & Yoon, M. (2025). The impact of digital transformation on faculty performance in higher education: The mediating role of digital self-efficacy and the moderating role of task-technology fit. Frontiers in Psychology, 16, 1693375. https://doi.org/10.3389/fpsyg.2025.1693375
+
+Sunarto, S., Manurung, Y. C., & Aulia, I. P. (2026). Peran human AI-collaboration dalam meningkatkan adaptive performance karyawan. Indo-MathEdu Intellectuals Journal, 7(3).
+
+Venkatesh, V., & Davis, F. D. (2000). A theoretical extension of the technology acceptance model. Management Science, 46(2), 186–204. https://doi.org/10.1287/mnsc.46.2.186.11926
+
+Wijaya, F. (2025). Pengaruh work passion dan organization support terhadap adaptive performance karyawan. Jurnal Jejama Manajemen Malahayati, 5(2).
+
+Xanthopoulou, D., Bakker, A. B., Demerouti, E., & Schaufeli, W. B. (2007). The role of personal resources in the job demands-resources model. International Journal of Stress Management, 14(2), 121–141. https://doi.org/10.1037/1072-5245.14.2.121
+
+Zhao, N., Hong, J., & Lau, K. H. (2023). Impact of supply chain digitalization on supply chain resilience and performance. International Journal of Production Economics. https://doi.org/10.1016/j.ijpe.2023.108817

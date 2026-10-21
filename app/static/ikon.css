@@ -1,0 +1,30 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   IKON — Lucide (ISC License)
+   ACC Bos 15Sep26: emoji standar (📄📊📽️) tidak konsisten (bentuknya beda
+   di tiap HP), tidak bisa diwarnai ikut tema, dan terlihat murahan untuk
+   produk berbayar. Lucide = gaya GARIS, konsisten di semua perangkat.
+
+   Cara pakai di template:  {{ ikon('file-text', 16) }}
+   Sprite SVG dimuat lewat makro ikon_sprite() di dalam <body>.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.ik {
+  display: inline-block;
+  vertical-align: -0.155em;     /* sejajar dengan teks di sebelahnya */
+  flex: 0 0 auto;               /* tidak mengecil dalam flexbox */
+  color: inherit;               /* ikut warna teks → bisa diwarnai */
+  stroke-width: 2;
+}
+
+/* Ukuran umum — pakai kelas supaya konsisten antar halaman */
+.ik-sm { vertical-align: -0.14em; }
+.ik-lg { vertical-align: -0.19em; }
+
+/* Ikon di dalam tombol/lencana: jangan menambah tinggi baris */
+button .ik, a .ik, .lencana .ik { vertical-align: -0.16em; }
+
+/* Ikon sebagai penanda bulat (ikon saja, tanpa teks) */
+.ik-bundar {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+}

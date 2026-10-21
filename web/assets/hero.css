@@ -1,0 +1,46 @@
+/* ===== HERO EDUAI — gaya edlink.id: background hijau, teks putih ===== */
+.hero{
+  background:#198E3B url('/static/hero-bg.svg') center center / cover no-repeat;
+  padding:0;
+  position:relative;
+  overflow:hidden;
+  border-top:4px solid #198E3B;
+}
+.hero::after{display:none}
+.hero .wadah{padding-top:82px;padding-bottom:82px}
+
+/* teks putih */
+.hero h1{color:#FFFFFF}
+.hero h1 .sorot{color:#FFFFFF}
+.hero h1 .sorot::after{
+  background:rgba(244,160,37,.45);
+}
+.hero p.ket{color:rgba(255,255,255,.82)}
+
+/* lencana versi terang */
+.lencana{
+  background:rgba(255,255,255,.17);
+  border:1px solid rgba(255,255,255,.3);
+  color:#FFFFFF;
+}
+
+/* catatan bawah hero */
+.hero-catatan{color:rgba(255,255,255,.85)}
+.hero-catatan svg{stroke:#B9F5CE !important}
+
+/* tombol: utama oranye (kontras dgn hijau), sekunder putih */
+.tombol-oranye{
+  background:#F4A025;color:#2E1B00;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);
+}
+.tombol-oranye:hover{background:#FFB63D}
+.hero .tombol-garis{
+  border-color:rgba(255,255,255,.65);color:#FFFFFF;background:transparent;
+}
+.hero .tombol-garis:hover{background:rgba(255,255,255,.15);border-color:#fff}
+
+/* kartu pratinjau tetap putih (pop di atas hijau) */
+.pratinjau{
+  box-shadow:0 20px 50px rgba(0,0,0,.26);
+  border:none;
+}

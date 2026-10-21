@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketsa — Halaman Pembimbing · EduAi</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:#eef1f5;color:#1c2530;line-height:1.5;padding:18px}
+  .bungkus{max-width:1080px;margin:0 auto}
+  .judul-sketsa{background:#0f2e4a;color:#fff;padding:14px 20px;border-radius:12px;margin-bottom:6px}
+  .judul-sketsa h1{font-size:19px;font-weight:700}
+  .judul-sketsa p{font-size:13px;opacity:.85;margin-top:3px}
+  .catatan{background:#fff8e1;border-left:4px solid #f0b429;padding:9px 14px;border-radius:7px;font-size:12.5px;margin-bottom:18px}
+
+  .hp{background:#fff;border-radius:14px;box-shadow:0 3px 16px rgba(15,46,74,.13);overflow:hidden;margin-bottom:26px}
+  .hp-atas{background:#12405f;padding:11px 16px;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .hp-atas b{font-size:15px}
+  .hp-atas small{font-size:11.5px;opacity:.85;display:block;margin-top:1px}
+  .lencana{background:rgba(255,255,255,.18);padding:3px 10px;border-radius:20px;font-size:11px}
+
+  .dua{display:grid;grid-template-columns:200px 1fr;gap:0}
+  @media(max-width:760px){.dua{grid-template-columns:1fr}}
+
+  .kiri{background:#f6f8fa;padding:13px;border-right:1px solid #e2e8ee}
+  .kiri h4{font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;color:#6b7a8b;margin-bottom:8px}
+  .bab{display:block;padding:7px 10px;border-radius:7px;font-size:13px;margin-bottom:4px;background:#fff;border:1px solid #e2e8ee;cursor:pointer}
+  .bab.aktif{background:#0f2e4a;color:#fff;border-color:#0f2e4a;font-weight:600}
+  .bab .tanda{float:right;font-size:11px}
+
+  .tengah{padding:16px}
+  .tengah h3{font-size:15px;margin-bottom:3px}
+  .tengah .sub{font-size:12px;color:#6b7a8b;margin-bottom:13px}
+
+  .naskah{background:#fcfdfe;border:1px solid #e2e8ee;border-radius:9px;padding:15px;font-family:Georgia,serif;font-size:13.5px;line-height:1.75;color:#2a3542;max-height:230px;overflow-y:auto}
+  .sorot{background:#fff3cd;border-bottom:2px solid #f0b429;padding:1px 2px;border-radius:2px}
+
+  .kotak-catatan{margin-top:14px;border:1px solid #e2e8ee;border-radius:9px;overflow:hidden}
+  .kc-atas{background:#f0f4f8;padding:8px 13px;font-size:12.5px;font-weight:600;color:#0f2e4a}
+  .kc-isi{padding:11px 13px;font-size:13px;border-bottom:1px solid #eef1f5}
+  .kc-isi:last-child{border-bottom:0}
+  .waktu{font-size:11px;color:#8a97a6}
+
+  .tulis{margin-top:14px}
+  .tulis textarea{width:100%;border:1px solid #ccd6e0;border-radius:8px;padding:10px;font-family:inherit;font-size:13px;resize:vertical;min-height:66px}
+  .baris-tombol{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+  .btn{background:#1a73c7;color:#fff;border:0;border-radius:7px;padding:8px 15px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+  .btn-putih{background:#fff;color:#1a73c7;border:1px solid #b9d1e8}
+  .btn-abu{background:#fff;color:#5a6876;border:1px solid #ccd6e0}
+
+  .status{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+  .st-berubah{background:#e3f6e8;color:#1c7a3d}
+  .st-belum{background:#fdeaea;color:#a8322a}
+  .st-tunggu{background:#eef2f7;color:#5a6876}
+
+  .kartu-tabel{background:#fff;border:1px solid #e2e8ee;border-radius:9px;overflow:hidden;margin-top:14px}
+  .tabel{width:100%;border-collapse:collapse;font-size:12.5px}
+  .tabel th{background:#f0f4f8;text-align:left;padding:8px 11px;font-size:11.5px;color:#4a5a6b;text-transform:uppercase;letter-spacing:.3px}
+  .tabel td{padding:10px 11px;border-top:1px solid #eef1f5;vertical-align:top}
+  .tabel tr.aktif td{background:#f5faff}
+
+  .lampiran{margin-top:12px;padding-top:12px;border-top:1px dashed #ccd6e0}
+  .lampiran h5{font-size:12.5px;color:#0f2e4a;margin-bottom:8px}
+  .berkas-lampir{display:flex;gap:9px;align-items:center;padding:8px 11px;background:#f6f8fa;border:1px solid #e2e8ee;border-radius:8px;margin-bottom:6px;font-size:12.5px}
+  .thumb{width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#1a73c7,#0f2e4a);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px}
+  .tautan-berkas{color:#1a73c7;font-weight:600;text-decoration:none}
+  .tautan-berkas:hover{text-decoration:underline}
+
+  .panel-info{background:#f0f7ff;border:1px solid #cfe2f7;border-radius:9px;padding:11px 14px;font-size:12.5px;margin-top:14px}
+  .panel-info b{color:#0f2e4a}
+
+  .hp-bawah{padding:11px 16px;background:#f6f8fa;border-top:1px solid #e2e8ee;font-size:11.5px;color:#6b7a8b}
+
+  .hp-sisi{background:#fff;border-radius:14px;box-shadow:0 3px 16px rgba(15,46,74,.13);padding:16px;max-width:330px;margin:0 auto 26px}
+  .hp-sisi .atas-hp{background:#0f2e4a;color:#fff;border-radius:9px;padding:9px 12px;font-size:12.5px;margin-bottom:12px}
+
+  .label-sketsa{background:#0f2e4a;color:#fff;font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:8px 8px 0 0;display:inline-block}
+  .label-sketsa.alt{background:#1c7a3d}
+  .label-sketsa.alt2{background:#8a4b1c}
+
+  .kaki{margin-top:30px;padding:15px 18px;background:#fff;border-radius:12px;font-size:12.5px;border-left:4px solid #1a73c7}
+  .kaki h3{font-size:14px;margin-bottom:7px;color:#0f2e4a}
+</style>
+</head>
+<body>
+<div class="bungkus">
+
+<div class="judul-sketsa">
+  <h1>Sketsa Halaman Pembimbing — EduAi</h1>
+  <p>Bukan kode jadi. Hanya gambaran tata letak supaya Bos bisa pilih mana yang cocok.</p>
+</div>
+<div class="catatan">
+  <b>Cara baca:</b> tiap bagian di bawah = 1 layar yang pembimbing lihat. Warna &amp; bentuk belum final — yang Bos nilai <b>ISI dan ALURNYA</b>: apa yang pembimbing lihat, di mana tombolnya, apa yang bisa dia kirim.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SKETSA 1 — LAYAR UTAMA PEMBIMBING (dua kolom, desktop) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="label-sketsa">SKETSA 1 — Layar utama pembimbing (buka di laptop)</div>
+<div class="hp">
+  <div class="hp-atas">
+    <div>
+      <b>Tinjauan Naskah</b>
+      <small>Siti Nurhaliza · Skripsi · Manajemen</small>
+    </div>
+    <div style="text-align:right">
+      <div class="lencana">👁 Hanya melihat &amp; berkomentar</div>
+      <small style="margin-top:3px">Masuk sebagai: Prof. Ahmad</small>
+    </div>
+  </div>
+
+  <div class="dua">
+    <!-- KIRI: daftar bab -->
+    <div class="kiri">
+      <h4>Daftar Bab</h4>
+      <div class="bab">BAB I Pendahuluan <span class="tanda">✅</span></div>
+      <div class="bab aktif">BAB II Tinjauan Pustaka <span class="tanda">⏸</span></div>
+      <div class="bab">BAB III Metode <span class="tanda">✅</span></div>
+      <div class="bab">BAB IV Hasil <span class="tanda">—</span></div>
+      <div class="bab">Bab V Penutup <span class="tanda">—</span></div>
+      <div style="margin-top:12px;font-size:11px;color:#8a97a6;line-height:1.6">
+        ✅ naskah berubah<br>⏸ belum berubah
+      </div>
+    </div>
+
+    <!-- TENGAH: naskah + kotak komentar -->
+    <div class="tengah">
+      <h3>BAB II — Tinjauan Pustaka</h3>
+      <div class="sub">1.240 kata · diperbarui 2 jam lalu</div>
+
+      <div class="naskah">
+        2.1 Landasan Teori<br><br>
+        Kepuasan pelanggan merupakan <span class="sorot">evaluasi menyeluruh</span> atas pengalaman konsumsi yang terbentuk dari perbandingan antara harapan dan kinerja...
+        <br><br>
+        2.2 Penelitian Terdahulu<br><br>
+        Penelitian Sari (2023) menunjukkan bahwa kualitas layanan berpengaruh signifikan terhadap kepuasan...
+      </div>
+
+      <div class="kotak-catatan">
+        <div class="kc-atas">💬 Komentar Anda (Prof. Ahmad)</div>
+        <div class="kc-isi">
+          <b>Perbaiki paragraf kedua — landasan teori belum ada rujukannya.</b>
+          <div class="waktu">14 Sep 10:22 · <span class="status st-tunggu">Menunggu</span></div>
+        </div>
+        <div class="kc-isi">
+          <b>Tambahkan tabel penelitian terdahulu, biar mudah dibandingkan.</b>
+          <div class="waktu">14 Sep 10:25 · <span class="status st-tunggu">Menunggu</span></div>
+        </div>
+      </div>
+
+      <div class="tulis">
+        <label style="font-size:12.5px;font-weight:600;color:#4a5a6b">Tulis komentar atau saran untuk mahasiswa</label>
+        <textarea placeholder="Contoh:&#10;Perbaiki paragraf kedua BAB II, landasan teori belum ada rujukannya.&#10;&#10;Bisa juga tempel link referensi atau unggah gambar."></textarea>
+
+        <div class="baris-tombol">
+          <button class="btn">📎 Lampirkan Gambar</button>
+          <button class="btn btn-putih">🔗 Sisipkan Link</button>
+          <button class="btn btn-putih">📄 Lampirkan Berkas</button>
+        </div>
+        <div class="baris-tombol" style="margin-top:10px">
+          <button class="btn" style="background:#1c7a3d">Kirim ke Mahasiswa</button>
+          <button class="btn btn-abu">Batal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hp-bawah">
+    Halaman ini hanya untuk melihat &amp; memberi komentar. Naskah tidak bisa diubah dari sini.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SKETSA 2 — LOG REVISI (dilihat BERDUA, data SAMA) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="label-sketsa alt">SKETSA 2 — Log Revisi (mahasiswa &amp; pembimbing lihat DATA YANG SAMA)</div>
+<div class="hp">
+  <div class="hp-atas">
+    <div>
+      <b>📋 Log Revisi</b>
+      <small>Catatan lengkap semua permintaan &amp; tindak lanjutnya</small>
+    </div>
+    <div class="lencana">Tampilan identik di dua sisi</div>
+  </div>
+
+  <div style="padding:16px">
+    <div class="panel-info">
+      <b>Catatan:</b> inilah yang diminta Bos — <b>mahasiswa dan pembimbing melihat daftar yang sama</b>. Pembimbing yang menulis di kolom "Permintaan"; mahasiswa mengisi kolom "Catatan Mahasiswa" kalau mengerjakan sendiri.
+    </div>
+
+    <div class="kartu-tabel">
+      <table class="tabel">
+        <tr>
+          <th style="width:30%">Permintaan Pembimbing</th>
+          <th style="width:13%">Status Naskah</th>
+          <th style="width:19%">Ditangani oleh</th>
+          <th style="width:38%">Hasil / Catatan</th>
+        </tr>
+        <tr class="aktif">
+          <td><b>Perbaiki paragraf kedua, landasan teori belum ada rujukannya.</b><div class="waktu">14 Sep 10:22</div></td>
+          <td><span class="status st-berubah">Berubah</span></td>
+          <td>✨ EduAi<div class="waktu">14 Sep 10:40</div></td>
+          <td>"Ditambahkan 3 rujukan pada paragraf 2 (Sari 2023, Wibowo 2022, Handoko 2021)."<div style="margin-top:5px"><a href="#" class="tautan-berkas">Lihat hasil ▸</a></div></td>
+        </tr>
+        <tr>
+          <td><b>Tambahkan tabel penelitian terdahulu.</b><div class="waktu">14 Sep 10:25</div></td>
+          <td><span class="status st-berubah">Berubah</span></td>
+          <td>✍️ Anda sendiri<div class="waktu">15 Sep 20:10</div></td>
+          <td>Mahasiswa mengerjakan manual.<div style="margin-top:5px"><a href="#" class="tautan-berkas">Bandingkan versi ▸</a></div></td>
+        </tr>
+        <tr>
+          <td><b>Ringkas bagian metode, terlalu panjang.</b><div class="waktu">15 Sep 09:00</div></td>
+          <td><span class="status st-belum">Belum</span></td>
+          <td>—</td>
+          <td>Naskah belum berubah sejak komentar ini.<div style="margin-top:5px"><a href="#" class="tautan-berkas">Lihat bagian ▸</a></div></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="lampiran">
+      <h5>📎 Lampiran yang terkirim</h5>
+      <div class="berkas-lampir">
+        <div class="thumb">🖼</div>
+        <div>
+          <b>contoh_tabel_penelitian.png</b>
+          <div class="waktu">Dari Prof. Ahmad · 14 Sep 10:26 · 428 KB</div>
+        </div>
+      </div>
+      <div class="berkas-lampir">
+        <div class="thumb" style="background:linear-gradient(135deg,#1c7a3d,#0f4a26)">🔗</div>
+        <div>
+          <b>Contoh format tabel di jurnal ini</b>
+          <div class="tautan-berkas" style="font-size:11.5px">https://journal.uny.ac.id/contoh-tabel.pdf</div>
+          <div class="waktu">Dari Prof. Ahmad · 14 Sep 10:27</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SKETSA 3 — TAMPILAN HP (pembimbing sering buka dari WA) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="label-sketsa alt2">SKETSA 3 — Kalau pembimbing buka dari HP (lewat link WA)</div>
+<div class="hp-sisi">
+  <div class="atas-hp">
+    <b>Tinjauan Naskah</b>
+    <div style="font-size:11px;opacity:.85;margin-top:2px">Prof. Ahmad · hanya melihat</div>
+  </div>
+
+  <div style="font-size:12.5px;margin-bottom:10px">
+    <b>BAB II — Tinjauan Pustaka</b>
+    <div class="waktu">1.240 kata · 2 jam lalu</div>
+  </div>
+
+  <div style="background:#fcfdfe;border:1px solid #e2e8ee;border-radius:8px;padding:11px;font-family:Georgia,serif;font-size:12.5px;line-height:1.7;max-height:150px;overflow-y:auto">
+    2.1 Landasan Teori<br><br>
+    Kepuasan pelanggan merupakan evaluasi menyeluruh atas pengalaman konsumsi...
+  </div>
+
+  <div style="margin-top:10px;font-size:11.5px;color:#6b7a8b">
+    Bab: [BAB I] [<b>BAB II</b>] [BAB III] [BAB IV] [BAB V]
+  </div>
+
+  <div style="margin-top:13px">
+    <textarea style="width:100%;border:1px solid #ccd6e0;border-radius:8px;padding:9px;font-family:inherit;font-size:12.5px;min-height:58px" placeholder="Tulis komentar..."></textarea>
+    <div class="baris-tombol" style="margin-top:8px">
+      <button class="btn" style="flex:1;font-size:12px">📎 Gambar</button>
+      <button class="btn btn-putih" style="flex:1;font-size:12px">🔗 Link</button>
+    </div>
+    <button class="btn" style="width:100%;margin-top:8px;background:#1c7a3d">Kirim</button>
+  </div>
+
+  <div style="margin-top:14px;padding-top:12px;border-top:1px solid #eef1f5;font-size:12px">
+    <b style="color:#0f2e4a">📋 Log Revisi</b>
+    <div style="margin-top:7px">✅ <b>Paragraf 2</b> — sudah berubah <span class="waktu">(EduAi)</span></div>
+    <div style="margin-top:5px">⏸ <b>Ringkas metode</b> — belum berubah</div>
+    <a href="#" class="tautan-berkas" style="font-size:11.5px">Lihat semua ▸</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SKETSA 4 — HALAMAN MAHASISWA (sisi sebaliknya) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="label-sketsa">SKETSA 4 — Sisi mahasiswa: bukan "bagikan", tapi "pembimbingan"</div>
+<div class="hp">
+  <div class="hp-atas">
+    <div>
+      <b>👥 Pembimbingan Saya</b>
+      <small>1 link untuk semua naskah — tidak perlu ganti walau naskah baru</small>
+    </div>
+  </div>
+  <div style="padding:16px">
+    <div style="border:1px solid #e2e8ee;border-radius:9px;padding:13px;margin-bottom:13px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <b>Prof. Ahmad</b>
+          <div class="waktu">Aktif · kedaluwarsa 29 Sep 2026 · dibuka 4×</div>
+        </div>
+        <div class="baris-tombol" style="margin:0">
+          <button class="btn btn-putih" style="font-size:12px">Salin Link</button>
+          <button class="btn btn-abu" style="font-size:12px">Cabut</button>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:8px 11px;background:#f6f8fa;border-radius:7px;font-size:11.5px;color:#5a6876;word-break:break-all">
+        eduai.bikinaja.id/tinjau/7f3a9c2e1b4d8a6f...
+      </div>
+    </div>
+
+    <div style="border:1px solid #e2e8ee;border-radius:9px;padding:13px">
+      <b>📄 Naskah yang dibagikan</b>
+      <div class="waktu" style="margin-bottom:9px">Semua naskah yang dibagikan ke Prof. Ahmad</div>
+      <div class="berkas-lampir" style="background:#eef7ee;border-color:#b9dfc4">
+        <div class="thumb" style="background:linear-gradient(135deg,#1c7a3d,#0f4a26)">📄</div>
+        <div>
+          <b>skripsi_bab1-3_rev2.docx</b> <span class="status st-berubah" style="font-size:10px">SEKARANG</span>
+          <div class="waktu">Dibagikan 22 Sep 15:30 · 184 KB</div>
+        </div>
+      </div>
+      <div class="berkas-lampir">
+        <div class="thumb" style="background:linear-gradient(135deg,#8a97a6,#5a6876)">📄</div>
+        <div>
+          <b>skripsi_rev1.docx</b>
+          <div class="waktu">Dibagikan 18 Sep 09:10 · 178 KB</div>
+        </div>
+      </div>
+      <div class="berkas-lampir">
+        <div class="thumb" style="background:linear-gradient(135deg,#8a97a6,#5a6876)">📄</div>
+        <div>
+          <b>skripsi_awal.docx</b>
+          <div class="waktu">Dibagikan 12 Sep 14:00 · 165 KB</div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn btn-putih" style="font-size:12px">+ Bagikan naskah lain</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SKETSA 5 — LAPORAN KEMAJUAN (fitur turunan, usul Wulan) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="label-sketsa alt">SKETSA 5 — Usul Wulan: "Kemajuan Bimbingan" (tidak diminta, tapi berguna)</div>
+<div class="hp">
+  <div class="hp-atas">
+    <div>
+      <b>📈 Kemajuan Bimbingan</b>
+      <small>Siti Nurhaliza · ringkasan 12 Sep – 22 Sep</small>
+    </div>
+  </div>
+  <div style="padding:16px">
+    <div class="kartu-tabel" style="margin-top:0">
+      <table class="tabel">
+        <tr><th>Ringkasan</th><th style="text-align:right">Jumlah</th></tr>
+        <tr><td>Permintaan pembimbing (total)</td><td style="text-align:right"><b>9</b></td></tr>
+        <tr><td>Sudah ditindaklanjuti</td><td style="text-align:right"><b>6</b> (67%)</td></tr>
+        <tr><td>Belum ditindaklanjuti</td><td style="text-align:right"><b>3</b></td></tr>
+        <tr><td>BAB yang sudah tersentuh</td><td style="text-align:right"><b>3 dari 5</b></td></tr>
+      </table>
+    </div>
+    <div class="panel-info" style="margin-top:12px">
+      <b>Usul Wulan:</b> ini fitur tambahan — <b>tidak diminta Bos</b>. Wulan sebutkan supaya Bos tahu ada peluang, tapi <b>tidak akan dikerjakan</b> kalau Bos tidak mau. Berguna untuk pembimbing yang mengampu banyak mahasiswa.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="kaki">
+  <h3>❓ Yang Wulan butuh jawaban Bos</h3>
+  <div>1. Sketsa 1–4: mana yang sesuai bayangan Bos? Ada yang perlu diubah?</div>
+  <div>2. Lampiran: cukup <b>gambar + link + berkas</b>, atau ada jenis lain?</div>
+  <div>3. Sketsa 5 (Kemajuan Bimbingan) — perlu atau tidak?</div>
+  <div style="margin-top:9px;color:#a8322a"><b>Catatan jujur:</b> ini gambar HTML, dibuat dengan tangan — bukan tangkapan layar aplikasi. Belum ada kode di baliknya.</div>
+</div>
+
+</div>
+</body>
+</html>

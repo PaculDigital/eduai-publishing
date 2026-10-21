@@ -1,0 +1,587 @@
+<link rel="stylesheet" href="/static/ikon.css">
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mulai — EduAi</title>
+<style>
+:root{
+  --hijau:#198E3B;--hijau-gelap:#15702F;--hijau-lembut:#E9F6EE;
+  --oranye:#F4A025;--putih-hangat:#FAFCFB;--garis:#E2E8E4;
+  --tinta:#272530;--tinta-2:#5C6670;
+  /* MUTU NASKAH (Bos 10 Okt 2026): dipakai kotak hasil periksa mutu.
+     Nama SENGAJA baru — sebelumnya tidak ada, jangan karang pakai nama lain. */
+  --hijau-muda:#E9F6EE;--kuning:#B7791F;--kuning-muda:#FDF6E3;
+  --merah:#C53030;--merah-muda:#FDECEC;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--putih-hangat);color:var(--tinta);
+     font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+
+/* ── kepala (sama gaya dengan halaman lain) ─────────────────────── */
+.kepala{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);
+        border-bottom:1px solid rgba(255,255,255,.13);position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;
+     display:flex;align-items:center;justify-content:space-between}
+.nav .merek{color:#fff;font-weight:800;font-size:19px;letter-spacing:-.3px;text-decoration:none}
+.nav-kanan{display:flex;align-items:center;gap:16px;font-size:14.5px}
+.nav-kanan .nama{color:rgba(255,255,255,.9)}
+.nav-kanan a{color:#fff;text-decoration:none}
+.nav-kanan .keluar{font-weight:600;border:1.5px solid rgba(255,255,255,.34);
+                   padding:6px 15px;border-radius:70px;transition:.2s}
+.nav-kanan .keluar:hover{background:rgba(255,255,255,.14)}
+
+.wadah{max-width:820px;margin:0 auto;padding:34px 22px 70px}
+
+/* ── judul halaman ──────────────────────────────────────────────── */
+.judul-hal{text-align:center;margin:0 0 6px;font-size:25px;font-weight:800;
+           letter-spacing:-.4px}
+.ket-hal{text-align:center;color:var(--tinta-2);margin:0 0 26px;font-size:14.5px}
+.lencana{display:inline-block;background:var(--hijau-lembut);color:var(--hijau);
+         font-size:12.5px;font-weight:700;padding:4px 12px;border-radius:999px;
+         margin-bottom:10px}
+
+/* ── pintu: 2 kartu besar ───────────────────────────────────────── */
+.dua-pintu{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.dua-pintu{grid-template-columns:1fr}}
+
+.pintu{background:#fff;border:2px solid var(--garis);border-radius:16px;
+       padding:20px;text-align:left;cursor:pointer;transition:.18s;
+       display:flex;gap:14px;align-items:flex-start;width:100%;
+       font:inherit;color:inherit}
+.pintu:hover{border-color:var(--hijau);box-shadow:0 6px 22px rgba(25,142,59,.14);
+             transform:translateY(-2px)}
+.pintu .ik{width:46px;height:46px;border-radius:12px;background:var(--hijau-lembut);
+           display:flex;align-items:center;justify-content:center;font-size:22px;
+           flex:0 0 auto}
+.pintu b{display:block;font-size:16.5px;margin-bottom:3px}
+.pintu span.ket{display:block;font-size:13.5px;color:var(--tinta-2);line-height:1.5}
+
+/* ── panel (dipakai semua langkah) ──────────────────────────────── */
+.panel{background:#fff;border:1px solid var(--garis);border-radius:16px;
+       padding:22px;box-shadow:0 2px 12px rgba(39,37,48,.05)}
+.kepala-langkah{display:flex;justify-content:space-between;align-items:center;
+                margin-bottom:8px}
+.kepala-langkah .nomor-l{font-size:12.5px;font-weight:800;letter-spacing:.05em;
+                         color:var(--tinta-2)}
+.gratis{font-size:12.5px;font-weight:700;color:var(--hijau)}
+.rel{height:7px;background:#EEF1EF;border-radius:99px;overflow:hidden;margin-bottom:20px}
+.rel i{display:block;height:100%;background:var(--hijau);border-radius:99px;
+       transition:width .3s}
+
+.tanya{font-size:19px;font-weight:750;margin:0 0 5px;letter-spacing:-.3px}
+.tanya-ket{font-size:13.5px;color:var(--tinta-2);margin:0 0 16px}
+
+/* ── pilihan berbentuk pil ──────────────────────────────────────── */
+.pil-baris{display:flex;flex-wrap:wrap;gap:9px}
+.pil{border:1.5px solid var(--garis);background:#fff;border-radius:999px;
+     padding:10px 16px;font:inherit;font-size:14px;font-weight:600;
+     color:var(--tinta);cursor:pointer;transition:.15s}
+.pil:hover{border-color:var(--hijau);background:var(--hijau-lembut)}
+.pil.aktif{background:var(--hijau);color:#fff;border-color:var(--hijau)}
+.pil .ket-kecil{display:block;font-size:11.5px;font-weight:500;
+                color:var(--tinta-2);margin-top:2px}
+.pil.aktif .ket-kecil{color:rgba(255,255,255,.85)}
+
+/* ── kolom judul ────────────────────────────────────────────────── */
+.kotak{width:100%;border:1.5px solid var(--garis);border-radius:11px;
+       padding:12px 14px;font:inherit;font-size:14.5px;color:var(--tinta)}
+.kotak:focus{outline:none;border-color:var(--hijau);
+             box-shadow:0 0 0 3px rgba(25,142,59,.12)}
+.contoh{margin-top:11px;display:flex;flex-direction:column;gap:7px}
+.contoh button{text-align:left;background:var(--hijau-lembut);border:1px dashed #B9DCC5;
+               border-radius:10px;padding:9px 12px;font:inherit;font-size:13.5px;
+               color:#14532D;cursor:pointer;transition:.15s}
+.contoh button:hover{background:#DCF0E4;border-style:solid}
+
+/* ── tombol ─────────────────────────────────────────────────────── */
+.aksi{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.tb{border-radius:11px;padding:11px 20px;font:inherit;font-size:14.5px;
+    font-weight:650;cursor:pointer;border:1.5px solid transparent;transition:.18s}
+.tb-utama{background:var(--hijau);color:#fff;border-color:var(--hijau);flex:1}
+.tb-utama:hover{background:var(--hijau-gelap)}
+.tb-utama:disabled{background:#C9D3CC;border-color:#C9D3CC;cursor:not-allowed}
+.tb-garis{background:#fff;color:var(--tinta);border-color:var(--garis)}
+.tb-garis:hover{border-color:var(--tinta-2)}
+.tb-oranye{background:var(--oranye);color:#2E1B00;border-color:var(--oranye);flex:1}
+.tb-oranye:hover{background:#FFB63D}
+
+/* ── riwayat 4 langkah ──────────────────────────────────────────── */
+.riwayat{margin-top:22px;border-top:1px solid var(--garis);padding-top:16px}
+.rw{display:flex;gap:12px;align-items:center;padding:8px 0}
+.rw .n{width:26px;height:26px;border-radius:50%;flex:0 0 auto;display:flex;
+       align-items:center;justify-content:center;font-size:13px;font-weight:700;
+       background:#EEF1EF;color:var(--tinta-2);border:1.5px solid var(--garis)}
+.rw .n.kini{background:var(--hijau);color:#fff;border-color:var(--hijau)}
+.rw .n.selesai{background:var(--hijau-lembut);color:var(--hijau);border-color:var(--hijau)}
+.rw b{font-size:13.5px;display:block}
+.rw .isi{font-size:12.5px;color:var(--tinta-2)}
+
+/* ── kotak pesan ────────────────────────────────────────────────── */
+.pesan{border-radius:11px;padding:13px 15px;font-size:14px;margin-top:16px;display:none}
+.pesan.tampil{display:block}
+.pesan.info{background:var(--hijau-lembut);color:#14532D}
+.pesan.salah{background:#FDEEEE;color:#8A1F1F}
+.pesan b{display:block;margin-bottom:3px}
+
+/* ── hasil deteksi (jalur lanjutkan) ────────────────────────────── */
+.berkas-terpilih{display:flex;gap:13px;align-items:center;background:var(--putih-hangat);
+                 border:1px solid var(--garis);border-radius:12px;padding:13px;
+                 margin-bottom:14px}
+.berkas-terpilih .ik{width:40px;height:40px;border-radius:10px;
+                     background:var(--hijau-lembut);display:flex;align-items:center;
+                     justify-content:center;font-size:19px;flex:0 0 auto}
+.deteksi{background:var(--hijau-lembut);border-radius:12px;padding:15px}
+.deteksi b.besar{font-size:15.5px}
+.deteksi p{margin:7px 0 0;font-size:13.5px;color:#14532D}
+
+/* ── daftar berkas (pilih naskah) ───────────────────────────────── */
+.berkas-baris{display:flex;align-items:center;gap:12px;padding:12px;
+              border:1.5px solid var(--garis);border-radius:12px;margin-bottom:9px;
+              cursor:pointer;background:#fff;transition:.15s;width:100%;
+              font:inherit;color:inherit;text-align:left}
+.berkas-baris:hover{border-color:var(--hijau);background:var(--hijau-lembut)}
+.muat{text-align:center;color:var(--tinta-2);font-size:14px;padding:18px}
+.sembunyi{display:none!important}
+</style>
+</head>
+<body>
+
+{{ ikon_sprite() }}
+<div class="kepala">
+  <div class="nav">
+    <a class="merek" href="/naskah">EduAi</a>
+    <div class="nav-kanan">
+      {{ ikon('file-text', 15) }} Naskah Saya
+      <span class="nama">{{ user.nama_tampil }}</span>
+      <a class="keluar" href="/keluar">Keluar</a>
+    </div>
+  </div>
+</div>
+
+<div class="wadah">
+
+  <!-- ══════════ LAYAR 1: DUA PINTU (Desain 1) ══════════ -->
+  <section id="layar-pintu">
+    <div class="lencana">Tahap ini gratis</div>
+    <h1 class="judul-hal">Mau mulai dari mana?</h1>
+    <p class="ket-hal">Pilih satu — nanti kami pandu langkah demi langkah.</p>
+
+    <div class="dua-pintu">
+      <button class="pintu" id="pintu-baru">
+        <span class="ik">{{ ikon('pencil', 20) }}</span>
+        <span>
+          <b>Mulai baru</b>
+          <span class="ket">Belum ada naskah. Kami bimbing dari langkah pertama sampai BAB I siap.</span>
+        </span>
+      </button>
+      <button class="pintu" id="pintu-lanjut">
+        <span class="ik">{{ ikon('file-text', 20) }}</span>
+        <span>
+          <b>Lanjutkan naskah saya</b>
+          <span class="ket">Sudah punya naskah. Unggah, kami periksa sudah sampai bagian mana.</span>
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════ LAYAR 2: PILIH BERKAS (jalur lanjutkan) ══════════ -->
+  <section id="layar-berkas" class="sembunyi">
+    <div class="panel">
+      <p class="tanya">Naskah mana yang mau dilanjutkan?</p>
+      <p class="tanya-ket">Membaca naskah <b>gratis</b> — belum memakai Token Revisi.</p>
+      <div id="daftar-berkas"><div class="muat">Memuat daftar naskah…</div></div>
+      <div class="aksi">
+        <button class="tb tb-garis" data-kembali="pintu">← Kembali</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ LAYAR 3: HASIL DETEKSI (pagar P3) ══════════ -->
+  <section id="layar-deteksi" class="sembunyi">
+    <div class="panel">
+      <div class="berkas-terpilih">
+        <span class="ik">{{ ikon('file-text', 20) }}</span>
+        <span><b id="det-nama">—</b><br>
+        <span class="isi" style="font-size:12.5px;color:var(--tinta-2)">Sudah selesai dibaca · gratis</span></span>
+      </div>
+      <div class="deteksi">
+        <b class="besar" id="det-ringkas">Terdeteksi…</b>
+        <p id="det-bab">—</p>
+      </div>
+      <!-- MUTU NASKAH (Bos 10 Okt 2026) — titip di layar deteksi yang SUDAH
+           ada. Kode menghitung fakta (tanpa Jev, tanpa biaya). Sifat:
+           TAHU + TAWAR, bukan blokir. -->
+      <div id="det-mutu" class="sembunyi"
+           style="margin:12px 0 0;padding:12px;border-radius:12px;
+                  border:1px solid var(--garis);background:var(--putih-hangat)">
+        <b id="det-mutu-judul" style="font-size:14px">—</b>
+        <p id="det-mutu-pesan" style="font-size:12.5px;margin:6px 0 0;color:var(--tinta-2)">—</p>
+        <button class="tb tb-garis sembunyi" id="det-mutu-docx"
+                style="margin-top:10px;width:100%">Kirim berkas .docx aslinya (disarankan)</button>
+      </div>
+      <div class="aksi">
+        <button class="tb tb-utama" id="det-benar">{{ ikon('check', 15) }} Benar, lanjutkan</button>
+        <button class="tb tb-garis" data-kembali="berkas">Bukan — pilih naskah lain</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ LAYAR 4: 4 LANGKAH (Desain 2) ══════════ -->
+  <section id="layar-langkah" class="sembunyi">
+    <div class="panel">
+      <div class="kepala-langkah">
+        <span class="nomor-l" id="l-nomor">LANGKAH 1 DARI 4</span>
+        <span class="gratis">GRATIS</span>
+      </div>
+      <div class="rel"><i id="l-rel" style="width:25%"></i></div>
+
+      <p class="tanya" id="l-tanya">—</p>
+      <p class="tanya-ket" id="l-ket">—</p>
+      <div id="l-pilihan"></div>
+
+      <div class="aksi">
+        <button class="tb tb-garis" id="l-kembali">← Kembali</button>
+        <button class="tb tb-utama" id="l-lanjut" disabled>Lanjut →</button>
+      </div>
+
+      <div class="riwayat" id="l-riwayat"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ LAYAR 5: SELESAI / NASKAH DIBUAT (OPSI D) ══════════ -->
+  <section id="layar-selesai" class="sembunyi">
+    <div class="panel">
+      <div class="pesan info tampil" id="s-pesan">
+        <b>{{ ikon('check', 15) }} Naskahmu sudah dibuat</b>
+        <span id="s-detail">—</span>
+      </div>
+      <div class="berkas-terpilih" style="margin-top:16px">
+        <span class="ik">{{ ikon('file-pen', 20) }}</span>
+        <span><b id="s-nama">—</b><br>
+        <span style="font-size:12.5px;color:var(--tinta-2)" id="s-ringkas">—</span></span>
+      </div>
+      <div class="aksi">
+        <button class="tb tb-oranye" id="s-kerangka">Susun kerangka BAB I →</button>
+        <button class="tb tb-garis" id="s-nanti">Nanti saja</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   HALAMAN "MULAI" — pintu 2 kartu + 4 langkah satu-satu.
+   Semua panggilan ke rute /api/ai/v1/alur/* yang SUDAH TERUJI (42/0).
+   ════════════════════════════════════════════════════════════════════ */
+const API = '/api/ai/v1';
+const el = (id) => document.getElementById(id);
+
+/*  keadaan halaman (state) — satu sumber, mudah dibaca */
+const S = {
+  pilihan: null,        // 'baru' | 'lanjut'
+  fileId: null,         // naskah terpilih (jalur lanjutkan)
+  deteksi: null,
+  langkah: null,        // {langkah, nomor, selesai, pilihan}
+  nilai: {jenjang:'', bidang:'', mode_penelitian:'', judul:''},
+  dokumen: null,        // hasil OPSI D
+  kembaliDari: 'pintu',
+};
+
+function tampil(id) {
+  ['pintu','berkas','deteksi','langkah','selesai'].forEach(k => {
+    el('layar-' + k).classList.toggle('sembunyi', k !== id);
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function pesan(kotakId, jenis, judul, isi) {
+  const p = el(kotakId);
+  if (!jenis) { p.classList.remove('tampil'); return; }
+  p.className = 'pesan ' + jenis + ' tampil';
+  p.innerHTML = '<b>' + judul + '</b><span>' + (isi || '') + '</span>';
+}
+async function minta(jalan, opsi) {
+  const r = await fetch(API + jalan, Object.assign({
+    headers: {'Content-Type':'application/json'},
+    credentials: 'same-origin'
+  }, opsi || {}));
+  let d = {};
+  try { d = await r.json(); } catch (e) {}
+  if (!r.ok) {
+    const p = (d && d.detail && d.detail.pesan) || (d && d.pesan) || 'Terjadi kendala.';
+    throw new Error(p);
+  }
+  return d;
+}
+
+/* ── LANGKAH: label & riwayat ─────────────────────────────────── */
+const NAMA_LANGKAH = {jenjang:'Jenjang', bidang:'Bidang studi',
+                      mode_penelitian:'Jenis penelitian', judul:'Judul penelitian'};
+
+function gambarRiwayat() {
+  const urut = ['jenjang','bidang','mode_penelitian','judul'];
+  const kini = S.langkah ? S.langkah.langkah : null;
+  let h = '';
+  urut.forEach((k, i) => {
+    const sudah = !!S.nilai[k];
+    const sekarang = (k === kini);
+    const kelas = sudah ? 'selesai' : (sekarang ? 'kini' : '');
+    const tanda = sudah ? '<svg class="ik" width="13" height="13"><use href="#ik-check"/></svg>' : (i + 1);
+    h += '<div class="rw"><span class="n ' + kelas + '">' + tanda + '</span>' +
+         '<span><b>' + NAMA_LANGKAH[k] + '</b>' +
+         '<span class="isi">' + (sudah ? S.nilai[k] : (sekarang ? 'sedang diisi…' : 'belum')) +
+         '</span></span></div>';
+  });
+  el('l-riwayat').innerHTML = h;
+}
+
+/* ── LANGKAH: gambar pilihan sesuai jenis pertanyaan ──────────── */
+const JENJANG = [
+  {kode:'skripsi', label:'S1 — Skripsi'}, {kode:'tesis', label:'S2 — Tesis'},
+  {kode:'disertasi', label:'S3 — Disertasi'}];
+
+function gambarPilihan() {
+  const L = S.langkah;
+  const wadah = el('l-pilihan');
+  wadah.innerHTML = '';
+  if (!L) return;
+
+  if (L.langkah === 'judul') {
+    const k = document.createElement('input');
+    k.className = 'kotak'; k.id = 'in-judul'; k.type = 'text';
+    k.placeholder = 'Tulis judul penelitianmu…';
+    k.value = S.nilai.judul || '';
+    k.addEventListener('input', () => {
+      S.nilai.judul = k.value.trim();
+      el('l-lanjut').disabled = S.nilai.judul.length < 8;
+    });
+    wadah.appendChild(k);
+    const c = document.createElement('div');
+    c.className = 'contoh'; c.id = 'in-contoh';
+    c.innerHTML = '<div class="muat" style="padding:6px 0">Menyiapkan contoh judul…</div>';
+    wadah.appendChild(c);
+    muatContoh();
+  } else {
+    const baris = document.createElement('div');
+    baris.className = 'pil-baris';
+    const daftar = L.pilihan || [];
+    daftar.forEach(o => {
+      const b = document.createElement('button');
+      b.className = 'pil' + (S.nilai[L.langkah] === o.kode ? ' aktif' : '');
+      b.innerHTML = o.label + (o.ket ? '<span class="ket-kecil">' + o.ket + '</span>' : '');
+      b.addEventListener('click', () => {
+        S.nilai[L.langkah] = o.kode;
+        [...baris.children].forEach(x => x.classList.remove('aktif'));
+        b.classList.add('aktif');
+        el('l-lanjut').disabled = false;
+      });
+      baris.appendChild(b);
+    });
+    wadah.appendChild(baris);
+    el('l-lanjut').disabled = !S.nilai[L.langkah];
+  }
+
+  el('l-nomor').textContent = 'LANGKAH ' + L.nomor + ' DARI 4';
+  el('l-rel').style.width = (L.nomor * 25) + '%';
+  el('l-tanya').textContent = L.tanya || '';
+  el('l-ket').textContent = L.ket || '';
+  el('l-kembali').style.visibility = (L.nomor === 1) ? 'hidden' : 'visible';
+  gambarRiwayat();
+}
+
+async function muatContoh() {
+  try {
+    const d = await minta('/alur/contoh-judul?bidang=' +
+      encodeURIComponent(S.nilai.bidang || '') +
+      '&mode=' + encodeURIComponent(S.nilai.mode_penelitian || 'kuantitatif'));
+    const c = el('in-contoh');
+    if (!c) return;
+    if (!d.contoh || !d.contoh.length) { c.innerHTML = ''; return; }
+    c.innerHTML = '<div style="font-size:12.5px;color:var(--tinta-2);margin-bottom:2px">' +
+                  'Contoh — klik untuk pakai:</div>';
+    d.contoh.forEach(t => {
+      const b = document.createElement('button');
+      b.textContent = t;
+      b.addEventListener('click', () => {
+        const i = el('in-judul'); i.value = t; S.nilai.judul = t;
+        el('l-lanjut').disabled = false; i.focus();
+      });
+      c.appendChild(b);
+    });
+  } catch (e) { const c = el('in-contoh'); if (c) c.innerHTML = ''; }
+}
+
+/* ── LANGKAH: maju / mundur ───────────────────────────────────── */
+async function ambilLangkah() {
+  const q = new URLSearchParams(S.nilai).toString();
+  try {
+    S.langkah = await minta('/alur/langkah?' + q);
+    tampil('langkah'); gambarPilihan();
+  } catch (e) { alert(e.message); }
+}
+
+async function maju() {
+  const L = S.langkah;
+  if (!L) return;
+  const isi = {};
+  isi[L.langkah] = S.nilai[L.langkah];
+  const bodi = Object.assign({}, isi);
+  if (S.fileId) bodi.file_id = S.fileId;
+  if (L.langkah === 'judul') bodi.nama_dokumen = S.nilai.judul.slice(0, 60);
+  el('l-lanjut').disabled = true;
+  try {
+    const d = await minta('/alur/simpan', {method:'POST', body: JSON.stringify(bodi)});
+    //  ⚠️ PENTING (jebakan 26Sep26): kalau server MEMBUAT naskah baru
+    //     (OPSI D), file_id balasannya WAJIB disimpan — kalau tidak,
+    //     langkah berikutnya membuat naskah KEDUA.
+    if (d.file_id) S.fileId = d.file_id;
+    if (d.dokumen && d.dokumen.file_id) S.dokumen = d.dokumen;
+    if (d.berikut && d.berikut.selesai) { selesai(); return; }
+    S.langkah = d.berikut;
+    tampil('langkah'); gambarPilihan();
+  } catch (e) {
+    el('l-lanjut').disabled = false;
+    pesan('l-msg', 'salah', 'Belum bisa disimpan', e.message);
+    alert(e.message);
+  }
+}
+
+function selesai() {
+  const d = S.dokumen || {};
+  const nama = d.nama || 'Naskah Baru.docx';
+  el('s-nama').textContent = nama;
+  const bagian = [S.nilai.jenjang, S.nilai.bidang, S.nilai.mode_penelitian]
+                  .filter(Boolean).map(x => x.charAt(0).toUpperCase() + x.slice(1)).join(' · ');
+  el('s-ringkas').textContent = bagian + (S.nilai.judul ? ' — ' + S.nilai.judul : '');
+  el('s-detail').textContent = 'Tersimpan. Naskahmu bernama "' + nama +
+    '" — tinggal kami isi kerangkanya.';
+  el('s-kerangka').onclick = () => {
+    if (S.fileId) { window.location.href = '/edit/' + S.fileId; }
+    else { window.location.href = '/naskah'; }
+  };
+  tampil('selesai');
+}
+
+/* ── JALUR "LANJUTKAN": pilih berkas → deteksi → konfirmasi ───── */
+async function mintaBerkas() {
+  tampil('berkas');
+  const w = el('daftar-berkas');
+  w.innerHTML = '<div class="muat">Memuat daftar naskah…</div>';
+  try {
+    const r = await fetch('/api/kuota', {credentials:'same-origin'});
+    const d = await r.json();
+    const daftar = d.berkas || d.daftar || [];
+    if (!daftar.length) {
+      w.innerHTML = '<div class="muat">Belum ada naskah tersimpan.<br>' +
+        'Unggah dulu di <a href="/naskah" style="color:var(--hijau)">Naskah Saya</a>, ' +
+        'atau pilih <b>Mulai baru</b>.</div>';
+      return;
+    }
+    w.innerHTML = '';
+    daftar.forEach(b => {
+      const t = document.createElement('button');
+      t.className = 'berkas-baris';
+      t.innerHTML = '<span style="font-size:19px">{{ ikon("file-text", 19) }}</span><span><b>' +
+        (b.nama || b.nama_asli || 'Naskah') + '</b></span>';
+      t.addEventListener('click', () => deteksiBerkas(b.id));
+      w.appendChild(t);
+    });
+  } catch (e) {
+    w.innerHTML = '<div class="muat">Daftar naskah belum bisa dimuat.<br>' +
+      'Coba lagi sebentar lagi, atau pilih <b>Mulai baru</b>.</div>';
+  }
+}
+
+async function deteksiBerkas(fid) {
+  el('daftar-berkas').innerHTML = '<div class="muat">Sedang membaca naskah… (gratis)</div>';
+  try {
+    const d = await minta('/alur/petakan', {method:'POST',
+      body: JSON.stringify({pilihan:'lanjut', file_id: fid})});
+    if (d.tanya === 'unggah') { alert(d.pesan || 'Naskah belum bisa dibaca.'); return; }
+    S.fileId = fid;
+    S.deteksi = d.deteksi || {};
+    const nama = d.nama_berkas || 'Naskah';
+    el('det-nama').textContent = nama;
+    el('det-ringkas').textContent = 'Terdeteksi: ' +
+      (S.deteksi.label_jenis || 'naskah') +
+      (S.deteksi.jenis_penelitian ? ' · ' + S.deteksi.jenis_penelitian : '');
+    el('det-bab').textContent = S.deteksi.ringkas || '(Bagian naskah terdeteksi.)';
+    tampilMutu(d.mutu);
+    tampil('deteksi');
+  } catch (e) { alert(e.message); mintaBerkas(); }
+}
+
+/* MUTU NASKAH (Bos 10 Okt 2026) — tampilkan hasil hitungan kode.
+   Sifat: TAHU + TAWAR. Tidak memblokir: tombol "Benar, lanjutkan" tetap ada. */
+function tampilMutu(m) {
+  const kotak = el('det-mutu');
+  if (!m || !m.tingkat) { kotak.classList.add('sembunyi'); return; }
+  const warna = {sehat:'var(--hijau)', rusak_konversi:'var(--merah)',
+                 baris_pendek:'var(--kuning)', kosong:'var(--tinta-2)'};
+  const tanda = {sehat:'✅ ', rusak_konversi:'⚠️ ', baris_pendek:'ℹ️ ', kosong:'ℹ️ '};
+  const judul = {sehat:'Naskah terbaca baik',
+                 rusak_konversi:'Naskah ini rusak akibat konversi',
+                 baris_pendek:'Naskah terbaca, tapi barisnya pendek-pendek',
+                 kosong:'Tidak ada teks yang terbaca'};
+  kotak.classList.remove('sembunyi');
+  kotak.style.background = (m.tingkat === 'rusak_konversi') ? 'var(--merah-muda)'
+      : (m.tingkat === 'baris_pendek' ? 'var(--kuning-muda)' : 'var(--hijau-muda)');
+  kotak.style.borderColor = warna[m.tingkat] || 'var(--garis)';
+  el('det-mutu-judul').textContent = (tanda[m.tingkat] || '') +
+      (judul[m.tingkat] || 'Naskah diperiksa');
+  el('det-mutu-judul').style.color = warna[m.tingkat] || 'var(--tinta)';
+  el('det-mutu-pesan').textContent = m.pesan || '';
+  el('det-mutu-docx').classList.toggle('sembunyi', m.saran !== 'ganti_ke_docx');
+}
+
+async function konfirmasiBenar() {
+  try {
+    const d = await minta('/alur/petakan', {method:'POST',
+      body: JSON.stringify({pilihan:'lanjut', file_id: S.fileId, konfirmasi:true})});
+    if (d.deteksi) {
+      S.deteksi = d.deteksi;
+      if (d.deteksi.jenjang) S.nilai.jenjang = d.deteksi.jenjang;
+      if (d.deteksi.jenis_penelitian) S.nilai.mode_penelitian = d.deteksi.jenis_penelitian;
+    }
+    await ambilLangkah();
+  } catch (e) { alert(e.message); }
+}
+
+/* ── SAMBUNGAN TOMBOL ─────────────────────────────────────────── */
+el('pintu-baru').addEventListener('click', async () => {
+  S.pilihan = 'baru';
+  try {
+    const d = await minta('/alur/petakan', {method:'POST',
+      body: JSON.stringify({pilihan:'baru'})});
+    S.langkah = d.berikut || null;
+    S.dokumen = null;
+    //  Naskah dibuat SAAT user menekan "Lanjut" di langkah 1 (OPSI D),
+    //  supaya user tidak melihat naskah kosong kalau dia batal di tengah.
+    if (!S.langkah) await ambilLangkah(); else { tampil('langkah'); gambarPilihan(); }
+  } catch (e) { alert(e.message); }
+});
+
+el('pintu-lanjut').addEventListener('click', () => { S.pilihan = 'lanjut'; mintaBerkas(); });
+el('det-benar').addEventListener('click', konfirmasiBenar);
+el('l-lanjut').addEventListener('click', maju);
+el('l-kembali').addEventListener('click', async () => {
+  //  mundur = ulangi langkah sebelumnya dengan nilai yang sudah ada
+  const urut = ['jenjang','bidang','mode_penelitian','judul'];
+  const kini = S.langkah ? S.langkah.langkah : 'jenjang';
+  const i = Math.max(0, urut.indexOf(kini) - 1);
+  const sebelum = urut[i];
+  S.nilai[sebelum] = '';            // kosongkan supaya bisa diubah
+  await ambilLangkah();
+});
+el('s-nanti').addEventListener('click', () => { window.location.href = '/naskah'; });
+document.querySelectorAll('[data-kembali]').forEach(b => {
+  b.addEventListener('click', () => {
+    const ke = b.getAttribute('data-kembali');
+    if (ke === 'pintu') tampil('pintu'); else mintaBerkas();
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,2224 @@
+PENGARUH DIGITAL MARKETING DAN ORIENTASI KEWIRAUSAHAAN TERHADAP KEBERLANJUTAN USAHA PADA UMKM KULINER AYAM BAKAR DI KABUPATEN BEKASI
+
+SKRIPSI
+
+[[GAMBAR-1: di sini — JANGAN diubah, ini konteks]]
+
+OLEH :
+
+ASIH SUSANTI PUTRI
+
+NIM : 112210485
+
+PROGRAM STUDI MANAJEMEN
+
+FAKULTAS EKONOMI DAN BISNIS
+
+UNIVERSITAS PELITA BANGSA
+
+BEKASI
+
+2026
+
+PENGARUH DIGITAL MARKETING DAN ORIENTASI KEWIRAUSAHAAN TERHADAP KEBERLANJUTAN USAHA PADA UMKM KULINER AYAM BAKAR DI KABUPATEN BEKASI
+
+Ditulis dan diajukan untuk memenuhi syarat ujian akhir
+
+guna memperoleh gelar Sarjana Strata-1 di Program Studi Manajemen,
+
+Fakultas Ekonomi dan Bisnis, Universitas Pelita Bangsa
+
+SKRIPSI
+
+[[GAMBAR-2: di sini — JANGAN diubah, ini konteks]]
+
+OLEH :
+
+ASIH SUSANTI PUTRI
+
+NIM : 112210485
+
+PROGRAM STUDI MANAJEMEN
+
+FAKULTAS EKONOMI DAN BISNIS
+
+UNIVERSITAS PELITA BANGSA
+
+BEKASI
+
+2026
+
+[[GAMBAR-3: di sini — JANGAN diubah, ini konteks]]
+
+PERSETUJUAN PEMBIMBING
+
+[[GAMBAR-4: di sini — JANGAN diubah, ini konteks]]
+
+SKRIPSI
+
+[[GAMBAR-5: di sini — JANGAN diubah, ini konteks]]
+
+PERNYATAAN KEASLIAN SKRIPSI
+
+MOTTO DAN PERSEMBAHAN
+
+“Sesungguhnya Allah bersama orang-orang yang sabar.”
+
+(QS. Al-Baqarah: 153)
+
+”Semua jatuh bangunmu hal yang biasa, angan dan pertanyaan waktu yang menjawabnya, berikan tenggat waktu bersedihlah secukupnya, rayakan perasaanmu sebagai manusia”
+
+(Baskara Putra – Hindia)
+
+"Dreams require action, action requires courage, courage requires confidence."
+
+– Potatoes
+
+Skripsi ini dipersembahkan kepada keluarga dan penulis mengucapkan terima kasih yang tulus kepada ayah, ibu, dan kakak tercinta, atas doa, kasih sayang, dukungan moral maupun materi, menjadi pendengar dan keluh kesah serta kesabaran yang tiada henti selama menempuh pendidikan hingga menyelesaikan skripsi ini. Terima kasih telah menjadi sumber kekuatan dan motivasi terbesar dalam hidup. Semoga skripsi ini menjadi bukti kecil dari bakti besar yang selalu kalian ajarkan. Semua langkahku adalah ikhtiar, semua hasilku adalah karena Allah dan doa kalian. Semoga Allah SWT membalas setiap pengorbanan dan kebaikan keluarga dengan keberkahan dan kebahagiaan.
+
+KATA PENGANTAR
+
+Alhamdulillah, segala puji dan syukur penulis panjatkan kepada Allah SWT atas segala rahmat, taufik dan hidayah-Nya sehingga penulis dapat menyelesaikan penulisan skripsi dengan judul “Pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi”. Penyusunan skripsi ini merupakan salah satu persyaratan untuk memperoleh gelar Sarjana Manajemen (S.M.) Fakultas Ekonomi dan Bisnis Universitas Pelita Bangsa (UPB).
+
+Penulis menyadari bahwa skripsi ini dapat diselesaikan berkat dukungan dari berbagai pihak. Penulis mengucapkan terima kasih dan penghargaan yang setinggi-tingginya kepada:
+
+Hamzah Muhammad Mardiputra., SKM., MM, D.B.A sebagai Rektor Universitas Pelita Bangsa.
+
+Dr. Preatmi Nurastuti., S.E., M.M selaku Dekan Fakultas Ekonomi dan Bisnis (FEB) Universitas Pelita Bangsa.
+
+Dr. Yunita Ramadhani Ratnaningsih DS., SE., Msc selaku Kaprodi Program Studi Manajemen Fakultas Ekonomi dan Bisnis (FEB) Universitas Pelita Bangsa.
+
+Dr. Hj. R.R. Wening Ken Widodasih., SH., MM.Dipl.Cidesco Int’L ., C.CLE selaku Dosen Pembimbing yang telah memberikan arahan, bimbingan, dan masukan selama proses penyusunan skripsi ini..
+
+Penulis mengucapkan terima kasih kepada Dewan Penguji atas waktu, perhatian, serta saran yang diberikan dalam proses penyusunan skripsi ini. Masukan yang diberikan sangat membantu penulis dalam menyempurnakan penelitian.
+
+Bapak/Ibu Dosen Fakultas Ekonomi dan Bisnis yang telah membimbing, mengarahkan, memberi nasehat dan membagi ilmu pengetahuan sebagai bekal bagi penulis dalam mengembangkan keilmuan maupun menyelesaikan skripsi ini.
+
+Terima kasih penulis sampaikan kepada keluarga terutama kedua orang tua dan kakak, atas doa, dukungan, dan kasih sayang yang menjadi kekuatan terbesar dalam menyelesaikan skripsi ini.
+
+Kepada Yasin teman terbaik selama bimbingan yang selalu memberikan dukungan, membantu dalam revisian dan semangat selama proses penyusunan skripsi ini. Terima kasih atas waktu, pikiran dan energi yang telah diberikan secara langsung maupun tidak langsung. Semoga kebaikanmu dibalas dengan hal-hal terbaik di masa depan.
+
+Kepada teman-teman penulis, Arfia Putri Damayanti, Josephin Michael Panjaitan, dan teman-teman yang tidak bisa disebutkan satu persatu. Terima kasih telah menjadi bagian terkuat di masa perkuliahan dan tidak hanya mendukung skripsi, tetapi juga menjaga kewarasan penulis selama prosesnya, menjadi sumber tawa di tengah stres, dan menjadi pengingat bahwa penulis tidak berjalan sendirian. Setiap motivasi, setiap kebersamaan, dan setiap momen kecil yang kita lalui, semuanya menjadi energi besar yang membantu penulis menyelesaikan skripsi ini. Semoga pertemanan ini terus tumbuh dan membawa kebaikan untuk kita semua.
+
+Penulis menyadari bahwa skripsi ini masih memiliki keterbatasan. Penulis sangat terbuka terhadap saran dan kritik yang membangun demi penyempurnaan di masa mendatang. Semoga skripsi ini dapat memberikan manfaat bagi pembaca dan berkontribusi pada pengembangan ilmu pengetahuan.
+
+[[GAMBAR-6: di sini — JANGAN diubah, ini konteks]]
+
+Bekasi, 06 Mei 2026
+
+Asih Susanti Putri
+
+DAFTAR ISI
+
+Halaman
+
+halaman Juduli
+
+Halaman Persetujuan Pembimbingii
+
+Halaman Lembar Pengesahaniii
+
+Halaman Pernyataan Keaslian Skripsiiv
+
+Motto dan Persembahanv
+
+Kata Pengantarvi
+
+Daftar Isiviii
+
+Daftar Tabelx
+
+Daftar Gambarxi
+
+Daftar Lampiranxii
+
+Abstractxiii
+
+ABSTRAKxiv
+
+BAB I PENDAHULUAN1
+
+1.1Latar Belakang1
+
+1.1.1Gap research6
+
+1.1.2Hasil Pra-Survei8
+
+1.2Rumusan Masalah13
+
+1.3Tujuan Penelitian14
+
+1.4Manfaat Penelitian14
+
+1.5Sistematika Penulisan15
+
+BAB II TINJAUAN PUSTAKA17
+
+2.1Landasan Teori17
+
+2.1.1Keberlanjutan Usaha17
+
+2.1.2Digital Marketing18
+
+2.1.3Orientasi Kewirausahaan20
+
+2.2Penelitian Terdahulu Relevan21
+
+2.2.1Penelitian Terdahulu Internasional21
+
+2.2.2Penelitian Terdahulu Nasional25
+
+2.3Hipotesis dan Model Penelitian28
+
+2.3.1Hipotesis28
+
+2.3.2Model Penelitian30
+
+BAB III METODE PENELITIAN31
+
+3.1Jenis dan Desain Penelitian31
+
+3.1.1Jenis Penelitian31
+
+3.1.2Tempat dan Waktu Penelitian31
+
+3.1.3Desain Penelitian32
+
+3.2Definisi Operasional dan Pengukuran Variabel33
+
+3.3Metode Pengumpulan Data36
+
+3.4Jenis, Sumber, dan Teknik Pengumpulan Data37
+
+3.4.1Jenis dan Sumber Data37
+
+3.4.2Teknik Pengumpulan Data38
+
+3.5Metode Analisis40
+
+3.5.1Uji Instrumen41
+
+3.5.2Uji Asumsi Klasik41
+
+3.5.3Analisis Regresi Linier Berganda43
+
+3.5.4Koefisien Determinasi (R2)44
+
+3.5.5Uji Hipotesis Parsial (Uji T)44
+
+3.5.6Uji Hipotesis Simultan (Uji F)45
+
+BAB IV HASIL DAN PEMBAHASAN46
+
+4.1Hasil Penelitian46
+
+4.1.1Deskripsi Data Penelitian46
+
+4.1.2Hasil Analisis Data48
+
+4.2Pembahasan Penelitian56
+
+4.2.1Pengaruh Digital Marketing terhadap Keberlanjutan Usaha56
+
+4.2.2Pengaruh Orientasi Kewirausahaan terhadap Keberlanjutan Usaha56
+
+4.2.3Pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha57
+
+BAB V PENUTUP58
+
+5.1Kesimpulan58
+
+5.2Saran59
+
+DAFTAR  PUSTAKA60
+
+LAMPIRAN66
+
+DAFTAR TABEL
+
+Halaman
+
+Tabel 1. 1 Gap research6
+
+Tabel 1. 2 Hasil Pra-Survei Variabel Digital Marketing9
+
+Tabel 1. 3 Hasil Pra-Survei Variabel Orientasi Kewirausahaan10
+
+Tabel 1. 4 Hasil Pra-Survei Variabel Keberlanjutan Usaha12
+
+Tabel 3. 1 Definisi Operasional Variabel33
+
+Tabel 3. 2 Skala Likert38
+
+Tabel 4. 1 Hasil Uji Validitas Instrumen Variabel X148
+
+Tabel 4. 2 Hasil Uji Validitas Instrumen Variabel X249
+
+Tabel 4. 3 Hasil Uji Validitas Instrumen Variabel Y49
+
+Tabel 4. 4 Hasil Uji Reliabilitas50
+
+Tabel 4. 5 Hasil Uji 1-Sample – K-S50
+
+Tabel 4. 6 Hasil Uji Multikolinieritas51
+
+Tabel 4. 7 Hasil Uji Heteroskedastisitas Metode Glejser52
+
+Tabel 4. 8 Hasil Analisis Regresi Linier Berganda53
+
+Tabel 4. 9 Hasil Uji Koefisien Determinasi (R2)54
+
+Tabel 4. 10 Hasil Uji t (Parsial)55
+
+Tabel 4. 11 Hasil Uji F (Simultan)55
+
+DAFTAR GAMBAR
+
+Halaman
+
+Gambar 1. 1 Perkembangan UMKM Kabupaten Bekasi Periode 2020–20232
+
+Gambar 1. 2 Perbandingan Jumlah UMKM Antar Provinsi Tahun 20223
+
+Gambar 1. 3 Grafik Hasil Pra-Survei Variabel Digital Marketing10
+
+Gambar 1. 4 Hasil Grafik Pra-Survei Variabel Orientasi Kewirausahaan11
+
+Gambar 1. 5 Hasil Grafik Pra-Survei Variabel Keberlanjutan Usaha12
+
+Gambar 2. 1 Model Penelitian30
+
+Gambar 3. 1 Desain Penelitian32
+
+Gambar 4. 1 Karakteristik Responden Berdasarkan Lama Usaha46
+
+Gambar 4. 2 Karakteristik Responden Berdasarkan Lokasi Usaha47
+
+Gambar 4. 3 Hasil Uji P-Plot51
+
+Gambar 4. 4 Hasil Uji Scatterplot52
+
+DAFTAR LAMPIRAN
+
+Halaman
+
+Lampiran 1 Permohonan Izin Responden66
+
+Lampiran 2 Dokumentasi67
+
+Lampiran 3 Kuesioner68
+
+Lampiran 4 Kuesioner Manual75
+
+Lampiran 5 Data Hasil Pra-Survei78
+
+Lampiran 6 Hasil Olah Data Pra-Kuesioner81
+
+Lampiran 7 Mapping Jurnal87
+
+Lampiran 8 Tabulasi Data94
+
+Lampiran 9 Hasil Olah Data Kuesioner102
+
+Lampiran 10 Hasil Turnitin107
+
+Lampiran 11 Riwayat Hidup108
+
+The Influence Of Digital Marketing And Entrepreneurial Orientation On Business Sustainability In Culinary Grilled Chicken Micro, Small, And Medium Enterprises (MSMEs) In Bekasi Regency
+
+Asih Susanti Putri1)
+
+R.R. Wening Ken Widodasih2)
+
+Abstract
+
+Business Sustainability is one of the major challenges faced by grilled chicken culinary MSMEs in Bekasi Regency amid increasingly intense business competition. The use of Digital Marketing and the strengthening of Entrepreneurial Orientation have become relevant strategies to support Business Sustainability, although their implementation among MSME actors has not been fully optimized. This study aims to analyze the influence of Digital Marketing and Entrepreneurial Orientation on Business Sustainability in grilled chicken culinary MSMEs in Bekasi Regency. The research used a quantitative approach with a survey method involving 100 respondents selected through purposive sampling techniques. Data were collected through questionnaires and analyzed using multiple linear regression analysis with the assistance of SPSS version 25 software. The results showed that Digital Marketing and Entrepreneurial Orientation had a positive and significant effect on Business Sustainability, both partially and simultaneously. These findings indicate that the ability of business actors to utilize digital media, build interactions with customers, and possess innovative, proactive, and opportunity-oriented attitudes plays an important role in increasing competitiveness and maintaining Business Sustainability. This study provides useful insights for MSME actors in developing business strategies that are more adaptive to market developments, technological changes, and future business competition challenges.
+
+Keywords: Digital Marketing, Entrepreneurial Orientation, Business Sustainability, MSMEs
+
+PENGARUH DIGITAL MARKETING DAN ORIENTASI KEWIRAUSAHAAN TERHADAP KEBERLANJUTAN USAHA PADA UMKM KULINER AYAM BAKAR DI KABUPATEN BEKASI
+
+Asih Susanti Putri1)
+
+R.R. Wening Ken Widodasih2)
+
+ABSTRAK
+
+Keberlanjutan Usaha menjadi salah satu tantangan penting bagi pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi yang menghadapi persaingan usaha yang semakin ketat. Pemanfaatan Digital Marketing dan penguatan Orientasi Kewirausahaan menjadi strategi yang relevan dalam mendukung Keberlanjutan Usaha, namun penerapannya belum sepenuhnya optimal di kalangan pelaku UMKM. Penelitian ini bertujuan untuk menganalisis pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada UMKM kuliner ayam bakar di Kabupaten Bekasi. Pendekatan yang digunakan adalah kuantitatif dengan metode survei terhadap 100 responden yang dipilih menggunakan teknik purposive sampling. Data dikumpulkan melalui kuesioner dan dianalisis menggunakan analisis regresi linier berganda dengan bantuan perangkat lunak SPSS versi 25. Hasil penelitian menunjukkan bahwa Digital Marketing dan Orientasi Kewirausahaan berpengaruh positif dan signifikan terhadap Keberlanjutan Usaha baik secara parsial maupun simultan. Temuan ini menunjukkan bahwa kemampuan pelaku usaha dalam memanfaatkan media digital, membangun interaksi dengan pelanggan, serta memiliki sikap inovatif, proaktif, dan berani mengambil peluang usaha berperan penting dalam meningkatkan daya saing dan menjaga Keberlanjutan Usaha. Penelitian ini dapat menjadi bahan pertimbangan bagi pelaku UMKM dalam mengembangkan strategi usaha yang lebih adaptif terhadap perkembangan pasar dan teknologi digital serta menghadapi persaingan usaha yang terus berkembang di berbagai kondisi pasar.
+
+Kata Kunci: Digital Marketing, Orientasi Kewirausahaan, Keberlanjutan Usaha, UMKM
+
+BAB I
+
+PENDAHULUAN
+
+Latar Belakang
+
+UMKM merupakan sektor yang memiliki peran strategis dalam mendorong pertumbuhan perekonomian Indonesia, terutama melalui kemampuannya menciptakan peluang kerja dan mengurangi tingkat pengangguran. Perkembangan teknologi digital yang semakin pesat juga memberikan dorongan signifikan bagi kemajuan UMKM, karena informasi, pengetahuan, serta akses pasar kini dapat diperoleh dengan lebih mudah melalui media digital. Kondisi ini menunjukkan bahwa pemanfaatan teknologi dan media digital tidak lagi dapat diabaikan, terutama bagi pelaku UMKM di Indonesia yang harus beradaptasi dengan perubahan lingkungan bisnis yang semakin kompetitif (Latifah et al., 2023).
+
+Perkembangan UMKM di Indonesia juga tercermin dari peningkatan jumlah unit usaha yang terus terjadi di berbagai daerah. Data Kementerian Koperasi dan UMKM tahun 2022 menunjukkan bahwa secara nasional terdapat 8,71 juta UMKM, di mana Provinsi Jawa Barat menjadi penyumbang terbesar dengan total 1.494.723 unit usaha. Hal ini menegaskan bahwa Jawa Barat merupakan salah satu pusat pertumbuhan UMKM di Indonesia. Pada tingkat daerah, Kabupaten Bekasi termasuk wilayah dengan pertumbuhan UMKM yang signifikan.
+
+Berdasarkan data dari Dinas Koperasi dan Usaha Kecil, jumlah UMKM di Kabupaten Bekasi meningkat dari 293.753 unit pada tahun 2020 menjadi 311.927 unit pada tahun 2021, kemudian bertambah menjadi 331.226 unit pada 2022, hingga mencapai 351.720 unit pada tahun 2023 (Sianturi et al., 2024). Kenaikan ini menunjukkan bahwa keberadaan UMKM semakin penting dalam perekonomian daerah. Peningkatan jumlah pelaku usaha tersebut juga mencerminkan kebutuhan UMKM untuk beradaptasi dengan dinamika lingkungan bisnis guna menjaga Keberlanjutan Usaha di tengah persaingan yang semakin kompetitif. Peningkatan jumlah pelaku usaha tersebut juga mencerminkan kebutuhan UMKM untuk beradaptasi dengan dinamika lingkungan bisnis guna menjaga Keberlanjutan Usaha di tengah persaingan yang semakin kompetitif.
+
+[[GAMBAR-7: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 1. 1 Perkembangan UMKM Kabupaten Bekasi Periode 2020–2023
+
+Sumber: Sianturi et al. (2024), data diolah oleh penulis, 2026
+
+Gambar 1.1 menunjukkan bahwa jumlah UMKM di Kabupaten Bekasi mengalami peningkatan setiap tahun sejak 2020 hingga 2023. Kenaikan ini memperlihatkan bahwa aktivitas usaha masyarakat terus berkembang dan peluang pasar semakin terbuka. Pertumbuhan jumlah pelaku usaha tersebut juga menandakan perlunya pengelolaan bisnis yang lebih terarah agar dapat menghadapi persaingan yang semakin ketat.
+
+Kondisi ini mendorong UMKM untuk memperkuat strategi pemasaran, terutama melalui pemanfaatan media digital, serta menumbuhkan sikap kewirausahaan agar usaha yang dijalankan tidak hanya bertahan, tetapi juga mampu berkembang mengikuti perubahan kebutuhan konsumen. Posisi Jawa Barat sebagai provinsi dengan jumlah UMKM terbesar di Indonesia tergambar pada data Kemenkop UMKM tahun 2022. Informasi ini menunjukkan besarnya peluang pasar serta tingkat persaingan yang dihadapi pelaku UMKM, sehingga pemanfaatan strategi Digital Marketing dan penguatan Orientasi Kewirausahaan menjadi semakin penting. Perkembangan tersebut juga menunjukkan bahwa pelaku UMKM perlu menyesuaikan cara menjalankan usahanya dengan perubahan perilaku dan preferensi konsumen. Situasi tersebut menuntut pelaku usaha untuk lebih adaptif dalam merespons dinamika pasar yang terus berubah, terutama dalam memanfaatkan teknologi sebagai sarana promosi dan komunikasi dengan konsumen.
+
+[[GAMBAR-8: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 1. 2 Perbandingan Jumlah UMKM Antar Provinsi Tahun 2022
+
+Sumber: Sianturi et al. (2024), data diolah penulis, 2026
+
+Temuan tersebut memperlihatkan besarnya peluang pasar yang tersedia bagi pelaku UMKM di wilayah Jawa Barat, termasuk Kabupaten Bekasi. Jumlah pelaku usaha yang tinggi juga menunjukkan semakin ketatnya persaingan, sehingga kemampuan promosi dan strategi pemasaran menjadi bagian penting dalam pengelolaan usaha. Kondisi ini menuntut UMKM untuk memanfaatkan strategi Digital Marketing secara lebih efektif dan memperkuat Orientasi Kewirausahaan agar mampu menarik konsumen serta mempertahankan Keberlanjutan Usaha di tengah dinamika pasar yang semakin cepat.
+
+Berbagai unit usaha kuliner ayam bakar tercatat secara resmi sebagai bagian dari Produk UMKM Kabupaten Bekasi dalam katalog yang dikelola oleh Pemerintah Daerah, antara lain entri produk seperti Ayam Bakar Kartika dan Ayam Bakar Bif yang dipasarkan oleh pelaku usaha mikro setempat (Bekasi, 2026). Keberadaan beberapa usaha kuliner ayam bakar dalam daftar UMKM tersebut menunjukkan bahwa jenis usaha ini bukan hanya sekadar fenomena umum di kalangan pelaku UMKM kuliner, tetapi juga menjadi bagian nyata dari aktivitas ekonomi lokal di Kabupaten Bekasi, sehingga layak dijadikan objek kajian lebih lanjut.
+
+UMKM kuliner ayam bakar merupakan salah satu subsektor kuliner yang memiliki tingkat persaingan tinggi di Kabupaten Bekasi, sehingga menuntut pelaku usaha untuk menerapkan strategi yang adaptif dan inovatif dalam menjaga Keberlanjutan Usaha. Banyaknya pelaku usaha dengan jenis produk yang relatif serupa menjadikan kemampuan pemasaran sebagai faktor penting dalam mempertahankan konsumen dan memperluas jangkauan usaha. Tantangan tersebut semakin terasa ketika sebagian pelaku UMKM masih mengandalkan praktik pemasaran konvensional yang kurang efektif dalam menjangkau konsumen yang semakin memanfaatkan platform digital. Pemanfaatan Digital Marketing terbukti mampu meningkatkan efektivitas promosi dan kinerja usaha pelaku UMKM kuliner, sehingga mendorong peningkatan daya saing di tengah perkembangan pasar yang semakin dinamis (Syah & Sugiyanto, 2025).
+
+Orientasi Kewirausahaan yang mencerminkan kemampuan pelaku usaha dalam berinovasi dan menangkap peluang juga berperan dalam meningkatkan kemampuan adaptasi terhadap perubahan teknologi dan perilaku konsumen (Ramdan et al., 2025). Hal tersebut mengindikasikan bahwa penguatan Digital Marketing dan Orientasi Kewirausahaan memiliki peran penting dalam mendukung Keberlanjutan Usaha UMKM kuliner ayam bakar di tengah persaingan yang semakin ketat.
+
+Persaingan di antara pelaku UMKM di Kabupaten Bekasi semakin intens, sehingga kemampuan pemasaran menjadi salah satu faktor penting dalam mempertahankan konsumen dan memperluas jangkauan usaha. Pemanfaatan Digital Marketing oleh pelaku UMKM terbukti berperan dalam meningkatkan efektivitas promosi serta kinerja usaha, yang pada akhirnya mendorong daya saing di tengah perkembangan pasar yang semakin digital (Syah & Sugiyanto, 2025). Orientasi Kewirausahaan yang mencerminkan kemampuan pelaku usaha dalam berinovasi dan menangkap peluang juga berkontribusi terhadap penerapan Digital Marketing yang lebih optimal, karena pelaku UMKM dengan Orientasi Kewirausahaan yang kuat cenderung lebih adaptif terhadap perubahan teknologi dan perilaku konsumen (Ramdan et al., 2025). Kondisi tersebut menunjukkan bahwa penguatan Digital Marketing dan Orientasi Kewirausahaan menjadi faktor penting dalam mendukung Keberlanjutan Usaha UMKM di tengah persaingan yang semakin ketat.
+
+Orientasi Kewirausahaan merupakan salah satu faktor internal yang berperan penting dalam menjaga keberlanjutan UMKM. Orientasi Kewirausahaan mencerminkan kemampuan pelaku usaha dalam bersikap inovatif, proaktif, serta berani mengambil risiko dalam mengembangkan usaha. Orientasi Kewirausahaan yang kuat mendorong pelaku UMKM untuk menciptakan inovasi, menangkap peluang pasar, serta meningkatkan daya saing usaha, sehingga berkontribusi positif terhadap pertumbuhan dan Keberlanjutan Usaha (Purwanti et al., 2025). Sebagian pelaku UMKM masih menjalankan usaha dengan cara yang sederhana dan tradisional, kurang tanggap terhadap perubahan pasar, serta belum memiliki strategi usaha jangka panjang yang jelas. Situasi ini berpotensi membatasi kemampuan UMKM dalam mempertahankan Keberlanjutan Usahanya di tengah persaingan yang semakin ketat, termasuk UMKM kuliner ayam bakar di Kabupaten Bekasi.
+
+Keberlanjutan Usaha merupakan aspek penting bagi UMKM dalam mempertahankan eksistensinya di tengah dinamika lingkungan bisnis yang terus berkembang. Keberlanjutan Usaha tidak hanya berkaitan dengan kemampuan bertahan dalam jangka pendek, tetapi juga mencerminkan kemampuan pelaku usaha dalam menjaga kinerja usaha secara konsisten dalam jangka panjang. Pertumbuhan jumlah UMKM yang terus meningkat tidak selalu diikuti oleh tingkat Keberlanjutan Usaha yang stabil, karena sebagian pelaku usaha masih menghadapi keterbatasan dalam pengelolaan usaha, adaptasi terhadap perubahan pasar, serta pengambilan keputusan strategis. Kemampuan pelaku UMKM dalam mengelola strategi bisnis dan mengoptimalkan sumber daya internal berperan penting dalam menjaga keberlanjutan dan pertumbuhan usaha (Purwanti et al., 2025).
+
+Digital Marketing dan Orientasi Kewirausahaan telah banyak dikaji dalam penelitian terdahulu sebagai faktor yang berperan dalam mendukung Keberlanjutan Usaha UMKM. Berbagai penelitian menunjukkan bahwa penerapan Digital Marketing mampu meningkatkan kinerja usaha dan keberlanjutan bisnis melalui peningkatan jangkauan pasar, efektivitas promosi, serta kinerja pemasaran, sementara Orientasi Kewirausahaan dipandang sebagai faktor strategis yang mendorong Keberlanjutan Usaha melalui kemampuan inovasi, proaktivitas, dan keberanian dalam pengambilan risiko.
+
+Temuan empiris lainnya menunjukkan bahwa pengaruh Digital Marketing terhadap Keberlanjutan Usaha tidak selalu bersifat langsung dan sangat bergantung pada kapabilitas internal, literasi digital, serta sumber daya pelaku usaha, demikian pula Orientasi Kewirausahaan yang dalam beberapa penelitian tidak memberikan pengaruh langsung terhadap Keberlanjutan Usaha, melainkan bekerja melalui mekanisme mediasi seperti inovasi, integrasi pengetahuan, dan orientasi masa depan. Variasi hasil penelitian tersebut mengindikasikan bahwa hubungan antara Digital Marketing, Orientasi Kewirausahaan, dan Keberlanjutan Usaha masih belum sepenuhnya konsisten.
+
+Sebagian besar penelitian terdahulu masih berfokus pada UMKM secara umum dengan objek dan karakteristik usaha yang beragam, seperti agribisnis, e-commerce, koperasi, dan UMKM lintas sektor. Penelitian yang secara spesifik mengkaji UMKM kuliner dengan tingkat persaingan tinggi, khususnya UMKM kuliner ayam bakar, masih relatif terbatas. Perbedaan karakteristik usaha dan konteks wilayah berpotensi memengaruhi efektivitas penerapan Digital Marketing dan Orientasi Kewirausahaan dalam mendukung Keberlanjutan Usaha. Kondisi ini menunjukkan adanya celah penelitian yang perlu dikaji lebih lanjut.
+
+Gap research
+
+Penelitian terdahulu yang relevan terkait hubungan antara Digital Marketing, Orientasi Kewirausahaan, dan Keberlanjutan Usaha disajikan pada tabel berikut:
+
+Tabel 1. 1 Gap research
+
+[[TABEL-1: 4 baris × 6 kolom — JANGAN diubah, ini konteks]]
+
+No | Peneliti (Tahun) | Variabel Penelitian | Objek Penelitian | Hasil Penelitian | Posisi Penelitian yang Dilakukan
+1 | Munawaroh et al. (2024) | Digital Marketing adoption, sustainable growth | UMKM di Indonesia | Adopsi Digital Marketing berpengaruh positif terhadap pertumbuhan berkelanjutan UMKM melalui peningkatan penggunaan aktual Digital Marketing. | Penelitian ini mengembangkan penelitian sebelumnya dengan menambahkan variabel Orientasi Kewirausahaan dan menggunakan objek penelitian yang lebih spesifik, yaitu UMKM kuliner ayam bakar di Kabupaten Bekasi.
+2 | Firi et al. (2023) | Digital Marketing, Entrepreneurial Orientation, Sustainable Business performance | Usaha mikro agribisnis | Digital Marketing tidak berpengaruh signifikan, sedangkan Orientasi Kewirausahaan berpengaruh signifikan. | Penelitian ini mengembangkan penelitian terdahulu dengan menguji kembali peran Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada sektor UMKM, khususnya kuliner ayam bakar di Kabupaten Bekasi.
+3 | Dewa et al. (2023) | Entrepreneurial Orientation, sustainability decision | UMKM milenial di Semarang | Orientasi Kewirausahaan tidak berpengaruh langsung terhadap keputusan keberlanjutan dan memerlukan mekanisme lain untuk memberikan pengaruh. | Penelitian ini memperluas penelitian terdahulu dengan memasukkan variabel Digital Marketing sebagai faktor pendukung dalam menganalisis pengaruh Orientasi Kewirausahaan terhadap Keberlanjutan Usaha UMKM kuliner ayam bakar di Kabupaten Bekasi.
+
+[[/TABEL-1]]
+
+Sumber: data dari jurnal penelitian terdahulu, diolah penulis, 2026
+
+Berdasarkan gap research tersebut, penelitian ini dilakukan pada UMKM kuliner ayam bakar di Kabupaten Bekasi untuk menguji pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha.
+
+Hasil Pra-Survei
+
+Responden dalam penelitian ini merupakan pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi yang diperoleh melalui pelaksanaan pra-kuesioner sebagai tahap awal pengumpulan data. Pra-survei terhadap 30 pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi dilakukan untuk memperoleh data awal terkait variabel Digital Marketing, Orientasi Kewirausahaan, dan Keberlanjutan Usaha dengan menggunakan instrumen yang telah diuji.
+
+Tabel 1. 2 Hasil Pra-Survei Variabel Digital Marketing
+
+[[TABEL-2: 9 baris × 5 kolom — JANGAN diubah, ini konteks]]
+
+Kode (Indikator) | Setuju & Sangat Setuju | Persentase (%) | Tidak Setuju & Sangat Tidak Setuju | Persentase (%)
+X1.1 (Penggunaan Media Digital) | 22 | 73% | 8 | 27%
+X1.2 (Penggunaan Media Digital) | 21 | 70% | 9 | 30%
+X1.3 (Kualitas Konten Digital) | 22 | 73% | 8 | 27%
+X1.4 (Kualitas Konten Digital) | 21 | 70% | 9 | 30%
+X1.5 (Interaksi Dua Arah dengan Pelanggan) | 22 | 73% | 8 | 27%
+X1.6 (Interaksi Dua Arah dengan Pelanggan) | 20 | 67% | 10 | 23%
+X1.7 (Kemudahan Proses Transaksi Digital) | 22 | 73% | 8 | 27%
+X1.8 (Kemudahan Proses Transaksi Digital) | 20 | 67% | 10 | 23%
+
+[[/TABEL-2]]
+
+Sumber: Data diolah penulis, 2026
+
+[[GAMBAR-9: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 1. 3 Grafik Hasil Pra-Survei Variabel Digital Marketing
+
+Sumber: Data diolah penulis, 2026
+
+Berdasarkan hasil pra-survei terhadap 30 responden pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi, mayoritas responden menyatakan setuju dan sangat setuju pada seluruh indikator variabel Digital Marketing, dengan jumlah persetujuan berkisar antara 20–22 orang, sedangkan respon tidak setuju dan sangat tidak setuju berada pada kisaran 8–10 orang. Temuan ini menunjukkan bahwa Digital Marketing telah mulai dimanfaatkan dalam kegiatan usaha, namun penerapannya belum sepenuhnya optimal, sehingga variabel ini masih relevan untuk diteliti lebih lanjut dalam mendukung Keberlanjutan Usaha.
+
+Tabel 1. 3 Hasil Pra-Survei Variabel Orientasi Kewirausahaan
+
+[[TABEL-3: 11 baris × 5 kolom — JANGAN diubah, ini konteks]]
+
+Kode (Indikator) | Setuju & Sangat Setuju | Persentase (%) | Tidak Setuju dan Sangat Tidak Setuju | Persentase (%)
+X2.1 (Inovatif) | 19 | 63% | 11 | 37%
+X2.1 (Inovatif | 18 | 60% | 12 | 40%
+X2.3 (Proaktif) | 19 | 63% | 11 | 37%
+X2.4 (Proaktif) | 20 | 67% | 10 | 33%
+X2.5 (Pengambilan Risiko) | 21 | 70% | 9 | 30%
+X2.6 (Pengambilan Risiko) | 19 | 63% | 11 | 37%
+X2.7 (Otonomi) | 20 | 67% | 10 | 33%
+X2.8 (Otonomi) | 19 | 63% | 11 | 37%
+X2.9 (Keagresifan Kompetitif) | 21 | 70% | 9 | 30%
+X2.10 (Keagresifan Kompetitif) | 20 | 67% | 10 | 33%
+
+[[/TABEL-3]]
+
+Sumber: Data diolah penulis, 2026
+
+[[GAMBAR-10: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 1. 4 Hasil Grafik Pra-Survei Variabel Orientasi Kewirausahaan
+
+Sumber: Data diolah penulis, 2026
+
+Berdasarkan hasil pra-survei terhadap 30 responden pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi, mayoritas responden memberikan tanggapan setuju dan sangat setuju pada indikator variabel Orientasi Kewirausahaan, dengan jumlah persetujuan berkisar antara 18–21 orang, sedangkan respon tidak setuju dan sangat tidak setuju berada pada kisaran 9–12 orang. Temuan ini menunjukkan bahwa pelaku usaha telah menunjukkan kecenderungan memiliki Orientasi Kewirausahaan dalam menjalankan usahanya, meskipun masih terdapat beberapa indikator yang perlu diperkuat agar penerapannya lebih optimal dalam mendukung Keberlanjutan Usaha.
+
+Tabel 1. 4 Hasil Pra-Survei Variabel Keberlanjutan Usaha
+
+[[TABEL-4: 7 baris × 5 kolom — JANGAN diubah, ini konteks]]
+
+Kode (Indikator) | Setuju & Sangat Setuju | Persentase (%) | Tidak Setuju dan Sangat Tidak Setuju | Persentase (%)
+Y1.1 (Keberlanjutan Ekonomi) | 21 | 70% | 9 | 30%
+Y1.2 (Keberlanjutan Ekonomi) | 21 | 70% | 9 | 30%
+Y1.3 (Keberlanjutan Sosial) | 21 | 70% | 9 | 30%
+Y1.4 (Keberlanjutan Sosial) | 21 | 70% | 9 | 30%
+Y1.5 (Keberlanjutan Lingkungan) | 21 | 70% | 9 | 30%
+Y1.6 (Keberlanjutan Lingkungan) | 22 | 73% | 8 | 27%
+
+[[/TABEL-4]]
+
+Sumber: Data diolah penulis, 2026
+
+[[GAMBAR-11: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 1. 5 Hasil Grafik Pra-Survei Variabel Keberlanjutan Usaha
+
+Sumber: Data diolah penulis, 2026
+
+Berdasarkan hasil pra-survei terhadap 30 responden pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi, mayoritas responden memberikan tanggapan setuju dan sangat setuju pada seluruh indikator variabel Keberlanjutan Usaha, dengan jumlah persetujuan berkisar antara 21–22 orang, sedangkan respon tidak setuju dan sangat tidak setuju berada pada kisaran 8–9 orang. Hasil ini menunjukkan bahwa pelaku usaha telah memiliki persepsi yang cukup baik mengenai Keberlanjutan Usaha, sehingga variabel Keberlanjutan Usaha dinilai relevan untuk dianalisis lebih lanjut dalam penelitian ini.
+
+Hasil pra-survei menunjukkan bahwa instrumen penelitian pada variabel Digital Marketing, Orientasi Kewirausahaan, dan Keberlanjutan Usaha telah memenuhi kriteria kelayakan, sehingga dapat digunakan dalam pengumpulan data penelitian selanjutnya pada UMKM kuliner ayam bakar di Kabupaten Bekasi.
+
+Rumusan Masalah
+
+Perkembangan teknologi digital telah mengubah cara para pelaku UMKM, termasuk UMKM kuliner ayam bakar, dalam menerapkan strategi pemasaran mereka. Menurut Kotler dan Keller (2016), dalam (Sitindaon, 2025) Digital Marketing memudahkan perusahaan dalam mencapai pelanggan dengan lebih efektif dan hemat waktu melalui platform seperti media sosial dan aplikasi mobile. Strategi ini memberi kebebasan bagi pelaku usaha, termasuk UMKM, untuk menyesuaikan pesan mereka sesuai dengan sifat dan tindakan konsumen secara langsung dan cepat.
+
+Lumpkin dan Dess (1996) dalam (Ismaeni et al., 2024) menjelaskan Orientasi Kewirausahaan sebagai kecenderungan seseorang atau kelompok untuk berinovasi, bersikap proaktif, dan berani mengambil risiko. Orientasi ini mendorong para pelaku usaha untuk menciptakan nilai tambah dengan ide-ide baru, merespons cepat terhadap perubahan pasar, serta mampu menemukan peluang dari situasi yang tidak pasti. Menurut Wahyudi dan Susanti (2020) dalam (Agil & Apriadi, 2025) Orientasi Kewirausahaan mempunyai peran yaitu untuk memperkuat daya tahan usaha terhadap tekanan dari luar dan mendorong Keberlanjutan Usaha.
+
+Keberlanjutan Usaha menurut Widayanti (2017) dalam (Surya et al., 2025) merujuk pada kondisi usaha yang stabil, yang mencakup berbagai upaya untuk menjaga kelangsungan operasional, memperluas pasar, serta menerapkan strategi yang mendorong pertumbuhan bisnis secara berkelanjutan. Konsep ini menekankan bahwa pemilik usaha tidak hanya perlu fokus pada keuntungan jangka pendek, tetapi juga harus memperhatikan berbagai faktor yang memengaruhi kemampuan usaha untuk bertahan dan berkembang dalam jangka waktu yang lebih lama, seperti kemampuan adaptasi terhadap perubahan pasar, inovasi produk, serta peningkatan mutu layanan.
+
+Apakah Digital Marketing berpengaruh terhadap Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi?
+
+Apakah Orientasi Kewirausahaan berpengaruh terhadap Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi?
+
+Apakah Digital Marketing dan Orientasi Kewirausahaan berpengaruh secara simultan terhadap Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi?
+
+Tujuan Penelitian
+
+Tujuan Penelitian ini untuk membuktikan Pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha. Berdasarkan hal tersebut maka tujuan penelitian diuraikan sebagai berikut:
+
+Untuk mengetahui pengaruh Digital Marketing terhadap Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi.
+
+Untuk mengetahui pengaruh Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi.
+
+Untuk mengetahui pengaruh Digital Marketing dan Orientasi Kewirausahaan secara simultan terhadap Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi.
+
+Manfaat Penelitian
+
+Berdasarkan tujuan diatas, penelitian ini dapat memberikan manfaat di antaranya:
+
+Manfaat Teoritis
+
+Hasil penelitian ini bisa memperkaya pemahaman dan menjadi acuan dalam membangun ilmu ekonomi khususnya bidang kewirausahaan, serta bisa digunakan sebagai bahan referensi untuk penelitian di masa depan. Penelitian ini juga dapat memberikan tambahan wawasan mengenai hubungan antara Digital Marketing, Orientasi Kewirausahaan, dan Keberlanjutan Usaha pada UMKM.
+
+Manfaat Praktis
+
+Bahwa hasil penelitian ini dapat memberikan kontribusi bagi pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi dalam meningkatkan pemahaman tentang pentingnya penerapan Digital Marketing dan penguatan Orientasi Kewirausahaan untuk menjaga Keberlanjutan Usaha. Penelitian ini juga dapat menjadi sumber wawasan bagi pembaca dalam memahami bagaimana strategi Digital Marketing dan Orientasi Kewirausahaan dapat membantu pelaku usaha bertahan dan berkembang di tengah persaingan bisnis yang semakin ketat.
+
+Sistematika Penulisan
+
+Sistematika penulisan skripsi ini disusun untuk memberikan gambaran yang jelas mengenai susunan serta alur pembahasan penelitian. Uraian sistematika ini bertujuan membantu pembaca memahami keterkaitan antar bab yang disajikan secara runtut dan terstruktur.
+
+BAB I PENDAHULUAN
+
+Bab ini berisi penjelasan mengenai latar belakang penelitian, rumusan masalah, tujuan penelitian, manfaat penelitian, serta sistematika penulisan skripsi.
+
+BAB II TINJAUAN PUSTAKA
+
+Bab ini membahas teori-teori yang mendukung penelitian terkait Digital Marketing, Orientasi Kewirausahaan, dan Keberlanjutan Usaha. Uraian mengenai penelitian terdahulu yang mencakup penelitian terdahulu internasional dan penelitian terdahulu nasional, pengembangan hipotesis, serta model penelitian yang akan digunakan juga disertakan.
+
+BAB III METODE PENELITIAN
+
+Bab ini menjelaskan metode penelitian yang digunakan, meliputi jenis dan desain penelitian, definisi operasional dan pengukuran variabel, metode pengumpulan data, jenis, sumber, dan teknik pengumpulan data, serta metode analisis yang digunakan dalam penelitian. Seluruh tahapan tersebut disusun sebagai pedoman dalam pelaksanaan penelitian agar proses pengumpulan dan analisis data dilakukan secara sistematis sesuai dengan tujuan penelitian.
+
+BAB IV HASIL DAN PEMBAHASAN
+
+Bab ini berisi pemaparan hasil penelitian yang meliputi deskripsi objek penelitian, karakteristik responden, serta hasil pengolahan data melalui analisis statistik. Bab ini juga memuat pembahasan hasil penelitian yang menginterpretasikan temuan penelitian serta mengaitkannya dengan teori dan penelitian terdahulu yang relevan.
+
+BAB V PENUTUP
+
+Bab ini memuat kesimpulan yang diperoleh berdasarkan hasil analisis dan pembahasan penelitian. Bab ini juga berisi saran yang ditujukan kepada pihak terkait serta rekomendasi untuk penelitian selanjutnya guna pengembangan penelitian di masa mendatang.
+
+BAB II
+
+TINJAUAN PUSTAKA
+
+Landasan Teori
+
+Keberlanjutan Usaha
+
+Keberlanjutan Usaha adalah usaha yang dilakukan oleh pelaku UMKM untuk memperkuat hubungan dengan pelanggan, meningkatkan kualitas layanan, serta meningkatkan keterlibatan pelanggan, sehingga dapat meningkatkan visibilitas dan reputasi usaha. Menurut Yanti & Ridayanti (2022) dalam (Tingal & Situmorang, 2024), usaha didefinisikan sebagai upaya pelaku usaha yang memanfaatkan berbagai sumber daya dan kemampuan perusahaan untuk dikembangkan agar bisa mencapai keunggulan kompetitif.
+
+Keberlanjutan Usaha menurut Widayanti (2017) dalam (Surya et al., 2025) merujuk pada kondisi usaha yang stabil, yang mencakup berbagai upaya untuk menjaga kelangsungan operasional, memperluas pasar, serta menerapkan strategi yang mendorong pertumbuhan bisnis secara berkelanjutan. Konsep ini menekankan bahwa pemilik usaha tidak hanya perlu fokus pada keuntungan jangka pendek, tetapi juga harus memperhatikan berbagai faktor yang memengaruhi kemampuan usaha untuk bertahan dan berkembang dalam jangka waktu yang lebih lama, seperti kemampuan adaptasi terhadap perubahan pasar, inovasi produk, serta peningkatan mutu layanan.
+
+Pepin et al. (2023) dalam (Sholeh & Idris, 2024) mengatakan bahwa setiap bisnis perlu memiliki model bisnis yang bisa menarik perhatian konsumen sekaligus mendorong kelangsungan usaha. Penerapan strategi pemasaran digital dan semangat kewirausahaan merupakan salah satu cara untuk mengembangkan model bisnis yang mampu meningkatkan minat pembeli dan memperkuat Keberlanjutan Usaha.  Keberlanjutan Usaha menggambarkan kemampuan sebuah bisnis untuk tetap bertahan dalam jangka panjang dengan memperhatikan penggunaan sumber daya secara efisien, kestabilan dalam operasional, serta nilai sosial yang diberikan (Othman et al., 2021). Keberlanjutan Usaha juga mencakup kemampuan bisnis dalam menjaga keseimbangan antara tujuan keuangan dan tanggung jawab sosial terhadap masyarakat dan lingkungan (Figurek & Thrassou, 2023). Untuk mencapai keberlanjutan, pelaku bisnis juga harus mempertahankan kualitas produk, membangun kepercayaan dari pelanggan, serta mampu beradaptasi dengan kondisi pasar yang terus berubah agar tetap bisa bersaing secara berkelanjutan.
+
+Indikator Keberlanjutan Usaha
+
+Indikator Keberlanjutan Usaha berdasarkan Triple Bottom Line (TBL) menurut Elkington (1997) dalam (Zaman et al., 2025) yaitu:
+
+Keberlanjutan Ekonomi
+
+Kemampuan usaha untuk mendapatkan penghasilan yang konsisten dan tetap bertahan di pasar.
+
+Keberlanjutan Sosial
+
+Menjaga hubungan yang baik dengan pelanggan, karyawan, serta masyarakat sekitar.
+
+Keberlanjutan Lingkungan
+
+Menerapkan cara kerja yang ramah lingkungan, seperti mengelola sampah dan menggunakan energi secara efisien.
+
+Digital Marketing
+
+Digital Marketing merupakan kegiatan pemasaran produk atau jasa melalui media digital dengan memanfaatkan teknologi internet untuk promosi, komunikasi, dan distribusi kepada konsumen secara lebih efektif. Menurut Kotler dan Keller (2016) dalam (Aswedya & Wiguna, 2025), Digital Marketing merupakan bentuk pemasaran yang menggunakan alat digital untuk mencapai konsumen, membangun hubungan, serta memengaruhi keputusan seseorang dalam membeli.
+
+Digital Marketing menurut Hendrayani, E., & Siwiyanti, L. (2021) dalam (Zahra et al., 2025) merupakan proses yang melibatkan perencanaan, pelaksanaan, dan pengawasan berbagai tindakan yang bertujuan untuk menciptakan, mengkomunikasikan, dan menyalurkan nilai kepada pelanggan. Digital Marketing juga bertugas mengelola hubungan yang saling menguntungkan antara pelaku usaha dan juga pelanggan. Digital Marketing merupakan proses pemasaran sekaligus pembentukan citra merek yang dijalankan melalui berbagai saluran berbasis digital. Media yang digunakan dapat berupa blog, website, surat elektronik, layanan iklan seperti Google Ads, serta beragam platform media sosial (Daspar et al., 2021).
+
+Digital Marketing memainkan peran penting dalam mengatasi keterbatasan sumber daya dengan solusi yang lebih murah dan terukur untuk usaha mikro, kecil, dan menengah (UMKM), dibandingkan metode pemasaran tradisional (Chaffey dan Smith, 2020) dalam (Puspitasari & Mulyanto, 2025). Dengan memanfaatkan media sosial dan platform digital, para pengusaha bisa memperluas jangkauan pasar tanpa perlu menghabiskan biaya besar untuk iklan. Bagi UMKM kuliner ayam bakar, strategi ini membantu pemilik usaha mempromosikan produk, menonjolkan keunikan rasa, serta membangun interaksi langsung dengan pelanggan, sehingga bisa terjalin hubungan yang lebih akrab dan berkelanjutan.
+
+Indikator Digital Marketing
+
+Menurut Chaffey dan Ellis-Chadwick (2019) dalam (Havidz, 2024), Digital Marketing adalah berbagai kegiatan yang menggunakan media digital untuk menyampaikan informasi, berkomunikasi, dan mempermudah proses pembelian. Indikator Digital Marketing bisa dilihat dari beberapa aspek utama berikut:
+
+Penggunaan media digital
+
+Terlihat dari cara usaha tersebut memanfaatkan platform pemesanan makanan online seperti Shopee Food, Gofood, atau Grabfood untuk menampilkan menu, harga, dan promo secara teratur. Informasi mengenai produk menjadi lebih mudah diakses oleh pelanggan sehingga memudahkan mereka dalam menentukan pilihan pembelian melalui platform tersebut.
+
+Kualitas konten digital
+
+Kualitas gambar atau video yang jernih, informatif, dan menarik, sehingga memudahkan konsumen memahami produk yang ditawarkan. Konten yang disajikan secara jelas membantu menyampaikan informasi produk kepada konsumen dengan lebih efektif.
+
+Interaksi dua arah dengan pelanggan
+
+Ditunjukkan melalui komunikasi aktif di chat, komentar, atau pesan pribadi, di mana respons yang cepat dan ramah dapat memperkuat hubungan dengan pelanggan.
+
+Kemudahan proses transaksi digital
+
+Dapat dilihat dari alur pemesanan yang sederhana, ketersediaan kontak yang mudah dijangkau, pilihan pembayaran digital, serta informasi operasional yang jelas.
+
+Orientasi Kewirausahaan
+
+Orientasi Kewirausahaan adalah sifat strategis yang menunjukkan seberapa besar seseorang atau lembaga bersikap kreatif, proaktif, dan berani mengambil risiko dalam menjalankan usaha. Menurut Lumpkin & Dess (1996) dalam (Ramadanti et al., 2024),  Orientasi Kewirausahaan terdiri dari berbagai proses, cara kerja, dan keputusan yang mendorong tindakan wirausaha seperti mengembangkan ide baru, bersedia mengambil risiko, serta mencari peluang usaha secara proaktif.
+
+Menurut Covin & Slevin (1989) dalam (Wales et al., 2023) mengatakan bahwa Orientasi Kewirausahaan adalah sikap perusahaan yang suka berinovasi, berani ambil risiko, dan selalu mencari ide baru untuk menghadapi pesaing. Konsep ini dianggap penting karena bisa mendorong hasil kerja dan kelangsungan usaha, terutama di sektor usaha kecil dan menengah. Orientasi Kewirausahaan menggambarkan perkembangan aktivitas kewirausahaan dalam suatu perusahaan. Konsep ini mencakup kemampuan organisasi dalam menciptakan peluang baru, kesediaan untuk menghadapi dan mengelola risiko, serta kecenderungan pemimpin dalam menetapkan arah dan perilaku strategis perusahaan (Latifah et al., 2023).
+
+Menurut Kuratko dan Audretsch (2009) dalam (Frans et al., 2020), Orientasi Kewirausahaan adalah konsep yang menggabungkan prinsip kewirausahaan dengan pendekatan manajemen strategis. Konsep ini mendorong para pengusaha untuk terus mencari dan memanfaatkan keunggulan bersaing dengan cara mengembangkan inovasi di bidang produk, proses, maupun pasar. Sikap ini juga terlihat dari kemampuan pengusaha dalam beradaptasi dengan perubahan, menghasilkan ide-ide baru, serta mengambil keputusan tegas untuk memastikan usahanya tetap berjalan lancar dan berkelanjutan.
+
+Indikator Orientasi Kewirausahaan
+
+Menurut Lumpkin & Dess (1996) dalam (Ramadanti et al., 2024), Orientasi Kewirausahaan bisa dilihat dari lima dimensi utama berikut:
+
+Inovatif
+
+Kemampuan pengusaha untuk menciptakan ide, produk, atau cara baru agar bisnis bisa lebih unggul.
+
+Proaktif
+
+Sikap untuk bertindak lebih dulu daripada kompetitor dalam memanfaatkan peluang pasar.
+
+Pengambilan Risiko
+
+Kemauan untuk menerima ketidakpastian agar bisa mendapatkan hasil yang lebih baik.
+
+Otonomi
+
+Kemampuan seseorang atau tim untuk membuat keputusan sendiri dan bertindak tanpa bantuan orang lain.
+
+Keagresifan Kompetitif
+
+Sikap yang tegas dalam menghadapi persaingan pasar agar bisnis tetap bisa berada di posisi terdepan.
+
+Penelitian Terdahulu Relevan
+
+Penelitian terdahulu memberikan gambaran mengenai penelitian yang telah dilakukan sebelumnya. Ringkasan penelitian terdahulu yang relevan disajikan pada bagian berikut.
+
+Penelitian Terdahulu Internasional
+
+Penelitian yang dilakukan oleh Munawaroh et al. (2024) dengan judul “Unveiling the Link: Does Digital Marketing Adoption Fuel Sustainable Growth for SMEs in Indonesia?” yang diterbitkan dalam TRANSEKONOMIKA: Akuntansi, Bisnis, dan Keuangan Vol. 4 No. 2. Hasil penelitian menunjukkan bahwa adopsi Digital Marketing berpengaruh positif dan signifikan terhadap pertumbuhan serta Keberlanjutan Usaha UMKM di Indonesia. Penerapan Digital Marketing membantu memperluas jangkauan pasar dan meningkatkan efektivitas strategi pemasaran sehingga mampu mendukung Keberlanjutan Usaha.
+
+Penelitian yang dilakukan oleh Bangun et al. (2024) dengan judul “Embracing the Role of Business Performance to Foster the Association between Digital Marketing, Intellectual Capital, and Business Sustainability” yang diterbitkan dalam International Journal of Management and Sustainability Vol. 13 No. 4. Hasil penelitian menunjukkan bahwa Digital Marketing tidak berpengaruh signifikan terhadap kinerja usaha, sedangkan intellectual capital berperan dalam meningkatkan kinerja usaha dan keberlanjutan bisnis.
+
+Penenlitian yang dilakukan oleh Yasa et al. (2024) dengan judul “The Role of Tri Hita Karana-Based Business Strategy and Digital Marketing to Improve Sustainable Business Performance” yang diterbitkan dalam International Journal of Data and Network Science Vol. 8 No. 1. Hasil penelitian menunjukkan bahwa strategi bisnis berbasis Tri Hita Karana dan Digital Marketing berpengaruh positif terhadap Keberlanjutan Usaha. Penelitian tersebut juga menunjukkan bahwa tidak seluruh aspek Digital Marketing memberikan pengaruh yang signifikan terhadap kinerja usaha.
+
+Penelitian yang dilakukan oleh Nga & Khoi (2024) dengan judul “Influencing Digital Marketing and Marketing Performance on the Business Sustainability of Small and Medium Enterprises” yang diterbitkan dalam International Journal of Applied Economics, Finance and Accounting Vol. 21 No. 1. Hasil penelitian menunjukkan bahwa Digital Marketing berpengaruh positif terhadap kinerja pemasaran dan Keberlanjutan Usaha UMKM.
+
+Penelitian yang dilakukan oleh Pramesti et al. (2025) dengan judul “Business Sustainability Strategy for MSMEs Through Digital Marketing Optimization and Product Innovation” yang diterbitkan dalam Jurnal Ekonomi Kreatif dan Manajemen Bisnis Digital Vol. 3 No. 4. Hasil penelitian menunjukkan bahwa optimalisasi Digital Marketing dan inovasi produk berpengaruh positif terhadap Keberlanjutan Usaha UMKM. Kedua faktor tersebut berperan dalam meningkatkan daya saing dan mendukung perkembangan usaha secara berkelanjutan.
+
+Penelitian yang dilakukan oleh Hanaysha & Al-Shaikh (2024) dengan judul “Impact of Entrepreneurial Orientation, Marketing Capability, and Market Orientation on Business Sustainability and Corporate Reputation” yang diterbitkan dalam Discover Sustainability Vol. 5 No. 1. Hasil penelitian menunjukkan bahwa Orientasi Kewirausahaan, kemampuan pemasaran, dan orientasi pasar berpengaruh positif terhadap Keberlanjutan Usaha. Penelitian tersebut juga menunjukkan bahwa ketiga faktor tersebut berkontribusi dalam meningkatkan reputasi perusahaan.
+
+Penelitian dilakukan oleh Clarissa et al. (2023) dengan judul “The Effect of Entrepreneurship Orientation and Innovation on Sustainable Business Growth SME’s Rice Box in West Jakarta” yang diterbitkan dalam International Journal of Application on Economics and Business Vol. 1 No. 1, halaman 512-520. Hasil penelitian ini menunjukkan bahwa Orientasi Kewirausahaan dan inovasi berpengaruh positif dan signifikan terhadap pertumbuhan usaha berkelanjutan pada UMKM Rice Box di Jakarta Barat. Kedua variabel tersebut menjadi faktor utama yang mendorong Keberlanjutan Usaha melalui peningkatan inovasi dan kemampuan bersaing.
+
+Penelitian dilakukan oleh Ismaeni et al. (2024) dengan judul “Does Entrepreneurial Orientation Influence the Sustainability Performance of Indonesian SMEs?” yang diterbitkan dalam Asia-Pacific Management and Business Application Vol. 12 No. 3, halaman 285-298. Hasil penelitian ini menunjukkan bahwa Orientasi Kewirausahaan tidak berpengaruh langsung terhadap kinerja keberlanjutan UMKM. Pengaruhnya muncul secara tidak langsung melalui kemampuan integrasi pengetahuan dan sikap keberlanjutan.
+
+Penelitian yang dilakukan oleh Ingram et al. (2022) dengan judul “Entrepreneurial Orientation as a Determinant of Sustainable Performance in Polish Family and Non-Family Organizations” yang dipublikasikan pada tahun 2022 dalam jurnal Sustainability Vol. 14 No. 24, halaman 1-25. Hasil menunjukkan bahwa Orientasi Kewirausahaan memiliki pengaruh positif terhadap kinerja berkelanjutan organisasi, dengan dimensi “proaktiveness” terbukti berperan utama; meski demikian, hasil penelitian juga mengungkap bahwa efek mediasi dari output inovasi hanya signifikan pada bisnis keluarga, dan tidak signifikan pada bisnis non-keluarga.
+
+Penelitian yang dilakukan oleh Manigandan & Raghuram, (2025) dengan judul “Linking Entrepreneurial Orientation to Sustainable Performance: The Mediating Role of Green Innovation” yang dipublikasikan pada tahun 2025 dalam jurnal International Journal of Product Quality Management Vol. 44, No. 3, halaman 331-355. Hasil menunjukkan bahwa Orientasi Kewirausahaan memiliki pengaruh positif terhadap kinerja berkelanjutan melalui peran mediasi inovasi hijau. Hasil penelitian ini menegaskan bahwa Orientasi Kewirausahaan mendorong lahirnya inovasi hijau yang pada akhirnya meningkatkan Keberlanjutan Usaha.
+
+Penelitian dilakukan oleh Firi et al. (2023) dengan judul “The Effect of Digital Marketing and Entrepreneurial Orientation on Sustainable Business Performance in Micro Agribusiness Enterprises” yang diterbitkan dalam Prosiding International Conference on Economy, Management, and Business (IC-EMBUS) Vol. 1 Tahun 2023, halaman 1850–1859. Hasil penelitian menunjukkan bahwa Digital Marketing tidak berpengaruh signifikan terhadap Sustainable Business Performance, sedangkan Entrepreneurial Orientation berpengaruh positif dan signifikan terhadap Sustainable Business Performance.
+
+Penelitian Terdahulu Nasional
+
+Penelitian dilakukan oleh Vania & Fikriah (2023) dengan judul “The Impact of Creative Digital Marketing on the Sustainability of MSME Businesses: A Mediating Role of Marketing Performance” yang diterbitkan dalam Jurnal Ilmiah Manajemen dan Bisnis Vol. 8 No. 2, halaman 141-150. Hasil penelitian ini menunjukkan bahwa kreativitas Digital Marketing berpengaruh positif terhadap kinerja pemasaran dan Keberlanjutan Usaha, serta kinerja pemasaran berperan sebagai variabel mediasi dalam hubungan tersebut.
+
+Penelitian dilakukan oleh Santoso (2020) dengan judul “Review of Digital Marketing & Business Sustainability of E-Commerce During Pandemic Covid-19 in Indonesia” yang diterbitkan dalam JIET (Jurnal Ilmu Ekonomi Terapan) Vol. 5 No. 2, halaman 95–106. Hasil penelitian ini menyatakan bahwa Digital Marketing berpengaruh positif terhadap Keberlanjutan Usaha, di mana pemanfaatan strategi digital dan e-commerce mampu meningkatkan brand awareness, memperluas jangkauan konsumen, serta membantu UMKM bertahan selama masa pandemi.
+
+Penelitian dilakukan oleh Awa et al. (2025) dengan judul “Business Sustainability Based on Digital Marketing, Entrepreneurial Passion, and Self-efficacy in MSMEs as Cooperative Members” yang diterbitkan dalam Indonesian Interdisciplinary Journal of Sharia Economics (IIJSE) Vol. 8 No. 2, halaman 5320-5340. Hasil penelitian ini menunjukkan bahwa Digital Marketing, entrepreneurial passion, dan self-efficacy berpengaruh signifikan terhadap Keberlanjutan Usaha, baik secara parsial maupun simultan, pada UMKM anggota koperasi di Kabupaten Bogor.
+
+Penelitian dilakukan oleh Dora et al. (2024) dengan judul “Kolaborasi Dan Digital Marketing Untuk Keberlanjutan Usaha UMKM Kota Bandung” yang diterbitkan di Jurnal JAKW (Jurnal Abdimas Kartika Wijayakusuma) Vol. 5 No. 2, halaman 400-408. Hasil penelitian ini menunjukkan bahwa kolaborasi dan Digital Marketing berkontribusi positif terhadap Keberlanjutan Usaha UMKM di Kota Bandung, di mana pelaku UMKM binaan Kadin Kota Bandung memahami cara menjalin kerjasama dengan berbagai pihak dan menggunakan Digital Marketing secara efektif untuk mendukung kelangsungan usaha mereka.
+
+Penelitian dilakukan oleh Dafina (2025) dengan judul “Digital Marketing Sebagai Solusi Keberlanjutan UMKM Pada Perspektif Negara Berkembang: Systematic Literature Review” yang diterbitkan dalam Bussman Journal: Indonesian Journal of Business & Management Vol. 5 No. 2, halaman 981-994. Hasil penelitian ini menunjukkan bahwa Digital Marketing berpengaruh signifikan terhadap keberlanjutan UMKM di negara berkembang. Melalui analisis 17 artikel menggunakan metode systematic literature review, penelitian ini mengungkap bahwa Digital Marketing mampu meningkatkan daya saing, inovasi, serta kinerja keberlanjutan UMKM, dengan dukungan teknologi, kapasitas sumber daya manusia, dan kebijakan pemerintah sebagai faktor pendukung utama.
+
+Penelitian dilakukan oleh Rahmani et al. (2025) dalam artikel berjudul “Optimizing MSME Sustainability through Digital Marketing, Innovation, and Financial Literacy with Financial Technology Support” yang diterbitkan pada tahun 2025 dalam jurnal IQTISHADUNA: Jurnal Ilmiah Ekonomi Kita Vol. 14 No. 1, halaman 212-239. Hasil penelitian ini menunjukkan bahwa Digital Marketing, inovasi bisnis, dan literasi keuangan secara positif dan signifikan memengaruhi Keberlanjutan Usaha UMKM, dan teknologi finansial (fintech) berperan sebagai mediator yang signifikan antara Digital Marketing dan Keberlanjutan Usaha. Hasil penelitian ini mendukung hipotesis bahwa Digital Marketing berpengaruh terhadap Keberlanjutan Usaha.
+
+Penelitian yang dilakukan oleh Setiawan et al. (2025) dengan judul “Digital Marketing Strategy for Sustainable Performance of MSMEs: Literature Review” yang diterbitkan pada tahun 2025 dalam jurnal Research Horizon Vol. 05 No. 01, halaman 33-46. Hasil menunjukkan bahwa strategi Digital Marketing seperti pemanfaatan media sosial, iklan digital, dan optimisasi konten memiliki peran penting dalam meningkatkan kinerja usaha berkelanjutan pada UMKM, meskipun terdapat hambatan berupa keterbatasan infrastruktur dan kemampuan digital pelaku usaha. Hasil penelitian ini mendukung hipotesis bahwa Digital Marketing berpengaruh terhadap Keberlanjutan Usaha.
+
+Penelitian dilakukan oleh Dewa et al. (2023) dengan judul “The Effect of Entrepreneurial Orientation on Sustainability Decisions in SMEs Run by Millennial Generations in Semarang, Indonesia” yang diterbitkan dalam Indonesian Journal of Business and Entrepreneurship Vol. 9 No. 3, halaman 370-382. Hasil penelitian ini menunjukkan bahwa Orientasi Kewirausahaan tidak berpengaruh terhadap keputusan keberlanjutan. Dimensi proaktivitas dan orientasi risiko tidak memberikan pengaruh langsung terhadap keputusan keberlanjutan, sedangkan inovasi hanya berpengaruh melalui mediasi orientasi masa depan. Temuan ini menunjukkan adanya ketidakkonsistenan hasil penelitian, bahwa keputusan keberlanjutan UMKM milenial lebih dipengaruhi oleh orientasi masa depan daripada Orientasi Kewirausahaan secara langsung.
+
+Penelitian yang dilakukan oleh Purwanti et al. (2025) dengan judul “Sustainable Business Practices, Financial Literacy, and Entrepreneurial Orientation On MSME Growth” yang dipublikasikan pada tahun 2025 dalam jurnal Indo-Fintech Intellectuals: Journal of Economics and Business Vol. 5 No. 2, halaman 4619-4629. Hasil menunjukkan bahwa praktik bisnis berkelanjutan, literasi keuangan, dan Orientasi Kewirausahaan secara bersama-sama memiliki pengaruh signifikan terhadap pertumbuhan UMKM, dengan literasi keuangan sebagai prediktor terkuat. Hasil penelitian ini mendukung hipotesis bahwa Orientasi Kewirausahaan berpengaruh terhadap Keberlanjutan Usaha.
+
+Hipotesis dan Model Penelitian
+
+Hipotesis
+
+Hipotesis adalah pernyataan sementara yang masih perlu dibuktikan melalui analisis dan pengolahan data. Berdasarkan teori yang menjadi dasar dan hasil penelitian sebelumnya, penelitian “Pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi” mengembangkan hipotesis yang menjelaskan dampak dari variabel-variabel tersebut.
+
+Hipotesis Pertama: Digital Marketing akan berpengaruh terhadap Keberlanjutan Usaha dimana hipotesis akan didukung oleh:
+
+Vania & Fikriah (2023) dalam artikel yang berjudul “The Impact of Creative Digital Marketing on the Sustainability of MSME Businesses: A Mediating Role of Marketing Performance”, yang dipublikasikan pada Vol. 8 No. 2 dalam Jurnal Ilmiah Manajemen dan Bisnis, menunjukkan bahwa creative Digital Marketing memiliki pengaruh positif dan signifikan terhadap Keberlanjutan Usaha, dengan kinerja pemasaran berperan sebagai variabel mediasi yang memperkuat hubungan tersebut.
+
+Munawaroh et al. (2024) dalam artikel yang berjudul “Unveiling the Link: Does Digital Marketing Adoption Fuel Sustainable Growth for SMEs in Indonesia?”, yang dipublikasikan pada Vol. 4 No. 2 tahun 2024 dalam jurnal TRANSEKONOMIKA: Akuntansi, Bisnis, dan Keuangan, menunjukkan bahwa adopsi Digital Marketing memiliki pengaruh positif dan signifikan terhadap pertumbuhan dan Keberlanjutan Usaha UMKM di Indonesia, terutama melalui peningkatan jangkauan pasar dan efektivitas strategi pemasaran digital.
+
+Awa et al. (2025) dalam artikel yang berjudul “Business Sustainability Based on Digital Marketing, Entrepreneurial Passion, and Self-efficacy in MSMEs as Cooperative Members”, yang dipublikasikan pada Vol. 8 No. 2 tahun 2025 dalam Indonesian Interdisciplinary Journal of Sharia Economics (IIJSE), menunjukkan bahwa Digital Marketing memiliki pengaruh positif dan signifikan terhadap Keberlanjutan Usaha.
+
+Clarissa et al. (2023) dalam artikel yang berjudul “The Effect of Entrepreneurship Orientation and Innovation on Sustainable Business Growth SME’s Rice Box in West Jakarta”, yang dipublikasikan pada Vol. 1 No. 1 tahun 2023 dalam International Journal of Application on Economics and Business, menunjukkan bahwa Orientasi Kewirausahaan dan inovasi berpengaruh positif dan signifikan terhadap pertumbuhan usaha berkelanjutan pada UMKM Rice Box di Jakarta Barat. Kedua variabel tersebut menjadi faktor utama yang mendorong Keberlanjutan Usaha melalui peningkatan inovasi dan daya saing.
+
+Hipotesis Kedua: Orientasi Kewirausahaan akan berpengaruh terhadap Keberlanjutan Usaha dimana hipotesis akan didukung oleh:
+
+Hanaysha & Al-Shaikh (2024) dalam artikel yang berjudul “Impact of Entrepreneurial Orientation, Marketing Capability, and Market Orientation on Business Sustainability and Corporate Reputation”, yang dipublikasikan pada Discover Sustainability Vol. 5 No. 1, menunjukkan bahwa Orientasi Kewirausahaan, kapabilitas pemasaran, dan orientasi pasar berpengaruh positif terhadap Keberlanjutan Usaha dan reputasi perusahaan. Hasil penelitian ini mendukung hipotesis bahwa Orientasi Kewirausahaan berpengaruh positif terhadap Keberlanjutan Usaha.
+
+Clarissa et al. (2023) dalam artikel yang berjudul “The Effect of Entrepreneurship Orientation and Innovation on Sustainable Business Growth SME’s Rice Box in West Jakarta”, yang dipublikasikan pada Vol. 1 No. 1 tahun 2023 dalam International Journal of Application on Economics and Business, menunjukkan bahwa Orientasi Kewirausahaan dan inovasi berpengaruh positif dan signifikan terhadap pertumbuhan usaha berkelanjutan pada UMKM Rice Box di Jakarta Barat. Kedua variabel tersebut menjadi faktor utama yang mendorong Keberlanjutan Usaha melalui peningkatan inovasi dan daya saing. Hasil tersebut menunjukkan bahwa penerapan Orientasi Kewirausahaan yang didukung oleh inovasi dapat memperkuat Keberlanjutan Usaha pada UMKM.
+
+Hipotesis Ketiga: Digital Marketing dan Orientasi Kewirausahaan akan berpengaruh secara simultan terhadap Keberlanjutan Usaha:
+
+Firi et al. (2023) dalam artikel berjudul “The Effect of Digital Marketing and Entrepreneurial Orientation on Sustainable Business Performance in Micro Agribusiness Enterprises” yang dipublikasikan pada Prosiding International Conference on Economy, Management, and Business (IC-EMBUS) Vol. 1 No. 1 meneliti pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Sustainable Business Performance. Hasil penelitian menunjukkan bahwa Orientasi Kewirausahaan berpengaruh positif, sedangkan Digital Marketing tidak berpengaruh signifikan.
+
+Model Penelitian
+
+Model penelitian disusun untuk menggambarkan hubungan antara Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha berdasarkan kajian teori dan penelitian terdahulu. Model penelitian ini digunakan sebagai kerangka konseptual dalam menganalisis pengaruh masing-masing variabel yang diteliti.
+
+[[GAMBAR-12: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 2. 1 Model Penelitian
+
+Sumber: Data diolah penulis, 2026
+
+BAB III
+
+METODE PENELITIAN
+
+Jenis dan Desain Penelitian
+
+Jenis Penelitian
+
+Penelitian kuantitatif merupakan pendekatan penelitian yang digunakan untuk menguji hubungan antarvariabel melalui data berbentuk angka. Pendekatan ini memungkinkan peneliti menguji hipotesis secara objektif dan sistematis dengan menggunakan analisis statistik (Creswell & Creswell, 2023). Metode penelitian kuantitatif adalah pendekatan penelitian yang menggunakan banyak angka, mulai dari cara mengumpulkan data hingga cara menganalisis dan menafsirkan hasilnya (Ali et al., 2022).  Penelitian ini menggunakan pendekatan kuantitatif karena bertujuan untuk menguji pengaruh dari Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada usaha mikro kecil menengah (UMKM) kuliner ayam bakar di Kabupaten Bekasi. Data diperoleh melalui kuesioner dan dianalisis menggunakan metode statistik. Untuk menentukan peserta penelitian, digunakan teknik pengambilan sampel non-probabilitas yang disesuaikan dengan ciri-ciri para pelaku UMKM kuliner ayam bakar di wilayah tersebut.
+
+Tempat dan Waktu Penelitian
+
+Penelitian ini dilakukan pada UMKM kuliner ayam bakar yang beroperasi di Kabupaten Bekasi. Pelaksanaan penelitian dilakukan secara bertahap dan sistematis sesuai dengan tahapan penyusunan skripsi. Tahap awal penelitian diawali dengan persetujuan judul penelitian pada bulan Oktober 2025 yang kemudian dilanjutkan dengan penyusunan proposal skripsi pada bulan November hingga Desember 2025. Setelah proposal selesai disusun, penulis melaksanakan sidang proposal skripsi pada bulan Januari 2026 sebagai salah satu tahapan untuk memperoleh persetujuan pelaksanaan penelitian.
+
+Setelah memperoleh persetujuan untuk melaksanakan penelitian, penulis melakukan penyebaran kuesioner kepada 100 responden pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi yang memenuhi kriteria penelitian pada bulan Februari 2026. Data yang telah terkumpul selanjutnya diolah dan dianalisis untuk menjawab rumusan masalah serta menguji hipotesis yang diajukan dalam penelitian ini.
+
+Tahap berikutnya meliputi penyusunan hasil penelitian, pembahasan, kesimpulan, dan saran berdasarkan hasil analisis data yang diperoleh. Penulis juga melakukan penyempurnaan naskah skripsi sesuai dengan arahan dosen pembimbing hingga memperoleh persetujuan skripsi pada bulan Mei 2026. Setelah seluruh proses tersebut selesai, penulis mengikuti sidang skripsi pada bulan Juli 2026 sebagai tahap akhir dalam penyelesaian penelitian.
+
+Desain Penelitian
+
+Desain penelitian merupakan rencana dan struktur penelitian yang disusun untuk menjawab pertanyaan penelitian (Sreekumar, 2025). Desain penelitian ini disusun untuk melihat bagaimana Digital Marketing dan Orientasi Kewirausahaan berpengaruh terhadap Keberlanjutan Usaha pada UMKM kuliner ayam bakar di Kabupaten Bekasi. Penulis dapat mengetahui seberapa besar pengaruh kedua variabel independen tersebut terhadap Keberlanjutan Usaha melalui desain ini.
+
+[[GAMBAR-13: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 3. 1 Desain Penelitian
+
+Sumber: Data diolah penulis, 2026
+
+Penelitian ini menggunakan pendekatan korelasional untuk mengetahui hubungan antara Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha. Dengan pendekatan ini hubungan antar variabel dapat dianalisis secara tepat melalui teknik statistik seperti regresi linier. Desain penelitian ini cocok dengan kondisi UMKM kuliner ayam bakar di Kabupaten Bekasi yang berada dalam persaingan yang terus berubah, sehingga penerapan strategi Digital Marketing dan Orientasi Kewirausahaan menjadi faktor penting untuk menjaga kelangsungan usaha. Dengan desain ini penelitian dapat menunjukkan peran kedua variabel independen dalam membantu usaha tetap bertahan dan berkembang.
+
+Definisi Operasional dan Pengukuran Variabel
+
+Definisi operasional yang dibuat dalam penelitian ini didasarkan pada landasan teori sebelumnya dengan merujuk pada pendapat para ahli serta teori, indikator, dan penjelasan yang mendukung dan relevan dengan penelitian, yaitu sebagai berikut:
+
+Tabel 3. 1 Definisi Operasional Variabel
+
+[[TABEL-5: 13 baris × 6 kolom — JANGAN diubah, ini konteks]]
+
+No | Uraian Variabel | Indikator | Penjelasan Indikator | Skala | Item Pernyataan
+1 | Digital Marketing (Pemasaran Digital)Chaffey dan Ellis-Chadwick (2019) dalam (Havidz, 2024) | Penggunaan Media Digital | Terlihat dari cara usaha tersebut memanfaatkan platform pemesanan makanan online seperti Shopee Food, Gofood, atau Grabfood untuk menampilkan menu, harga, dan promo secara teratur. | Likert1-4 | X1.1X1.2
+Kualitas konten digital | Kualitas gambar atau video yang jernih, informatif, dan menarik, sehingga memudahkan konsumen memahami produk yang ditawarkan. | Likert1-4 | X1.3X1.4
+Interaksi dua arah dengan pelanggan | Ditunjukkan melalui komunikasi aktif di chat, komentar, atau pesan pribadi, di mana respons yang cepat dan ramah dapat memperkuat hubungan dengan pelanggan. | Likert1-4 | X1.5X1.6
+Kemudahan proses transaksi digital | Dapat dilihat dari alur pemesanan yang sederhana, ketersediaan kontak yang mudah dijangkau, pilihan pembayaran digital, serta informasi operasional yang jelas. | Likert1-4 | X1.6X1.8
+2 | Orientasi KewirausahaanLumpkin & Dess (1996) dalam (Ramadanti et al., 2024) | Inovatif | Kemampuan pengusaha untuk menciptakan ide, produk, atau cara baru agar bisnis bisa lebih unggul. | Likert1-4 | X2.1X.2.2
+Proaktif | Sikap untuk bertindak lebih dulu daripada kompetitor dalam memanfaatkan peluang pasar. | Likert1-4 | X2.3X2.4
+Pengambilan Risiko | Kemauan untuk menerima ketidakpastian agar bisa mendapatkan hasil yang lebih baik. | Likert1-4 | X2.5X2.6
+Otonomi | Kemampuan seseorang atau tim untuk membuat keputusan sendiri dan bertindak tanpa bantuan orang lain. | Likert1-4 | X2.7X2.8
+Keagresifan Kompetitif | Sikap yang tegas dalam menghadapi persaingan pasar agar bisnis tetap bisa berada di posisi terdepan. | Likert1-4 | X2.9X2.10
+3 | Keberlanjutan UsahaElkington (1997) dalam (Zaman et al., 2025) | Keberlanjuta Ekonomi | Kemampuan usaha untuk mendapatkan penghasilan yang konsisten dan tetap bertahan di pasar. | Likert1-4 | Y1.1Y1.2
+Keberlanjutan Sosial | Menjaga hubungan yang baik dengan pelanggan, karyawan, serta masyarakat sekitar. | Likert1-4 | Y1.3Y1.4
+Keberlanjutan Lingkungan | Menerapkan cara kerja yang ramah lingkungan, seperti mengelola sampah dan menggunakan energi secara efisien. | Likert1-4 | Y1.5Y1.6
+
+[[/TABEL-5]]
+
+Sumber: Data diolah penulis, 2026
+
+Metode Pengumpulan Data
+
+Pengumpulan data pada penelitian ini dilakukan dengan menggunakan kuesioner, yang disusun berdasarkan indikator dari variabel Digital Marketing, Orientasi Kewirausahaan, dan Keberlanjutan Usaha. Kuesioner dipilih karena sesuai dengan pendekatan kuantitatif yang memerlukan data dalam bentuk angka untuk dianalisis secara statistik. Kuesioner merupakan serangkaian pertanyaan atau pernyataan yang disusun terstruktur dan diberikan kepada responden. Kuesioner dilengkapi dengan petunjuk yang jelas mengenai urutan mengisi dan cara memilih jawaban. Kuesioner memiliki tingkat kemudahan yang tinggi dan bisa digunakan dalam berbagai jenis penelitian, baik survei maupun eksperimen. Kuesioner membantu penulis dalam membuat kerangka kerja yang sistematis untuk mengumpulkan data dan mendapatkan informasi secara terarah (Kuphanga, 2024).
+
+Kuesioner disusun menggunakan skala Likert 1-4, sehingga responden bisa memberikan penilaian sesuai dengan kondisi usaha masing-masing. Instrumen ini disebarluaskan secara langsung maupun melalui formulir online agar responden dapat mengisinya dengan lebih fleksibel sesuai dengan waktu yang dimiliki. Data yang berhasil dikumpulkan dari kuesioner tersebut kemudian digunakan sebagai dasar untuk analisis dalam penelitian ini.
+
+Jenis, Sumber, dan Teknik Pengumpulan Data
+
+Jenis dan Sumber Data
+
+Jenis data yang diterapkan dalam penelitian ini berfokus pada kuantitatif dengan pendekatan asosiatif, karena penelitian ini bertujuan untuk menganalisis hubungan antara variabel Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada UMKM yang bergerak di bidang kuliner ayam bakar di Kabupaten Bekasi. Penelitian asosiatif digunakan untuk mengukur sejauh mana variabel-variabel tersebut saling berhubungan. Penelitian asosiatif adalah jenis penelitian yang bertujuan untuk memahami keterkaitan antara dua variabel atau lebih (Nurlasera et al., 2023).
+
+Data dalam penelitian ini terbagi menjadi dua jenis, yaitu data primer dan data sekunder. Data primer didapat secara langsung dari responden melalui pemberian kuesioner kepada para pelaku usaha mikro kecil menengah (UMKM) yang bergerak di bidang kuliner ayam bakar, sedangkan data sekunder diambil dari berbagai sumber pendukung seperti jurnal ilmiah, hasil penelitian sebelumnya, serta literatur yang relevan. Data ini digunakan untuk memperkuat landasan teori serta menentukan indikator variabel penelitian.
+
+Data Primer
+
+Data primer adalah informasi langsung yang dikumpulkan oleh penulis sendiri. Data ini diperoleh langsung dari orang yang menjadi responden dan digunakan secara khusus untuk memenuhi kebutuhan penelitian (Ajayi, 2025).
+
+Data Sekunder
+
+Data sekunder merupakan data yang telah dikumpulkan oleh pihak lain sebelumnya. Data ini umumnya berasal dari dokumen, laporan, atau publikasi yang telah tersedia dan dapat digunakan kembali sebagai sumber informasi untuk mendukung penyusunan landasan teori, analisis, dan pembahasan dalam penelitian (Wagh, 2025).
+
+Teknik Pengumpulan Data
+
+Teknik yang digunakan untuk mengumpulkan data dalam penelitian ini adalah sebagai berikut:
+
+Observasi
+
+Observasi dilakukan dengan melihat secara langsung kegiatan operasional UMKM kuliner ayam bakar di Kabupaten Bekasi. Penulis dapat memahami pengamatan ini melalui alur pelayanan, kondisi tempat usaha, serta praktik usaha yang berkaitan dengan variabel penelitian. Informasi hasil observasi menjadi pendukung untuk memahami konteks lapangan sebelum data kuesioner dianalisis.
+
+Kuesioner
+
+Data utama dalam penelitian ini diperoleh melalui penyebaran kuesioner kepada pelaku UMKM kuliner ayam bakar. Instrumen ini berisi sejumlah pernyataan yang mengukur variabel Digital Marketing, Orientasi Kewirausahaan, dan Keberlanjutan Usaha. Setiap pernyataan dinilai menggunakan skala Likert 1–4, mulai dari “Sangat Tidak Setuju” hingga “Sangat Setuju”. Skala Likert adalah alat untuk mengukur sikap, pendapat, atau pandangan seseorang terhadap suatu pernyataan. (Koo & Yang, 2025).
+
+Tabel 3. 2 Skala Likert
+
+[[GAMBAR-14: di sini — JANGAN diubah, ini konteks]]
+
+Data diolah Penulis, 2026
+
+Studi Kepustakaan
+
+Studi kepustakaan dilakukan dengan menelaah berbagai sumber seperti jurnal, buku, artikel ilmiah, serta penelitian terdahulu yang relevan dengan variabel penelitian.
+
+Populasi dan Teknik Pengambilan Sampel
+
+Populasi penelitian merujuk pada keseluruhan subjek atau objek yang ditetapkan sebagai sasaran penelitian karena memiliki karakteristik sesuai dengan fokus kajian. Penentuan populasi membantu peneliti membatasi ruang lingkup penelitian agar data yang dikumpulkan sesuai dengan kebutuhan penelitian (Hossan et al., 2023).
+
+Penelitian ini menggunakan pelaku UMKM kuliner ayam bakar yang beroperasi di Kabupaten Bekasi sebagai responden penelitian. Populasi penelitian tidak memiliki jumlah yang pasti dan terdiri dari berbagai karakteristik usaha, sehingga ukuran populasi tidak dapat ditentukan secara jelas. Kondisi tersebut membuat peneliti menggunakan teknik non-probability sampling, yaitu pemilihan responden berdasarkan kriteria yang sesuai dengan kebutuhan penelitian, bukan melalui proses pemilihan secara acak. Teknik ini dipilih agar responden yang digunakan benar-benar sesuai dengan karakteristik pelaku UMKM kuliner ayam bakar yang menjadi sasaran penelitian.
+
+Purposive sampling digunakan untuk menyaring responden yang memiliki kesesuaian dengan fokus penelitian. Kriteria pemilihan sampel ditetapkan oleh peneliti agar responden yang dipilih benar-benar relevan dengan kebutuhan penelitian (Creswell & Creswell, 2023). Responden dipilih berdasarkan karakteristik tertentu yang telah ditetapkan sesuai dengan tujuan penelitian. Pemilihan tersebut disesuaikan dengan variabel dan objek penelitian agar data yang diperoleh lebih sesuai dengan kebutuhan penelitian. Pemenuhan kriteria tersebut bertujuan agar informasi yang diperoleh berasal dari responden yang memiliki pengalaman dan pemahaman sesuai dengan topik penelitian.
+
+Rumus Lemeshow digunakan karena jumlah populasi pelaku UMKM kuliner ayam bakar belum diketahui secara pasti.
+
+n = Z² · P (1 − P)
+
+────────
+
+d²
+
+Keterangan:
+
+n = jumlah sampel
+
+Z = skor Z pada tingkat kepercayaan 95% (1,96)
+
+P = proporsi maksimum (0,5)
+
+d = tingkat kesalahan pengambilan sampel (0,10)
+
+Perhitungan sampel ditampilkan sebagai berikut:
+
+n = 1,96² · 0,5 (1 − 0,5)
+
+───────────
+
+0,1²
+
+n = 3,8416 · 0,25
+
+────────
+
+0,01
+
+n = 96,04 ≈ 100
+
+Hasil perhitungan memperoleh nilai 96,04, kemudian jumlah responden ditetapkan menjadi 100 pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi. Jumlah tersebut dianggap cukup untuk kebutuhan penelitian dan digunakan sebagai dasar dalam proses analisis data.
+
+Metode Analisis
+
+Analisis data dilakukan setelah seluruh data penelitian terkumpul dari responden maupun sumber pendukung lainnya. Tahap analisis dilakukan dengan menata data berdasarkan variabel penelitian, menyajikan hasil pengolahan data, serta melakukan perhitungan statistik untuk menjawab rumusan masalah dan menguji hipotesis. Penelitian ini menggunakan analisis statistik deskriptif dan inferensial dengan bantuan perangkat lunak SPSS 25. Berbagai ahli seperti Chattamvelli & Shanmugam (2023), Jones & Goldring (2022), Sánchez (2023), hingga Yahya & Fianto (2020) menjelaskan bahwa statistik deskriptif berfokus pada proses mengumpulkan, menampilkan, dan membaca data apa adanya. Tujuannya adalah memberikan gambaran yang sederhana namun informatif mengenai karakteristik data. Penulis pada tahap ini belum melakukan penarikan kesimpulan untuk populasi secara luas, melainkan hanya menjelaskan pola yang muncul dari data yang terkumpul (Iba & Wardhana, n.d).
+
+Hirschauer, Grüner et al. (2022), Janczyk & Pfister (2023), Klappa (2022), Sánchez (2023), dan Wardhana et al. (2022) menjelaskan bahwa statistik inferensial digunakan untuk menarik kesimpulan mengenai populasi berdasarkan data sampel. Analisis ini berbeda dari statistik deskriptif karena tidak hanya menyajikan data, tetapi juga digunakan untuk menguji hubungan antarvariabel dalam penelitian. Analisis inferensial memungkinkan peneliti menguji hipotesis yang telah dirumuskan menggunakan data yang diperoleh dari sampel penelitian. (Iba & Wardhana, 2023).
+
+Uji Instrumen
+
+Uji instrumen dilakukan untuk menilai apakah kuesioner yang digunakan sudah sesuai dalam mengukur variabel penelitian dan dapat digunakan pada tahap pengolahan data. Proses ini mencakup dua bagian utama, yaitu uji validitas dan uji reliabilitas.
+
+Uji Validitas
+
+Uji validitas digunakan untuk melihat kesesuaian setiap pernyataan dalam kuesioner dengan variabel yang diukur. Pengujian validitas dalam penelitian ini menggunakan teknik Product Moment Pearson dengan taraf signifikansi 0,05. Butir pernyataan dinyatakan valid apabila nilai r hitung lebih besar daripada r tabel, sehingga instrumen dinyatakan mampu mengukur variabel penelitian secara tepat dan dapat digunakan pada tahap analisis berikutnya (Iba & Wardhana, 2023).
+
+Uji Reliabilitas
+
+Uji reliabilitas digunakan untuk mengetahui tingkat konsistensi suatu instrumen dalam mengukur konstruk yang sama. Nunnally dan Bernstein (1994) dalam (Noor & Fuzi, 2025), menjelaskan bahwa reliabilitas berkaitan dengan kestabilan hasil pengukuran, sehingga instrumen dapat dinilai melalui nilai Cronbach’s Alpha. Instrumen dianggap reliabel apabila nilai Cronbach’s Alpha melebihi 0,70, karena nilai tersebut menunjukkan bahwa instrumen pada setiap variabel memiliki reliabilitas yang memuaskan.
+
+Uji Asumsi Klasik
+
+Uji asumsi klasik digunakan untuk menilai kelayakan model regresi sebelum hasil analisis disimpulkan. Pengujian dilakukan melalui uji normalitas, multikolinieritas, dan heteroskedastisitas. Model regresi dapat digunakan apabila ketiga asumsi tersebut terpenuhi, sehingga hasil analisis lebih layak dijadikan dasar pengambilan kesimpulan.
+
+Hirschauer, Grüner et al. (2022), Janczyk dan Pfister (2023), Klappa (2022), Sánchez (2023), serta Wardhana et al. (2022) dalam Iba & Wardhana (2023) menjelaskan bahwa uji asumsi digunakan untuk memeriksa kesiapan data sebelum analisis statistik dilakukan. Hasil pemeriksaan tersebut menjadi dasar untuk menilai kelayakan analisis berikutnya:
+
+Uji Normalitas
+
+Uji normalitas dilakukan untuk menilai apakah residual pada model regresi memiliki sebaran yang normal dan sesuai dengan kebutuhan analisis statistik. Residual yang tidak normal dapat memengaruhi ketepatan hasil regresi, terutama pada pengujian signifikansi. Pengecekan normalitas dapat dilakukan melalui uji statistik seperti Kolmogorov–Smirnov maupun dengan mengamati bentuk kurva pada histogram residual. Asumsi normalitas mengacu pada anggapan bahwa data penelitian memiliki distribusi normal, yang menjadi prasyarat dalam beberapa metode statistik inferensial, seperti uji t dan analisis varians (analysis of variance atau ANOVA). Normalitas data dapat diperiksa melalui beberapa cara, seperti uji Kolmogorov-Smirnov, uji Shapiro-Wilk, dan grafik Q-Q plot untuk melihat pola sebaran data (Iba & Wardhana, 2023).
+
+Uji Multikolinieritas
+
+Uji multikolinieritas digunakan untuk melihat apakah hubungan antarvariabel independen masih berada pada batas yang wajar. Multikolinieritas dapat menyebabkan hasil estimasi regresi menjadi kurang stabil, ditandai dengan meningkatnya standar error dan menurunnya nilai t-hitung sehingga pengaruh masing-masing variabel sulit diinterpretasikan. Deteksi multikolinieritas biasanya dilakukan menggunakan nilai Tolerance and Variance Inflation Factor (VIF). Model dikatakan bebas multikolinieritas apabila nilai Tolerance berada di atas batas minimum dan nilai VIF berada di bawah nilai ambang yang direkomendasikan. Pengujian ini dilakukan untuk menilai apakah hubungan antarvariabel independen dalam model regresi masih berada dalam batas yang dapat diterima (Iba & Wardhana, 2023).
+
+Uji Heteroskedastisitas
+
+Uji heteroskedastisitas digunakan untuk melihat apakah sebaran residual pada model regresi memiliki pola yang tetap. Varians residual yang tidak merata dapat membuat hasil estimasi regresi kurang stabil dan memengaruhi ketepatan pengujian signifikansi. Pemeriksaan heteroskedastisitas dapat dilihat melalui grafik scatterplot yang membandingkan nilai prediksi dengan residual. Model dinilai bebas dari heteroskedastisitas apabila titik pada scatterplot menyebar secara acak dan tidak membentuk pola khusus. Pengujian statistik juga dapat dilihat dari nilai signifikansi. Model dianggap tidak mengalami heteroskedastisitas apabila nilai signifikansi lebih dari 0,05, sedangkan nilai di bawah 0,05 menunjukkan adanya gejala heteroskedastisitas. Uji heteroskedastisitas bertujuan menilai kestabilan sebaran residual pada model regresi. (Iba & Wardhana, 2023).
+
+Analisis Regresi Linier Berganda
+
+Analisis regresi linier berganda digunakan untuk menilai pengaruh beberapa variabel independen terhadap satu variabel dependen. Metode ini juga membantu memperkirakan perubahan variabel dependen berdasarkan variabel independen yang digunakan dalam model. Analisis regresi linier berganda digunakan untuk melihat hubungan pengaruh antara lebih dari satu variabel bebas dan satu variabel terikat dalam model regresi linier (Iba & Wardhana, 2023). Penggunaan analisis ini memungkinkan peneliti mengetahui besarnya pengaruh masing-masing variabel independen terhadap variabel dependen. Hasil analisis tersebut menjadi dasar dalam menjawab tujuan penelitian serta menguji hipotesis yang telah dirumuskan. Analisis ini sesuai digunakan karena penelitian melibatkan dua variabel independen, yaitu Digital Marketing dan Orientasi Kewirausahaan, terhadap satu variabel dependen, yaitu Keberlanjutan Usaha.
+
+Secara matematis, persamaan regresi linier berganda dapat dituliskan sebagai:
+
+Y = a + b1X1 + b2X2 + ⋯ + bnXn + ε
+
+Keterangan:
+
+Y = variabel terikat dalam model regresi
+
+a = nilai konstanta pada persamaan regresi
+
+b₁, b₂, …, bₙ = koefisien regresi yang menunjukkan arah dan besar pengaruh masing-masing variabel bebas
+
+X₁, X₂, …, Xₙ = variabel bebas yang digunakan dalam penelitian
+
+ε (epsilon) = residual atau kesalahan prediksi dalam model regresi
+
+Koefisien Determinasi (R2)
+
+Koefisien determinasi (R²) digunakan untuk melihat seberapa jauh Digital Marketing dan Orientasi Kewirausahaan mampu menjelaskan perubahan pada Keberlanjutan Usaha. Nilai R² menggambarkan bagian perubahan Keberlanjutan Usaha yang dapat diterangkan oleh model regresi, di mana nilai yang semakin tinggi menunjukkan kemampuan model yang semakin baik, sementara nilai yang rendah menunjukkan bahwa masih terdapat faktor lain di luar model yang ikut memengaruhi variabel tersebut.
+
+Analisis regresi juga memperhatikan nilai Adjusted R² agar penilaian model lebih sesuai, terutama pada penelitian yang menggunakan lebih dari satu variabel independen. Iba & Wardhana (2023) menjelaskan bahwa koefisien determinasi (R²) menggambarkan sejauh mana variabel independen dapat menerangkan perubahan pada variabel dependen. Nilai R² berada antara 0 sampai 1. Nilai yang mendekati 1 menunjukkan bahwa model regresi semakin mampu menjelaskan perubahan data dalam penelitian.
+
+Uji Hipotesis Parsial (Uji T)
+
+Pengujian hipotesis secara parsial dilakukan menggunakan uji t untuk mengetahui pengaruh masing-masing variabel independen terhadap variabel dependen. Pengujian ini menilai signifikansi pengaruh variabel independen berdasarkan perbandingan antara nilai signifikansi hasil pengujian dan batas signifikansi yang digunakan dalam penelitian. Keputusan uji t ditentukan berdasarkan dua dasar penilaian berikut:
+
+Nilai signifikansi (p-value): p-value < 0,05 menunjukkan bahwa H₀ ditolak dan H₁ diterima, sehingga variabel independen dinyatakan memiliki pengaruh signifikan.
+
+Perbandingan nilai t: H₀ ditolak apabila nilai t hitung lebih besar daripada t tabel.
+
+Uji t digunakan untuk melihat pengaruh setiap variabel independen secara terpisah terhadap variabel dependen. Uji t membantu peneliti menilai apakah pengaruh masing-masing variabel independen terhadap variabel dependen dinyatakan signifikan berdasarkan perbandingan antara nilai signifikansi hasil pengujian dan batas signifikansi yang digunakan (Iba & Wardhana, 2023).
+
+Uji Hipotesis Simultan (Uji F)
+
+Uji hipotesis simultan (Uji F) digunakan untuk menilai pengaruh Digital Marketing dan Orientasi Kewirausahaan secara bersama-sama terhadap Keberlanjutan Usaha. Uji F dalam penelitian ini dilakukan pada model regresi linier berganda dengan bantuan program Statistical Package for the Social Sciences (SPSS) versi 25.
+
+Keputusan uji F ditentukan berdasarkan perbandingan nilai signifikansi (Sig.) dengan batas signifikansi 0,05. Nilai Sig. < 0,05 menunjukkan bahwa H₀ ditolak dan H₁ diterima, sehingga Digital Marketing dan Orientasi Kewirausahaan secara simultan berpengaruh terhadap Keberlanjutan Usaha. Sebaliknya, nilai Sig. > 0,05 menunjukkan bahwa H₀ diterima, sehingga kedua variabel tersebut tidak berpengaruh secara simultan terhadap Keberlanjutan Usaha. Iba & Wardhana (2023) menjelaskan bahwa uji F digunakan untuk mengetahui pengaruh variabel independen secara bersama-sama terhadap variabel dependen dalam model regresi.
+
+BAB IV
+
+HASIL DAN PEMBAHASAN
+
+Hasil Penelitian
+
+Deskripsi Data Penelitian
+
+Data penelitian diperoleh dari kuesioner yang dibagikan kepada pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi sesuai dengan kriteria responden yang telah ditetapkan. Pengumpulan data dilakukan kepada responden yang menjalankan usaha di bidang kuliner ayam bakar dan masih aktif beroperasi saat penelitian berlangsung. Hasil pengumpulan data menghasilkan 100 kuesioner yang lengkap, sehingga dapat digunakan untuk tahap analisis penelitian.
+
+Karakteristik responden digunakan untuk menggambarkan kondisi umum pelaku usaha yang terlibat dalam penelitian ini. Informasi tersebut membantu peneliti memahami latar belakang usaha responden sebelum hasil penelitian dianalisis lebih lanjut. Karakteristik responden disajikan berdasarkan beberapa aspek yang relevan dengan tujuan penelitian.
+
+Karakteristik Responden Berdasarkan Lama Usaha
+
+Karakteristik berdasarkan lama usaha menunjukkan durasi pelaku UMKM kuliner ayam bakar dalam menjalankan usahanya. Lama usaha juga dapat menggambarkan pengalaman pelaku usaha dalam mengelola kegiatan usahanya. Distribusi responden berdasarkan lama usaha dapat dilihat sebagai berikut.
+
+[[GAMBAR-15: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 4. 1 Karakteristik Responden Berdasarkan Lama Usaha
+
+Sumber: Data diolah penulis, 2026
+
+Gambar 4.1 menunjukkan bahwa lama usaha responden dalam penelitian ini cukup beragam. Sebagian besar responden berada pada kategori usaha yang telah berjalan selama 2–4 tahun dengan persentase sebesar 39%, yang mengindikasikan bahwa mayoritas pelaku UMKM kuliner ayam bakar telah memiliki pengalaman dalam menjalankan kegiatan usahanya. Kelompok responden dengan lama usaha 4–5 tahun tercatat sebesar 22%, sedangkan responden dengan lama usaha 1–2 tahun tercatat sebesar 19%. Responden yang menjalankan usaha lebih dari 1 tahun berada pada persentase 20%. Hasil tersebut menunjukkan bahwa banyak responden telah melewati tahap awal usaha dan mulai memiliki pengalaman dalam mengelola serta mempertahankan usahanya.
+
+Karakteristik Responden Berdasarkan Lokasi Usaha
+
+Karakteristik berdasarkan lokasi usaha menunjukkan wilayah tempat pelaku UMKM kuliner ayam bakar menjalankan usahanya. Lokasi usaha dapat memberikan gambaran mengenai persebaran responden dalam penelitian ini. Distribusi responden berdasarkan lokasi usaha dapat dilihat sebagai berikut:
+
+[[GAMBAR-16: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 4. 2 Karakteristik Responden Berdasarkan Lokasi Usaha
+
+Sumber: Data diolah penulis, 2026
+
+Gambar 4.2 menunjukkan bahwa responden berasal dari beberapa kecamatan di Kabupaten Bekasi. Kecamatan Cikarang Utara menjadi lokasi usaha dengan jumlah responden paling banyak, yaitu 24%. Kecamatan Cikarang Barat berada pada urutan berikutnya dengan persentase 21%. Responden dari Kecamatan Cikarang Selatan dan kecamatan lainnya di Kabupaten Bekasi masing-masing tercatat sebesar 19% Kecamatan Cikarang Timur memiliki persentase sebesar 17% dari total responden. Hasil tersebut menunjukkan bahwa responden tersebar di beberapa kecamatan dengan jumlah terbanyak berada di Cikarang Utara.
+
+Hasil Analisis Data
+
+Data penelitian diolah menggunakan SPSS versi 25 untuk menganalisis pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada UMKM kuliner ayam bakar di Kabupaten Bekasi.
+
+Uji Instrumen
+
+Pemeriksaan instrumen dilakukan melalui uji validitas dan uji reliabilitas untuk menilai ketepatan indikator serta konsistensi jawaban yang diberikan responden.
+
+Uji Validitas
+
+Hasil uji validitas yang diolah menggunakan SPSS Statistics versi 25 untuk setiap variabel ditampilkan pada tabel berikut:
+
+Variabel Digital Marketing
+
+Tabel 4. 1 Hasil Uji Validitas Instrumen Variabel X1
+
+[[GAMBAR-17: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Tabel 4.1 menunjukkan bahwa seluruh item pernyataan pada variabel Digital Marketing (X1) memiliki nilai r hitung yang lebih besar dari r tabel (0,1966), sehingga seluruh indikator telah memenuhi kriteria validitas dan dapat digunakan pada tahap analisis berikutnya.
+
+Variabel Orientasi Kewirausahaan
+
+Tabel 4. 2 Hasil Uji Validitas Instrumen Variabel X2
+
+[[GAMBAR-18: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Tabel 4.2 memperlihatkan bahwa setiap item pernyataan pada variabel Orientasi Kewirausahaan (X2) memperoleh nilai r hitung di atas r tabel (0,1966). Hasil tersebut menunjukkan bahwa seluruh indikator pada variabel Orientasi Kewirausahaan telah memenuhi kriteria validitas, sehingga setiap item pernyataan dapat digunakan pada tahap analisis berikutnya.
+
+Variabel Keberlanjutan Usaha
+
+Tabel 4. 3 Hasil Uji Validitas Instrumen Variabel Y
+
+[[GAMBAR-19: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Tabel 4.3 memperlihatkan bahwa setiap item pernyataan pada variabel Keberlanjutan Usaha (Y) memperoleh nilai r hitung di atas r tabel (0,1966). Hasil tersebut menunjukkan bahwa seluruh indikator pada variabel Keberlanjutan Usaha telah memenuhi kriteria validitas.
+
+Uji Reliabilitas
+
+Hasil uji reliabilitas setiap variabel ditampilkan pada tabel berikut:
+
+Tabel 4. 4 Hasil Uji Reliabilitas
+
+[[GAMBAR-20: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Tabel 4.4 menunjukkan bahwa seluruh variabel penelitian memperoleh nilai Cronbach’s Alpha di atas batas minimum 0,70. Variabel Digital Marketing memperoleh nilai Cronbach’s Alpha sebesar 0,940, Orientasi Kewirausahaan sebesar 0,960, dan Keberlanjutan Usaha sebesar 0,936. Hasil tersebut menunjukkan bahwa seluruh variabel telah memenuhi kriteria reliabilitas.
+
+Uji Asumsi Klasik
+
+Pengujian asumsi klasik pada penelitian ini meliputi uji normalitas, multikolinieritas, dan heteroskedastisitas yang disajikan pada bagian berikut:
+
+Uji Normalitas
+
+Hasil uji normalitas disajikan pada tabel berikut:
+
+Tabel 4. 5 Hasil Uji 1-Sample – K-S
+
+[[GAMBAR-21: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Berdasarkan kriteria uji normalitas, data dinyatakan berdistribusi normal apabila nilai signifikansi (Asymp. Sig.) lebih besar dari 0,05. Hasil pengujian menggunakan One-Sample Kolmogorov-Smirnov Test memperoleh nilai signifikansi (Asymp. Sig.) sebesar 0,105, sehingga residual pada model regresi telah memenuhi asumsi normalitas. Grafik Normal P-P Plot selanjutnya digunakan sebagai pendukung untuk melihat penyebaran titik residual terhadap garis diagonal.
+
+[[GAMBAR-22: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 4. 3 Hasil Uji P-Plot
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Berdasarkan kriteria grafik Normal P-P Plot, residual dinyatakan berdistribusi normal apabila titik-titik menyebar di sekitar dan mengikuti arah garis diagonal. Hasil grafik Normal P-P Plot memperlihatkan bahwa titik residual berada di sekitar garis diagonal. Temuan ini mendukung hasil uji Kolmogorov-Smirnov sebelumnya, sehingga model regresi telah memenuhi asumsi normalitas dan layak digunakan untuk analisis selanjutnya.
+
+Uji Multikolinieritas
+
+Hasil uji multikolinieritas disajikan pada tabel berikut:
+
+Tabel 4. 6 Hasil Uji Multikolinieritas
+
+[[GAMBAR-23: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Berdasarkan kriteria uji multikolinieritas, nilai Tolerance harus lebih dari 0,10 dan VIF kurang dari 10. Hasil uji menunjukkan nilai Tolerance sebesar 0,138 dan VIF sebesar 7,232 pada variabel Digital Marketing dan Orientasi Kewirausahaan, sehingga model regresi tidak mengalami multikolinieritas.
+
+Uji heteroskedastisitas
+
+Hasil pengujian heteroskedastisitas disajikan pada tabel berikut:
+
+Tabel 4. 7 Hasil Uji Heteroskedastisitas Metode Glejser
+
+[[GAMBAR-24: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Hasil uji heteroskedastisitas dengan metode Glejser menunjukkan nilai signifikansi Digital Marketing sebesar 0,216 dan Orientasi Kewirausahaan sebesar 0,446. Kedua nilai tersebut berada di atas 0,05, sehingga model regresi tidak mengalami gejala heteroskedastisitas dan layak digunakan untuk tahap analisis selanjutnya.
+
+[[GAMBAR-25: di sini — JANGAN diubah, ini konteks]]
+
+Gambar 4. 4 Hasil Uji Scatterplot
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Berdasarkan grafik scatterplot, model regresi dinyatakan tidak mengalami heteroskedastisitas apabila titik-titik menyebar secara acak dan tidak membentuk pola tertentu. Hasil grafik scatterplot menunjukkan bahwa titik data menyebar secara acak di sekitar sumbu Y, sehingga model regresi tidak mengalami gejala heteroskedastisitas.
+
+Analisis Linier Berganda
+
+Hasil analisis regresi linier berganda dalam penelitian ini disajikan pada tabel berikut:
+
+Tabel 4. 8 Hasil Analisis Regresi Linier Berganda
+
+[[GAMBAR-26: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Nilai koefisien pada tabel digunakan sebagai dasar penyusunan persamaan regresi linier berganda. Persamaan tersebut mengacu pada nilai dalam kolom Unstandardized Coefficients (B) yang menggambarkan besar pengaruh masing-masing variabel independen terhadap variabel dependen. Hasil perhitungan regresi pada penelitian ini menghasilkan persamaan berikut:
+
+Y = a + b1​X1​ + b2​X2​ + e
+
+Y = −0,392 + 0,362X1 ​+ 0,339X2 ​+ e
+
+Maka dari persamaan regresi tersebut dapat dijelaskan pada uraian berikut:
+
+Konstanta sebesar -0,392 berarti ketika Digital Marketing (X1) dan Orientasi Kewirausahaan (X2) berada pada nilai 0, Keberlanjutan Usaha (Y) diperkirakan berada pada nilai -0,392.
+
+Koefisien regresi Digital Marketing sebesar 0,362 menunjukkan pengaruh positif terhadap Keberlanjutan Usaha. Setiap peningkatan Digital Marketing sebesar satu satuan akan meningkatkan Keberlanjutan Usaha sebesar 0,362 dengan asumsi variabel lain tetap. Hasil tersebut menunjukkan bahwa penerapan Digital Marketing yang lebih baik cenderung diikuti peningkatan Keberlanjutan Usaha.
+
+Koefisien regresi Orientasi Kewirausahaan sebesar 0,339 menunjukkan pengaruh positif terhadap Keberlanjutan Usaha. Setiap peningkatan Orientasi Kewirausahaan sebesar satu satuan akan meningkatkan Keberlanjutan Usaha sebesar 0,339 dengan asumsi variabel lain tetap. Hasil tersebut menunjukkan bahwa Orientasi Kewirausahaan yang semakin baik cenderung diikuti peningkatan Keberlanjutan Usaha.
+
+Koefisien Determinasi (R2)
+
+Hasil koefisien determinasi pada penelitian ini disajikan pada tabel berikut:
+
+Tabel 4. 9 Hasil Uji Koefisien Determinasi (R2)
+
+[[GAMBAR-27: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Berdasarkan hasil koefisien determinasi, semakin besar nilai R Square maka semakin besar kemampuan variabel independen dalam menjelaskan variabel dependen. Hasil pengujian menunjukkan nilai R Square sebesar 0,930 dan Adjusted R Square sebesar 0,928. Nilai Adjusted R Square menunjukkan bahwa Digital Marketing dan Orientasi Kewirausahaan mampu menjelaskan Keberlanjutan Usaha sebesar 92,8%, sedangkan sisanya sebesar 7,2% dipengaruhi oleh faktor lain di luar model penelitian.
+
+Uji Hipotesis Parsial (Uji T)
+
+Hasil uji t disajikan untuk mengetahui pengaruh masing-masing variabel independen terhadap variabel dependen. Nilai t hitung, tingkat signifikansi, dan keputusan hipotesis dapat dilihat pada tabel berikut:
+
+Tabel 4. 10 Hasil Uji t (Parsial)
+
+[[GAMBAR-28: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Berdasarkan kriteria uji parsial (uji t), hipotesis diterima apabila nilai signifikansi lebih kecil dari 0,05. Hasil pengujian menunjukkan bahwa Digital Marketing memperoleh nilai t hitung sebesar 5,905 dengan signifikansi 0,000 dan koefisien regresi positif sebesar 0,362, sehingga berpengaruh positif dan signifikan terhadap Keberlanjutan Usaha. Orientasi Kewirausahaan memperoleh nilai t hitung sebesar 7,645 dengan signifikansi 0,000 serta koefisien regresi positif sebesar 0,339, sehingga juga berpengaruh positif dan signifikan terhadap Keberlanjutan Usaha.
+
+Uji Hipotesis Simultan (Uji F)
+
+Hasil uji hipotesis simultan disajikan pada tabel berikut:
+
+Tabel 4. 11 Hasil Uji F (Simultan)
+
+[[GAMBAR-29: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Berdasarkan kriteria uji simultan (uji F), hipotesis diterima apabila nilai signifikansi lebih kecil dari 0,05. Hasil uji menunjukkan nilai F hitung sebesar 640,505 dengan signifikansi 0,000, sehingga Digital Marketing dan Orientasi Kewirausahaan secara simultan berpengaruh signifikan terhadap Keberlanjutan Usaha. Hasil tersebut menunjukkan bahwa kedua variabel independen mampu memberikan pengaruh secara bersama-sama terhadap Keberlanjutan Usaha.
+
+Pembahasan Penelitian
+
+Pengaruh Digital Marketing terhadap Keberlanjutan Usaha
+
+Hasil pengujian hipotesis memperlihatkan bahwa Digital Marketing berpengaruh positif dan signifikan terhadap Keberlanjutan Usaha. Nilai t-statistic yang melebihi 1,96 dan p-value yang berada di bawah 0,05 menjadi dasar penerimaan hipotesis pertama (H1). Temuan ini menggambarkan bahwa semakin baik pemanfaatan Digital Marketing oleh pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi, semakin besar pula kemampuan usaha dalam mempertahankan dan mengembangkan Keberlanjutan Usahanya. Pemanfaatan media digital membantu pelaku usaha memperluas jangkauan pasar, meningkatkan efektivitas promosi, serta membangun komunikasi yang lebih dekat dengan konsumen.
+
+Temuan penelitian ini mendukung hasil penelitian Munawaroh et al. (2024) yang menjelaskan bahwa penggunaan Digital Marketing dapat mendorong pertumbuhan usaha berkelanjutan pada UMKM. Pemanfaatan teknologi digital dalam aktivitas pemasaran tidak hanya membantu meningkatkan visibilitas usaha, tetapi juga memperkuat daya saing di tengah perubahan perilaku konsumen yang semakin terbiasa menggunakan media digital. Kondisi tersebut sesuai dengan karakteristik UMKM kuliner ayam bakar di Kabupaten Bekasi yang menghadapi persaingan tinggi, sehingga penerapan Digital Marketing menjadi salah satu strategi penting untuk menjaga Keberlanjutan Usaha.
+
+Pengaruh Orientasi Kewirausahaan terhadap Keberlanjutan Usaha
+
+Hasil pengujian hipotesis memperlihatkan bahwa Orientasi Kewirausahaan berpengaruh positif dan signifikan terhadap Keberlanjutan Usaha. Nilai t-statistic yang melebihi 1,96 dan p-value yang berada di bawah 0,05 menjadi dasar penerimaan hipotesis kedua (H2). Temuan ini menggambarkan bahwa semakin kuat Orientasi Kewirausahaan yang dimiliki pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi, semakin besar pula kemampuan usaha dalam menjaga Keberlanjutan Usahanya. Orientasi Kewirausahaan yang tercermin melalui sikap inovatif, proaktif, dan berani mengambil risiko membantu pelaku usaha untuk terus beradaptasi dan berkembang dalam menghadapi perubahan pasar.
+
+Temuan penelitian ini mendukung penelitian Hanaysha & Al-Shaikh (2024) yang menjelaskan bahwa Orientasi Kewirausahaan berpengaruh positif terhadap Keberlanjutan Usaha. Hasil tersebut menunjukkan bahwa Orientasi Kewirausahaan yang kuat mendorong pelaku usaha lebih siap menghadapi perubahan, memanfaatkan peluang, dan meningkatkan daya saing usaha. Kondisi ini relevan dengan UMKM kuliner ayam bakar di Kabupaten Bekasi yang menghadapi persaingan tinggi, sehingga pelaku usaha dengan Orientasi Kewirausahaan yang baik cenderung lebih mampu menjaga Keberlanjutan Usaha.
+
+Pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha
+
+Hasil pengujian hipotesis memperlihatkan bahwa Digital Marketing dan Orientasi Kewirausahaan secara simultan berpengaruh positif dan signifikan terhadap Keberlanjutan Usaha. Nilai F-statistic yang berada di atas nilai pembanding dan nilai signifikansi yang lebih kecil dari 0,05 menjadi dasar penerimaan hipotesis ketiga (H3). Temuan ini menggambarkan bahwa penerapan Digital Marketing dan Orientasi Kewirausahaan yang dimiliki pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi secara bersama-sama dapat mendukung peningkatan Keberlanjutan Usaha dalam jangka panjang.
+
+Penelitian ini memiliki keterkaitan dengan penelitian Firi et al. (2023) yang menguji pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Sustainable Business Performance. Hasil penelitian tersebut menunjukkan bahwa Orientasi Kewirausahaan berpengaruh positif dan signifikan terhadap Sustainable Business Performance, sedangkan Digital Marketing tidak memberikan pengaruh yang signifikan. Perbedaan hasil pada variabel Digital Marketing dapat dipengaruhi oleh karakteristik usaha, tingkat pemanfaatan media digital, serta perilaku konsumen pada masing-masing objek penelitian. Penerapan Digital Marketing pada UMKM kuliner ayam bakar di Kabupaten Bekasi dinilai lebih mampu mendukung promosi dan komunikasi dengan konsumen sehingga, bersama Orientasi Kewirausahaan, dapat meningkatkan Keberlanjutan Usaha.
+
+BAB V
+
+PENUTUP
+
+Kesimpulan
+
+Hasil analisis data dan pembahasan mengenai pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada UMKM kuliner ayam bakar di Kabupaten Bekasi menghasilkan kesimpulan sebagai berikut:
+
+Digital Marketing memiliki pengaruh positif dan signifikan terhadap Keberlanjutan Usaha. Pemanfaatan media digital melalui platform online, penggunaan konten digital yang jelas dan menarik, interaksi yang baik dengan pelanggan, serta kemudahan proses transaksi digital mampu membantu pelaku usaha dalam menjaga hubungan dengan konsumen dan meningkatkan kenyamanan pelanggan. Kondisi tersebut dapat membantu Keberlanjutan Usaha melalui pemanfaatan sistem digital yang lebih efisien dalam kegiatan usaha.
+
+Orientasi Kewirausahaan memiliki pengaruh positif dan signifikan terhadap Keberlanjutan Usaha. Sikap inovatif, proaktif, berani dalam mengambil risiko, mampu mengambil keputusan secara mandiri, serta memiliki daya saing dalam menghadapi kompetitor dapat membantu pelaku usaha dalam mengembangkan usahanya. Kemampuan tersebut dapat mendukung Keberlanjutan Usaha melalui kemampuan usaha dalam beradaptasi terhadap perubahan dan persaingan pasar.
+
+Digital Marketing dan Orientasi Kewirausahaan secara simultan memiliki pengaruh positif dan signifikan terhadap Keberlanjutan Usaha. Pemanfaatan media sosial dan platform digital yang didukung kemampuan pelaku usaha dalam menciptakan inovasi, melihat peluang, mengambil keputusan, serta menghadapi persaingan mampu membantu usaha berjalan lebih baik dan lebih berkembang. Hubungan yang baik dengan pelanggan, proses usaha yang lebih mudah, serta kemampuan beradaptasi terhadap perubahan pasar juga membantu menjaga Keberlanjutan Usaha dalam jangka panjang.
+
+Saran
+
+Hasil analisis dan pembahasan dalam penelitian ini menghasilkan beberapa saran yang dapat dijadikan bahan pertimbangan sebagai berikut:
+
+Peningkatan Digital Marketing untuk mendukung Keberlanjutan Usaha dapat dilakukan melalui pemanfaatan media sosial dan platform pemesanan online dengan menampilkan foto produk yang jelas dan menarik, memberikan informasi produk yang mudah dipahami, serta merespon pelanggan dengan baik dan cepat. Kemudahan dalam proses pemesanan dan transaksi digital juga perlu diperhatikan agar usaha mampu mempertahankan penjualan, menjaga hubungan baik dengan pelanggan, dan tetap bertahan dalam persaingan usaha.
+
+Pengembangan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha perlu dilakukan dengan cara membuat variasi produk baru, melihat peluang usaha, berani mencoba strategi penjualan yang berbeda, serta mempertahankan daya saing dalam menghadapi persaingan pasar. Sikap proaktif dan kemampuan menyesuaikan diri terhadap perubahan kebutuhan konsumen juga perlu terus diperkuat agar usaha mampu bertahan, berkembang, dan menjaga hubungan baik dengan pelanggan dalam jangka panjang.
+
+Penguatan Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha perlu dilakukan secara simultan dengan cara memanfaatkan media sosial dan platform pemesanan online, memberikan informasi produk yang mudah dipahami, serta membangun interaksi yang baik dengan pelanggan dan kemudahan dalam proses transaksi. Sikap inovatif melalui pembuatan variasi produk baru, bersikap proaktif dalam melihat peluang usaha, berani mengambil risiko dalam mencoba strategi penjualan yang berbeda, serta mempertahankan daya saing usaha juga perlu terus dikembangkan agar usaha mampu bertahan dan berkembang dalam jangka panjang.
+
+DAFTAR  PUSTAKA
+
+Agil, M. S., & Apriadi, D. (2025). Pengaruh Liliterasi Digital dan Orientasi Kewirausahaan Terhadap Kinerja Usaha UMKM di Kota Bandung. Jurnal Manajemen, Bisnis Dan Akuntansi, 4(3), 176–191.
+
+Ajayi, V. O. (2025). A Review on Primary Sources of Data and Secondary Sources of Data. SSRN Electronic Journal, 2(3), 1–7. https://doi.org/10.2139/ssrn.5378785
+
+Ali, M. M., Hariyati, T., Pratiwi, M. Y., & Afifah, S. (2022). Metodologi Penelitian Kuantitatif Dan Penerapan Nya Dalam Penelitian. Eduation Journal, 2(2). https://doi.org/10.2991/ictte-17.2017.26
+
+Amin, N. F., Garancang, S., & Abunawas, K. (2023). KONSEP UMUM POPULASI DAN SAMPEL DALAM PENELITIAN. JURNAL PILAR: Jurnal Kajian Islam Kontemporer, 14(1), 15–31. https://doi.org/10.21070/2017/978-979-3401-73-7
+
+Aswedya, D. N., & Wiguna, S. V. (2025). PERAN DIGITAL MARKETING DALAM MENJAGA KONSISTENSI PENJUALAN BRAND FASHION LOKAL DI LUAR MOMEN MUSIMAN LEBARAN. Jurnal Media Akademik (JMA), 3(10).
+
+Awa, A., Ramadian, A., Hutomo, Y. P., Alam, S., & Ma’hadi, M. A. S. (2025). BUSINESS SUSTAINABILITY BASED ON DIGITAL MARKETING, ENTREPRENEURIAL PASSION, AND SELF-EFFICACY IN MSMES AS COOPERATIVE MEMBERS. Indonesian Interdisciplinary Journal of Sharia Economics (IIJSE), 8(2), 5320–5340.
+
+Bangun, W., Saragih, S., Veronica, M. S., Zaniarti, S., & Budiningsih, T. (2024). Embracing the role of business performance to foster the association between Digital Marketing, intellectual capital, and business sustainability. International Journal of Management and Sustainability, 13(4), 795–807. https://doi.org/10.18488/11.v13i4.3898
+
+Bekasi, P. K. (2026). Produk UMKM Kabupaten Bekasi. SIMPUM Bekasi. https://simpum.bekasikab.go.id/page/produk/10
+
+Clarissa, S., Selamat, F., & Lim, A. (2023). The Effect of Entrepreneurship Orientation and Innovation on Sustainable Business Growth SME’s Rice Box in West Jakarta. International Journal of Application on Economics and Business, 1(1), 512–520. https://doi.org/10.24912/ijaeb.11.512-520
+
+Covin, J. G., & Slevin, D. P. (1989). Strategic management of small firms in hostile and benign environments. Strategic Management Journal, 10(1), 75–87. https://doi.org/https://doi.org/10.1002/smj.4250100107
+
+Creswell, J. W., & Creswell, J. D. (2023). Research design 6th. ed.
+
+Dafina, R. R. (2025). Digital Marketing Sebagai Solusi Keberlanjutan Umkm Pada Perspektif Negara Berkembang: Systematic Literature Review. Bussman Journal : Indonesian Journal of Business and Management, 5(2), 981–994. https://doi.org/10.53363/buss.v5i2.409
+
+Daspar, D., Ratnaningsih, Y. R., Baldah, N., Nur’aeni, N., & Rismawati, R. (2021). PELATIHAN PEMANFAATAN DIGITAL MARKETING BAGI PELAKU USAHA MIKRO, KECIL DAN MENENGAH (UMKM) DI DESA WANGUN HARJA, CIKARANG UTARA, KABUPATEN BEKASI. Jurnal Abdimas Pelita Bangsa, 2(2), 29–33. https://www.neliti.com/publications/559361/pelatihan-pemanfaatan-digital-marketing-bagi-pelaku-usaha-mikro-kecil-dan-meneng
+
+Dewa, A. L., Oktavia, A., & Rahmasari, L. (2023). The Effect of Entrepreneurial Orientation on Sustainability Decisions in SMEs Run By Millennial Generations in Semarang, Indonesia. Indonesian Journal of Business and Entrepreneurship, 9(3), 370–382. https://doi.org/10.17358/ijbe.9.3.370
+
+Dora, Y. M., F, R. A. M., Zulganef, Z., & Suganda, U. K. (2024). Kolaborasi Dan Digital Marketing Untuk Keberlanjutan Usaha UMKM Kota Bandung. Jurnal Abdimas Kartika Wijayakusuma, 5(2), 400–408. https://doi.org/10.26874/jakw.v5i2.437
+
+Figurek, A., & Thrassou, A. (2023). An Integrated Framework for Sustainable Development in Agri-Food SMEs. Sustainability (Switzerland), 15(12), 1–22. https://doi.org/10.3390/su15129387
+
+Firi, F., Halik, R. A. F., & Mutmainna, M. (2023). The effect of Digital Marketing and entrepreneurial orientation on Sustainable Business performance in micro agribusiness enterprises. Internasional Conference on Economy, Management, and Business (IC-EMBus), 1(1), 1850–1859. https://conference.trunojoyo.ac.id/pub/icembus/article/view/373
+
+Frans, A., Dahmiri, & Indrawijaya, S. (2020). … Kewirausahaan Dan Keunggulan Bersaing Terhadap Keberhasilan Usaha Pada Rumah Makan Dendeng Batokok Di Provinsi Jambi. Jurnal Manajemen Terapan Dan …, 9(03), 172–182. https://repository.unja.ac.id/18797/
+
+Hanaysha, J. R., & Al-Shaikh, M. E. (2024). Impact of entrepreneurial orientation, marketing capability, and market orientation on business sustainability and corporate reputation. Discover Sustainability, 5(1). https://doi.org/10.1007/s43621-024-00401-4
+
+Havidz, H. B. H. (2024). Digital Marketing in Facing Business Competition in the Digital Era: A Conceptual Study as a Reference for Researcher. International Journal of Advanced Multidisciplinary, 2(4), 1151–1159. https://greenpub.org/IJAM/article/view/643%0Ahttps://greenpub.org/IJAM/article/download/643/458
+
+Hossan, D., Mansor, Z. D., & Jaharuddin, N. S. (2023). Research Population and Sampling in Quantitative Study. International Journal of Business and Technopreneurship (IJBT), 13(3), 209–222.
+
+Iba, Z., & Wardhana, A. (2023). METODE PENELITIAN. CV.EUREKA MEDIA AKSARA.
+
+Ingram, T., Bratnicka-Myśliwiec, K., Kraśnicka, T., & Steinerowska-Streb, I. (2022). Entrepreneurial Orientation as a Determinant of Sustainable Performance in Polish Family and Non-Family Organizations. Sustainability (Switzerland), 14(24), 1–25. https://doi.org/10.3390/su142416393
+
+Ismaeni, F., Martdianty, F., Adhikaputri, A., & Triono, R. A. (2024). Does Entrepreneurial Orientation Influence the Sustainability Performance of Indonesian SMEs? Asia Pacific Management and Business Application, 12(3), 285–298. https://doi.org/10.21776/ub.apmba.2024.012.03.4
+
+Koo, M., & Yang, S. (2025). Likert-Type Scale. Encyclopedia, 5(18), 1–11. https://doi.org/10.3390/ encyclopedia5010018
+
+Kuphanga, D. (2024). Questionnaires in Research: Their Role, Advantages, and Main Aspects (Issue March). https://www.collegesidekick.com/study-docs/21610189
+
+Latifah, U. A., Widodasih, R. W. K., & BR, K. S. (2023). Pengaruh Orientasi Kewirausahaan Terhadap Kinerja Pemasaran Melalui Keunggulan Bersaing Sebagai Variabel Mediasi Pada Umkm Kedai Kopi Di Cikarang Utara Kabupaten Bekasi. Jurnal Ilmiah Global Education, 4(2), 943–954. https://doi.org/10.55681/jige.v4i2.889
+
+Lumpkin, G. T., & Dess, G. G. (1996). Clarifying the Entrepreneurial Orientation Construct and Linking It to Performance. The Academy of Management Review, 21(1), 135–172. https://doi.org/10.2307/258632
+
+Manigandan, R., & Raghuram, J. N. V. (2025). Linking entrepreneurial orientation to sustainable performance: the mediating role of green innovation. International Journal of Productivity and Quality Management, 44(3), 331–355. https://doi.org/10.1504/IJPQM.2025.144900
+
+Munawaroh, N. A., Sudarmiatin, S., & Putimelinda, W. (2024). UNVEILING THE LINK: DOES DIGITAL MARKETING ADOPTION FUEL SUSTAINABLE GROWTH FOR SMEs IN INDONESIA? TRANSEKONOMIKA: Akuntansi, Bisnis Dan Keuangan, 4(2), 161–182. https://doi.org/10.55047/transekonomika.v4i2.642
+
+Nga, N. T. N., & Khoi, B. H. (2024). Influencing Digital Marketing and marketing performance on the business sustainability of small and medium enterprises. International Journal of Applied Economics, Finance and Accounting, 21(1), 76–86. https://doi.org/10.33094/ijaefa.v21i1.2048
+
+Noor, N. H. M., & Fuzi, A. M. (2025). Assessment of Validity, Reliability, and Normality in Quantitative Study: A Survey Instrument Analysis with IBM SPSS. Asian Journal of Research in Education and Social Sciences, 7(3), 438–452.
+
+Nurlasera, N., Alfianti, D., Mahyarni, M., & Julina, J. (2023). The Influence of Organizational Commitment and Employee Retention on Production Employee Turnover Intention at PT. Bengkalis Dockindo Perkasa. Proceeding of International Conference on Business Management and Accounting (ICOBIMA), 2(1), 136–144.
+
+Othman, N. A., Simpong, D. B., Razak, N. F. A., Saidi, N. A., Samengon, H., & Ahmad, G. (2021). Sustainable Food Waste Practice Among Small Medium Enterprise (SME) Restaurant Operators in Peninsular Malaysia. Journal of Contemporary Issues in Business and Government, 27(1), 2021. https://cibg.org.au/
+
+Pramesti, H., Jaya, U. A., Albar, F. M., Chrisulianti, R., & Wulandari, D. (2025). BUSINESS SUSTAINABILITY STRATEGY FOR MSMEs THROUGH DIGITAL MARKETING OPTIMIZATION AND PRODUCT INNOVATION. Jurnal Ekonomi Kreatif Dan Manajemen Bisnis Digital, 3(4), 492–506. https://transpublika.co.id/ojs/index.php/JEKOMBITAL/article/view/932
+
+Purwanti, A., Zaman, D., Hidayati, N., & Basir, B. (2025). Sustainable Business Practices, Financial Literacy, and Entrepreneurial Orientation on Msme Growth. Indo-Fintech Intellectuals: Journal of Economics and Business, 5(2), 4619–4629. https://doi.org/10.54373/ifijeb.v5i2.2941
+
+Puspitasari, N., & Mulyanto, D. (2025). Peran Pemanfaatan Digital Marketing dalam Peningkatan Kinerja dan Keberlanjutan UMKM. Al-Kharaj: Jurnal Ekonomi, Keuangan & Bisnis Syariah, 7(4), 1728–1741. https://doi.org/10.47467/alkharaj.v7i4.6870
+
+Rahmani, S., Abdillah, F., & Ristanti, V. (2025). Optimizing MSME sustainability through Digital Marketing, innovation, and financial literacy with financial technology support. IQTISHADUNA: Jurnal Ilmiah Ekonomi Kita, 14(1), 212–239. https://doi.org/10.46367/iqtishaduna.v14i1.2425
+
+Ramadanti, F. G., Tantriana, D., Putranto, H. A., Samsuri, A., & Saifuddin, M. (2024). Orientasi Kewirausahaan dan Keunggulan Kompetitif sebagai Faktor Pendorong Kinerja Usaha Mikro Kecil Menengah (UMKM) di Kota Surabaya. EKOMABIS: Jurnal Ekonomi Manajemen Bisnis, 5(01), 113–130. https://doi.org/10.37366/ekomabis.v5i01.865
+
+Ramdan, A., Rahma, R. S., Sofiyah, S., & Heryanto, Y. (2025). Pengaruh Orientasi Kewirausahaan terhadap Kinerja Pemasaran Digital melalui Jejaring Usaha dan Orientasi Pasar sebagai Variabel Intervening pada UMKM. Jurnal Ilmu Manajemen, Ekonomi Dan Kewirausahaan, 5(2), 360–372.
+
+Salmaa. (2023). Purposive Sampling: Pengertian, Jenis-Jenis, dan Contoh yang Baik dan Benar. Deepublish. https://penerbitdeepublish.com/purposive-sampling/
+
+Santoso, R. (2020). Review of Digital Marketing & Business Sustainability of E-Commerce During Pandemic Covid19 In Indonesia. JIET (Jurnal Ilmu Ekonomi Terapan), 5(2), 95–106. https://doi.org/10.20473/jiet.v5i2.23614
+
+Setiawan, R., Prasetyo, P. T., & Yuniawan, A. (2025). Digital Marketing Strategy for Sustainable Performance of MSMEs: Literature Review. Research Horizon, 05(01), 33–46.
+
+Sholeh, M. I., & Idris, I. (2024). Keberlanjutan Bisnis Kuliner di Tengah Dinamika Pasar: Pengalaman Albarokah Chicken. Jurnal Dinamika Bisnis Dan Kewirausahaan, 1(1), 47–56.
+
+Sianturi, G., Manrejo, S., & Faeni, D. P. (2024). PEMAHAMAN PERATURAN PERPAJAKAN, SANKSI, DAN PERSEPSI TARIF PAJAK TERHADAP KEPATUHAN WAJIB PAJAK USAHA MIKRO KECIL MENENGAH (UMKM) DI WILAYAH KABUPATEN BEKASI. Jurnal Risel Ilmiah, 1(2), 33–48.
+
+Sitindaon, N. (2025). Strategi Pemasaran Digital dalam Meningkatkan Loyalitas Konsumen: Studi pada UMKM di Era Industri 4.0. Digital Business Progress, 4(1), 53–59. https://journal.stie-binakarya.ac.id/index.php/dbp/article/view/209
+
+Sreekumar, D. (2025). What is Research Design? Types and Examples. PaperPal. https://paperpal.com/blog/researcher-resources/research-design
+
+Surya, E. P., Rahayu, W. P., & Dhewi, T. S. (2025). DETERMINASI FAKTOR YANG MEMPENGARUHI KEBERLANJUTAN USAHA UMKM : A SYSTEMATIC LITERATURE REVIEW (SLR). Jurnal Manajemen Terapan Dan Keuangan (Mankeu), 14(03), 1129–1143.
+
+Syah, A. R., & Sugiyanto. (2025). Pengaruh Pemasaran Digital , Inovasi Produk dan Orientasi Kewirausahaan terhadap Kinerja Pemasaran UMKM. Journal of Innovative and Creativity, 5(3), 26026–26037.
+
+Tingal, J. M., & Situmorang, T. P. (2024). Pengaruh Orientasi Pasar, Inovasi Produk dan Kinerja UMKM terhadap Keberlanjutan UMKM di Kota Waingapu. Jurnal Minfo Polgan, 13(1), 684–694. https://doi.org/https://doi.org/10.33395/jmp.v13i1.13774
+
+Vania, A., & Fikriah, N. L. (2023). The Impact of Creative Digital Marketing on the Sustainability of MSME Businesses: A Mediating Role of Marketing Performance. Jurnal Ilmiah Manajemen Dan Bisnis, 8(2), 141–150. https://doi.org/10.38043/jimb.v8i2.4546
+
+Wagh, S. (2025). Public Health Research Guide: Primary & Secondary Data Definitions. Benjamin Franklin University Libary. https://researchguides.ben.edu/c.php?g=282050&p=4036581
+
+Wales, W. J., Covin, J. G., Schüler, J., & Baum, M. (2023). Entrepreneurial orientation as a theory of new value creation. Journal of Technology Transfer, 48(5), 1752–1772. https://doi.org/10.1007/s10961-023-10021-1
+
+Yasa, N. N. K., Ekawati, N. W., Rahmayanti, P. L. D., & Tirtayani, I. G. A. (2024). The role of Tri Hita Karana-based business strategy and Digital Marketing to improve Sustainable Business performance. International Journal of Data and Network Science, 8(1), 629–640. https://doi.org/10.5267/j.ijdns.2023.8.022
+
+Zahra, K., Harahap, N. A., & Lubis, P. A. U. (2025). Analysis of the Impact of Digital Marketing on the Success of MSMEs Businesses in the Digital Era. Jurnal Manajemen Bisnis Eka Prasetya, 11(1), 249–257. https://www.jurnal.eka-prasetya.ac.id/MBEP/article/view/498
+
+Zaman, M., Tanewski, G., & Ekanayake, G. (2025). What does sustainability mean for small and medium enterprises: A systematic literature review. Journal of Cleaner Production, 492, 144830. https://doi.org/https://doi.org/10.1016/j.jclepro.2025.144830
+
+LAMPIRAN
+
+Lampiran 1 Permohonan Izin Responden
+
+[[GAMBAR-30: di sini — JANGAN diubah, ini konteks]]
+
+Lampiran 2 Dokumentasi
+
+[[GAMBAR-31: di sini — JANGAN diubah, ini konteks]]
+
+[[GAMBAR-32: di sini — JANGAN diubah, ini konteks]]
+
+Lampiran 3 Kuesioner
+
+KUESIONER PENELITIAN: PENGARUH DIGITAL MARKETING DAN ORIENTASI KEWIRAUSAHAAN TERHADAP KEBERLANJUTAN USAHA PADA UMKM KULINER AYAM BAKAR DI KABUPATEN BEKASI
+
+Assalamu'alaikum warahmatullahi wabarakatuh.
+
+Perkenalkan, saya Asih Susanti Putri dengan NIM 112210485, mahasiswi Program Studi Manajemen, Fakultas Ekonomi dan Bisnis, Universitas Pelita Bangsa, yang saat ini sedang menyusun penelitian skripsi berjudul, "Pengaruh Digital Marketing dan Orientasi Kewirausahaan terhadap Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi". Kuesioner ini disusun untuk menilai sejauh mana pernyataan-pernyataan dalam instrumen penelitian dapat dipahami dan relevan dengan kondisi usaha para pelaku UMKM kuliner ayam bakar di Kabupaten Bekasi. Melalui kuesioner ini, peneliti berharap mendapatkan gambaran awal mengenai kejelasan butir, kesesuaian indikator, serta kelayakan penggunaan instrumen dalam mengukur variabel Digital Marketing, Orientasi Kewirausahaan, dan Keberlanjutan Usaha.  Setiap pernyataan dalam instrumen ini menggunakan skala Likert 1–4, dengan pilihan jawaban sangat tidak setuju hingga sangat setuju. Seluruh informasi yang diberikan akan dijaga kerahasiaannya dan digunakan hanya untuk kepentingan pengembangan instrumen penelitian.
+
+PETUNJUK PENGISIAN
+
+Silahkan isi pernyataan berikut sesuai dengan pengalaman usaha Bapak/Ibu.
+
+Gunakan skala berikut:
+
+1 = Sangat Tidak Setuju
+
+2 = Tidak Setuju
+
+3 = Setuju
+
+4 = Sangat Setuju
+
+Identitas Responden
+
+Nama Usaha:
+
+Lama Usaha Berdiri:
+
+1—2 Tahun
+
+2—4 Tahun
+
+4—5 Tahun
+
+>5 Tahun
+
+Lokasi (Kecamatan):
+
+Daftar Pernyataan
+
+Pernyataan Digital Marketing
+
+[[GAMBAR-33: di sini — JANGAN diubah, ini konteks]]
+
+[[GAMBAR-34: di sini — JANGAN diubah, ini konteks]]
+
+Pernyataan Orientasi Kewirausahaan
+
+[[GAMBAR-35: di sini — JANGAN diubah, ini konteks]]
+
+[[GAMBAR-36: di sini — JANGAN diubah, ini konteks]]
+
+Pernyataan Keberlanjutan Usaha
+
+[[GAMBAR-37: di sini — JANGAN diubah, ini konteks]]
+
+Lampiran 4 Kuesioner Manual
+
+[[TABEL-6: 25 baris × 8 kolom — JANGAN diubah, ini konteks]]
+
+No | Variabel | Pernyataan | Kode | 1 | 2 | 3 | 4
+1 | Digital Marketing (X1) | Usaha kuliner ayam bakar saya menggunakan jasa Shopee Food, GoFood, atau GrabFood untuk menampilkan menu dan informasi usaha | X1.1
+2 | Usaha saya rutin memperbaharui menu, harga atau promo di platform pemesanan makanan online | X1.2
+3 | Konten digital usaha kuliner ayam bakar saya memiliki kualitas gambar atau video yang jelas dan menarik | X1.3
+4 | Konten yang saya unggah membantu pelanggan memahami produk yang ditawarkan | X1.4
+5 | Usaha kuliner ayam bakar saya merespons pertanyaan pelanggan melalui media digital dengan cepat dan ramah | X1.5
+6 | Saya aktif berkomunikasi dengan pelanggan melalui chat atau komentar di media digital | X1.6
+7 | Usaha kuliner ayam bakar saya menyediakan alur pemesanan online yang mudah dipahami pelanggan | X1.7
+8 | Usaha saya menyediakan pilihan pembayaran digital yang memudahkan pelanggan | X1.8
+9 | Orientasi Kewirausahaan (X2) | Usaha kuliner ayam bakar saya sering mencoba cara baru untuk meningkatkan kualitas produk atau layanan | X2.1
+10 | Saya berusaha membuat inovasi, seperti menu baru atau metode promosi baru, agar usaha tetap menarik | X2.2
+11 | Saya berusaha mengambil langkah lebih awal dalam menangkap peluang pasar sebelum pesaing | X2.3
+12 | Usaha kuliner ayam bakar saya cepat menyesuaikan diri dengan trend atau kebutuhan pelanggan | X2.4
+13 | Saya bersedia mengambil keputusan usaha yang mengandung risiko untuk mencapai hasil lebih baik | X2.5
+14 | Saya tidak ragu mencoba strategi baru meski ada kemungkinan gagal | X2.6
+15 | Saya mengambil keputusan usaha secara mandiri tanpa selalu bergantung pada orang lain | X2.7
+16 | Saya mampu menyelesaikan masalah usaha dengan inisiatif sendiri | X2.8
+17 | Usaha kuliner ayam bakar saya berusaha bersaing secara aktif untuk mempertahankan pelanggan | X2.9
+18 | Saya mengambil langkah-langkah untuk menghadapi pesaing secara tegas agar usaha tetap bertahan di pasar | X2.10
+19 | Keberlanjutan Usaha (Y) | Usaha saya mampu menghasilkan pendapatan yang stabil | Y1.1
+20 | Usaha saya dapat mempertahankan posisinya dipasar | Y1.2
+21 | Usaha saya menjaga hubungan baik dengan pelanggan | Y1.3
+22 | Usaha saya menjalin hubungan yang harmonis dengan masyarakat sekitar | Y1.4
+23 | Usaha saya menerapkan praktik kerja yang ramah lingkungan | Y1.5
+24 | Usaha saya mengelola sampah usaha dengan cara yang benar | Y1.6
+
+[[/TABEL-6]]
+
+Lampiran 5 Data Hasil Pra-Survei
+
+Hasil Pra-Survei Variabel Digital Marketing
+
+[[TABEL-7: 32 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Digital Marketing (X1)
+X1.1 | X1.2 | X1.3 | X1.4 | X1.5 | X1.6 | X1.7 | X1.8
+3 | 4 | 4 | 4 | 4 | 4 | 4 | 4
+1 | 2 | 1 | 1 | 2 | 2 | 2 | 1
+1 | 1 | 2 | 2 | 1 | 2 | 2 | 2
+3 | 4 | 4 | 4 | 3 | 4 | 3 | 2
+4 | 3 | 4 | 3 | 4 | 4 | 3 | 4
+3 | 3 | 3 | 3 | 4 | 1 | 4 | 3
+1 | 2 | 1 | 2 | 2 | 2 | 2 | 1
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+1 | 2 | 2 | 2 | 2 | 2 | 2 | 1
+3 | 3 | 3 | 3 | 4 | 4 | 4 | 3
+4 | 3 | 3 | 4 | 3 | 4 | 4 | 4
+3 | 3 | 3 | 4 | 4 | 4 | 4 | 3
+4 | 3 | 3 | 4 | 4 | 3 | 4 | 4
+1 | 2 | 2 | 2 | 1 | 1 | 1 | 1
+3 | 3 | 4 | 4 | 3 | 3 | 3 | 2
+3 | 3 | 4 | 1 | 4 | 4 | 3 | 3
+1 | 2 | 1 | 2 | 1 | 1 | 1 | 1
+3 | 3 | 3 | 3 | 3 | 3 | 4 | 4
+3 | 4 | 4 | 4 | 3 | 4 | 4 | 3
+4 | 3 | 3 | 4 | 4 | 4 | 4 | 3
+4 | 4 | 3 | 4 | 4 | 3 | 4 | 4
+3 | 3 | 3 | 3 | 3 | 4 | 3 | 3
+2 | 2 | 1 | 1 | 2 | 2 | 2 | 2
+3 | 4 | 3 | 3 | 1 | 3 | 3 | 4
+3 | 4 | 3 | 3 | 3 | 4 | 3 | 3
+3 | 1 | 3 | 4 | 3 | 4 | 4 | 4
+3 | 3 | 4 | 4 | 3 | 1 | 3 | 4
+3 | 4 | 4 | 3 | 4 | 3 | 4 | 4
+3 | 4 | 4 | 4 | 4 | 4 | 3 | 3
+1 | 2 | 2 | 2 | 3 | 1 | 2 | 2
+
+[[/TABEL-7]]
+
+Hasil Pra-Survei Variabel Orientasi Kewirausahaan
+
+[[TABEL-8: 32 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Orientasi Kewirausahaan (X2)
+X2.1 | X2.2 | X2.3 | X2.4 | X2.5 | X2.6 | X2.7 | X2.8 | X2.9 | X2.10
+3 | 4 | 3 | 3 | 4 | 4 | 3 | 3 | 3 | 4
+1 | 2 | 1 | 2 | 2 | 1 | 2 | 2 | 2 | 1
+2 | 1 | 1 | 1 | 1 | 2 | 2 | 1 | 1 | 1
+4 | 3 | 4 | 3 | 3 | 4 | 3 | 4 | 4 | 3
+2 | 3 | 3 | 4 | 3 | 3 | 4 | 3 | 4 | 3
+3 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 3 | 4
+1 | 2 | 3 | 2 | 2 | 1 | 2 | 2 | 2 | 1
+3 | 3 | 3 | 4 | 3 | 3 | 3 | 3 | 4 | 4
+1 | 2 | 1 | 2 | 2 | 1 | 2 | 2 | 2 | 1
+3 | 4 | 3 | 3 | 4 | 3 | 1 | 4 | 3 | 4
+3 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 3
+3 | 4 | 3 | 3 | 4 | 4 | 3 | 3 | 4 | 2
+4 | 3 | 4 | 4 | 4 | 2 | 3 | 4 | 4 | 4
+2 | 1 | 1 | 1 | 3 | 3 | 1 | 1 | 3 | 2
+4 | 4 | 3 | 4 | 4 | 4 | 4 | 3 | 4 | 4
+4 | 4 | 4 | 4 | 4 | 4 | 4 | 3 | 4 | 4
+2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2
+3 | 1 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4
+3 | 4 | 3 | 1 | 3 | 3 | 4 | 4 | 3 | 4
+4 | 3 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4
+4 | 3 | 1 | 3 | 3 | 4 | 4 | 3 | 3 | 4
+3 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 3 | 3
+2 | 1 | 1 | 1 | 1 | 1 | 1 | 2 | 2 | 1
+4 | 3 | 4 | 3 | 4 | 4 | 4 | 4 | 3 | 4
+3 | 3 | 3 | 3 | 3 | 1 | 3 | 3 | 3 | 3
+4 | 3 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 3
+3 | 4 | 3 | 3 | 4 | 3 | 4 | 3 | 4 | 3
+4 | 4 | 3 | 3 | 4 | 4 | 4 | 4 | 2 | 3
+4 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 3
+2 | 1 | 1 | 1 | 1 | 1 | 2 | 2 | 2 | 2
+
+[[/TABEL-8]]
+
+Hasil Pra-Survei Variabel Keberlanjutan Usaha
+
+[[TABEL-9: 32 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Keberlanjutan Usaha (Y)
+Y1.1 | Y1.2 | Y1.3 | Y1.4 | Y1.5 | Y1.6
+4 | 2 | 3 | 4 | 4 | 4
+2 | 2 | 1 | 1 | 1 | 1
+2 | 2 | 1 | 1 | 2 | 2
+3 | 4 | 4 | 3 | 4 | 3
+4 | 3 | 4 | 4 | 4 | 4
+3 | 3 | 3 | 4 | 3 | 4
+2 | 2 | 1 | 1 | 1 | 1
+2 | 4 | 4 | 3 | 4 | 3
+1 | 2 | 1 | 1 | 1 | 1
+3 | 3 | 3 | 4 | 3 | 4
+4 | 4 | 4 | 1 | 4 | 3
+4 | 4 | 3 | 3 | 4 | 4
+4 | 3 | 4 | 4 | 3 | 3
+2 | 1 | 1 | 1 | 2 | 2
+3 | 3 | 4 | 4 | 4 | 4
+4 | 4 | 4 | 4 | 3 | 3
+2 | 1 | 1 | 1 | 2 | 2
+4 | 4 | 3 | 4 | 4 | 4
+4 | 3 | 4 | 3 | 4 | 4
+3 | 4 | 1 | 4 | 3 | 3
+4 | 4 | 4 | 3 | 4 | 4
+4 | 3 | 3 | 3 | 2 | 4
+1 | 1 | 2 | 2 | 2 | 1
+3 | 4 | 3 | 4 | 4 | 4
+4 | 3 | 3 | 3 | 4 | 3
+4 | 4 | 3 | 3 | 3 | 3
+4 | 3 | 4 | 4 | 3 | 3
+4 | 4 | 4 | 4 | 3 | 4
+4 | 3 | 4 | 4 | 4 | 4
+2 | 1 | 2 | 2 | 2 | 2
+
+[[/TABEL-9]]
+
+Lampiran 6 Hasil Olah Data Pra-Kuesioner
+
+Uji Validitas
+
+Uji Validitas Variabel X1 (Digital Marketing)
+
+[[TABEL-10: 10 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Item-Total Statistics
+Scale Mean if Item Deleted | Scale Variance if Item Deleted | Corrected Item-Total Correlation | Cronbach’s Alpha if Item Deleted
+X1_1 | 20.60 | 33.766 | .912 | .916
+X1_2 | 20.37 | 37.689 | .667 | .934
+X1_3 | 20.37 | 35.137 | .813 | .924
+X1_4 | 20.27 | 35.789 | .731 | .930
+X1_5 | 20.30 | 35.459 | .747 | .928
+X1_6 | 20.33 | 35.264 | .674 | .935
+X1_7 | 20.20 | 35.062 | .873 | .920
+X1_8 | 20.43 | 34.461 | .791 | .925
+
+[[/TABEL-10]]
+
+Berdasarkan hasil uji validitas melalui Item-Total Statistics, seluruh indikator pada variabel X1 (X1_1 sampai X1_8) memiliki nilai Corrected Item-Total Correlation lebih besar dari 0,30. Hal tersebut menunjukkan bahwa setiap butir pernyataan mampu mengukur konstruk yang diteliti secara tepat. Dengan demikian, seluruh item pernyataan pada variabel X1 dinyatakan valid dan layak digunakan dalam penelitian.
+
+Uji Validitas Variabel X2 (Orientasi Kewirausahaan)
+
+[[TABEL-11: 12 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Item-Total Statistics
+Scale Mean if Item Deleted | Scale Variance if Item Deleted | Corrected Item-Total Correlation | Cronbach’s Alpha if Item Deleted
+X2_1 | 26.27 | 66.202 | .802 | .946
+X2_2 | 26.33 | 65.057 | .742 | .949
+X2_3 | 26.47 | 63.982 | .803 | .946
+X2_4 | 26.40 | 64.731 | .796 | .946
+X2_5 | 26.10 | 63.748 | .889 | .942
+X2_6 | 26.33 | 63.816 | .770 | .948
+X2_7 | 26.27 | 66.133 | .746 | .949
+X2_8 | 26.23 | 66.254 | .814 | .946
+X2_9 | 26.13 | 67.085 | .774 | .948
+X2_10 | 26.27 | 64.133 | .819 | .945
+
+[[/TABEL-11]]
+
+Berdasarkan hasil uji validitas melalui Item-Total Statistics, seluruh indikator pada variabel X2 (X2_1 sampai X2_10) memiliki nilai Corrected Item-Total Correlation lebih besar dari 0,30. Hal ini menunjukkan bahwa setiap butir pernyataan mampu mengukur konstruk yang diteliti secara tepat. Dengan demikian, seluruh item pernyataan pada variabel X2 dinyatakan valid dan layak digunakan dalam penelitian.
+
+Uji Validitas Variabel Y (Keberlanjutan Usaha)
+
+[[TABEL-12: 8 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Item-Total Statistics
+Scale Mean if Item Deleted | Scale Variance if Item Deleted | Corrected Item-Total Correlation | Cronbach’s Alpha if Item Deleted
+Y_1 | 14.77 | 23.564 | .810 | .921
+Y_2 | 14.97 | 23.964 | .725 | .931
+Y_3 | 15.03 | 21.895 | .820 | .919
+Y_4 | 15.00 | 22.207 | .772 | .926
+Y_5 | 14.87 | 23.154 | .833 | .918
+Y_6 | 14.87 | 22.464 | .881 | .911
+
+[[/TABEL-12]]
+
+Berdasarkan hasil uji validitas melalui Item-Total Statistics, seluruh indikator pada variabel Y (Y_1 sampai Y_6) memiliki nilai Corrected Item-Total Correlation lebih besar dari 0,30. Hal tersebut menunjukkan bahwa setiap butir pernyataan mampu mengukur konstruk yang diteliti secara tepat. Dengan demikian, seluruh item pernyataan pada variabel Y dinyatakan valid dan layak digunakan dalam penelitian.
+
+Uji Reliabilitas
+
+Tabel berikut menunjukan hasil uji reliabilitas instrumen kuesioner.
+
+Baris pertama menunjukan hasil variabel X1 (Digital Marketing), baris kedua varibel X2 (Orientasi Kewirausahaan), dan baris ketiga variabel Y (Keberlanjutan Usaha).
+
+[[TABEL-13: 5 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Reliability Statistics
+Cronbach’s Alpha | N of Items
+.935 | 8
+.952 | 10
+.933 | 6
+
+[[/TABEL-13]]
+
+Berdasarkan hasil uji reliabilitas menggunakan metode Cronbach’s Alpha, variabel Digital Marketing (X1) memiliki nilai Cronbach’s Alpha sebesar 0,935 dengan 8 item, variabel Orientasi Kewirausahaan (X2) sebesar 0,952 dengan 10 item, dan variabel Keberlanjutan Usaha (Y) sebesar 0,933 dengan 6 item. Seluruh nilai Cronbach’s Alpha berada di atas batas minimum 0,70, sehingga instrumen penelitian dinyatakan reliabel.
+
+Uji Normalitas
+
+[[TABEL-14: 5 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Tests of Normality
+Kolmogorov-Smirnova | Shapiro-Wilk
+Statistic | df | Sig. | Statistic | df | Sig.
+Keberlanjutan Usaha | .310 | 30 | .000 | .754 | 30 | .000
+a. Lilliefors Significance Correction
+
+[[/TABEL-14]]
+
+Berdasarkan hasil uji normalitas menggunakan Kolmogorov–Smirnov dan Shapiro–Wilk, variabel Keberlanjutan Usaha menunjukkan nilai signifikansi sebesar 0,000 pada kedua metode pengujian. Nilai signifikansi tersebut lebih kecil dari 0,05, sehingga dapat disimpulkan bahwa data pada variabel Keberlanjutan Usaha tidak berdistribusi normal.
+
+Uji Multikolinieritas
+
+[[TABEL-15: 6 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Coefficientsa
+Model | Collinierity Statistics
+Tolerance | VIF
+1 | Digital Marketing | .171 | 5.846
+Orientasi Kewirausahaan | .171 | 5.846
+a. Dependent Variable: Keberlanjutan Usaha
+
+[[/TABEL-15]]
+
+Berdasarkan hasil uji multikolinieritas yang ditunjukkan oleh nilai Tolerance dan Variance Inflation Factor (VIF), variabel Digital Marketing dan Orientasi Kewirausahaan masing-masing memiliki nilai tolerance sebesar 0,171 (> 0,10) dan nilai VIF sebesar 5,846 (< 10). Hasil tersebut menunjukkan bahwa tidak terjadi multikolinieritas antar variabel independen, sehingga model regresi dinyatakan bebas dari gejala multikolinieritas dan layak digunakan dalam penelitian.
+
+Uji Heteroskedastisitas
+
+[[GAMBAR-38: di sini — JANGAN diubah, ini konteks]]
+
+Berdasarkan hasil uji heteroskedastisitas dengan menggunakan scatterplot, terlihat bahwa titik-titik data menyebar secara acak di atas dan di bawah sumbu nol serta tidak membentuk pola tertentu. Hal tersebut menunjukkan bahwa tidak terjadi gejala heteroskedastisitas pada model regresi. Dengan demikian, model regresi dinyatakan memenuhi asumsi homoskedastisitas dan layak digunakan dalam penelitian
+
+Analisis Regresi Linier Berganda
+
+[[TABEL-16: 7 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Coefficientsa
+Model | Unstandardized Coefficients | t | Sig.
+B
+1 | (Constant) | -.159 | -.898 | .377
+Digital Marketing | .571 | 4.053 | .000
+Orientasi Kewirausahaan | .507 | 3.811 | .001
+a. Dependent Variable: Keberlanjutan Usaha
+
+[[/TABEL-16]]
+
+Berdasarkan hasil analisis regresi linier berganda, diperoleh persamaan regresi yaitu Y = -0,159 + 0,571X₁ + 0,507X₂. Koefisien regresi Digital Marketing sebesar 0,571 dan Orientasi Kewirausahaan sebesar 0,507 menunjukkan bahwa kedua variabel independen memiliki pengaruh positif terhadap Keberlanjutan Usaha. Dengan demikian, model regresi linier berganda dapat digunakan dalam penelitian.
+
+Koefisien Determinasi (R2)
+
+[[TABEL-17: 4 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Model Summaryb
+Model | R Square | Adjusted R Square
+1 | .927 | .922
+b. Dependent Variable: Keberlanjutan Usaha
+
+[[/TABEL-17]]
+
+Berdasarkan hasil analisis koefisien determinasi, diperoleh nilai adjusted r square sebesar 0,922. Hal ini menunjukkan bahwa variabel Digital Marketing dan Orientasi Kewirausahaan mampu menjelaskan variasi Keberlanjutan Usaha sebesar 92,2%, sedangkan sisanya sebesar 7,8% dijelaskan oleh variabel lain di luar model penelitian.
+
+Uji Hipotesis (Uji T)
+
+[[TABEL-18: 6 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Coefficientsa
+Model | t | Sig.
+1 | (Constant) | -.898 | .377
+Digital Marketing | 4.053 | .000
+Orientasi Kewirausahaan | 3.811 | .001
+a. Dependent Variable: Keberlanjutan Usaha
+
+[[/TABEL-18]]
+
+Berdasarkan hasil uji t (parsial), variabel Digital Marketing memiliki nilai signifikansi sebesar 0,000 < 0,05, sehingga Digital Marketing berpengaruh signifikan terhadap Keberlanjutan Usaha. Variabel Orientasi Kewirausahaan memiliki nilai signifikansi sebesar 0,001 < 0,05, sehingga Orientasi Kewirausahaan juga berpengaruh signifikan terhadap Keberlanjutan Usaha. Dengan demikian, secara parsial kedua variabel independen berpengaruh signifikan terhadap variabel dependen.
+
+Uji Hipotesis Simultan (Uji F)
+
+[[TABEL-19: 7 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+ANOVAa
+Model | Sum of Squares | df | Mean Square | F | Sig.
+1 | Regression | 24.287 | 2 | 12.144 | 172.660 | .000b
+Residual | 1.899 | 27 | .070
+Total | 26.186 | 29
+a. Dependent Variable: Keberlanjutan Usaha
+b. Predictors: (Constant), Orientasi Kewirausahaan, Digital Marketing
+
+[[/TABEL-19]]
+
+Berdasarkan hasil uji F (simultan), diperoleh nilai signifikansi sebesar 0,000 < 0,05. Hal tersebut menunjukkan bahwa variabel Digital Marketing dan Orientasi Kewirausahaan secara simultan berpengaruh signifikan terhadap Keberlanjutan Usaha. Dengan demikian, model regresi yang digunakan dalam penelitian dinyatakan layak untuk menjelaskan pengaruh variabel independen terhadap variabel dependen.
+
+Lampiran 7 Mapping Jurnal
+
+Jurnal Internasional
+
+[[TABEL-20: 12 baris × 6 kolom — JANGAN diubah, ini konteks]]
+
+No | Peneliti (Tahun) | Judul Penelitian | Variabel Penelitian | Hasil Penelitian | Sumber Jurnal
+1 | Munawaroh et al. (2024) | Unveiling the Link: Does Digital Marketing Adoption Fuel Sustainable Growth for SMEs in Indonesia? | Digital Marketing; Sikap; Subjective norm; Niat Penggunaan; Keberlanjutan Usaha | Adopsi Digital Marketing berpengaruh positif terhadap pertumbuhan berkelanjutan UMKM melalui niat dan penggunaan aktual Digital Marketing. | TRANSEKONOMIKA: Akuntansi, Bisnis dan Keuangan
+2 | Bangun et al. (2024) | Embracing the Role of Business Performance to Foster the Association Between Digital Marketing, Intellectual capital, and Business Sustainability | Digital Marketing; Intellectual capital; Kinerja Usaha; Keberlanjutan Usaha | Digital Marketing tidak berpengaruh signifikan terhadap kinerja usaha, sedangkan intellectual capital berpengaruh positif terhadap kinerja dan keberlanjutan usaha. | International Journal of Management and Sustainability
+3 | Yasa et al. (2024) | The Role of Tri Hita Karana-Based Business Strategy and Digital Marketing to Improve Sustainable Business Performance | Strategi Bisnis; Digital Marketing; Kinerja Usaha Berkelanjutan | Strategi bisnis berbasis Tri Hita Karana dan Digital Marketing berpengaruh positif dan signifikan terhadap kinerja usaha berkelanjutan. | International Journal of Data and Network Science
+4 | Nga & Khoi, (2024) | Influencing Digital Marketing and Marketing Performance on the Business Sustainability of SMEs | Digital Marketing; Marketing Performance; Brand Awareness; Keberlanjutan Usaha | Digital Marketing berpengaruh positif terhadap marketing performance dan secara langsung terhadap keberlanjutan usaha. | International Journal of Applied Economics, Finance and Accounting, (IJAEFA)
+5 | Pramesti et al. (2025) | Business Sustainability Strategy for MSMEs Through Digital Marketing Optimization and Product Innovation | Digital Marketing; Inovasi Produk; Keberlanjutan Usaha | Digital Marketing dan inovasi produk berpengaruh positif dan signifikan terhadap keberlanjutan usaha UMKM. | JEKOMBITAL: Jurnal Ekonomi, Komunikasi, dan Bisnis Digital
+6 | Hanaysha & Al-Shaikh (2024) | Impact of Entrepreneurial Orientation, Marketing Capability, and Market Orientation on Business Sustainability and Corporate Reputation | Orientasi Kewirausahaan; Marketing capability; Market orientation; Keberlanjutan Usaha | Orientasi kewirausahaan, marketing capability, dan market orientation berpengaruh positif terhadap keberlanjutan usaha. | Discover Sustainability
+7 | Clarissa et al. (2023) | The Effect of Entrepreneurship Orientation and Innovation on Sustainable Business Growth SMEs Rice Box in West Jakarta | Orientasi Kewirausahaan; Inovasi; Pertumbuhan Usaha Berkelanjutan | Orientasi kewirausahaan dan inovasi berpengaruh positif dan signifikan terhadap pertumbuhan usaha berkelanjutan. | International Journal of Application on Economics and Business
+8 | Ismaeni et al. (2024) | Does Entrepreneurial Orientation Influence the Sustainability Performance of Indonesian SMEs? | Orientasi Kewirausahaan; Integrasi Pengetahuan; Sikap Keberlanjutan; Kinerja Keberlanjutan | Orientasi kewirausahaan tidak berpengaruh langsung terhadap kinerja keberlanjutan, namun berpengaruh tidak langsung. | Asia-Pacific Management and Business Application
+9 | Ingram et al. (2022) | Entrepreneurial Orientation as a Determinant of Sustainable Performance in Polish Family and Non-Family Organizations | Orientasi Kewirausahaan; Inovasi; Kinerja Berkelanjutan | Orientasi kewirausahaan berpengaruh positif terhadap kinerja berkelanjutan. | Sustainability
+10 | Manigandan & Raghuram, (2025) | Linking Entrepreneurial Orientation to Sustainable Performance: The Mediating Role of Green Innovation | Orientasi Kewirausahaan; Green Innovation; Kinerja Berkelanjutan | Orientasi kewirausahaan berpengaruh positif terhadap kinerja berkelanjutan melalui inovasi hijau. | International Journal of Product Quality Management
+11 | Firi et al. (2023) | The Effect of Digital Marketing and Entrepreneurial Orientation on Sustainable Business Performance in Micro Agribusiness Enterprises | Digital Marketing; Orientasi Kewirausahaan; Kinerja Usaha Berkelanjutan | Digital Marketing tidak berpengaruh signifikan, sedangkan orientasi kewirausahaan berpengaruh positif terhadap kinerja berkelanjutan. | Prosiding International Conference on Economy, Management, and Business (IC-EMBUS)
+
+[[/TABEL-20]]
+
+Jurnal Nasional
+
+[[TABEL-21: 10 baris × 6 kolom — JANGAN diubah, ini konteks]]
+
+No | Peneliti (Tahun) | Judul Penelitian | Variabel Penelitian | Hasil Penelitian | Sumber Jurnal
+1 | Vania & Fikriah (2023) | The Impact of Creative Digital Marketing on the Sustainability of MSME Businesses: A Mediating Role of Marketing Performance | Digital Marketing; Kinerja Pemasaran; Keberlanjutan Usaha | Digital Marketing kreatif berpengaruh positif terhadap kinerja pemasaran dan keberlanjutan usaha, dengan kinerja pemasaran sebagai variabel mediasi. | Jurnal Ilmiah Manajemen dan Bisnis
+2 | Santoso (2020) | Review of Digital Marketing & Business Sustainability of E-Commerce During Pandemic Covid-19 in Indonesia | Digital Marketing; Keberlanjutan Usaha | Digital Marketing berpengaruh positif terhadap keberlanjutan usaha melalui peningkatan brand awareness dan jangkauan pasar. | JIET (Jurnal Ilmu Ekonomi Terapan)
+3 | Awa et al. (2025) | Business Sustainability Based on Digital Marketing, Entrepreneurial Passion, and Self-efficacy in MSMEs as Cooperative Members | Digital Marketing; Entrepreneurial Passion; Self-efficacy; Keberlanjutan Usaha | Digital Marketing, entrepreneurial passion, dan self-efficacy berpengaruh signifikan terhadap keberlanjutan usaha UMKM. | Indonesian Interdisciplinary Journal of Sharia Economics (IIJSE)
+4 | Dora et al. (2024) | Kolaborasi dan Digital Marketing untuk Keberlanjutan Usaha UMKM Kota Bandung | Kolaborasi; Digital Marketing; Keberlanjutan Usaha | Kolaborasi dan Digital Marketing berkontribusi positif terhadap keberlanjutan usaha UMKM. | JAKW (Jurnal Abdimas Kartika Wijayakusuma)
+5 | Dafina (2025) | Digital Marketing sebagai Solusi Keberlanjutan UMKM pada Perspektif Negara Berkembang: Systematic Literature Review | Digital Marketing; Keberlanjutan Usaha | Digital Marketing berpengaruh signifikan terhadap keberlanjutan UMKM di negara berkembang. | Bussman Journal: Indonesian Journal of Business & Management
+6 | Rahmani et al. (2025) | Optimizing MSME Sustainability through Digital Marketing, Innovation, and Financial Literacy with Financial Technology Support | Digital Marketing; Inovasi; Literasi Keuangan; Keberlanjutan Usaha | Digital Marketing, inovasi, dan literasi keuangan berpengaruh positif terhadap keberlanjutan usaha dengan fintech sebagai mediator. | IQTISHADUNA: Jurnal Ilmiah Ekonomi Kita
+7 | Setiawan et al. (2025) | Digital Marketing Strategy for Sustainable Performance of MSMEs: Literature Review | Digital Marketing; Kinerja Usaha Berkelanjutan | Strategi Digital Marketing berperan penting dalam meningkatkan kinerja usaha berkelanjutan UMKM. | Research Horizon
+8 | Dewa et al. (2023) | The Effect of Entrepreneurial Orientation on Sustainability Decisions in SMEs Run by Millennial Generations in Semarang, Indonesia | Orientasi Kewirausahaan; Keputusan Keberlanjutan | Orientasi kewirausahaan tidak berpengaruh langsung terhadap keputusan keberlanjutan. | Indonesian Journal of Business and Entrepreneurship
+9 | Purwanti et al. (2025) | Sustainable Business Practices, Financial Literacy, and Entrepreneurial Orientation on MSME Growth | Orientasi Kewirausahaan; Literasi Keuangan; Pertumbuhan Usaha | Orientasi kewirausahaan berpengaruh signifikan terhadap pertumbuhan UMKM. | Indo-Fintech Intellectuals: Journal of Economics and Business
+
+[[/TABEL-21]]
+
+Lampiran 8 Tabulasi Data
+
+Hasil Pernyataan Digital Marketing (X1)
+
+[[TABEL-22: 101 baris × 8 kolom — JANGAN diubah, ini konteks]]
+
+Usaha kuliner ayam bakar saya menggunakan jasa Shopee Food, GoFood, atau GrabFood untuk menampilkan menu dan informasi usaha | Usaha saya rutin memperbaharui menu, harga atau promo di platform pemesanan makanan online | Konten digital usaha kuliner ayam bakar saya memiliki kualitas gambar atau video yang jelas dan menarik | Konten yang saya unggah membantu pelanggan memahami produk yang ditawarkan | Usaha kuliner ayam bakar saya merespons pertanyaan pelanggan melalui media digital dengan cepat dan ramah | Saya aktif berkomunikasi dengan pelanggan melalui chat atau komentar di media digital | Usaha kuliner ayam bakar saya menyediakan alur pemesanan online yang mudah dipahami pelanggan | Usaha saya menyediakan pilihan pembayaran digital yang memudahkan pelanggan
+4 | 3 | 4 | 4 | 3 | 4 | 4 | 3
+3 | 3 | 4 | 3 | 4 | 3 | 3 | 4
+1 | 2 | 2 | 2 | 2 | 2 | 1 | 1
+3 | 3 | 4 | 4 | 3 | 3 | 4 | 4
+3 | 4 | 3 | 3 | 4 | 4 | 4 | 3
+3 | 3 | 3 | 3 | 3 | 4 | 4 | 4
+4 | 4 | 3 | 4 | 4 | 3 | 4 | 3
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+4 | 4 | 4 | 4 | 4 | 4 | 4 | 4
+4 | 4 | 3 | 4 | 4 | 3 | 3 | 3
+4 | 3 | 3 | 4 | 3 | 4 | 4 | 3
+4 | 3 | 4 | 4 | 3 | 3 | 3 | 4
+3 | 3 | 4 | 3 | 4 | 4 | 3 | 4
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 4
+3 | 3 | 3 | 4 | 3 | 4 | 4 | 4
+1 | 2 | 2 | 2 | 2 | 2 | 2 | 2
+4 | 4 | 3 | 3 | 4 | 3 | 3 | 3
+4 | 3 | 3 | 4 | 4 | 3 | 4 | 4
+4 | 3 | 3 | 4 | 3 | 3 | 3 | 4
+2 | 2 | 1 | 1 | 2 | 2 | 2 | 2
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+3 | 3 | 4 | 4 | 4 | 4 | 4 | 4
+3 | 3 | 4 | 4 | 3 | 4 | 3 | 3
+3 | 3 | 3 | 4 | 4 | 3 | 4 | 3
+3 | 4 | 4 | 4 | 4 | 3 | 4 | 4
+1 | 2 | 2 | 2 | 2 | 2 | 1 | 1
+4 | 4 | 4 | 3 | 4 | 4 | 4 | 4
+3 | 3 | 3 | 3 | 3 | 4 | 4 | 3
+3 | 3 | 4 | 4 | 4 | 4 | 3 | 4
+1 | 2 | 2 | 2 | 2 | 3 | 3 | 1
+1 | 2 | 1 | 1 | 2 | 1 | 2 | 2
+3 | 4 | 4 | 4 | 4 | 3 | 3 | 4
+4 | 3 | 3 | 3 | 4 | 4 | 3 | 3
+4 | 4 | 2 | 3 | 3 | 4 | 4 | 3
+3 | 3 | 3 | 3 | 3 | 4 | 3 | 4
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+3 | 4 | 3 | 3 | 4 | 4 | 4 | 3
+3 | 4 | 4 | 4 | 3 | 4 | 4 | 4
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+3 | 4 | 3 | 4 | 3 | 4 | 3 | 3
+3 | 4 | 4 | 3 | 3 | 4 | 4 | 3
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+3 | 3 | 3 | 3 | 4 | 4 | 4 | 4
+3 | 4 | 3 | 3 | 4 | 3 | 3 | 4
+3 | 3 | 4 | 3 | 3 | 4 | 3 | 3
+3 | 4 | 4 | 4 | 4 | 4 | 3 | 4
+4 | 4 | 3 | 4 | 4 | 3 | 4 | 3
+1 | 2 | 2 | 2 | 2 | 2 | 1 | 1
+4 | 3 | 4 | 3 | 4 | 3 | 4 | 4
+3 | 3 | 4 | 4 | 3 | 4 | 3 | 4
+1 | 1 | 2 | 2 | 2 | 2 | 2 | 2
+1 | 2 | 1 | 1 | 2 | 1 | 2 | 2
+1 | 2 | 2 | 2 | 2 | 2 | 1 | 1
+3 | 3 | 3 | 4 | 4 | 3 | 3 | 4
+3 | 3 | 3 | 4 | 4 | 3 | 3 | 4
+1 | 3 | 4 | 4 | 4 | 3 | 3 | 3
+4 | 4 | 4 | 4 | 4 | 4 | 4 | 4
+3 | 3 | 4 | 3 | 3 | 3 | 4 | 3
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+4 | 4 | 3 | 4 | 3 | 3 | 3 | 3
+1 | 2 | 1 | 2 | 1 | 1 | 1 | 1
+3 | 3 | 4 | 3 | 3 | 4 | 4 | 4
+4 | 3 | 3 | 3 | 3 | 3 | 2 | 3
+4 | 4 | 3 | 3 | 3 | 3 | 4 | 4
+4 | 3 | 4 | 4 | 3 | 4 | 4 | 4
+3 | 3 | 4 | 4 | 3 | 4 | 3 | 4
+3 | 4 | 3 | 3 | 4 | 3 | 3 | 3
+1 | 2 | 2 | 2 | 1 | 1 | 1 | 1
+3 | 1 | 4 | 3 | 3 | 4 | 3 | 3
+3 | 4 | 4 | 4 | 4 | 4 | 4 | 4
+1 | 2 | 1 | 1 | 2 | 2 | 2 | 1
+1 | 1 | 2 | 2 | 1 | 2 | 2 | 2
+3 | 4 | 4 | 4 | 3 | 4 | 3 | 2
+4 | 3 | 4 | 3 | 4 | 4 | 3 | 4
+3 | 3 | 3 | 3 | 4 | 1 | 4 | 3
+1 | 2 | 1 | 2 | 2 | 2 | 2 | 1
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+1 | 2 | 2 | 2 | 2 | 2 | 2 | 1
+3 | 3 | 3 | 3 | 4 | 4 | 4 | 3
+4 | 3 | 3 | 4 | 3 | 4 | 4 | 4
+3 | 3 | 3 | 4 | 4 | 4 | 4 | 3
+4 | 3 | 3 | 4 | 4 | 3 | 4 | 4
+1 | 2 | 2 | 2 | 1 | 1 | 1 | 1
+3 | 3 | 4 | 4 | 3 | 3 | 3 | 2
+3 | 3 | 4 | 1 | 4 | 4 | 3 | 3
+1 | 2 | 1 | 2 | 1 | 1 | 1 | 1
+3 | 3 | 3 | 3 | 3 | 3 | 4 | 4
+3 | 4 | 4 | 4 | 3 | 4 | 4 | 3
+4 | 3 | 3 | 4 | 4 | 4 | 4 | 3
+4 | 4 | 3 | 4 | 4 | 3 | 4 | 4
+3 | 3 | 3 | 3 | 3 | 4 | 3 | 3
+2 | 2 | 1 | 1 | 2 | 2 | 2 | 2
+3 | 4 | 3 | 3 | 1 | 3 | 3 | 4
+3 | 4 | 3 | 3 | 3 | 4 | 3 | 3
+3 | 1 | 3 | 4 | 3 | 4 | 4 | 4
+3 | 3 | 4 | 4 | 3 | 1 | 3 | 4
+3 | 4 | 4 | 3 | 4 | 3 | 4 | 4
+3 | 4 | 4 | 4 | 4 | 4 | 3 | 3
+1 | 2 | 2 | 2 | 3 | 1 | 2 | 2
+
+[[/TABEL-22]]
+
+Hasil Pernyataan Orientasi Kewirausahaan (X2)
+
+[[TABEL-23: 101 baris × 10 kolom — JANGAN diubah, ini konteks]]
+
+Usaha kuliner ayam bakar saya sering mencoba cara baru untuk meningkatkan kualitas produk atau layanan | Saya berusaha membuat inovasi, seperti menu baru atau metode promosi baru, agar usaha tetap menarik | Saya berusaha mengambil langkah lebih awal dalam menangkap peluang pasar sebelum pesaing | Usaha kuliner ayam bakar saya cepat menyesuaikan diri dengan trend atau kebutuhan pelanggan | Saya bersedia mengambil keputusan usaha yang mengandung risiko untuk mencapai hasil lebih baik | Saya tidak ragu mencoba strategi baru meski ada kemungkinan gagal | Saya mengambil keputusan usaha secara mandiri tanpa selalu bergantung pada orang lain | Saya mampu menyelesaikan masalah usaha dengan inisiatif sendiri | Usaha kuliner ayam bakar saya berusaha bersaing secara aktif untuk mempertahankan pelanggan | Saya mengambil langkah-langkah untuk menghadapi pesaing secara tegas agar usaha tetap bertahan di pasar
+4 | 3 | 3 | 4 | 3 | 3 | 3 | 4 | 3 | 4
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 4 | 4 | 3
+2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2
+4 | 4 | 4 | 4 | 4 | 4 | 4 | 3 | 4 | 4
+4 | 3 | 4 | 3 | 4 | 4 | 4 | 4 | 3 | 4
+3 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 3 | 4
+4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4
+3 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4
+3 | 3 | 3 | 4 | 3 | 3 | 3 | 3 | 4 | 4
+4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4
+3 | 3 | 4 | 3 | 4 | 4 | 3 | 3 | 3 | 4
+4 | 3 | 4 | 4 | 4 | 4 | 3 | 4 | 4 | 4
+3 | 3 | 4 | 3 | 4 | 3 | 3 | 4 | 4 | 4
+3 | 3 | 4 | 3 | 4 | 4 | 3 | 3 | 3 | 4
+4 | 3 | 4 | 3 | 4 | 3 | 3 | 3 | 4 | 4
+3 | 4 | 3 | 3 | 4 | 4 | 3 | 3 | 4 | 3
+1 | 2 | 1 | 2 | 2 | 1 | 2 | 2 | 2 | 1
+4 | 3 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 3
+4 | 3 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4
+3 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 3
+2 | 1 | 1 | 1 | 1 | 1 | 1 | 2 | 2 | 1
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+3 | 4 | 3 | 4 | 3 | 3 | 4 | 3 | 4 | 3
+4 | 4 | 3 | 4 | 4 | 4 | 4 | 3 | 4 | 4
+4 | 4 | 3 | 3 | 3 | 4 | 4 | 4 | 3 | 3
+4 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 3
+2 | 1 | 1 | 1 | 3 | 3 | 1 | 1 | 3 | 2
+4 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 4
+4 | 3 | 3 | 3 | 4 | 4 | 3 | 4 | 3 | 3
+3 | 4 | 3 | 3 | 4 | 3 | 4 | 3 | 4 | 3
+2 | 1 | 1 | 1 | 1 | 1 | 2 | 2 | 2 | 2
+1 | 2 | 1 | 2 | 2 | 1 | 2 | 2 | 2 | 1
+4 | 3 | 4 | 3 | 3 | 4 | 3 | 4 | 4 | 3
+3 | 4 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 4
+4 | 4 | 4 | 4 | 4 | 3 | 4 | 4 | 3 | 4
+3 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 3 | 3
+3 | 3 | 3 | 4 | 3 | 3 | 3 | 3 | 4 | 4
+3 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 3
+3 | 4 | 3 | 3 | 4 | 4 | 3 | 3 | 3 | 4
+3 | 3 | 3 | 4 | 3 | 3 | 3 | 3 | 4 | 4
+4 | 4 | 3 | 3 | 4 | 3 | 4 | 4 | 4 | 4
+4 | 4 | 3 | 3 | 4 | 4 | 4 | 4 | 4 | 3
+3 | 3 | 3 | 4 | 3 | 3 | 3 | 3 | 4 | 4
+3 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 3 | 4
+3 | 3 | 3 | 3 | 3 | 4 | 3 | 3 | 3 | 3
+3 | 4 | 3 | 3 | 3 | 3 | 3 | 4 | 3 | 3
+3 | 4 | 3 | 4 | 3 | 3 | 4 | 4 | 3 | 4
+4 | 3 | 4 | 3 | 3 | 4 | 4 | 3 | 3 | 4
+2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2
+3 | 3 | 3 | 4 | 3 | 3 | 4 | 3 | 4 | 3
+3 | 4 | 3 | 3 | 4 | 3 | 4 | 3 | 4 | 3
+2 | 1 | 1 | 1 | 1 | 2 | 2 | 1 | 1 | 1
+1 | 2 | 3 | 2 | 2 | 1 | 2 | 2 | 2 | 1
+2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2
+4 | 3 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 3
+4 | 4 | 3 | 3 | 3 | 4 | 4 | 4 | 3 | 3
+4 | 3 | 3 | 4 | 3 | 3 | 3 | 4 | 3 | 4
+4 | 4 | 4 | 2 | 4 | 4 | 4 | 4 | 4 | 4
+3 | 4 | 3 | 3 | 1 | 3 | 3 | 4 | 3 | 3
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3
+3 | 3 | 4 | 3 | 2 | 4 | 3 | 3 | 3 | 4
+2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2
+3 | 3 | 4 | 3 | 4 | 4 | 3 | 2 | 3 | 4
+3 | 4 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 4
+4 | 3 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 3
+3 | 3 | 4 | 3 | 4 | 3 | 2 | 4 | 4 | 4
+3 | 4 | 3 | 3 | 4 | 3 | 4 | 3 | 4 | 3
+3 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 3
+2 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2
+3 | 3 | 3 | 3 | 3 | 3 | 3 | 4 | 4 | 3
+3 | 4 | 3 | 3 | 4 | 4 | 3 | 3 | 3 | 4
+1 | 2 | 1 | 2 | 2 | 1 | 2 | 2 | 2 | 1
+2 | 1 | 1 | 1 | 1 | 2 | 2 | 1 | 1 | 1
+4 | 3 | 4 | 3 | 3 | 4 | 3 | 4 | 4 | 3
+2 | 3 | 3 | 4 | 3 | 3 | 4 | 3 | 4 | 3
+3 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 3 | 4
+1 | 2 | 3 | 2 | 2 | 1 | 2 | 2 | 2 | 1
+3 | 3 | 3 | 4 | 3 | 3 | 3 | 3 | 4 | 4
+1 | 2 | 1 | 2 | 2 | 1 | 2 | 2 | 2 | 1
+3 | 4 | 3 | 3 | 4 | 3 | 1 | 4 | 3 | 4
+3 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 3
+3 | 4 | 3 | 3 | 4 | 4 | 3 | 3 | 4 | 2
+4 | 3 | 4 | 4 | 4 | 2 | 3 | 4 | 4 | 4
+2 | 1 | 1 | 1 | 3 | 3 | 1 | 1 | 3 | 2
+4 | 4 | 3 | 4 | 4 | 4 | 4 | 3 | 4 | 4
+4 | 4 | 4 | 4 | 4 | 4 | 4 | 3 | 4 | 4
+2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2
+3 | 1 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4
+3 | 4 | 3 | 1 | 3 | 3 | 4 | 4 | 3 | 4
+4 | 3 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4
+4 | 3 | 1 | 3 | 3 | 4 | 4 | 3 | 3 | 4
+3 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 3 | 3
+2 | 1 | 1 | 1 | 1 | 1 | 1 | 2 | 2 | 1
+4 | 3 | 4 | 3 | 4 | 4 | 4 | 4 | 3 | 4
+3 | 3 | 3 | 3 | 3 | 1 | 3 | 3 | 3 | 3
+4 | 3 | 4 | 3 | 3 | 4 | 3 | 3 | 4 | 3
+3 | 4 | 3 | 3 | 4 | 3 | 4 | 3 | 4 | 3
+4 | 4 | 3 | 3 | 4 | 4 | 4 | 4 | 2 | 3
+4 | 4 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 3
+2 | 1 | 1 | 1 | 1 | 1 | 2 | 2 | 2 | 2
+
+[[/TABEL-23]]
+
+Hasil Pernyataan Keberlanjutan Usaha
+
+[[TABEL-24: 101 baris × 6 kolom — JANGAN diubah, ini konteks]]
+
+Usaha saya mampu menghasilkan pendapatan yang stabil | Usaha saya dapat mempertahankan posisinya dipasar | Usaha saya menjaga hubungan baik dengan pelanggan | Usaha saya menjalin hubungan yang harmonis dengan masyarakat sekitar | Usaha saya menerapkan praktik kerja yang ramah lingkungan | Usaha saya mengelola sampah usaha dengan cara yang benar
+4 | 3 | 3 | 4 | 4 | 4
+4 | 4 | 4 | 3 | 3 | 3
+2 | 1 | 1 | 1 | 2 | 2
+4 | 4 | 4 | 4 | 3 | 3
+3 | 4 | 3 | 4 | 4 | 4
+3 | 3 | 3 | 4 | 3 | 4
+4 | 4 | 4 | 4 | 4 | 4
+4 | 4 | 3 | 4 | 4 | 4
+4 | 4 | 4 | 3 | 4 | 3
+4 | 4 | 4 | 4 | 4 | 4
+4 | 3 | 4 | 3 | 4 | 4
+4 | 3 | 4 | 4 | 3 | 3
+3 | 4 | 4 | 3 | 4 | 3
+4 | 3 | 4 | 3 | 4 | 4
+4 | 4 | 4 | 4 | 3 | 3
+4 | 4 | 3 | 3 | 4 | 4
+2 | 2 | 1 | 1 | 1 | 1
+3 | 4 | 4 | 3 | 4 | 4
+3 | 4 | 3 | 4 | 3 | 3
+4 | 4 | 4 | 3 | 4 | 3
+1 | 1 | 2 | 2 | 1 | 1
+3 | 3 | 3 | 3 | 3 | 3
+3 | 3 | 4 | 4 | 3 | 4
+3 | 3 | 4 | 4 | 4 | 4
+4 | 3 | 4 | 3 | 3 | 4
+4 | 3 | 4 | 4 | 4 | 4
+2 | 1 | 1 | 1 | 2 | 2
+4 | 3 | 4 | 4 | 3 | 4
+4 | 4 | 4 | 3 | 3 | 4
+4 | 3 | 4 | 4 | 3 | 3
+2 | 1 | 2 | 2 | 2 | 2
+2 | 2 | 1 | 1 | 1 | 1
+3 | 4 | 4 | 3 | 4 | 3
+4 | 3 | 3 | 4 | 4 | 4
+4 | 4 | 3 | 3 | 4 | 4
+4 | 3 | 3 | 3 | 3 | 4
+4 | 4 | 4 | 3 | 4 | 3
+4 | 4 | 3 | 3 | 4 | 4
+4 | 4 | 3 | 4 | 4 | 4
+4 | 4 | 4 | 3 | 4 | 3
+3 | 4 | 4 | 3 | 3 | 3
+4 | 4 | 4 | 4 | 3 | 4
+4 | 4 | 4 | 3 | 4 | 3
+3 | 3 | 3 | 4 | 3 | 4
+4 | 3 | 3 | 3 | 4 | 3
+3 | 3 | 4 | 3 | 3 | 3
+4 | 3 | 4 | 3 | 4 | 4
+4 | 4 | 4 | 3 | 4 | 4
+2 | 1 | 1 | 1 | 2 | 2
+4 | 3 | 4 | 4 | 4 | 4
+4 | 3 | 4 | 4 | 3 | 3
+2 | 2 | 1 | 1 | 2 | 2
+2 | 2 | 1 | 1 | 1 | 1
+2 | 1 | 1 | 1 | 2 | 2
+4 | 4 | 3 | 3 | 3 | 3
+4 | 3 | 4 | 3 | 3 | 4
+4 | 3 | 3 | 4 | 4 | 4
+4 | 4 | 4 | 4 | 4 | 4
+3 | 3 | 4 | 3 | 3 | 3
+3 | 3 | 3 | 3 | 3 | 2
+4 | 3 | 4 | 3 | 4 | 4
+2 | 1 | 1 | 1 | 2 | 2
+4 | 3 | 4 | 3 | 4 | 4
+4 | 3 | 3 | 4 | 4 | 4
+3 | 1 | 4 | 3 | 4 | 4
+3 | 4 | 4 | 3 | 4 | 3
+4 | 3 | 4 | 4 | 3 | 3
+4 | 4 | 2 | 3 | 4 | 4
+2 | 1 | 1 | 1 | 2 | 2
+4 | 4 | 4 | 3 | 3 | 3
+4 | 2 | 3 | 4 | 4 | 4
+2 | 2 | 1 | 1 | 1 | 1
+2 | 2 | 1 | 1 | 2 | 2
+3 | 4 | 4 | 3 | 4 | 3
+4 | 3 | 4 | 4 | 4 | 4
+3 | 3 | 3 | 4 | 3 | 4
+2 | 2 | 1 | 1 | 1 | 1
+2 | 4 | 4 | 3 | 4 | 3
+1 | 2 | 1 | 1 | 1 | 1
+3 | 3 | 3 | 4 | 3 | 4
+4 | 4 | 4 | 1 | 4 | 3
+4 | 4 | 3 | 3 | 4 | 4
+4 | 3 | 4 | 4 | 3 | 3
+2 | 1 | 1 | 1 | 2 | 2
+3 | 3 | 4 | 4 | 4 | 4
+4 | 4 | 4 | 4 | 3 | 3
+2 | 1 | 1 | 1 | 2 | 2
+4 | 4 | 3 | 4 | 4 | 4
+4 | 3 | 4 | 3 | 4 | 4
+3 | 4 | 1 | 4 | 3 | 3
+4 | 4 | 4 | 3 | 4 | 4
+4 | 3 | 3 | 3 | 2 | 4
+1 | 1 | 2 | 2 | 2 | 1
+3 | 4 | 3 | 4 | 4 | 4
+4 | 3 | 3 | 3 | 4 | 3
+4 | 4 | 3 | 3 | 3 | 3
+4 | 3 | 4 | 4 | 3 | 3
+4 | 4 | 4 | 4 | 3 | 4
+4 | 3 | 4 | 4 | 4 | 4
+2 | 1 | 2 | 2 | 2 | 2
+
+[[/TABEL-24]]
+
+Lampiran 9 Hasil Olah Data Kuesioner
+
+Uji Validitas
+
+Uji Validitas Variabel X1 (Digital Marketing)
+
+[[TABEL-25: 10 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Item-Total Statistics
+Scale Mean if Item Deleted | Scale Variance if Item Deleted | Corrected Item-Total Correlation | Cronbach's Alpha if Item Deleted
+X1.1 | 21.57 | 27.500 | .846 | .928
+X1.2 | 21.39 | 30.665 | .697 | .938
+X1.3 | 21.36 | 28.960 | .796 | .931
+X1.4 | 21.28 | 29.173 | .780 | .933
+X1.5 | 21.30 | 29.364 | .779 | .933
+X1.6 | 21.30 | 28.980 | .743 | .935
+X1.7 | 21.31 | 28.559 | .829 | .929
+X1.8 | 21.36 | 27.808 | .826 | .929
+
+[[/TABEL-25]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji Validitas Variabel X2 (Orientasi Kewirausahaan)
+
+[[TABEL-26: 12 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Item-Total Statistics
+Scale Mean if Item Deleted | Scale Variance if Item Deleted | Corrected Item-Total Correlation | Cronbach's Alpha if Item Deleted
+X2.1 | 27.62 | 60.137 | .800 | .957
+X2.2 | 27.64 | 57.849 | .813 | .956
+X2.3 | 27.73 | 56.886 | .849 | .955
+X2.4 | 27.73 | 57.835 | .828 | .955
+X2.5 | 27.55 | 57.240 | .851 | .954
+X2.6 | 27.64 | 57.041 | .826 | .956
+X2.7 | 27.65 | 58.452 | .822 | .956
+X2.8 | 27.60 | 58.606 | .819 | .956
+X2.9 | 27.49 | 58.899 | .819 | .956
+X2.10 | 27.56 | 58.693 | .797 | .957
+
+[[/TABEL-26]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji Validitas Variabel Y (Keberlanjutan Usaha)
+
+[[TABEL-27: 8 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Item-Total Statistics
+Scale Mean if Item Deleted | Scale Variance if Item Deleted | Corrected Item-Total Correlation | Cronbach's Alpha if Item Deleted
+Y1.1 | 15.54 | 19.544 | .842 | .922
+Y1.2 | 15.82 | 19.220 | .747 | .933
+Y1.3 | 15.75 | 17.866 | .823 | .924
+Y1.4 | 15.87 | 18.417 | .808 | .925
+Y1.5 | 15.68 | 19.189 | .834 | .922
+Y1.6 | 15.69 | 19.024 | .838 | .922
+
+[[/TABEL-27]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji Reliabilitas
+
+[[TABEL-28: 5 baris × 1 kolom — JANGAN diubah, ini konteks]]
+
+Reliability Statistics
+Cronbach's Alpha | N of Items
+.940 | 8
+.960 | 10
+.936 | 6
+
+[[/TABEL-28]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji Normalitas
+
+Uji Kolmogorov-Smirnov
+
+[[GAMBAR-39: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Grafik Normal P-P Plot
+
+[[GAMBAR-40: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji Multikolinieritas
+
+[[GAMBAR-41: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji Heteroskedastisitas
+
+Uji Glejser
+
+[[GAMBAR-42: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Grafik Scatterplot
+
+[[GAMBAR-43: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji Regresi Linier Berganda
+
+[[GAMBAR-44: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji Koefisien Determinasi (R2)
+
+[[GAMBAR-45: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji T (Parsial)
+
+[[GAMBAR-46: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Uji F (Simultan)
+
+[[GAMBAR-47: di sini — JANGAN diubah, ini konteks]]
+
+Sumber: Data diolah penulis menggunakan SPSS Statistics 25, 2026
+
+Lampiran 10 Hasil Turnitin
+
+[[GAMBAR-48: di sini — JANGAN diubah, ini konteks]]
+
+Lampiran 11 Riwayat Hidup
+
+[[GAMBAR-49: di sini — JANGAN diubah, ini konteks]]
+
+Nama lengkap Asih Susanti Putri, lahir di Bekasi pada tanggal 14 September 2004. Merupakan anak ke dua dari dua bersudara dari pasangan Bapak Agus Suharminto dan Ibu Warsini. Penulis berdomisili di Desa Simpangan, Perumahan Graha Asri, Kec.Cikarang Utara, Kab. Bekasi, Jawa Barat. Penulis menempuh pendidikan formal dari SD Simpangan 03 (2010-2016. Kemudian melanjutkan pendidikan di SMP Negeri 2 Cikarang Utara (2026-2019).  Selanjutnya di SMA Negeri 2 Cikarang Utara (2019-2022). Penulis juga aktif di esktrakurikuler Japan Club, Taekwondo dan Excel. Selanjutnya, penulis melanjutkan pendidikan di Universitas Pelita Bangsa, Program studi S1 Manajemen, Fakultas Ekonomi Dan Bisnis sejak tahun 2022. Selama masa perkuliahan penulis aktif mengikuti kegiatan organisasi mahasiswa yaitu Unit Kegiatan Mahasiswa Seni menjadi kepengurusan dengan jabatan sebagai Humas pada tahun 2023-2024. Kemudian pada tahun 2025 penulis melakukan Kuliah Kerja Nyata (KKN) yang bertempat di Desa Bojongsari, kec. Kedungwaringin, Kab.Bekasi, Jawa Barat sebagai Humas. Penulis mengucapkan rasa syukur kepada Tuhan Yang Maha Esa atas segala rahmat dan karunia-Nya, serta dukungan dari kedua orang tua dan semua pihak yang telah membantu sehingga penilis dapat menempuh dan menyelesaikan pendidikan hingga saat ini.
+
+Email: asihsusantiputri@gmail.com
+
+Instagram: ashssnt_ptr

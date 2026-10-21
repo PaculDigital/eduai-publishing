@@ -1,0 +1,410 @@
+{# ══════════════════════════════════════════════════════════════════════════
+   SUBMIT ARTIKEL JURNAL — tab ke-7 EduAi
+   ACC Bos 16 Okt 2026 · PUTUSAN_SUBMIT_ARTIKEL_JURNAL_16OKT2026.md
+
+   3 KARTU (sketsa PILIHAN 1 yang dipilih Bos):
+     ① Jurnal Nasional  → pilih naskah + konfirmasi nama/email/HP
+                          → Kirim → AddOn "Terbit Jurnal" bayar QRIS
+     ② Terbit Sinta 2–6 → pilih naskah + peringkat → Buka WA Admin
+     ③ Daftar Artikel   → status dari Tridarma (muncul HANYA kalau sudah ada)
+   ══════════════════════════════════════════════════════════════════════════ #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submit Artikel Jurnal — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="stylesheet" href="/static/ikon.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA;--merah:#C0392B;
+      --biru:#2B7FD4;--kuning:#8A6100}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none}
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);border-bottom:1px solid rgba(255,255,255,.13);
+       position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;display:flex;align-items:center;justify-content:space-between}
+.nav img{height:52px;width:auto}
+.nav-kanan{display:flex;align-items:center;gap:16px;font-size:14.5px;color:rgba(255,255,255,.9)}
+.nav-kanan .keluar{color:#fff;font-weight:600;border:1.5px solid rgba(255,255,255,.34);padding:6px 15px;border-radius:70px}
+main{max-width:1080px;margin:0 auto;padding:28px 22px 60px}
+.pita-tab{display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--garis);flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:2px}
+.pita-tab a{padding:11px 20px;border-radius:10px 10px 0 0;font-size:14.5px;font-weight:600;
+            color:var(--teks-abu);display:inline-flex;align-items:center;gap:7px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pita-tab a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);
+                  border-bottom:2px solid var(--hijau);margin-bottom:-2px}
+h1{font-size:21px;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+.sub{font-size:13.5px;color:var(--teks-abu);margin-bottom:20px;line-height:1.6}
+.kartu{background:#fff;border:1px solid var(--garis);border-radius:14px;padding:20px 22px;margin-bottom:16px}
+.kartu-kepala{display:flex;align-items:center;gap:9px;margin-bottom:5px;flex-wrap:wrap}
+.kartu-no{width:26px;height:26px;border-radius:50%;background:var(--hijau);color:#fff;
+          font-size:13px;font-weight:800;display:grid;place-items:center;flex:0 0 auto}
+.kartu-no.netral{background:#8B9A95}
+.kartu h2{font-size:16px;font-weight:700}
+.lencana{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-left:auto}
+.l-hijau{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.l-kuning{background:#FDF3DD;color:var(--kuning)}
+.l-biru{background:#E4EEFB;color:#1B5FA8}
+.kartu .ket{font-size:13px;color:var(--teks-abu);margin-bottom:14px;line-height:1.55}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--teks);margin-bottom:6px}
+select,input{width:100%;padding:11px 12px;border:1.5px solid var(--garis);border-radius:9px;
+              font-size:14px;font-family:inherit;color:var(--teks);background:#fff}
+select:focus,input:focus{outline:none;border-color:var(--hijau)}
+select:disabled,input:disabled{background:#F4F6F5;color:var(--teks-abu)}
+.bidang{margin-bottom:13px}
+.baris-data{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;
+            padding:9px 0;border-bottom:1px dashed var(--garis)}
+.baris-data:last-of-type{border-bottom:0}
+.baris-data span{color:var(--teks-abu)}
+.baris-data b{font-weight:600;text-align:right;word-break:break-word}
+.ket-kecil{font-size:12px;color:var(--teks-abu);background:#F7FAF8;border:1px solid var(--garis);
+            border-radius:9px;padding:10px 12px;line-height:1.55;margin-bottom:13px}
+.tombol{display:block;width:100%;text-align:center;background:var(--hijau);color:#fff;
+        font-size:14.5px;font-weight:700;padding:13px;border-radius:10px}
+.tombol:hover{background:var(--hijau-gelap)}
+.tombol:disabled{background:#C9D2CF;cursor:not-allowed}
+.tombol.wa{background:#1FAA53}
+.tombol.wa:hover{background:#178643}
+.tombol.putih{background:#fff;color:var(--hijau);border:1.5px solid var(--hijau)}
+.pesan{border-radius:9px;padding:11px 13px;font-size:13px;margin-top:12px;display:none;line-height:1.55}
+.pesan.tampil{display:block}
+.pesan.galat{background:#FDECEA;color:var(--merah);border:1px solid #F5C6C0}
+.pesan.baik{background:var(--hijau-muda);color:var(--hijau-gelap);border:1px solid #BFE3CC}
+.pesan.info{background:#EAF3FD;color:#1B5FA8;border:1px solid #C7DEF7}
+.tabel{width:100%;border-collapse:collapse;font-size:13px}
+.tabel th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;
+          color:var(--teks-abu);padding:7px 6px;border-bottom:1.5px solid var(--garis)}
+.tabel td{padding:11px 6px;border-bottom:1px solid #F0F4F2;vertical-align:top}
+.tabel td:last-child{text-align:right;white-space:nowrap}
+.tabel tr:last-child td{border-bottom:0}
+.titik{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.w-review{background:var(--biru)}.w-revisi{background:var(--oranye)}
+.w-terima{background:var(--hijau)}.w-tolak{background:var(--merah)}
+.w-antre{background:#9AA8A4}.w-abu{background:#9AA8A4}
+.kosong{background:var(--hijau-muda);border:1px solid #BFE3CC;border-radius:10px;
+        padding:14px;font-size:13px;color:var(--hijau-gelap);text-align:center;line-height:1.6}
+.sandi{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+       background:#F7FAF8;border:1px solid var(--garis);border-radius:9px;padding:12px;margin-top:14px}
+.sandi kode{background:#fff;border:1px solid var(--garis);border-radius:6px;padding:4px 10px;
+            font-family:ui-monospace,Menlo,monospace;font-size:14px;font-weight:700;color:var(--hijau-gelap)}
+.catatan{font-size:12px;color:var(--teks-abu);line-height:1.6;margin-top:14px}
+.catatan b{color:var(--teks)}
+@media(max-width:560px){
+  .nav{height:auto;padding:12px 16px;flex-wrap:wrap;gap:10px}
+  main{padding:20px 16px 50px}
+  .kartu{padding:17px 16px}
+  h1{font-size:19px}
+  .kartu h2{font-size:15px}
+  .lencana{margin-left:0;order:3;width:100%;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="/naskah"><img src="/static/logo-terang-320.png" alt="EduAi"></a>
+    <div class="nav-kanan">
+      <span>{{ user.nama or user.email }}</span>
+      <a class="keluar" href="/keluar">Keluar</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  {% set menu_aktif = 'submit-jurnal' %}
+  {% include '_menu.html' %}
+
+  <h1>{{ ikon('send', 21) }} Submit Artikel Jurnal</h1>
+  <p class="sub">Kirim artikelmu ke jurnal Tridarma. Pilih jalur di bawah ini —
+     untuk jurnal nasional prosesnya otomatis, untuk jurnal Sinta dibantu admin.</p>
+
+  {# ═══════════════════ KARTU 1 — JURNAL NASIONAL ═══════════════════ #}
+  <div class="kartu">
+    <div class="kartu-kepala">
+      <div class="kartu-no">1</div>
+      <h2>Jurnal Nasional</h2>
+      <span class="lencana l-hijau">{{ jurnal.indeks }}</span>
+    </div>
+    <p class="ket">Terindeks <b>Google Scholar</b>, <b>Garuda</b>, dan <b>ber-ISSN</b>.
+       Artikelmu dikirim otomatis ke jurnal <b>{{ jurnal.nama }}</b>.</p>
+
+    <div class="bidang">
+      <label for="n1">Naskah yang mau dikirim</label>
+      <select id="n1">
+        <option value="">— pilih naskah —</option>
+        {% for n in daftar_naskah %}
+        <option value="{{ n.id }}">{{ n.nama }}</option>
+        {% endfor %}
+      </select>
+      {% if not daftar_naskah %}
+      <div class="catatan">Belum ada naskah. Buat dulu di
+        <a href="/naskah" style="color:var(--hijau);font-weight:600">Naskah Saya</a>.</div>
+      {% endif %}
+    </div>
+
+    <div class="bidang">
+      <label>Data pemilik artikel (dari akunmu — ubah kalau perlu)</label>
+      <div class="baris-data"><span>Nama lengkap</span>
+        <b>{{ user.nama_lengkap or user.nama or '—' }}</b></div>
+      <div class="baris-data"><span>Email</span><b>{{ user.email }}</b></div>
+      <div class="baris-data"><span>No. HP</span><b>{{ user.phone or '— belum diisi' }}</b></div>
+    </div>
+
+    <div class="ket-kecil">
+      Sebelum dikirim, EduAi memeriksa dulu: judul, abstrak, dan data penulis.
+      Kalau ada yang kurang, kami beri tahu <b>sebelum</b> kamu membayar.
+    </div>
+
+    <button class="tombol" id="kirim-nasional">
+      {{ ikon('send', 16) }} Kirim &amp; Lanjut Bayar
+    </button>
+    <div class="pesan" id="pesan-nasional"></div>
+  </div>
+
+  {# ═══════════════════ KARTU 2 — JURNAL SINTA ═══════════════════ #}
+  <div class="kartu">
+    <div class="kartu-kepala">
+      <div class="kartu-no">2</div>
+      <h2>Terbit Jurnal Sinta</h2>
+      <span class="lencana l-kuning">Dibantu admin</span>
+    </div>
+    <p class="ket">Untuk jurnal <b>Sinta 2–6</b>, penerbitan dibantu langsung oleh
+       admin kami (perlu penyesuaian naskah dan komunikasi dengan pengelola jurnal).</p>
+
+    <div class="bidang">
+      <label for="n2">Naskah yang mau dikirim</label>
+      <select id="n2">
+        <option value="">— pilih naskah —</option>
+        {% for n in daftar_naskah %}
+        <option value="{{ n.id }}">{{ n.nama }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="bidang">
+      <label for="sinta">Peringkat jurnal tujuan</label>
+      <select id="sinta">
+        <option value="">— pilih peringkat —</option>
+        {% for s in sinta %}
+        <option value="Sinta {{ s }}">Sinta {{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button class="tombol wa" id="wa-admin">
+      {{ ikon('message-circle', 16) }} Buka WhatsApp Admin
+    </button>
+    <div class="pesan" id="pesan-sinta"></div>
+  </div>
+
+  {# ═══════════════════ KARTU 3 — DAFTAR ARTIKEL ═══════════════════ #}
+  {#  Muncul HANYA kalau user sudah pernah submit (putusan Bos). #}
+  <div class="kartu" id="kartu-artikel" hidden>
+    <div class="kartu-kepala">
+      <div class="kartu-no netral">{{ ikon('list', 14) }}</div>
+      <h2>Artikel Saya di Tridarma</h2>
+      <span class="lencana l-biru" id="jumlah-artikel">—</span>
+    </div>
+    <p class="ket">Status artikelmu di jurnal Tridarma. Tekan
+       <b>Cek Status</b> untuk memperbarui dari Tridarma.</p>
+    <table class="tabel">
+      <thead><tr><th>Artikel</th><th>Status</th></tr></thead>
+      <tbody id="isi-artikel"></tbody>
+    </table>
+
+    {#  🔘 TOMBOL — BUKAN otomatis. Putusan Bos 16 Okt: hemat resource VPS. #}
+    <button class="tombol putih" id="cek-status" style="margin-top:14px">
+      {{ ikon('refresh-cw', 16) }} Cek Status dari Tridarma
+    </button>
+    <div class="pesan" id="pesan-status"></div>
+    <p class="catatan" id="kapan-diperiksa"></p>
+
+    <div class="sandi">
+      <div>
+        <div style="font-size:12.5px;color:var(--teks-abu)">Sandi awal Tridarma-mu</div>
+        <kode>{{ sandi_awal }}</kode>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="tombol putih" style="width:auto;padding:9px 15px;font-size:13px"
+           href="{{ jurnal and '#' }}" id="tautan-masuk" target="_blank"
+           rel="noopener">Masuk Tridarma</a>
+        <a class="tombol putih" style="width:auto;padding:9px 15px;font-size:13px"
+           href="#" id="tautan-sandi" target="_blank" rel="noopener">Lupa sandi?</a>
+      </div>
+    </div>
+    <p class="catatan">Sudah pernah mengganti sandi di Tridarma? Pakai tombol
+       <b>Lupa sandi?</b> — tautan penggantian sandi dikirim ke emailmu oleh
+       sistem jurnal. EduAi tidak menyimpan sandi Tridarma-mu.</p>
+  </div>
+
+  <p class="catatan">
+    Setiap pengiriman artikel memakai <b>1 AddOn Terbit Jurnal</b>.
+    Artikel yang <b>sama persis</b> tidak dihitung dua kali — jadi kamu tidak
+    membayar untuk kiriman yang sama.
+  </p>
+</main>
+
+<script>
+  //  ── KARTU 3: muat daftar artikel (Rp 0, hanya membaca catatan) ────────
+  //  Putusan Bos 17 Okt 2026 — tombol LoA HANYA muncul kalau DITERIMA.
+  const STATUS_DITERIMA = ['diterima', 'terbit', 'published', 'accepted'];
+  function sudahDiterima(a) {
+    return STATUS_DITERIMA.includes(String(a.status || '').trim().toLowerCase());
+  }
+
+  function gambarArtikel(daftar) {
+    const isi = document.getElementById('isi-artikel');
+    isi.innerHTML = daftar.map(a => `
+      <tr>
+        <td><b>${a.judul}</b><br>
+          <span style="color:var(--teks-abu);font-size:12px">
+            #${a.id}${a.tanggal ? ' · ' + a.tanggal : ''}</span>
+          ${a.catatan ? `<br><span style="color:var(--teks-abu);font-size:11.5px">
+            ${a.catatan}</span>` : ''}</td>
+        <td><span class="titik w-${a.warna || 'antre'}"></span>${a.status}
+          ${a.tautan ? `<br><a href="${a.tautan}" target="_blank"
+             rel="noopener" style="font-size:11.5px;color:var(--biru)">
+             buka di Tridarma</a>` : ''}
+          ${sudahDiterima(a) ? `<br><button class="tombol putih btn-loa"
+             data-berkas="${a.berkas_id}" style="margin-top:6px;font-size:12px">
+             📄 Unduh LoA</button>` : ''}</td>
+      </tr>`).join('');
+  }
+
+  async function muatArtikel() {
+    try {
+      const r = await fetch('/api/ai/v1/submit-jurnal/tinjau');
+      const j = await r.json();
+      if (j.tautan_sandi) {
+        document.getElementById('tautan-sandi').href = j.tautan_sandi;
+        document.getElementById('tautan-masuk').href = j.tautan_masuk;
+      }
+      if (!j.artikel || !j.artikel.length) return;   // belum pernah submit
+      document.getElementById('kartu-artikel').hidden = false;
+      document.getElementById('jumlah-artikel').textContent =
+        j.artikel.length + ' artikel';
+      gambarArtikel(j.artikel);
+    } catch (e) { /* senyap — kartu 3 opsional */ }
+  }
+  muatArtikel();
+
+  //  ── TOMBOL "Unduh LoA" (delegasi: baris tabel dibuat dinamis) ────────
+  document.addEventListener('click', async (ev) => {
+    const b = ev.target.closest('.btn-loa');
+    if (!b) return;
+    const berkas = b.dataset.berkas;
+    const asal = b.textContent;
+    b.disabled = true; b.textContent = 'Menerbitkan LoA…';
+    try {
+      const r = await fetch('/api/ai/v1/loa/terbitkan', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'berkas_id=' + encodeURIComponent(berkas)
+      });
+      const j = await r.json();
+      if (!j.ok) {
+        alert(j.sebab || 'LoA belum bisa diterbitkan.');
+        b.disabled = false; b.textContent = asal;
+        return;
+      }
+      //  buka PDF di tab baru
+      window.open('/api/ai/v1/loa/unduh?berkas_id=' + encodeURIComponent(berkas), '_blank');
+      b.disabled = false;
+      b.textContent = '📄 Unduh LoA (' + j.nomor + ')';
+    } catch (e) {
+      alert('Gagal menghubungi server.');
+      b.disabled = false; b.textContent = asal;
+    }
+  });
+
+  //  ── KARTU 3: 🔘 TOMBOL "Cek Status" (MANUAL, bukan otomatis) ──────────
+  //  Putusan Bos 16 Okt 2026: pembaruan TIDAK jalan sendiri tiap halaman
+  //  dibuka, karena menghabiskan resource VPS Tridarma. User yang menekan
+  //  tombol ini = satu-satunya pemicu.
+  document.getElementById('cek-status').addEventListener('click', async () => {
+    const b = document.getElementById('cek-status');
+    const p = document.getElementById('pesan-status');
+    b.disabled = true; b.textContent = 'Memeriksa ke Tridarma…';
+    try {
+      const r = await fetch('/api/ai/v1/submit-jurnal/cek-status',
+                            { method: 'POST' });
+      const j = await r.json();
+      if (j.artikel) {
+        gambarArtikel(j.artikel);
+        document.getElementById('jumlah-artikel').textContent =
+          j.jumlah + ' artikel';
+      }
+      p.className = 'pesan tampil ' + (j.ok ? 'baik' : 'galat');
+      p.textContent = j.pesan || 'Selesai diperiksa.';
+      if (j.diperiksa_pada) {
+        document.getElementById('kapan-diperiksa').textContent =
+          'Terakhir diperiksa: ' + j.diperiksa_pada;
+      }
+    } catch (e) {
+      p.className = 'pesan tampil galat';
+      p.textContent = 'Belum bisa menghubungi Tridarma. Coba lagi nanti ya.';
+    } finally {
+      b.disabled = false;
+      b.innerHTML = '{{ ikon("refresh-cw", 16) }} Cek Status dari Tridarma';
+    }
+  });
+
+  //  ── KARTU 1: kirim & lanjut bayar ─────────────────────────────────────
+  const pesan1 = document.getElementById('pesan-nasional');
+  function tampilPesan(el, kelas, teks) {
+    el.className = 'pesan tampil ' + kelas;
+    el.innerHTML = teks;
+  }
+  document.getElementById('kirim-nasional').addEventListener('click', async () => {
+    const id = document.getElementById('n1').value;
+    if (!id) { tampilPesan(pesan1, 'galat', 'Pilih naskah dulu ya.'); return; }
+    const b = document.getElementById('kirim-nasional');
+    b.disabled = true; b.textContent = 'Memeriksa naskah…';
+    try {
+      const fd = new FormData();
+      fd.append('berkas_id', id);
+      const r = await fetch('/api/ai/v1/submit-jurnal/siap', { method: 'POST',
+        body: fd });
+      const j = await r.json();
+      if (!j.ok) {
+        tampilPesan(pesan1, 'galat',
+          (j.masalah && j.masalah.length) ? j.masalah.join('<br>') : j.pesan);
+      } else {
+        tampilPesan(pesan1, 'baik',
+          'Naskah siap dikirim. Lanjut ke pembayaran AddOn Terbit Jurnal…');
+        if (window.bukaTopup) setTimeout(() => window.bukaTopup(), 700);
+      }
+    } catch (e) {
+      tampilPesan(pesan1, 'galat', 'Gagal memeriksa naskah. Coba lagi ya.');
+    } finally {
+      b.disabled = false; b.innerHTML = '{{ ikon("send", 16) }} Kirim &amp; Lanjut Bayar';
+    }
+  });
+
+  //  ── KARTU 2: buka WA admin + pesan sesuai PERINGKAT yang dipilih ──────
+  document.getElementById('wa-admin').addEventListener('click', () => {
+    const id = document.getElementById('n2').value;
+    const sinta = document.getElementById('sinta').value;
+    const pesan2 = document.getElementById('pesan-sinta');
+    if (!id) { tampilPesan(pesan2, 'galat', 'Pilih naskah dulu ya.'); return; }
+    if (!sinta) { tampilPesan(pesan2, 'galat', 'Pilih peringkat Sinta dulu ya.'); return; }
+    const namaNaskah = document.getElementById('n2')
+      .selectedOptions[0].textContent.trim();
+    const teks = `Halo Admin EduAi, saya mau submit artikel ke jurnal ${sinta}.\n\n`
+      + `Nama: {{ user.nama_lengkap or user.nama or user.email }}\n`
+      + `Email: {{ user.email }}\n`
+      + `Naskah: ${namaNaskah}\n\nMohon dibantu prosesnya ya. Terima kasih.`;
+    window.open('https://wa.me/{{ wa_admin }}?text=' + encodeURIComponent(teks),
+                '_blank');
+  });
+</script>
+
+{% include '_topup_popup.html' %}
+<script>window.BOLEH_ADDON = true;</script>
+</body>
+</html>

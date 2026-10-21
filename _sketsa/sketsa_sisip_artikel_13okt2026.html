@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sketsa — Sisipkan Artikel ke Bab (13 Okt 2026)</title>
+<style>
+:root{
+  --hijau:#198E3B; --hijau-lembut:#E8F5EC; --tinta:#14261A; --tinta-2:#5B6B60;
+  --garis:#DDE5DF; --putih-hangat:#FBFDFB; --kuning:#B7791F; --kuning-lembut:#FDF6E7;
+  --biru:#1D4ED8; --biru-lembut:#EEF2FF; --merah:#B91C1C; --merah-lembut:#FEF2F2;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:18px 14px 60px;background:#F4F7F5;
+  font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--tinta)}
+.wrap{max-width:660px;margin:0 auto}
+.judul-utama{text-align:center;margin:0 0 4px;font-size:21px;font-weight:800}
+.sub{text-align:center;color:var(--tinta-2);font-size:13px;margin:0 0 20px}
+.panel{background:#fff;border:1px solid var(--garis);border-radius:16px;padding:18px;
+  margin-bottom:16px;box-shadow:0 1px 3px rgba(20,38,26,.04)}
+.panel h2{font-size:15.5px;margin:0 0 4px}
+.panel p.ket{font-size:12.5px;color:var(--tinta-2);margin:0 0 14px}
+.sketsa-tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.4px;
+  background:var(--kuning-lembut);color:var(--kuning);border:1px solid #F0DFB8;
+  border-radius:6px;padding:2px 7px;margin-bottom:10px}
+.langkah{display:flex;gap:11px;margin-bottom:13px;align-items:flex-start}
+.langkah .no{flex:0 0 26px;height:26px;border-radius:50%;background:var(--hijau);
+  color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;margin-top:1px}
+.langkah .isi{flex:1;font-size:13.5px}
+.langkah .isi b{display:block;margin-bottom:2px}
+.langkah .isi span{color:var(--tinta-2);font-size:12.5px}
+/* kartu artikel */
+.artikel{border:1px solid var(--garis);border-radius:12px;padding:13px 14px;
+  margin-bottom:10px;background:var(--putih-hangat)}
+.artikel .jd{font-weight:700;font-size:13.5px;margin-bottom:3px}
+.artikel .meta{font-size:12px;color:var(--tinta-2);margin-bottom:9px}
+.lencana{display:inline-block;font-size:10.5px;font-weight:700;border-radius:6px;
+  padding:2px 7px;margin-right:5px}
+.lencana.ok{background:var(--hijau-lembut);color:var(--hijau);border:1px solid #C6E8D2}
+.lencana.biru{background:var(--biru-lembut);color:var(--biru);border:1px solid #D5DDFA}
+.aksi{display:flex;gap:7px;flex-wrap:wrap}
+.btn{border:1.5px solid var(--garis);background:#fff;border-radius:9px;padding:7px 12px;
+  font:inherit;font-size:12.5px;cursor:pointer;color:var(--tinta)}
+.btn.utama{background:var(--hijau);border-color:var(--hijau);color:#fff;font-weight:700}
+.btn.kecil{padding:5px 10px;font-size:12px}
+/* dropdown */
+.dd{border:1.5px solid var(--hijau);border-radius:12px;padding:13px;margin-top:10px;
+  background:var(--hijau-lembut)}
+.dd .jd{font-weight:700;font-size:13px;margin-bottom:9px}
+.bab{display:flex;align-items:center;gap:9px;padding:8px 10px;background:#fff;
+  border:1px solid var(--garis);border-radius:9px;margin-bottom:7px;font-size:13px}
+.bab .cek{width:17px;height:17px;border:1.5px solid var(--garis);border-radius:5px;
+  flex:0 0 17px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.bab .cek.on{background:var(--hijau);border-color:var(--hijau);color:#fff}
+.bab small{color:var(--tinta-2);font-size:11.5px;margin-left:auto}
+.note{font-size:11.5px;color:var(--tinta-2);margin-top:8px;font-style:italic}
+/* paragraf hasil */
+.par{border-left:3px solid var(--garis);padding:10px 0 10px 13px;margin-bottom:11px;
+  font-size:13.5px;line-height:1.7}
+.par.sorot{border-left-color:var(--hijau);background:var(--hijau-lembut);
+  border-radius:0 10px 10px 0;padding-right:12px}
+.kutip{background:#FFF7D6;border-bottom:1.5px solid var(--kuning);font-weight:600}
+.tunjuk{border:1.5px dashed var(--biru);border-radius:12px;padding:12px 13px;
+  background:var(--biru-lembut);margin-bottom:11px}
+.tunjuk .jd{font-weight:700;font-size:13px;color:var(--biru);margin-bottom:5px}
+.tunjuk .isi{font-size:12.5px;color:var(--tinta)}
+.baris{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.banding{display:grid;grid-template-columns:1fr;gap:11px}
+@media(min-width:560px){.banding{grid-template-columns:1fr 1fr}}
+.banding .kol{border:1px solid var(--garis);border-radius:12px;padding:13px}
+.banding .kol.a{border-color:#C6E8D2;background:var(--hijau-lembut)}
+.banding .kol.b{border-color:#F0DFB8;background:var(--kuning-lembut)}
+.banding h3{font-size:13px;margin:0 0 7px}
+.banding ul{margin:0;padding-left:17px;font-size:12.5px;line-height:1.6}
+.pagar{background:var(--merah-lembut);border:1px solid #F5C6C6;border-radius:11px;
+  padding:11px 13px;font-size:12.5px;color:#7F1D1D;margin-top:12px}
+.pagar b{display:block;margin-bottom:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="judul-utama">Sisipkan Artikel ke Bab</h1>
+  <p class="sub">Dari hasil pencarian → jadi kutipan di dalam paragraf naskah.
+     <b>Sisip saja</b> — paragraf Bos tidak diubah.</p>
+
+  <!-- ══════════ LANGKAH BESARNYA ══════════ -->
+  <div class="panel">
+    <span class="sketsa-tag">ALUR BESAR</span>
+    <h2>Bagaimana AI menyisipkan</h2>
+    <p class="ket">Artikel sudah dicari → tinggal dipakai. Paragraf Bapak tidak ditulis ulang.</p>
+
+    <div class="langkah">
+      <div class="no">1</div>
+      <div class="isi"><b>Artikel dikirim ke AI</b>
+        <span>Judul + abstrak asli dari penulis artikel (bukan tebakan). Maks 8 per bab.</span></div>
+    </div>
+    <div class="langkah">
+      <div class="no">2</div>
+      <div class="isi"><b>AI diberi aturan ketat</b>
+        <span>Boleh mengutip HANYA dari artikel itu. Dilarang menambah atau mengarang.</span></div>
+    </div>
+    <div class="langkah">
+      <div class="no">3</div>
+      <div class="isi"><b>AI cari paragraf yang cocok</b>
+        <span>Membaca paragraf di bab itu, cari yang paling nyambung, lalu sisipkan (Nama, Tahun).</span></div>
+    </div>
+    <div class="langkah">
+      <div class="no">4</div>
+      <div class="isi"><b>Mesin memeriksa hasilnya</b>
+        <span>Kutipan yang tidak ada di daftar artikel → DIBUANG. Lalu masuk daftar pustaka sendiri.</span></div>
+    </div>
+
+    <div class="pagar">
+      <b>Pagar yang sudah ada (tidak perlu dibangun lagi)</b>
+      Artikel tanpa abstrak ditandai <b>isi terbatas</b> · hanya yang lolos cek DOI masuk
+      daftar pustaka · kutipan karangan langsung dibuang.
+    </div>
+  </div>
+
+  <!-- ══════════ A. FOTOKOPI KE BAB LAIN ══════════ -->
+  <div class="panel">
+    <span class="sketsa-tag">BAGIAN 1 — PAKAI DI BAB LAIN</span>
+    <h2>Artikel BAB 3 dipakai juga di BAB 1</h2>
+    <p class="ket">Bapak centang bab mana saja. Artikelnya muncul di bab itu,
+       tapi di daftar pustaka tetap <b>satu entri</b> (tidak dobel).</p>
+
+    <div class="artikel">
+      <div class="jd">Keaslian Streamer → Pembelian Impulsif pada Live Streaming</div>
+      <div class="meta">Susanti, A. (2024) · Jurnal Manajemen Retail</div>
+      <div>
+        <span class="lencana ok">✓ terverifikasi</span>
+        <span class="lencana biru">✨ pilihan EduAi</span>
+      </div>
+      <div class="aksi" style="margin-top:11px">
+        <button class="btn utama">📄 Pakai juga di bab…</button>
+        <button class="btn kecil">Buka</button>
+        <button class="btn kecil">Unduh</button>
+      </div>
+
+      <div class="dd">
+        <div class="jd">Pakai juga di bab:</div>
+        <div class="bab"><span class="cek on">✓</span> BAB I — Pendahuluan
+          <small>latar belakang</small></div>
+        <div class="bab"><span class="cek on">✓</span> BAB II — Tinjauan Pustaka
+          <small>teori &amp; penelitian terdahulu</small></div>
+        <div class="bab"><span class="cek">?</span> BAB III — Metode
+          <small>sedang dibuka</small></div>
+        <button class="btn utama" style="margin-top:5px">Simpan</button>
+        <div class="note">Sudah dipakai di: BAB III. Yang dicentang akan
+          ditambahkan. Satu artikel = satu entri daftar pustaka.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ B. SISIP KE PARAGRAF ══════════ -->
+  <div class="panel">
+    <span class="sketsa-tag">BAGIAN 2 — SISIP KE DALAM PARAGRAF</span>
+    <h2>Dua-duanya: AI tunjuk, Bapak yang putuskan</h2>
+    <p class="ket">AI menunjukkan paragraf mana yang paling cocok. Bapak bisa
+       setuju, atau pilih sendiri paragrafnya.</p>
+
+    <div class="tunjuk">
+      <div class="jd">✦ Usulan EduAi</div>
+      <div class="isi">Artikel ini paling cocok di <b>paragraf ke-2</b> —
+        karena paragraf itu sudah membahas kepercayaan pada penjual online.</div>
+      <div class="baris">
+        <button class="btn utama">Sisipkan di paragraf 2</button>
+        <button class="btn">Pilih paragraf lain</button>
+        <button class="btn">Lewati</button>
+      </div>
+    </div>
+
+    <div class="par">
+      Paragraf 1 · Kepercayaan konsumen terbentuk dari pengalaman sebelumnya.
+      Penjual dengan reputasi baik membuat pembeli merasa aman
+      <span class="kutip">(Wijaya, 2021)</span>.
+    </div>
+
+    <div class="par sorot">
+      Paragraf 2 · <b>← disarankan</b><br>
+      Persepsi keaslian penjual menjadi penentu utama. Penelitian terbaru
+      menunjukkan keaslian streamer meningkatkan pembelian impulsif pada
+      belanja langsung <span class="kutip">(Susanti, 2024)</span>.
+    </div>
+
+    <div class="par">
+      Paragraf 3 · Harga dan kemudahan pembayaran tetap menjadi pertimbangan
+      tambahan bagi konsumen.
+    </div>
+
+    <div class="note">Hanya tambahan <b>(Nama, Tahun)</b> di dalam paragraf.
+      Kalimat asli Bapak tidak diubah, tidak diganti, tidak dihapus.</div>
+
+    <div class="banding" style="margin-top:15px">
+      <div class="kol a">
+        <h3>✅ Cara 1 — AI menunjuk</h3>
+        <ul>
+          <li>AI cari paragraf paling cocok</li>
+          <li>Bapak tinggal setuju / ganti / lewati</li>
+          <li>Cepat, tetap dalam kendali</li>
+        </ul>
+      </div>
+      <div class="kol b">
+        <h3>✍️ Cara 2 — Bapak menunjuk</h3>
+        <ul>
+          <li>Bapak lihat daftar artikel BAB itu</li>
+          <li>Pilih paragraf sendiri dari yang tampil</li>
+          <li>Kontrol penuh, sedikit lebih lama</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note">Bapak bilang “dua-duanya” — jadi keduanya tersedia,
+      tinggal pilih di layar. Default: usulan AI dulu (paling cepat).</div>
+  </div>
+
+  <!-- ══════════ C. HASIL AKHIR ══════════ -->
+  <div class="panel">
+    <span class="sketsa-tag">BAGIAN 3 — HASILNYA</span>
+    <h2>Setelah disisipkan</h2>
+    <p class="ket">Kutipan di paragraf dan entri di daftar pustaka selalu sejalan.</p>
+
+    <div class="langkah">
+      <div class="no">✓</div>
+      <div class="isi"><b>Di dalam paragraf</b>
+        <span>(Susanti, 2024) muncul di kalimat yang cocok.</span></div>
+    </div>
+    <div class="langkah">
+      <div class="no">✓</div>
+      <div class="isi"><b>Di daftar pustaka</b>
+        <span>Susanti, A. (2024). Keaslian streamer… <i>Jurnal Manajemen Retail</i>.
+        — otomatis, dari artikel yang lolos cek DOI.</span></div>
+    </div>
+    <div class="langkah">
+      <div class="no">✓</div>
+      <div class="isi"><b>Kalau ada yang salah</b>
+        <span>Kutipan bisa dihapus satu per satu. Artikelnya tetap tersimpan di rak bab.</span></div>
+    </div>
+
+    <div class="pagar">
+      <b>Mustahil terjadi</b>
+      AI mengutip artikel yang tidak ada · AI mengarang nama penulis ·
+      kutipan tanpa entri daftar pustaka · daftar pustaka dobel.
+    </div>
+  </div>
+
+  <p class="sub" style="margin-top:22px">
+    Sketsa ini belum jadi kode — hanya gambaran untuk dipilih.<br>
+    Semua bahan mesinnya <b>sudah ada</b>; ini memasang sambungannya.
+  </p>
+
+</div>
+</body>
+</html>

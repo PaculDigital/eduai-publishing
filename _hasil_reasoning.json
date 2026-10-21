@@ -1,0 +1,90 @@
+[
+ {
+  "model": "ali/deepseek-v4.1-flash",
+  "reasoning": 106,
+  "detik": 2.5018453219963703,
+  "panjang": 216,
+  "finish": "stop",
+  "err": null
+ },
+ {
+  "model": "ag/gemini-3.7-flash-high",
+  "reasoning": 237,
+  "detik": 2.9589948619977804,
+  "panjang": 209,
+  "finish": "stop",
+  "err": null
+ },
+ {
+  "model": "cbcn/deepseek-v4.1-flash",
+  "reasoning": 63,
+  "detik": 1.8744118950053235,
+  "panjang": 179,
+  "finish": "stop",
+  "err": null
+ },
+ {
+  "model": "ali/kimi-k2.7-code",
+  "reasoning": 125,
+  "detik": 4.977726899996924,
+  "panjang": 211,
+  "finish": "stop",
+  "err": null
+ },
+ {
+  "model": "ali/qwen3.8-max",
+  "reasoning": 86,
+  "detik": 5.0822834220016375,
+  "panjang": 158,
+  "finish": "stop",
+  "err": null
+ },
+ {
+  "model": "cbcn/glm-5.3-flash",
+  "reasoning": 0,
+  "detik": 2.055992563997279,
+  "panjang": 190,
+  "finish": "stop",
+  "err": null
+ },
+ {
+  "model": "cb/deepseek-v4.1-flash",
+  "reasoning": 103,
+  "detik": 2.7737847329990473,
+  "panjang": 166,
+  "finish": "stop",
+  "err": null
+ },
+ {
+  "model": "cb/gpt-5.6-luna",
+  "reasoning": 0,
+  "detik": 25.533986022994213,
+  "panjang": 180,
+  "finish": "stop",
+  "err": null
+ },
+ {
+  "model": "zai/glm-5.3-flash",
+  "reasoning": null,
+  "detik": 0,
+  "panjang": 0,
+  "finish": "-",
+  "err": "HTTP 402: {\"error\":{\"code\":\"no_provider_under_bid\",\"message\":\"every provider within your max-per-mtok bid is rate-limite"
+ },
+ {
+  "model": "cb/gemini-3.1-pro",
+  "reasoning": 421,
+  "detik": 27.3911769059996,
+  "panjang": 227,
+  "finish": "stop",
+  "err": null
+ },
+ {
+  "model": "ag/gemini-3.8-flash-high",
+  "reasoning": null,
+  "detik": 0,
+  "panjang": 0,
+  "finish": "-",
+  "err": "HTTP 503: {\"error\":{\"message\":\"no available provider for ag/gemini-3.8-flash-high (all offers exhausted or in cooldown);"
+ }
+]

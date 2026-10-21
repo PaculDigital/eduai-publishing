@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 780" preserveAspectRatio="xMidYMid slice" width="1440" height="780">
+  <!-- Background hero EduAi Publishing — gaya edlink.id: 2 lingkaran besar, flat, tanpa gradien -->
+  <defs>
+    <clipPath id="kanvas">
+      <rect width="1440" height="780"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#kanvas)">
+    <!-- dasar putih -->
+    <rect width="1440" height="780" fill="#FFFFFF"/>
+
+    <!-- lingkaran UTAMA (hijau tua brand) — kiri/tengah, busur bawah menyapu ke tengah-bawah -->
+    <circle cx="430" cy="60" r="700" fill="#198E3B"/>
+
+    <!-- lingkaran SEKUNDER (hijau terang) — sisi kanan -->
+    <circle cx="1290" cy="120" r="660" fill="#2FB055"/>
+
+    <!-- lingkaran AKSEN (hijau paling terang) — kanan-bawah, bikin kedalaman -->
+    <circle cx="1560" cy="330" r="560" fill="#45C46E" opacity="0.92"/>
+  </g>
+</svg>

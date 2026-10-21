@@ -1,0 +1,81 @@
+[PROFIL] Paradigma=kuantitatif; Desain=survei korelasional dengan pengujian mediasi (PLS-SEM)
+
+[K1-KUTIP-ASLI]
+Pergeseran paradigma ini menegaskan urgensi pengembangan sumber daya manusia yang tidak hanya kompeten secara teknis, tetapi juga resilien terhadap perubahan serta mampu mengoptimalkan perangkat digital untuk mencapai kinerja yang optimal (Kurnia Sari et al., 2025).
+[K1-GANTI-JADI]
+Pergeseran paradigma ini menegaskan urgensi pengembangan sumber daya manusia yang tidak hanya kompeten secara teknis, tetapi juga resilien terhadap perubahan serta mampu memanfaatkan perangkat digital secara optimal untuk mencapai kinerja yang tinggi (Kurnia Sari et al., 2025).
+
+[K1-KUTIP-ASLI]
+Pola ini menandakan bahwa pertumbuhan sektor logistik bukanlah fenomena sesaat, melainkan struktur ekonomi yang telah mapan.
+[K1-GANTI-JADI]
+Pola ini menandakan bahwa pertumbuhan sektor logistik bukanlah fenomena sesaat, melainkan bagian dari struktur ekonomi yang telah mapan.
+
+[K1-KUTIP-ASLI]
+QWL dan digital self-efficacy secara bersama-sama mendorong terbentuknya digital readiness, yaitu kapasitas dan kemauan karyawan untuk mengadopsi serta memanfaatkan teknologi digital guna meningkatkan performa (Nasution et al., 2018).
+[K1-GANTI-JADI]
+QWL dan digital self-efficacy bersama-sama mendorong terbentuknya digital readiness, yaitu kapasitas dan kemauan karyawan untuk mengadopsi serta memanfaatkan teknologi digital guna meningkatkan kinerjanya (Nasution et al., 2018).
+
+[K1-KUTIP-ASLI]
+Faktor kedua yang menjadi fokus penelitian ini adalah digital self-efficacy mencerminkan keyakinan individu terhadap kemampuannya mengoperasikan teknologi, memecahkan masalah teknis, dan memanfaatkan sistem digital dalam pekerjaan.
+[K1-GANTI-JADI]
+Faktor kedua yang menjadi fokus penelitian ini adalah digital self-efficacy, yaitu keyakinan individu terhadap kemampuannya mengoperasikan teknologi, memecahkan masalah teknis, dan memanfaatkan sistem digital dalam pekerjaan.
+
+[K1-KUTIP-ASLI]
+PT Tiki Jalur Nugraha Ekakurir (JNE), berdiri sejak 1990, merupakan salah satu pemain utama industri logistik Indonesia dengan jaringan distribusi lebih dari 6.000 titik layanan serta layanan unggulan seperti JNE REG, YES (Yakin Esok Sampai), dan JTR (JNE Trucking).
+[K1-GANTI-JADI]
+PT Tiki Jalur Nugraha Ekakurir (JNE) yang berdiri sejak 1990 merupakan salah satu pemain utama industri logistik Indonesia, dengan jaringan distribusi lebih dari 6.000 titik layanan serta layanan unggulan seperti JNE REG, YES (Yakin Esok Sampai), dan JTR (JNE Trucking).
+
+[K1-KUTIP-ASLI]
+Kondisi awal pada objek penelitian dipetakan melalui pra-survey kepada 40 orang Account Officer PT JNE Wilayah Lampung.
+[K1-GANTI-JADI]
+Kondisi awal pada objek penelitian dipetakan melalui pra-survei terhadap 40 orang Account Officer PT JNE Wilayah Lampung.
+
+[K1-KUTIP-ASLI]
+Hasil pra-survey (Tabel 1.1) menunjukkan bahwa secara umum modal awal karyawan tergolong kuat:
+[K1-GANTI-JADI]
+Hasil pra-survei (Tabel 1.1) menunjukkan bahwa secara umum modal awal karyawan tergolong kuat:
+
+[K1-KUTIP-ASLI]
+Pra-survey tersebut juga mengungkap titik lemah yang signifikan.
+[K1-GANTI-JADI]
+Pra-survei tersebut juga mengungkap titik lemah yang signifikan.
+
+[K1-KUTIP-ASLI]
+Hasil Pra-Survey terhadap 40 Account Officer PT JNE Wilayah Lampung
+[K1-GANTI-JADI]
+Hasil Pra-Survei terhadap 40 Account Officer PT JNE Wilayah Lampung
+
+[K1-KUTIP-ASLI]
+Pada aspek kecepatan mempelajari peran atau tanggung jawab baru saat terjadi rotasi atau perubahan struktur, indikator yang mencerminkan kesiapan digital, tercatat 25,93% responden menyatakan ragu-ragu, angka keraguan tertinggi di antara seluruh sepuluh indikator yang diukur.
+[K1-GANTI-JADI]
+Pada aspek kecepatan mempelajari peran atau tanggung jawab baru saat terjadi rotasi atau perubahan struktur, yang merupakan indikator kesiapan digital, tercatat 25,93% responden menyatakan ragu-ragu. Angka tersebut merupakan yang tertinggi di antara seluruh sepuluh indikator yang diukur.
+
+[K1-KUTIP-ASLI]
+Berdasarkan uraian tersebut, peneliti tertarik untuk mengkaji secara mendalam bagaimana quality of work life dan digital self-efficacy memengaruhi adaptive performance melalui mediasi digital readiness pada Account Officer PT JNE Wilayah Lampung. Maka penelitian ini diberi judul:
+[K1-GANTI-JADI]
+Berdasarkan uraian tersebut, peneliti tertarik untuk mengkaji secara mendalam bagaimana quality of work life dan digital self-efficacy memengaruhi adaptive performance melalui mediasi digital readiness pada Account Officer PT JNE Wilayah Lampung. Oleh karena itu, penelitian ini diberi judul:
+
+[K1-KUTIP-ASLI]
+Penelitian ini diharapkan memperkaya khazanah keilmuan manajemen sumber daya manusia, khususnya pada kajian tentang bagaimana kondisi kerja dan kapasitas diri karyawan ditransformasikan menjadi kinerja adaptif dalam era transformasi digital.
+[K1-GANTI-JADI]
+Secara teoretis, penelitian ini diharapkan memperluas kajian manajemen sumber daya manusia, khususnya mengenai bagaimana kondisi kerja dan kapasitas diri karyawan ditransformasikan menjadi kinerja adaptif pada era transformasi digital.
+
+[K1-KUTIP-ASLI]
+Materi ajar turut memperoleh manfaat dari penelitian ini karena tersedia contoh kasus yang dapat digunakan dalam pembelajaran mata kuliah manajemen sumber daya manusia, perilaku organisasi, dan metodologi penelitian kuantitatif.
+[K1-GANTI-JADI]
+Penelitian ini juga bermanfaat bagi materi ajar karena menyediakan contoh kasus yang dapat digunakan dalam pembelajaran mata kuliah manajemen sumber daya manusia, perilaku organisasi, dan metodologi penelitian kuantitatif.
+
+[K1-KUTIP-ASLI]
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini menunjukkan bahwa masing-masing konstruk telah memperoleh perhatian yang memadai, namun arah pengembangannya belum bertemu pada satu model yang utuh. Kesiapan digital, misalnya, lebih banyak diposisikan sebagai variabel independen maupun konsekuensi organisasi, bukan sebagai mekanisme yang menjembatani sumber daya psikologis dengan kinerja adaptif. Kondisi ini menimbulkan sejumlah kesenjangan yang perlu diidentifikasi secara sistematis. Melalui penelusuran terhadap penelitian terdahulu (Tabel 1.3), teridentifikasi lima kesenjangan utama yang menjadi dasar dilakukannya penelitian ini.
+[K1-GANTI-JADI]
+Keempat konstruk yang menjadi fokus kajian ini telah memperoleh perhatian yang memadai, tetapi arah pengembangannya belum bertemu pada satu model yang utuh. Kesiapan digital, misalnya, lebih banyak diposisikan sebagai variabel independen atau sebagai konsekuensi organisasi, bukan sebagai mekanisme yang menjembatani sumber daya psikologis dengan kinerja adaptif. Kondisi tersebut menimbulkan sejumlah kesenjangan yang perlu diidentifikasi secara sistematis. Penelusuran terhadap penelitian terdahulu (Tabel 1.3) mengidentifikasi lima kesenjangan utama yang menjadi dasar dilakukannya penelitian ini.
+
+[K1-KUTIP-ASLI]
+Penggunaan adaptive performance sebagai luaran spesifik yang menangkap dimensi adaptasi terhadap perubahan, bukan sekadar pencapaian target masih relatif terbatas, khususnya pada konteks Indonesia.
+[K1-GANTI-JADI]
+Penggunaan adaptive performance sebagai luaran spesifik yang menangkap dimensi adaptasi terhadap perubahan, bukan sekadar pencapaian target, masih relatif terbatas, khususnya pada konteks Indonesia.
+
+[K1-KUTIP-ASLI]
+Individu yang yakin atas kemampuan digitalnya lebih mungkin memandang teknologi baru sebagai tantangan yang dapat diatasi daripada ancaman sehingga lebih cepat membentuk kesiapan untuk berubah.
+[K1-GANTI-JADI]
+Individu yang yakin atas kemampuan digitalnya lebih mungkin memandang teknologi baru sebagai tantangan yang dapat diatasi daripada sebagai ancaman, sehingga mereka lebih cepat membentuk kesiapan untuk berubah.

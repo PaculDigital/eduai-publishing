@@ -1,0 +1,2199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ berkas.nama }} — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<style>
+:root{
+  --hijau:#198E3B; --hijau-tua:#104F22; --oranye:#F4A025;
+  --teks:#272530; --teks-abu:#68666e; --garis:#E4E8E6; --latar:#F7F9F8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
+     background:var(--latar);color:var(--teks);height:100vh;display:flex;flex-direction:column}
+
+/* navbar gradient (samakan dengan halaman lain) */
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);
+       border-bottom:1px solid rgba(255,255,255,.13);flex-shrink:0}
+.nav{display:flex;align-items:center;justify-content:space-between;height:66px;
+     max-width:1500px;margin:0 auto;padding:0 20px;gap:14px}
+.nav-kiri{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+.nav img{height:44px;width:auto;flex-shrink:0}
+.nav-info{min-width:0;display:flex;flex-direction:column}
+.nav-nama{font-size:14.5px;font-weight:700;color:#fff;white-space:nowrap;
+          overflow:hidden;text-overflow:ellipsis}
+.nav-sub{font-size:11.5px;color:rgba(255,255,255,.72)}
+.nav-aksi{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.tombol-nav{border:1.5px solid rgba(255,255,255,.4);background:transparent;color:#fff;
+            font-family:inherit;font-size:13px;font-weight:600;padding:9px 16px;
+            border-radius:70px;cursor:pointer;text-decoration:none;transition:.2s;
+            white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.tombol-nav:hover{background:rgba(255,255,255,.16);border-color:#fff}
+.tombol-nav.utama{background:var(--oranye);border-color:var(--oranye);color:#2E1B00}
+.tombol-nav.utama:hover{background:#FFB63D}
+
+/* wadah editor */
+main{flex:1;position:relative;min-height:0;background:#fff}
+#tempat-editor{position:absolute;inset:0}
+#tempat-editor iframe{width:100%;height:100%;border:none;display:block}
+
+/* status memuat / galat */
+.lapisan{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+         flex-direction:column;gap:16px;background:#fff;z-index:5;text-align:center;padding:26px}
+.lapisan[hidden]{display:none!important}
+.pemutar{width:44px;height:44px;border:4px solid #E4E8E6;border-top-color:var(--hijau);
+         border-radius:50%;animation:putar .85s linear infinite}
+@keyframes putar{to{transform:rotate(360deg)}}
+.lapisan h2{font-size:18px;font-weight:700}
+.lapisan p{font-size:14px;color:var(--teks-abu);max-width:430px;line-height:1.6}
+.lapisan code{background:#F2F4F5;padding:2px 7px;border-radius:6px;font-size:12.5px}
+.tombol-lapisan{margin-top:6px;padding:11px 24px;border-radius:70px;border:none;
+                background:var(--oranye);color:#2E1B00;font-family:inherit;font-size:14px;
+                font-weight:700;cursor:pointer;text-decoration:none;transition:.2s}
+.tombol-lapisan:hover{background:#FFB63D}
+
+/* notifikasi simpan */
+#notif{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(90px);
+       background:var(--hijau-tua);color:#fff;padding:12px 22px;border-radius:70px;
+       font-size:13.5px;font-weight:600;z-index:60;transition:.32s cubic-bezier(.2,.8,.2,1);
+       box-shadow:0 10px 28px rgba(0,0,0,.24);white-space:nowrap;max-width:92vw;
+       overflow:hidden;text-overflow:ellipsis}
+#notif.tampil{transform:translateX(-50%) translateY(0)}
+#notif.gagal{background:#B3261E}
+#notif.kerja{background:#8A6D1F}
+
+/* HP */
+@media(max-width:640px){
+  .nav{height:58px;padding:0 13px;gap:9px}
+  .nav img{height:36px}
+  .nav-nama{font-size:13px;max-width:130px}
+  .nav-sub{display:none}
+  .tombol-nav{padding:8px 13px;font-size:12px}
+  .tombol-nav .teks-lengkap{display:none}
+  #notif{font-size:12.5px;padding:11px 18px;bottom:14px}
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PANEL ASISTEN AI  (MASTER_PLAN §4.10 — langkah #2)
+   Kuota dikirim SERVER-SIDE ({{ ai_kuota }}), jadi panel langsung benar
+   saat halaman dibuka — tidak ada kedipan / permintaan tambahan.
+   ═══════════════════════════════════════════════════════════════════ */
+#tombol-ai{position:fixed;right:20px;bottom:20px;z-index:40;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 22px;border:none;border-radius:70px;cursor:pointer;
+  font-family:inherit;font-size:14px;font-weight:700;
+  background:linear-gradient(135deg,#198E3B,#12B457);color:#fff;
+  box-shadow:0 8px 24px rgba(25,142,59,.38);transition:.2s}
+#tombol-ai:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(25,142,59,.46)}
+#tombol-ai .lencana{background:rgba(255,255,255,.24);border-radius:70px;
+  padding:2px 9px;font-size:11.5px;font-weight:700}
+
+/* panel samping */
+#panel-ai{position:fixed;top:0;right:0;bottom:0;width:404px;max-width:94vw;z-index:70;
+  background:#fff;box-shadow:-14px 0 44px rgba(0,0,0,.18);display:flex;flex-direction:column;
+  transform:translateX(105%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+#panel-ai.buka{transform:translateX(0)}
+.pai-atas{padding:18px 20px;border-bottom:1px solid var(--garis);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#104F22,#198E3B)}
+.pai-atas h2{font-size:15.5px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.pai-atas small{display:block;font-size:11.5px;color:rgba(255,255,255,.75);font-weight:500}
+.pai-tutup{background:rgba(255,255,255,.18);border:none;color:#fff;width:32px;height:32px;
+  border-radius:50%;cursor:pointer;font-size:16px;line-height:1;flex-shrink:0}
+.pai-tutup:hover{background:rgba(255,255,255,.3)}
+.pai-isi{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:16px}
+
+/* kotak kuota */
+.pai-kuota{background:#F4F8F5;border:1px solid #DCEAE0;border-radius:14px;padding:14px 16px}
+.pai-kuota-atas{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  margin-bottom:9px}
+.pai-kuota-atas b{font-size:13px;font-weight:700;color:var(--teks)}
+.pai-angka{font-size:12.5px;color:var(--teks-abu);font-weight:600}
+.pai-angka b{color:var(--hijau);font-size:15px}
+.pai-rel{height:9px;border-radius:70px;background:#DFE9E2;overflow:hidden}
+.pai-rel i{display:block;height:100%;border-radius:70px;
+  background:linear-gradient(90deg,#198E3B,#3FBF6B);transition:width .4s}
+.pai-rel i.penuh{background:linear-gradient(90deg,#E8A33D,#D9752B)}
+.pai-note{font-size:11.5px;color:var(--teks-abu);margin-top:9px;line-height:1.5}
+
+/* kartu penjelasan / terkunci */
+.pai-kartu{background:#FBFBFB;border:1px solid var(--garis);border-radius:14px;
+  padding:15px 16px;font-size:13px;line-height:1.65;color:var(--teks-abu)}
+.pai-kartu h3{font-size:13.5px;font-weight:700;color:var(--teks);margin-bottom:7px}
+.pai-kartu ol{margin:0 0 0 17px;display:flex;flex-direction:column;gap:5px}
+.pai-kartu b{color:var(--teks)}
+.pai-kartu.terkunci{background:#FFF9ED;border-color:#F2DDB4}
+.pai-kartu.terkunci h3{color:#8A6D1F}
+
+/* kartu izin dokumen besar (ACC Bos 14Sep26) */
+.pai-kartu.izin{background:#F1F7FF;border-color:#C8DDF7;margin-bottom:10px}
+.pai-kartu.izin h3{color:#1B4F8A}
+.pai-izin-angka{display:grid;grid-template-columns:1fr 1fr;gap:7px 12px;
+  margin-top:11px;font-size:12.5px}
+.pai-izin-angka span{color:var(--teks-abu)}
+.pai-izin-angka b{color:var(--teks)}
+.pai-ringkas{font-size:12.5px;line-height:1.55;color:var(--teks-abu);
+  background:#FBFBFB;border:1px dashed var(--garis);border-radius:10px;
+  padding:7px 10px;margin-top:8px}
+.pai-ringkas b{color:var(--teks);font-weight:700}
+.pai-bukti{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;align-items:center}
+
+/* tombol utama aksi */
+.pai-aksi{width:100%;padding:13px 18px;border:none;border-radius:70px;cursor:pointer;
+  font-family:inherit;font-size:14px;font-weight:700;transition:.2s;
+  background:linear-gradient(135deg,#198E3B,#12B457);color:#fff}
+.pai-aksi:hover:not(:disabled){filter:brightness(1.07)}
+.pai-aksi:disabled{opacity:.55;cursor:not-allowed}
+.pai-aksi.oranye{background:linear-gradient(135deg,#F4A025,#E88B10);color:#2E1B00}
+
+/* Baris dua tombol (Tambah + Revisi) — JANGAN pakai width:100% di sini,
+   nanti tombol kedua meluber keluar panel (bug tampilan 14Sep26:
+   tombol "Revisi dengan AI" terpotong di tepi kanan). */
+.pai-baris-aksi{display:flex;gap:9px;margin-top:9px;align-items:stretch}
+.pai-baris-aksi .pai-aksi{width:auto;flex:1 1 auto;min-width:0;padding:12px 14px;
+  font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pai-baris-aksi .pai-aksi.oranye{flex:0 0 auto;padding:12px 18px}
+
+/* kotak tulis komentar */
+.pai-label{font-size:12.5px;font-weight:700;color:var(--teks);margin-bottom:7px;display:block}
+.pai-tulis{width:100%;min-height:104px;resize:vertical;font-family:inherit;font-size:13px;
+  padding:11px 13px;border:1.5px solid var(--garis);border-radius:12px;line-height:1.55;
+  background:#fff;color:var(--teks)}
+.pai-tulis:focus{outline:none;border-color:var(--hijau);box-shadow:0 0 0 3px rgba(25,142,59,.12)}
+
+/* daftar komentar */
+.pai-daftar{display:flex;flex-direction:column;gap:8px}
+.pai-komentar{display:flex;gap:9px;align-items:flex-start;background:#F4F8F5;
+  border:1px solid #DCEAE0;border-radius:11px;padding:10px 12px;font-size:12.5px;line-height:1.5}
+.pai-komentar span{flex:1;word-break:break-word}
+.pai-komentar button{background:none;border:none;color:#B3261E;cursor:pointer;
+  font-size:15px;line-height:1;padding:0 2px;flex-shrink:0}
+
+/* hasil revisi */
+.pai-hasil{background:#F4F8F5;border:1px solid #DCEAE0;border-radius:12px;padding:13px 14px;
+  font-size:12.5px;line-height:1.7;white-space:pre-wrap;max-height:340px;overflow-y:auto;
+  word-break:break-word}
+.pai-salindi{margin-top:9px;width:100%;padding:10px;border-radius:70px;cursor:pointer;
+  border:1.5px solid var(--hijau);background:#fff;color:var(--hijau);
+  font-family:inherit;font-size:13px;font-weight:700}
+
+/* ── SAMBUNGAN B (13Okt26): tombol "Tulis isi bab dari artikel saya" ── */
+.pai-tulis-bab{margin-top:14px;padding-top:13px;border-top:1px dashed #D8E4DE}
+.pai-tulis-bab .pai-aksi{width:100%;display:flex;align-items:center;
+  justify-content:center;gap:7px}
+.pai-bab-ket{margin-top:8px;font-size:11.5px;line-height:1.55;color:var(--tinta-2)}
+.pai-bab-ket b{color:var(--hijau)}
+/* kutipan yang TIDAK ada di sumber → ditandai supaya user waspada */
+.pai-buang{margin-top:9px;padding:9px 11px;border-radius:10px;
+  background:#FFF6E8;border:1px solid #F3D9A8;font-size:11.5px;line-height:1.55;
+  color:#6B4A08}
+.pai-buang b{color:#8A5A00}
+
+/* ── PEMILIH BAB (ACC Bos 14Sep26) ── */
+.pai-bab{background:#fff;border:1px solid var(--garis);border-radius:14px;padding:13px 15px}
+.pai-bab h3{font-size:13.5px;font-weight:700;color:var(--teks);margin-bottom:4px}
+.pai-bab-sub{font-size:11.5px;color:var(--teks-abu);line-height:1.5;margin-bottom:10px}
+.pai-bab-daftar{display:flex;flex-direction:column;gap:7px}
+.pai-bab-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;cursor:pointer;
+  border:1.5px solid var(--garis);border-radius:11px;background:#FCFCFC;transition:.15s}
+.pai-bab-item:hover{border-color:#C9DCCF;background:#F7FBF8}
+.pai-bab-item.pilih{border-color:var(--hijau);background:#F1F9F3;box-shadow:0 0 0 3px rgba(25,142,59,.1)}
+.pai-bab-item input{margin-top:2px;accent-color:var(--hijau);flex:0 0 auto}
+.pai-bab-teks{flex:1;min-width:0}
+.pai-bab-teks b{display:block;font-size:12.8px;font-weight:700;color:var(--teks)}
+.pai-bab-teks small{display:block;font-size:11.3px;color:var(--teks-abu);margin-top:2px;line-height:1.45}
+.pai-bab-lencana{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:70px;
+  background:#E7F3EA;color:#1B6B36;margin-top:4px}
+.pai-bab-lencana.biru{background:#EAF2FC;color:#1B4F8A}
+
+/* ⭐ AKORDEON 3 JALUR (rancangan ACC 29Sep26): kepala BAB utuh → anak
+   pembuka + sub-bab. Lipat/lebar diatur .buka; pilihan jalur di kartu
+   lingkup sebelum kirim. */
+.pai-akor{border:1.5px solid var(--garis);border-radius:11px;background:#FCFCFC;
+  overflow:hidden;transition:.15s}
+.pai-akor:hover{border-color:#C9DCCF}
+.pai-akor.pilih{border-color:var(--hijau);background:#F1F9F3;
+  box-shadow:0 0 0 3px rgba(25,142,59,.1)}
+.pai-akor-kepala{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;
+  cursor:pointer}
+.pai-akor-panah{flex:0 0 auto;color:var(--teks-abu);font-size:10px;margin-top:4px;
+  transition:transform .15s}
+.pai-akor.buka .pai-akor-panah{transform:rotate(90deg)}
+.pai-akor-anak{display:none;flex-direction:column;gap:6px;
+  padding:0 10px 9px 30px}
+.pai-akor.buka .pai-akor-anak{display:flex}
+.pai-bab-item.anak{padding:8px 10px;border-radius:9px}
+.pai-bab-item.pembuka-anak{background:#FBFAF3;border-style:dashed}
+.pai-akor-lebar{padding:8px 12px 0 30px;font-size:11.3px;color:var(--teks-abu)}
+.pai-akor-lebar button{background:none;border:none;color:#1B4F8A;font-size:11.3px;
+  cursor:pointer;padding:0;text-decoration:underline;font-family:inherit}
+/* kartu lingkup (rancangan A.6): angka Token dari /v1/hitung, bukan karangan */
+.pai-lingkup-blok{margin-top:9px;font-size:12.3px;line-height:1.7}
+.pai-lingkup-blok .lbl{color:var(--teks-abu);font-size:11.3px}
+.pai-lingkup-blok ol{margin:3px 0 0 17px;padding:0}
+
+/* ── RIWAYAT (bahasa waktu, tanpa nomor versi — ACC Bos 14Sep26) ──
+   Tersembunyi: <details> kecil. 90% user tidak perlu membukanya. */
+.pai-riwayat{margin-top:4px}
+.pai-riwayat summary{list-style:none;cursor:pointer;font-size:12.3px;font-weight:600;
+  color:var(--teks-abu);padding:6px 2px;display:flex;align-items:center;gap:7px;user-select:none}
+.pai-riwayat summary::-webkit-details-marker{display:none}
+.pai-riwayat summary:before{content:'▸';font-size:11px;transition:.18s;display:inline-block}
+.pai-riwayat[open] summary:before{transform:rotate(90deg)}
+.pai-riwayat summary:hover{color:var(--teks)}
+.pai-riwayat-isi{margin-top:8px;display:flex;flex-direction:column;gap:7px}
+.pai-rw{display:flex;align-items:center;gap:10px;padding:9px 11px;
+  border:1px solid var(--garis);border-radius:11px;background:#FCFCFC}
+.pai-rw.kini{border-color:#C9DCCF;background:#F4FAF6}
+.pai-rw-teks{flex:1;min-width:0}
+.pai-rw-teks b{display:block;font-size:12.4px;font-weight:700;color:var(--teks)}
+.pai-rw-teks small{display:block;font-size:11.2px;color:var(--teks-abu);margin-top:2px}
+.pai-rw button{flex:0 0 auto;border:1.4px solid #1B4F8A;background:#fff;color:#1B4F8A;
+  border-radius:70px;padding:6px 13px;font-family:inherit;font-size:11.8px;
+  font-weight:700;cursor:pointer}
+.pai-rw button:hover{background:#F1F7FF}
+.pai-rw-lencana{flex:0 0 auto;font-size:10.5px;font-weight:700;padding:3px 9px;
+  border-radius:70px;background:#E7F3EA;color:#1B6B36}
+.pai-ingat{margin-top:8px;padding:9px 11px;border-radius:10px;
+  background:#FFF9ED;border:1px solid #F2DDB4;color:#7A5C15;
+  font-size:11.6px;line-height:1.5}
+/* keterangan storage (ACC Bos 15Sep26): riwayat revisi memakai kuota */
+.pai-storage{margin-top:8px;padding:8px 11px;border-radius:10px;
+  background:#F4F7FB;border:1px solid #D8E2EE;color:#3E5A78;
+  font-size:11.3px;line-height:1.5}
+
+/* ── VERSI TERSIMPAN + TOMBOL MUNDUR (Opsi A ACC Bos) ──
+   Kartu lama dipertahankan untuk kompatibilitas, tapi TIDAK dipakai
+   kalau .pai-riwayat aktif. */
+.pai-versi{background:#FBFBFB;border:1px solid var(--garis);border-radius:14px;padding:13px 15px}
+.pai-versi h3{font-size:13.5px;font-weight:700;color:var(--teks);margin-bottom:6px}
+.pai-versi-info{font-size:11.8px;color:var(--teks-abu);line-height:1.55}
+.pai-versi-info b{color:var(--teks)}
+.pai-mundur{margin-top:9px;width:100%;padding:11px;border-radius:70px;cursor:pointer;
+  border:1.5px solid #1B4F8A;background:#fff;color:#1B4F8A;
+  font-family:inherit;font-size:12.8px;font-weight:700}
+.pai-mundur:hover:not(:disabled){background:#F1F7FF}
+.pai-mundur:disabled{opacity:.5;cursor:not-allowed;border-color:var(--garis);color:var(--teks-abu)}
+
+/* tawaran AddOn */
+.pai-addon{display:flex;flex-direction:column;gap:10px}
+.pai-addon-item{border:1.5px solid var(--garis);border-radius:13px;padding:13px 15px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff}
+.pai-addon-item div{min-width:0}
+.pai-addon-item b{display:block;font-size:13px;font-weight:700;color:var(--teks)}
+.pai-addon-item small{display:block;font-size:11.5px;color:var(--teks-abu);margin-top:2px;line-height:1.45}
+.pai-addon-item .harga{font-size:13.5px;font-weight:800;color:var(--hijau);white-space:nowrap}
+.pai-tutup-lapisan{position:fixed;inset:0;background:rgba(20,30,24,.42);z-index:60;
+  opacity:0;pointer-events:none;transition:.25s}
+.pai-tutup-lapisan.tampil{opacity:1;pointer-events:auto}
+
+/* ══════════════════════════════════════════════════════════════════
+   LANGKAH C — PAPAN PANTAU PROSES (MASTER_PLAN §4.12 poin F)
+   TAHAP NYATA, bukan persentase karangan: waktu AI tidak stabil
+   (terukur 15Sep26: 7 dtk s/d 400 dtk), jadi persen akan BOHONG.
+   ══════════════════════════════════════════════════════════════════ */
+#pantau{position:fixed;inset:0;z-index:80;background:rgba(18,28,22,.55);
+  display:none;align-items:center;justify-content:center;padding:18px}
+#pantau.buka{display:flex}
+.pantau-kotak{background:#fff;border-radius:16px;width:100%;max-width:540px;
+  padding:24px 22px;box-shadow:0 18px 54px rgba(0,0,0,.3);text-align:center}
+.pantau-kunci{display:inline-block;font-size:11.5px;font-weight:800;color:#8a6d00;
+  background:#fff6d6;border:1px solid #ffe08a;border-radius:99px;padding:4px 12px}
+.pantau-kotak h2{font-size:16.5px;margin:13px 0 4px;color:var(--teks)}
+.pantau-tahap{font-size:14px;font-weight:800;color:var(--hijau);margin:7px 0 15px;
+  min-height:20px}
+.pantau-skel{display:flex;flex-direction:column;gap:8px;margin:0 0 16px}
+.pantau-skel i{display:block;height:11px;border-radius:6px;
+  background:linear-gradient(90deg,#eef3ef 25%,#dfe8e2 37%,#eef3ef 63%);
+  background-size:400% 100%;animation:denyut 1.4s ease infinite}
+.pantau-skel i:nth-child(1){width:92%}
+.pantau-skel i:nth-child(2){width:100%}
+.pantau-skel i:nth-child(3){width:78%}
+.pantau-skel i:nth-child(4){width:88%}
+@keyframes denyut{0%{background-position:100% 0}100%{background-position:0 0}}
+.pantau-langkah{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;
+  margin:0 0 16px}
+.pantau-langkah span{font-size:11.5px;font-weight:700;border-radius:99px;
+  padding:4px 11px;border:1.5px solid #e4e8e6;color:var(--teks-abu);background:#fff}
+.pantau-langkah span.kini{border-color:var(--hijau);color:var(--hijau);
+  background:#eefaf1}
+.pantau-langkah span.lewat{border-color:#cfe6d6;color:#2f7a47;background:#f5fbf7}
+.pantau-catatan{font-size:12.5px;color:var(--teks-abu);line-height:1.55;
+  background:#f7faf8;border-radius:10px;padding:11px 13px;margin:0 0 15px;
+  text-align:left}
+.pantau-aksi{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.pantau-aksi button{font:inherit;cursor:pointer;border-radius:10px;
+  padding:10px 18px;font-size:13px;font-weight:800;border:1.5px solid var(--hijau);
+  background:var(--hijau);color:#fff}
+.pantau-aksi button.putih{background:#fff;color:var(--teks-abu);
+  border-color:#e4e8e6}
+
+/* spanduk kecil saat modal disembunyikan ("boleh ditinggal") */
+/* ⚠️ PERBAIKAN 16Sep26 (temuan MATA, bukan uji kode): dengan `top:78px`
+   spanduk ini TUMANG TINDIH bilah menu OnlyOffice — header hanya 66px,
+   jadi jarak cuma 12px. Diverifikasi lewat potret layar + pemeriksaan mata:
+   "Spanduk melayang menimpa bilah menu biru dan menutupi teks di baliknya".
+   Perbaikan: turunkan ke bawah toolbar OO + kasih bayangan lebih tegas. */
+#kunci-spanduk{position:fixed;left:50%;transform:translateX(-50%);top:120px;z-index:55;
+  background:#fff6d6;border:1.5px solid #ffe08a;color:#8a6d00;border-radius:99px;
+  padding:8px 17px;font-size:12.5px;font-weight:700;display:none;align-items:center;
+  gap:9px;box-shadow:0 6px 20px rgba(0,0,0,.1)}
+#kunci-spanduk.tampil{display:flex}
+#kunci-spanduk i{width:9px;height:9px;border-radius:99px;background:#e8a300;
+  animation:kedip 1s ease-in-out infinite}
+@keyframes kedip{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ══════════════════════════════════════════════════════════════════
+   LANGKAH E — LONCENG (ACC Bos 16Sep26: notifikasi LEWAT LONCENG di web)
+   Endpoint /api/ai/v1/proses sudah ada sejak Langkah A+B; ini tampilannya.
+   ══════════════════════════════════════════════════════════════════ */
+#lonceng{position:relative}
+#lonceng .lonceng-angka{position:absolute;top:-7px;right:-7px;background:#e5484d;
+  color:#fff;font-size:10.5px;font-weight:800;border-radius:99px;min-width:18px;
+  height:18px;display:none;align-items:center;justify-content:center;padding:0 5px;
+  border:2px solid #fff;box-sizing:content-box}
+#lonceng.nyala .lonceng-angka{display:flex}
+#lonceng.nyala{border-color:#e5484d;color:#c02b30}
+#daftar-lonceng{position:fixed;top:70px;right:16px;z-index:70;width:340px;max-width:92vw;
+  background:#fff;border-radius:14px;box-shadow:0 16px 44px rgba(0,0,0,.22);
+  padding:14px;display:none;max-height:70vh;overflow:auto}
+#daftar-lonceng.buka{display:block}
+#daftar-lonceng h3{font-size:13.5px;margin:0 0 10px;color:var(--teks)}
+.lonceng-item{border:1.5px solid #e4e8e6;border-radius:11px;padding:11px 12px;
+  margin-bottom:9px;cursor:pointer;background:#fff;text-align:left}
+.lonceng-item:hover{border-color:var(--hijau);background:#f7fbf8}
+.lonceng-item.jalan{cursor:default;background:#f7faf8}
+.lonceng-item.jalan:hover{border-color:#e4e8e6}
+/* 17Sep26: pembeda GAGAL — lembut, bukan alarm. Bos minta notifikasi
+   mengingatkan, bukan menakutkan (notifikasi sering muncul). */
+.lonceng-item.gagal{border-color:#e8ddd9;background:#fdfbfa}
+.lonceng-item.gagal:hover{border-color:#c9a89f}
+/* NADA dari server (app/notifikasi.py): kabar/ingat/bantu/semangat.
+   Semuanya warna lembut — TIDAK ada merah menyala. */
+.lonceng-item.nada-kabar{border-left:3px solid #2f9e6e}
+.lonceng-item.nada-ingat{border-left:3px solid #d4a13a}
+.lonceng-item.nada-bantu{border-left:3px solid #6b93c7}
+.lonceng-item.nada-semangat{border-left:3px solid #9b7ec7}
+.lonceng-aksi{margin-top:8px;font:inherit;font-size:11.5px;font-weight:700;
+  padding:6px 13px;border-radius:8px;border:1.5px solid var(--hijau);
+  background:#fff;color:var(--hijau);cursor:pointer;min-height:32px}
+.lonceng-aksi:hover{background:var(--hijau);color:#fff}
+.lonceng-item.gagal .lonceng-aksi{border-color:#6b93c7;color:#3f6693}
+.lonceng-item.gagal .lonceng-aksi:hover{background:#6b93c7;color:#fff}
+.lonceng-item b{display:block;font-size:12.5px;color:var(--teks);margin-bottom:3px}
+.lonceng-item small{display:block;font-size:11.5px;color:var(--teks-abu);line-height:1.45}
+.lonceng-kosong{font-size:12.5px;color:var(--teks-abu);text-align:center;padding:14px 4px}
+.lonceng-baru{display:inline-block;font-size:10px;font-weight:800;color:#fff;
+  background:#e5484d;border-radius:99px;padding:2px 8px;margin-left:6px}
+
+/* tombol "Terapkan ke dokumen" (Langkah D) */
+.pai-terapkan{width:100%;margin-top:9px;font:inherit;font-size:13px;font-weight:800;
+  cursor:pointer;border:none;border-radius:10px;padding:12px;background:var(--hijau);color:#fff}
+.pai-terapkan:disabled{background:#c9d4cd;cursor:default}
+.pai-terapkan-catatan{font-size:11.5px;color:var(--teks-abu);line-height:1.5;
+  margin-top:7px;text-align:center}
+
+
+/* HP */
+@media(max-width:520px){
+  #tombol-ai{right:13px;bottom:13px;padding:11px 17px;font-size:12.5px}
+  #panel-ai{width:100%;max-width:100%}
+  .pai-isi{padding:16px}
+}
+</style>
+<link rel="stylesheet" href="/static/ikon.css">
+</head>
+<body>
+<!-- IKON: sprite Lucide (ACC Bos 15Sep26) -->
+{{ ikon_sprite() }}
+
+
+<header>
+  <div class="nav">
+    <div class="nav-kiri">
+      <a href="/naskah"><img src="/static/logo-320.png" alt="EduAi"></a>
+      <div class="nav-info">
+        <span class="nav-nama">{{ berkas.nama }}</span>
+        <span class="nav-sub">
+          {% if tipe == 'edit' %}Sedang diedit{% else %}Hanya lihat{% endif %}
+          · {{ '%.1f'|format(berkas.ukuran / 1048576) }} MB
+        </span>
+      </div>
+    </div>
+    <div class="nav-aksi">
+      {# ── LONCENG (Langkah E) ──
+         Notifikasi hasil revisi latar belakang. Endpoint /api/ai/v1/proses
+         sudah ada sejak Langkah A+B; ini tampilan yang dipakai user. #}
+      <button type="button" class="tombol-nav" id="lonceng" title="Pemberitahuan">
+        <span>{{ ikon('bell', 16) }}</span>
+        <span class="lonceng-angka" id="lonceng-angka">0</span>
+      </button>
+      <button type="button" class="tombol-nav" id="simpan" title="Simpan sekarang">
+        <span>{{ ikon('check', 16) }}</span><span class="teks-lengkap">Simpan</span>
+      </button>
+      <a href="/naskah" class="tombol-nav utama">Selesai</a>
+    </div>
+  </div>
+</header>
+
+{# ── DAFTAR LONCENG ── #}
+<div id="daftar-lonceng" aria-label="Pemberitahuan">
+  <h3>{{ ikon('bell', 15) }} Pemberitahuan</h3>
+  <div id="lonceng-isi"><div class="lonceng-kosong">Belum ada pemberitahuan.</div></div>
+</div>
+
+{# ══════════════════════════════════════════════════════════════════════
+   LANGKAH C — PAPAN PANTAU + SKELETON (MASTER_PLAN §4.12 poin F)
+   LAPIS 1 PENGUNCIAN: selama AI bekerja, dokumen TERKUNCI (user tidak
+   boleh menyunting) supaya hasil AI tidak bertabrakan dengan editan user.
+   Lapis 2 (server) ada di app/main.py — TOLAK forcesave saat AI jalan.
+   Lapis 3 (atomik) ada di app/tulis_docx.py — tulis SEKALI di akhir.
+
+   ⚠️ Modal ini TIDAK memblokir pekerjaan: user boleh menutupnya dan
+   meninggalkan halaman ("boleh ditinggal" — ACC Bos). Proses jalan di
+   server; saat selesai, LONCENG menyala. #}
+<div id="pantau" role="dialog" aria-modal="true" aria-label="Proses revisi berjalan">
+  <div class="pantau-kotak">
+    <span class="pantau-kunci">{{ ikon('lock', 14) }} DOKUMEN SEDANG DIREVISI AI</span>
+    <h2 id="pantau-judul">AI sedang bekerja</h2>
+    <div class="pantau-tahap" id="pantau-tahap">Menyiapkan…</div>
+
+    <div class="pantau-skel" aria-hidden="true">
+      <i></i><i></i><i></i><i></i>
+    </div>
+
+    <div class="pantau-langkah" id="pantau-langkah"></div>
+
+    <div class="pantau-catatan">
+      <b>Mohon tunggu.</b> Dokumen dikunci sementara supaya hasil AI tidak
+      bertabrakan dengan editan Anda. Anda juga <b>boleh menutup ini dan
+      melanjutkan hal lain</b> — prosesnya tetap jalan di server, dan nanti
+      akan muncul tanda di <b>lonceng</b> kalau sudah selesai.
+    </div>
+
+    <div class="pantau-aksi">
+      <button type="button" id="pantau-sembunyi" class="putih">Lanjut bekerja lain</button>
+      <button type="button" id="pantau-tutup">Tutup &amp; lihat dokumen</button>
+    </div>
+  </div>
+</div>
+
+<div id="kunci-spanduk"><i></i><span id="kunci-spanduk-teks">AI sedang merevisi — dokumen terkunci sementara</span></div>
+
+<main>
+  <div id="tempat-editor"></div>
+
+  <div class="lapisan" id="memuat">
+    {#  Logo EduAi di layar tunggu (ACC Bos 03Okt26 "Opsi 1 + foto").
+        Aset lokal yang SUDAH ADA — nol beban tambahan. #}
+    <img src="/static/ikon-burung-about.png" alt=""
+         style="width:86px;height:86px;object-fit:contain;margin-bottom:4px;
+                animation:denyut 2.2s ease-in-out infinite">
+    <div class="pemutar"></div>
+    <h2>Naskahmu sedang disiapkan</h2>
+    <p>Sebentar ya, dokumen sedang dibuka. Untuk berkas besar,
+       proses ini bisa butuh beberapa detik.</p>
+    <style>@keyframes denyut{0%,100%{transform:scale(1);opacity:.92}
+                            50%{transform:scale(1.05);opacity:1}}</style>
+  </div>
+
+  <div class="lapisan" id="galat" hidden>
+    <h2>Editor tidak bisa dimuat</h2>
+    <p id="galat-pesan">Periksa koneksi Anda, lalu coba lagi.</p>
+    <button type="button" class="tombol-lapisan" onclick="location.reload()">Coba Lagi</button>
+    <a href="/naskah" class="tombol-lapisan" style="background:#fff;border:1.5px solid #E4E8E6;color:#68666e">Kembali</a>
+  </div>
+</main>
+
+<div id="notif"></div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PANEL ASISTEN AI (MASTER_PLAN §4.10 — langkah #2)
+     Alur: tulis komentar → klik "Revisi dengan AI" → POST /api/ai/v1/revisi
+     Kuota ditampilkan dari data server ({{ ai_kuota }}), bukan tebakan.
+     ══════════════════════════════════════════════════════════════════ -->
+<button type="button" id="tombol-ai">
+  <span>{{ ikon('sparkles', 16) }}</span><span>Asisten AI</span>
+  {% if ai_kuota and ai_kuota.revisi %}<span class="lencana" id="lencana-kuota">{{ ai_kuota.revisi.sisa or 0 }}</span>{% endif %}
+</button>
+
+<div class="pai-tutup-lapisan" id="pai-lapisan"></div>
+
+<aside id="panel-ai" aria-label="Panel Asisten AI">
+  <div class="pai-atas">
+    <div>
+      <h2>{{ ikon('sparkles', 18) }} Asisten AI</h2>
+      <small>Membantu menyesuaikan dokumen dengan komentar pembimbing</small>
+    </div>
+    <button type="button" class="pai-tutup" id="pai-tutup" aria-label="Tutup">{{ ikon('x', 16) }}</button>
+  </div>
+  <div class="pai-isi">
+
+    {% if ai_kuota %}
+{% set kr = ai_kuota.revisi or {} %}
+<div class="pai-kuota">
+  <div class="pai-kuota-atas">
+    <b>Sisa Token Revisi</b>
+    <span class="pai-angka"><b id="pai-sisa">{{ kr.sisa or 0 }}</b> / {{ kr.total or 0 }}</span>
+  </div>
+  <div class="pai-rel">
+    <i id="pai-rel" style="width:{{ (kr.persen_pakai or 0) if (kr.persen_pakai or 0) <= 100 else 100 }}%"
+       class="{{ 'penuh' if (kr.persen_pakai or 0) >= 80 else '' }}"></i>
+  </div>
+  <div class="pai-note">
+    Paket <b>{{ (ai_kuota.paket or 'gratis')|capitalize }}</b> ·
+    {{ kr.dipakai or 0 }} dari {{ kr.total or 0 }} token terpakai bulan ini
+    {%- if kr.sisa_addon %} · termasuk {{ kr.sisa_addon }} dari AddOn{% endif %}.
+    Saldo permanen — tidak hangus tiap awal bulan.
+  </div>
+</div>
+{% endif %}
+
+    {# ── PEMILIH BAB (ACC Bos 14Sep26) ──
+       1 bab = 1 revisi = 1 kuota. Dimuat dari /api/ai/v1/bab saat panel dibuka. #}
+    <div class="pai-bab" id="pai-wadah-bab" hidden>
+      <h3>Bagian yang direvisi</h3>
+      <div class="pai-bab-sub" id="pai-bab-sub">
+        Pilih satu bab supaya revisinya fokus dan hemat kuota.
+      </div>
+      <div class="pai-bab-daftar" id="pai-bab-daftar"></div>
+    </div>
+
+    {# ── Kotak tulis komentar ── #}
+    <div>
+      <label class="pai-label" for="pai-kotak">Komentar pembimbing</label>
+      <textarea class="pai-tulis" id="pai-kotak"
+        placeholder="Tempelkan komentar pembimbing di sini — satu komentar per baris.&#10;&#10;Contoh:&#10;Perbaiki paragraf kedua BAB II, landasan teori belum ada rujukannya.&#10;Ringkas bagian metode, terlalu panjang."></textarea>
+      {# ── RINGKAS PAHAM (putusan Bos 29Sep26) — apa yang diminta + ke mana #}
+      <div class="pai-ringkas" id="pai-ringkas" hidden></div>
+
+      <div class="pai-baris-aksi">
+        <button type="button" class="pai-aksi oranye" id="pai-tambah">
+          + Tambah
+        </button>
+        <button type="button" class="pai-aksi" id="pai-jalan">Revisi dengan AI {{ ikon('sparkles', 15) }}</button>
+      </div>
+
+      {# ── SAMBUNGAN B (13Okt26) — AI MENULIS ISI BAB dari ARTIKEL user ──
+         Putusan Bos: artikel yang sudah dikumpulkan di tab Referensi
+         (termasuk yang dipakai ulang antar bab) dipakai AI sebagai SUMBER
+         saat menulis bab. Sengaja tombol TERPISAH dari "Revisi dengan AI":
+         yang satu MEMPERBAIKI naskah, yang ini MENULIS ISIAN BAB.
+         Pagar: AI hanya boleh menyebut nama/tahun yang ada di sumber. #}
+      <div class="pai-tulis-bab">
+        <button type="button" class="pai-aksi" id="pai-tulis-bab"
+                title="AI menulis isi bab memakai artikel yang kamu kumpulkan di tab Referensi">
+          {{ ikon('file-pen', 15) }} Tulis isi bab dari artikel saya
+        </button>
+        <div class="pai-bab-ket" id="pai-bab-ket">
+          Memakai artikel yang kamu sudah kumpulkan di <b>Referensi</b> —
+          AI tidak mencari artikel baru. Butuh 1 Token Revisi.
+        </div>
+      </div>
+    </div>
+
+    <div class="pai-daftar" id="pai-daftar"></div>
+
+    {# ── RIWAYAT (ACC Bos 14Sep26) ──
+       TANPA nomor versi — bahasa waktu: "5 menit lalu · ✨ AI".
+       Tersembunyi (▸ Riwayat) supaya user TIDAK dibingungkan pilihan.
+       Satu dokumen hidup, yang terakhir menang. Menyesal? revisi lagi. #}
+    <details class="pai-riwayat" id="pai-wadah-versi" hidden>
+      <summary id="pai-riwayat-ringkas">Riwayat</summary>
+      <div class="pai-riwayat-isi" id="pai-riwayat-isi"></div>
+      <div class="pai-ingat" id="pai-ingat" hidden></div>
+      {# keterangan storage (ACC Bos 15Sep26) — riwayat revisi memakai kuota #}
+      <div class="pai-storage">Riwayat revisi memakai kuota storage Anda — sama seperti berkas.</div>
+    </details>
+
+    {# ── Hasil ── #}
+    <div id="pai-wadah-hasil" hidden>
+      <label class="pai-label">Hasil revisi</label>
+      <div class="pai-hasil" id="pai-hasil"></div>
+      <button type="button" class="pai-salindi" id="pai-salindi">Salin hasil</button>
+      {# ── LANGKAH D: TULIS HASIL KE .DOCX (ACC Bos 16Sep26) ──
+         Sebelum ini mahasiswa harus SALIN MANUAL lalu tempel sendiri.
+         Untuk naskah 60.000 karakter itu berat & rawan salah tempel.
+         Ditulis ATOMIK 1× di akhir (Lapis 3) + cadangan otomatis. #}
+      <button type="button" class="pai-terapkan" id="pai-terapkan">
+        Tulis hasil ke dokumen
+      </button>
+      <div class="pai-terapkan-catatan">
+        Hasil ditulis langsung ke berkas Word Anda (edisi lama disimpan
+        sebagai cadangan). Setelah itu <b>tutup &amp; buka dokumennya</b>
+        supaya tampilan editor ikut menyegarkan.
+      </div>
+    </div>
+
+    {# ── Izin dokumen besar (muncul kalau > 1 bagian) ── #}
+    <div id="pai-wadah-izin" hidden></div>
+
+    {# ── Tawaran AddOn (muncul saat kuota habis / 402) ── #}
+    <div id="pai-wadah-addon" hidden></div>
+
+    {# ── Kartu cara kerja ── #}
+    <div class="pai-kartu">
+      <h3>Cara kerja</h3>
+      <ol>
+        <li>Tempelkan komentar pembimbing (satu per baris).</li>
+        <li>Klik <b>Revisi dengan AI</b> — AI membaca dokumen, bukan menjawab pertanyaan.</li>
+        <li>Hasilnya menempel di sini. <b>Selalu periksa dulu sebelum dipakai.</b></li>
+      </ol>
+      <div style="margin-top:9px;font-size:11.5px;line-height:1.55">
+        AI menyiapkan, <b>Anda yang memutuskan</b>.
+      </div>
+    </div>
+
+  </div>
+</aside>
+
+<script src="{{ api_js }}"></script>
+<script>
+window.__AI_AWAL__ = {{ (ai_kuota or {})|tojson }};
+window.__AI_ADDON__ = {{ ai_addon|tojson }};
+window.__AI_ADDON_TERKUNCI__ = {{ (ai_addon_terkunci or false)|tojson }};
+window.__AI_FILE_ID__ = {{ berkas.id }};
+</script>
+<script>
+(function () {
+  var berkas = { nama: {{ berkas.nama|tojson }}, id: {{ berkas.id }} };
+  var notif = document.getElementById('notif');
+  var timer = null;
+
+  function pesan(teks, jenis) {
+    notif.className = jenis || '';
+    notif.textContent = teks;
+    notif.classList.add('tampil');
+    clearTimeout(timer);
+    timer = setTimeout(function () { notif.classList.remove('tampil'); }, 3200);
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  //  PANEL ASISTEN AI (MASTER_PLAN §4.10 — langkah #2)
+  // ══════════════════════════════════════════════════════════════════
+  var addon    = window.__AI_ADDON__ || [];
+  var terkunci = window.__AI_ADDON_TERKUNCI__ === true;
+
+  var panel    = document.getElementById('panel-ai');
+  var tombolAi = document.getElementById('tombol-ai');
+  var lapisan  = document.getElementById('pai-lapisan');
+  var kotak    = document.getElementById('pai-kotak');
+  var daftar   = document.getElementById('pai-daftar');
+  var btnJalan = document.getElementById('pai-jalan');
+  var btnTambah = document.getElementById('pai-tambah');
+  var wadahHasil = document.getElementById('pai-wadah-hasil');
+  var wadahAddon = document.getElementById('pai-wadah-addon');
+  var wadahIzin  = document.getElementById('pai-wadah-izin');
+  var elHasil  = document.getElementById('pai-hasil');
+  //  SAMBUNGAN B (13Okt26) — tombol "Tulis isi bab dari artikel saya"
+  var btnTulisBab = document.getElementById('pai-tulis-bab');
+  var elBabKet    = document.getElementById('pai-bab-ket');
+  var komentar = [];
+
+  // ── PEMILIH BAB (ACC Bos 14Sep26) ─────────────────────────────────
+  // 1 bab = 1 revisi = 1 kuota. Server yang mendeteksi bab (JANGAN menebak
+  // di sisi browser) — panel hanya menampilkan pilihannya.
+  var wadahBab  = document.getElementById('pai-wadah-bab');
+  var daftarBab = document.getElementById('pai-bab-daftar');
+  var babSub    = document.getElementById('pai-bab-sub');
+  var babPilih  = null;       // {label, judul, panjang, bagian} | null
+  //  ⭐ 3 JALUR (rancangan ACC 29Sep26) — null = ALUR LAMA persis.
+  //  {jalur:1, bab:'BAB III', lingkup:'pembuka'} | {jalur:3, bab:'...'} |
+  //  {jalur:2, babs:['3.1','3.2']}
+  var pilihanLingkup = null;
+  var dataAkor = { besar: [], peta: {}, anak: {} };  // utk akordeon + preview
+  var babDimuat = false;
+
+  // ── RIWAYAT (bahasa waktu, tanpa nomor versi — ACC Bos 14Sep26) ───
+  // Satu dokumen hidup. Riwayat cuma untuk "panik", bukan untuk dipilih.
+  var wadahVersi = document.getElementById('pai-wadah-versi');
+  var riwayatIsi = document.getElementById('pai-riwayat-isi');
+  var riwayatRingkas = document.getElementById('pai-riwayat-ringkas');
+  var elIngat     = document.getElementById('pai-ingat');
+  var versiInfo  = null;        // kartu lama sudah tidak dipakai
+  var btnMundur  = null;        // tombol lama sudah tidak dipakai
+  var riwayatBab = null;        // bab yang riwayatnya sedang tampil
+  var adaSuntingan = false;     // user sudah edit manual setelah titik mundur?
+
+  function angka(n) { return Number(n || 0).toLocaleString('id-ID'); }
+
+  function gambarRiwayat(daftar, adaLuar) {
+    if (!wadahVersi || !riwayatIsi) return;
+    wadahVersi.hidden = false;
+    riwayatIsi.innerHTML = '';
+
+    // ringkasan: "Riwayat (3)" — kecil, abu-abu, tidak menonjol
+    if (riwayatRingkas) {
+      riwayatRingkas.textContent = 'Riwayat (' + daftar.length + ')';
+    }
+
+    daftar.forEach(function (v) {
+      var d = document.createElement('div');
+      d.className = 'pai-rw' + (v.terpakai ? ' kini' : '');
+      var t = document.createElement('div');
+      t.className = 'pai-rw-teks';
+      var b = document.createElement('b');
+      b.textContent = v.kapan || '-';                       // "5 menit lalu"
+      var s = document.createElement('small');
+      s.textContent = v.sumber + (v.terpakai ? ' · versi sekarang' : '');  // "✨ AI"
+      t.appendChild(b); t.appendChild(s);
+      d.appendChild(t);
+
+      if (v.terpakai) {
+        var lb = document.createElement('span');
+        lb.className = 'pai-rw-lencana';
+        lb.textContent = 'dipakai';
+        d.appendChild(lb);
+      } else {
+        var bt = document.createElement('button');
+        bt.type = 'button';
+        bt.textContent = 'Kembalikan';
+        bt.onclick = function () { kembalikan(v, adaLuar); };
+        d.appendChild(bt);
+      }
+      riwayatIsi.appendChild(d);
+    });
+
+    // peringatan singkat: suntingan manual yang belum jadi titik mundur
+    if (elIngat) {
+      if (adaLuar && daftar.length > 1) {
+        elIngat.hidden = false;
+        elIngat.textContent = 'Dokumen sudah Anda ubah sendiri setelah riwayat terakhir. ' +
+          'Mengembalikan akan menghapus perubahan itu.';
+      } else {
+        elIngat.hidden = true;
+      }
+    }
+  }
+
+  function muatVersi(bab) {
+    if (!wadahVersi) return;
+    riwayatBab = bab;
+    fetch('/api/ai/v1/versi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_id: window.__AI_FILE_ID__, bab: bab })
+    })
+    .then(function (r) { return r.json().then(function (d) { return { s: r.status, d: d }; }); })
+    .then(function (res) {
+      var d = (res.d && res.d.detail) ? res.d.detail : (res.d || {});
+      if (res.s !== 200 || !d.ok || !d.versi || !d.versi.length) {
+        wadahVersi.hidden = true; return;
+      }
+      adaSuntingan = d.ada_suntingan === true;
+      gambarRiwayat(d.versi, adaSuntingan);
+    })
+    .catch(function () { wadahVersi.hidden = true; });
+  }
+
+  // ── Kembalikan ke titik riwayat tertentu ──
+  function kembalikan(v, adaLuar) {
+    var pesanKonfirmasi = 'Kembalikan ke kondisi ' + (v.kapan || 'sebelumnya') +
+      ' (' + v.sumber + ')?';
+    if (adaLuar) {
+      pesanKonfirmasi += '\n\nDokumen sudah Anda ubah setelah ini — ' +
+        'perubahan itu akan hilang.';
+    }
+    if (!confirm(pesanKonfirmasi)) return;
+    fetch('/api/ai/v1/mundur', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_id: window.__AI_FILE_ID__, bab: riwayatBab,
+                             sampai_nomor: v.nomor })
+    })
+    .then(function (r) { return r.json().then(function (d) { return { s: r.status, d: d }; }); })
+    .then(function (res) {
+      var d = (res.d && res.d.detail) ? res.d.detail : (res.d || {});
+      if (res.s === 200 && d.ok) {
+        pesan(d.pesan || 'Dikembalikan');
+        muatVersi(riwayatBab);
+      } else {
+        pesan(d.pesan || 'Tidak bisa dikembalikan.', 'gagal');
+      }
+    })
+    .catch(function () { pesan('Koneksi bermasalah. Coba lagi.', 'gagal'); });
+  }
+
+  //  ⭐ AKORDEON 3 JALUR (rancangan ACC 29Sep26) ──────────────────────────
+  //  Kepala `BAB III (utuh)` → anak: `paragraf pembuka` + sub-bab.
+  //  Label besar & pengelompokan anak datang DARI SERVER (posisi asli) —
+  //  browser TIDAK menebak nomor. Pilihan default = kepala PERTAMA (jalur 3).
+  function bersihSeleksi(kecualiWrap, simpanSub) {
+    [].forEach.call(daftarBab.querySelectorAll('input[name="pai-sub"]'),
+                    function (c) {
+                      //  ⭐ FIX 30Sep26 — centang yang SEDANG dipilih
+                      //  (simpanSub) jangan ikut dihapus. Dulu ikut
+                      //  terhapus → centangan tak menempel & pilihan
+                      //  ganda (3.1 + 3.2) tak pernah menumpuk.
+                      if (simpanSub && simpanSub.indexOf(c) >= 0) return;
+                      c.checked = false;
+                    });
+    [].forEach.call(daftarBab.querySelectorAll('input[name="pai-pembuka"]'),
+                    function (c) { c.checked = false; });
+    [].forEach.call(daftarBab.querySelectorAll('input[name="pai-bab"]'),
+                    function (r) {
+                      if (kecualiWrap && kecualiWrap.contains(r)) return;
+                      r.checked = false;
+                    });
+    [].forEach.call(daftarBab.querySelectorAll('.pai-akor'),
+                    function (a) {
+                      if (a === kecualiWrap) return;
+                      a.classList.remove('pilih');
+                    });
+    [].forEach.call(daftarBab.querySelectorAll('.pai-bab-item'),
+                    function (x) { x.classList.remove('pilih'); });
+  }
+
+  //  ⭐ FIX 30Sep26 — ganti pilihan sementara kartu lingkup tampil:
+  //  kartu basi ditutup + tombol "Revisi dengan AI" aktif kembali.
+  //  Dulu tombol terkunci "Memeriksa dokumen..." sampai user klik Batal,
+  //  sehingga pilihan berikutnya tak pernah terkirim.
+  function lepasKartu() {
+    if (!wadahIzin || wadahIzin.hidden) return;
+    wadahIzin.hidden = true;
+    if (btnJalan) {
+      btnJalan.disabled = false;
+      btnJalan.innerHTML = 'Revisi dengan AI {{ ikon("sparkles", 15) }}';
+    }
+  }
+
+  function gambarAkordeon(data) {
+    var besar = data.besar || [];
+    var yatim = data.yatim || [];
+    dataAkor.besar = besar;
+    dataAkor.peta = {}; dataAkor.anak = {};
+    daftarBab.innerHTML = '';
+    besar.forEach(function (bb, ib) {
+      dataAkor.peta[bb.label] = bb;
+      var anak = bb.anak || [];
+      var wrap = document.createElement('div');
+      wrap.className = 'pai-akor' + (ib === 0 ? ' buka pilih' : '');
+      wrap.dataset.bab = bb.label;
+
+      // ── KEPALA: radio jalur 3 (seluruh BAB utuh) ──
+      var kep = document.createElement('label');
+      kep.className = 'pai-akor-kepala';
+      var ph = document.createElement('span');
+      ph.className = 'pai-akor-panah';
+      ph.textContent = '▸';
+      ph.title = 'Buka/tutup isi bab';
+      ph.onclick = function (e) {
+        e.preventDefault(); e.stopPropagation();
+        wrap.classList.toggle('buka');
+      };
+      var r = document.createElement('input');
+      r.type = 'radio'; r.name = 'pai-bab'; r.value = bb.label;
+      r.checked = (ib === 0);
+      var t = document.createElement('div');
+      t.className = 'pai-bab-teks';
+      var nama = bb.label + (bb.judul ? ' — ' + bb.judul : '') + ' (utuh)';
+      var bEl = document.createElement('b'); bEl.textContent = nama;
+      var sEl = document.createElement('small');
+      sEl.textContent = angka(bb.panjang) + ' karakter · ' +
+        (1 + anak.length) + ' blok · 1 pembuka + ' + anak.length + ' sub-bab';
+      t.appendChild(bEl); t.appendChild(sEl);
+      kep.appendChild(ph); kep.appendChild(r); kep.appendChild(t);
+      r.onchange = function () {
+        bersihSeleksi(wrap);
+        wrap.classList.add('pilih');
+        kep.classList.add('pilih');
+        wrap.classList.add('buka');
+        pilihanLingkup = { jalur: 3, bab: bb.label };
+        babPilih = { label: bb.label, judul: bb.judul, panjang: bb.panjang };
+        babDipilihSendiri = true;
+        lepasKartu();
+        muatVersi(bb.label);
+        if (typeof segarkanRingkas === 'function') segarkanRingkas();
+      };
+      wrap.appendChild(kep);
+
+      //  kalau kepala ini belum pernah punya isi → tanpa wadah anak
+      if (!anak.length && !yatim.length) {
+        daftarBab.appendChild(wrap);
+        if (ib === 0) { pilihanLingkup = { jalur: 3, bab: bb.label }; }
+        return;
+      }
+
+      // ── ANAK ──
+      var wAnak = document.createElement('div');
+      wAnak.className = 'pai-akor-anak';
+
+      //  1) paragraf pembuka (jalur 1) — harga FLAT resmi 1 Token
+      var labP = document.createElement('label');
+      labP.className = 'pai-bab-item anak pembuka-anak';
+      var rP = document.createElement('input');
+      rP.type = 'radio'; rP.name = 'pai-pembuka'; rP.value = bb.label;
+      var tP = document.createElement('div'); tP.className = 'pai-bab-teks';
+      var bP = document.createElement('b');
+      bP.textContent = 'Paragraf pembuka';
+      var sP = document.createElement('small');
+      sP.textContent = 'setelah judul ' + bb.label + ', sebelum sub-bab ' +
+        (anak[0] || '') + ' · 1 Token Revisi';
+      tP.appendChild(bP); tP.appendChild(sP);
+      labP.appendChild(rP); labP.appendChild(tP);
+      rP.onchange = function () {
+        bersihSeleksi(null);        //  radio kepala + sub ikut dibersihkan
+        wrap.classList.add('pilih');
+        labP.classList.add('pilih');
+        wrap.classList.add('buka');
+        rP.checked = true;          //  ⭐ FIX: centang MENEMPEL
+        pilihanLingkup = { jalur: 1, bab: bb.label, lingkup: 'pembuka' };
+        babPilih = { label: bb.label, judul: bb.judul, panjang: bb.panjang };
+        babDipilihSendiri = true;
+        lepasKartu();
+        muatVersi(bb.label);
+        if (typeof segarkanRingkas === 'function') segarkanRingkas();
+      };
+      wAnak.appendChild(labP);
+
+      //  2) sub-bab (jalur 2, boleh lebih dari satu)
+      anak.forEach(function (L) {
+        dataAkor.anak[L] = bb.label;
+        var h = (dataAkor.halus || {})[L] || {};
+        var lab = document.createElement('label');
+        lab.className = 'pai-bab-item anak';
+        var c = document.createElement('input');
+        c.type = 'checkbox'; c.name = 'pai-sub'; c.value = L;
+        var tw = document.createElement('div');
+        tw.className = 'pai-bab-teks';
+        var bl = document.createElement('b');
+        bl.textContent = L + (h.judul ? ' — ' + h.judul : '');
+        var sl = document.createElement('small');
+        sl.textContent = angka(h.panjang || 0) + ' karakter · 1 Token Revisi';
+        tw.appendChild(bl); tw.appendChild(sl);
+        if (h.versi_terpakai || h.versi_tersimpan) {
+          var lb = document.createElement('span');
+          lb.className = 'pai-bab-lencana';
+          lb.textContent = 'pernah direvisi';
+          tw.appendChild(lb);
+        }
+        lab.appendChild(c); lab.appendChild(tw);
+        c.onchange = function () {
+          var terpilih = [].filter.call(
+            daftarBab.querySelectorAll('input[name="pai-sub"]'),
+            function (x) { return x.checked; });
+          if (!terpilih.length) {       //  anak terakhir dilepas → balik utuh
+            r.checked = true;
+            r.onchange();
+            return;
+          }
+          bersihSeleksi(null, terpilih);   //  ⭐ sisakan yang terpilih
+          terpilih.forEach(function (x) {
+            x.checked = true;              //  ⭐ FIX: centang MENEMPEL
+            var lb = x.closest('.pai-bab-item');
+            if (lb) lb.classList.add('pilih');
+            var wp = x.closest('.pai-akor');
+            if (wp) { wp.classList.add('buka'); wp.classList.add('pilih'); }
+          });
+          pilihanLingkup = {
+            jalur: 2,
+            babs: terpilih.map(function (x) { return x.value; })
+          };
+          var h0 = (dataAkor.halus || {})[terpilih[0].value] || {};
+          babPilih = { label: terpilih[0].value, judul: h0.judul || '',
+                       panjang: h0.panjang || 0 };
+          babDipilihSendiri = true;
+          lepasKartu();
+          muatVersi(terpilih[0].value);
+          if (typeof segarkanRingkas === 'function') segarkanRingkas();
+        };
+        wAnak.appendChild(lab);
+      });
+      wrap.appendChild(wAnak);
+      daftarBab.appendChild(wrap);
+      if (ib === 0) { pilihanLingkup = { jalur: 3, bab: bb.label }; }
+    });
+
+    //  sub-bab yatim (di luar semua rentang bab) → item LAMA persis, alur
+    //  lama (pilihanLingkup = null → tanpa field baru = perilaku lama)
+    yatim.forEach(function (L) {
+      var h = (dataAkor.halus || {})[L]; if (!h) return;
+      var d = document.createElement('label');
+      d.className = 'pai-bab-item';
+      var r = document.createElement('input');
+      r.type = 'radio'; r.name = 'pai-bab'; r.value = L;
+      var tw = document.createElement('div'); tw.className = 'pai-bab-teks';
+      var bl = document.createElement('b');
+      bl.textContent = L + (h.judul ? ' — ' + h.judul : '');
+      var sl = document.createElement('small');
+      sl.textContent = angka(h.panjang || 0) + ' karakter';
+      tw.appendChild(bl); tw.appendChild(sl);
+      r.onchange = function () {
+        bersihSeleksi(null);
+        d.classList.add('pilih');
+        pilihanLingkup = null;          //  alur LAMA persis
+        babPilih = h;
+        babDipilihSendiri = true;
+        lepasKartu();
+        muatVersi(L);
+        if (typeof segarkanRingkas === 'function') segarkanRingkas();
+      };
+      d.appendChild(r); d.appendChild(tw);
+      daftarBab.appendChild(d);
+    });
+    if (babSub) {
+      babSub.textContent = 'Lipat/lebar isi bab dengan tanda ▸. Pilih kepala ' +
+        'untuk seluruh bab, atau centang sub-bab yang mau direvisi.';
+    }
+  }
+
+  function gambarPemilihBab(data) {
+    if (!wadahBab || !daftarBab) return;
+    var daftar = (data && data.bab) || [];
+    if (!daftar.length) { wadahBab.hidden = true; return; }
+    wadahBab.hidden = false;
+    daftarBab.innerHTML = '';
+    //  indeks sub-bab halus (judul/panjang/lencana) utk anak akordeon
+    dataAkor.halus = {};
+    daftar.forEach(function (x) { dataAkor.halus[x.label] = x; });
+    if (babSub) {
+      babSub.textContent = data.ada_judul_bab
+        ? 'Pilih satu bab — tiap bab dihitung 1 revisi. Hemat kuota.'
+        : 'Judul bab tidak terdeteksi di dokumen ini, jadi diproses utuh sebagai satu bagian.';
+    }
+    // ⭐ Ada label besar → AKORDEON 3 JALUR; tidak ada → kerangka LAMA
+    //    persis (dokumen polos/tanpa judul BAB = perilaku lama, tak berubah).
+    if (data.besar && data.besar.length) { gambarAkordeon(data); return; }
+    dataAkor.besar = []; dataAkor.peta = {}; dataAkor.anak = {};
+    pilihanLingkup = null;
+    daftar.forEach(function (b, i) {
+      var d = document.createElement('label');
+      d.className = 'pai-bab-item' + (i === 0 ? ' pilih' : '');
+      var r = document.createElement('input');
+      r.type = 'radio'; r.name = 'pai-bab'; r.value = b.label;
+      r.checked = (i === 0);
+      var t = document.createElement('div');
+      t.className = 'pai-bab-teks';
+      var nama = b.label + (b.judul ? ' — ' + b.judul : '');
+      var bb = document.createElement('b'); bb.textContent = nama;
+      var ss = document.createElement('small');
+      ss.textContent = angka(b.panjang) + ' karakter';
+      if (b.bagian > 1) ss.textContent += ' · dipotong ' + b.bagian + ' bagian';
+      t.appendChild(bb); t.appendChild(ss);
+      // TANPA nomor versi (ACC Bos 14Sep26) — cukup "pernah direvisi".
+      // User tidak boleh dipaksa berpikir "versi berapa ini".
+      if (b.versi_terpakai || b.versi_tersimpan) {
+        var lb = document.createElement('span');
+        lb.className = 'pai-bab-lencana';
+        lb.textContent = 'pernah direvisi';
+        t.appendChild(lb);
+      }
+      r.onchange = function () {
+        [].forEach.call(daftarBab.querySelectorAll('.pai-bab-item'),
+                        function (x) { x.classList.remove('pilih'); });
+        d.classList.add('pilih');
+        babPilih = b;
+        muatVersi(b.label);
+        babDipilihSendiri = true;
+        if (typeof segarkanRingkas === 'function') segarkanRingkas();
+      };
+      d.appendChild(r); d.appendChild(t);
+      daftarBab.appendChild(d);
+      if (i === 0) { babPilih = b; }
+    });
+    if (daftar[0]) muatVersi(daftar[0].label);
+  }
+
+  function muatBab() {
+    if (babDimuat || !wadahBab) return;
+    babDimuat = true;
+    fetch('/api/ai/v1/bab', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_id: window.__AI_FILE_ID__ })
+    })
+    .then(function (r) { return r.json().then(function (d) { return { s: r.status, d: d }; }); })
+    .then(function (res) {
+      var d = (res.d && res.d.detail) ? res.d.detail : (res.d || {});
+      if (res.s === 200 && d.ok) { gambarPemilihBab(d); }
+      else { babDimuat = false; }   // gagal → biar bisa dicoba lagi
+    })
+    .catch(function () { babDimuat = false; });
+  }
+
+  function bukaPanel(b) {
+    if (!panel) return;
+    panel.classList.toggle('buka', b);
+    if (lapisan) lapisan.classList.toggle('tampil', b);
+    if (b) muatBab();          // pilihan bab diambil saat panel pertama dibuka
+  }
+  if (tombolAi) tombolAi.onclick = function () { bukaPanel(!panel.classList.contains('buka')); };
+  var btnTutupAi = document.getElementById('pai-tutup');
+  if (btnTutupAi) btnTutupAi.onclick = function () { bukaPanel(false); };
+  if (lapisan) lapisan.onclick = function () { bukaPanel(false); };
+
+  // perbarui tampilan kuota dari respons server
+  // Bentuk dari /api/ai/v1/revisi → { kuota: { revisi: {sisa,total,persen_pakai}, paket, ... } }
+  function segarkanKuota(k) {
+    var kk = (k && k.revisi) ? k.revisi : k;      // tahan dua bentuk
+    if (!kk || typeof kk.sisa !== 'number') return;
+    var eSisa = document.getElementById('pai-sisa');
+    var eRel  = document.getElementById('pai-rel');
+    var eLen  = document.getElementById('lencana-kuota');
+    if (eSisa) eSisa.textContent = kk.sisa;
+    if (eLen)  eLen.textContent = kk.sisa;
+    if (eRel && typeof kk.persen_pakai === 'number') {
+      eRel.style.width = Math.min(kk.persen_pakai, 100) + '%';
+      eRel.className = kk.persen_pakai >= 80 ? 'penuh' : '';
+    }
+  }
+
+  function gambarDaftar() {
+    if (!daftar) return;
+    daftar.innerHTML = '';
+    komentar.forEach(function (t, i) {
+      var d = document.createElement('div');
+      d.className = 'pai-komentar';
+      var s = document.createElement('span');
+      s.textContent = (i + 1) + '. ' + t;
+      var x = document.createElement('button');
+      x.type = 'button'; x.innerHTML = '{{ ikon("x", 14) }}'; x.title = 'Hapus komentar ini';
+      x.onclick = function () { komentar.splice(i, 1); gambarDaftar(); };
+      d.appendChild(s); d.appendChild(x);
+      daftar.appendChild(d);
+    });
+    if (typeof segarkanRingkas === 'function') segarkanRingkas();
+  }
+
+  /* ── BAWA KOMENTAR PEMBIMBING OTOMATIS (celah ditutup 27Sep26) ──────
+     Tombol [Revisi AI] di kartu Catatan Pembimbing (naskah.html) menyimpan
+     komentar ke sessionStorage 'kb_komentar_bawa' lalu membuka halaman ini
+     dgn ?dari=catatan — tapi panel TIDAK PERNAH membacanya (temuan audit
+     E2E antar-AI). Sekarang: sekali di awal, komentar itu LANGSUNG masuk
+     daftar, mahasiswa tinggal pilih bab + tekan Revisi. */
+  (function bawaKomentarPembimbing() {
+    try {
+      var mentah = sessionStorage.getItem('kb_komentar_bawa');
+      if (!mentah) return;
+      sessionStorage.removeItem('kb_komentar_bawa');   // sekali pakai
+      var b = JSON.parse(mentah);
+      var teks = (b && (b.isi || b.masalah) || '').trim();
+      if (!teks) return;
+      // Lampiran pembimbing ikut dibawa (nama disk) — dikirim ke server
+      // saat Revisi, supaya AI bisa membaca PDF/gambar contohnya (27Sep26).
+      window.__LAMPIRAN_BAWA__ = (b && b.lampiran) || [];
+      if (komentar.length === 0) {
+        komentar.push(teks);
+        gambarDaftar();
+        pesan('Komentar pembimbing sudah siap. Pilih bagian lalu tekan Revisi.');
+      }
+    } catch (e) { /* mode privat / JSON rusak → biarkan panel kosong */ }
+  })();
+
+  if (btnTambah) btnTambah.onclick = function () {
+    var isi = (kotak.value || '').trim();
+    if (!isi) { pesan('Tulis komentar dulu ya.', 'gagal'); return; }
+    isi.split('\n').forEach(function (b) {
+      var t = b.trim().replace(/^[-•*\d.)\s]+/, '');
+      if (t) komentar.push(t);
+    });
+    kotak.value = '';
+    gambarDaftar();
+    pesan(komentar.length + ' komentar siap direvisi.');
+  };
+
+  function tampilkanAddon(teks) {
+    if (!wadahAddon) return;
+    wadahAddon.hidden = false;
+    wadahAddon.innerHTML = '';
+
+    var judul = document.createElement('div');
+    judul.className = 'pai-kartu terkunci';
+    judul.innerHTML = '<h3>Kuota bulan ini sudah habis</h3><div>' +
+      (teks || 'Tambahkan kuota lewat AddOn di bawah — tanpa perlu ganti paket.') + '</div>';
+    wadahAddon.appendChild(judul);
+
+    if (terkunci || !addon.length) {
+      var k = document.createElement('div');
+      k.className = 'pai-kartu terkunci';
+      k.innerHTML = '<h3>AddOn belum tersedia</h3><div>AddOn hanya untuk paket berbayar ' +
+        '(Penulis / Peneliti / Penerbit). Paket <b>Gratis</b> memberi 3 revisi setiap bulan.</div>';
+      wadahAddon.appendChild(k);
+    } else {
+      var box = document.createElement('div');
+      box.className = 'pai-addon';
+      addon.forEach(function (a) {
+        if (a.jenis !== 'ai') return;
+        var d = document.createElement('div');
+        d.className = 'pai-addon-item';
+        var kiri = document.createElement('div');
+        var b = document.createElement('b'); b.textContent = a.nama || 'AddOn AI';
+        var s = document.createElement('small');
+        s.textContent = '+' + (a.revisi || 0) + ' revisi · ' + (a.ket || 'berlaku 12 bulan');
+        kiri.appendChild(b); kiri.appendChild(s);
+        var h = document.createElement('span');
+        h.className = 'harga';
+        h.textContent = 'Rp ' + Number(a.harga || 0).toLocaleString('id-ID');
+        d.appendChild(kiri); d.appendChild(h);
+        box.appendChild(d);
+      });
+      wadahAddon.appendChild(box);
+      var c = document.createElement('button');
+      c.type = 'button'; c.className = 'pai-aksi oranye';
+      c.textContent = 'Tambah kuota sekarang';
+      c.onclick = function () { location.href = '/naskah'; };
+      wadahAddon.appendChild(c);
+    }
+  }
+
+  // ── BUKTI, BUKAN TEBAPAN (putusan Bos 29Sep26) ───────────────────────
+  //  Mesin DILARANG menebak. Kalau bagian belum dipilih, layar menahan
+  //  dulu: ada bukti tertulis → tampilkan buktinya (user pilih); tidak
+  //  ada → tolak halus + dampingi memilih. Semua Rp 0 (tanpa AI).
+  var tokRingkas = '';            // isi oleh langkahHitung() dari /v1/hitung
+  //  📏 DIBUKTIKAN 29Sep26 (BUKAN dari komentar kode): daftar /v1/bab di
+  //     produksi = ['1.1','1.2',…] — TIDAK ada item '__seluruh__', jadi
+  //     `babPilih` LANGSUNG terisi item pertama saat daftar dimuat. Karena
+  //     itu penanda "user memilih sendiri" harus STATUS, bukan isi label.
+  var babDipilihSendiri = false;
+
+  function belumPilihSendiri() {
+    return !babDipilihSendiri;
+  }
+
+  function segarkanRingkas() {
+    var e = document.getElementById('pai-ringkas');
+    if (!e) return;
+    if (!komentar.length) { e.hidden = true; e.textContent = ''; return; }
+    var nama = belumPilihSendiri() ? 'belum dipilih'
+             : (babPilih ? babPilih.label + (babPilih.judul ? ' — ' + babPilih.judul : '')
+                         : 'seluruh naskah');
+    var satu = komentar[0].length > 90
+             ? komentar[0].slice(0, 90) + '…' : komentar[0];
+    var sisa = komentar.length > 1
+             ? '  (+' + (komentar.length - 1) + ' komentar lain)' : '';
+    e.hidden = false;
+    e.textContent = 'Kamu minta: “' + satu + '”' + sisa +
+                    '  ·  Bagian: ' + nama +
+                    (tokRingkas ? '  ·  ' + tokRingkas : '');
+  }
+
+  function pilihBabLabel(label) {
+    if (!daftarBab) return false;
+    var ketemu = null;
+    [].forEach.call(daftarBab.querySelectorAll('input'), function (r) {
+      if (r.value === label) ketemu = r;
+    });
+    if (!ketemu) return false;
+    ketemu.checked = true;
+    ketemu.dispatchEvent(new Event('change'));
+    babDipilihSendiri = true;
+    segarkanRingkas();
+    return true;
+  }
+
+  function periksaBukti() {
+    btnJalan.disabled = true;
+    btnJalan.textContent = 'Memeriksa bukti di komentarmu...';
+    fetch('/api/ai/v1/petunjuk', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        file_id: window.__AI_FILE_ID__,
+        komentar: komentar
+      })
+    })
+    .then(function (r) { return r.json().then(function (d) { return { s: r.status, d: d }; }); })
+    .then(function (res) {
+      btnJalan.disabled = false;
+      btnJalan.innerHTML = 'Revisi dengan AI {{ ikon("sparkles", 15) }}';
+      var d = (res.d && res.d.detail) ? res.d.detail : (res.d || {});
+      //  gagal dicek → jalur LAMA tidak berubah (izin Pintu B tetap jalan)
+      if (res.s !== 200 || d.ok !== true) { langkahHitung(); return; }
+      //  pengali > 1 → memang wajib dokumen utuh: jangan menahan di bab
+      if (Number(d.pengali || 1) > 1) { langkahHitung(); return; }
+      //  dokumen tanpa bagian bernomor → tak ada yang bisa ditawarkan
+      if (!d.jumlah_bab || !wadahBab || wadahBab.hidden) { langkahHitung(); return; }
+      if (d.cocok && d.cocok.length) { kartuBukti(d.cocok); return; }
+      kartuTolakHalus(d.jumlah_bab);
+    })
+    .catch(function () {
+      btnJalan.disabled = false;
+      btnJalan.innerHTML = 'Revisi dengan AI {{ ikon("sparkles", 15) }}';
+      langkahHitung();            // koneksi bermasalah → jalur lama
+    });
+  }
+
+  function kartuBukti(cocok) {
+    wadahIzin.innerHTML = '';
+    wadahIzin.hidden = false;
+    var k = document.createElement('div');
+    k.className = 'pai-kartu izin';
+    var h = document.createElement('h3');
+    h.textContent = cocok.length > 1
+      ? 'Komentarmu menyebut beberapa bagian'
+      : 'Bagian ini tertulis jelas di komentarmu';
+    k.appendChild(h);
+    var p = document.createElement('div');
+    p.textContent = cocok.length > 1
+      ? 'Semua yang tampil di bawah ini kamu sendiri yang menulis. Pilih sendiri ya — mesin tidak memilihkan.'
+      : 'Kelihatan dari tulisanmu sendiri, bukan tebakan mesin.';
+    k.appendChild(p);
+    cocok.forEach(function (c) {
+      var baris = document.createElement('div');
+      baris.className = 'pai-bukti';
+      var t = document.createElement('span');
+      t.textContent = '“' + c.bukti.join('”, “') + '”  →  ' + c.label;
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'pai-aksi';
+      b.style.width = 'auto';
+      b.textContent = 'Pakai ' + c.label;
+      b.onclick = function () {
+        if (pilihBabLabel(c.label)) {
+          wadahIzin.hidden = true;
+          langkahHitung();
+        } else {
+          pesan('Bagian itu tidak ada di daftar dokumenmu — pilih dari daftar ya.');
+          wadahIzin.hidden = true;
+          if (wadahBab) wadahBab.scrollIntoView({ block: 'nearest' });
+        }
+      };
+      baris.appendChild(t); baris.appendChild(b);
+      k.appendChild(baris);
+    });
+    var pilih = document.createElement('button');
+    pilih.type = 'button'; pilih.className = 'pai-salindi';
+    pilih.textContent = 'Pilih sendiri dari daftar bagian';
+    pilih.onclick = function () {
+      wadahIzin.hidden = true;
+      if (wadahBab) wadahBab.scrollIntoView({ block: 'nearest' });
+    };
+    k.appendChild(pilih);
+    wadahIzin.appendChild(k);
+    wadahIzin.scrollIntoView({ block: 'nearest' });
+  }
+
+  function kartuTolakHalus(jumlah) {
+    wadahIzin.innerHTML = '';
+    wadahIzin.hidden = false;
+    var k = document.createElement('div');
+    k.className = 'pai-kartu izin';
+    var h = document.createElement('h3');
+    h.textContent = 'Komentarmu belum menunjuk bagian tertentu';
+    k.appendChild(h);
+    var p = document.createElement('div');
+    p.textContent = 'Supaya revisinya tepat sasaran, pilih dulu bagiannya ya — '
+                  + 'dokumenmu punya ' + jumlah + ' bagian.';
+    k.appendChild(p);
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'pai-aksi';
+    b.textContent = 'Buka pilihan bagian';
+    b.onclick = function () {
+      wadahIzin.hidden = true;
+      if (wadahBab) wadahBab.scrollIntoView({ block: 'nearest' });
+    };
+    k.appendChild(b);
+    var utuh = document.createElement('button');
+    utuh.type = 'button'; utuh.className = 'pai-salindi';
+    utuh.textContent = 'Tetap proses seluruh naskah';
+    utuh.onclick = function () {
+      babPilih = null;             // bab '' → Pintu B (jalur lama, tak berubah)
+      pilihanLingkup = null;       // ⭐ lepas pilihan akordeon → kartu izin lama
+      babDipilihSendiri = true;
+      segarkanRingkas();
+      wadahIzin.hidden = true;
+      langkahHitung();
+    };
+    k.appendChild(utuh);
+    wadahIzin.appendChild(k);
+    wadahIzin.scrollIntoView({ block: 'nearest' });
+  }
+
+  if (btnJalan) btnJalan.onclick = function () {
+    if (!komentar.length) { pesan('Tambahkan minimal 1 komentar dulu.', 'gagal'); return; }
+    //  belum memilih bagian → tahan dulu: tampilkan bukti / dampingi pilih
+    if (belumPilihSendiri() && wadahIzin) { periksaBukti(); return; }
+    langkahHitung();
+  };
+
+  /* ══ SAMBUNGAN B (13Okt26) — AI MENULIS ISI BAB dari artikel user ══
+     Berbeda dari "Revisi dengan AI": yang itu MEMPERBAIKI naskah dari
+     komentar pembimbing; yang ini MENULIS ISIAN bab memakai artikel yang
+     sudah dikumpulkan user di tab Referensi. Pintunya rute yang SUDAH ADA
+     (`/api/ai/v1/kerangka/kerjakan`) — jalur yang sama dipakai "Susun
+     kerangka". Kuota dipotong server (1 Token Revisi), bukan di sini. */
+  function tulisIsiBab() {
+    //  `babPilih` = variabel panel ini (dipilih user di daftar bab panel).
+    //  Label bentuknya boleh 'BAB III' atau '3.1' — `bangun_isi()` hanya
+    //  mengerti NOMOR bab. Jadi romawi diubah ke angka di sini:
+    //  'BAB III' → '3'. Kalau label sudah angka/bernomor ('3.1'), ambil
+    //  angka depannya saja ('3').
+    var namaBab = (babPilih && babPilih.label) ? babPilih.label : '';
+    if (!namaBab) {
+      pesan('Pilih dulu bab yang mau ditulis (daftar bab di panel ini).', 'gagal');
+      return;
+    }
+    var nomorBab = nomorDariLabel(namaBab);
+    if (!nomorBab) {
+      pesan('Bab "' + namaBab + '" belum bisa ditulis otomatis. ' +
+            'Pilih bab utama (BAB I / BAB II / BAB III).', 'gagal');
+      return;
+    }
+    //  Judul naskah diambil dari judul bab yang dipilih user — server yang
+    //  menyusun kata kuncinya, jadi judul di sini hanya penanda konteks.
+    var judul = (babPilih && babPilih.judul) ? babPilih.judul : namaBab;
+
+    var asliTeks = btnTulisBab ? btnTulisBab.textContent : '';
+    if (btnTulisBab) {
+      btnTulisBab.disabled = true;
+      btnTulisBab.textContent = 'AI sedang menulis… (bisa 1-2 menit)';
+    }
+    if (elBabKet) elBabKet.textContent =
+      'AI sedang membaca artikelmu dan menulis ' + namaBab + '…';
+
+    fetch('/api/ai/v1/kerangka/kerjakan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        file_id: window.__AI_FILE_ID__,
+        judul: judul || namaBab,
+        bab: nomorBab,
+        setuju: true,
+        permintaan: 'tulis isi ' + namaBab
+      })
+    })
+    .then(function (r) { return r.json().then(function (d) { return { status: r.status, d: d }; }); })
+    .then(function (res) {
+      var d = (res.d && res.d.detail && typeof res.d.detail === 'object')
+              ? res.d.detail : (res.d || {});
+      if (btnTulisBab) { btnTulisBab.disabled = false; btnTulisBab.textContent = asliTeks; }
+
+      if (res.status === 200 && d.ok) {
+        var teks = d.tulisan_ai || '';
+        if (!teks) {
+          if (elBabKet) elBabKet.textContent =
+            d.tulisan_galat
+              ? ('Belum bisa ditulis: ' + d.tulisan_galat)
+              : ('Belum ada artikel berabstrak untuk ' + namaBab +
+                 '. Buka tab Referensi, kumpulkan artikelnya dulu — ' +
+                 'AI tidak mencari artikel sendiri.');
+          pesan('Belum ada yang bisa ditulis. Lihat keterangan di panel.', 'gagal');
+          if (typeof segarkanKuota === 'function') segarkanKuota(d.kuota);
+          return;
+        }
+        elHasil.textContent = teks;
+        if (wadahHasil) wadahHasil.hidden = false;
+        if (typeof segarkanKuota === 'function') segarkanKuota(d.kuota);
+
+        //  kutipan yang TIDAK ada di sumber: beri tahu JUJUR, jangan diamkan
+        var buang = d.sitasi_dibuang || [];
+        tampilkanBuang(buang, d.sitasi_dipakai || []);
+        if (elBabKet) elBabKet.textContent =
+          'Periksa dulu sebelum dipakai. Hasil ini memakai 1 Token Revisi.';
+      } else if (res.status === 402) {
+        pesan('Kuota habis — tambahkan lewat AddOn.', 'gagal');
+        if (typeof tampilkanAddon === 'function') tampilkanAddon(d.pesan || '');
+      } else if (res.status === 403) {
+        pesan('Sisa Token Revisi kamu tidak cukup untuk menulis bab ini.', 'gagal');
+      } else {
+        pesan(d.pesan || 'Gagal menulis bab. Coba lagi.', 'gagal');
+      }
+    })
+    .catch(function (e) {
+      if (btnTulisBab) { btnTulisBab.disabled = false; btnTulisBab.textContent = asliTeks; }
+      pesan('Gagal menyambung ke server: ' + (e && e.message ? e.message : e), 'gagal');
+    });
+  }
+
+  /* Ubah label bab → NOMOR bab ('BAB III' → '3', '3.1' → '3', 'III' → '3').
+     Server (`kerangka.bangun_isi`) hanya mengerti angka; angka ini juga yang
+     menentukan kerangka baku + harga token. Mengembalikan '' kalau tak jelas. */
+  function nomorDariLabel(label) {
+    var s = String(label || '').trim();
+    if (!s) return '';
+    var m = s.match(/\d+/);                 // 'BAB 3' / '3.1' / 'Bab 4'
+    if (m) return String(parseInt(m[0], 10));
+    var rom = s.toUpperCase().match(/\b(I|II|III|IV|V|VI|VII|VIII|IX|X)\b/);
+    if (rom) {
+      var peta = { I:1, II:2, III:3, IV:4, V:5, VI:6, VII:7, VIII:8, IX:9, X:10 };
+      return String(peta[rom[1]] || '');
+    }
+    return '';
+  }
+
+  /* Keterangan jujur: sebutkan kutipan mana yang dibuang & mana yang sah,
+     supaya user tahu AI tidak mengarang (pagar keras Bos 13Okt26). */
+  function tampilkanBuang(buang, dipakai) {
+    var lama = document.getElementById('pai-buang');
+    if (lama) lama.remove();
+    if ((!buang || !buang.length) && (!dipakai || !dipakai.length)) return;
+    var k = document.createElement('div');
+    k.id = 'pai-buang';
+    k.className = 'pai-buang';
+    var t = '';
+    if (dipakai && dipakai.length) {
+      t += '<b>Kutipan dari artikelmu:</b> ' + dipakai.join(' · ') + '.';
+    }
+    if (buang && buang.length) {
+      if (t) t += '<br>';
+      t += '<b>Dibuang karena tidak ada di artikelmu:</b> ' + buang.join(' · ') +
+           '. Ini penjagaan supaya AI tidak mengarang sumber.';
+    }
+    k.innerHTML = t;
+    if (wadahHasil && wadahHasil.parentNode) {
+      wadahHasil.parentNode.insertBefore(k, wadahHasil.nextSibling);
+    }
+  }
+
+  if (btnTulisBab) btnTulisBab.onclick = tulisIsiBab;
+
+  function langkahHitung() {
+    btnJalan.disabled = true;
+    btnJalan.textContent = 'Memeriksa dokumen…';
+    if (wadahHasil) wadahHasil.hidden = true;
+    if (wadahAddon) wadahAddon.hidden = true;
+    if (wadahIzin) wadahIzin.hidden = true;
+
+    // FastAPI membungkus pesan error di dalam { detail: {...} }.
+    // Fungsi ini menerima KEDUA bentuk supaya tidak ada yang hilang.
+    function isi(d) {
+      if (d && d.detail && typeof d.detail === 'object') return d.detail;
+      return d || {};
+    }
+
+    // ── LANGKAH 1: tanya server berapa bagian (TIDAK memotong kuota) ──
+    // `bab` dikirim supaya yang dihitung HANYA bab terpilih (1 bab = 1 kuota).
+    //  ⭐ 3 JALUR: pilihan akordeon → ikut field `babs`/`lingkup` supaya
+    //    harga FLAT (1 pembuka + N sub-bab) yang dihitung server.
+    var bh = { file_id: window.__AI_FILE_ID__ };
+    if (pilihanLingkup && pilihanLingkup.jalur === 2) {
+      bh.babs = pilihanLingkup.babs;
+    } else {
+      bh.bab = babPilih ? babPilih.label : '';
+      if (pilihanLingkup && pilihanLingkup.lingkup) {
+        bh.lingkup = pilihanLingkup.lingkup;
+      }
+    }
+    fetch('/api/ai/v1/hitung', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bh)
+    })
+    .then(function (r) { return r.json().then(function (d) { return { status: r.status, d: d }; }); })
+    .then(function (res) {
+      var d = isi(res.d);
+      if (res.status === 200 && d.ok) {
+        //  RINGKAS PAHAM — angka SEBENARNYA dari /v1/hitung (bukan perkiraan).
+        tokRingkas = d.bab
+          ? 'Token Revisi: ' + (d.revisi_dibutuhkan || d.bagian || 1)
+          : 'Token Revisi: lihat rincian di bawah';
+        segarkanRingkas();
+        //  🔧 FIX 29Sep26 — celah "masuk senyap": dulu kartu izin hanya
+        //     muncul kalau `bagian > 1`, jadi naskah Pintu B (TANPA bab)
+        //     yang muat 1 bagian diproses diam-diam tanpa user tahu
+        //     berapa kuota terpakai. Sekarang: Pintu B SELALU minta izin
+        //     (berapa pun ukurannya); Pintu A (bab dipilih) tetap hanya
+        //     untuk dokumen multi-bagian supaya revisi sub-bab kecil
+        //     tetap ringkas.
+        //     ⚠️ Yang dicek `d.bab` (balasan server /v1/hitung), BUKAN
+        //     `babPilih` — `babPilih` selalu terisi (item pertama daftar
+        //     = `__seluruh__`), jadi `!babPilih` mustahil benar. Server
+        //     mengirim `bab: ''` untuk seluruh naskah (ai.py:1652).
+        //  ⭐ 3 JALUR: pilihan akordeon → KARTU LINGKUP (angka Token dari
+        //    /v1/hitung + struktur blok) sebelum kirim. Pintu B (tanpa
+        //    pilihan bab) → kartu izin LAMA persis, tak berubah.
+        if (pilihanLingkup) { kartuLingkup(d); return; }
+        if (d.bagian > 1 || !d.bab) {
+          tanyaIzin(d);
+          return;
+        }
+        kirimRevisi(false);
+      } else if (res.status === 403) {
+        tampilkanAddon(d.pesan); pesan(d.pesan || 'Fitur AI untuk member berbayar.', 'gagal');
+        selesai();
+      } else if (res.status === 401) {
+        pesan('Sesi Anda berakhir. Muat ulang halaman.', 'gagal'); selesai();
+      } else {
+        pesan((d && d.pesan) || 'Tidak bisa memeriksa dokumen.', 'gagal');
+        selesai();
+      }
+    })
+    .catch(function () { pesan('Koneksi bermasalah. Coba lagi.', 'gagal'); selesai(); });
+
+    function selesai() {
+      btnJalan.disabled = false;
+      btnJalan.innerHTML = 'Revisi dengan AI {{ ikon("sparkles", 15) }}';
+    }
+
+    // ── IZIN: dokumen besar = beberapa bagian = beberapa kuota ──
+    function tanyaIzin(d) {
+      wadahIzin.hidden = false;
+      wadahIzin.innerHTML =
+        '<div class="pai-kartu izin">' +
+          '<h3>Dokumen ini cukup besar</h3>' +
+          '<div>' + (d.pesan || '') + '</div>' +
+          '<div class="pai-izin-angka">' +
+            '<span>Ukuran dokumen <b>' + Number(d.panjang || 0).toLocaleString('id-ID') + '</b> karakter</span>' +
+            '<span>Bagian <b>' + (d.bagian || 0) + '</b></span>' +
+            '<span>Kuota terpakai <b>' + (d.revisi_dibutuhkan || d.bagian || 0) + '</b></span>' +
+            '<span>Sisa kuota Anda <b>' + (typeof d.sisa_kuota === 'number' ? d.sisa_kuota : '?') + '</b></span>' +
+          '</div>' +
+        '</div>';
+      var ya = document.createElement('button');
+      ya.type = 'button'; ya.className = 'pai-aksi';
+      ya.textContent = 'Ya, proses ' + (d.bagian || 0) + ' bagian';
+      if (d.cukup === false) { ya.disabled = true; ya.textContent = 'Kuota tidak cukup'; }
+      ya.onclick = function () { wadahIzin.hidden = true; kirimRevisi(true); };
+      wadahIzin.appendChild(ya);
+
+      var batal = document.createElement('button');
+      batal.type = 'button'; batal.className = 'pai-salindi';
+      batal.textContent = 'Batal';
+      batal.onclick = function () { wadahIzin.hidden = true; selesai(); };
+      wadahIzin.appendChild(batal);
+    }
+
+    // ── ⭐ KARTU LINGKUP (rancangan A.6) — jalur 1/2/3 dari akordeon ──
+    //  Angka Token dari /v1/hitung (BUKAN karangan) + daftar blok yang
+    //  akan disentuh; bagian lain TIDAK berubah. Terapkan = baru kirim.
+    function kartuLingkup(d) {
+      wadahIzin.hidden = false;
+      wadahIzin.innerHTML = '';
+      var k = document.createElement('div');
+      k.className = 'pai-kartu izin';
+      var h = document.createElement('h3');
+      h.textContent = 'Yang akan direvisi';
+      k.appendChild(h);
+      var p = document.createElement('div');
+      p.textContent = d.pesan || '';       //  preview dari server (jujur)
+      k.appendChild(p);
+
+      //  daftar blok — label = pilihan user sendiri, diurutkan alur naskah
+      var blok = [];
+      var namaBab = pilihanLingkup.bab || '';
+      if (pilihanLingkup.jalur === 1) {
+        blok.push('Paragraf pembuka ' + namaBab +
+                  ' (sebelum sub-bab pertama)');
+      } else if (pilihanLingkup.jalur === 3) {
+        blok.push('Paragraf pembuka ' + namaBab);
+        var bb = dataAkor.peta[namaBab] || {};
+        (bb.anak || []).forEach(function (L) {
+          var hh = (dataAkor.halus || {})[L] || {};
+          blok.push('Sub-bab ' + L + (hh.judul ? ' — ' + hh.judul : ''));
+        });
+      } else {
+        (pilihanLingkup.babs || []).forEach(function (L) {
+          var hh = (dataAkor.halus || {})[L] || {};
+          blok.push('Sub-bab ' + L + (hh.judul ? ' — ' + hh.judul : ''));
+        });
+      }
+      var w = document.createElement('div');
+      w.className = 'pai-lingkup-blok';
+      var lbl = document.createElement('span');
+      lbl.className = 'lbl';
+      lbl.textContent = 'Yang disentuh — bagian lain TIDAK berubah:';
+      var ol = document.createElement('ol');
+      blok.forEach(function (x) {
+        var li = document.createElement('li'); li.textContent = x;
+        ol.appendChild(li);
+      });
+      w.appendChild(lbl); w.appendChild(ol);
+      k.appendChild(w);
+
+      //  angka SEBENARNYA dari /v1/hitung (bukan perkiraan layar)
+      var a = document.createElement('div');
+      a.className = 'pai-izin-angka';
+      var tok = document.createElement('span');
+      tok.innerHTML = 'Token Revisi <b>' +
+        (d.revisi_dibutuhkan || d.bagian || 1) + '</b>';
+      var sisa = document.createElement('span');
+      sisa.innerHTML = 'Sisa kuota Anda <b>' +
+        (typeof d.sisa_kuota === 'number' ? d.sisa_kuota : '?') + '</b>';
+      a.appendChild(tok); a.appendChild(sisa);
+      k.appendChild(a);
+
+      var ya = document.createElement('button');
+      ya.type = 'button'; ya.className = 'pai-aksi';
+      ya.textContent = 'Terapkan ' +
+        (d.revisi_dibutuhkan || d.bagian || 1) + ' Token Revisi';
+      if (d.cukup === false) {
+        ya.disabled = true; ya.textContent = 'Kuota tidak cukup';
+      }
+      ya.onclick = function () { wadahIzin.hidden = true; kirimRevisi(true); };
+      k.appendChild(ya);
+
+      var batal = document.createElement('button');
+      batal.type = 'button'; batal.className = 'pai-salindi';
+      batal.textContent = 'Batal';
+      batal.onclick = function () { wadahIzin.hidden = true; selesai(); };
+      k.appendChild(batal);
+
+      wadahIzin.appendChild(k);
+      wadahIzin.scrollIntoView({ block: 'nearest' });
+    }
+
+    // ── LANGKAH 2: kirim revisi ──
+    function kirimRevisi(setuju) {
+      btnJalan.disabled = true;
+      btnJalan.textContent = setuju ? 'Memproses ' + '…' : 'AI sedang bekerja…';
+      //  ⭐ 3 JALUR — ikutkan field pilihan akordeon; TANPA pilihan
+      //    (Pintu B / yatim / dokumen polos) → body LAMA persis.
+      var rb = {
+        file_id: window.__AI_FILE_ID__,
+        komentar: komentar,
+        lampiran: (window.__LAMPIRAN_BAWA__ || []),
+        bab: babPilih ? babPilih.label : '',
+        setuju_bagian: setuju === true
+      };
+      if (pilihanLingkup && pilihanLingkup.jalur === 2) {
+        rb.babs = pilihanLingkup.babs;
+        rb.bab = '';
+      } else if (pilihanLingkup && pilihanLingkup.lingkup) {
+        rb.lingkup = pilihanLingkup.lingkup;
+      }
+      fetch('/api/ai/v1/revisi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rb)
+      })
+      .then(function (r) { return r.json().then(function (d) { return { status: r.status, d: d }; }); })
+      .then(function (res) {
+        var d = isi(res.d);
+        if (res.status === 200 && d.ok) {
+          elHasil.textContent = d.jawaban || '';
+          wadahHasil.hidden = false;
+          segarkanKuota(d.kuota);
+          // versi baru tersimpan → segarkan info versi & tombol mundur
+          if (babPilih) muatVersi(babPilih.label);
+          var namaBab = (babPilih && babPilih.label) ? babPilih.label + ' — ' : '';
+          if (d.bagian > 1) {
+            pesan(namaBab + 'selesai, ' + d.bagian + ' bagian digabung. Periksa dulu sebelum dipakai.');
+          } else {
+            pesan(namaBab + 'revisi selesai. Periksa dulu sebelum dipakai.');
+          }
+        } else if (res.status === 409) {
+          // server minta izin (mis. panel lupa cek dulu)
+          tanyaIzin(d);
+          return;
+        } else if (res.status === 402) {
+          tampilkanAddon(d.pesan); pesan('Kuota habis — tambahkan lewat AddOn.', 'gagal');
+        } else if (res.status === 403) {
+          tampilkanAddon(d.pesan); pesan(d.pesan || 'Fitur AI untuk member berbayar.', 'gagal');
+        } else if (res.status === 401) {
+          pesan('Sesi Anda berakhir. Muat ulang halaman.', 'gagal');
+        } else {
+          pesan((d && d.pesan) || 'Gagal memproses. Coba lagi.', 'gagal');
+        }
+      })
+      .catch(function () { pesan('Koneksi bermasalah. Coba lagi.', 'gagal'); })
+      .finally(selesai);
+    }
+  }                                 // ← penutup langkahHitung()
+
+  var btnSalin = document.getElementById('pai-salindi');
+  if (btnSalin) btnSalin.onclick = function () {
+    var t = elHasil.textContent || '';
+    if (!t) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t)
+        .then(function () { pesan('Hasil disalin'); })
+        .catch(function () { pesan('Tidak bisa menyalin — pilih manual ya.', 'gagal'); });
+    } else {
+      pesan('Browser tidak mendukung salin otomatis.', 'gagal');
+    }
+  };
+
+  gambarDaftar();
+
+  // ---- cek pustaka OnlyOffice benar-benar termuat ----
+  if (typeof DocsAPI === 'undefined') {
+    document.getElementById('memuat').hidden = true;
+    document.getElementById('galat').hidden = false;
+    document.getElementById('galat-pesan').innerHTML =
+      'Pustaka editor tidak termuat dari <code>{{ api_js }}</code>. ' +
+      'Pastikan alamat editor bisa diakses dari browser Anda.';
+    return;
+  }
+
+  var cfg = {{ cfg|tojson }};
+  var editor = null;
+
+  cfg.events = {
+    onAppReady: function () {
+      document.getElementById('memuat').hidden = true;
+    },
+    onDocumentReady: function () {
+      document.getElementById('memuat').hidden = true;
+    },
+    onError: function (e) {
+      document.getElementById('memuat').hidden = true;
+      document.getElementById('galat').hidden = false;
+      // e.data BISA objek -> jangan cetak mentah (dulu jadi "[object Object]"
+      // dan pesan aslinya HILANG -> diagnosa buta). Tampilkan isi lengkap.
+      var kode;
+      try {
+        kode = (e && e.data !== undefined && e.data !== null)
+          ? (typeof e.data === 'string' ? e.data
+             : JSON.stringify(e.data))
+          : (e ? JSON.stringify(e) : '?');
+      } catch (x) { kode = String(e && e.data); }
+      console.error('[oo error] isi lengkap:', e);   // untuk diagnosa
+      document.getElementById('galat-pesan').innerHTML =
+        'Editor melaporkan kesalahan: <code>' + kode + '</code>';
+    },
+    onWarning: function (e) { console.warn('[oo warning]', e); },
+
+    // tanda tangan JWT wajib untuk setiap permintaan
+    onRequestSign: function (e) {
+      if (!e || !e.data) return;
+      fetch('/api/oo/sign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(e.data)
+      }).then(function (r) { return r.json(); })
+        .then(function (d) { if (d.token) editor.serviceCommand('sendsign', { token: d.token }); })
+        .catch(function () {});
+    },
+
+    onDocumentStateChange: function (e) {
+      if (e && e.data === true) pesan('Ada perubahan belum tersimpan…', 'kerja');
+    },
+
+    onDocumentSave: function () {
+      pesan('Tersimpan otomatis');
+    },
+
+    onServerSave: function () { pesan('Menyimpan ke server…', 'kerja'); },
+
+    onOutdatedVersion: function () {
+      pesan('Versi berkas ini sudah lama. Muat ulang halaman.', 'gagal');
+    }
+  };
+
+  try {
+    // ⚠️ WAJIB: beri tahu DocsAPI di mana server aset kita berada.
+    //  Tanpa ini, DocsAPI memakai path RELATIF dari halaman (/edit/9)
+    //  sehingga iframe OO meminta aset lewat /web-apps/... (TANPA
+    //  prefix /oo/aset) -> 404 -> browser jatuh ke cache lama ->
+    //  CSS tab oranye & rebranding TIDAK PERNAH terlihat user.
+    //  (Bug terverifikasi 13Sep26 lewat cek header: Location kosong +
+    //   /web-apps/.../app.css balas 404.)
+    editor = new DocsAPI.DocEditor('tempat-editor', cfg,
+                                   { documentServerUrl: '/oo/aset' });
+  } catch (err) {
+    document.getElementById('memuat').hidden = true;
+    document.getElementById('galat').hidden = false;
+    document.getElementById('galat-pesan').textContent = 'Gagal memulai editor: ' + err.message;
+    return;
+  }
+
+  // ---- tombol Simpan -> minta OnlyOffice menyimpan paksa ----
+  document.getElementById('simpan').onclick = function () {
+    if (!editor || !editor.serviceCommand) { pesan('Editor belum siap.', 'gagal'); return; }
+    editor.serviceCommand('forceSave');
+    pesan('Menyimpan…', 'kerja');
+  };
+
+  // ══════════════════════════════════════════════════════════════════
+  //  LANGKAH C+D+E (16Sep26, ACC Bos) — PANTAU, TERAPKAN, LONCENG
+  // ══════════════════════════════════════════════════════════════════
+  //  KENAPA ADA: revisi naskah besar >125 dtk → Cloudflare memutus (524)
+  //  → kuota hangus. Solusi: proses jalan di LATAR BELAKANG server, user
+  //  boleh ditinggal. Konsekuensinya user HARUS bisa: (1) melihat tahap
+  //  nyata, (2) tahu kapan selesai, (3) MEMUTUSKAN kapan hasil ditulis ke
+  //  dokumen (Lapis 3 = tulis ATOMIK 1x di akhir, bukan mengalir).
+  // ══════════════════════════════════════════════════════════════════
+  var FILE_ID = window.__AI_FILE_ID__ || null;
+  var JEDA_PANTAU = 2000;      // 2 detik — cukup responsif, hemat server
+  var jamPantau = null;
+  var terakhirSelesai = null;  // kode proses yang sudah ditangani
+
+  // ---- LONCENG (Langkah E) ----
+  // ⚠️ Bentuk balasan server (VERIFIKASI di app/ai.py baris ~1915):
+  //     { ok, jalan: [...], belum_dibaca: [...] }
+  //  BUKAN { proses: [...] } — Wulan sempat salah tebak. Cocokkan dengan server.
+  function ambilLonceng() {
+    if (!FILE_ID) return;
+    fetch('/api/ai/v1/proses', { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { gambarLonceng(d.belum_dibaca || []); })
+      .catch(function (e) { console.error('[lonceng] gagal:', e); });
+  }
+
+  function gambarLonceng(daftar) {
+    var tombol = document.getElementById('lonceng');
+    var angka  = document.getElementById('lonceng-angka');
+    var wadah  = document.getElementById('lonceng-isi');
+    if (!tombol || !wadah) return;
+    if (!daftar.length) {
+      tombol.classList.remove('nyala');
+      wadah.innerHTML = '<div class="lonceng-kosong">Belum ada pemberitahuan.</div>';
+      return;
+    }
+    tombol.classList.add('nyala');
+    if (angka) angka.textContent = String(daftar.length);
+    //  ✅ / ⚠️ / ⏳ dibedakan supaya mahasiswa langsung paham.
+    //  🐛 17Sep26: status 'gagal' dulu TIDAK PERNAH sampai ke sini (server
+    //  hanya mengirim 'selesai'), jadi cabang ⚠️ ini tidak pernah terpakai.
+    //  Kini server mengirim 'gagal' juga — cabang ini benar-benar bekerja.
+    wadah.innerHTML = daftar.map(function (p) {
+      var judul = p.judul || 'Revisi dokumen';
+      var pesan = p.pesan || p.tahap || '';
+      //  17Sep26 (ACC Bos): kalimat & nada datang dari SERVER
+      //  (app/notifikasi.py) — halaman TIDAK menulis kalimat sendiri supaya
+      //  gaya bahasa tetap satu dan mudah diubah dari satu tempat.
+      var nada = p.nada || 'bantu';
+      var gagal = p.status === 'gagal';
+      var ok = p.status === 'selesai';
+      var ikonNama = gagal ? 'message-circle' : (ok ? 'sparkles' : 'timer');
+      //  06Okt26: emoji ✨💬⏳ → ikon Lucide (permintaan Bos: jangan standar)
+      var ikon = '<svg class="ik" width="15" height="15" aria-hidden="true">' +
+                 '<use href="#ik-' + ikonNama + '"/></svg>';
+      var kelas = 'lonceng-item nada-' + nada + (gagal ? ' gagal' : '');
+      var aksi = '';
+      var label = p.tombol || (ok ? 'Buka' : (gagal ? 'Coba lagi' : ''));
+      if (label && p.file_id) {
+        var att = ok ? 'data-buka' : (gagal ? 'data-ulang' : 'data-buka');
+        aksi = '<button type="button" class="lonceng-aksi" ' +
+               att + '="' + Number(p.file_id) + '">' + aman(label) + '</button>';
+      }
+      return '<div class="' + kelas + '">' +
+        '<b>' + ikon + ' ' + aman(judul) +
+        ' <span class="lonceng-baru">baru</span></b>' +
+        '<small>' + aman(pesan) + '</small>' + aksi +
+        '</div>';
+    }).join('');
+  }
+
+  function aman(s) {
+    // JANGAN tempel teks server langsung ke innerHTML (XSS) — aturan 15Sep26.
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  //  17Sep26: tombol di dalam lonceng — 'Buka' (selesai) / 'Coba lagi' (gagal).
+  //  Pakai pendengar di WADAH (delegasi) supaya tombol yang baru dibuat
+  //  lewat innerHTML tetap berfungsi tanpa perlu dipasangi ulang.
+  (function () {
+    var wadah = document.getElementById('lonceng-isi');
+    if (!wadah) return;
+    wadah.addEventListener('click', function (ev) {
+      var t = ev.target;
+      if (!t || !t.classList || !t.classList.contains('lonceng-aksi')) return;
+      ev.stopPropagation();          // jangan sampai menutup panel lonceng
+      var buka  = t.getAttribute('data-buka');
+      var ulang = t.getAttribute('data-ulang');
+      if (buka) {
+        window.location.href = '/edit/' + buka;
+      } else if (ulang) {
+        //  Arahkan ke berkasnya; mahasiswa menjalankan revisi lagi dari sana
+        //  (biaya kuota tetap lewat gerbang izin — JANGAN dijalankan diam-diam).
+        window.location.href = '/edit/' + ulang + '?ulang=1';
+      }
+    });
+  })();
+
+  var tl = document.getElementById('lonceng');
+  if (tl) {
+    tl.onclick = function () {
+      var d = document.getElementById('daftar-lonceng');
+      var buka = d.classList.contains('buka');
+      d.classList.toggle('buka', !buka);
+      if (!buka) {   // saat DIBUKA = dibaca → padamkan
+        fetch('/api/ai/v1/proses/baca', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ kode: null })
+        }).then(function () { ambilLonceng(); })
+          .catch(function (e) { console.error('[lonceng baca]', e); });
+      }
+    };
+  }
+
+  // ---- PAPAN PANTAU (Langkah C) ----
+  function tahapManusia(t) {
+    //  🚦 TAHAP ANTREAN (17Sep26): kode sekarang mengirim kalimat tahap APA
+    //  ADANYA dari server, mis. 'Menunggu antrean (posisi 3 dari 41)'.
+    //  Kalimat utuh itu SUDAH berbahasa manusia — jadi dipakai langsung,
+    //  JANGAN diterjemahkan lagi (dulu jatuh ke 'Bekerja…' dan mahasiswa
+    //  kehilangan informasi antreannya).
+    if (t && t.indexOf('Menunggu antrean') === 0) return t;
+    return ({ 'menyiapkan': 'Menyiapkan…',
+              'membaca': 'Membaca naskah…',
+              'memahami': 'AI memahami dokumen…',
+              'menyusun': 'Menyusun revisi…',
+              'menulis': 'Menulis hasil ke dokumen…',
+              'selesai': 'Selesai' })[t] || (t || 'Bekerja…');
+  }
+
+  function tampilPantau(p) {
+    var mp = document.getElementById('pantau');
+    if (!mp || !p) return;
+    // ⚠️ AKAR 16Sep26: CSS mendefinisikan `#pantau.buka` (bukan `.tampil`).
+    //  JS dulu menambah 'tampil' → modal TIDAK PERNAH tampil walau DOM
+    //  melaporkan classList berisi. Uji kode LOLOS, mata user menemukannya.
+    mp.classList.add('buka');
+    document.getElementById('pantau-judul').textContent =
+      p.judul || 'AI sedang bekerja';
+    document.getElementById('pantau-tahap').textContent = tahapManusia(p.tahap);
+    // pita tahap (§4.12: "progress pakai TAHAP NYATA, bukan persen tebakan")
+    var pita = document.getElementById('pantau-langkah');
+    if (pita) {
+      var kini = p.tahap_selesai || 0, total = p.tahap_total || 0;
+      if (total) {
+        var tah = ['Membaca', 'Memahami', 'Menyusun', 'Menulis'];
+        var isi = '';
+        for (var i = 0; i < tah.length; i++) {
+          var kelas = (i + 1 < kini) ? 'lewat' : (i + 1 === kini ? 'kini' : '');
+          isi += '<span class="' + kelas + '">' + tah[i] + '</span>';
+        }
+        pita.innerHTML = isi;
+      } else {
+        pita.innerHTML = '';
+      }
+    }
+    document.getElementById('kunci-spanduk').classList.add('tampil');
+  }
+
+  function sembunyiPantau() {
+    var mp = document.getElementById('pantau');
+    if (mp) mp.classList.remove('buka');
+    var sp = document.getElementById('kunci-spanduk');
+    if (sp) sp.classList.remove('tampil');
+  }
+
+  // Tombol modal: keduanya MENYEMBUNYIKAN panel TANPA membatalkan proses
+  // ("boleh ditinggal" — ACC Bos). Proses tetap jalan di server.
+  var bSembunyi = document.getElementById('pantau-sembunyi');
+  if (bSembunyi) bSembunyi.onclick = sembunyiPantau;
+  var bTutup = document.getElementById('pantau-tutup');
+  if (bTutup) bTutup.onclick = sembunyiPantau;
+
+  function pantau() {
+    if (!FILE_ID) return;
+    fetch('/api/ai/v1/proses', { credentials: 'same-origin' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        gambarLonceng(d.belum_dibaca || []);
+        var jln = d.jalan || [];
+        var sedang = jln.length ? jln[0] : null;
+        // hanya proses milik BERKAS INI yang menahan penyuntingan
+        // (`file_id` kini dikirim ringkas() sejak 16Sep26)
+        var untukBerkasIni = null;
+        for (var j = 0; j < jln.length; j++) {
+          if (jln[j].file_id === FILE_ID) { untukBerkasIni = jln[j]; break; }
+        }
+        if (untukBerkasIni) {
+          tampilPantau(untukBerkasIni);
+        } else {
+          sembunyiPantau();
+          // Selesai & belum ditangani → beri tahu + muat ulang dokumen
+          var selesai = (d.belum_dibaca || []).filter(function (p) {
+            return p.file_id === FILE_ID;
+          })[0];
+          if (selesai && selesai.kode !== terakhirSelesai) {
+            terakhirSelesai = selesai.kode;
+            pesan('Revisi selesai. Hasil siap ditulis ke dokumen.', 'sukses');
+            if (window.berkasBerubah) window.berkasBerubah();
+          }
+        }
+      })
+      .catch(function (e) { console.error('[pantau] gagal:', e); });
+  }
+
+  function mulaiPantau() {
+    if (!FILE_ID || jamPantau) return;
+    pantau();
+    jamPantau = setInterval(pantau, JEDA_PANTAU);
+  }
+  function hentikanPantau() {
+    if (jamPantau) { clearInterval(jamPantau); jamPantau = null; }
+  }
+
+  // ---- LANGKAH D: tulis hasil ke dokumen ----
+  var btTerap = document.getElementById('pai-terapkan');
+  if (btTerap) {
+    btTerap.onclick = function () {
+      if (!konfirmasi('Tulis hasil revisi ke dokumen sekarang?\n\n' +
+                      'Versi sebelumnya disimpan sebagai cadangan, jadi bisa ' +
+                      'dikembalikan kalau hasilnya kurang pas.')) return;
+      btTerap.disabled = true;
+      btTerap.textContent = 'Menulis…';
+      var kode = btTerap.getAttribute('data-kode') || '';
+      fetch('/api/ai/v1/terapkan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ kode: kode })
+      })
+        .then(function (r) { return r.json().then(function (d) { return [r.ok, d]; }); })
+        .then(function (hasil) {
+          var ok = hasil[0], d = hasil[1];
+          if (!ok) { throw new Error(d.pesan || d.detail || 'gagal menerapkan'); }
+          pesan('Hasil ditulis ke dokumen. Cadangan: ' + (d.cadangan || '-'), 'sukses');
+          if (window.berkasBerubah) window.berkasBerubah();
+        })
+        .catch(function (e) {
+          // ⚠️ JANGAN cetak e mentah → "[object Object]" = diagnosa buta.
+          console.error('[terapkan] isi lengkap:', e);
+          pesan('Gagal menulis hasil: ' + (e.message || JSON.stringify(e)), 'gagal');
+        })
+        .then(function () {
+          btTerap.disabled = false;
+          btTerap.textContent = 'Tulis hasil ke dokumen';
+        });
+    };
+  }
+
+  // mulai memantau kalau ada berkas (LANGSUNG — jangan menunggu AI dulu,
+  // supaya proses yang ditinggal user tetap memunculkan lonceng saat kembali)
+  if (FILE_ID) {
+    mulaiPantau();
+    window.addEventListener('beforeunload', hentikanPantau);
+  }
+
+  // ---- peringatan kalau keluar sementara masih ada perubahan ----
+  window.addEventListener('beforeunload', function (e) {
+    // autosave aktif; ini hanya pengingat halus
+    if (document.querySelector('#notif.kerja')) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+
+  // ══════════════════════════════════════════════════════════════════
+  //  HEARTBEAT SESI EDIT  (permintaan Bos 12Sep26)
+  // ══════════════════════════════════════════════════════════════════
+  // KENAPA: server membatasi berapa dokumen boleh terbuka bersamaan
+  // (MAX_SESI_EDIT). Supaya tab yang ditutup paksa / koneksi putus TIDAK
+  // terus "menahan" kuota, sesi yang tidak ada kabar selama SESI_IDLE_MENIT
+  // dianggap BASI dan otomatis dibersihkan server.
+  // Kirim kabar tiap 60 detik selama halaman ini terbuka.
+  var SESI_FID = berkas.id;
+  function kabarSesi() {
+    fetch('/api/sesi/heartbeat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({file_id: SESI_FID})
+    }).then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.ok === false) {
+          pesan('Sesi editor ini sudah berakhir. Muat ulang halaman.', 'gagal');
+        }
+      })
+      .catch(function () { /* koneksi putus sementara — abaikan */ });
+  }
+  kabarSesi();
+  setInterval(kabarSesi, 60000);
+
+  // ⚠ CATATAN (bug 12Sep26): JANGAN pakai pagehide+sendBeacon untuk
+  // menutup sesi. Percobaan pertama memakai itu -> setiap kali user
+  // PINDAH halaman (termasuk membuka dokumen lain) sesi lama ikut
+  // ditutup, sehingga batas 3 dokumen tidak pernah tercapai.
+  // Penutupan sesi hanya lewat:
+  //   (a) tombol "Simpan & Tutup" / "Selesai" (disengaja user), atau
+  //   (b) pembersihan otomatis sesi BASI setelah SESI_IDLE_MENIT.
+
+  // ---- di HP: cegah editor terpotong saat papan ketik muncul ----
+  window.addEventListener('resize', function () {
+    var m = document.querySelector('main');
+    if (m) m.style.minHeight = '0';
+  });
+})();
+</script>
+</body>
+</html>

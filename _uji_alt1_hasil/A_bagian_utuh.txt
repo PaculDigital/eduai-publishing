@@ -1,0 +1,42 @@
+[PROFIL] Paradigma=kuantitatif; Desain=survei korelasional dengan pengujian mediasi (model mediasi tunggal)
+
+[K1-KUTIP-ASLI]
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini dapat dipetakan sebagai berikut.
+[K1-GANTI-JADI]
+Peluang pengembangan yang diuraikan di atas menegaskan bahwa penelitian ini perlu diposisikan di dalam peta kajian yang lebih luas. Untuk itu, perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini (quality of work life, digital self-efficacy, digital readiness, dan adaptive performance) dipetakan pada Tabel 1.1 berikut.
+
+Tabel 1.1. Pemetaan State of the Art Penelitian
+
+Ranah
+
+Perkembangan Terkini
+
+Titik Lanjut yang Ditawarkan Penelitian Ini
+
+Quality of Work Life (QWL)
+
+Leitão et al. (2019) menunjukkan bahwa QWL meningkatkan kinerja melalui keterlibatan dan kontribusi karyawan; Rahardhiansyah et al. (2026) serta Ayuni dan Nuraeni (2026) menguji QWL bersama self-efficacy terhadap kinerja.
+
+Menguji QWL sebagai sumber daya psikologis yang dikonversi melalui kesiapan digital, bukan melalui jalur langsung terhadap kinerja.
+
+Digital Self-Efficacy (DSE)
+
+Sun dan Yoon (2025) menemukan bahwa DSE memediasi pengaruh transformasi digital terhadap kinerja, sedangkan Shahzad et al. (2025) menempatkan DSE sebagai anteseden pembelajaran.
+
+Memposisikan DSE sebagai anteseden kesiapan digital, bukan sebagai mediator.
+
+Digital Readiness (DR)
+
+Palapa dan Saragih (2026) menguji DR sebagai anteseden kepuasan kerja, sementara Trenerry et al. (2021) menyusun kerangka multi-level kesiapan digital.
+
+Menempatkan DR sebagai simpul konversi (mediator) antara sumber daya psikologis dan kinerja.
+
+Adaptive Performance (AP)
+
+Pulakos et al. (2000) menyusun taksonomi AP yang menjadi rujukan orisinal; Setiyadi et al. (2024) mengkaji penentu AP pada berbagai level; kajian AP pada sektor logistik masih terbatas.
+
+Menguji AP pada level individu account officer di sektor logistik Indonesia.
+
+Sumber: diolah peneliti (2026).
+
+Berdasarkan pemetaan tersebut, kebaruan (novelty) penelitian ini terletak pada tiga hal. Pertama, kebaruan konteks: penelitian ini menempatkan Account Officer PT JNE Wilayah Lampung, yakni sektor logistik ekspedisi Indonesia pada level individu di wilayah yang belum diteliti, sebagai unit analisis. Kedua, kebaruan model: penelitian ini mengintegrasikan dua teori besar, yaitu Conservation of Resources (COR) dan Social Cognitive Theory (SCT), ke dalam satu model mediasi yang parsimonius dengan digital readiness sebagai mediator tunggal. Ketiga, kebaruan fenomena: penelitian ini menggeser fokus kajian dari tingkat kinerja ke mekanisme konversi, yakni menjelaskan bagaimana sumber daya psikologis menjadi kinerja, bukan semata apakah sumber daya tersebut berpengaruh. Ketiga kebaruan tersebut bertumpu pada satu benang merah, yaitu upaya menempatkan kesiapan digital sebagai simpul yang menghubungkan sumber daya psikologis dengan kinerja adaptif karyawan.

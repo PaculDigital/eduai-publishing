@@ -1,0 +1,37 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+jinja2==3.1.5
+python-multipart==0.0.20
+sqlalchemy==2.0.36
+itsdangerous==2.2.0
+httpx==0.28.1
+qrcode[pil]==8.2
+PyJWT==2.14.0
+websockets==15.0.1
+# 26Sep26 — baca panduan penulisan user (PDF) TANPA AI:
+# 05Okt26 (putusan Bos "B"): pypdf → pypdfium2. UJI 97 naskah nyata:
+#   pypdf 6,669 dtk/naskah  vs  pypdfium2 0,162 dtk/naskah  (35× lebih cepat)
+#   temuan sub-bab 3 tingkat: pypdf 158 · pypdfium2 160 (lebih baik)
+#   lisensi pypdfium2 = BSD/Apache (bersih, sama seperti pypdf).
+# fontTools = WAJIB pendamping: tanpa ia, PDF bertipografi CFF Type1
+#   memunculkan peringatan encoding & berisiko teks hilang.
+pypdfium2==5.14.0
+fonttools==4.62.0
+# 16Okt26 — UJI PLAGIARISME (fitur baru, ACC Bos).
+#   weasyprint = mesin cetak PDF gaya Turnitin (dipakai script Bos
+#     `similarity_precheck.py` → `generate_combined_pdf`).
+#   pymupdf    = tempel watermark + hitung halaman (`app/uji_mirip.py`).
+# ⚠️ AKAR 16 Okt: tanpa 2 ini fitur balas 500 "No module named ..."
+#    — mesinnya ADA di host, tapi TIDAK ikut image. Versi = sama dgn host
+#    yang sudah terbukti (weasyprint 69.0 · PyMuPDF 1.28.0).
+weasyprint==69.0
+pymupdf==1.28.0
+
+# 19Okt26 — ASSEMBLY BUKU (ACC Bos 19 Okt, opsi B): 1 buku jadi SATU .docx
+#   supaya bisa dibuka/diedit di OnlyOffice seperti dokumen biasa.
+# ⚠️ AKAR: `buku_umum_assembly.py` mengimpor `docx`, sedangkan image EduAi
+#    SELALU memakai WeasyPrint (PDF) — `python-docx` BELUM PERNAH ada di
+#    requirements. Tanpa baris ini, perakitan buku GAGAL di produksi
+#    ("No module named 'docx'") padahal di host jalan.
+#    Versi = sama dengan host yang sudah terbukti (python-docx 1.2.0).
+python-docx==1.2.0

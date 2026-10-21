@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Publish Buku — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="stylesheet" href="/static/ikon.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA;--merah:#C0392B;
+      --biru:#2B7FD4;--kuning:#8A6100}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none}
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);border-bottom:1px solid rgba(255,255,255,.13);
+       position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;display:flex;align-items:center;justify-content:space-between}
+.nav img{height:52px;width:auto}
+.nav-kanan{display:flex;align-items:center;gap:16px;font-size:14.5px;color:rgba(255,255,255,.9)}
+.nav-kanan .keluar{color:#fff;font-weight:600;border:1.5px solid rgba(255,255,255,.34);padding:6px 15px;border-radius:70px}
+main{max-width:1080px;margin:0 auto;padding:28px 22px 60px}
+
+/* pita tab — bisa digeser 1 baris di HP */
+.pita{display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid var(--garis);
+      flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;padding-bottom:2px}
+.pita a{padding:11px 20px;border-radius:10px 10px 0 0;font-size:14.5px;font-weight:600;
+        color:var(--teks-abu);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.pita a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);border-bottom:2px solid var(--hijau);margin-bottom:-2px}
+
+h1{font-size:21px;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+.sub{font-size:13.5px;color:var(--teks-abu);margin-bottom:22px;line-height:1.6}
+
+/* ══ KARTU JENIS BUKU (2 kolom di PC, 1 kolom di HP) ══ */
+.grid-buku{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.kartu-buku{background:#fff;border:1.5px solid var(--garis);border-radius:16px;overflow:hidden;
+            display:flex;flex-direction:column;transition:.16s}
+.kartu-buku:hover{border-color:var(--hijau);box-shadow:0 6px 20px rgba(25,142,59,.13);transform:translateY(-2px)}
+.kepala-buku{background:linear-gradient(135deg,#104F22,#198E3B);padding:17px 18px;
+             display:flex;align-items:center;gap:12px}
+.ikon-buku{width:42px;height:42px;border-radius:11px;background:rgba(255,255,255,.16);
+           display:grid;place-items:center;flex:none}
+.ikon-buku .ikon{color:#fff}
+.nama-buku{color:#fff;font-size:15px;font-weight:700;line-height:1.25}
+.nama-buku small{display:block;font-size:10.5px;font-weight:500;opacity:.82;
+                 margin-top:2px;letter-spacing:.3px}
+.isi-buku{padding:15px 18px 17px;flex:1;display:flex;flex-direction:column}
+.tanya-buku{font-size:12.5px;color:var(--hijau-gelap);font-weight:600;background:var(--hijau-muda);
+            border-radius:8px;padding:9px 11px;margin-bottom:11px;line-height:1.5}
+.daftar-buku{list-style:none;font-size:12px;color:var(--teks-abu);line-height:1.75;
+             margin-bottom:13px;flex:1}
+.daftar-buku li{padding-left:16px;position:relative}
+.daftar-buku li::before{content:"✓";color:var(--hijau);font-weight:800;position:absolute;left:0}
+.kaki-buku{display:flex;align-items:center;justify-content:space-between;gap:8px;
+           padding-top:11px;border-top:1px solid #F0F4F2}
+.lencana{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.l-hijau{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.l-kuning{background:#FDF3DD;color:var(--kuning)}
+.l-biru{background:#E4EEFB;color:#1B5FA8}
+.l-abu{background:#EEF1F0;color:#6B7671}
+
+.tombol-mulai{font-size:12.5px;font-weight:700;color:#fff;background:var(--hijau);
+              padding:9px 18px;border-radius:9px;white-space:nowrap}
+.tombol-mulai:hover{background:var(--hijau-gelap)}
+.tombol-mulai.segera{background:#fff;color:var(--teks-abu);border:1.5px dashed #C9D2CF;cursor:not-allowed}
+.tombol-mulai.segera:hover{background:#fff}
+/* ── Pilihan Bidang + Untuk siapa (kartu Buku Umum, 18 Okt 2026) ── */
+.pilih-umum{display:flex;flex-direction:column;gap:7px;margin:2px 0 10px}
+.baris-pilih{display:flex;flex-direction:column;gap:3px}
+.label-pilih{font-size:11px;font-weight:700;letter-spacing:.3px;
+             text-transform:uppercase;color:var(--teks-abu)}
+.baris-pilih select{width:100%;font-size:12.5px;font-family:inherit;
+  padding:8px 9px;border:1.5px solid #C9D2CF;border-radius:8px;
+  background:#fff;color:var(--teks);cursor:pointer}
+.baris-pilih select:focus{outline:none;border-color:var(--hijau);
+  box-shadow:0 0 0 3px rgba(39,174,96,.14)}
+.kaki-buku{align-items:flex-end}
+
+/* ══ CATATAN BAWAH ══ */
+.nota{background:#FFFBF2;border:1px solid #F0E2C8;border-radius:12px;
+      padding:16px 18px;margin-top:20px}
+.nota h3{font-size:13.5px;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.nota ul{margin:0;padding-left:20px;font-size:12.5px;color:var(--teks-abu);line-height:1.85}
+.nota li b{color:var(--teks)}
+footer{max-width:1080px;margin:0 auto;padding:0 22px 40px;font-size:12px;
+       color:var(--teks-abu);line-height:1.7}
+
+/* ══ HP ══ */
+@media(max-width:560px){
+  main{padding:20px 14px 50px}
+  .grid-buku{grid-template-columns:1fr;gap:13px}
+  h1{font-size:19px}
+  .isi-buku{padding:13px 15px 15px}
+}
+</style>
+</head>
+<body>
+{{ ikon_sprite() }}
+<header><div class="nav">
+  <a href="/naskah"><img src="/static/logo-terang-320.png" alt="EduAi"></a>
+  <div class="nav-kanan"><span>{{ user.nama or user.email }}</span>
+    <a class="keluar" href="/keluar">Keluar</a></div>
+</div></header>
+<main>
+  {% set menu_aktif = 'buku' %}
+  {% set menu_kelas = 'pita' %}
+  {% include '_menu.html' %}
+
+  <h1>{{ ikon('book-open', 22) }} Publish Buku</h1>
+  <p class="sub">Pilih jenis buku yang mau kamu terbitkan. Tiap jenis punya
+    susunan sendiri — jangan sampai salah pilih.</p>
+
+  <div class="grid-buku">
+    {% for b in jenis_buku %}
+    <div class="kartu-buku">
+      <div class="kepala-buku">
+        <div class="ikon-buku">{{ ikon(b.ikon, 21) }}</div>
+        <div class="nama-buku">{{ b.nama }}<small>{{ b.label }}</small></div>
+      </div>
+      <div class="isi-buku">
+        <div class="tanya-buku">{{ b.tanya }}</div>
+        <ul class="daftar-buku">
+          {% for isi in b.isi %}<li>{{ isi }}</li>{% endfor %}
+        </ul>
+        <div class="kaki-buku">
+          <span class="lencana l-{{ b.warna }}">{{ b.lencana }}</span>
+          {% if b.siap %}
+          <form method="post" action="/buku/mulai" style="margin:0">
+            <input type="hidden" name="jenis" value="{{ b.kode }}">
+            {% if b.kode == 'buku-umum' %}
+            {# ── Pilihan BIDANG + UNTUK SIAPA (putusan Bos 18 Okt 2026) ──
+               Hanya kartu Buku Umum. Dua jawaban ini menentukan seluruh
+               wajah buku: ilustrasi, infografis, dan cara menulis. #}
+            <div class="pilih-umum">
+              <label class="baris-pilih">
+                <span class="label-pilih">Bidang</span>
+                <select name="bidang" required>
+                  <option value="" disabled selected>Pilih bidang…</option>
+                  {% for bd in bidang_umum %}
+                  <option value="{{ bd.kode }}">{{ bd.nama }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+              <label class="baris-pilih">
+                <span class="label-pilih">Untuk siapa</span>
+                <select name="untuk" required>
+                  <option value="" disabled selected>Pilih pembaca…</option>
+                  {% for us in untuk_siapa %}
+                  <option value="{{ us.kode }}">{{ us.nama }} — {{ us.ket }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+            </div>
+            {% endif %}
+            <button class="tombol-mulai" type="submit">Mulai</button>
+          </form>
+          {% else %}
+          <button class="tombol-mulai segera" type="button" disabled
+                  title="Fitur ini sedang disiapkan">Segera</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="nota">
+    <h3>{{ ikon('info', 15) }} Sebelum memilih</h3>
+    <ul>
+      <li><b>Buku Ajar</b> butuh <b>RPS mata kuliah</b> — keluarannya ada tujuan
+          pembelajaran &amp; latihan.</li>
+      <li><b>Buku Umum</b> cukup <b>tema</b> — tone naratif, bukan buku kuliah.</li>
+      <li><b>Buku Monograf</b> butuh <b>naskah penelitian</b> (skripsi/tesis).</li>
+      <li><b>Book Chapter</b> cukup <b>judul bab</b> untuk buku kolaborasi.</li>
+      <li><b>Buku Referensi</b> bisa dari <b>tema bebas</b> atau <b>bahan
+          sendiri</b> — isinya kumpulan teori dengan sitasi padat.</li>
+    </ul>
+  </div>
+</main>
+<footer>
+  Hasil tiap jenis buku berupa berkas <b>DOCX</b> siap cetak. Naskah yang sudah
+  jadi tetap bisa kamu sunting di <b>Naskah Saya</b>.
+</footer>
+</body>
+</html>

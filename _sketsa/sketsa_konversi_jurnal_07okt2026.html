@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SKETSA — Pintu Konversi Jurnal (3 pilihan)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;--merah:#D9534F;
+      --teks:#272530;--abu:#68666E;--garis:#E7E7EA;--putih-hangat:#FAFCFB}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#F3F6F4;padding:24px 14px 70px}
+.wadah{max-width:1120px;margin:0 auto}
+h1.hal{font-size:24px;font-weight:800;margin-bottom:4px}
+.sub{color:var(--abu);font-size:13.5px;margin-bottom:22px}
+.label-pil{display:inline-block;background:var(--hijau);color:#fff;font-size:12.5px;font-weight:700;
+      padding:6px 14px;border-radius:70px;margin:32px 0 12px}
+.label-pil.b{background:var(--oranye)}
+.label-pil.c{background:#5B4DBE}
+.ket{background:#fff;border-left:4px solid var(--oranye);padding:11px 15px;border-radius:0 12px 12px 0;
+     font-size:13px;color:var(--abu);line-height:1.6;margin-bottom:14px}
+.ket b{color:var(--teks)}
+
+/* ── rangka aplikasi (header + pita tab) ── */
+.rangka{border-radius:16px;overflow:hidden;box-shadow:0 6px 26px rgba(16,79,34,.09);background:#fff}
+header.app{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);
+     padding:0 20px;height:64px;display:flex;align-items:center;justify-content:space-between}
+header.app .logo{color:#fff;font-weight:800;font-size:17px;letter-spacing:.4px}
+header.app .kanan{color:rgba(255,255,255,.92);font-size:13px;display:flex;gap:8px;align-items:center}
+header.app .pil{border:1.5px solid rgba(255,255,255,.32);padding:5px 13px;border-radius:70px}
+.pita{display:flex;gap:2px;padding:0 20px;background:#fff;border-bottom:1px solid var(--garis);overflow-x:auto}
+.pita a{padding:11px 16px;font-size:13.5px;font-weight:600;color:var(--abu);white-space:nowrap}
+.pita a.aktif{background:var(--hijau-muda);color:var(--hijau-gelap);border-bottom:2.5px solid var(--hijau);margin-bottom:-1px}
+.isi{padding:20px}
+
+/* ═══ PILIHAN A — KARTU BESAR ═══ */
+.kartu-pintu{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pintu{border:1.6px solid var(--garis);border-radius:16px;padding:18px;background:#fff;transition:.15s}
+.pintu.utama{border-color:var(--hijau);box-shadow:0 5px 18px rgba(25,142,59,.1)}
+.pintu h3{font-size:15.5px;font-weight:800;margin:10px 0 5px}
+.pintu p{font-size:12.5px;color:var(--abu);line-height:1.6}
+.ikon-bulat{width:42px;height:42px;border-radius:12px;background:var(--hijau-muda);display:grid;place-items:center;font-size:20px}
+.btn{display:inline-block;margin-top:12px;background:var(--hijau);color:#fff;font-weight:700;font-size:13px;
+     padding:9px 18px;border-radius:70px;text-align:center}
+.btn.garis{background:#fff;color:var(--hijau-gelap);border:1.6px solid var(--hijau)}
+.btn.kecil{font-size:12px;padding:7px 14px;margin-top:0}
+
+/* ── baris naskah (Pintu 2) ── */
+.daftar-naskah{margin-top:20px}
+.baris{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid var(--garis);
+       border-radius:12px;margin-bottom:9px;background:#fff}
+.baris .doc{width:36px;height:36px;border-radius:9px;background:var(--hijau-muda);display:grid;place-items:center;font-size:17px}
+.baris .nm{flex:1;min-width:0}
+.baris .nm b{display:block;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.baris .nm small{font-size:11.5px;color:var(--abu)}
+.baris .aksi{display:flex;gap:7px;flex-wrap:wrap}
+.aksi .b{font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:70px;border:1.4px solid var(--garis);color:var(--abu)}
+.aksi .b.hijau{border-color:var(--hijau);color:var(--hijau-gelap);background:var(--hijau-muda)}
+
+/* ═══ PILIHAN B — LANGKAH BERTAHAP ═══ */
+.langkah{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+.langkah .ln{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--abu)}
+.langkah .ln.aktif{color:var(--hijau-gelap)}
+.langkah .no{width:24px;height:24px;border-radius:50%;background:#E5E5EA;color:var(--abu);
+       display:grid;place-items:center;font-size:12px;font-weight:800}
+.langkah .ln.aktif .no{background:var(--hijau);color:#fff}
+.langkah .garis-k{flex:1;height:2px;background:var(--garis);min-width:14px}
+.kotak-pilih{border:1.6px dashed var(--hijau);border-radius:14px;padding:26px;text-align:center;background:var(--hijau-muda)}
+.kotak-pilih p{font-size:13px;color:var(--hijau-gelap);font-weight:600;margin-bottom:4px}
+.kotak-pilih small{font-size:12px;color:var(--abu)}
+
+/* ── layar konfirmasi ── */
+.konfirmasi{border:1.6px solid var(--garis);border-radius:16px;padding:20px;background:#fff;max-width:520px}
+.konfirmasi h3{font-size:16px;font-weight:800;margin-bottom:14px}
+.baris-info{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--garis);font-size:13px}
+.baris-info:last-of-type{border-bottom:0}
+.baris-info span{color:var(--abu)}
+.baris-info b{font-weight:700}
+.tanda{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:9px 12px;border-radius:10px;margin-top:10px}
+.tanda.ok{background:var(--hijau-muda);color:var(--hijau-gelap)}
+.tanda.warn{background:#FDF3E2;color:#8A5A10}
+.aksi-konfirmasi{display:flex;gap:10px;margin-top:18px}
+.btn-batal{background:#fff;border:1.6px solid var(--garis);color:var(--abu);font-weight:700;font-size:13px;
+     padding:10px 20px;border-radius:70px}
+.btn-mulai{background:var(--hijau);color:#fff;font-weight:700;font-size:13px;padding:10px 22px;border-radius:70px}
+
+/* ═══ PILIHAN C — SATU HALAMAN RINGKAS ═══ */
+.ringkas{display:grid;grid-template-columns:1fr 1.25fr;gap:18px}
+.panel{background:#fff;border:1px solid var(--garis);border-radius:16px;padding:18px}
+.panel h3{font-size:14.5px;font-weight:800;margin-bottom:12px}
+.pilih-naskah{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1.6px solid var(--hijau);
+       border-radius:11px;background:var(--hijau-muda);margin-bottom:9px;font-size:13px;font-weight:600}
+.pilih-naskah small{display:block;font-size:11.5px;color:var(--abu);font-weight:400}
+.lain{opacity:.5;font-weight:400}
+
+/* ── pratinjau hasil (semua pilihan) ── */
+.hasil{border:1.6px solid var(--garis);border-radius:16px;padding:20px;background:#fff;margin-top:18px}
+.hasil h3{font-size:16px;font-weight:800;margin-bottom:3px}
+.hasil .meta{font-size:12px;color:var(--abu);margin-bottom:14px}
+.tombol-hasil{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px}
+.baris-cek{display:flex;align-items:center;gap:9px;font-size:12.8px;padding:7px 0;border-bottom:1px dashed var(--garis)}
+.baris-cek:last-child{border-bottom:0}
+.baris-cek .ok{color:var(--hijau);font-weight:800}
+.baris-cek .no{color:var(--oranye);font-weight:800}
+.baris-cek .aksi-mini{margin-left:auto;font-size:11px;font-weight:700;color:var(--hijau-gelap);
+       border:1.3px solid var(--hijau);padding:4px 11px;border-radius:70px}
+.notif-halus{background:#FDF3E2;border-left:4px solid var(--oranye);padding:11px 14px;border-radius:0 10px 10px 0;
+       font-size:12.5px;color:#7A5510;line-height:1.6;margin-top:12px}
+.catatan-sketsa{margin-top:34px;background:#fff;border:1.6px solid var(--garis);border-radius:16px;padding:20px}
+.catatan-sketsa h2{font-size:17px;font-weight:800;margin-bottom:10px}
+.catatan-sketsa p{font-size:13px;color:var(--abu);line-height:1.7;margin-bottom:8px}
+.catatan-sketsa b{color:var(--teks)}
+table.banding{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+table.banding th,table.banding td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--garis);vertical-align:top}
+table.banding th{background:var(--hijau-muda);font-weight:800;color:var(--hijau-gelap)}
+@media(max-width:820px){.kartu-pintu,.ringkas{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wadah">
+
+<h1 class="hal">Sketsa Pintu &amp; Halaman — Konversi ke Artikel Jurnal</h1>
+<p class="sub">Tampilan pakai gaya EduAi asli (hijau). Ini <b>sketsa</b> — belum koding, tinggal Bos pilih huruf.</p>
+
+<div class="ket">
+  <b>Cara baca:</b> ada <b>3 pilihan cara masuk (A / B / C)</b>. Semua isinya sama —
+  bedanya cuma <i>cara user memilih naskah</i>. Di bawah tiap pilihan ditampilkan
+  <b>layar konfirmasi</b> &amp; <b>hasil</b> yang sama (biar tidak digambar 3×).
+</div>
+
+<!-- ═══════════════ PILIHAN A ═══════════════ -->
+<span class="label-pil">PILIHAN A — DUA KARTU DI HALAMAN SENDIRI</span>
+<div class="ket">
+  Halaman <b>/artikel</b> baru. Di atas: 2 kartu besar (pilih naskah dari daftar /
+  unggah naskah). Di bawah: daftar naskah dengan tombol <b>Konversi</b> di barisnya.
+</div>
+<div class="rangka">
+  <header class="app">
+    <div class="logo">EduAi</div>
+    <div class="kanan"><span class="pil">Kuota: 1 konversi</span><span class="pil">Pacul</span></div>
+  </header>
+  <div class="pita">
+    <a>Naskah Saya</a><a>Kolaborasi</a><a>Belajar</a><a>Referensi</a><a class="aktif">Konversi Jurnal</a>
+  </div>
+  <div class="isi">
+    <div class="kartu-pintu">
+      <div class="pintu utama">
+        <div class="ikon-bulat">📄</div>
+        <h3>Pilih naskah yang sudah ada</h3>
+        <p>Skripsi/tesis yang sudah di EduAi → dikonversi jadi artikel jurnal.</p>
+        <span class="btn">Pilih Naskah</span>
+      </div>
+      <div class="pintu">
+        <div class="ikon-bulat">⬆️</div>
+        <h3>Unggah naskah baru</h3>
+        <p>Naskah sudah jadi (.docx) yang belum ada di sini.</p>
+        <span class="btn garis">Unggah</span>
+      </div>
+    </div>
+
+    <div class="daftar-naskah">
+      <div class="baris">
+        <div class="doc">📘</div>
+        <div class="nm"><b>SKRIPSI-Pacul-Final.docx</b><small>118 hlm · 2,1 MB · Kuantitatif</small></div>
+        <div class="aksi"><span class="b">Buka</span><span class="b">Revisi</span><span class="b hijau">Konversi ke Jurnal</span></div>
+      </div>
+      <div class="baris">
+        <div class="doc">📗</div>
+        <div class="nm"><b>TESIS-Bab1-5.docx</b><small>96 hlm · 1,7 MB · Kualitatif</small></div>
+        <div class="aksi"><span class="b">Buka</span><span class="b">Revisi</span><span class="b hijau">Konversi ke Jurnal</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PILIHAN B ═══════════════ -->
+<span class="label-pil b">PILIHAN B — LANGKAH BERTAHAP (wizard)</span>
+<div class="ket">
+  User dibimbing <b>1 langkah demi 1</b>. Cocok untuk orang awam — tidak melihat semua
+  pilihan sekaligus. Tab Konversi tetap 1 halaman, isinya berganti tiap langkah.
+</div>
+<div class="rangka">
+  <header class="app">
+    <div class="logo">EduAi</div>
+    <div class="kanan"><span class="pil">Kuota: 1 konversi</span><span class="pil">Pacul</span></div>
+  </header>
+  <div class="pita">
+    <a>Naskah Saya</a><a>Kolaborasi</a><a>Belajar</a><a>Referensi</a><a class="aktif">Konversi Jurnal</a>
+  </div>
+  <div class="isi">
+    <div class="langkah">
+      <div class="ln aktif"><span class="no">1</span> Pilih naskah</div><div class="garis-k"></div>
+      <div class="ln"><span class="no">2</span> Periksa</div><div class="garis-k"></div>
+      <div class="ln"><span class="no">3</span> Konversi</div><div class="garis-k"></div>
+      <div class="ln"><span class="no">4</span> Hasil</div>
+    </div>
+    <div class="kotak-pilih">
+      <p>Langkah 1 dari 4 — Pilih naskah</p>
+      <small>Klik di sini untuk memilih naskah dari daftar, atau unggah .docx</small>
+      <div style="margin-top:14px"><span class="btn">Pilih Naskah</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PILIHAN C ═══════════════ -->
+<span class="label-pil c">PILIHAN C — SATU HALAMAN, DUA PANEL</span>
+<div class="ket">
+  Kiri: daftar naskah (pilih). Kanan: <b>langsung tampil</b> pemeriksaan + tombol
+  Konversi. Tidak pindah langkah — pilih naskah, sisi kanan langsung terisi.
+</div>
+<div class="rangka">
+  <header class="app">
+    <div class="logo">EduAi</div>
+    <div class="kanan"><span class="pil">Kuota: 1 konversi</span><span class="pil">Pacul</span></div>
+  </header>
+  <div class="pita">
+    <a>Naskah Saya</a><a>Kolaborasi</a><a>Belajar</a><a>Referensi</a><a class="aktif">Konversi Jurnal</a>
+  </div>
+  <div class="isi">
+    <div class="ringkas">
+      <div class="panel">
+        <h3>Naskah saya</h3>
+        <div class="pilih-naskah">📘 SKRIPSI-Pacul-Final.docx<small>118 hlm · Kuantitatif</small></div>
+        <div class="pilih-naskah lain">📗 TESIS-Bab1-5.docx<small>96 hlm</small></div>
+        <div class="pilih-naskah lain">📙 REVIEW-Pustaka.docx<small>40 hlm</small></div>
+      </div>
+      <div class="panel">
+        <h3>Pemeriksaan cepat</h3>
+        <div class="baris-cek"><span class="ok">✓</span> Ada abstrak</div>
+        <div class="baris-cek"><span class="ok">✓</span> Abstrak 187 kata (batas 200)</div>
+        <div class="baris-cek"><span class="ok">✓</span> ADA kata kunci</div>
+        <div class="baris-cek"><span class="ok">✓</span> PENDAHULUAN · METODE · HASIL · KESIMPULAN</div>
+        <div class="baris-cek"><span class="ok">✓</span> DAFTAR PUSTAKA</div>
+        <div class="baris-cek"><span class="no">!</span> Kebaruan (novelty) — <i>perlu dinilai AI</i></div>
+        <div style="margin-top:14px"><span class="btn">Konversi Sekarang</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ LAYAR KONFIRMASI (sama utk semua) ═══════════════ -->
+<span class="label-pil">LAYAR KONFIRMASI — sama untuk A/B/C (dipakai sebelum mulai)</span>
+<div class="ket">
+  Wajib tampil <b>sebelum</b> kuota terpakai — supaya user tidak kaget. Pola lama
+  EduAi: <i>"Kuota sudah sangat sedikit, sisa 2 token"</i>.
+</div>
+<div class="konfirmasi">
+  <h3>Sebelum mulai konversi</h3>
+  <div class="baris-info"><span>Naskah</span><b>SKRIPSI-Pacul-Final.docx</b></div>
+  <div class="baris-info"><span>Terdeteksi</span><b>Skripsi (S1) · Kuantitatif</b></div>
+  <div class="baris-info"><span>Jurnal tujuan</span><b>JPEM / SINTA 4</b></div>
+  <div class="baris-info"><span>Kuota</span><b>1 dari paket akan dipakai</b></div>
+  <div class="tanda ok">✓ Mengerti — hasilnya langsung tersimpan, kuota dipakai saat proses selesai</div>
+  <div class="tanda warn">⚠︎ Bab IV &amp; V belum terdeteksi — masih bisa lanjut, tapi hasilnya mungkin kurang lengkap</div>
+  <div class="aksi-konfirmasi">
+    <span class="btn-batal">Batalkan</span>
+    <span class="btn-mulai">Mulai Konversi</span>
+  </div>
+</div>
+
+<!-- ═══════════════ HASIL (sama utk semua) ═══════════════ -->
+<span class="label-pil">HASIL &amp; PEMERIKSAAN 2 LAPIS — sama untuk A/B/C</span>
+<div class="hasil">
+  <h3>Artikel kamu sudah jadi</h3>
+  <div class="meta">Dari SKRIPSI-Pacul-Final.docx · 1 artikel · JPEM/SINTA 4 · 4.812 kata</div>
+  <div class="tombol-hasil">
+    <span class="btn kecil">Buka Artikel</span>
+    <span class="btn garis kecil">Unduh .docx</span>
+    <span class="btn garis kecil">Revisi (kena token)</span>
+    <span class="btn garis kecil">Konversi Ulang (bayar lagi)</span>
+  </div>
+
+  <div class="baris-cek"><span class="ok">✓</span> Ada abstrak (ID + EN)</div>
+  <div class="baris-cek"><span class="ok">✓</span> Kata kunci ada</div>
+  <div class="baris-cek"><span class="ok">✓</span> IMRaD: PENDAHULUAN · METODE · HASIL · KESIMPULAN</div>
+  <div class="baris-cek"><span class="ok">✓</span> DAFTAR PUSTAKA ada</div>
+  <div class="baris-cek"><span class="no">!</span> Kebaruan (novelty) belum terlihat jelas
+      <span class="aksi-mini">Perbaiki pakai AI</span></div>
+  <div class="baris-cek"><span class="no">!</span> Limitasi &amp; Rekomendasi belum spesifik
+      <span class="aksi-mini">Perbaiki pakai AI</span></div>
+
+  <div class="notif-halus">
+    Artikelnya sudah bagus, dan ada <b>2 hal</b> yang biasanya diminta jurnal dan belum
+    terlihat di sini. Mau dilengkapi dulu pakai AI, atau <b>lanjut saja juga tidak masalah</b> —
+    artikel tetap bisa kamu pakai.
+  </div>
+</div>
+
+<!-- ═══════════════ CATATAN ═══════════════ -->
+<div class="catatan-sketsa">
+  <h2>Catatan Wulan untuk Bos</h2>
+  <p><b>1. Isinya sama semua</b> — yang beda cuma cara pilih naskah. Jadi yang Bos pilih
+     hanya "bentuk pintu", bukan fitur.</p>
+  <p><b>2. Rekomendasi Wulan: A</b> — karena Bos sudah putuskan <b>DUA PINTU</b>
+     (tab di menu + tombol di baris naskah). Pilihan A paling dekat dengan putusan itu
+     dan paling sedikit kode baru. B = paling ramah awam tapi user harus klik lebih banyak.
+     C = paling cepat tapi halaman bisa terasa padat.</p>
+  <table class="banding">
+    <tr><th>Hal</th><th>A (dua kartu)</th><th>B (wizard)</th><th>C (dua panel)</th></tr>
+    <tr><td>Ramah orang awam</td><td>Baik</td><td><b>Paling baik</b></td><td>Sedang</td></tr>
+    <tr><td>Klik untuk konversi</td><td>2–3 klik</td><td>4–5 klik</td><td><b>2 klik</b></td></tr>
+    <tr><td>Kode baru (kira-kira)</td><td><b>Paling sedikit</b></td><td>Sedang</td><td>Sedang</td></tr>
+    <tr><td>Cocok dgn putusan Bos</td><td><b>Paling cocok</b></td><td>Cocok</td><td>Kurang</td></tr>
+  </table>
+  <p style="margin-top:14px"><b>3. Yang TIDAK masuk sketsa ini</b> (biar sederhana):
+     pilihan template user-upload, halaman riwayat konversi, pengaturan lanjutan —
+     semua itu nanti, setelah yang dasar jalan.</p>
+</div>
+
+</div>
+</body>
+</html>

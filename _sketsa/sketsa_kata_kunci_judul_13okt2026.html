@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sketsa — Kata Kunci & Saran Judul EduAi</title>
+<style>
+:root{
+  --hijau:#198E3B; --hijau-lembut:#E8F5EC; --tinta:#14261A; --tinta-2:#5B6B60;
+  --garis:#DDE5DF; --putih-hangat:#FBFDFB; --kuning:#B7791F; --kuning-lembut:#FDF6E7;
+  --biru:#1D4ED8; --biru-lembut:#EEF2FF; --merah:#B91C1C;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:18px 14px 60px;background:#F4F7F5;font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--tinta)}
+.wrap{max-width:640px;margin:0 auto}
+.judul-utama{text-align:center;margin:0 0 4px;font-size:21px;font-weight:800}
+.sub{text-align:center;color:var(--tinta-2);font-size:13px;margin:0 0 20px}
+.pilih{display:flex;gap:8px;justify-content:center;margin-bottom:22px;flex-wrap:wrap}
+.pilih button{border:1.5px solid var(--garis);background:#fff;border-radius:10px;padding:9px 16px;
+  font:inherit;font-size:13.5px;cursor:pointer;color:var(--tinta)}
+.pilih button.aktif{background:var(--hijau);border-color:var(--hijau);color:#fff;font-weight:700}
+.panel{background:#fff;border:1px solid var(--garis);border-radius:16px;padding:18px;margin-bottom:16px;
+  box-shadow:0 1px 3px rgba(20,38,26,.04)}
+.panel h2{font-size:15.5px;margin:0 0 4px;display:flex;align-items:center;gap:7px}
+.panel p.ket{font-size:12.5px;color:var(--tinta-2);margin:0 0 14px}
+.sembunyi{display:none}
+.sketsa-tag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.4px;
+  background:var(--kuning-lembut);color:var(--kuning);border:1px solid #F0DFB8;
+  border-radius:6px;padding:2px 7px;margin-bottom:10px}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--tinta-2);margin:12px 0 5px}
+.kotak{width:100%;border:1.5px solid var(--garis);border-radius:11px;padding:12px 14px;
+  font:inherit;font-size:14.5px;color:var(--tinta);background:#fff}
+.kotak:focus{outline:none;border-color:var(--hijau);box-shadow:0 0 0 3px rgba(25,142,59,.12)}
+.chip-baris{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.chip{background:var(--hijau-lembut);border:1px solid #B9DCC5;border-radius:999px;
+  padding:6px 13px;font-size:13px;color:#14532D;cursor:pointer;transition:.15s}
+.chip:hover{background:#DCF0E4}
+.chip.hapus{background:#FDECEC;border-color:#F5C9C9;color:var(--merah);padding:6px 10px}
+.tb{border-radius:11px;padding:11px 18px;font:inherit;font-size:14px;border:1.5px solid transparent;
+  cursor:pointer;transition:.15s}
+.tb-utama{background:var(--hijau);color:#fff;font-weight:600}
+.tb-utama:hover{background:#14722F}
+.tb-garis{background:#fff;border-color:var(--garis);color:var(--tinta)}
+.tb-garis:hover{border-color:var(--hijau);color:var(--hijau)}
+.tb-bantu{background:var(--biru-lembut);border-color:#C7D2FE;color:var(--biru);font-weight:600;
+  font-size:13.5px;padding:9px 15px}
+.tb-bantu:hover{background:#E0E7FF}
+.aksi{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}
+.contoh{margin-top:9px;display:flex;flex-direction:column;gap:7px}
+.contoh button{text-align:left;background:var(--hijau-lembut);border:1px dashed #B9DCC5;
+  border-radius:10px;padding:10px 13px;font:inherit;font-size:13.5px;color:#14532D;cursor:pointer}
+.contoh button:hover{background:#DCF0E4;border-style:solid}
+.kartu-pilih{background:var(--putih-hangat);border:1.5px solid var(--garis);border-radius:12px;
+  padding:13px 15px;margin-top:9px;cursor:pointer;transition:.15s}
+.kartu-pilih:hover{border-color:var(--hijau);background:#F3FBF5}
+.kartu-pilih b{display:block;font-size:14px;margin-bottom:3px}
+.kartu-pilih span{font-size:12.5px;color:var(--tinta-2)}
+.nota{margin-top:12px;padding:11px 13px;border-radius:11px;font-size:12.5px;line-height:1.5}
+.nota.info{background:var(--biru-lembut);border:1px solid #C7D2FE;color:#1E3A8A}
+.nota.kuning{background:var(--kuning-lembut);border:1px solid #F0DFB8;color:#7C4A03}
+.nota.hijau{background:var(--hijau-lembut);border:1px solid #B9DCC5;color:#14532D}
+.muat{font-size:13px;color:var(--tinta-2);padding:8px 0}
+.cek-baris{display:flex;align-items:flex-start;gap:9px;margin-top:11px;font-size:13.5px}
+.cek-baris input{margin-top:3px;accent-color:var(--hijau)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="judul-utama">Sketsa: Kata Kunci &amp; Saran Judul</h1>
+  <p class="sub">Bos, klik tombol di bawah untuk lihat bentuknya. Ini <b>tampilan contoh</b> — belum tersambung ke mesin.</p>
+
+  <div class="pilih">
+    <button class="aktif" onclick="tukar('referensi',this)">Pintu 2 · Referensi</button>
+    <button onclick="tukar('baru',this)">Pintu 1 · Langkah 4 (judul)</button>
+  </div>
+
+  <!-- ══════════════ PINTU 2: HALAMAN REFERENSI ══════════════ -->
+  <div id="s-referensi">
+    <div class="panel">
+      <span class="sketsa-tag">SKETSA — YANG BARU: 2 TOMBOL BIRU</span>
+      <h2>✨ Pilihan EduAi <span style="font-size:11px;background:var(--hijau-lembut);color:var(--hijau);
+          border:1px solid #B9DCC5;border-radius:6px;padding:2px 7px">TANPA TOKEN</span></h2>
+      <p class="ket">EduAi mencarikan artikel untukmu. Tidak memakai Token Revisi — pilihanmu tetap utuh.</p>
+
+      <label for="naskah-ai">Naskah</label>
+      <select class="kotak" id="naskah-ai">
+        <option>Skripsi_Kualitas_Produk.docx</option>
+        <option>Tesis_Relationship_Marketing.docx</option>
+      </select>
+
+      <label for="bab-ai">Untuk BAB</label>
+      <select class="kotak" id="bab-ai">
+        <option>BAB II — Tinjauan Pustaka</option>
+        <option>BAB I — Pendahuluan</option>
+      </select>
+
+      <label for="kk-ai">Kata kunci</label>
+      <input class="kotak" id="kk-ai" placeholder="mis. kualitas produk" value="">
+      <div class="aksi" style="margin-top:9px">
+        <button class="tb tb-bantu" onclick="bantuIsi()">🤖 EduAi bantu isi</button>
+        <span style="font-size:12.5px;color:var(--tinta-2);align-self:center">
+          ← Wulan usul: tombol ini <b>menitip</b> di kotak yang sudah ada
+        </span>
+      </div>
+
+      <!-- HASIL AI: keadaan 1 = AI mengisi kata kunci -->
+      <div id="hasil-kk" class="sembunyi">
+        <div class="nota hijau" id="nota-kk">—</div>
+        <label>Kata kunci hasil EduAi — <b>boleh kamu ubah</b></label>
+        <div class="chip-baris" id="chip-kk"></div>
+        <input class="kotak" id="kk-tambah" placeholder="Tambah kata kunci lain, tekan Enter"
+               style="margin-top:9px" onkeydown="if(event.key==='Enter'){tambahChip(this.value);this.value=''}">
+
+        <label style="margin-top:16px">Atau pilih tema pencarian dari EduAi</label>
+        <div id="tema-baris"></div>
+      </div>
+
+      <div class="aksi">
+        <button class="tb tb-utama" onclick="cariMulai()">✨ Carikan artikel</button>
+      </div>
+      <div class="nota info" id="nota-cari" style="display:none">
+        <b>Mencari…</b> 4 mesin sekaligus: Scopus · OpenAlex · Garuda · CrossRef
+      </div>
+    </div>
+
+    <!-- BAGIAN 2: tidak berubah -->
+    <div class="panel" style="opacity:.62">
+      <h2>🔎 Pencarian kamu
+        <span style="font-size:11px;background:var(--hijau-lembut);color:var(--hijau);
+        border:1px solid #B9DCC5;border-radius:6px;padding:2px 7px">2× TANPA TOKEN</span></h2>
+      <p class="ket">Tidak diubah — tetap seperti sekarang.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════ PINTU 1: LANGKAH 4 MULAI ══════════════ -->
+  <div id="s-baru" class="sembunyi">
+    <div class="panel">
+      <span class="sketsa-tag">SKETSA — YANG BARU: 1 TOMBOL BIRU</span>
+      <h2>Langkah 4 dari 4 — Judul penelitian</h2>
+      <p class="ket">Semua langkah awal sudah lengkap. Sekarang tulis judulmu.</p>
+
+      <label for="in-judul">Judul penelitianmu</label>
+      <input class="kotak" id="in-judul" placeholder="Tulis judul penelitianmu…"
+             value="Analisis Faktor-Faktor yang Mempengaruhi Kepuasan Pelanggan E-Commerce di Indonesia">
+
+      <div class="aksi" style="margin-top:9px">
+        <button class="tb tb-bantu" onclick="mintaJudul()">🤖 Minta saran judul dari EduAi</button>
+      </div>
+
+      <!-- HASIL AI: usulan judul -->
+      <div id="hasil-judul" class="sembunyi">
+        <div class="nota kuning" id="nota-judul">—</div>
+        <label style="margin-top:14px">Pilih yang paling cocok — klik langsung masuk ke kotak</label>
+        <div id="judul-baris"></div>
+        <div class="nota info" style="margin-top:13px">
+          Judul di atas <b>contoh dari EduAi</b>. Kamu bebas mengubah sendiri setelah dipilih —
+          ini hanya jalan pintas, bukan mengunci judulmu.
+        </div>
+      </div>
+
+      <!-- daftar statis: TETAP ADA -->
+      <label style="margin-top:17px">Contoh — klik untuk pakai <span style="font-weight:400">(tetap ada, dari daftar bidang)</span></label>
+      <div class="contoh">
+        <button onclick="pakaiJudul(this)">Pengaruh Kualitas Produk dan Harga terhadap Keputusan Pembelian</button>
+        <button onclick="pakaiJudul(this)">Pengaruh Gaya Kepemimpinan terhadap Kinerja Karyawan</button>
+        <button onclick="pakaiJudul(this)">Pengaruh Digital Marketing terhadap Minat Beli Konsumen</button>
+      </div>
+
+      <div class="aksi">
+        <button class="tb tb-utama">Lanjut</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="nota kuning" style="margin-top:22px">
+    <b>Catatan Wulan (jujur):</b> dari 2 tombol ini, yang <b>belum pasti</b> =
+    apakah AI selalu berhasil. Kalau AI mati/gagal, Wulan usul
+    <b>bilang terus terang</b> (“EduAi belum bisa memetakan judul ini”) —
+    <b>bukan</b> jatuh ke kata mentah yang bikin hasil ngawur.
+  </div>
+</div>
+
+<script>
+function el(i){return document.getElementById(i)}
+function tukar(nama,tb){
+  ['referensi','baru'].forEach(n=>{
+    el('s-'+n).classList.toggle('sembunyi', n!==nama);
+  });
+  document.querySelectorAll('.pilih button').forEach(b=>b.classList.remove('aktif'));
+  tb.classList.add('aktif');
+}
+
+/* ── PINTU 2: bantu isi kata kunci ── */
+const KK = ['kepuasan pelanggan','e-commerce','faktor penentu','konsumen Indonesia'];
+const TEMA = [
+  ['Customer satisfaction in e-commerce','150 artikel · paling banyak dipakai'],
+  ['E-service quality dan kepuasan','82 artikel · lebih spesifik'],
+  ['Determinan kepuasan konsumen online','47 artikel · paling dalam'],
+];
+function bantuIsi(){
+  el('hasil-kk').classList.remove('sembunyi');
+  el('nota-kk').innerHTML = '<b>EduAi membaca judul naskahmu:</b> “Analisis Faktor-Faktor yang ' +
+    'Mempengaruhi Kepuasan Pelanggan E-Commerce di Indonesia” → ' +
+    'ditemukan <b>4 konsep inti</b>. Ini yang akan dicari:';
+  gambarChip();
+  el('tema-baris').innerHTML = '';
+  TEMA.forEach(([t,k],i)=>{
+    const d=document.createElement('div');
+    d.className='kartu-pilih';
+    d.innerHTML='<b>'+t+'</b><span>'+k+'</span>';
+    d.onclick=()=>{
+      el('kk-ai').value=t;
+      el('nota-cari').style.display='block';
+      el('nota-cari').innerHTML='<b>Dicari di 4 mesin:</b> '+t+' — Scopus · OpenAlex · Garuda · CrossRef';
+    };
+    el('tema-baris').appendChild(d);
+  });
+  el('nota-cari').style.display='block';
+  el('nota-cari').innerHTML='<b>Siap dicari.</b> Kata kunci yang akan dipakai: ' + KK.join(' · ');
+}
+function gambarChip(){
+  const c=el('chip-kk'); c.innerHTML='';
+  KK.forEach((k,i)=>{
+    const s=document.createElement('span');
+    s.className='chip';
+    s.innerHTML=k+' <span class="hapus" style="border:0;background:none;padding:0 0 0 5px">✕</span>';
+    s.onclick=()=>{KK.splice(i,1);gambarChip()};
+    c.appendChild(s);
+  });
+}
+function tambahChip(v){
+  v=(v||'').trim(); if(!v) return;
+  KK.push(v); gambarChip();
+  el('nota-cari').style.display='block';
+  el('nota-cari').innerHTML='<b>Siap dicari.</b> Kata kunci yang akan dipakai: ' + KK.join(' · ');
+}
+function cariMulai(){
+  el('nota-cari').style.display='block';
+  el('nota-cari').innerHTML='<b>Mencari…</b> 4 mesin sekaligus: Scopus · OpenAlex · Garuda · CrossRef';
+}
+
+/* ── PINTU 1: minta saran judul ── */
+const JUDUL = [
+  ['Pengaruh Kualitas Layanan dan Kepercayaan terhadap Kepuasan Pelanggan E-Commerce di Indonesia',
+   'Paling jelas arahnya — 2 variabel bebas + 1 terikat'],
+  ['Determinan Kepuasan Pelanggan E-Commerce: Peran Mediasi Kepercayaan',
+   'Lebih dalam — ada variabel perantara (M)'],
+  ['Kepuasan Pelanggan E-Commerce di Indonesia: Tinjauan Sistematis',
+   'Kalau naskahmu berupa kajian pustaka, bukan survei'],
+  ['Pengaruh Harga, Kualitas Produk, dan Promosi terhadap Kepuasan Pelanggan Marketplace Indonesia',
+   'Kalau objekmu marketplace (Shopee/Tokopedia), bukan e-commerce umum'],
+];
+function mintaJudul(){
+  el('hasil-judul').classList.remove('sembunyi');
+  el('nota-judul').innerHTML='<b>EduAi membaca judulmu:</b> kata “Analisis”, “Faktor-Faktor”, dan ' +
+    '“Mempengaruhi” <b>terlalu umum</b> — pembaca belum tahu variabel apa yang kamu uji. ' +
+    'Wulan usul judul yang <b>menyebut variabelnya</b>:';
+  const w=el('judul-baris'); w.innerHTML='';
+  JUDUL.forEach(([t,k])=>{
+    const d=document.createElement('div');
+    d.className='kartu-pilih';
+    d.innerHTML='<b>'+t+'</b><span>'+k+'</span>';
+    d.onclick=()=>{el('in-judul').value=t; window.scrollTo({top:0,behavior:'smooth'})};
+    w.appendChild(d);
+  });
+}
+function pakaiJudul(b){el('in-judul').value=b.textContent.trim();window.scrollTo({top:0,behavior:'smooth'})}
+</script>
+</body>
+</html>

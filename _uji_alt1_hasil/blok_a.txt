@@ -1,0 +1,91 @@
+=== PETA BAGIAN (konteks posisi) ===
+SUB-BAB INI : 1.5 — State of the Art Penelitian
+POSISI      : bagian ke-5 dari 9
+BENANG MASUK (akhir 1.4): "Lebih jauh, temuan penelitian ini diharapkan membuka ruang bagi penyusunan agenda penelitian lanjutan, misalnya pengujian pada sektor jasa lain dengan karakter ketidakpastian serupa, penggunaan desain longitudinal untuk menelusuri dinamika kesiapan digital, atau perluasan model dengan variabel kontekstual lain."
+BENANG KELUAR (awal 1.6): "Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini menunjukkan bahwa masing-masing konstruk telah memperoleh perhatian yang memadai, namun arah pengembangannya belum bertemu pada satu model yang utuh."
+⇒ Sambung kalimat pertama & terakhir hasil revisi dengan benang di atas. JANGAN mengulang kalimat benang itu.
+
+=== BAB I (konteks) ===
+1.1 Latar Belakang Masalah
+
+Perkembangan pesat teknologi dan transformasi digital telah mengubah lanskap kerja organisasi secara mendasar dalam satu dekade terakhir. Organisasi di seluruh dunia dituntut memastikan karyawannya memiliki kapabilitas adaptif yang tinggi agar tetap relevan dan berkelanjutan di tengah perubahan yang berlangsung cepat (Metris et al., 2025). Pergeseran paradigma ini menegaskan urgensi pengembangan sumber daya manusia yang tidak hanya kompeten secara teknis, tetapi juga resilien terhadap perubahan serta mampu mengoptimalkan perangkat digital untuk mencapai kinerja yang optimal (Kurnia Sari et al., 2025). Dengan kata lain, kemampuan beradaptasi telah bergeser dari sekadar kompetensi pelengkap menjadi prasyarat utama keberlangsungan organisasi.
+
+Pergeseran tersebut berdampak langsung pada sektor jasa, khususnya logistik dan ekspedisi, yang berperan sebagai tulang punggung perekonomian nasional. Dinamika pertumbuhan sektor ini dapat dilihat dari nilai Produk Domestik Bruto (PDB) pergudangan, jasa penunjang angkutan, pos, dan kurir sepanjang sepuluh tahun terakhir, sebagaimana disajikan pada Gambar 1.1.
+
+Gambar 1.1. Nilai PDB Pergudangan, Jasa Penunjang Angkutan, Pos dan Kurir 2015–2024
+
+Sumber: Badan Pusat Statistik (BPS), dipublikasikan Techinasia (2025)
+
+Prospek sektor ini diperkirakan akan terus menguat. Proyeksi pendapatan pasar logistik Indonesia untuk periode 2020–2029 disajikan pada Gambar 1.2.
+
+Gambar 1.2. Proyeksi Pendapatan Pasar Logistik Indonesia 2020–2029
+
+Sumber: Statista Market Insight, dipublikasikan Techinasia (2025)
+
+Konsekuensinya, perusahaan logistik tidak hanya dituntut memiliki infrastruktur yang kuat, tetapi juga sumber daya manusia yang mampu beradaptasi cepat terhadap perubahan perilaku konsumen dan perkembangan teknologi (Dâmbean & Gabor, 2022). Tuntutan ganda inilah yang menjadikan kapabilitas adaptif sumber daya manusia sebagai faktor penentu daya saing perusahaan logistik.
+
+Kapabilitas tersebut diwujudkan pada …[dipotong]
+
+=== BAGIAN SEBELUMNYA (konteks) ===
+1.4 Manfaat Penelitian
+
+Penelitian ini diharapkan memberikan kontribusi baik pada tataran pengembangan ilmu pengetahuan maupun pada tataran praktik manajerial, serta memperkaya khazanah akademik mengenai pengelolaan sumber daya manusia di era digital. Secara rinci, manfaat penelitian ini diuraikan ke dalam manfaat teoretis, manfaat praktis, dan manfaat akademis sebagai berikut.
+
+1.4.1 Manfaat Teoretis
+
+Penelitian ini diharapkan memperkaya khazanah keilmuan manajemen sumber daya manusia, khususnya pada kajian tentang bagaimana kondisi kerja dan kapasitas diri karyawan ditransformasikan menjadi kinerja adaptif dalam era transformasi digital. Selama ini literatur cenderung menempatkan adaptive performance sebagai luaran yang dipengaruhi secara langsung oleh faktor individual maupun organisasional, tanpa banyak menyingkap mekanisme konversi yang menjembatani keduanya. Penelitian ini mengisi celah tersebut dengan memposisikan digital readiness sebagai mekanisme penjelas.
+
+Kontribusi …[dipotong]
+
+=== BAGIAN SESUDAHNYA (konteks) ===
+1.6 Kesenjangan Penelitian (Research Gap)
+
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini menunjukkan bahwa masing-masing konstruk telah memperoleh perhatian yang memadai, namun arah pengembangannya belum bertemu pada satu model yang utuh. Kesiapan digital, misalnya, lebih banyak diposisikan sebagai variabel independen maupun konsekuensi organisasi, bukan sebagai mekanisme yang menjembatani sumber daya psikologis dengan kinerja adaptif. Kondisi ini menimbulkan sejumlah kesenjangan yang perlu diidentifikasi secara sistematis. Melalui penelusuran terhadap penelitian …[dipotong]
+
+=== ISI BAGIAN YANG DIREVISI (saat ini) ===
+
+1.5  State of the Art Penelitian
+
+Perkembangan penelitian pada empat ranah yang menjadi fokus kajian ini dapat dipetakan sebagai berikut.
+
+
+Ranah
+
+Perkembangan Terkini
+
+Titik Lanjut yang Ditawarkan Penelitian Ini
+
+Quality of Work Life (QWL)
+
+QWL terbukti meningkatkan kinerja melalui keterlibatan dan kontribusi karyawan (Leitão et al., 2019); QWL diuji bersama self-efficacy terhadap kinerja (Rahardhiansyah et al., 2026; Ayuni & Nuraeni, 2026)
+
+Menguji QWL sebagai sumber daya psikologis yang dikonversi melalui kesiapan digital, bukan jalur langsung
+
+Digital Self-Efficacy (DSE)
+
+DSE memediasi pengaruh transformasi digital terhadap kinerja (Sun & Yoon, 2025); DSE sebagai anteseden pembelajaran (Shahzad et al., 2025)
+
+Memposisikan DSE sebagai anteseden kesiapan digital, bukan mediator
+
+Digital Readiness (DR)
+
+DR diuji sebagai anteseden kepuasan kerja (Palapa & Saragih, 2026); kerangka multi-level kesiapan digital (Trenerry et al., 2021)
+
+Menempatkan DR sebagai simpul konversi (mediator) antara sumber daya dan kinerja
+
+Adaptive Performance (AP)
+
+Taksonomi AP orisinal (Pulakos et al., 2000); penentu AP pada berbagai level (Setiyadi et al., 2024); AP di sektor logistik masih terbatas
+
+Menguji AP pada level individu account officer di sektor logistik Indonesia
+
+Sumber: diolah peneliti (2026).
+
+Kebaruan (novelty) penelitian ini terletak pada tiga hal: pertama, kebaruan konteks, yaitu Account Officer PT JNE Wilayah Lampung, yaitu sektor logistik ekspedisi Indonesia pada level individu di wilayah yang belum diteliti; kedua, kebaruan model, integrasi dua teori besar (COR dan SCT) dalam satu model mediasi parsimonius dengan digital readiness sebagai mediator tunggal; ketiga, kebaruan fenomena, menggeser fokus dari tingkat kinerja ke mekanisme konversi, yaitu menjelaskan bagaimana sumber daya menjadi kinerja, bukan sekadar apakah berpengaruh.
+
+
+=== KOMENTAR/MASUKAN ===
+Perbaiki paragraf ini supaya kalimatnya lebih mengalir dan rujukannya jelas.
+
+=== TUGAS SAAT INI ===
+Revisi HANYA bagian **1.5**. Jangan menulis ulang bagian lain. Seluruh istilah dan variabel WAJIB sama dengan yang di atas.

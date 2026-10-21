@@ -1,0 +1,306 @@
+<link rel="stylesheet" href="/static/ikon.css">
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pengaturan Harga — EduAi</title>
+<style>
+  :root{
+    --tinta:#2b2621; --tinta2:#6b6259; --kertas:#faf7f2; --kartu:#fff;
+    --garis:#e6dfd4; --hijau:#1f7a5a; --hijau2:#2a9d76;
+    --kuning:#b8860b; --merah:#b3402f; --biru:#2d5f9a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--kertas);
+       color:var(--tinta);line-height:1.6;padding:0 0 60px}
+  .nav{background:#14342a;color:#fff;padding:0 24px;height:68px;display:flex;
+       align-items:center;justify-content:space-between}
+  .nav b{font-size:17px;font-weight:600}
+  .nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:14px;margin-left:18px}
+  .nav a:hover{color:#fff}
+  .wadah{max-width:940px;margin:0 auto;padding:0 20px}
+  h1{font-size:26px;margin:28px 0 6px}
+  .sub{color:var(--tinta2);font-size:15px;margin-bottom:24px}
+  .kartu{background:var(--kartu);border:1px solid var(--garis);border-radius:14px;
+         padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .kartu h2{font-size:17px;margin-bottom:4px}
+  .kartu .ket{color:var(--tinta2);font-size:14px;margin-bottom:18px}
+  label{display:block;font-weight:600;font-size:15px;margin-bottom:8px}
+  input[type=number]{width:200px;padding:12px 14px;font-size:20px;font-weight:700;
+      border:2px solid var(--garis);border-radius:10px;font-family:inherit;color:var(--tinta)}
+  input[type=number]:focus{outline:none;border-color:var(--hijau2)}
+  .satuan{font-size:15px;color:var(--tinta2);margin-left:8px}
+  .tombol{background:var(--hijau);color:#fff;border:none;padding:13px 30px;font-size:15px;
+      font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit}
+  .tombol:hover{background:var(--hijau2)}
+  .pesan{padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:14px}
+  .pesan.ok{background:#e8f5ef;border:1px solid #b8e0cd;color:#14543c}
+  .pesan.gagal{background:#fdecea;border:1px solid #f5c6c0;color:#8c2f20}
+
+  /* arah akibat */
+  .arah{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .arah div{border-radius:12px;padding:16px 18px;font-size:14px;border:1.5px solid}
+  .turun{background:#fff8e6;border-color:#f0d28a}
+  .naik{background:#eef6ff;border-color:#b9d4f0}
+  .arah b{display:block;font-size:15px;margin-bottom:6px}
+  .turun b{color:var(--kuning)} .naik b{color:var(--biru)}
+  .arah ul{margin:8px 0 0 18px} .arah li{margin-bottom:3px}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--garis)}
+  th{background:#f5f1ea;font-size:13px;text-transform:uppercase;
+     letter-spacing:.4px;color:var(--tinta2);font-weight:600}
+  td.angka{text-align:center;font-weight:700}
+  tr.ini td{background:#eef7f2}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+  .badge.db{background:#e8f5ef;color:#14543c}
+  .badge.def{background:#f0ede8;color:#6b6259}
+  .cap{color:var(--merah);font-size:12px;font-weight:600}
+  .riwayat td{font-size:13px;color:var(--tinta2)}
+  .riwayat .lama{text-decoration:line-through;opacity:.6}
+  .catatan{font-size:13px;color:var(--tinta2);background:#f5f1ea;padding:14px 16px;
+     border-radius:10px;border-left:3px solid var(--hijau)}
+  .catatan b{color:var(--tinta)}
+</style>
+</head>
+<body>
+
+{{ ikon_sprite() }}
+<div class="nav">
+  <b>{{ ikon('settings', 17) }} EduAi — Pengaturan</b>
+  <span>
+    <a href="/naskah">Naskah</a>
+    <a href="/keluar">Keluar</a>
+  </span>
+</div>
+
+<div class="wadah">
+  <h1>Setelan Admin</h1>
+  <p class="sub">Halaman ini hanya untuk admin. Perubahan berlaku
+     <b>langsung</b> — tanpa perlu pasang ulang aplikasi.</p>
+
+  {% if pesan %}
+  <div class="pesan {{ 'ok' if berhasil else 'gagal' }}">{{ pesan }}</div>
+  {% endif %}
+
+  <h1 id="kunci" style="margin-top:26px">Kunci Layanan</h1>
+  <p class="sub">Tempel kunci baru → klik <b>Simpan &amp; Uji</b>. Sistem langsung
+     mencoba menyambung, jadi Bapak tahu <b>seketika</b> kuncinya benar atau salah.</p>
+
+  <div class="kartu">
+    <h2>Status kunci yang dipakai</h2>
+    <p class="ket">Kunci di halaman ini <b>menang</b> atas setelan bawaan.
+       Kalau ingin kembali ke bawaan, klik <b>Kembalikan</b>.</p>
+    <table>
+      <thead>
+        <tr><th>Layanan</th><th>Tersambung</th><th>Kunci</th>
+            <th>Diatur oleh</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for k in kunci %}
+        <tr>
+          <td><b>{{ k.label }}</b><br>
+              <span style="color:var(--tinta2);font-size:12px">{{ k.catatan }}</span></td>
+          <td>{% if k.ada %}<span class="badge db">✅ ada</span>
+              {% else %}<span class="badge def">belum ada</span>{% endif %}</td>
+          <td><code>{{ k.tersamar or '—' }}</code><br>
+              <span style="color:var(--tinta2);font-size:12px">{{ k.panjang }} karakter
+              · dari {{ k.asal }}</span></td>
+          <td style="font-size:13px">{{ k.oleh or '—' }}</td>
+          <td style="text-align:right">
+            {% if k.asal == 'diatur admin' %}
+            <form method="post" action="/pengaturan/kunci/hapus" style="margin:0">
+              <input type="hidden" name="nama" value="{{ k.nama }}">
+              <button class="badge def" style="cursor:pointer;border:1px solid var(--garis)">
+                Kembalikan</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if kuota_scite %}
+    <div style="margin-top:16px;padding:14px 16px;background:#f5f1ea;border-radius:10px">
+      <b>📊 Kuota Scite</b>
+      <span class="badge {{ 'db' if kuota_scite.status != 'trialing' else 'def' }}"
+            style="margin-left:6px">{{ kuota_scite.status }}</span>
+      <div style="margin-top:8px;font-size:14px">
+        Terpakai <b>{{ kuota_scite.terpakai }}</b> dari
+        <b>{{ kuota_scite.kuota }}</b> · sisa <b>{{ kuota_scite.sisa }}</b>
+        · reset {{ kuota_scite.reset }}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="kartu">
+    <h2>{{ ikon('wallet', 17) }} Ganti kunci</h2>
+    <p class="ket">Pilih layanan, tempel kunci barunya, lalu klik Simpan &amp; Uji.</p>
+    {% for k in kunci %}
+    <form method="post" action="/pengaturan/kunci"
+          style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+      <input type="hidden" name="nama" value="{{ k.nama }}">
+      <span style="min-width:96px"><b>{{ k.label }}</b></span>
+      <input type="text" name="nilai" placeholder="tempel kunci {{ k.label }} di sini"
+             style="flex:1;min-width:220px" autocomplete="off">
+      <button type="submit" class="badge db"
+              style="cursor:pointer;border:1px solid var(--garis);padding:7px 14px">
+        Simpan &amp; Uji</button>
+    </form>
+    {% endfor %}
+    <p class="ket" style="margin:12px 0 0">
+      ℹ️ <b>Scite</b> memakai token yang berlaku 15 menit (disegarkan otomatis).
+      Kalau token mati, login ulang akun Scite — minta Wulan untuk memandu.</p>
+  </div>
+
+  <h1 style="margin-top:26px">Harga Token Revisi</h1>
+
+  <form method="post" action="/pengaturan">
+    <div class="kartu">
+      <h2>1 Token Revisi = berapa token</h2>
+      <p class="ket">Rumusnya: Token Revisi = jumlah token ÷ angka ini
+         (dibulatkan ke atas). <b>Angka kecil = mahasiswa kena Token lebih banyak.</b></p>
+
+      <label>1 Token Revisi =</label>
+      <input type="number" name="token_revisi_per" id="per"
+             value="{{ nilai.token_revisi_per }}" min="1" step="100" required>
+      <span class="satuan">token
+        <span class="badge {{ 'db' if asal.token_revisi_per == 'DB' else 'def' }}">
+          {{ 'diatur dari halaman ini' if asal.token_revisi_per == 'DB' else 'nilai bawaan' }}
+        </span>
+      </span>
+
+      <div class="arah">
+        <div class="turun">
+          <b>{{ ikon('arrow-down', 15) }} Angka DITURUNKAN (mis. 10.000 → 5.000)</b>
+          <ul>
+            <li>Ambang batas makin <b>sempit</b></li>
+            <li>Mahasiswa kena Token Revisi <b>LEBIH BANYAK</b></li>
+            <li>Pendapatan <b>NAIK</b> {{ ikon('wallet', 14) }}</li>
+            <li>{{ ikon('alert-triangle', 14) }} Risiko: mahasiswa mengeluh mahal</li>
+          </ul>
+        </div>
+        <div class="naik">
+          <b>{{ ikon('arrow-up', 15) }} Angka DINAIKKAN (mis. 10.000 → 20.000)</b>
+          <ul>
+            <li>Ambang batas makin <b>lebar</b></li>
+            <li>Mahasiswa kena Token Revisi <b>LEBIH SEDIKIT</b></li>
+            <li>Pendapatan <b>TURUN</b></li>
+            <li>{{ ikon('check', 14) }} Mahasiswa senang, tapi margin menipis</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="kartu">
+      <h2>Batas maksimum Token Revisi</h2>
+      <p class="ket">Pagar supaya naskah sangat besar tidak menagih sampai
+         ratusan Token. Kalau hitungan melewati batas ini, yang ditagih = batas ini.</p>
+      <label>Maksimum per satu kali revisi =</label>
+      <input type="number" name="token_revisi_cap" id="cap"
+             value="{{ nilai.token_revisi_cap }}" min="1" step="5" required>
+      <span class="satuan">Token Revisi
+        <span class="badge {{ 'db' if asal.token_revisi_cap == 'DB' else 'def' }}">
+          {{ 'diatur dari halaman ini' if asal.token_revisi_cap == 'DB' else 'nilai bawaan' }}
+        </span>
+      </span>
+    </div>
+
+    <button class="tombol" type="submit">Simpan</button>
+  </form>
+
+  <div class="kartu" style="margin-top:24px">
+    <h2>Daftar potongannya (contoh nyata)</h2>
+    <p class="ket">Inilah akibat perubahan angka — dihitung dengan rumus yang
+       sama seperti aplikasi. Angka <b>ditebalkan</b> = yang berlaku sekarang.</p>
+    <table>
+      <thead>
+        <tr><th>Naskah</th><th style="text-align:center">Total token</th>
+            <th style="text-align:center">Token Revisi</th>
+            <th style="text-align:center">Kalau diturunkan 5.000</th>
+            <th style="text-align:center">Kalau dinaikkan 20.000</th></tr>
+      </thead>
+      <tbody id="tabel-simulasi">
+        {% for s in simulasi %}
+        <tr class="{{ 'ini' if loop.index == 2 }}">
+          <td>{{ s.nama }}</td>
+          <td style="text-align:center">{{ '{:,}'.format(s.total).replace(',', '.') }}</td>
+          <td class="angka">{{ s.token }}{% if s.kena_cap %} <span class="cap">(batas)</span>{% endif %}</td>
+          <td style="text-align:center" data-sim="5000">—</td>
+          <td style="text-align:center" data-sim="20000">—</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="catatan" style="margin-top:16px">
+      <b>Cara membaca:</b> baris pertama = revisi ringan (satu sub-bab),
+      baris kedua = <b>skripsi S1</b> (paling sering dipakai), ketiga = tesis S2,
+      keempat = disertasi S3. Angka dihitung oleh peramban supaya Bos bisa
+      mencoba-coba sebelum menyimpan.
+    </p>
+  </div>
+
+  {% if riwayat %}
+  <div class="kartu">
+    <h2>Riwayat perubahan</h2>
+    <p class="ket">Jejak siapa mengubah apa — supaya tidak ada perubahan yang hilang jejaknya.</p>
+    <table class="riwayat">
+      <thead><tr><th>Kapan</th><th>Setelan</th><th>Dari</th><th>Menjadi</th><th>Oleh</th></tr></thead>
+      <tbody>
+        {% for r in riwayat %}
+        <tr>
+          <td>{{ r.kapan.strftime('%d %b %Y, %H:%M') if r.kapan else '-' }}</td>
+          <td>{{ r.kunci }}</td>
+          <td class="lama">{{ r.lama }}</td>
+          <td><b>{{ r.baru }}</b></td>
+          <td>{{ r.oleh or '-' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <p class="catatan">
+    <b>Catatan:</b> perubahan di sini <b>tidak bisa dibatalkan otomatis</b> —
+    riwayat di atas bisa jadi acuan mengembalikan nilai lama.
+    Kalau halaman ini dikosongkan, aplikasi kembali memakai nilai bawaan
+    ({{ default_terpasang }}).
+  </p>
+</div>
+
+<script>
+// Hitung ulang kolom simulasi di peramban begitu angka diubah — supaya Bos
+// bisa melihat akibatnya SEBELUM menyimpan.
+({{ simulasi|tojson }}) && (function(){
+  var baris = {{ simulasi|tojson }};
+  var capEl = document.getElementById('cap');
+  var perEl = document.getElementById('per');
+  function hitung(total, per, cap){
+    if (!per || per <= 0) return '-';
+    var n = Math.ceil(total / per);
+    return Math.min(n, cap || 999999);
+  }
+  function segarkan(){
+    var cap = parseInt(capEl.value, 10) || 60;
+    document.querySelectorAll('#tabel-simulasi tr').forEach(function(tr, i){
+      var s = baris[i]; if (!s) return;
+      var td5  = tr.querySelector('[data-sim="5000"]');
+      var td20 = tr.querySelector('[data-sim="20000"]');
+      if (td5)  td5.textContent  = hitung(s.total, 5000, cap);
+      if (td20) td20.textContent = hitung(s.total, 20000, cap);
+      // kolom "berlaku sekarang" ikut berubah saat angka utama diubah
+      var tdNow = tr.querySelector('td.angka');
+      if (tdNow) tdNow.innerHTML = hitung(s.total, parseInt(perEl.value,10)||10000, cap);
+    });
+  }
+  perEl.addEventListener('input', segarkan);
+  capEl.addEventListener('input', segarkan);
+  segarkan();
+})();
+</script>
+</body>
+</html>
