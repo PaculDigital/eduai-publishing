@@ -141,7 +141,10 @@ Naskah BAB I–III
    manual gratis; yang 2 token/item khusus konversi jurnal, beda fitur.)
 4. **Token antar-layanan** untuk jembatan produksi (API mesin hari ini
    publik tanpa kunci) — ACC pembuatan kunci baru milik EduAi.
-5. **Cara Wulan push/PR branch ini** (PAT sesaat / fork / lokal saja).
+5. ~~**Cara Wulan push/PR branch ini**~~ **SELESAI 21 Okt 2026**: Bos
+   memerintahkan push; branch ter-push ke repo asal via PAT Bos sesaat
+   (langsung dihapus sesudahnya; revokasi disarankan). PR ke main belum
+   dibuat — menunggu keputusan Bos.
 
 ### C2. Bagian rancangan yang belum dibahas sama sekali
 6. ~~**Jembatan KUALITATIF**~~ **SELESAI — diputuskan Bos 21 Okt 2026:

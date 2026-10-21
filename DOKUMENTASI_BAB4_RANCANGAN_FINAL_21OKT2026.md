@@ -555,8 +555,12 @@ Semua panggilan AI tetap lewat **satu pintu 9router** (aturan repo).
 ## 15. YANG BELUM DIPUTUSKAN (jangan diisi sendiri — tanya Bos)
 
 1. Kapan mulai membangun (menunggu perintah Bos; mode sekarang bahas).
-2. Cara push/PR branch dokumen ini ke GitHub (PAT sesaat / fork
-   kolaborator / lokal saja) — Wulan tidak punya akun fork sendiri.
+2. ~~Cara push/PR branch dokumen ini ke GitHub~~ **SELESAI 21 Okt 2026**:
+   Bos memerintahkan push langsung; branch `agen/wulan/bab4-statistik-backend`
+   SUDAH ter-push ke repo asal memakai PAT Bos sesaat (dipakai lewat
+   variabel lingkungan, langsung dihapus; revokasi disarankan).
+   PR ke main BELUM dibuat — menunggu keputusan Bos (merge = keputusan
+   Bos, bukan agen).
 3. Pembuatan kunci antar-layanan milik EduAi (bagian paket §11.2,
    dikerjakan saat tahap bangun).
 4. Timeout & perilaku kegagalan jembatan (§11.3).
