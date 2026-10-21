@@ -634,6 +634,54 @@ Semua panggilan AI tetap lewat **satu pintu 9router** (aturan repo).
   dipakai user. Bukti silang-repo kemarin adalah uji layanan, bukan
   pemasangan.
 
+---
+
+## 15c. VONIS REVIEW KETIGA — FASE 2 LULUS SEBAGAI FONDASI (21 Okt 2026)
+
+Reviewer: Wulan (pemegang kendali `main`). Branch: `agen/wulan/bab4-statistik-backend`
+@ **5eeeff0**. Metode: baca diff baris-per-baris + jalankan uji bawaan +
+**uji bug independen yang sama persis seperti review sebelumnya** + **uji
+mutasi** (perbaikan dicabut untuk membuktikan uji bisa GAGAL).
+
+### Status 6 temuan review kedua
+
+| # | Temuan | Status | Bukti |
+|---|---|---|---|
+| 1 | Kunci Hasil mundur ke versi lama | ✅ TUNTAS + BERGIGI | kunci#2 → `None`; bug disuntik balik → uji GAGAL |
+| 2 | `periksa_peta([])` meledak | ✅ TUNTAS | → masalah `bentuk_salah` |
+| 3 | `periksa_peta({'variabel':'x'})` meledak | ✅ TUNTAS | → masalah `bentuk_salah` |
+| 4 | Jalur ke variabel hantu | ✅ TUNTAS | → masalah `jalur_hantu` |
+| 5 | Peran tak dikenal (`Q`) | ✅ TUNTAS | → masalah `peran_tak_dikenal` |
+| 6 | Modul belum dipasang ke aplikasi | ⚠️ DIAKUI JUJUR di §15b | verifikasi ulang: `main.py` memang belum impor, rute `/bab4` belum ada — klaim COCOK kenyataan |
+
+### Uji mutasi (bukti uji tidak hijau palsu)
+
+| Keadaan | `kunci#2` |
+|---|---|
+| Kode asli (5eeeff0) | **None** ✅ |
+| Bug lama disuntik balik | **2** ← uji menangkap |
+
+### Uji tepi tambahan reviewer (di luar uji bawaan)
+
+| Kasus | Hasil |
+|---|---|
+| Kunci v3 → generate v4,v5 → kunci lagi | v5 ✅ (tidak mundur) |
+| Kunci v4 → generate v5 → kunci | v5 ✅ (bukan v3) |
+| 12 generate berturut-turut | 12 baris, tanpa error |
+
+`uji_bab4_fase2.py`: **22 → 29 asersi, semua LULUS.**
+
+### Catatan kecil (BUKAN bug, tidak menghalangi merge)
+
+- `bab4.py` menyimpan SEMUA versi draf tanpa batas (12 generate = 12 baris),
+  sedangkan pola `VersiDokumen` di repo ini menyimpan maksimal 2 versi lama.
+  Dokumen tidak mewajibkan pembatasan, tapi tabel bisa membesar bila narasi
+  dijalankan terus. **Catat untuk Fase 3**, bukan syarat merge.
+
+**VONIS: LULUS SEBAGAI FONDASI — boleh masuk `main` dengan pesan tegas
+"fondasi, belum bisa dipakai user". Fitur BAB IV belum bisa dipakai sampai
+Fase 3 (orkestrasi + rute + layar) selesai.**
+
 ## 16. URUTAN BANGUN YANG DIUSULKAN [USULAN Wulan — belum diperintah Bos]
 
 1. Di Statistik Lab: pintu kuantitatif tanpa sesi + dua pintu
