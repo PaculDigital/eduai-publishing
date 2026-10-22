@@ -626,26 +626,22 @@ Semua panggilan AI tetap lewat **satu pintu 9router** (aturan repo).
   Review agen Bos menemukan 6 hal: 5 bug kode (kunci mundur ke versi
   lama; pemeriksa meledak pada bentuk salah ×2; jalur hantu; peran tak
   dikenal) — DIPERBAIKI & teruji regresi; 1 hal di bawah ini.
-- **Fase 3 INTI SELESAI & ter-push** (21 Okt sore): modul terpasang —
-  `app/bab4_rute.py` terdaftar di main.py, 11 rute /api/bab4 (peta,
-  sahkan, instrumen + 2 unduhan, data 3 tahap, pra-survei + kartu
-  kesehatan, olah-data + tarif, kunci-hasil, ringkasan, simulasi
-  contoh); tabel `data_lapangan_bab4`; pembuat instrumen lahir dari
-  peta. Uji rute ujung-ke-ujung 13 pemeriksaan LULUS melawan server
-  Statistik Lab hidup. Uji ini menangkap 3 cacat antar-fase yang uji
-  per-fase tidak lihat: FK tabel salah nama ('file_berkas' → 'files'),
-  bentuk baris kontrak (objek per responden), dan larangan mencampur
-  'peran' + kolom eksplisit. SISA Fase 3: simulasi sungguhan (mesin
-  BUAT DATA), narasi AI dari hasil terkunci, dan layar HTML Halaman
-  Data Lapangan (rute JSON sudah siap).
-- ⚠️ **FONDASI BELUM DIPASANG KE APLIKASI** (status SEBELUM Fase 3 —
-  kini sudah terpasang, lihat butir di atas): `app/bab4.py` dan
-  `app/jembatan_statistik.py` saat ini MODUL FONDASI — belum diimpor
-  `main.py`, belum ada rute HTTP, belum ada layar. Itu memang cakupan
-  Fase 3 (orkestrasi + rute + UI), BUKAN kelalaian — tapi siapa pun
-  yang membaca status ini tidak boleh mengira fitur BAB IV sudah bisa
-  dipakai user. Bukti silang-repo kemarin adalah uji layanan, bukan
-  pemasangan.
+- **Fase 3 SELESAI, LULUS REVIEW & SUDAH DI `main`** (21 Okt, malam):
+  modul terpasang — `app/bab4_rute.py` terdaftar di main.py, **17 rute**
+  /api/bab4 (peta, sahkan, instrumen + 2 unduhan, data 3 tahap,
+  pra-survei + kartu kesehatan, olah-data + tarif, kunci-hasil, hasil,
+  profil, ringkasan, simulasi contoh, simulasi/buat, narasi,
+  narasi/teks, data/unduh.csv); tabel `data_lapangan_bab4`; pembuat
+  instrumen lahir dari peta; **layar** `templates/bab4.html`.
+  Simulasi lewat **mesin BUAT DATA** (bukan AI mengarang), narasi AI
+  hanya lahir dari hasil TERKUNCI. Review **9 ronde, 34 bug** ditutup,
+  uji mutasi terbukti bergigi — rincian di §15d. Sudah di-merge ke
+  `main` (`3ca2f2d`, catatan `ef402e2`).
+- ⚠️ **RIWAYAT (bukan status sekarang)** — blok di bawah ini ditulis
+  SEBELUM Fase 3 dipasang; disimpan sebagai catatan, JANGAN dibaca
+  sebagai keadaan kini: `app/bab4.py` dan `app/jembatan_statistik.py`
+  dulu MODUL FONDASI (belum diimpor `main.py`, belum ada rute HTTP,
+  belum ada layar). Kini SUDAH terpasang — lihat butir Fase 3 di atas.
 
 ## 15c. VONIS REVIEW KETIGA — FASE 2 LULUS SEBAGAI FONDASI (21 Okt 2026)
 
@@ -766,3 +762,31 @@ tanpa filter `jenis` → tertangkap.
 3. Jalur kualitatif penuh (§12), lalu campuran (§5.5).
 4. Gerbang `scripts/periksa_kode.sh`, uji ujung-ke-ujung di HP
    (mobile-first: user Bos menguji lewat ponsel), baru PR.
+
+### Pembaruan Fase 4 (21 Okt 2026, petang) — SELESAI di branch
+
+- **Statistik Lab** (branch `agen/wulan/jembatan-bab4`, commit `59df57b`):
+  `POST /api/jembatan/kualitatif/koding` (catatan informan → AI
+  mengusulkan kode+tema per potongan; pengesahan tetap manusia di
+  EduAi) dan `POST /api/jembatan/kualitatif/matriks` (koding tersahkan
+  → triangulasi / SWOT+IFAS-EFAS+kuadran). Hitungan adalah pindahan
+  PERSIS logika peramban `kualitatif.html` (aturan tema kuat:
+  ≥3 informan atau ≥2 informan + ≥2 teknik; kuadran dari titik tengah
+  2,50) — halaman /kualitatif pemakai langsung TIDAK diubah. Pemanggil
+  AI disuntikkan dari `main.py` (`_panggil_ai_server`, pola saran yang
+  sudah ada). Uji: `uji_jembatan_kualitatif.py` semua lulus.
+- **EduAi** (branch ini): catatan & segmen & faktor tersimpan di EduAi
+  (tahap `kual_catatan`/`kual_segmen`/`swot_faktor`); rute
+  `/api/bab4/kualitatif/*` (catatan, usulkan-koding, segmen, faktor,
+  matriks — tarif meteran generate per jenis hasil, token kembali bila
+  mesin gagal); `/kunci-hasil` menerima jenis kualitatif; narasi
+  `sumber: kualitatif_tematik | kualitatif_swot | campuran`.
+- **Campuran dua putaran**: gerbang keras — matriks tematik pada peta
+  campuran ditolak 409 sampai hasil kuantitatif dikunci;
+  `POST /api/bab4/campuran/pendalaman` menyusun pertanyaan wawancara
+  putaran 2 secara deterministik dari putusan hipotesis terkunci
+  (jalur tak signifikan digali sebab lapangannya). `periksa_peta`
+  kini memeriksa bukti fokus/informan juga untuk jenis campuran.
+- **BELUM DIPUTUSKAN Bos**: waktu bayar campuran (usulan Wulan: per
+  putaran) — implementasi mengikuti meteran generate per jenis yang
+  sudah ada, bukan skema bayar baru. PR & deploy tetap menunggu Bos.

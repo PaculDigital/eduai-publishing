@@ -200,7 +200,7 @@ def periksa_peta(peta: dict) -> list[dict]:
                    f'Bagian "{kunci_daftar}" harus berupa daftar objek.')
             peta = {**peta, kunci_daftar: []}
 
-    if peta.get('jenis') == 'kualitatif':
+    if peta.get('jenis') in ('kualitatif', 'campuran'):
         if not peta.get('fokus'):
             tambah('fokus_kosong', 'Fokus penelitian belum terisi.')
         if not peta.get('informan'):
@@ -215,7 +215,10 @@ def periksa_peta(peta: dict) -> list[dict]:
                 tambah('tanpa_bukti',
                        f'Informan "{i.get("jenis", "?")}" tidak punya '
                        'bukti kalimat dari naskah.')
-        return masalah
+        if peta.get('jenis') == 'kualitatif':
+            return masalah
+        # jenis 'campuran': lanjut ke pemeriksaan kuantitatif di bawah
+        # (kedua belahan peta wajib sama-sama sah — desain §14).
 
     variabel = peta.get('variabel') or []
     jalur = peta.get('jalur') or []

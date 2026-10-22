@@ -76,6 +76,48 @@
     <textarea id="teksNarasi" style="min-height:260px" placeholder="Narasi akan muncul di sini. Angka hanya dari hasil yang dikunci."></textarea>
   </div>
 </main>
+
+  <h2>5 · Kualitatif &amp; Campuran</h2>
+  <div class="kartu">
+    <p class="kecil">Catatan informan — satu potongan per baris, format:
+      <b>Informan | teknik | internal/eksternal | isi catatan</b>.
+      Catatan tersimpan di EduAi; mesin hanya menghitung.</p>
+    <textarea id="catatan" rows="5" style="width:100%" placeholder="Pelanggan A | wawancara | eksternal | pelayanannya lambat sekali"></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+      <button id="btnCatatan">Simpan Catatan</button>
+      <button id="btnUsulan">Minta Usulan Koding (AI)</button>
+    </div>
+    <div id="daftarUsulan"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+      <button id="btnSegmen">Sahkan &amp; Simpan Koding</button>
+      <button id="btnTri">Hitung Triangulasi</button>
+      <button id="btnKunciTri">Kunci Hasil Tematik</button>
+    </div>
+    <p class="kecil" id="infoKual"></p>
+    <div id="ringkasTri"></div>
+  </div>
+  <div class="kartu">
+    <p class="kecil">Faktor SWOT — satu faktor per baris, format:
+      <b>S/W/O/T | isi faktor | bobot | rating</b> (total bobot kelompok
+      dalam &amp; luar masing-masing idealnya 1,00).</p>
+    <textarea id="faktor" rows="4" style="width:100%" placeholder="S | rasa enak | 0.6 | 4"></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+      <button id="btnFaktor">Simpan Faktor</button>
+      <button id="btnSwot">Hitung SWOT (IFAS/EFAS)</button>
+      <button id="btnKunciSwot">Kunci Hasil SWOT</button>
+    </div>
+    <p class="kecil" id="infoSwot"></p>
+  </div>
+  <div class="kartu">
+    <p class="kecil">Penelitian campuran: sesudah hasil kuantitatif
+      dikunci, buat pertanyaan pendalaman untuk putaran 2.</p>
+    <button id="btnDalam">Buat Pertanyaan Pendalaman</button>
+    <ol id="daftarDalam" class="kecil"></ol>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+      <button id="btnNarasiKual">Buat Narasi Kualitatif</button>
+      <button id="btnNarasiCampur">Buat Narasi Campuran</button>
+    </div>
+  </div>
 <script>
 const FID = {{ file_id }};
 const $ = id => document.getElementById(id);
@@ -185,6 +227,79 @@ async function muatHasil(){
     }
   }catch(e){ /* layar tetap bisa dipakai tanpa hasil tersimpan */ }
 }
+
+let USULAN = [];
+function barisPisah(teks){
+  return teks.split('\n').map(s=>s.trim()).filter(Boolean).map(s=>s.split('|').map(x=>x.trim()));
+}
+$('btnCatatan').onclick = async () => {
+  const catatan = barisPisah($('catatan').value).map(p=>({informan:p[0]||'', teknik:p[1]||'', jenis:p[2]||'internal', teks:p[3]||''}));
+  try{ const j = await api('/api/bab4/kualitatif/catatan','PUT',{file_id:FID, catatan});
+    $('infoKual').textContent = 'Catatan tersimpan: '+j.jumlah+' potongan.';
+  }catch(e){ $('infoKual').textContent = e.message; }
+};
+$('btnUsulan').onclick = async () => {
+  try{ const j = await api('/api/bab4/kualitatif/usulkan-koding','POST',{file_id:FID});
+    USULAN = j.usulan || [];
+    $('daftarUsulan').innerHTML = USULAN.map((u,i)=>
+      '<div style="margin:6px 0"><span class="kecil">'+u.informan+': "'+u.teks+'"</span><br>'+
+      '<input data-kode="'+i+'" value="'+(u.kode_usulan||'')+'" placeholder="kode" style="width:38%"> '+
+      '<input data-tema="'+i+'" value="'+(u.tema_usulan||'')+'" placeholder="tema" style="width:38%"></div>').join('');
+    $('infoKual').textContent = 'Usulan AI tampil — periksa & betulkan, lalu sahkan. Kamulah penelitinya.';
+  }catch(e){ $('infoKual').textContent = e.message; }
+};
+$('btnSegmen').onclick = async () => {
+  const segmen = USULAN.map((u,i)=>({teks:u.teks, informan:u.informan, teknik:u.teknik, jenis:u.jenis,
+    kode: document.querySelector('[data-kode="'+i+'"]').value, tema: document.querySelector('[data-tema="'+i+'"]').value}));
+  try{ const j = await api('/api/bab4/kualitatif/segmen','PUT',{file_id:FID, segmen});
+    $('infoKual').textContent = 'Koding disahkan: '+j.jumlah+' segmen.';
+  }catch(e){ $('infoKual').textContent = e.message; }
+};
+$('btnTri').onclick = async () => {
+  try{ const j = await api('/api/bab4/kualitatif/matriks','POST',{file_id:FID, jenis:'tematik'});
+    const tri = j.hasil.triangulasi;
+    $('ringkasTri').innerHTML = '<table><tr><th>Tema</th><th>Kutipan</th><th>Informan</th><th>Kekuatan</th></tr>'+
+      tri.tema.map(t=>'<tr><td>'+t.tema+'</td><td>'+t.total_kutipan+'</td><td>'+t.jumlah_informan+'</td><td>'+
+      (t.kuat?'kuat':'perlu diperkuat')+(t.tertriangulasi?' · tertriangulasi':'')+'</td></tr>').join('')+'</table>';
+    $('infoKual').textContent = 'Triangulasi versi '+j.versi+' terhitung (tarif '+j.tarif_dikenakan+' token). Kunci untuk bahan narasi.';
+  }catch(e){ $('infoKual').textContent = e.message; }
+};
+$('btnKunciTri').onclick = async () => {
+  try{ const j = await api('/api/bab4/kunci-hasil','POST',{file_id:FID, jenis:'kualitatif_tematik'});
+    $('infoKual').textContent = 'Hasil tematik versi '+j.versi_terkunci+' TERKUNCI.';
+  }catch(e){ $('infoKual').textContent = e.message; }
+};
+$('btnFaktor').onclick = async () => {
+  const faktor = barisPisah($('faktor').value).map(p=>({kelompok:(p[0]||'').toUpperCase(), teks:p[1]||'', bobot:parseFloat(p[2])||0, rating:parseFloat(p[3])||0}));
+  try{ const j = await api('/api/bab4/kualitatif/faktor','PUT',{file_id:FID, faktor});
+    $('infoSwot').textContent = 'Faktor tersimpan: '+j.jumlah+'.';
+  }catch(e){ $('infoSwot').textContent = e.message; }
+};
+$('btnSwot').onclick = async () => {
+  try{ const j = await api('/api/bab4/kualitatif/matriks','POST',{file_id:FID, jenis:'swot'});
+    const sw = j.hasil.swot;
+    $('infoSwot').textContent = 'IFAS '+sw.ifas.total_skor+' · EFAS '+sw.efas.total_skor+
+      (sw.kuadran ? ' · Kuadran '+sw.kuadran.label : '')+' (versi '+j.versi+', tarif '+j.tarif_dikenakan+' token).';
+  }catch(e){ $('infoSwot').textContent = e.message; }
+};
+$('btnKunciSwot').onclick = async () => {
+  try{ const j = await api('/api/bab4/kunci-hasil','POST',{file_id:FID, jenis:'kualitatif_swot'});
+    $('infoSwot').textContent = 'Hasil SWOT versi '+j.versi_terkunci+' TERKUNCI.';
+  }catch(e){ $('infoSwot').textContent = e.message; }
+};
+$('btnDalam').onclick = async () => {
+  try{ const j = await api('/api/bab4/campuran/pendalaman','POST',{file_id:FID});
+    $('daftarDalam').innerHTML = j.pertanyaan.map(q=>'<li><b>'+q.hipotesis+'</b> ('+q.putusan+'): '+q.pertanyaan+'</li>').join('');
+  }catch(e){ $('daftarDalam').innerHTML = '<li>'+e.message+'</li>'; }
+};
+async function narasiSumber(sumber){
+  try{ const j = await api('/api/bab4/narasi','POST',{file_id:FID, sumber});
+    $('teksNarasi').value = j.teks;
+    $('infoNarasi').textContent = 'Narasi versi '+j.versi+' ('+sumber+', tarif '+j.tarif_dikenakan+' token).';
+  }catch(e){ $('infoNarasi').textContent = e.message; }
+}
+$('btnNarasiKual').onclick = () => narasiSumber('kualitatif_tematik');
+$('btnNarasiCampur').onclick = () => narasiSumber('campuran');
 muatRingkasan(); muatProfil(); muatHasil();
 </script>
 </body>

@@ -321,12 +321,15 @@ def kunci_hasil_rute(body: dict, u: User = Depends(wajib_login_api),
                      db: Session = Depends(get_db)):
     file_id = int(body.get('file_id') or 0)
     _berkas_milik(db, u, file_id)
-    h = bab4.kunci_hasil(db, u.id, file_id)
+    jenis = str(body.get('jenis') or 'olah_data')
+    if jenis not in ('olah_data', 'kualitatif_tematik', 'kualitatif_swot'):
+        raise HTTPException(422, 'Jenis hasil tidak dikenal untuk dikunci.')
+    h = bab4.kunci_hasil(db, u.id, file_id, jenis)
     if h is None:
         raise HTTPException(
             409, 'Tidak ada hasil baru yang lebih baru dari yang sudah '
                  'terkunci — jalankan olah data dulu.')
-    return {'versi_terkunci': h.nomor}
+    return {'versi_terkunci': h.nomor, 'jenis': jenis}
 
 
 # ── Simulasi contoh (placeholder sebelum paket aktif) ────────────
@@ -346,7 +349,7 @@ def baca_hasil_rute(file_id: int, jenis: str = 'olah_data',
     `versi`: isi versi itu. Jenis: olah_data | pra_survei | simulasi."""
     from .models import HasilBab4
     _berkas_milik(db, u, file_id)
-    if jenis not in ('olah_data', 'pra_survei', 'simulasi', 'narasi'):
+    if jenis not in ('olah_data', 'pra_survei', 'simulasi', 'narasi', 'kualitatif_tematik', 'kualitatif_swot', 'pendalaman'):
         raise HTTPException(422, 'Jenis hasil tidak dikenal.')
     semua = (db.query(HasilBab4)
              .filter_by(user_id=u.id, file_id=file_id, jenis=jenis)
@@ -460,12 +463,36 @@ async def buat_narasi(body: dict, u: User = Depends(wajib_login_api),
     from . import bab4_narasi
     file_id = int(body.get('file_id') or 0)
     _berkas_milik(db, u, file_id)
-    bahan = bab4_narasi.kumpulkan_bahan(db, u, file_id)
-    if bahan is None:
-        raise HTTPException(
-            409, 'Belum ada hasil yang dikunci. Kunci hasil dulu — '
-                 'narasi hanya lahir dari angka yang sudah dikunci.')
-    draf = bab4_narasi.susun_draf(bahan)
+    sumber = str(body.get('sumber') or 'olah_data')
+    if sumber in ('kualitatif_tematik', 'kualitatif_swot'):
+        bahan = bab4_narasi.kumpulkan_bahan_kualitatif(
+            db, u, file_id, sumber)
+        if bahan is None:
+            raise HTTPException(
+                409, 'Belum ada hasil kualitatif yang dikunci. Hitung '
+                     'matriks lalu kunci hasilnya dulu.')
+        draf = bab4_narasi.susun_draf_kualitatif(bahan)
+        bahan = {'mode': bahan['mode'],
+                 'versi_terkunci': bahan['versi_terkunci']}
+    elif sumber == 'campuran':
+        bk = bab4_narasi.kumpulkan_bahan(db, u, file_id)
+        bq = bab4_narasi.kumpulkan_bahan_kualitatif(
+            db, u, file_id, 'kualitatif_tematik')
+        if bk is None or bq is None:
+            raise HTTPException(
+                409, 'Narasi campuran butuh DUA hasil terkunci: '
+                     'kuantitatif (putaran 1) dan kualitatif tematik '
+                     '(putaran 2).')
+        draf = bab4_narasi.susun_draf_campuran(bk, bq)
+        bahan = {'mode': 'campuran',
+                 'versi_terkunci': bk['versi_terkunci']}
+    else:
+        bahan = bab4_narasi.kumpulkan_bahan(db, u, file_id)
+        if bahan is None:
+            raise HTTPException(
+                409, 'Belum ada hasil yang dikunci. Kunci hasil dulu — '
+                     'narasi hanya lahir dari angka yang sudah dikunci.')
+        draf = bab4_narasi.susun_draf(bahan)
     teks, dipoles = await bab4_narasi.poles_ai(draf)
     sudah_ada = (db.query(bab4.HasilBab4)
                  .filter_by(user_id=u.id, file_id=file_id, jenis='narasi')
@@ -500,3 +527,219 @@ def sunting_narasi(body: dict, u: User = Depends(wajib_login_api),
         {'teks': teks, 'suntingan_manual': True,
          'dari_versi_terkunci': terkunci.nomor if terkunci else None})
     return {'versi': h.nomor, 'tarif_dikenakan': 0}
+
+# ── Fase 4: kualitatif (rumah data di EduAi; mesin hanya menghitung) ──
+def _simpan_set(db: Session, u: User, file_id: int, tahap: str,
+                items: list) -> None:
+    d = (db.query(DataLapanganBab4)
+         .filter_by(user_id=u.id, file_id=file_id, tahap=tahap).first())
+    if d is None:
+        d = DataLapanganBab4(user_id=u.id, file_id=file_id, tahap=tahap,
+                             kolom='[]', baris='[]')
+        db.add(d)
+    d.baris = json.dumps(items)
+    db.commit()
+
+
+def _ambil_set(db: Session, u: User, file_id: int, tahap: str) -> list:
+    d = (db.query(DataLapanganBab4)
+         .filter_by(user_id=u.id, file_id=file_id, tahap=tahap).first())
+    if d is None:
+        return []
+    try:
+        v = json.loads(d.baris or '[]')
+    except Exception:                                        # noqa: BLE001
+        return []
+    return v if isinstance(v, list) else []
+
+
+@router.put('/kualitatif/catatan')
+def simpan_catatan(body: dict, u: User = Depends(wajib_login_api),
+                   db: Session = Depends(get_db)):
+    """Catatan informan mentah — disimpan di EduAi (rumah data)."""
+    file_id = int(body.get('file_id') or 0)
+    _berkas_milik(db, u, file_id)
+    catatan = body.get('catatan')
+    if not isinstance(catatan, list) or not catatan:
+        raise HTTPException(422, 'Catatan harus berupa daftar potongan.')
+    for no, c in enumerate(catatan, start=1):
+        if not isinstance(c, dict) or not str(c.get('teks') or '').strip():
+            raise HTTPException(
+                422, f'Potongan ke-{no} tidak punya teks catatan.')
+    _simpan_set(db, u, file_id, 'kual_catatan', catatan)
+    return {'jumlah': len(catatan)}
+
+
+@router.get('/kualitatif/catatan')
+def baca_catatan(file_id: int, u: User = Depends(wajib_login_api),
+                 db: Session = Depends(get_db)):
+    _berkas_milik(db, u, file_id)
+    return {'catatan': _ambil_set(db, u, file_id, 'kual_catatan')}
+
+
+@router.post('/kualitatif/usulkan-koding')
+def usulkan_koding_rute(body: dict, u: User = Depends(wajib_login_api),
+                        db: Session = Depends(get_db)):
+    """Panggilan 1 ke mesin: catatan -> usulan kode+tema dari AI.
+
+    Usulan TIDAK disimpan sebagai hasil — peneliti memeriksa,
+    membetulkan, lalu mengesahkan lewat PUT /kualitatif/segmen.
+    Koding sengaja tidak otomatis penuh (tafsir peneliti)."""
+    file_id = int(body.get('file_id') or 0)
+    _berkas_milik(db, u, file_id)
+    peta = _peta_disahkan(db, u, file_id)
+    catatan = _ambil_set(db, u, file_id, 'kual_catatan')
+    if not catatan:
+        raise HTTPException(
+            409, 'Catatan informan masih kosong — simpan catatan dulu.')
+    fokus_teks = '; '.join(
+        str(f.get('nama') or '') for f in (peta.get('fokus') or [])
+        if isinstance(f, dict)) or str(peta.get('fokus') or '')
+    try:
+        hasil = jembatan_statistik.usulkan_koding(fokus_teks, catatan)
+    except Exception as e:  # noqa: BLE001
+        raise _terjemahkan_gagal(e) from e
+    return hasil
+
+
+@router.put('/kualitatif/segmen')
+def simpan_segmen(body: dict, u: User = Depends(wajib_login_api),
+                  db: Session = Depends(get_db)):
+    """Segmen yang SUDAH disahkan peneliti (kode+tema hasil betulan
+    peneliti atas usulan AI / koding manualnya sendiri)."""
+    file_id = int(body.get('file_id') or 0)
+    _berkas_milik(db, u, file_id)
+    segmen = body.get('segmen')
+    if not isinstance(segmen, list) or not segmen:
+        raise HTTPException(422, 'Segmen harus berupa daftar.')
+    for no, s in enumerate(segmen, start=1):
+        if not isinstance(s, dict) or not str(s.get('teks') or '').strip():
+            raise HTTPException(
+                422, f'Segmen ke-{no} tidak punya teks.')
+    _simpan_set(db, u, file_id, 'kual_segmen', segmen)
+    return {'jumlah': len(segmen)}
+
+
+@router.get('/kualitatif/segmen')
+def baca_segmen(file_id: int, u: User = Depends(wajib_login_api),
+                db: Session = Depends(get_db)):
+    _berkas_milik(db, u, file_id)
+    return {'segmen': _ambil_set(db, u, file_id, 'kual_segmen')}
+
+
+@router.put('/kualitatif/faktor')
+def simpan_faktor(body: dict, u: User = Depends(wajib_login_api),
+                  db: Session = Depends(get_db)):
+    """Faktor SWOT berbobot+rating — disimpan di EduAi."""
+    file_id = int(body.get('file_id') or 0)
+    _berkas_milik(db, u, file_id)
+    faktor = body.get('faktor')
+    if not isinstance(faktor, list) or not faktor:
+        raise HTTPException(422, 'Faktor harus berupa daftar.')
+    for no, f in enumerate(faktor, start=1):
+        if (not isinstance(f, dict)
+                or str(f.get('kelompok') or '').upper() not in 'SWOT'
+                or len(str(f.get('kelompok') or '')) != 1
+                or not str(f.get('teks') or '').strip()):
+            raise HTTPException(
+                422, f'Faktor ke-{no} tidak sah — wajib kelompok '
+                     'S/W/O/T dan teks faktor.')
+    _simpan_set(db, u, file_id, 'swot_faktor', faktor)
+    return {'jumlah': len(faktor)}
+
+
+@router.get('/kualitatif/faktor')
+def baca_faktor(file_id: int, u: User = Depends(wajib_login_api),
+                db: Session = Depends(get_db)):
+    _berkas_milik(db, u, file_id)
+    return {'faktor': _ambil_set(db, u, file_id, 'swot_faktor')}
+
+
+@router.post('/kualitatif/matriks')
+def matriks_kualitatif(body: dict, u: User = Depends(wajib_login_api),
+                       db: Session = Depends(get_db)):
+    """Panggilan 2 ke mesin: koding/faktor tersahkan -> matriks.
+
+    Tarif mengikuti meteran generate yang sama (per jenis hasil):
+    dalam jatah gratis dulu, lalu 5 token. Mesin gagal -> token
+    dikembalikan. Hasil disimpan sebagai draf berjenis
+    kualitatif_tematik / kualitatif_swot; dikunci lewat /kunci-hasil.
+    Gerbang campuran: jalur tematik pada peta campuran hanya boleh
+    jalan sesudah putaran 1 (kuantitatif) dikunci."""
+    file_id = int(body.get('file_id') or 0)
+    _berkas_milik(db, u, file_id)
+    peta = _peta_disahkan(db, u, file_id)
+    jenis = str(body.get('jenis') or '')
+    if jenis not in ('tematik', 'swot'):
+        raise HTTPException(422, 'Jenis matriks: tematik atau swot.')
+    jenis_hasil = ('kualitatif_tematik' if jenis == 'tematik'
+                   else 'kualitatif_swot')
+    if jenis == 'tematik':
+        campuran = bool(peta.get('variabel')) and bool(peta.get('fokus'))
+        if campuran and bab4.hasil_terkunci(
+                db, u.id, file_id, 'olah_data') is None:
+            raise HTTPException(
+                409, 'Penelitian campuran: putaran 1 (kuantitatif) '
+                     'harus selesai dan dikunci dulu sebelum putaran 2 '
+                     '(kualitatif) dihitung.')
+        segmen = _ambil_set(db, u, file_id, 'kual_segmen')
+        if not segmen:
+            raise HTTPException(
+                409, 'Belum ada segmen yang disahkan — sahkan koding '
+                     'dulu.')
+        panggilan = lambda: jembatan_statistik.hitung_matriks_kualitatif(  # noqa: E731
+            'tematik', segmen=segmen)
+    else:
+        faktor = _ambil_set(db, u, file_id, 'swot_faktor')
+        if not faktor:
+            raise HTTPException(
+                409, 'Faktor SWOT masih kosong — isi faktor dulu.')
+        panggilan = lambda: jembatan_statistik.hitung_matriks_kualitatif(  # noqa: E731
+            'swot', faktor=faktor)
+    tarif = bab4.tarif_generate_berikutnya(db, u.id, file_id, jenis_hasil)
+    terpotong = 0
+    if tarif > 0:
+        info = kuota.potong_banyak(db, u, tarif, jenis_addon='ai')
+        terpotong = int(info.get('dipotong') or 0)
+    try:
+        hasil = panggilan()
+    except Exception as e:  # noqa: BLE001
+        if terpotong:
+            try:
+                kuota.kembalikan_banyak(db, u, terpotong, 'ai')
+            except Exception:  # noqa: BLE001
+                pass
+        raise _terjemahkan_gagal(e) from e
+    h = bab4.simpan_hasil(db, u.id, file_id, jenis_hasil,
+                          'kualitatif', hasil)
+    return {'versi': h.nomor, 'jenis': jenis_hasil,
+            'tarif_dikenakan': terpotong, 'hasil': hasil}
+
+
+@router.post('/campuran/pendalaman')
+def pertanyaan_pendalaman(body: dict, u: User = Depends(wajib_login_api),
+                          db: Session = Depends(get_db)):
+    """Pertanyaan wawancara putaran 2 dari hasil kuantitatif TERKUNCI.
+
+    Disimpan berjenis 'pendalaman' supaya tahap narasi campuran dan
+    peneliti bisa membacanya kembali."""
+    from . import bab4_narasi
+    file_id = int(body.get('file_id') or 0)
+    _berkas_milik(db, u, file_id)
+    terkunci = bab4.hasil_terkunci(db, u.id, file_id, 'olah_data')
+    if terkunci is None:
+        raise HTTPException(
+            409, 'Belum ada hasil kuantitatif yang dikunci — putaran 1 '
+                 'harus selesai dulu.')
+    isi = bab4.baca_hasil(terkunci)
+    pertanyaan = bab4_narasi.susun_pertanyaan_pendalaman(
+        isi.get('peta_hipotesis') or [])
+    if not pertanyaan:
+        raise HTTPException(
+            409, 'Hasil terkunci tidak memuat jalur hipotesis yang '
+                 'bisa digali.')
+    h = bab4.simpan_hasil(db, u.id, file_id, 'pendalaman', 'campuran',
+                          {'pertanyaan': pertanyaan,
+                           'dari_versi_terkunci': terkunci.nomor})
+    return {'versi': h.nomor, 'pertanyaan': pertanyaan}
+

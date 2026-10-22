@@ -160,3 +160,69 @@ def buat_data_simulasi(payload: dict, timeout: float | None = None) -> dict:
         pass
     raise GagalJembatan(detail or f'Mesin BUAT DATA menolak ({r.status_code}).',
                         r.status_code if 400 <= r.status_code < 500 else 502)
+
+def _pos_jembatan(path: str, payload: dict,
+                  timeout: float | None = None) -> dict:
+    """POST generik ke pintu jembatan (pola galat sama dengan hitung())."""
+    k = kunci()
+    if not k:
+        raise GagalJembatan(
+            'Kunci antar-layanan ke Statistik Lab belum dipasang. '
+            'Pasang dulu di halaman pengaturan (layanan Statistik Lab).',
+            'kunci')
+    try:
+        with httpx.Client(timeout=timeout or _timeout(),
+                          trust_env=False) as c:
+            r = c.post(f'{alamat()}{path}',
+                       json=payload, headers={'X-Kunci-Layanan': k})
+    except httpx.TimeoutException as e:
+        raise GagalJembatan(
+            'Statistik Lab terlalu lama menjawab (lewat batas waktu). '
+            'Datanya tidak tersimpan di sana — coba kirim lagi.',
+            'waktu') from e
+    except httpx.HTTPError as e:
+        raise GagalJembatan(
+            'Statistik Lab tidak bisa dihubungi. Periksa jaringan server, '
+            'lalu coba lagi.', 'jaringan') from e
+    if r.status_code == 200:
+        return r.json()
+    try:
+        detail = str(r.json().get('detail') or '')
+    except Exception:                                        # noqa: BLE001
+        detail = ''
+    if r.status_code == 401:
+        raise GagalJembatan(
+            'Kunci antar-layanan ditolak Statistik Lab. Nilai kunci di '
+            'EduAi dan di server Statistik Lab harus sama persis.', 401)
+    if r.status_code == 503:
+        raise GagalJembatan(detail or (
+            'Jembatan di Statistik Lab belum dibuka pemilik server '
+            '(kunci sisi server belum dipasang).'), 503)
+    if r.status_code in (400, 422) and detail:
+        raise GagalJembatan(detail, 400)
+    raise GagalJembatan(
+        f'Statistik Lab menjawab dengan galat {r.status_code}. '
+        'Coba lagi sebentar lagi.', r.status_code)
+
+
+def usulkan_koding(fokus: str, catatan: list[dict]) -> dict:
+    """Panggilan 1 kualitatif: catatan informan -> usulan kode+tema AI.
+
+    Usulan BUKAN hasil akhir — peneliti mengesahkan/membetulkan di
+    EduAi sebelum disimpan sebagai segmen (keputusan Bos 21 Okt).
+    """
+    return _pos_jembatan('/api/jembatan/kualitatif/koding',
+                         {'fokus': fokus or '', 'catatan': catatan},
+                         timeout=120.0)
+
+
+def hitung_matriks_kualitatif(jenis: str, segmen: list[dict] | None = None,
+                              faktor: list[dict] | None = None) -> dict:
+    """Panggilan 2 kualitatif: koding tersahkan -> matriks hitungan."""
+    payload: dict = {'jenis': jenis}
+    if segmen is not None:
+        payload['segmen'] = segmen
+    if faktor is not None:
+        payload['faktor'] = faktor
+    return _pos_jembatan('/api/jembatan/kualitatif/matriks', payload)
+
