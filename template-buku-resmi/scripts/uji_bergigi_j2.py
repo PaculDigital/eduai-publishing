@@ -68,11 +68,21 @@ with tempfile.TemporaryDirectory() as td:
     #  C: nomor bab jadi angka Arab — ganti teks di DALAM paragraf Heading1
     p_c = Path(td) / 'bukan-romawi.docx'
     print('\nC. nomor bab jadi angka Arab (BAB I -> BAB 1) — J2 harus GAGAL')
-    #  ⚠️ Pola dicari dari XML nyata: run "BAB I" / "BAB II", bukan
-    #  "<w:t>BAB II</w:t>" (teks itu dipecah antar-run, sudah terbukti).
-    #  ⚠️ HANYA run "BAB I" yang diikuti </w:t> (teks tepat "BAB I").
-    #  Pola '>BAB I<' juga mengenai 'BAB II' -> pernah merusak jadi 'BAB 1I'.
-    suntik(p_c, [('<w:t>BAB I</w:t>', '<w:t>BAB 1</w:t>')])
+    #  ⚠️ KOREKSI audit 22 Okt 2026 malam: pola '<w:t>BAB I</w:t>' muncul
+    #  DUA kali — judul BAB II di template terpecah antar-run ('BAB I' +
+    #  'I'), jadi replace-all menciptakan 'BAB 1I' (jebakan J7 persis).
+    #  Suntikan yang benar: ganti kemunculan PERTAMA saja (judul BAB I).
+    with zipfile.ZipFile(TEMPLATE) as z:
+        isi_c = {n: z.read(n) for n in z.namelist()}
+    teks_c = isi_c['word/document.xml'].decode('utf-8')
+    n_c = teks_c.count('<w:t>BAB I</w:t>')
+    assert n_c == 2, f'praduga jumlah run BAB I berubah: {n_c}'
+    teks_c = teks_c.replace('<w:t>BAB I</w:t>', '<w:t>BAB 1</w:t>', 1)
+    print('         disuntik 1x (pertama saja): <w:t>BAB I</w:t> -> BAB 1')
+    isi_c['word/document.xml'] = teks_c.encode('utf-8')
+    with zipfile.ZipFile(p_c, 'w', zipfile.ZIP_DEFLATED) as z:
+        for n_berkas, b_berkas in isi_c.items():
+            z.writestr(n_berkas, b_berkas)
     kode_c, j2_c = jalankan(p_c)
     for ln in j2_c:
         print('   ', ln)

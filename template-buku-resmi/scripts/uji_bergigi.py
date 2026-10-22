@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""UJI BERGIGI: rusak template dengan 4 cara, gerbang WAJIB menangkap semua.
+"""UJI BERGIGI: rusak template dengan 8 cara, gerbang WAJIB menangkap semua.
 
 Setiap kerusakan disuntik ke SALINAN (template asli tidak disentuh),
 lalu gerbang dijalankan dan harus GAGAL.

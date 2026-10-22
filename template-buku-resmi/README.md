@@ -17,8 +17,8 @@ Baca sampai habis sebelum menulis kode.
 | **MD5** | `0bb7bc5cdae9a99f489feb87387b64b6` |
 | Ukuran | **497.163 byte** (~486 KB) |
 | Isi ZIP | 25 berkas |
-| `word/document.xml` | 131.855 byte |
-| Teks | 74 paragraf · 16.600 karakter |
+| `word/document.xml` | 131.857 byte |
+| Teks | 117 paragraf total (74 berteks) · 12.364 karakter teks `w:t` |
 
 ⚠️ **Verifikasi MD5 sebelum dipakai.** Kalau beda, berkasnya sudah diubah —
 jangan dipakai, cari yang asli.
@@ -30,14 +30,17 @@ md5sum templates/template-buku-resmi.docx
 
 ### Apa saja di dalam berkas
 
-**Gambar (4):**
+**Gambar (6)** — koreksi audit 22 Okt 2026: versi pertama README ini hanya
+menyebut 4; dua terbesar justru terlewat:
 
-| Berkas | Ukuran |
-|---|---|
-| `word/media/image2.png` | 87 KB |
-| `word/media/image4.png` | 58 KB |
-| `word/media/image3.jpeg` | 6 KB |
-| `word/media/image1.emf` | 640 byte |
+| Berkas | Ukuran | Letak |
+|---|---|---|
+| `word/media/image5.png` | 242 KB | gambar isi BAB II |
+| `word/media/image2.png` | 87 KB | gambar isi BAB I |
+| `word/media/image4.png` | 58 KB | gambar isi BAB II |
+| `word/media/image6.jpeg` | 36 KB | gambar di TENTANG PENULIS |
+| `word/media/image3.jpeg` | 6 KB | gambar isi BAB I |
+| `word/media/image1.emf` | 640 byte | dekorasi judul (dirujuk semua Heading1) |
 
 **Struktur halaman (urut):**
 
@@ -204,15 +207,20 @@ python3 scripts/periksa_buku_template.py buku-anda.docx
 echo $?      # 0 = LULUS, 1 = GAGAL
 ```
 
-**WAJIB dijalankan sebelum `.docx` diserahkan.** 20 asersi:
+**WAJIB dijalankan sebelum `.docx` diserahkan.** **48 asersi** (v2,
+22 Okt 2026 malam — v1 hanya 20 dan terbukti berlubang, lihat §11):
 
 | Kelompok | Asersi |
 |---|---|
-| Halaman | H1 ukuran 14×20 cm · H2 batas semua sisi · H3 area teks |
-| Font isi | F1 font Palatino · F2 ukuran 10 pt · F3 rata both |
-| Judul bab | F4 font Trajan Pro · F4b 22 pt · F4c tebal · **J2a SEMUA pakai `<w:br/>`** · **J2b nomor Romawi sah** · **J2c tepat 2 baris** |
-| Sub bab | F5 13 pt · F5b tebal |
-| Hirarki | J1 minimal 1 Heading1 |
+| Halaman & batas | H1/H2 ukuran 14×20 cm (sectPr pertama) · M batas 5 sisi |
+| Section (v2) | G0–G3 **SEMUA** sectPr: ukuran + batas + margin header/footer 720 · G4 titlePg · G5 mirrorMargins + evenAndOddHeaders |
+| Footer (v2) | K1 footer1+footer2 ada · K2 field PAGE di keduanya · K3 sectPr merujuk footer default+even |
+| Font isi | F1 font Palatino · F2 ukuran 10 pt · F3 rata both · S1 line ≤ 240 · **F6/F7 (v2) SEMUA run isi zona konten ≥40 kar** |
+| Judul | F4/F4b/F4c Trajan Pro 22 pt tebal · F5/F5b Heading2 13 pt tebal |
+| Gaya lengkap (v2) | Y1 Normal TNR 12 · Y2/Y3 spasi + garis Heading1 · Y4–Y7 font tema, latar F2F2F2, garis, keepNext, spasi Heading2 · Y8 tab TOC1/TOC2 pos 5938 |
+| Struktur (v2) | T1 KATA PENGANTAR · T2 DAFTAR ISI + field TOC · T3 BAB · T4 TENTANG PENULIS · T5 urutannya |
+| Muka buku (v2) | P1 judul sampul 35 pt · P2 ISBN · P3 Cetakan Pertama · P4 ukuran run zona depan hanya {19,22,28,30,70} |
+| Judul bab | **J2a SEMUA pakai `<w:br/>`** · **J2b nomor Romawi sah (pola ketat)** · **J2c tepat 2 baris** · J1 minimal 1 Heading1 |
 
 ### 4.3 `scripts/uji_bergigi.py` — bukti gerbang bisa GAGAL (format)
 
@@ -226,12 +234,12 @@ Menyuntik 8 kerusakan ke **salinan** (template asli tidak disentuh):
 |---|---|
 | D1 | halaman 14×20 → 16×24 |
 | D2 | batas kiri 1,02 → 2,0 cm |
-| D3 | batas atas 1,6 → 2,54 cm |
-| D4 | font isi Palatino → Cambria |
-| D5 | ukuran isi 10 → 12 pt |
-| D6 | judul bab Trajan Pro → Arial |
-| D7 | judul bab 22 → 18 pt |
-| D8 | isi rata both → kiri |
+| D3 | font isi Palatino → Cambria |
+| D4 | ukuran isi 10 → 12 pt |
+| D5 | judul bab Trajan Pro → Arial |
+| D6 | judul bab 22 → 18 pt |
+| D7 | isi rata both → kiri |
+| D8 | batas atas 1,6 → 2,54 cm |
 
 ### 4.4 `scripts/uji_bergigi_j2.py` — bukti gerbang bisa GAGAL (judul bab)
 
@@ -245,14 +253,50 @@ python3 scripts/uji_bergigi_j2.py  # 3 LULUS / 0 GAGAL
 | B | `<w:br/>` dibuang → judul menyatu | J2 **GAGAL** |
 | C | `BAB I` → `BAB 1` (bukan Romawi) | J2 **GAGAL** |
 
+### 4.5 `scripts/uji_bergigi_v2.py` — bukti lubang audit tertutup (BARU)
+
+```bash
+python3 scripts/uji_bergigi_v2.py  # 10/10 harus tertangkap
+```
+
+Sepuluh kerusakan kelas audit 22 Okt 2026: latar Heading2 diubah, spasi
+Heading1 diubah, font Normal diganti, footer dibuang, KATA PENGANTAR
+dihapus, ukuran run sampul diubah, margin header/footer digandakan,
+tab TOC digeser, sectPr kedua salah ukuran, font paragraf pendek diubah.
+
+### 4.6 `scripts/buat_buku.py` — GENERATOR berbasis salinan template (BARU)
+
+```bash
+python3 scripts/buat_buku.py scripts/contoh_buku.json buku-saya.docx
+python3 scripts/uji_generator.py   # bukti ujung-ke-ujung: 16/16
+```
+
+**Cara kerja (WAJIB cara ini, bukan menulis ulang dari angka):** template
+disalin utuh — semua berkas zip selain `document.xml`, `footer1.xml`,
+`footer2.xml`, `settings.xml` **byte-per-byte identik** (dibuktikan
+`uji_generator.py`). Konten baru diisi memakai paragraf prototipe dari
+template sendiri (isi, Heading1 + gambar dekorasinya, Heading2, sub-sub,
+kutipan, tanda tangan). Spesifikasi buku = satu berkas JSON (lihat
+`scripts/contoh_buku.json`). Sesudah menulis, generator menjalankan
+gerbang secara otomatis. Daftar isi: teks cache diperbarui generator,
+nomor halaman dihitung ulang aplikasi pembuka (`updateFields=true`
+dipasang di settings; di Word otomatis, di LibreOffice nomor cache bisa
+tampil sebelum dokumen disimpan ulang — periksa di Word untuk final).
+
 ---
 
-## 5. Hasil uji terakhir (22 Okt 2026)
+## 5. Hasil uji terakhir (22 Okt 2026, malam — gerbang v2 + generator)
 
 ```
-template asli                        → 20 LULUS / 0 GAGAL
+template asli                        → 48 LULUS / 0 GAGAL
+buku contoh hasil generator          → 48 LULUS / 0 GAGAL
 uji_bergigi.py    (8 suntikan format) →  8/8 tertangkap
 uji_bergigi_j2.py (2 suntikan judul)  →  2/2 tertangkap
+uji_bergigi_v2.py (10 suntikan audit) → 10/10 tertangkap
+uji_generator.py  (ujung-ke-ujung)    → 16/16 LULUS
+render LibreOffice buku contoh       → 9 halaman, 14×20 cm, footer
+                                        genap/ganjil benar, judul bab
+                                        dua baris, daftar isi terisi
 periksa --wajib-lebih=1               →  EXIT 1  (terbukti bisa gagal)
 ```
 
@@ -405,13 +449,16 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
 1. Baca README ini sampai habis.
 2. Verifikasi MD5 template.
 3. Jalankan `baca_template.py` — lihat angka sah dengan mata sendiri.
-4. Tulis kode penghasil .docx memakai angka di §2.
-   · Isi buku  : Palatino Linotype 10 pt, rata both
-   · Judul bab : Heading1 Trajan Pro 22 pt tebal + <w:br/>
-   · Sub bab   : Heading2 13 pt tebal, latar F2F2F2
-5. Jalankan GERBANG: `periksa_buku_template.py hasil.docx`
-6. Kalau GAGAL → perbaiki kode, JANGAN melonggarkan gerbang.
-7. Kalau LULUS → periksa mata (font berlisensi bisa diganti Word).
+4. Hasilkan buku dengan GENERATOR (§4.6): susun JSON spesifikasi buku,
+   lalu `buat_buku.py spec.json hasil.docx`. JANGAN menulis .docx dari
+   nol memakai angka §2 — cara itu terbukti kehilangan styles, footer,
+   dan dekorasi template. Angka §2 dipakai untuk memeriksa & memahami,
+   generator yang menjamin kesetiaan (salinan + prototipe template).
+5. Generator menjalankan GERBANG otomatis. Manual:
+   `periksa_buku_template.py hasil.docx`
+6. Kalau GAGAL → perbaiki spec/kode, JANGAN melonggarkan gerbang.
+7. Kalau LULUS → periksa mata (font berlisensi bisa diganti Word) dan
+   buka di Word agar daftar isi & nomor halaman dihitung ulang penuh.
 ```
 
 ### 🔴 DILARANG
@@ -454,14 +501,31 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
 - Jev dibaca ulang dari `docs.typesafe.ai` → 2 koreksi dokumentasi
 - Judul bab dua baris diperiksa otomatis (J2a/J2b/J2c)
 
+### ✅ Tambahan (22 Okt 2026 malam — audit + perbaikan)
+
+- **Audit independen menemukan gerbang v1 berlubang**: 6 kelas kerusakan
+  (gaya Heading, footer dibuang, struktur dihapus, muka buku diubah,
+  margin header/footer, tab TOC) LOLOS 20/20. Sekarang tertutup.
+- **Gerbang v2: 48 asersi** (kelompok G/K/T/Y/F6/F7/P) + uji bergigi v2
+  10/10 + pola Romawi diperketat.
+- **Generator `buat_buku.py`**: buku dihasilkan dari SALINAN template +
+  prototipe paragraf template; buku contoh lolos 48/48 dan ter-render
+  benar di LibreOffice (9 hlm). Sampul & hak cipta kini terisi otomatis
+  dari JSON.
+- Koreksi dokumen: gambar 4 → 6, `document.xml` 131.857 byte, karakter
+  12.364, DAFTAR ISI = style `TOCHeading` (bukan Heading1), tabel D1–D8
+  diselaraskan dengan script, suntikan uji J2-C diperbaiki (dulu
+  menciptakan `BAB 1I`).
+
 ### ⬜ BELUM
 
 | Item | Catatan |
 |---|---|
-| Sambung gerbang ke mesin buku | `buku-umum`, `buku-referensi`, dll belum memanggil `periksa_buku_template.py` |
+| Sambung gerbang ke mesin buku | `buku-umum`, `buku-referensi`, dll belum memanggil `periksa_buku_template.py` / `buat_buku.py` |
 | Font berlisensi | belum diperiksa apakah terpasang di mesin produksi |
-| Template halaman sampul otomatis | sampul masih perlu diisi manual |
-| Daftar isi otomatis | TOC memakai FIELD Word, belum digenerate mesin |
+| Nomor halaman daftar isi | cache dari generator bisa basi sampai dokumen dibuka & dihitung ulang di Word (updateFields sudah dipasang) |
+| Gambar isi bab via generator | v1 belum mendukung menyisipkan gambar bab baru (prototipe ListParagraph membawa gambar contoh CapCut, sengaja tidak dipakai) |
+| Paragraf daftar bernomor | generator v1 memakai paragraf isi biasa untuk isi sub-sub bab |
 
 ---
 
@@ -470,6 +534,7 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
 | Tanggal | Perubahan |
 |---|---|
 | **22 Okt 2026** | Versi pertama. Template diunduh, angka diekstrak, gerbang dibuat, Jev dioptimalkan menurut dokumentasi resmi. Judul bab diputuskan **dua baris** (sesuai template). |
+| **22 Okt 2026 (malam)** | Audit independen → gerbang v2 (48 asersi) + generator berbasis salinan template + uji bergigi v2 & uji generator; koreksi angka/gambar/TOCHeading di dokumen. Branch `agen/wulan/template-buku-generator`. |
 
 ### Koreksi yang tercatat
 

@@ -114,7 +114,7 @@ basedOn : Normal
 | Urutan | Gaya | Contoh isi |
 |---|---|---|
 | 1 | `Heading1` | KATA PENGANTAR |
-| 2 | `Heading1` | DAFTAR ISI |
+| 2 | `TOCHeading` | DAFTAR ISI (koreksi audit 22 Okt malam: BUKAN Heading1) |
 | 3 | `Heading1` | BAB I + JUDUL BAB PERTAMA |
 | 4 | `Heading2` | 1.1. Judul Sub Bab |
 | 5 | `Heading2` | 1.2. Judul Sub Bab |
@@ -171,3 +171,16 @@ image3.jpeg 6 KB, image1.emf 640 byte) + image5.png 242 KB, image6.jpeg 36 KB.
    ⇒ bentuk buku berubah. Perlu dipastikan terpasang.
 3. Template ini menyebut ukuran **14 × 20 cm** di halaman hak cipta — COCOK
    dengan `w:pgSz` (14,00 × 20,00 cm). Jadi angkanya sahih.
+
+## 13. FAKTA TAMBAHAN (audit 22 Okt 2026 malam — belum tercatat sebelumnya)
+
+| Fakta | Nilai terukur |
+|---|---|
+| Jumlah `sectPr` | **1** (jadi "sectPr pertama" = satu-satunya di template; buku hasil tetap wajib diperiksa SEMUA sectPr-nya) |
+| `sectPr` memuat | `footerReference` even (rId14/footer1) + default (rId15/footer2), `pgNumType start=1`, `titlePg` AKTIF, `docGrid linePitch=360` |
+| `settings.xml` | `mirrorMargins` AKTIF + `evenAndOddHeaders` AKTIF — inilah sebab margin kiri 1,02 tampak "aneh": halaman genap/ganjil dicerminkan |
+| Footer1 (genap) | teks `<nomor> \| <Nama Penulis>` + field `PAGE` |
+| Footer2 (default/ganjil) | teks `<Judul Buku> \| <nomor>` + field `PAGE` |
+| Judul BAB II terpecah run | `BAB I` + `I` (artefak ketikan) — penggantian teks judul bab WAJIB spesifik per kemunculan (jebakan J7) |
+| Ukuran run teks zona depan | hanya sz {19, 22, 28, 30, 70} (9,5 / 11 / 14 / 15 / 35 pt) |
+| Paragraf | 117 total, 74 berteks; karakter teks `w:t` = 12.364 (klaim lama "16.600" tidak terbukti) |

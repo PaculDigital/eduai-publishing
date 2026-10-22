@@ -118,10 +118,12 @@ def baca(path):
     hasil['paragraf_isi'] = isi[:6]
 
     # ── HIRARKI JUDUL ──────────────────────────────────────────────────
+    # DAFTAR ISI memakai style TOCHeading (BUKAN Heading1 — koreksi audit
+    # 22 Okt 2026; versi lama alat ini & fakta-terukur menyebutnya Heading1).
     judul = []
     for p in paras:
         ps = ambil(p, r'<w:pStyle w:val="([^"]+)"')
-        if ps not in ('Heading1', 'Heading2', 'Heading3'):
+        if ps not in ('Heading1', 'Heading2', 'Heading3', 'TOCHeading'):
             continue
         teks = ''.join(re.findall(r'<w:t(?:\s[^>]*)?>([^<]*)</w:t>', p)).strip()
         if teks:
