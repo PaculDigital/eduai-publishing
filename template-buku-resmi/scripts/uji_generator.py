@@ -2,10 +2,12 @@
 """UJI UJUNG-KE-UJUNG GENERATOR: contoh_buku.json -> buku -> bukti setia.
 
 Yang dibuktikan (bukan diklaim):
-  1. Generator jalan & buku lolos gerbang v2 (48 asersi).
-  2. Semua bagian zip SELAIN document.xml, footer1, footer2, settings.xml
-     BYTE-PER-BYTE identik dengan template — artinya styles, theme,
-     numbering, gambar, sectPr bawaan TIDAK berubah sama sekali.
+  1. Generator jalan & buku lolos gerbang (semua asersi).
+  2. Semua bagian zip SELAIN document.xml, footer1, footer2, settings.xml,
+     document.xml.rels BYTE-PER-BYTE identik dengan template — artinya
+     styles, theme, numbering, gambar bawaan, sectPr TIDAK berubah.
+     (v2: rels hanya bertambah relasi gambar baru; media gambar baru
+     byte-identik dengan berkas sumbernya.)
   3. Isi baru benar-benar masuk: judul sampul, ISBN baru, judul bab dua
      baris, sub-sub bab; dan 'Lorem ipsum' template sudah tidak tersisa.
   4. Footer memuat judul & penulis baru; settings memuat updateFields.
@@ -26,7 +28,10 @@ GERBANG = HERE / 'periksa_buku_template.py'
 CONTOH = HERE / 'contoh_buku.json'
 MD5_WAJIB = '0bb7bc5cdae9a99f489feb87387b64b6'
 BOLEH_BEDA = {'word/document.xml', 'word/footer1.xml', 'word/footer2.xml',
-              'word/settings.xml'}
+              'word/settings.xml',
+              # v2: rels berubah HANYA karena relasi gambar baru ditambahkan
+              'word/_rels/document.xml.rels'}
+MEDIA_BARU = {'word/media/buku1.png'}   # gambar dari contoh_buku.json (v2)
 
 LULUS = GAGAL = 0
 
@@ -62,10 +67,21 @@ with tempfile.TemporaryDirectory() as td:
         asli = {n: z.read(n) for n in z.namelist()}
     with zipfile.ZipFile(hasil) as z:
         baru = {n: z.read(n) for n in z.namelist()}
-    cek('daftar berkas zip sama persis', set(asli) == set(baru),
+    cek('daftar berkas zip = template + media gambar baru',
+        set(baru) == set(asli) | MEDIA_BARU,
         f'beda: {set(asli) ^ set(baru)}')
     beda = [n for n in asli if n not in BOLEH_BEDA and asli[n] != baru[n]]
-    cek('semua berkas selain 4 yang diizinkan byte-identik', not beda, str(beda))
+    cek('semua berkas selain yang diizinkan byte-identik', not beda, str(beda))
+    contoh_png = (HERE / 'contoh_gambar.png').read_bytes()
+    cek('media gambar baru byte-identik dengan berkas sumber',
+        baru.get('word/media/buku1.png') == contoh_png)
+    rels_baru = baru['word/_rels/document.xml.rels'].decode('utf-8')
+    rels_asli = asli['word/_rels/document.xml.rels'].decode('utf-8')
+    cek('rels lama utuh + 1 relasi gambar baru',
+        rels_baru.replace('</Relationships>', '').startswith(
+            rels_asli.replace('</Relationships>', '')[:200])
+        and 'media/buku1.png' in rels_baru and rels_baru.count('<Relationship') ==
+        rels_asli.count('<Relationship') + 1)
 
     doc = baru['word/document.xml'].decode('utf-8')
     cek('judul sampul masuk (huruf besar)', 'BELAJAR MENULIS BUKU PERTAMA' in doc)
@@ -85,6 +101,15 @@ with tempfile.TemporaryDirectory() as td:
     cek('teks cache daftar isi diperbarui',
         'BAB I MEMULAI DENGAN PETA YANG JELAS' in doc
         and 'JUDUL BAB PERTAMA' not in doc)
+    # ── v2: tabel & gambar ──
+    cek('tabel masuk (w:tbl + kepala F2F2F2)',
+        '<w:tbl>' in doc and 'w:fill="F2F2F2"' in doc)
+    cek('isi sel tabel masuk', 'Menentukan gagasan inti dan pembaca sasaran' in doc)
+    cek('judul tabel masuk', 'Tabel 1.1 Contoh Tabel Tahapan Menulis' in doc)
+    cek('gambar inline masuk (wp:inline + r:embed baru)',
+        '<wp:inline' in doc and 'buku1.png' in rels_baru)
+    cek('keterangan gambar masuk',
+        'Gambar: Contoh diagram batang' in doc)
 
 md5_akhir = hashlib.md5(TEMPLATE.read_bytes()).hexdigest()
 cek('MD5 template sesudah generate tetap', md5_akhir == MD5_WAJIB, md5_akhir)

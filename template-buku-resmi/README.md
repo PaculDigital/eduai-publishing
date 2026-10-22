@@ -207,7 +207,7 @@ python3 scripts/periksa_buku_template.py buku-anda.docx
 echo $?      # 0 = LULUS, 1 = GAGAL
 ```
 
-**WAJIB dijalankan sebelum `.docx` diserahkan.** **48 asersi** (v2,
+**WAJIB dijalankan sebelum `.docx` diserahkan.** **54 asersi** (v2.1,
 22 Okt 2026 malam — v1 hanya 20 dan terbukti berlubang, lihat §11):
 
 | Kelompok | Asersi |
@@ -268,7 +268,7 @@ tab TOC digeser, sectPr kedua salah ukuran, font paragraf pendek diubah.
 
 ```bash
 python3 scripts/buat_buku.py scripts/contoh_buku.json buku-saya.docx
-python3 scripts/uji_generator.py   # bukti ujung-ke-ujung: 16/16
+python3 scripts/uji_generator.py   # bukti ujung-ke-ujung: 23/23
 ```
 
 **Cara kerja (WAJIB cara ini, bukan menulis ulang dari angka):** template
@@ -283,20 +283,54 @@ nomor halaman dihitung ulang aplikasi pembuka (`updateFields=true`
 dipasang di settings; di Word otomatis, di LibreOffice nomor cache bisa
 tampil sebelum dokumen disimpan ulang — periksa di Word untuk final).
 
+### 4.7 Blok TABEL & GAMBAR (generator v2)
+
+Di dalam daftar paragraf mana pun, item boleh berupa objek:
+
+```json
+{"tabel":  {"judul": "Tabel 1.1 Judul tabel",
+            "kolom": ["Kolom 1", "Kolom 2"],
+            "baris": [["isi", "isi"], ["isi", "isi"]]}}
+{"gambar": {"berkas": "gambar/diagram.png",
+            "keterangan": "Gambar: keterangan gambar",
+            "lebar_cm": 9.0}}
+```
+
+- **Tabel**: template berisi **0 tabel** — tidak ada prototipe. XML tabel
+  dibangun mengikuti angka & warna template: lebar total 6453 twip
+  (= area teks), garis single sz 4 warna **808080**, baris kepala latar
+  **F2F2F2** tebal & berulang di halaman berikut, sel Palatino 10 pt.
+  Judul tabel memakai prototipe paragraf keterangan (di atas tabel).
+- **Gambar** (ilustrasi, diagram, infografis — semuanya berkas
+  PNG/JPEG dari luar; generator hanya menempatkan): disisipkan
+  `wp:inline` terpusat, lebar dibatasi area teks (bawaan maks 10,5 cm
+  seperti gambar isi template; gambar kecil tidak diperbesar paksa
+  melewati 150 dpi), keterangan dari prototipe keterangan template.
+  Berkas media + relasi baru ditambahkan ke zip oleh generator.
+- Gerbang memeriksa keduanya: **TB1–TB4** (tabel) & **GB1–GB2** (gambar);
+  `uji_bergigi_v3.py` membuktikan 6 suntikan kerusakan tabel/gambar
+  tertangkap. ⚠️ Pengecualian terukur GB: paragraf garis penutup
+  (`----`) membawa ornamen 16,87 cm bawaan template — dikecualikan,
+  TETAPI hanya bila teksnya tidak kosong (paragraf gambar murni tanpa
+  teks TIDAK boleh ikut terkecuali — bug ini tertangkap uji v3).
+
 ---
 
-## 5. Hasil uji terakhir (22 Okt 2026, malam — gerbang v2 + generator)
+## 5. Hasil uji terakhir (22 Okt 2026, malam — gerbang v2.1 + generator v2)
 
 ```
-template asli                        → 48 LULUS / 0 GAGAL
-buku contoh hasil generator          → 48 LULUS / 0 GAGAL
+template asli                        → 50 LULUS / 0 GAGAL
+   (TB dilewati: template berisi 0 tabel; GB aktif)
+buku contoh hasil generator v2       → 54 LULUS / 0 GAGAL
 uji_bergigi.py    (8 suntikan format) →  8/8 tertangkap
 uji_bergigi_j2.py (2 suntikan judul)  →  2/2 tertangkap
 uji_bergigi_v2.py (10 suntikan audit) → 10/10 tertangkap
-uji_generator.py  (ujung-ke-ujung)    → 16/16 LULUS
-render LibreOffice buku contoh       → 9 halaman, 14×20 cm, footer
-                                        genap/ganjil benar, judul bab
-                                        dua baris, daftar isi terisi
+uji_bergigi_v3.py (6 suntikan tabel/
+                   gambar)            →  6/6 tertangkap
+uji_generator.py  (ujung-ke-ujung)    → 23/23 LULUS
+render LibreOffice buku contoh v2    → 11 halaman, 14×20 cm, tabel
+                                        tampil + kepala tabel berulang,
+                                        gambar + keterangan tampil
 periksa --wajib-lebih=1               →  EXIT 1  (terbukti bisa gagal)
 ```
 
@@ -527,6 +561,19 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
   diselaraskan dengan script, suntikan uji J2-C diperbaiki (dulu
   menciptakan `BAB 1I`).
 
+### ✅ Tambahan (22 Okt 2026 malam — generator v2: tabel & gambar)
+
+- **Generator v2**: blok `tabel` + blok `gambar` di JSON (§4.7);
+  diagram/infografis/ilustrasi diperlakukan sama — berkas gambar dari
+  luar yang ditempatkan generator.
+- **Gerbang v2.1: + TB1–TB4 & GB1–GB2** (total 54 asersi pada buku
+  bertabel & bergambar; template asli 50/50 — TB dilewati, 0 tabel).
+- **Bug GB yang tertangkap uji v3 W5/W6**: pengecualian paragraf garis
+  penutup memakai `set(teks) <= {'-',' '}` — himpunan kosong selalu
+  subset, jadi paragraf gambar TANPA teks ikut terkecuali dan GB buta.
+  Diperbaiki: pengecualian hanya untuk teks tidak kosong. Pelajaran:
+  uji bergigi ditulis SEBELUM mengklaim gerbang selesai.
+
 ### ⬜ BELUM
 
 | Item | Catatan |
@@ -534,8 +581,8 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
 | Sambung gerbang ke mesin buku | `buku-umum`, `buku-referensi`, dll belum memanggil `periksa_buku_template.py` / `buat_buku.py` |
 | Font berlisensi | belum diperiksa apakah terpasang di mesin produksi |
 | Nomor halaman daftar isi | cache dari generator bisa basi sampai dokumen dibuka & dihitung ulang di Word (updateFields sudah dipasang) |
-| Gambar isi bab via generator | v1 belum mendukung menyisipkan gambar bab baru (prototipe ListParagraph membawa gambar contoh CapCut, sengaja tidak dipakai) |
-| Paragraf daftar bernomor | generator v1 memakai paragraf isi biasa untuk isi sub-sub bab |
+| Paragraf daftar bernomor | generator memakai paragraf isi biasa untuk isi sub-sub bab (prototipe ListParagraph membawa gambar contoh CapCut, sengaja tidak dipakai) |
+| Diagram/infografis digambar generator | TIDAK dikerjakan generator — diagram/infografis/ilustrasi dibuat di luar (berkas PNG/JPEG), generator v2 hanya menempatkannya via blok `gambar` |
 
 ---
 
@@ -545,6 +592,7 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
 |---|---|
 | **22 Okt 2026** | Versi pertama. Template diunduh, angka diekstrak, gerbang dibuat, Jev dioptimalkan menurut dokumentasi resmi. Judul bab diputuskan **dua baris** (sesuai template). |
 | **22 Okt 2026 (malam)** | Audit independen → gerbang v2 (48 asersi) + generator berbasis salinan template + uji bergigi v2 & uji generator; koreksi angka/gambar/TOCHeading di dokumen. Branch `agen/wulan/template-buku-generator`. |
+| **22 Okt 2026 (malam, lanjutan)** | Generator v2: blok tabel + blok gambar; gerbang v2.1 (+TB1–TB4, GB1–GB2 = 54 asersi); uji bergigi v3 6/6; bug pengecualian GB (himpunan kosong) ditemukan & diperbaiki; fonts/README.md + periksa_font.py. |
 
 ### Koreksi yang tercatat
 

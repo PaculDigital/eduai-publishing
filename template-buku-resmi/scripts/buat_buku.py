@@ -28,17 +28,36 @@ Pakai:
 Sesudah generate, GERBANG (periksa_buku_template.py) otomatis dijalankan;
 buku yang gagal gerbang TIDAK dianggap selesai (exit 1).
 
+v2 — BLOK TABEL & BLOK GAMBAR. Di dalam daftar paragraf (kata pengantar,
+paragraf_pembuka, paragraf sub/sub-sub, tentang penulis), item boleh:
+  - string                      -> paragraf isi biasa
+  - {"tabel": {"judul": "Tabel 1.1 Judul tabel" (opsional),
+               "kolom": ["Kolom 1", ...],
+               "baris": [["sel", ...], ...]}}
+  - {"gambar": {"berkas": "relatif/ke/spec.png",   (PNG/JPEG)
+                "keterangan": "Gambar: ..." (opsional tapi dianjurkan),
+                "lebar_cm": 8.0 (opsional; bawaan maks 10,5 cm seperti
+                gambar isi template, tidak pernah melebihi 11,38 cm)}}
+Tabel TIDAK punya prototipe di template (template berisi 0 tabel), jadi
+XML-nya dibangun mengikuti angka & warna template: lebar total 6453 twip,
+garis single 808080, kepala tabel latar F2F2F2 tebal, sel Palatino 10 pt.
+Gambar disisipkan sebagai wp:inline terpusat + paragraf keterangan dari
+prototipe keterangan template; berkas media & relasi baru ditambahkan
+ke zip (Content_Types bawaan template sudah mengenal png & jpeg).
+
 Batasan jujur (baca README §11):
   - Daftar isi: nomor halaman hasil hitung-ulang aplikasi pembuka
     (updateFields), bukan dari generator.
   - Paragraf daftar bernomor (ListParagraph) TIDAK dipakai generator —
     prototipenya membawa numId + gambar contoh CapCut dari template.
-  - Gambar isi bab belum didukung v1 (caption saja tidak cukup bukti).
+  - Diagram/infografis = berkas gambar dari luar; generator hanya
+    menempatkannya, tidak menggambarnya.
   - Font berlisensi tetap urusan mesin pembuka (gerbang memeriksa XML).
 """
 import hashlib
 import json
 import re
+import struct
 import subprocess
 import sys
 import zipfile
@@ -170,7 +189,161 @@ def klon_ttd(proto, tempat_tanggal, nama):
     return hasil
 
 
-def buat(spec, keluaran):
+LEBAR_TEKS_TWIP = 6453
+EMU_PER_CM = 360000
+LEBAR_TEKS_EMU = 4097655          # 6453 twip x 635
+
+
+def ukuran_gambar(data, ext):
+    """(lebar_px, tinggi_px) dari berkas PNG/JPEG — stdlib murni."""
+    if ext == 'png' and data[:8] == b'\x89PNG\r\n\x1a\n':
+        w, h = struct.unpack('>II', data[16:24])
+        return w, h
+    if ext == 'jpeg' and data[:2] == b'\xff\xd8':
+        i = 2
+        while i < len(data) - 9:
+            if data[i] != 0xFF:
+                i += 1
+                continue
+            penanda = data[i + 1]
+            if penanda in (0xC0, 0xC1, 0xC2):
+                h, w = struct.unpack('>HH', data[i + 5:i + 9])
+                return w, h
+            panjang = struct.unpack('>H', data[i + 2:i + 4])[0]
+            i += 2 + panjang
+    return None, None
+
+
+class KonteksMedia:
+    """Mengumpulkan gambar baru: berkas media + relasi untuk zip hasil."""
+
+    def __init__(self, isi_zip, spec_dir):
+        self.isi_zip = isi_zip
+        self.spec_dir = Path(spec_dir)
+        rels = isi_zip['word/_rels/document.xml.rels'].decode('utf-8')
+        self.rid_berikut = max(int(x) for x in re.findall(r'Id="rId(\d+)"', rels)) + 1
+        self.rels_tambahan = []
+        self.berkas_baru = []       # nama zip baru, sesuai urutan tambah
+        self.hitung = 0
+
+    def tambah_gambar(self, item):
+        """Daftarkan berkas gambar item; kembalikan (rid, cx, cy) EMU."""
+        sumber = Path(item['berkas'])
+        if not sumber.is_absolute():
+            sumber = self.spec_dir / sumber
+        assert sumber.exists(), f"berkas gambar tidak ada: {sumber}"
+        data = sumber.read_bytes()
+        ext = sumber.suffix.lower().lstrip('.')
+        if ext == 'jpg':
+            ext = 'jpeg'
+        assert ext in ('png', 'jpeg'), f'format gambar belum didukung: {ext}'
+        self.hitung += 1
+        nama = f'word/media/buku{self.hitung}.{ext}'
+        self.isi_zip[nama] = data
+        self.berkas_baru.append(nama)
+        rid = f'rId{self.rid_berikut}'
+        self.rid_berikut += 1
+        self.rels_tambahan.append(
+            f'<Relationship Id="{rid}" '
+            'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" '
+            f'Target="media/buku{self.hitung}.{ext}"/>')
+        w_px, h_px = ukuran_gambar(data, ext)
+        lebar_cm = float(item.get('lebar_cm') or 10.5)
+        if w_px:
+            lebar_cm = min(lebar_cm, w_px / 150 * 2.54)   # jangan upscale > 150 dpi
+        lebar_cm = min(lebar_cm, 11.38)
+        cx = round(lebar_cm * EMU_PER_CM)
+        cy = round(cx * h_px / w_px) if w_px and h_px else round(cx * 0.62)
+        return rid, cx, cy
+
+    def terapkan_rels(self):
+        if not self.rels_tambahan:
+            return
+        kunci = 'word/_rels/document.xml.rels'
+        rels = self.isi_zip[kunci].decode('utf-8')
+        rels = rels.replace('</Relationships>',
+                            ''.join(self.rels_tambahan) + '</Relationships>')
+        self.isi_zip[kunci] = rels.encode('utf-8')
+
+
+def paragraf_gambar(rid, cx, cy, nama):
+    """Paragraf gambar wp:inline terpusat (pola gambar isi template)."""
+    _docpr[0] += 1
+    did = _docpr[0]
+    return (
+        '<w:p><w:pPr><w:spacing w:after="160"/><w:jc w:val="center"/>'
+        '<w:rPr><w:rFonts w:ascii="Palatino Linotype" w:eastAsia="Calibri" '
+        'w:hAnsi="Palatino Linotype"/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr></w:pPr>'
+        '<w:r><w:rPr><w:rFonts w:ascii="Palatino Linotype" w:eastAsia="Calibri" '
+        'w:hAnsi="Palatino Linotype"/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr>'
+        f'<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0">'
+        f'<wp:extent cx="{cx}" cy="{cy}"/><wp:effectExtent l="0" t="0" r="0" b="0"/>'
+        f'<wp:docPr id="{did}" name="{esc(nama)}"/>'
+        '<wp:cNvGraphicFramePr><a:graphicFrameLocks '
+        'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+        'noChangeAspect="1"/></wp:cNvGraphicFramePr>'
+        '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
+        '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">'
+        '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">'
+        '<pic:nvPicPr><pic:cNvPr id="0" name="Gambar buku"/>'
+        '<pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr>'
+        '</pic:nvPicPr><pic:blipFill>'
+        f'<a:blip r:embed="{rid}"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch>'
+        '</pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/>'
+        f'<a:ext cx="{cx}" cy="{cy}"/></a:xfrm>'
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>'
+        '</a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>')
+
+
+def _sel(teks, kepala=False, lebar=0):
+    shd = '<w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/>' if kepala else ''
+    tebal = '<w:b/><w:bCs/>' if kepala else ''
+    rata = 'center' if kepala else 'both'
+    return (
+        f'<w:tc><w:tcPr><w:tcW w:w="{lebar}" w:type="dxa"/>{shd}'
+        '<w:vAlign w:val="center"/></w:tcPr>'
+        '<w:p><w:pPr><w:spacing w:after="0"/>'
+        f'<w:jc w:val="{rata}"/><w:rPr>'
+        '<w:rFonts w:ascii="Palatino Linotype" w:eastAsia="Calibri" '
+        f'w:hAnsi="Palatino Linotype"/>{tebal}'
+        '<w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="en-ID"/></w:rPr></w:pPr>'
+        '<w:r><w:rPr><w:rFonts w:ascii="Palatino Linotype" w:eastAsia="Calibri" '
+        f'w:hAnsi="Palatino Linotype"/>{tebal}'
+        '<w:sz w:val="20"/><w:szCs w:val="20"/><w:lang w:val="en-ID"/></w:rPr>'
+        f'<w:t xml:space="preserve">{esc(str(teks))}</w:t></w:r></w:p></w:tc>')
+
+
+def buat_tabel(item):
+    """XML <w:tbl> mengikuti angka template: total 6453 twip, garis
+    single sz=4 warna 808080, kepala latar F2F2F2 (seperti Heading2)."""
+    kolom = item['kolom']
+    baris = item.get('baris', [])
+    n = len(kolom)
+    assert n >= 1, 'tabel harus punya minimal 1 kolom'
+    dasar, sisa = divmod(LEBAR_TEKS_TWIP, n)
+    lebar = [dasar + (1 if i < sisa else 0) for i in range(n)]
+    for b in baris:
+        assert len(b) == n, f'baris tabel punya {len(b)} sel, kolom {n}'
+    garis = ''.join(
+        f'<w:{s} w:val="single" w:sz="4" w:space="0" w:color="808080"/>'
+        for s in ('top', 'left', 'bottom', 'right', 'insideH', 'insideV'))
+    grid = ''.join(f'<w:gridCol w:w="{w}"/>' for w in lebar)
+    kepala = ('<w:tr><w:trPr><w:tblHeader/></w:trPr>'
+              + ''.join(_sel(k, kepala=True, lebar=lebar[i])
+                        for i, k in enumerate(kolom)) + '</w:tr>')
+    isi = ''.join('<w:tr>' + ''.join(_sel(s, lebar=lebar[i])
+                                     for i, s in enumerate(b)) + '</w:tr>'
+                  for b in baris)
+    return (
+        '<w:tbl><w:tblPr>'
+        f'<w:tblW w:w="{LEBAR_TEKS_TWIP}" w:type="dxa"/><w:jc w:val="center"/>'
+        f'<w:tblBorders>{garis}</w:tblBorders><w:tblLayout w:type="fixed"/>'
+        '</w:tblPr>'
+        f'<w:tblGrid>{grid}</w:tblGrid>{kepala}{isi}</w:tbl>')
+
+
+def buat(spec, keluaran, spec_dir='.'):
+    konteks = None   # dibuat sesudah isi_zip dibaca (di dalam buat)
     mentah = TEMPLATE.read_bytes()
     md5 = hashlib.md5(mentah).hexdigest()
     assert md5 == MD5_WAJIB, f'MD5 template berubah: {md5} != {MD5_WAJIB}'
@@ -189,17 +362,35 @@ def buat(spec, keluaran):
     P_TTD = paras[63]         # tanda tangan pengantar (jc=right, ada <w:br/>)
     P_H1BAB = paras[77]       # Heading1 bab + gambar dekoratif + <w:br/>
     P_H2 = paras[79]          # Heading2
+    P_KETERANGAN = paras[81]  # keterangan gambar (center, Palatino 10)
     P_SUBSUB = paras[94]      # sub-sub bab tebal ('a. Sub Sub Bab')
     P_NAMA = paras[107]       # nama penulis tebal
     P_KUTIPAN = next(p for p in paras if 'Tulis Quotes Di Sini' in p)
     P_PB = paras[104]         # paragraf page-break
     KOSONG = '<w:p/>'
 
-    def isi_blok(daftar_paragraf):
-        """Paragraf isi dipisahkan paragraf kosong — pola template."""
+    konteks = KonteksMedia(isi_zip, spec_dir)
+
+    def isi_blok(daftar):
+        """Daftar item -> XML. Item: string | {"tabel": ...} | {"gambar": ...}.
+        Tiap blok ditutup paragraf kosong — pola template."""
         out = []
-        for t in daftar_paragraf:
-            out.append(klon(P_ISI, t))
+        for item in daftar or []:
+            if isinstance(item, str):
+                out.append(klon(P_ISI, item))
+            elif isinstance(item, dict) and 'tabel' in item:
+                t = item['tabel']
+                if t.get('judul'):
+                    out.append(klon(P_KETERANGAN, t['judul']))
+                out.append(buat_tabel(t))
+            elif isinstance(item, dict) and 'gambar' in item:
+                g = item['gambar']
+                rid, cx, cy = konteks.tambah_gambar(g)
+                out.append(paragraf_gambar(rid, cx, cy, Path(g['berkas']).stem))
+                if g.get('keterangan'):
+                    out.append(klon(P_KETERANGAN, g['keterangan']))
+            else:
+                raise SystemExit(f'item blok tidak dikenal: {str(item)[:80]}')
             out.append(KOSONG)
         return out
 
@@ -307,6 +498,10 @@ def buat(spec, keluaran):
     doc_baru = doc[:awal] + tengah + doc[akhir:]
     isi_zip['word/document.xml'] = doc_baru.encode('utf-8')
 
+    # ── MEDIA GAMBAR BARU (v2): relasi + urutan berkas zip ──
+    konteks.terapkan_rels()
+    urutan = urutan + konteks.berkas_baru
+
     # ── FOOTER: judul & penulis ──
     for nama, lama, baru in (
             ('word/footer1.xml', 'Tulis Nama Penulis Di Sini', spec['penulis']),
@@ -339,7 +534,7 @@ def main():
     kurang = [k for k in wajib if k not in spec]
     if kurang:
         sys.exit(f'Spec kurang kolom: {kurang}')
-    buat(spec, arg[1])
+    buat(spec, arg[1], spec_dir=Path(arg[0]).resolve().parent)
     if '--tanpa-gerbang' not in sys.argv:
         print('\n— menjalankan GERBANG —')
         r = subprocess.run([sys.executable, str(GERBANG), arg[1]])

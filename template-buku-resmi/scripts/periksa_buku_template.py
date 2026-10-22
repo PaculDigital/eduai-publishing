@@ -27,6 +27,10 @@ LOLOS 20/20 sekarang wajib tertangkap):
   P1-P4   muka buku: judul sampul (run 35 pt), teks ISBN, Cetakan Pertama,
           ukuran run teks zona depan hanya yang terukur di template
           (sz 19/22/28/30/70 — di luar itu = muka buku diubah)
+  TB1-TB4 tabel (bila ada): lebar total 6453 twip, garis single 808080,
+          kepala latar F2F2F2, semua run sel Palatino 10 pt
+  GB1-GB2 gambar zona konten: lebar <= area teks (11,38 cm); gambar di
+          zona bab wajib diikuti paragraf keterangan 'Gambar...'
 
 Pakai:
     python3 periksa_buku_template.py buku.docx
@@ -362,6 +366,88 @@ def periksa(path, wajib_lebih=0):
                 sz_depan_salah.append(s)
     ok('P4 ukuran run teks zona depan hanya yang terukur (19/22/28/30/70)',
        not sz_depan_salah, f'ukuran asing: {sorted(set(sz_depan_salah), key=str)[:4]}')
+
+    # ── TB: TABEL (v2 generator) ────────────────────────────────────────
+    # Template asli berisi 0 tabel — asersi hanya berjalan bila buku
+    # MEMAKAI tabel. Standarnya dari angka template: lebar area teks
+    # 6453 twip, garis 808080 (warna garis judul), kepala F2F2F2.
+    tbls = re.findall(r'<w:tbl>.*?</w:tbl>', doc, re.S)
+    print(f'\n== TABEL == {len(tbls)} tabel')
+    if not tbls:
+        print('  (dilewati) buku ini tidak memakai tabel')
+    else:
+        lebar_salah, garis_salah, kepala_salah, run_salah = [], [], [], []
+        for ti, t in enumerate(tbls):
+            grid = [tw(x) for x in re.findall(r'<w:gridCol w:w="(\d+)"', t)]
+            if sum(x for x in grid if x) != 6453:
+                lebar_salah.append((ti, sum(x for x in grid if x)))
+            borders = ambil(t, r'<w:tblBorders>(.*?)</w:tblBorders>') or ''
+            if borders.count('w:val="single"') < 6 or borders.count('w:color="808080"') < 6:
+                garis_salah.append(ti)
+            baris1 = ambil(t, r'<w:tr(?: [^>]*)?>(.*?)</w:tr>') or ''
+            if 'w:fill="F2F2F2"' not in baris1:
+                kepala_salah.append(ti)
+            for run in re.findall(r'<w:r(?: [^>]*)?>.*?</w:r>', t, re.S):
+                if '<w:t' not in run:
+                    continue
+                if (ambil(run, r'w:ascii="([^"]+)"') != 'Palatino Linotype'
+                        or tw(ambil(run, r'<w:sz w:val="(\d+)"')) != 20):
+                    run_salah.append(ti)
+        ok('TB1 lebar total tiap tabel = 6453 twip (area teks)', not lebar_salah,
+           f'tabel salah: {lebar_salah[:3]}')
+        ok('TB2 garis tabel single warna 808080 (6 sisi)', not garis_salah,
+           f'tabel salah: {garis_salah[:3]}')
+        ok('TB3 baris kepala tabel latar F2F2F2', not kepala_salah,
+           f'tabel salah: {kepala_salah[:3]}')
+        ok('TB4 semua run sel tabel Palatino 10 pt', not run_salah,
+           f'tabel salah: {sorted(set(run_salah))[:3]}')
+
+    # ── GB: GAMBAR zona konten (v2 generator) ──────────────────────────
+    # Gambar isi = paragraf bergambar (drawing) tanpa style, sesudah
+    # Heading1 pertama. Dekorasi Heading1 & sampul TIDAK termasuk.
+    print('\n== GAMBAR ==')
+    idx_h1 = [i for i, p in enumerate(paras)
+              if ambil(p, r'<w:pStyle w:val="(Heading1)"')]
+    idx_penulis = next((i for i, p in enumerate(paras)
+                        if ambil(p, r'<w:pStyle w:val="(Heading1)"')
+                        and teks_para(p).upper().startswith('TENTANG PENULIS')), None)
+    if not idx_h1:
+        print('  (dilewati) tidak ada Heading1')
+    else:
+        para_gambar = []
+        for i, p in enumerate(paras[idx_h1[0]:], start=idx_h1[0]):
+            if '<w:drawing>' not in p:
+                continue
+            if ambil(p, r'<w:pStyle w:val="([^"]+)"'):
+                continue
+            # PENGECUALIAN TERUKUR: paragraf garis penutup buku (teks hanya
+            # '----') membawa gambar ornamen selebar 16,87 cm — memang
+            # ornamen penutup template, bukan gambar isi.
+            # ⚠️ WAJIB teks tidak kosong: set('') <= himpunan mana pun =
+            # True, jadi tanpa syarat ini paragraf gambar MURNI (tanpa
+            # teks) ikut terbuang dan GB buta (tertangkap uji v3 W5/W6).
+            _tp = teks_para(p)
+            if _tp and set(_tp) <= {'-', ' '}:
+                continue
+            para_gambar.append(i)
+        lebar_lewat, tanpa_ket = [], []
+        for i in para_gambar:
+            for cx in re.findall(r'<wp:extent cx="(\d+)"', paras[i]):
+                if int(cx) > 4097655:
+                    lebar_lewat.append((i, int(cx)))
+            if idx_penulis is not None and i < idx_penulis:
+                berikut = ''
+                for q in paras[i + 1:]:
+                    berikut = teks_para(q)
+                    if berikut:
+                        break
+                if not berikut.startswith('Gambar'):
+                    tanpa_ket.append((i, berikut[:30]))
+        print(f'  {len(para_gambar)} paragraf bergambar di zona konten')
+        ok('GB1 lebar gambar isi <= area teks (11,38 cm)', not lebar_lewat,
+           f'melebihi: {lebar_lewat[:3]}')
+        ok('GB2 gambar di zona bab diikuti keterangan "Gambar..."',
+           not tanpa_ket, f'tanpa keterangan: {tanpa_ket[:3]}')
 
     # ── J2: JUDUL BAB DUA BARIS (putusan Bos 22 Okt 2026) ──────────────
     #  Template asli menulis "BAB I" <w:br/> "JUDUL BAB PERTAMA" dalam SATU
