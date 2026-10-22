@@ -14,6 +14,7 @@ Yang dibuktikan (bukan diklaim):
   5. Template asli TIDAK berubah sesudah generator jalan (MD5 tetap).
 """
 import hashlib
+import json
 import subprocess
 import sys
 import tempfile
@@ -110,6 +111,45 @@ with tempfile.TemporaryDirectory() as td:
         '<wp:inline' in doc and 'buku1.png' in rels_baru)
     cek('keterangan gambar masuk',
         'Gambar: Contoh diagram batang' in doc)
+
+    # ── v2.1: mode gagal TIDAK meninggalkan berkas (cacat review) ──
+    # Cacat 1: bab=[] -> exit 1 TETAPI berkas rusak tetap tertulis.
+    # Cacat 2: romawi '1' -> generator menulis 'BAB 1', gerbang menolak
+    # sesudahnya. Keduanya ditutup validasi awal + tulis-sementara.
+    spec_asli = json.loads(CONTOH.read_text(encoding='utf-8'))
+
+    def jalan(spec_mod, nama_keluar):
+        sp = Path(td) / f'spec-{nama_keluar}.json'
+        sp.write_text(json.dumps(spec_mod), encoding='utf-8')
+        out = Path(td) / f'{nama_keluar}.docx'
+        r = subprocess.run([sys.executable, str(GENERATOR), str(sp), str(out)],
+                           capture_output=True, text=True)
+        sisa_tmp = list(Path(td).glob('*.tmp.docx'))
+        return r, out, sisa_tmp
+
+    s_bab_kosong = json.loads(json.dumps(spec_asli))
+    s_bab_kosong['bab'] = []
+    r, out, sisa = jalan(s_bab_kosong, 'tanpa-bab')
+    cek('bab kosong: generator menolak (exit != 0)', r.returncode != 0)
+    cek('bab kosong: TIDAK ada berkas keluaran', not out.exists())
+    cek('bab kosong: TIDAK ada berkas sementara tersisa', not sisa)
+
+    s_romawi = json.loads(json.dumps(spec_asli))
+    s_romawi['bab'][0]['romawi'] = '1'
+    r, out, sisa = jalan(s_romawi, 'romawi-angka')
+    cek("romawi '1': generator menolak SEBELUM menulis (exit != 0)",
+        r.returncode != 0)
+    cek("romawi '1': TIDAK ada berkas keluaran", not out.exists())
+
+    # berkas baik yang sudah ada TIDAK tertimpa percobaan gagal
+    out_baik = Path(td) / 'sudah-baik.docx'
+    out_baik.write_bytes(b'ISI LAMA YANG BAIK')
+    sp = Path(td) / 'spec-gagal.json'
+    sp.write_text(json.dumps(s_bab_kosong), encoding='utf-8')
+    r = subprocess.run([sys.executable, str(GENERATOR), str(sp), str(out_baik)],
+                       capture_output=True, text=True)
+    cek('percobaan gagal tidak menimpa berkas baik yang ada',
+        r.returncode != 0 and out_baik.read_bytes() == b'ISI LAMA YANG BAIK')
 
 md5_akhir = hashlib.md5(TEMPLATE.read_bytes()).hexdigest()
 cek('MD5 template sesudah generate tetap', md5_akhir == MD5_WAJIB, md5_akhir)

@@ -268,7 +268,7 @@ tab TOC digeser, sectPr kedua salah ukuran, font paragraf pendek diubah.
 
 ```bash
 python3 scripts/buat_buku.py scripts/contoh_buku.json buku-saya.docx
-python3 scripts/uji_generator.py   # bukti ujung-ke-ujung: 23/23
+python3 scripts/uji_generator.py   # bukti ujung-ke-ujung: 29/29
 ```
 
 **Cara kerja (WAJIB cara ini, bukan menulis ulang dari angka):** template
@@ -327,7 +327,9 @@ uji_bergigi_j2.py (2 suntikan judul)  →  2/2 tertangkap
 uji_bergigi_v2.py (10 suntikan audit) → 10/10 tertangkap
 uji_bergigi_v3.py (6 suntikan tabel/
                    gambar)            →  6/6 tertangkap
-uji_generator.py  (ujung-ke-ujung)    → 23/23 LULUS
+uji_generator.py  (ujung-ke-ujung)    → 29/29 LULUS
+   (termasuk mode gagal: bab kosong & romawi '1' TIDAK meninggalkan
+    berkas, dan percobaan gagal tidak menimpa berkas baik)
 render LibreOffice buku contoh v2    → 11 halaman, 14×20 cm, tabel
                                         tampil + kepala tabel berulang,
                                         gambar + keterangan tampil
@@ -561,6 +563,23 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
   diselaraskan dengan script, suntikan uji J2-C diperbaiki (dulu
   menciptakan `BAB 1I`).
 
+### ✅ Tambahan (22 Okt 2026 malam — tutup 2 cacat review)
+
+- **Cacat 1 — berkas rusak tetap tertulis**: `bab=[]` membuat generator
+  exit 1 (gerbang benar menolak), tetapi `tanpa-bab.docx` 475.582 byte
+  TELAH tertulis. Akarnya: generator menulis ke nama akhir SEBELUM
+  diperiksa. **Perbaikan: penulisan atomik** — tulis ke berkas
+  sementara → gerbang memeriksa berkas itu → hanya yang lulus dipindah
+  ke nama akhir; yang gagal dihapus, dan berkas baik lama tidak
+  tertimpa percobaan gagal.
+- **Cacat 2 — romawi `"1"` diterima generator**: generator menulis
+  `BAB 1`, baru gerbang (J2b) menolak sesudahnya. **Perbaikan: validasi
+  awal** — daftar bab kosong & pola Romawi (pola yang sama dengan J2b)
+  diperiksa sebelum menulis apa pun; spec buruk ditolak di pintu.
+- Kedua cacat DIVERIFIKASI dulu lewat reproduksi persis (ukuran berkas
+  sama dengan laporan: 475.582 & 478.680 byte), dan sekarang jadi
+  6 asersi regresi permanen di `uji_generator.py` (29/29).
+
 ### ✅ Tambahan (22 Okt 2026 malam — generator v2: tabel & gambar)
 
 - **Generator v2**: blok `tabel` + blok `gambar` di JSON (§4.7);
@@ -593,6 +612,7 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
 | **22 Okt 2026** | Versi pertama. Template diunduh, angka diekstrak, gerbang dibuat, Jev dioptimalkan menurut dokumentasi resmi. Judul bab diputuskan **dua baris** (sesuai template). |
 | **22 Okt 2026 (malam)** | Audit independen → gerbang v2 (48 asersi) + generator berbasis salinan template + uji bergigi v2 & uji generator; koreksi angka/gambar/TOCHeading di dokumen. Branch `agen/wulan/template-buku-generator`. |
 | **22 Okt 2026 (malam, lanjutan)** | Generator v2: blok tabel + blok gambar; gerbang v2.1 (+TB1–TB4, GB1–GB2 = 54 asersi); uji bergigi v3 6/6; bug pengecualian GB (himpunan kosong) ditemukan & diperbaiki; fonts/README.md + periksa_font.py. |
+| **22 Okt 2026 (malam, tutup cacat)** | Tutup 2 cacat review agen: penulisan atomik (sementara → gerbang → pindah) + validasi awal bab/Romawi; uji generator 29/29. |
 
 ### Koreksi yang tercatat
 

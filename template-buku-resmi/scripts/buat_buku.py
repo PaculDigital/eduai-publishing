@@ -26,7 +26,9 @@ Pakai:
     python3 buat_buku.py contoh_buku.json buku-hasil.docx --tanpa-gerbang
 
 Sesudah generate, GERBANG (periksa_buku_template.py) otomatis dijalankan;
-buku yang gagal gerbang TIDAK dianggap selesai (exit 1).
+buku yang gagal gerbang TIDAK dianggap selesai (exit 1). Penulisan
+ATOMIK: hasil ditulis ke berkas sementara, diperiksa, dan hanya yang
+lulus dipindah ke nama akhir (perbaikan cacat review 22 Okt 2026).
 
 v2 — BLOK TABEL & BLOK GAMBAR. Di dalam daftar paragraf (kata pengantar,
 paragraf_pembuka, paragraf sub/sub-sub, tentang penulis), item boleh:
@@ -534,11 +536,43 @@ def main():
     kurang = [k for k in wajib if k not in spec]
     if kurang:
         sys.exit(f'Spec kurang kolom: {kurang}')
-    buat(spec, arg[1], spec_dir=Path(arg[0]).resolve().parent)
-    if '--tanpa-gerbang' not in sys.argv:
-        print('\n— menjalankan GERBANG —')
-        r = subprocess.run([sys.executable, str(GERBANG), arg[1]])
-        sys.exit(r.returncode)
+
+    # ── VALIDASI AWAL (temuan review 22 Okt 2026, cacat 2) ──
+    # Romawi & daftar bab diperiksa SEBELUM menulis apa pun: generator
+    # yang menulis 'BAB 1' lalu berharap gerbang menolak = buku rusak
+    # sempat jadi. Pola Romawi sama persis dengan J2b di gerbang.
+    ROMAWI_SAH = re.compile(
+        r'^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$')
+    if not spec['bab']:
+        sys.exit('Spec ditolak: daftar "bab" kosong — buku wajib punya bab.')
+    for b in spec['bab']:
+        r_ = str(b.get('romawi', ''))
+        if not r_ or not ROMAWI_SAH.match(r_):
+            sys.exit(f'Spec ditolak: romawi bab tidak sah: {r_!r} '
+                     '(wajib angka Romawi: I, II, III, IV, ...)')
+
+    # ── TULIS-SEMENTARA (temuan review 22 Okt 2026, cacat 1) ──
+    # Buku ditulis ke berkas SEMENTARA, gerbang memeriksa berkas itu,
+    # dan hanya buku yang LULUS dipindah ke nama akhir. Buku gagal
+    # gerbang TIDAK PERNAH ada di disk dengan nama akhir — dan berkas
+    # hasil lama yang baik tidak tertimpa oleh percobaan yang gagal.
+    keluaran = Path(arg[1])
+    sementara = keluaran.with_name(keluaran.name + '.tmp.docx')
+    try:
+        buat(spec, str(sementara), spec_dir=Path(arg[0]).resolve().parent)
+        if '--tanpa-gerbang' not in sys.argv:
+            print('\n— menjalankan GERBANG —')
+            r = subprocess.run([sys.executable, str(GERBANG), str(sementara)])
+            if r.returncode != 0:
+                sementara.unlink(missing_ok=True)
+                print(f'\nGAGAL gerbang — berkas sementara dihapus, '
+                      f'{keluaran} TIDAK ditulis.')
+                sys.exit(r.returncode)
+        sementara.replace(keluaran)
+        print(f'SELESAI: {keluaran} ({keluaran.stat().st_size} byte)')
+    except BaseException:
+        sementara.unlink(missing_ok=True)
+        raise
 
 
 if __name__ == '__main__':
