@@ -15,6 +15,7 @@ Yang dibuktikan (bukan diklaim):
 """
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -111,6 +112,26 @@ with tempfile.TemporaryDirectory() as td:
         '<wp:inline' in doc and 'buku1.png' in rels_baru)
     cek('keterangan gambar masuk',
         'Gambar: Contoh diagram batang' in doc)
+    # ── v2.2: daftar pustaka ──
+    cek('judul DAFTAR PUSTAKA masuk (Heading1)',
+        'DAFTAR PUSTAKA' in doc)
+    cek('entri pustaka masuk', 'Creswell, J. W. (2014).' in doc
+        and 'Sugiyono. (2019).' in doc)
+    cek('entri memakai indentasi gantung 720',
+        doc.count('w:hanging="720"') >= 4,
+        f"jumlah: {doc.count('w:hanging=')}")
+    # urutan diperiksa per-PARAGRAF (bukan string mentah: teks cache
+    # daftar isi juga memuat 'DAFTAR PUSTAKA' & 'TENTANG PENULIS' di
+    # posisi lebih awal — jebakannya tertangkap uji ini sendiri)
+    paras_doc = re.findall(r'<w:p[ >].*?</w:p>', doc, re.S)
+    teks_paras = [''.join(re.findall(r'<w:t(?:\s[^>]*)?>([^<]*)</w:t>', p))
+                  for p in paras_doc]
+    i_bab = max(i for i, t in enumerate(teks_paras) if t.startswith('BAB '))
+    i_dp = next(i for i, t in enumerate(teks_paras) if t == 'DAFTAR PUSTAKA')
+    i_pen = next(i for i, t in enumerate(teks_paras)
+                 if t.startswith('TENTANG PENULIS'))
+    cek('urutan: pustaka sesudah bab terakhir, sebelum Tentang Penulis',
+        i_bab < i_dp < i_pen, f'bab={i_bab}, dp={i_dp}, penulis={i_pen}')
 
     # ── v2.1: mode gagal TIDAK meninggalkan berkas (cacat review) ──
     # Cacat 1: bab=[] -> exit 1 TETAPI berkas rusak tetap tertulis.

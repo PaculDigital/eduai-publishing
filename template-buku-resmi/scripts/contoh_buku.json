@@ -121,5 +121,11 @@
  },
  "twitter": "@penerbitcontoh",
  "web": "www.contoh-penerbit.id",
- "whatsapp": "0812-0000-0000"
+ "whatsapp": "0812-0000-0000",
+ "daftar_pustaka": [
+  "Creswell, J. W. (2014). Research design: Qualitative, quantitative, and mixed methods approaches (4th ed.). SAGE Publications.",
+  "Keraf, G. (2004). Komposisi: Sebuah pengantar kemahiran bahasa. Nusa Indah.",
+  "Semi, M. A. (2007). Dasar-dasar keterampilan menulis. Angkasa.",
+  "Sugiyono. (2019). Metode penelitian kuantitatif, kualitatif, dan R&D. Alfabeta."
+ ]
 }

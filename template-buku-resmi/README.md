@@ -207,7 +207,7 @@ python3 scripts/periksa_buku_template.py buku-anda.docx
 echo $?      # 0 = LULUS, 1 = GAGAL
 ```
 
-**WAJIB dijalankan sebelum `.docx` diserahkan.** **54 asersi** (v2.1,
+**WAJIB dijalankan sebelum `.docx` diserahkan.** **57 asersi** (v2.2,
 22 Okt 2026 malam — v1 hanya 20 dan terbukti berlubang, lihat §11):
 
 | Kelompok | Asersi |
@@ -268,7 +268,7 @@ tab TOC digeser, sectPr kedua salah ukuran, font paragraf pendek diubah.
 
 ```bash
 python3 scripts/buat_buku.py scripts/contoh_buku.json buku-saya.docx
-python3 scripts/uji_generator.py   # bukti ujung-ke-ujung: 29/29
+python3 scripts/uji_generator.py   # bukti ujung-ke-ujung: 33/33
 ```
 
 **Cara kerja (WAJIB cara ini, bukan menulis ulang dari angka):** template
@@ -314,25 +314,43 @@ Di dalam daftar paragraf mana pun, item boleh berupa objek:
   TETAPI hanya bila teksnya tidak kosong (paragraf gambar murni tanpa
   teks TIDAK boleh ikut terkecuali — bug ini tertangkap uji v3).
 
+### 4.8 DAFTAR PUSTAKA (generator v2.2, opsional)
+
+Kolom JSON `"daftar_pustaka": ["Entri satu...", "Entri dua..."]`.
+Bila ada & tidak kosong, generator menyisipkan bagian **DAFTAR PUSTAKA**
+di antara bab terakhir dan TENTANG PENULIS (posisi baku buku): judul =
+klon Heading1 polos, entri = klon paragraf isi + **indentasi gantung
+720 twip (1,27 cm)** — baris pertama menjorok keluar, baris lanjutan
+masuk; TANPA titik-titik (titik pemimpin itu milik Daftar Isi, §4.6).
+Gerbang memeriksa **DP1** posisi, **DP2** minimal 1 entri, **DP3**
+semua entri bergaya gantung; `uji_bergigi_v4.py` membuktikan kerusakan
+posisi & indentasi tertangkap. Catatan cache TOC: slot TOC1 bawaan
+hanya 4 — dengan pustaka, entri cache ke-5 tidak tertampung (Word
+menghitung ulang seluruh daftar isi saat berkas dibuka).
+
 ---
 
-## 5. Hasil uji terakhir (22 Okt 2026, malam — gerbang v2.1 + generator v2)
+## 5. Hasil uji terakhir (22 Okt 2026, malam — gerbang v2.2 + generator v2.2)
 
 ```
 template asli                        → 50 LULUS / 0 GAGAL
-   (TB dilewati: template berisi 0 tabel; GB aktif)
-buku contoh hasil generator v2       → 54 LULUS / 0 GAGAL
+   (TB & DP dilewati: template 0 tabel & tanpa daftar pustaka)
+buku contoh hasil generator v2.2     → 57 LULUS / 0 GAGAL
 uji_bergigi.py    (8 suntikan format) →  8/8 tertangkap
 uji_bergigi_j2.py (2 suntikan judul)  →  2/2 tertangkap
 uji_bergigi_v2.py (10 suntikan audit) → 10/10 tertangkap
 uji_bergigi_v3.py (6 suntikan tabel/
                    gambar)            →  6/6 tertangkap
-uji_generator.py  (ujung-ke-ujung)    → 29/29 LULUS
+uji_bergigi_v4.py (2 suntikan daftar
+                   pustaka)           →  2/2 tertangkap
+uji_generator.py  (ujung-ke-ujung)    → 33/33 LULUS
    (termasuk mode gagal: bab kosong & romawi '1' TIDAK meninggalkan
     berkas, dan percobaan gagal tidak menimpa berkas baik)
-render LibreOffice buku contoh v2    → 11 halaman, 14×20 cm, tabel
+render LibreOffice buku contoh v2.2  → 12 halaman, 14×20 cm, tabel
                                         tampil + kepala tabel berulang,
-                                        gambar + keterangan tampil
+                                        gambar + keterangan tampil,
+                                        daftar pustaka hal. 10 dengan
+                                        indentasi gantung terlihat
 periksa --wajib-lebih=1               →  EXIT 1  (terbukti bisa gagal)
 ```
 
@@ -563,6 +581,20 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
   diselaraskan dengan script, suntikan uji J2-C diperbaiki (dulu
   menciptakan `BAB 1I`).
 
+### ✅ Tambahan (22 Okt 2026 malam — Daftar Pustaka)
+
+- **Generator v2.2**: kolom opsional `daftar_pustaka` di JSON → bagian
+  DAFTAR PUSTAKA di antara bab terakhir & TENTANG PENULIS, entri
+  indentasi gantung 720 twip (§4.8). Lahir dari pertanyaan Boss soal
+  "titik-titik": titik pemimpin adalah milik Daftar Isi (sudah ada &
+  benar di template — digambar aplikasi pembuka dari tab leader),
+  sedangkan Daftar Pustaka memang belum ada di template & buku umum.
+- **Gerbang v2.2: + DP1–DP3** (buku contoh 57/57; template tetap 50/50
+  karena DP dilewati — template tidak memakainya).
+- Jebakan uji yang tertangkap: pemeriksaan urutan berbasis string
+  mentah tertipu teks cache Daftar Isi — uji generator sekarang
+  memeriksa urutan per-paragraf.
+
 ### ✅ Tambahan (22 Okt 2026 malam — tutup 2 cacat review)
 
 - **Cacat 1 — berkas rusak tetap tertulis**: `bab=[]` membuat generator
@@ -578,7 +610,7 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
   diperiksa sebelum menulis apa pun; spec buruk ditolak di pintu.
 - Kedua cacat DIVERIFIKASI dulu lewat reproduksi persis (ukuran berkas
   sama dengan laporan: 475.582 & 478.680 byte), dan sekarang jadi
-  6 asersi regresi permanen di `uji_generator.py` (29/29).
+  6 asersi regresi permanen di `uji_generator.py` (saat itu 29/29).
 
 ### ✅ Tambahan (22 Okt 2026 malam — generator v2: tabel & gambar)
 
@@ -613,6 +645,7 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
 | **22 Okt 2026 (malam)** | Audit independen → gerbang v2 (48 asersi) + generator berbasis salinan template + uji bergigi v2 & uji generator; koreksi angka/gambar/TOCHeading di dokumen. Branch `agen/wulan/template-buku-generator`. |
 | **22 Okt 2026 (malam, lanjutan)** | Generator v2: blok tabel + blok gambar; gerbang v2.1 (+TB1–TB4, GB1–GB2 = 54 asersi); uji bergigi v3 6/6; bug pengecualian GB (himpunan kosong) ditemukan & diperbaiki; fonts/README.md + periksa_font.py. |
 | **22 Okt 2026 (malam, tutup cacat)** | Tutup 2 cacat review agen: penulisan atomik (sementara → gerbang → pindah) + validasi awal bab/Romawi; uji generator 29/29. |
+| **22 Okt 2026 (malam, pustaka)** | Generator v2.2: bagian DAFTAR PUSTAKA opsional (indentasi gantung); gerbang +DP1–DP3 (57 asersi); uji bergigi v4 2/2; uji generator 33/33. |
 
 ### Koreksi yang tercatat
 

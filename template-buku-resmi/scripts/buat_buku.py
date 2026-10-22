@@ -30,6 +30,11 @@ buku yang gagal gerbang TIDAK dianggap selesai (exit 1). Penulisan
 ATOMIK: hasil ditulis ke berkas sementara, diperiksa, dan hanya yang
 lulus dipindah ke nama akhir (perbaikan cacat review 22 Okt 2026).
 
+v2.2 — DAFTAR PUSTAKA (opsional): kolom "daftar_pustaka" di JSON =
+daftar string entri rujukan. Bila ada & tidak kosong, generator
+menyisipkan bagian DAFTAR PUSTAKA (Heading1) sesudah bab terakhir,
+sebelum TENTANG PENULIS; entri memakai indentasi gantung 720 twip.
+
 v2 — BLOK TABEL & BLOK GAMBAR. Di dalam daftar paragraf (kata pengantar,
 paragraf_pembuka, paragraf sub/sub-sub, tentang penulis), item boleh:
   - string                      -> paragraf isi biasa
@@ -439,6 +444,7 @@ def buat(spec, keluaran, spec_dir='.'):
     daftar_isi = list(paras[65:77])
     entri1 = (['KATA PENGANTAR']
               + [f"BAB {b['romawi']} {b['judul'].upper()}" for b in spec['bab']]
+              + (['DAFTAR PUSTAKA'] if spec.get('daftar_pustaka') else [])
               + ['TENTANG PENULIS'])
     entri2 = [f"{s['nomor']} {s['judul']}"
               for b in spec['bab'] for s in b['sub']]
@@ -484,6 +490,28 @@ def buat(spec, keluaran, spec_dir='.'):
                 bab_xml += isi_blok(ss.get('paragraf', []))
         bab_xml.append(P_PB)   # bab berikut / tentang penulis mulai halaman baru
 
+    # ── DAFTAR PUSTAKA (opsional, sesudah bab terakhir) ──
+    # Template tidak punya bagian ini — dibangun dari prototipe yang ada:
+    # judul = klon Heading1 polos, entri = klon paragraf isi + indentasi
+    # gantung (hanging indent 720 twip = 1,27 cm, pola baku daftar
+    # pustaka: baris pertama menjorok keluar, lanjutan masuk).
+    # Catatan cache TOC: slot TOC1 bawaan hanya 4 — bila pustaka ada,
+    # entri cache ke-5 (TENTANG PENULIS) tidak tertampung & tetap teks
+    # lama (kebetulan sama); Word menghitung ulang seluruhnya saat dibuka.
+    def entri_pustaka(teks_entri):
+        p = klon(P_ISI, teks_entri)
+        p = p.replace('<w:jc', '<w:ind w:left="720" w:hanging="720"/><w:jc', 1)
+        assert 'w:hanging="720"' in p, 'indentasi gantung gagal dipasang'
+        return p
+
+    pustaka_xml = []
+    if spec.get('daftar_pustaka'):
+        pustaka_xml.append(klon(P_H1, 'DAFTAR PUSTAKA'))
+        for e in spec['daftar_pustaka']:
+            pustaka_xml.append(entri_pustaka(e))
+            pustaka_xml.append(KOSONG)
+        pustaka_xml.append(P_PB)   # Tentang Penulis mulai halaman baru
+
     # ── TENTANG PENULIS (105..116 dipertahankan, isi diganti) ──
     penulis_xml = [paras[105], paras[106],
                    ganti_semua_teks(paras[107], spec['tentang_penulis']['nama'])]
@@ -496,7 +524,8 @@ def buat(spec, keluaran, spec_dir='.'):
     # rakit ulang: ganti rentang paragraf utuh di document.xml
     awal = doc.index(paras[0])
     akhir = doc.index(paras[116]) + len(paras[116])
-    tengah = ''.join(depan + pengantar + daftar_isi + bab_xml + penulis_xml)
+    tengah = ''.join(depan + pengantar + daftar_isi + bab_xml
+                     + pustaka_xml + penulis_xml)
     doc_baru = doc[:awal] + tengah + doc[akhir:]
     isi_zip['word/document.xml'] = doc_baru.encode('utf-8')
 

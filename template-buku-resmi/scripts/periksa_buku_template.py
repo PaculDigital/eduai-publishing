@@ -29,6 +29,9 @@ LOLOS 20/20 sekarang wajib tertangkap):
           (sz 19/22/28/30/70 — di luar itu = muka buku diubah)
   TB1-TB4 tabel (bila ada): lebar total 6453 twip, garis single 808080,
           kepala latar F2F2F2, semua run sel Palatino 10 pt
+  DP1-DP3 daftar pustaka (bila ada): posisi sesudah bab terakhir &
+          sebelum Tentang Penulis, minimal 1 entri, semua entri memakai
+          indentasi gantung (w:hanging)
   GB1-GB2 gambar zona konten: lebar <= area teks (11,38 cm); gambar di
           zona bab wajib diikuti paragraf keterangan 'Gambar...'
 
@@ -342,6 +345,34 @@ def periksa(path, wajib_lebih=0):
     urut = [pos[k] for k in ('pengantar', 'daftarisi', 'bab', 'penulis') if k in pos]
     ok('T5 urutan: Pengantar < Daftar Isi < BAB < Tentang Penulis',
        len(urut) == 4 and urut == sorted(urut), f'posisi: {pos}')
+
+    # ── DP: DAFTAR PUSTAKA (generator v2.2, opsional) ──────────────────
+    # Template asli tidak punya bagian ini — asersi hanya berjalan bila
+    # buku MEMAKAI daftar pustaka (pola yang sama dengan tabel).
+    print('\n== DAFTAR PUSTAKA ==')
+    idx_dp = next((i for i, p in enumerate(paras)
+                   if ambil(p, r'<w:pStyle w:val="(Heading1)"')
+                   and teks_para(p).upper() == 'DAFTAR PUSTAKA'), None)
+    if idx_dp is None:
+        print('  (dilewati) buku ini tidak memakai daftar pustaka')
+    else:
+        idx_bab_terakhir = max(i for i, p in enumerate(paras)
+                               if ambil(p, r'<w:pStyle w:val="(Heading1)"')
+                               and teks_para(p).upper().startswith('BAB '))
+        idx_pen = next((i for i, p in enumerate(paras)
+                        if ambil(p, r'<w:pStyle w:val="(Heading1)"')
+                        and teks_para(p).upper().startswith('TENTANG PENULIS')), None)
+        ok('DP1 posisi: sesudah bab terakhir, sebelum Tentang Penulis',
+           idx_bab_terakhir < idx_dp and (idx_pen is None or idx_dp < idx_pen),
+           f'bab terakhir={idx_bab_terakhir}, dp={idx_dp}, penulis={idx_pen}')
+        batas = idx_pen if idx_pen is not None else len(paras)
+        entri = [p for p in paras[idx_dp + 1:batas] if teks_para(p)]
+        ok('DP2 ada minimal 1 entri pustaka', len(entri) >= 1,
+           f'entri ditemukan: {len(entri)}')
+        tanpa_gantung = [teks_para(p)[:30] for p in entri
+                         if 'w:hanging=' not in p]
+        ok('DP3 semua entri memakai indentasi gantung (w:hanging)',
+           not tanpa_gantung, f'tanpa hanging: {tanpa_gantung[:3]}')
 
     # ── P: MUKA BUKU (v2) ───────────────────────────────────────────────
     print('\n== MUKA BUKU ==')
