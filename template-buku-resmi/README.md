@@ -385,6 +385,16 @@ LULUS, tapi **bentuk buku berubah**.
 ⇒ Gerbang ini memeriksa **XML, bukan hasil cetak**. Untuk cetak, tetap
 perlu diperiksa mata.
 
+**Font TIDAK disimpan di repo ini** (repo publik + font komersial =
+pelanggaran lisensi). Template juga tidak membawa font tertanam —
+hanya nama. Daftar font, asal-usul, cara memperoleh yang sah, dan alat
+periksanya ada di `fonts/README.md` + `scripts/periksa_font.py`:
+
+```bash
+python3 scripts/periksa_font.py                 # periksa mesin ini
+python3 scripts/periksa_font.py --folder <dir>  # periksa folder font privat
+```
+
 ---
 
 ## 8. 🤖 Jev — pembagian tugas (jangan tertukar)
