@@ -51,6 +51,7 @@ menyebut 4; dua terbesar justru terlewat:
 | Keterangan cetak | `Cetakan Pertama, X 2024` · `X halaman; 14 x 20 cm` · kalimat hak cipta |
 | KATA PENGANTAR | 5 paragraf — semua `Lorem ipsum` |
 | DAFTAR ISI | KATA PENGANTAR · BAB I · 1.1 · 1.2 · BAB II · 2.1 · TENTANG PENULIS |
+| **DAFTAR PUSTAKA** | ⚠️ **TIDAK ADA di template asli** — ditambahkan generator v2.2. Disahkan **WAJIB** oleh Bos 22 Okt 2026 (§4.8) |
 | BAB I | `BAB I` + `JUDUL BAB PERTAMA` (**dua baris**) · 1.1 · 1.2 |
 | BAB II | `BAB II` + `JUDUL BAB KEDUA` (**dua baris**) · 2.1 · a. · b. |
 | TENTANG PENULIS | Nama Penulis + 2 paragraf `Lorem ipsum` + quotes |
@@ -183,6 +184,7 @@ BAB II                              (Heading1 + <w:br/>)
         a. Sub Sub Bab              (paragraf)
         b. Sub Sub Bab              (paragraf)
 TENTANG PENULIS                     (Heading1)
+DAFTAR PUSTAKA                      (Heading1 — ditambahkan generator, WAJIB)
 garis penutup
 ```
 ## 4. Skrip — cara pakai
@@ -324,7 +326,13 @@ Di dalam daftar paragraf mana pun, item boleh berupa objek:
   TETAPI hanya bila teksnya tidak kosong (paragraf gambar murni tanpa
   teks TIDAK boleh ikut terkecuali — bug ini tertangkap uji v3).
 
-### 4.8 DAFTAR PUSTAKA (generator v2.2, opsional)
+### 4.8 DAFTAR PUSTAKA — **WAJIB** (disahkan Bos 22 Okt 2026)
+
+> ✅ **PUTUSAN BOS 22 Okt 2026:** *"1. Ya"* — DAFTAR PUSTAKA **disahkan
+> sebagai bagian WAJIB buku**, walaupun berkas template asli tidak
+> memuatnya. Sebab: template asli = template DASAR (isi masih Lorem
+> ipsum, belum buku jadi); buku tanpa daftar pustaka bukan buku terbit.
+> ⇒ Template resmi **DILENGKAPI**, bukan dilanggar.
 
 Kolom JSON `"daftar_pustaka": ["Entri satu...", "Entri dua..."]`.
 Bila ada & tidak kosong, generator menyisipkan bagian **DAFTAR PUSTAKA**
@@ -436,6 +444,11 @@ Selalu `assert n > 0` **dan** cetak jumlah suntikan.
 ---
 
 ## 7. Font berlisensi — PERINGATAN
+
+> 📌 **STATUS 22 Okt 2026:** Bos **punya lisensi** dan akan **mengunggah
+> font ke server**. Sampai font terpasang, `periksa_font.py` akan
+> melaporkan **0/9** — itu **jujur, bukan bug**. Setelah diunggah,
+> jalankan ulang `periksa_font.py`; harus 9/9.
 
 Font berikut **berbayar** dan kemungkinan **tidak terpasang** di mesin
 penghasil `.docx`:
@@ -655,7 +668,7 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
 | Item | Catatan |
 |---|---|
 | Sambung gerbang ke mesin buku | `buku-umum`, `buku-referensi`, dll belum memanggil `periksa_buku_template.py` / `buat_buku.py` |
-| Font berlisensi | belum diperiksa apakah terpasang di mesin produksi |
+| Font berlisensi | 0/9 terpasang — Bos punya lisensi, akan unggah ke server (22 Okt 2026) |
 | Nomor halaman daftar isi | cache dari generator bisa basi sampai dokumen dibuka & dihitung ulang di Word (updateFields sudah dipasang) |
 | Paragraf daftar bernomor | generator memakai paragraf isi biasa untuk isi sub-sub bab (prototipe ListParagraph membawa gambar contoh CapCut, sengaja tidak dipakai) |
 | Diagram/infografis digambar generator | TIDAK dikerjakan generator — diagram/infografis/ilustrasi dibuat di luar (berkas PNG/JPEG), generator v2 hanya menempatkannya via blok `gambar` |
