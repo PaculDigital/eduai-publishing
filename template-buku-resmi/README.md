@@ -11,6 +11,12 @@ Baca sampai habis sebelum menulis kode.
 
 ## 1. Berkas template (SUMBER KEBENARAN)
 
+> ⚠️ **PENTING — template ini HANYA untuk buku 14 × 20 cm** (umum, anak).
+> **Monograf, buku referensi, dan buku ajar punya ukuran & font BERBEDA.**
+> Lihat **[`jenis/README.md`](jenis/README.md)** untuk perbandingan lengkap
+> semua jenis buku (A5 / B5, Cambria / TNR, margin, `w:sz`, twip).
+> Disahkan Bos 22 Okt 2026: *"Berarti harus template berbeda per jenis buku yaa."*
+
 | Hal | Nilai |
 |---|---|
 | Berkas | `templates/template-buku-resmi.docx` |
