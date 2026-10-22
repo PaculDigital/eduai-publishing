@@ -30,6 +30,11 @@ buku yang gagal gerbang TIDAK dianggap selesai (exit 1). Penulisan
 ATOMIK: hasil ditulis ke berkas sementara, diperiksa, dan hanya yang
 lulus dipindah ke nama akhir (perbaikan cacat review 22 Okt 2026).
 
+v2.3 — TITIK PEMIMPIN LITERAL di cache daftar isi: cache dibekali titik
+sungguhan (dihitung ke tepi kanan) supaya daftar isi bertitik juga di
+penampil yang tidak menggambar tab leader (penampil HP, Google Docs).
+Di Word cache ini tergantikan hitung-ulang field (updateFields).
+
 v2.2 — DAFTAR PUSTAKA (opsional): kolom "daftar_pustaka" di JSON =
 daftar string entri rujukan. Bila ada & tidak kosong, generator
 menyisipkan bagian DAFTAR PUSTAKA (Heading1) sesudah bab terakhir,
@@ -65,6 +70,7 @@ import hashlib
 import json
 import re
 import struct
+import xml.etree.ElementTree as ET
 import subprocess
 import sys
 import zipfile
@@ -453,13 +459,63 @@ def buat(spec, keluaran, spec_dir='.'):
         return RE_T.sub(lambda m: m.group(0).split('>')[0] + '>' + esc(baru) + '</w:t>',
                         p, count=1)
 
+    # ── TITIK PEMIMPIN LITERAL di cache daftar isi ──
+    # Titik daftar isi template BUKAN karakter: ia digambar aplikasi
+    # pembuka dari tab leader gaya TOC (tab kanan 5938). Renderer patuh
+    # (Word, LibreOffice — terbukti uji ganti-cache) menggambarnya;
+    # penampil HP sederhana & Google Docs TIDAK, sehingga judul dan
+    # nomor tampak menempel polos. Obatnya: cache dibekali titik
+    # SUNGGUHAN yang dihitung sampai tepi kanan. Di renderer patuh,
+    # titik literal menyambung mulus dengan tab leader; di Word,
+    # updateFields menghitung ulang seluruh daftar isi dan cache ini
+    # tergantikan versi asli Word. Perkiraan lebar huruf 11 pt cukup
+    # untuk lapisan tampilan ini (bukan angka struktural).
+    def lebar_teks_toc(s):
+        em = 220  # 11 pt dalam twip
+        total = 0.0
+        for ch in s:
+            if ch == ' ':
+                f = 0.30
+            elif ch.isdigit():
+                f = 0.556
+            elif ch.isupper():
+                f = 0.68
+            elif ch.islower():
+                f = 0.52
+            else:
+                f = 0.50
+            total += f * em
+        return total
+
+    def sisip_titik(p, judul):
+        # ⚠️ JANGAN pakai regex ber-.*? untuk mencari run tab: pola itu
+        # terbukti bisa merentang lintas run & field (instrText, hyperlink)
+        # dan merusak XML (kejadian 23 Okt 2026, dokumen tidak bisa dibuka
+        # LibreOffice). Cara aman: cari posisi PERSIS '<w:tab/>', lalu
+        # mundur ke awal run pembawanya ('<w:r ' / '<w:r>').
+        # Target DIKONSERVATIFKAN (5450 dari 5938, titik dihitung 70 twip):
+        # perkiraan huruf yang meleset membuat titik membungkus ke baris
+        # sendiri (kejadian render pertama v2.3 pada 'DAFTAR PUSTAKA').
+        # Kekurangan titik ditambal tab leader di renderer patuh.
+        sisa = 5450 - lebar_teks_toc(judul)   # tab stop 5938, sisakan nomor
+        n = max(3, min(160, int(sisa / 70)))  # lebar 1 titik ≈ 70 twip
+        titik = '.' * n
+        i_tab = p.index('<w:tab/>')
+        i_run = max(p.rfind('<w:r ', 0, i_tab), p.rfind('<w:r>', 0, i_tab))
+        assert i_run >= 0, 'run pembawa tab daftar isi tidak ditemukan'
+        run_titik = ('<w:r><w:rPr><w:webHidden/></w:rPr>'
+                     f'<w:t>{titik}</w:t></w:r>')
+        return p[:i_run] + run_titik + p[i_run:]
+
     i1 = i2 = 0
     for j, p in enumerate(daftar_isi):
         if '<w:pStyle w:val="TOC1"' in p and i1 < len(entri1):
-            daftar_isi[j] = ganti_teks_pertama(p, entri1[i1])
+            daftar_isi[j] = sisip_titik(ganti_teks_pertama(p, entri1[i1]),
+                                         entri1[i1])
             i1 += 1
         elif '<w:pStyle w:val="TOC2"' in p and i2 < len(entri2):
-            daftar_isi[j] = ganti_teks_pertama(p, entri2[i2])
+            daftar_isi[j] = sisip_titik(ganti_teks_pertama(p, entri2[i2]),
+                                         entri2[i2])
             i2 += 1
 
     # ── BAB (ganti zona 77..104) ──
@@ -527,6 +583,12 @@ def buat(spec, keluaran, spec_dir='.'):
     tengah = ''.join(depan + pengantar + daftar_isi + bab_xml
                      + pustaka_xml + penulis_xml)
     doc_baru = doc[:awal] + tengah + doc[akhir:]
+    # Pagar terakhir: document.xml WAJIB well-formed sebelum ditulis —
+    # operasi string yang keliru tidak boleh lolos jadi berkas rusak.
+    try:
+        ET.fromstring(doc_baru)
+    except ET.ParseError as e:
+        raise SystemExit(f'document.xml hasil rakitan RUSAK: {e}')
     isi_zip['word/document.xml'] = doc_baru.encode('utf-8')
 
     # ── MEDIA GAMBAR BARU (v2): relasi + urutan berkas zip ──

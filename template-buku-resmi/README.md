@@ -268,7 +268,7 @@ tab TOC digeser, sectPr kedua salah ukuran, font paragraf pendek diubah.
 
 ```bash
 python3 scripts/buat_buku.py scripts/contoh_buku.json buku-saya.docx
-python3 scripts/uji_generator.py   # bukti ujung-ke-ujung: 33/33
+python3 scripts/uji_generator.py   # bukti ujung-ke-ujung: 35/35
 ```
 
 **Cara kerja (WAJIB cara ini, bukan menulis ulang dari angka):** template
@@ -282,6 +282,16 @@ gerbang secara otomatis. Daftar isi: teks cache diperbarui generator,
 nomor halaman dihitung ulang aplikasi pembuka (`updateFields=true`
 dipasang di settings; di Word otomatis, di LibreOffice nomor cache bisa
 tampil sebelum dokumen disimpan ulang — periksa di Word untuk final).
+**Titik pemimpin (v2.3):** titik daftar isi template bukan karakter —
+ia digambar pembuka dari *tab leader* gaya TOC. Renderer patuh (Word,
+LibreOffice; terbukti uji ganti-cache) menggambarnya, penampil HP
+sederhana & Google Docs TIDAK — judul & nomor tampak menempel. Karena
+itu cache daftar isi generator dibekali **titik literal** yang dihitung
+sampai tepi kanan: tampil bertitik di semua penampil, menyambung mulus
+dengan tab leader di renderer patuh, dan tergantikan hitung-ulang Word
+saat berkas dibuka. Gerbang sengaja TIDAK mewajibkan titik literal
+(template asli sendiri tidak memuatnya); yang mewajibkan adalah
+`uji_generator.py`.
 
 ### 4.7 Blok TABEL & GAMBAR (generator v2)
 
@@ -330,7 +340,7 @@ menghitung ulang seluruh daftar isi saat berkas dibuka).
 
 ---
 
-## 5. Hasil uji terakhir (22 Okt 2026, malam — gerbang v2.2 + generator v2.2)
+## 5. Hasil uji terakhir (22 Okt 2026, malam — gerbang v2.2 + generator v2.3)
 
 ```
 template asli                        → 50 LULUS / 0 GAGAL
@@ -343,10 +353,10 @@ uji_bergigi_v3.py (6 suntikan tabel/
                    gambar)            →  6/6 tertangkap
 uji_bergigi_v4.py (2 suntikan daftar
                    pustaka)           →  2/2 tertangkap
-uji_generator.py  (ujung-ke-ujung)    → 33/33 LULUS
+uji_generator.py  (ujung-ke-ujung)    → 35/35 LULUS
    (termasuk mode gagal: bab kosong & romawi '1' TIDAK meninggalkan
     berkas, dan percobaan gagal tidak menimpa berkas baik)
-render LibreOffice buku contoh v2.2  → 12 halaman, 14×20 cm, tabel
+render LibreOffice buku contoh v2.3  → 12 halaman, 14×20 cm, tabel
                                         tampil + kepala tabel berulang,
                                         gambar + keterangan tampil,
                                         daftar pustaka hal. 10 dengan
@@ -581,6 +591,21 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
   diselaraskan dengan script, suntikan uji J2-C diperbaiki (dulu
   menciptakan `BAB 1I`).
 
+### ✅ Tambahan (23 Okt 2026 — titik pemimpin literal)
+
+- Boss melaporkan daftar isi "masih belum bisa titik-titik". Selidik
+  Wulan: mekanisme template BENAR (tab leader di gaya TOC, terbukti
+  tampil dari cache lewat uji ganti-cache di LibreOffice) — yang tidak
+  menggambar tab leader adalah penampil sederhana (HP/Google Docs).
+- **Generator v2.3**: cache daftar isi dibekali titik literal terhitung
+  (target konservatif 5450 twip, titik 70 twip — target agresif sempat
+  membuat titik membungkus baris sendiri pada render pertama).
+- **Kecelakaan yang jadi pagar permanen**: versi pertama penyisipan
+  memakai regex `.*?` yang merentang lintas run & field → XML rusak,
+  LibreOffice menolak membuka. Diganti pencarian posisi persis
+  `<w:tab/>` + mundur ke awal run; generator kini juga memvalidasi
+  `document.xml` well-formed (parse XML) sebelum menulis berkas.
+
 ### ✅ Tambahan (22 Okt 2026 malam — Daftar Pustaka)
 
 - **Generator v2.2**: kolom opsional `daftar_pustaka` di JSON → bagian
@@ -646,6 +671,7 @@ Fan-out banyak pertanyaan dalam **satu panggilan** — dokumentasi resmi:
 | **22 Okt 2026 (malam, lanjutan)** | Generator v2: blok tabel + blok gambar; gerbang v2.1 (+TB1–TB4, GB1–GB2 = 54 asersi); uji bergigi v3 6/6; bug pengecualian GB (himpunan kosong) ditemukan & diperbaiki; fonts/README.md + periksa_font.py. |
 | **22 Okt 2026 (malam, tutup cacat)** | Tutup 2 cacat review agen: penulisan atomik (sementara → gerbang → pindah) + validasi awal bab/Romawi; uji generator 29/29. |
 | **22 Okt 2026 (malam, pustaka)** | Generator v2.2: bagian DAFTAR PUSTAKA opsional (indentasi gantung); gerbang +DP1–DP3 (57 asersi); uji bergigi v4 2/2; uji generator 33/33. |
+| **23 Okt 2026** | Generator v2.3: titik pemimpin LITERAL di cache daftar isi (tampil di semua penampil); pagar parse XML well-formed di generator; uji generator 35/35. |
 
 ### Koreksi yang tercatat
 

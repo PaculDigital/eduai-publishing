@@ -103,6 +103,19 @@ with tempfile.TemporaryDirectory() as td:
     cek('teks cache daftar isi diperbarui',
         'BAB I MEMULAI DENGAN PETA YANG JELAS' in doc
         and 'JUDUL BAB PERTAMA' not in doc)
+    # ── v2.3: titik pemimpin LITERAL di cache daftar isi ──
+    # (tab leader saja tidak digambar penampil HP/Google Docs)
+    paras_toc = [p for p in re.findall(r'<w:p[ >].*?</w:p>', doc, re.S)
+                 if 'TOC1' in p or 'TOC2' in p]
+    # judul panjang sah mendapat sedikit titik (garis hampir penuh) —
+    # syaratnya: SEMUA entri bertitik (>= 3, batas bawah generator)
+    bertitik = [p for p in paras_toc if '...' in p]
+    total_titik = sum(p.count('.') for p in paras_toc)
+    cek('cache daftar isi dibekali titik literal (semua entri)',
+        len(bertitik) == len(paras_toc) and total_titik >= 150,
+        f'bertitik: {len(bertitik)} dari {len(paras_toc)}, total {total_titik}')
+    cek('titik literal tepat sebelum run tab (menyambung tab leader)',
+        all(re.search(r'\.{3,}</w:t></w:r><w:r', p) for p in bertitik))
     # ── v2: tabel & gambar ──
     cek('tabel masuk (w:tbl + kepala F2F2F2)',
         '<w:tbl>' in doc and 'w:fill="F2F2F2"' in doc)
