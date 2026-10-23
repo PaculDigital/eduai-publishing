@@ -16,6 +16,7 @@ Pakai:
 EXIT 0 = lulus, 1 = gagal.
 """
 import json
+import html
 import re
 import sys
 import zipfile
@@ -35,7 +36,7 @@ def ok(nama, syarat, info=''):
 
 
 def teks_para(p):
-    return ''.join(re.findall(r'<w:t(?:\s[^>]*)?>([^<]*)</w:t>', p)).strip()
+    return html.unescape(''.join(re.findall(r'<w:t(?:\s[^>]*)?>([^<]*)</w:t>', p))).strip()
 
 
 def gaya_para(p):
