@@ -22,7 +22,7 @@
 | **D** Mutu Gambar | 13–15 | 3 | 0 | 0 |
 | **E** Bukti & Mutu | 16–19 | 4 | 0 | 0 |
 | **F** Book Chapter | 20 | 1 | 0 | 0 |
-| **JUMLAH** | **20** | Book chapter mode sendiri | ✅ **SELESAI** (23 Okt 2026) | profil `jenis/book-chapter/profil.json` + `buat_book_chapter.py` + `periksa_book_chapter.py` (C1–C8 = daftar uji §9 spesifikasi: A5 Cambria, judul Normal 14, line None, heading hitam, break hanya N/O, glosarium tabel 2 kolom, render ≤ 15 hlm). Contoh nyata 10/10 (5 hlm); bergigi v6 5/5; emas chapter |
+| **JUMLAH** | **20** | Book chapter mode sendiri | ✅ **SELESAI** (23 Okt 2026) | profil `jenis/book-chapter/profil.json` + `buat_book_chapter.py` + `periksa_book_chapter.py` (C1–C8 = daftar uji §9 spesifikasi: A5 Cambria, judul Normal 14, line None, heading hitam, break hanya N/O, glosarium tabel 2 kolom, render ≤ 15 hlm). Contoh nyata 12/12 (5 hlm); bergigi v6 6/6; emas chapter |
 
 ---
 
@@ -86,7 +86,7 @@
 
 | # | Nomor | Status | Bukti / Alasan |
 |---|---|---|---|
-| **20** | Book chapter mode sendiri | ✅ **SELESAI** (23 Okt 2026) | profil `jenis/book-chapter/profil.json` + `buat_book_chapter.py` + `periksa_book_chapter.py` (C1–C8 = daftar uji §9 spesifikasi: A5 Cambria, judul Normal 14, line None, heading hitam, break hanya N/O, glosarium tabel 2 kolom, render ≤ 15 hlm). Contoh nyata 10/10 (5 hlm); bergigi v6 5/5; emas chapter |
+| **20** | Book chapter mode sendiri | ✅ **SELESAI** (23 Okt 2026) | profil `jenis/book-chapter/profil.json` + `buat_book_chapter.py` + `periksa_book_chapter.py` (C1–C8 = daftar uji §9 spesifikasi: A5 Cambria, judul Normal 14, line None, heading hitam, break hanya N/O, glosarium tabel 2 kolom, render ≤ 15 hlm). Contoh nyata 12/12 (5 hlm); bergigi v6 6/6; emas chapter |
 
 ---
 

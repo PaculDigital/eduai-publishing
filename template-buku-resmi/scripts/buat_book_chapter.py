@@ -133,6 +133,27 @@ def bangun(spec, keluar):
     for anak in list(body):
         if anak.tag != qn('w:sectPr'):
             body.remove(anak)
+    # Book chapter TIDAK memakai running footer/header buku utuh:
+    # template membawa footer placeholder ("Tulis Judul Buku Di Sini")
+    # yang harus dibuang dari sectPr, kalau tidak tercetak di chapter.
+    sectPr = doc.element.body.find(qn('w:sectPr'))
+    for ref in sectPr.findall(qn('w:footerReference')) + sectPr.findall(qn('w:headerReference')):
+        sectPr.remove(ref)
+    # Style Heading template membawa garis bawah (pBdr) & warna judul
+    # buku — chapter wajib heading polos hitam: bersihkan di styles.xml.
+    for nama_style in ('Heading 1', 'Heading 2'):
+        el = doc.styles[nama_style].element
+        ppr = el.find(qn('w:pPr'))
+        if ppr is not None:
+            for tag in ('w:pBdr', 'w:shd'):
+                b = ppr.find(qn(tag))
+                if b is not None:
+                    ppr.remove(b)
+        rpr = el.find(qn('w:rPr'))
+        if rpr is not None:
+            c = rpr.find(qn('w:color'))
+            if c is not None:
+                rpr.remove(c)
     sect = doc.sections[0]
     sect.page_width, sect.page_height = 8391 * 635, 11906 * 635
     for attr in ('top_margin', 'bottom_margin', 'left_margin', 'right_margin'):

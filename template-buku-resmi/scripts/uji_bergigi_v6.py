@@ -88,6 +88,14 @@ def main():
     ok('MUTASI chapter kepanjangan (> 15 hlm) -> generator MENOLAK',
        r.returncode != 0 and not o4.exists())
 
+    def footer_warisan(xml):
+        return xml.replace('</w:sectPr>',
+                           '<w:footerReference w:type="default" r:id="rId99"/></w:sectPr>', 1)
+    m4 = tmp / 'm4.docx'
+    mutasi(emas, m4, footer_warisan)
+    ok('MUTASI footer warisan template -> gerbang MENOLAK',
+       gerbang(m4, '--tanpa-halaman').returncode == 1)
+
     print(f'\nRINGKAS UJI BERGIGI v6: {LULUS} LULUS / {GAGAL} GAGAL')
     return 1 if GAGAL else 0
 

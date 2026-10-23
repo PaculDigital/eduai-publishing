@@ -148,6 +148,18 @@ def main():
     ok('C6 glosarium TABEL 2 kolom, kepala tebal', glo_ok,
        f'{len(tbls)} tabel ditemukan')
 
+    sect_ref = re.findall(r'<w:sectPr[^>]*>.*?</w:sectPr>', doc, re.S)[-1]
+    ok('C9 chapter TANPA footer/header warisan template',
+       'footerReference' not in sect_ref and 'headerReference' not in sect_ref,
+       'masih ada rujukan footer/header di sectPr')
+    styles = z.read('word/styles.xml').decode('utf-8')
+    pbd = []
+    for nama_style in ('Heading1', 'Heading2'):
+        m = re.search(rf'<w:style [^>]*w:styleId="{nama_style}".*?</w:style>', styles, re.S)
+        if m and '<w:pBdr' in m.group(0):
+            pbd.append(nama_style)
+    ok('C4b style heading tanpa garis bawah (pBdr)', not pbd, f'pBdr di: {pbd}')
+
     ref_isi = [t for g, t, p in P[i_ref + 1:i_glo] if t] if i_ref is not None and i_glo else []
     ok('C8 referensi tidak kosong', len(ref_isi) >= 1, '0 entri')
 
