@@ -26,7 +26,7 @@
     "tone": "akademik formal (mengikuti bab & buku induk kolaborasi)"
   },
   "format": {
-    "area_teks_twip": 6123,
+    "area_teks_twip": 6119,
     "font_heading": {
       "nama": "Cambria",
       "pt": 14,
@@ -47,23 +47,27 @@
     },
     "gutter_twip": 0,
     "indentasi": {
-      "bullet_baris_pertama_twip": -284,
-      "bullet_kiri_twip": 567,
+      "isi_kiri_twip": 283,
       "isi_baris_pertama_twip": 567,
-      "isi_kiri_twip": 284,
-      "tujuan_pembelajaran_kiri_twip": 738
+      "tujuan_pembelajaran_kiri_twip": 737,
+      "bullet_kiri_twip": 567,
+      "bullet_gantung_twip": 283,
+      "status": "diukur mentah dari XML berkas asli BAB 10"
     },
     "judul_bab": {
       "catatan": "BUKAN style Heading - koreksi resmi spesifikasi",
       "rata": "tengah",
       "style": "Normal"
     },
-    "maks_halaman": 15,
+    "maks_halaman": {
+      "nilai_di_spesifikasi_lama": 15,
+      "status": "KONFLIK: contoh nyata BAB 10 = 4.940 kata ter-render 40 hlm di LibreOffice; batas 15 hlm terikat paginasi Word. Gerbang melapor (C7 info), tidak menggagalkan."
+    },
     "margin_twip": {
-      "atas": 1134,
-      "bawah": 1134,
-      "kanan": 1134,
-      "kiri": 1134
+      "atas": 1138,
+      "bawah": 1138,
+      "kiri": 1138,
+      "kanan": 1138
     },
     "pdf_turnitin": "A4 - DILARANG diubah ke A5",
     "spasi": {
@@ -72,11 +76,12 @@
       "line_twip": null
     },
     "ukuran": {
-      "lebar_cm": 14.8,
-      "lebar_twip": 8391,
       "nama": "A5",
+      "lebar_cm": 14.8,
       "tinggi_cm": 21.0,
-      "tinggi_twip": 11906
+      "lebar_twip": 8395,
+      "tinggi_twip": 11909,
+      "status": "diukur dari berkas asli BAB 10 (23 Okt 2026) - konversi python-docx pipeline Bos"
     }
   },
   "gambar": {
@@ -87,25 +92,21 @@
   "mode": "book_chapter",
   "nama": "Book Chapter",
   "struktur": [
-    "A Judul Bab",
-    "B Penulis",
-    "C Abstrak",
-    "D Kata Kunci",
-    "(Tujuan Pembelajaran)",
-    "E-M Section isi (pertama = Pendahuluan)",
-    "N Referensi - page break sebelum",
-    "O Glosarium - page break sebelum, TABEL 2 kolom"
+    "BAB n + JUDUL (huruf besar) - TANPA penulis/abstrak/kata kunci",
+    "Section isi berhuruf A.. (pertama: A. Pendahuluan + Tujuan Pembelajaran a/b/c kiri 737)",
+    "Sub bernomor 1, 2, 3 per section",
+    "Section terakhir isi: Ringkasan Bab (butir - kiri 567 gantung 283)",
+    "N. Referensi (page break sebelum; M dilompati; entri gantung 720)",
+    "O. Glosarium (page break sebelum; TABEL 2 kolom 3059+3059, garis hitam)",
+    "CV Penulis No Spacing sesudah glosarium (judul 14 tebal, before 24 pt)"
   ],
-  "sumber_keputusan": "SPESIFIKASI.md jenis/book-chapter (diukur dari DOCX BAB 7 asli) + penegasan Bos 23 Okt 2026: book chapter = penggalan 1 bab, mode sendiri di luar daftar wajib-sama buku utuh",
+  "sumber_keputusan": "SPESIFIKASI.md jenis/book-chapter (BAB 7) DIKOREKSI contoh nyata Book Chapter BAB 10 dari Bos 23 Okt 2026 - berkas asli adalah acuan tertinggi",
   "versi": 1,
   "unsur_wajib": [
-    "Abstrak",
-    "Kata Kunci",
-    "Pendahuluan",
-    "Tujuan Pembelajaran (learning objectives)",
+    "Section berhuruf mulai A. Pendahuluan",
+    "Tujuan Pembelajaran di Pendahuluan",
     "Referensi (page break sebelum)",
     "Glosarium TABEL 2 kolom (page break sebelum)",
-    "CV Penulis (style No Spacing, space_before 24 pt)",
-    "Maksimal 15 halaman A5"
+    "CV Penulis (No Spacing)"
   ]
 }

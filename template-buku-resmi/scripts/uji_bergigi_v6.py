@@ -78,15 +78,12 @@ def main():
     ok('MUTASI heading berwarna -> gerbang MENOLAK',
        gerbang(m3, '--tanpa-halaman').returncode == 1)
 
-    panjang = json.loads(json.dumps(spec))
-    panjang['section'][1]['paragraf'] = panjang['section'][1]['paragraf'] * 30
-    p4 = tmp / 'panjang.json'
-    p4.write_text(json.dumps(panjang))
-    o4 = tmp / 'panjang.docx'
-    r = subprocess.run([sys.executable, str(SINI / 'buat_book_chapter.py'),
-                        str(p4), str(o4)], capture_output=True, text=True)
-    ok('MUTASI chapter kepanjangan (> 15 hlm) -> generator MENOLAK',
-       r.returncode != 0 and not o4.exists())
+    def huruf_rusak(xml):
+        return xml.replace('A. Pendahuluan', 'A. Pembuka', 1)
+    m5 = tmp / 'm5.docx'
+    mutasi(emas, m5, huruf_rusak)
+    ok('MUTASI section pertama bukan Pendahuluan -> gerbang MENOLAK',
+       gerbang(m5, '--tanpa-halaman').returncode == 1)
 
     def footer_warisan(xml):
         return xml.replace('</w:sectPr>',
