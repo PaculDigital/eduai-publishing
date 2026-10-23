@@ -7,17 +7,20 @@
 
 ---
 
-## Ringkasan: 2 dari 20 selesai
+## Ringkasan: 2 selesai penuh, 3 sebagian, 15 belum
 
-| Bagian | Nomor | Selesai | Belum |
-|---|---|---|---|
-| **A** Sumber Tunggal | 1–3 | 1 | 2 |
-| **B** Mesin | 4–8 | 0 | 5 |
-| **C** Mutu Tulisan | 9–12 | 0 | 4 |
-| **D** Mutu Gambar | 13–15 | 1 | 2 |
-| **E** Bukti & Mutu | 16–19 | 0 | 4 |
-| **F** Book Chapter | 20 | 0 | 1 |
-| **JUMLAH** | **20** | **2** | **18** |
+> Diperbarui 23 Okt 2026 (Fase 1, branch `agen/wulan/fase1-ssot`):
+> #1 & #3 SELESAI penuh; #2 naik ke SEBAGIAN. #14 & #18 tetap SEBAGIAN.
+
+| Bagian | Nomor | Selesai | Sebagian | Belum |
+|---|---|---|---|---|
+| **A** Sumber Tunggal | 1–3 | 2 | 1 | 0 |
+| **B** Mesin | 4–8 | 0 | 0 | 5 |
+| **C** Mutu Tulisan | 9–12 | 0 | 0 | 4 |
+| **D** Mutu Gambar | 13–15 | 0 | 1 | 2 |
+| **E** Bukti & Mutu | 16–19 | 0 | 1 | 3 |
+| **F** Book Chapter | 20 | 0 | 0 | 1 |
+| **JUMLAH** | **20** | **2** | **3** | **15** |
 
 ---
 
@@ -25,9 +28,9 @@
 
 | # | Nomor | Status | Bukti / Alasan |
 |---|---|---|---|
-| **1** | Peta SOT | 🟡 **SEBAGIAN** | `mutu-buku/SOT-INDUK.md` **ADA** (dibuat 22 Okt). Tapi **belum** memetakan SETIAP fakta; baru 7 fakta utama. Fakta berumah ganda **belum semua ditandai** — yang baru: `STYLE_BUKU['anak']` |
-| **2** | Berkas profil per jenis | 🔴 **BELUM** | `ls jenis/*/profil.json` → **kosong**. Baru ada `SPESIFIKASI.md` (tulisan tangan, bukan profil) |
-| **3** | Spesifikasi turunan dari profil | 🔴 **BELUM** | belum ada generator dokumen; `SPESIFIKASI.md` masih **salinan tangan** |
+| **1** | Peta SOT | ✅ **SELESAI** (23 Okt 2026) | `SOT-INDUK.md` §9: peta rumah tunggal untuk 9 kategori fakta buku + 3 fakta berumah ganda DITANDAI (blok gaya, tone, angka twip) + pemutakhiran §5 |
+| **2** | Berkas profil per jenis | 🟡 **SEBAGIAN** (23 Okt 2026) | `profil.json` **ADA** untuk monograf, buku-referensi, buku-ajar-obe, buku-umum — masing-masing berisi format + unsur wajib + aturan tulisan + gambar. Yang belum: nilai menunggu keputusan Bos (judul referensi, gutter, umum B5/induk, gaya gambar umum) tercatat `null` berlabel MENUNGGU, dan jangkar konsistensi menunggu #14 |
+| **3** | Spesifikasi turunan dari profil | ✅ **SELESAI** (23 Okt 2026) | `scripts/buat_spesifikasi.py` menghasilkan `SPESIFIKASI-DARI-PROFIL.md` untuk 4 jenis; verifikasi: 30 angka (twip/sz) dari profil, **0 hilang** dari dokumen |
 
 **Yang nyata ada:** 4 `SPESIFIKASI.md` (monograf, referensi, ajar, chapter) — tapi itu **bahan**, bukan profil.
 
@@ -129,3 +132,6 @@
 ---
 
 *Diukur Wulan 23 Oktober 2026 dari `main` = `1d7ec9d`. Bukan klaim.*
+*Pemutakhiran 23 Oktober 2026 (Fase 1 dikerjakan dari `main` = `e5d5375`,
+branch `agen/wulan/fase1-ssot`): #1 ✅, #3 ✅, #2 🟡 — bukti di commit
+branch tersebut (profil 4 jenis, `buat_spesifikasi.py`, SOT-INDUK §9).*

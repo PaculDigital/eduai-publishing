@@ -28,14 +28,18 @@
 
 ## A. SUMBER TUNGGAL (SSOT)
 
-- [ ] **1. Peta SOT** — `mutu-buku/SOT-INDUK.md` diperluas: setiap fakta
+- [x] **1. Peta SOT** — `mutu-buku/SOT-INDUK.md` diperluas: setiap fakta
   tercatat SATU rumahnya; fakta yang berumah ganda ditandai untuk disatukan.
+  ✅ 23 Okt 2026: §9 peta fakta per kategori + 3 rumah ganda ditandai
+  (branch `agen/wulan/fase1-ssot`).
 - [ ] **2. Berkas profil per jenis** — satu berkas untuk monograf, buku
   referensi, buku ajar, buku umum/anak. Isi tiap profil EMPAT hal:
   (a) angka format, (b) unsur isi wajib, (c) aturan tulisan,
   (d) prompt gambar + jangkar konsistensi.
-- [ ] **3. Dokumen spesifikasi turunan** — SPESIFIKASI per jenis DIHASILKAN
+- [x] **3. Dokumen spesifikasi turunan** — SPESIFIKASI per jenis DIHASILKAN
   dari profil (bukan salinan tangan), supaya tidak bisa menyimpang lagi.
+  ✅ 23 Okt 2026: `scripts/buat_spesifikasi.py` + 4 SPESIFIKASI-DARI-PROFIL.md;
+  verifikasi 30 angka profil, 0 hilang dari dokumen.
 
 ## B. MESIN
 

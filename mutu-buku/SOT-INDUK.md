@@ -131,4 +131,38 @@ mutu-buku/
 
 ---
 
+## 9. PETA FAKTA BUKU — rumah tunggal per fakta (Fase 1 SSOT, 23 Okt 2026)
+
+> Ditambah saat mengerjakan barang 1–3 `RENCANA-BANGUN-SSOT.md`.
+> Aturan: **setiap fakta punya SATU rumah.** Berkas lain yang memuat
+> fakta yang sama berstatus **turunan** (dihasilkan dari rumahnya) atau
+> **salinan berjalan** (sedang dipakai produksi, dijadwalkan pindah).
+
+| Fakta | Rumah tunggal (BENAR) | Yang lain berstatus |
+|---|---|---|
+| Angka format per jenis (ukuran, margin, font, spasi) | `template-buku-resmi/jenis/<jenis>/profil.json` → `format` | tabel twip di `jenis/README.md` §3 = salinan tangan, akan diganti turunan profil |
+| Unsur isi wajib per jenis | `profil.json` → `unsur_wajib` | daftar di `SPESIFIKASI.md` = salinan tangan |
+| Aturan tulisan per jenis (tone, sitasi, larangan teks) | `profil.json` → `aturan_tulisan` | tone yang berjalan masih di `tone_menulis.py` (hanya umum/anak/pendidikan) — pindah penuh pada barang 9 |
+| Blok gaya gambar per jenis | `profil.json` → `gambar.blok_gaya_saat_ini` (teks persis) | rumah berjalan produksi tetap `jenis_buku.PAKET` + `brief_visual.STYLE_BUKU` (aturan tetap §4 no. 1 berlaku sampai barang 13/14 memindahkan) |
+| Spesifikasi terbaca manusia per jenis | **TURUNAN:** `jenis/<jenis>/SPESIFIKASI-DARI-PROFIL.md`, dihasilkan `scripts/buat_spesifikasi.py` dari profil | `SPESIFIKASI.md` tulisan tangan = bahan lama; bila bertentangan, **profil yang menang** |
+| Format template induk 14×20 | `template-buku-resmi/templates/template-buku-resmi.docx` + profil `jenis/buku-umum/profil.json` (angka terukurnya) | `template-buku-resmi/README.md` = penjelasan |
+| Cara merakit & memeriksa | `template-buku-resmi/scripts/` (generator + gerbang) | — |
+| Cara review & mutu proses | `mutu-buku/skill-agen-kolaborator/SKILL.md` | — |
+| Status pekerjaan SSOT | `mutu-buku/STATUS-RENCANA-SSOT.md` (hasil ukur) | `RENCANA-BANGUN-SSOT.md` = daftar terkunci |
+
+**Fakta berumah ganda yang DITANDAI (belum disatukan):**
+
+| Fakta | Dua rumah saat ini | Penyatuan |
+|---|---|---|
+| Blok gaya gambar | `jenis_buku.PAKET`/`STYLE_BUKU` **dan** teks salinan di `profil.json` | barang 13/14: profil jadi rumah satu-satunya, kode membaca dari profil |
+| Tone menulis | `tone_menulis.py` **dan** `profil.json → aturan_tulisan.tone` | barang 9 |
+| Angka twip per jenis | `jenis/README.md` §3 **dan** `profil.json` | diganti tabel turunan dari profil |
+
+**Pemutakhiran §5 (23 Okt 2026):** butir 3 §5 (`profil.json` per jenis)
+sudah TIDAK berlaku — profil kini ADA untuk monograf, buku-referensi,
+buku-ajar-obe, buku-umum. Butir 1, 2, 4, 5, 6, 7 §5 masih berlaku.
+
+---
+
 *SOT induk dibuat Wulan 22 Oktober 2026. Semua angka dari kode hidup.*
+*§9 ditambah 23 Oktober 2026 (Fase 1 SSOT, branch `agen/wulan/fase1-ssot`).*
