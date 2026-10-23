@@ -1,5 +1,8 @@
 # 📗 Template Buku Resmi — Bayana / EduAi Publishing
 
+> 📌 **Bingung harus baca yang mana?** → **`../mutu-buku/SOT-INDUK.md`**
+> Berkas itu satu-satunya peta: mana yang BENAR, mana yang sudah DIBUANG.
+
 > **Satu-satunya template buku yang benar dan resmi.**
 > Semua buku WAJIB mengikuti template ini **persis**.
 > Dilarang menebak, menghalusinasi, atau mengira-ngira angka.

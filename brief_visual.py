@@ -98,19 +98,22 @@ GAYA_DEFAULT = "premium-konseptual"
 #  gambar — itulah sebabnya isi gambar melenceng dari isi bab.
 #  OBAT: latar PUTIH bersih, outline tegas, buang pemaksaan karakter
 #  matahari; isi gambar WAJIB ikut brief (adegan dari bab).
-STYLE_BUKU["anak"] = (
-    "Children's educational illustration, clean flat cartoon style with "
-    "clear dark outlines around every shape, simple rounded forms, "
-    "cheerful but controlled colors, on a clean PURE WHITE background "
-    "(hex #FFFFFF), no cream, no beige, no blue tint, no gradient background, "
-    "no vignette, no paper texture, no grain, no shadows on the background, "
-    "no gradients on objects, no photorealism, no watermark. "
-    #  🚨 {brief} WAJIB ADA (lihat gerbang_placeholder_brief.py):
-    #  tanpa placeholder, .format(brief=...) DIBUANG tanpa error dan AI
-    #  mengarang isi gambar sendiri.
-    "SCENE — illustrate EXACTLY this moment, nothing else: {brief}. "
-    "The scene above is the SUBJECT; keep every object named in it"
-)
+#  ─────────────────────────────────────────────────────────────────────────
+#  🗑️  `STYLE_BUKU["anak"]` DIHAPUS 22 Okt 2026 — atas perintah Bos:
+#      "buang atau hapus yang tidak terpakai jadikan SOT, jangan berantakan"
+#
+#  ALASAN (terukur, bukan selera):
+#    • `brief_visual.py:696` menulis:  blok = pkg["ilustrasi"] or STYLE_BUKU…
+#    • Untuk jenis "anak", `jenis_buku.PAKET["anak"]["ilustrasi"]` = 571 char
+#      ⇒ `STYLE_BUKU["anak"]` (518 char) TIDAK PERNAH DIEKSEKUSI.
+#    • Kedua salinan isinya SUDAH BERBEDA ⇒ inilah sumber "kok jadi beda-beda".
+#
+#  SOT: `mutu-buku/gambar-dan-visual/SOT-BLOK-GAYA.md`
+#  BLOK GAYA ANAK YANG BERLAKU: `jenis_buku.py` → `PAKET["anak"]["ilustrasi"]`
+#
+#  ⚠️ JANGAN ditambahkan kembali. Kalau perlu ubah gaya anak, ubah di
+#     `jenis_buku.py` (satu tempat). 4 gaya lain di bawah tetap dipakai.
+#  ─────────────────────────────────────────────────────────────────────────
 
 # Buku anak butuh adegan yang DIKENALI ANAK, bukan metafora abstrak ⇒ mode brief
 # `literal` yang benar untuk gaya ini. QC konseptual dimatikan, QC budaya TETAP.

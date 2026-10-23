@@ -1,5 +1,8 @@
 # 🏆 MUTU BUKU — cara kerja agen kolaborasi
 
+> 📌 **MULAI DARI SINI:** **`SOT-INDUK.md`** — peta mana yang BENAR,
+> mana yang sudah DIBUANG. Berkas ini hanya menjelaskan **cara kerja review**.
+
 > **Kenapa folder ini ada:** Bos minta *"upload juga tentang mutu buku, bagaimana
 > agen Kolaborasi delegation yang kemarin untuk membuat buku yang bermutu, saya
 > mau lihat skill-nya atau cara kerjanya."* (22 Okt 2026)

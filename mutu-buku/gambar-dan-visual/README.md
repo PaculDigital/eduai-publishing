@@ -1,5 +1,8 @@
 # 🎨 GAMBAR & VISUAL BUKU — Ilustrasi Anak vs Umum
 
+> 📌 **SOT blok gaya ilustrasi:** **`SOT-BLOK-GAYA.md`** di folder ini.
+> Sudah dibersihkan 22 Okt 2026 — `STYLE_BUKU['anak']` yang mati sudah dihapus.
+
 > **Untuk Bos perbaiki.** Semua isi di sini **diambil langsung dari kode**, bukan
 > ditulis ulang dari ingatan. Kalau ada yang salah, salahnya ada di kode — dan
 > itulah yang perlu Bos betulkan.
@@ -81,7 +84,8 @@ Kalau `blok` **tidak punya** `{brief}`, Python **membuang** argumen `brief`
 
 ### Pagar yang sekarang menjaga
 
-`gerbang_placeholder_brief` — **20 asersi**:
+`gerbang_placeholder_brief` — **19 asersi** (turun dari 20 karena
+`STYLE_BUKU['anak']` sudah dihapus 22 Okt 2026):
 1. Setiap blok gaya **wajib** mengandung `{brief}`
 2. Prompt final **wajib** memuat isi brief
 
@@ -204,7 +208,7 @@ gambar-dan-visual/
 | 2 | ⚠️ **Pastikan `{brief}` masih ada** | (jebakan §3) |
 | 3 | Ubah paket jenis | `kode/jenis_buku.py` → `PAKET` |
 | 4 | Uji 1 gambar nyata | lihat hasilnya, bukan percaya prompt |
-| 5 | Jalankan `gerbang_placeholder_brief` | 20 asersi harus LULUS |
+| 5 | Jalankan `gerbang_placeholder_brief` | **19 asersi** harus LULUS |
 
 ### ⚠️ 3 hal yang WAJIB diingat saat memperbaiki
 
@@ -228,7 +232,7 @@ gambar-dan-visual/
 
 ---
 
-## 11. 🔴 CACAT NYATA — dua salinan blok gaya sudah BERBEDA
+## 11. ✅ CACAT SUDAH DIPERBAIKI (22 Okt 2026) — dulu dua salinan BERBEDA
 
 **Diukur 22 Okt 2026, bukan dugaan.** Ini temuan baru saat Wulan menyusun folder ini.
 
@@ -236,8 +240,8 @@ gambar-dan-visual/
 
 | Lokasi | Panjang | Dipakai produksi? |
 |---|---|---|
-| `jenis_buku.PAKET['anak']['ilustrasi']` | **571 char** | ✅ **YA — MENANG** |
-| `brief_visual.STYLE_BUKU['anak']` | **518 char** | ❌ hanya cadangan |
+| `jenis_buku.PAKET['anak']['ilustrasi']` | **571 char** | ✅ **YA — SATU-SATUNYA** |
+| `brief_visual.STYLE_BUKU['anak']` | ~~518 char~~ | 🗑️ **SUDAH DIHAPUS** |
 
 ### Siapa menang — dari kode
 
@@ -251,34 +255,39 @@ if jenis is not None:
     #      ↑ INI MENANG
 ```
 
-**Artinya:** kalau Bos memperbaiki `brief_visual.STYLE_BUKU['anak']`,
-hasilnya **TIDAK akan berpengaruh** — yang dipakai `jenis_buku`.
+**Artinya:** kalau memperbaiki `brief_visual.STYLE_BUKU['anak']`, hasilnya
+**TIDAK berpengaruh** — yang dipakai `jenis_buku`. Karena itu salinan mati itu
+**sudah dihapus** (lihat di bawah).
 
-### Beda isinya
+### Yang dipakai vs yang dibuang
 
-| Kalimat | `jenis_buku` (yang dipakai) | `brief_visual` (cadangan) |
-|---|---|---|
-| Gaya dasar | `clean flat cartoon style` | `clean flat cartoon style with clear dark outlines around every shape` |
-| `clear dark outlines around every shape` | ✅ ada (kalimat sendiri) | ✅ ada (menyatu) |
-| `no 3D render` | ✅ ada | ✅ ada |
-| `no text/words/letters/numbers` | ✅ ada | ✅ ada |
+| Jenis | Blok yang DIPAKAI | Panjang | Asal |
+|---|---|---|---|
+| umum | `premium-konseptual` | 597 char | `brief_visual.STYLE_BUKU` |
+| **anak** | PAKET anak | **571 char** | ✅ `jenis_buku.PAKET` |
+| **pendidikan** | PAKET pendidikan | **536 char** | ✅ `jenis_buku.PAKET` |
 
-### Kenapa ini berbahaya
+### Kenapa dulu berbahaya
 
 1. **Memperbaiki salah satu = kerja sia-sia** — tidak ada efek
-2. **Dua sumber kebenaran** — nanti makin jauh berbeda
+2. **Dua sumber kebenaran** — isinya sudah mulai berbeda
 3. **Tidak ada gerbang** yang memeriksa keduanya sama
 
-### Usul Wulan (perlu keputusan Bos)
+### ✅ YANG SUDAH DIKERJAKAN (22 Okt 2026)
 
-| Pilihan | Cara | Risiko |
-|---|---|---|
-| **A** | Hapus `STYLE_BUKU['anak']`, sisakan `jenis_buku` saja | sedang — `brief_visual` masih rujuk |
-| **B** | `STYLE_BUKU['anak'] = PAKET['anak']['ilustrasi']` (satu sumber, impor) | **rendah** ← Wulan sarankan |
-| **C** | Tambah gerbang: kedua salinan WAJIB identik | nol, tapi masih dua salinan |
+**Pilihan A dijalankan:** `STYLE_BUKU['anak']` **dihapus** dari `brief_visual.py`.
 
-**Wulan sarankan B**: `jenis_buku` jadi **satu-satunya sumber**, `brief_visual`
-mengimpornya. Satu tempat, tidak bisa lupa.
+| Bukti | Hasil |
+|---|---|
+| Blok gaya umum sebelum/sesudah | 597 → **597** (tidak berubah) |
+| Blok gaya anak sebelum/sesudah | 571 → **571** (tidak berubah) |
+| Blok gaya pendidikan sebelum/sesudah | 536 → **536** (tidak berubah) |
+| `gerbang_placeholder_brief` | **19 LULUS / 0 GAGAL** |
+| Uji bergigi | **2/2 BERGIGI**, kontrol BERSIH |
+
+**Nol perubahan perilaku** — yang dihapus memang tidak pernah dieksekusi.
+
+> 📌 **SOT lengkapnya:** `SOT-BLOK-GAYA.md` di folder ini.
 
 ---
 
