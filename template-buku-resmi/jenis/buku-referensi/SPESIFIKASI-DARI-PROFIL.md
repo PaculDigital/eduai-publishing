@@ -12,10 +12,10 @@
 |---|---|
 | Ukuran | B5 — 17.6 × 25.0 cm (9978 × 14174 twip) |
 | Margin (twip) | atas 1134 · bawah 1134 · kiri 1134 · kanan 1134 |
-| Gutter (twip) | — (MENUNGGU KEPUTUSAN) |
+| Gutter (twip) | 0 |
 | Area teks (twip) | 7711 |
 | Font isi | Times New Roman 12 pt (`w:sz` 24) |
-| Font judul bab | — (MENUNGGU KEPUTUSAN) |
+| Font judul bab | Times New Roman 16 pt (`w:sz` 32) |
 | Spasi baris | kelipatan 1.15 (line 276) |
 | Target halaman | min 150 halaman |
 | Target bab | 8-12 |
@@ -37,5 +37,4 @@
 
 ## Menunggu keputusan
 
-- font judul bab (skill belum menetapkan; usulan Wulan: TNR 16 pt)
-- gutter A5/B5 (usulan Wulan: 0)
+- (tidak ada)

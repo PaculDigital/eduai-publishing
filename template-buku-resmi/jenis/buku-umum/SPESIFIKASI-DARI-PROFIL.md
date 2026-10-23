@@ -10,10 +10,10 @@
 
 | Item | Nilai |
 |---|---|
-| Ukuran | 14x20 — 14.0 × 20.0 cm (7938 × 11340 twip) |
-| Margin (twip) | atas 907 · bawah 907 · kiri 578 · kanan 907 |
-| Gutter (twip) | 505 |
-| Area teks (twip) | 6453 |
+| Ukuran | B5 — 17.6 × 25.0 cm (9978 × 14174 twip) |
+| Margin (twip) | atas 1134 · bawah 1134 · kiri 1134 · kanan 1134 |
+| Gutter (twip) | 0 |
+| Area teks (twip) | 7711 |
 | Font isi | Palatino Linotype 10 pt (`w:sz` 20) |
 | Font judul bab | Trajan Pro 22 pt (`w:sz` 44) |
 | Spasi baris | tetap, line 240 |
@@ -33,5 +33,4 @@
 
 ## Menunggu keputusan
 
-- buku umum dewasa: setelan induk 14x20 ini atau pindah B5/TNR (skill menulis B5; dokumen STANDAR menulis A5) - keputusan Bos
-- gaya gambar buku umum: flat (berjalan) atau 3D kartun edukasi (selera Bos) - keputusan Bos
+- (tidak ada)

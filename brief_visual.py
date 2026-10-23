@@ -50,19 +50,22 @@ STYLE_BUKU = {
     # krem + tekstur = kesan buku lawas/kotor.
     # OBAT: latar PUTIH bersih (hex eksplisit), outline tipis tegas, TANPA
     # tekstur kertas, TANPA warna krem/coklat di mana pun.
-    # Ditulis ulang POSITIF-DULU (barang 14, Fase 4, 23 Okt 2026): subjek &
-    # deskripsi di depan, larangan dipangkas pendek di ekor. Pilihan gaya
-    # (flat) TIDAK berubah — keputusan flat vs 3D tetap menunggu Bos.
+    # GAYA DIPUTUSKAN BOS 23 Okt 2026: infografis edukasi 3D KARTUN
+    # (selera Bos sejak contoh "Siklus Hujan" — flat/line-art ditinggalkan
+    # untuk buku umum). Nama kunci "premium-konseptual" dipertahankan
+    # (banyak rujukan); isinya kini 3D kartun. Positif-dulu, larangan
+    # pendek di ekor (barang 14). Buku anak TIDAK ikut berubah (flat
+    # putih+outline = perintah Bos 20 Okt khusus anak).
     "premium-konseptual": (
-        "Premium conceptual editorial illustration for a bestselling "
-        "non-fiction book: {brief}. One clever visual metaphor as a single "
-        "central focal subject, modern flat vector style, limited palette "
-        "of deep navy and warm terracotta, crisp thin dark outlines around "
-        "every shape, generous negative space, minimalist elegant "
-        "composition, smooth flat surfaces, on a clean pure white "
-        "background (hex #FFFFFF). "
-        "No text, no words, no letters, no watermark, no gradients, "
-        "no photorealism, no 3D, no clutter, no cream or beige tint."
+        "Cheerful 3D cartoon educational infographic illustration for a "
+        "bestselling non-fiction book: {brief}. One clear visual metaphor "
+        "as a single central subject, friendly rounded 3D shapes with "
+        "soft smooth shading, cheerful warm mood, bright controlled "
+        "colors in deep navy and warm orange, generous empty space "
+        "around the subject, on a clean pure white background "
+        "(hex #FFFFFF). "
+        "No text, no words, no letters, no numbers, no watermark, "
+        "no photorealism, no clutter, no dark or dirty background."
     ),
     # v1 lama — line art tipis. Disimpan untuk buku teknis/panduan.
     # ⚠️ Latar krem DIGANTI putih bersih 20 Okt 2026 (keluhan Bos: "kotor").

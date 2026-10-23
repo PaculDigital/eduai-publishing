@@ -55,9 +55,10 @@ PAKET = {
         #  Jangkar konsistensi (barang 14, Fase 4): ditempel prompt_gambar
         #  ke setiap prompt jenis ini.
         "jangkar": (
-            "Consistent series style for the whole book: the same flat "
-            "vector editorial style, the same deep navy and terracotta "
-            "palette, and one clear visual metaphor per illustration."
+            "Consistent series style for the whole book: the same "
+            "cheerful 3D cartoon infographic style, the same deep navy "
+            "and warm orange palette, and the same friendly rounded "
+            "character design in every illustration."
         ),
         "palet": {
             "krem": "#FFF9EE",

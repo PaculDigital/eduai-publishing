@@ -7,23 +7,22 @@
 
 ---
 
-## Ringkasan: 17 selesai penuh, 2 sebagian, 1 belum
+## Ringkasan: 18 selesai penuh, 1 sebagian, 1 belum
 
 > Diperbarui 23 Okt 2026 (Fase 4 — penyebaran ke semua jenis, branch
-> `agen/wulan/fase1-ssot`): #14 & #19 SELESAI. Semua jenis buku utuh
-> kini terbukti dari profilnya masing-masing. Sisa sebagian: #2
-> (4 nilai menunggu keputusan Bos), #8 (menunggu font di server
-> produksi). Sisa belum: #20 book chapter (Fase 5).
+> `agen/wulan/fase1-ssot`): #14 & #19 SELESAI; sesudahnya Bos
+> MENGESAHKAN keempat keputusan — #2 pun SELESAI. Sisa sebagian: #8
+> (menunggu font di server produksi). Sisa belum: #20 (Fase 5).
 
 | Bagian | Nomor | Selesai | Sebagian | Belum |
 |---|---|---|---|---|
-| **A** Sumber Tunggal | 1–3 | 2 | 1 | 0 |
+| **A** Sumber Tunggal | 1–3 | 3 | 0 | 0 |
 | **B** Mesin | 4–8 | 4 | 1 | 0 |
 | **C** Mutu Tulisan | 9–12 | 4 | 0 | 0 |
 | **D** Mutu Gambar | 13–15 | 3 | 0 | 0 |
 | **E** Bukti & Mutu | 16–19 | 4 | 0 | 0 |
 | **F** Book Chapter | 20 | 0 | 0 | 1 |
-| **JUMLAH** | **20** | **17** | **2** | **1** |
+| **JUMLAH** | **20** | **18** | **1** | **1** |
 
 ---
 
@@ -32,7 +31,7 @@
 | # | Nomor | Status | Bukti / Alasan |
 |---|---|---|---|
 | **1** | Peta SOT | ✅ **SELESAI** (23 Okt 2026) | `SOT-INDUK.md` §9: peta rumah tunggal untuk 9 kategori fakta buku + 3 fakta berumah ganda DITANDAI (blok gaya, tone, angka twip) + pemutakhiran §5 |
-| **2** | Berkas profil per jenis | 🟡 **SEBAGIAN** (23 Okt 2026) | `profil.json` **ADA** untuk monograf, buku-referensi, buku-ajar-obe, buku-umum — masing-masing berisi format + unsur wajib + aturan tulisan + gambar. Yang belum: nilai menunggu keputusan Bos (judul referensi, gutter, umum B5/induk, gaya gambar umum) tercatat `null` berlabel MENUNGGU, dan jangkar konsistensi menunggu #14 |
+| **2** | Profil per jenis | ✅ **SELESAI** (23 Okt 2026) | 4 profil final: semua nilai DIPUTUSKAN Bos (judul referensi TNR 16; gutter A5/B5 = 0; umum B5; gaya umum 3D kartun) & diterapkan — daftar menunggu_keputusan semua profil kosong; keempat jenis lulus gerbang dari profilnya (53/57/53/57) |
 | **3** | Spesifikasi turunan dari profil | ✅ **SELESAI** (23 Okt 2026) | `scripts/buat_spesifikasi.py` menghasilkan `SPESIFIKASI-DARI-PROFIL.md` untuk 4 jenis; verifikasi: 30 angka (twip/sz) dari profil, **0 hilang** dari dokumen |
 
 **Yang nyata ada:** 4 `SPESIFIKASI.md` (monograf, referensi, ajar, chapter) — tapi itu **bahan**, bukan profil.
@@ -96,7 +95,7 @@
 | Prioritas | Nomor | Kenapa mendesak |
 |---|---|---|
 | **1** | **#4 Daftar Pustaka WAJIB** | Bos sudah putuskan, kode belum ikut. **Buku tanpa pustaka bisa terbit** |
-| **2** | **#2 Profil per jenis** | tanpa ini #5, #6, #9, #20 **semua buntu** |
+| **2** | Profil per jenis | ✅ **SELESAI** (23 Okt 2026) | 4 profil final: semua nilai DIPUTUSKAN Bos (judul referensi TNR 16; gutter A5/B5 = 0; umum B5; gaya umum 3D kartun) & diterapkan — daftar menunggu_keputusan semua profil kosong; keempat jenis lulus gerbang dari profilnya (53/57/53/57) |
 | **3** | **#5 + #6 profil di mesin & gerbang** | monograf sekarang keluar **14×20 (SALAH)** |
 
 ---
@@ -157,3 +156,10 @@ menskalakan lebar tabel ke area profil; contoh induk diperbaiki
 indeks_referensi dapat jalur halaman TERUKUR dari render.
 Regresi penuh hijau: bergigi 8+3+10+6+2+11, generator 35/35,
 emas 4 jenis SEMUA SAMA, template 50/50, placeholder 19/19.*
+
+*Pemutakhiran keputusan (23 Oktober 2026): Bos menyetujui keempat
+usulan Wulan — diterapkan & terverifikasi: gutter 0 menaikkan asersi
+gerbang (monograf/ajar 53, referensi 57); buku umum terbit sebagai
+B5 (emas umum ditambahkan; emas induk 14x20 tetap sebagai warisan);
+gambar uji umum 3D kartun sesuai brief. Tersisa hanya #8 (font di
+server produksi, sisi Bos) dan #20 book chapter (Fase 5).*

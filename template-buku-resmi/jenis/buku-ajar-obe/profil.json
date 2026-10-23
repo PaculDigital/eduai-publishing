@@ -22,7 +22,7 @@
       "kiri": 1134,
       "kanan": 1134
     },
-    "gutter_twip": null,
+    "gutter_twip": 0,
     "area_teks_twip": 7711,
     "font_isi": {
       "nama": "Times New Roman",
@@ -54,7 +54,8 @@
       "line_twip": 276
     },
     "target_halaman": null,
-    "target_bab": "mengikuti RPS OBE (CPL/CPMK)"
+    "target_bab": "mengikuti RPS OBE (CPL/CPMK)",
+    "gutter_status": "Disahkan Bos 23 Okt 2026: gutter 0 untuk A5/B5 (margin 2 cm cukup untuk jilid)"
   },
   "unsur_wajib": [
     "tiu_per_bab",
@@ -104,7 +105,5 @@
     "jangkar_konsistensi": "Consistent series style for the whole book: the same flat educational cartoon style, the same deep navy and warm orange palette, and if a person appears, the same simple character design in every illustration.",
     "status": "Blok gaya versi positif-dulu + jangkar berlaku 23 Okt 2026 (barang 13/14 untuk jalur pendidikan/monograf)."
   },
-  "menunggu_keputusan": [
-    "gutter A5/B5 (usulan Wulan: 0)"
-  ]
+  "menunggu_keputusan": []
 }

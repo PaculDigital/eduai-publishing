@@ -17,7 +17,7 @@
       "kiri": 1134,
       "kanan": 1134
     },
-    "gutter_twip": null,
+    "gutter_twip": 0,
     "area_teks_twip": 7711,
     "font_isi": {
       "nama": "Times New Roman",
@@ -39,7 +39,8 @@
       "maks": null
     },
     "target_bab": "8-12",
-    "font_judul_status": "SEMENTARA - usulan Wulan (TNR 16), menunggu keputusan Bos"
+    "font_judul_status": "SAH - Disahkan Bos 23 Okt 2026: Times New Roman 16 pt",
+    "gutter_status": "Disahkan Bos 23 Okt 2026: gutter 0 untuk A5/B5 (margin 2 cm cukup untuk jilid)"
   },
   "unsur_wajib": [
     "indeks_subjek",
@@ -79,8 +80,5 @@
     "jangkar_konsistensi": null,
     "status": "Blok gaya di bawah ini adalah teks yang SEDANG BERJALAN (disalin persis dari sumbernya). Penulisan ulang mutu = barang 13/14 RENCANA-BANGUN-SSOT; jangkar konsistensi belum ada."
   },
-  "menunggu_keputusan": [
-    "font judul bab (skill belum menetapkan; usulan Wulan: TNR 16 pt)",
-    "gutter A5/B5 (usulan Wulan: 0)"
-  ]
+  "menunggu_keputusan": []
 }

@@ -12,7 +12,7 @@
 |---|---|
 | Ukuran | A5 — 14.8 × 21.0 cm (8391 × 11906 twip) |
 | Margin (twip) | atas 1134 · bawah 1134 · kiri 1134 · kanan 1134 |
-| Gutter (twip) | — (MENUNGGU KEPUTUSAN) |
+| Gutter (twip) | 0 |
 | Area teks (twip) | 6123 |
 | Font isi | Cambria 11 pt (`w:sz` 22) |
 | Font judul bab | Cambria 14 pt (`w:sz` 28) |
@@ -37,4 +37,4 @@
 
 ## Menunggu keputusan
 
-- gutter A5/B5 (usulan Wulan: 0)
+- (tidak ada)

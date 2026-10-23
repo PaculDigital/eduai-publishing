@@ -12,7 +12,7 @@
 |---|---|
 | Ukuran | B5 default / A5 pilihan — 17.6 × 25.0 cm (9978 × 14174 twip) |
 | Margin (twip) | atas 1134 · bawah 1134 · kiri 1134 · kanan 1134 |
-| Gutter (twip) | — (MENUNGGU KEPUTUSAN) |
+| Gutter (twip) | 0 |
 | Area teks (twip) | 7711 |
 | Font isi | Times New Roman 12 pt (`w:sz` 24) |
 | Font judul bab | Times New Roman 16 pt (`w:sz` 32) |
@@ -37,10 +37,10 @@
 
 ## Aturan tulisan
 
-- Tone: — (MENUNGGU KEPUTUSAN)
+- Tone: instruksional akademik - terstruktur dan jelas, menyapa pembaca 'Anda', istilah konsisten, setiap konsep diikuti contoh konkret
 - Sitasi: terverifikasi, dilarang mengarang
 - Larangan teks: larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)
 
 ## Menunggu keputusan
 
-- gutter A5/B5 (usulan Wulan: 0)
+- (tidak ada)

@@ -32,7 +32,8 @@
   tercatat SATU rumahnya; fakta yang berumah ganda ditandai untuk disatukan.
   ✅ 23 Okt 2026: §9 peta fakta per kategori + 3 rumah ganda ditandai
   (branch `agen/wulan/fase1-ssot`).
-- [ ] **2. Berkas profil per jenis** — satu berkas untuk monograf, buku
+- [x] **2. Berkas profil per jenis** — satu berkas untuk monograf, buku
+  ✅ 23 Okt 2026: keempat nilai yang menunggu DIPUTUSKAN Bos & diterapkan — judul referensi TNR 16 SAH; gutter A5/B5 = 0; buku umum pindah B5; gaya gambar umum = infografis 3D kartun (terbukti gambar uji). Semua daftar menunggu_keputusan di profil kini kosong.
   referensi, buku ajar, buku umum/anak. Isi tiap profil EMPAT hal:
   (a) angka format, (b) unsur isi wajib, (c) aturan tulisan,
   (d) prompt gambar + jangkar konsistensi.
