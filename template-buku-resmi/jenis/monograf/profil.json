@@ -50,22 +50,36 @@
     "struktur_buku_utuh: sampul, hak cipta, prakata, daftar isi, bab 1-5, daftar pustaka, tentang penulis"
   ],
   "aturan_tulisan": {
-    "tone": null,
-    "tone_status": "BELUM ADA - tone_menulis hanya kenal umum/anak/pendidikan; nada akademik monograf ditetapkan pada barang 9",
+    "tone": "akademik formal — orang ketiga, tanpa sapaan 'Anda', istilah teknis dipakai konsisten, kalimat lugas",
+    "tone_status": "Ditetapkan 23 Okt 2026 (barang 9) dari sifat monograf sebagai karya akademik satu penelitian; menutup temuan STATUS: monograf jatuh ke tone 'Anda'. Boleh diubah Bos.",
     "sitasi": "terverifikasi, dilarang mengarang (skill buku-monograf)",
-    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_* / mutu-buku/gambar-dan-visual/prompt/larangan-budaya.md)"
+    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_* / mutu-buku/gambar-dan-visual/prompt/larangan-budaya.md)",
+    "kata_terlarang_teks": [
+      "babi",
+      "piggy bank",
+      "minuman keras"
+    ]
   },
   "gambar": {
-    "mode_brief": null,
-    "mode_brief_status": "BELUM DITETAPKAN untuk monograf - kandidat paket pendidikan; diputuskan pada barang 13",
+    "mode_brief": "berslot",
     "blok_gaya_saat_ini": {
-      "sumber": "jenis_buku.PAKET['pendidikan']['ilustrasi'] (kandidat)",
-      "teks": "Educational instructional illustration, clean flat cartoon style, clear dark outlines around every shape, simple rounded forms, calm controlled colors, on a clean PURE WHITE background (hex #FFFFFF), no cream, no beige, no blue tint, no gradient background, no vignette, no paper texture, no grain, no gradients on objects, no 3D render, no photorealism, no text, no words, no letters, no numbers, no watermark. SCENE — illustrate EXACTLY this moment, nothing else: {brief}. The scene above is the SUBJECT; keep every object named in it"
+      "sumber": "jenis_buku.PAKET['pendidikan']['ilustrasi'] — ditulis ulang positif-dulu 23 Okt 2026 (barang 14)",
+      "teks": "Illustrate exactly this scene for an educational book: {brief}. Clean flat educational cartoon illustration, clear dark outlines around every shape, simple rounded forms, one clear focal subject with generous empty space around it, calm controlled colors - deep navy and warm orange accents - on a clean pure white background (hex #FFFFFF). No text, no words, no letters, no numbers, no watermark, no gradients, no 3D render, no photorealism, no cream or beige tint."
     },
-    "jangkar_konsistensi": null,
-    "status": "Blok gaya di bawah ini adalah teks yang SEDANG BERJALAN (disalin persis dari sumbernya). Penulisan ulang mutu = barang 13/14 RENCANA-BANGUN-SSOT; jangkar konsistensi belum ada."
+    "jangkar_konsistensi": "Consistent series style for the whole book: the same flat educational cartoon style, the same deep navy and warm orange palette, and if a person appears, the same simple character design in every illustration.",
+    "status": "Blok gaya versi positif-dulu + jangkar berlaku 23 Okt 2026 (barang 13/14 untuk jalur pendidikan/monograf)."
   },
   "menunggu_keputusan": [
     "gutter A5/B5 (usulan Wulan: 0)"
+  ],
+  "cek_teks_wajib": [
+    {
+      "label": "pernyataan kebaruan / novelty",
+      "pola": "kebaruan|novelty"
+    },
+    {
+      "label": "keterbatasan penelitian",
+      "pola": "keterbatasan"
+    }
   ]
 }

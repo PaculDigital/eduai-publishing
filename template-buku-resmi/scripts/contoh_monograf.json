@@ -1,0 +1,88 @@
+{
+  "alamat": "Jalan Contoh No. 1, Bandung",
+  "bab": [
+    {
+      "romawi": "I",
+      "judul": "Pendahuluan",
+      "paragraf_pembuka": [
+        "Penelitian ini berangkat dari persoalan nyata di lapangan, yaitu bagaimana sebuah gagasan sederhana dapat dibuktikan dengan data yang rapi dan jujur. Rahman (2021) menegaskan bahwa kekuatan sebuah penelitian terletak pada kejelasan rancangan sejak awal, bukan pada kerumitan alat yang dipakai."
+      ],
+      "sub": [
+        {
+          "nomor": "1.1",
+          "judul": "Latar Belakang",
+          "paragraf": [
+            "Temuan lapangan menunjukkan pola yang konsisten dari waktu ke waktu, dan pola itu hanya terlihat bila data dicatat dengan disiplin. Hasil ini sejalan dengan Sari dan Putra (2022) yang menemukan bahwa kedisiplinan pencatatan menentukan mutu kesimpulan, jauh melebihi pengaruh besar kecilnya sampel yang diambil."
+          ]
+        }
+      ]
+    },
+    {
+      "romawi": "II",
+      "judul": "Tinjauan Pustaka",
+      "paragraf_pembuka": [
+        "Kerangka teori yang dipakai dalam buku ini disusun dari tiga sumber utama yang saling melengkapi. Wijaya (2020) menyediakan peta konsep dasarnya, sedangkan perkembangan mutakhirnya dirangkum secara kritis oleh Rahman (2021) melalui perbandingan lintas studi yang dilakukan secara hati-hati dan terukur."
+      ],
+      "sub": [
+        {
+          "nomor": "2.1",
+          "judul": "Kerangka Teori",
+          "paragraf": [
+            "Penelitian ini berangkat dari persoalan nyata di lapangan, yaitu bagaimana sebuah gagasan sederhana dapat dibuktikan dengan data yang rapi dan jujur. Rahman (2021) menegaskan bahwa kekuatan sebuah penelitian terletak pada kejelasan rancangan sejak awal, bukan pada kerumitan alat yang dipakai."
+          ]
+        }
+      ]
+    },
+    {
+      "romawi": "III",
+      "judul": "Hasil dan Pembahasan",
+      "paragraf_pembuka": [
+        "Kebaruan penelitian ini terletak pada cara menggabungkan dua pendekatan yang selama ini berjalan sendiri-sendiri menjadi satu alur kerja yang utuh. Tidak ada penelitian terdahulu yang menguji gabungan tersebut pada konteks yang sama, sehingga temuan buku ini mengisi celah yang nyata dalam literatur yang ada.",
+        "Keterbatasan penelitian ini perlu dinyatakan dengan jujur: cakupan wilayahnya terbatas dan jumlah informannya tidak besar, sehingga generalisasi hasilnya harus dilakukan dengan hati-hati. Meski begitu, kedalaman data yang diperoleh memberi keyakinan bahwa pola yang ditemukan layak diuji ulang di konteks lain."
+      ],
+      "sub": [
+        {
+          "nomor": "3.1",
+          "judul": "Pembahasan",
+          "paragraf": [
+            "Temuan lapangan menunjukkan pola yang konsisten dari waktu ke waktu, dan pola itu hanya terlihat bila data dicatat dengan disiplin. Hasil ini sejalan dengan Sari dan Putra (2022) yang menemukan bahwa kedisiplinan pencatatan menentukan mutu kesimpulan, jauh melebihi pengaruh besar kecilnya sampel yang diambil."
+          ]
+        }
+      ]
+    }
+  ],
+  "cetakan": "Oktober 2026",
+  "desain_sampul": "Nama Desainer",
+  "editor": "Nama Editor",
+  "email": "redaksi@contoh-penerbit.id",
+  "facebook": "Penerbit Contoh",
+  "isbn": "978-602-000-000-0",
+  "isbn_pdf": "978-602-000-000-1",
+  "judul": "Monograf Contoh: Membuktikan Gagasan dengan Data",
+  "jumlah_halaman": 1,
+  "kata_pengantar": [
+    "Buku ini lahir dari pertanyaan sederhana yang sering diajukan penulis pemula: bagaimana cara memulai menulis buku pertama tanpa merasa kewalahan di tengah jalan. Banyak naskah berhenti bukan karena idenya buruk, melainkan karena penulis tidak memiliki peta kerja yang jelas sejak awal.",
+    "Melalui bab-bab yang singkat dan terstruktur, buku ini mengajak pembaca menyusun gagasan, merawat kebiasaan menulis, dan menyelesaikan naskah sampai tuntas. Setiap bab ditutup dengan langkah praktis yang bisa langsung dicoba pada hari yang sama, tanpa menunggu waktu yang sempurna."
+  ],
+  "penerbit": "Nama Penerbit",
+  "penulis": "Nama Penulis Contoh",
+  "penyunting": "Nama Penyunting",
+  "tahun": "2026",
+  "tempat_tanggal": "Bandung, 1 Oktober 2026",
+  "tentang_penulis": {
+    "kutipan": "Naskah yang selesai selalu mengalahkan naskah sempurna yang tidak pernah ditulis.",
+    "nama": "Nama Penulis Contoh",
+    "paragraf": [
+      "Nama Penulis Contoh adalah penulis dan editor lepas yang tinggal di Bandung. Ia telah mendampingi puluhan penulis pemula menyelesaikan naskah pertamanya, dan percaya bahwa menulis adalah keterampilan yang bisa dilatih oleh siapa pun yang bersedia meluangkan waktu secara teratur.",
+      "Selain menulis, ia mengajar kelas penulisan daring dan menjadi pembicara pada berbagai lokakarya kepenulisan. Waktu luangnya dihabiskan untuk membaca, merawat tanaman, dan berjalan pagi sambil mencari gagasan baru untuk buku berikutnya yang sedang ia susun perlahan."
+    ]
+  },
+  "twitter": "@penerbitcontoh",
+  "web": "www.contoh-penerbit.id",
+  "whatsapp": "0812-0000-0000",
+  "daftar_pustaka": [
+    "Rahman, A. (2021). Metode penelitian manajemen. Jakarta: Penerbit Contoh.",
+    "Sari, D., & Putra, B. (2022). Kedisiplinan pencatatan data lapangan. Jurnal Contoh, 4(1), 10-25.",
+    "Wijaya, C. (2020). Teori organisasi modern. Bandung: Penerbit Contoh."
+  ]
+}

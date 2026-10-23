@@ -31,7 +31,7 @@
 
 ## Aturan tulisan
 
-- Tone: — (MENUNGGU KEPUTUSAN)
+- Tone: akademik formal — orang ketiga, tanpa sapaan 'Anda', istilah teknis dipakai konsisten, kalimat lugas
 - Sitasi: terverifikasi, dilarang mengarang (skill buku-monograf)
 - Larangan teks: larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_* / mutu-buku/gambar-dan-visual/prompt/larangan-budaya.md)
 

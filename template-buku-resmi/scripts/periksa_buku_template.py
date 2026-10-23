@@ -41,6 +41,7 @@ Pakai:
 
 EXIT 0 = LULUS, EXIT 1 = GAGAL (cetak alasan).
 """
+import json
 import re
 import sys
 import zipfile
@@ -84,7 +85,7 @@ def teks_para(p):
     return ''.join(re.findall(r'<w:t(?:\s[^>]*)?>([^<]*)</w:t>', p)).strip()
 
 
-def periksa(path, wajib_lebih=0):
+def periksa(path, wajib_lebih=0, profil=None, wajib_pustaka=False):
     z = zipfile.ZipFile(path)
     nama_berkas = set(z.namelist())
     doc = z.read('word/document.xml').decode('utf-8')
@@ -94,17 +95,48 @@ def periksa(path, wajib_lebih=0):
 
     print(f'BERKAS: {path}')
 
+    # ── ANGKA AKTIF (barang 6: gerbang membaca profil) ─────────────────
+    # Tanpa --profil: angka template induk (perilaku lama persis).
+    # Dengan --profil: semua angka di bawah ini datang dari profil.json.
+    P = {'pg_w': 7938, 'pg_h': 11340,
+         'mar': {'top': 907, 'bottom': 907, 'right': 907, 'left': 578,
+                 'gutter': 505},
+         'font_isi': 'Palatino Linotype', 'sz_isi': 20,
+         'font_judul': 'Trajan Pro', 'sz_judul': 44,
+         'font_normal': 'Times New Roman', 'sz_normal': 24,
+         'line_cap': 240, 'tab_pos': 5938}
+    if profil:
+        f = profil['format']
+        u = f['ukuran']
+        m = f['margin_twip']
+        P.update({'pg_w': u['lebar_twip'], 'pg_h': u['tinggi_twip'],
+                  'mar': {'top': m['atas'], 'bottom': m['bawah'],
+                          'right': m['kanan'], 'left': m['kiri'],
+                          'gutter': f.get('gutter_twip')},
+                  'font_isi': f['font_isi']['nama'],
+                  'sz_isi': f['font_isi']['sz'],
+                  'font_normal': f['font_isi']['nama'],
+                  'sz_normal': f['font_isi']['sz'],
+                  'line_cap': f['spasi']['line_twip'],
+                  'tab_pos': f['area_teks_twip'] - 515})
+        if f.get('font_judul'):
+            P.update({'font_judul': f['font_judul']['nama'],
+                      'sz_judul': f['font_judul']['sz']})
+        print(f"PROFIL: {profil['id']} (angka dari profil.json)")
+
     # ── HALAMAN (sectPr pertama — kompat gerbang lama) ──────────────────
     pgsz = ambil(doc, r'<w:pgSz([^/]*)/>') or ''
     w = tw(ambil(pgsz, r'w:w="(\d+)"'))
     h = tw(ambil(pgsz, r'w:h="(\d+)"'))
     print(f'\n== HALAMAN == {cm(w)} x {cm(h)} cm')
-    ok('H1 lebar halaman = 14,00 cm', cm(w) == 14.0, f'{cm(w)} cm (wajib 14,0)')
-    ok('H2 tinggi halaman = 20,00 cm', cm(h) == 20.0, f'{cm(h)} cm (wajib 20,0)')
+    ok(f'H1 lebar halaman = {cm(P["pg_w"])} cm', w == P['pg_w'],
+       f'{cm(w)} cm (wajib {cm(P["pg_w"])})')
+    ok(f'H2 tinggi halaman = {cm(P["pg_h"])} cm', h == P['pg_h'],
+       f'{cm(h)} cm (wajib {cm(P["pg_h"])})')
 
     # ── BATAS (sectPr pertama — kompat gerbang lama) ────────────────────
     pgmar = ambil(doc, r'<w:pgMar([^/]*)/>') or ''
-    wajib = {'top': 1.6, 'bottom': 1.6, 'right': 1.6, 'left': 1.02, 'gutter': 0.89}
+    wajib = {k: cm(v) for k, v in P['mar'].items() if v is not None}
     print('\n== BATAS ==')
     for k, harus in wajib.items():
         v = ambil(pgmar, rf'w:{k}="(\d+)"')
@@ -120,19 +152,20 @@ def periksa(path, wajib_lebih=0):
         buruk_sz, buruk_mar, buruk_hf = [], [], []
         for i, s in enumerate(sects):
             sz = ambil(s, r'<w:pgSz([^/]*)/>') or ''
-            if (tw(ambil(sz, r'w:w="(\d+)"')), tw(ambil(sz, r'w:h="(\d+)"'))) != (7938, 11340):
+            if (tw(ambil(sz, r'w:w="(\d+)"')), tw(ambil(sz, r'w:h="(\d+)"'))) != (P['pg_w'], P['pg_h']):
                 buruk_sz.append(i)
             mar = ambil(s, r'<w:pgMar([^/]*)/>') or ''
-            for k, harus_twip in {'top': 907, 'bottom': 907, 'right': 907,
-                                  'left': 578, 'gutter': 505}.items():
+            for k, harus_twip in P['mar'].items():
+                if harus_twip is None:
+                    continue
                 if tw(ambil(mar, rf'w:{k}="(\d+)"')) != harus_twip:
                     buruk_mar.append((i, k))
             if (tw(ambil(mar, r'w:header="(\d+)"')) != 720
                     or tw(ambil(mar, r'w:footer="(\d+)"')) != 720):
                 buruk_hf.append(i)
-        ok('G1 SEMUA sectPr ukuran 14x20 cm', not buruk_sz,
-           f'sectPr ke-{buruk_sz} ukurannya beda')
-        ok('G2 SEMUA sectPr batas sama (1,6/1,6/1,6/1,02/gutter 0,89)',
+        ok(f"G1 SEMUA sectPr ukuran = profil ({cm(P['pg_w'])}x{cm(P['pg_h'])} cm)",
+           not buruk_sz, f'sectPr ke-{buruk_sz} ukurannya beda')
+        ok('G2 SEMUA sectPr batas sama dengan profil/induk',
            not buruk_mar, f'beda: {buruk_mar[:4]}')
         ok('G3 SEMUA sectPr margin header/footer = 720 twip (1,27 cm)',
            not buruk_hf, f'sectPr ke-{buruk_hf} header/footer beda')
@@ -199,12 +232,12 @@ def periksa(path, wajib_lebih=0):
     if not isi:
         ok('F0 ada paragraf isi', False, 'tidak ada paragraf >=150 karakter')
     else:
-        salah_font = [d for d in isi if d['font'] != 'Palatino Linotype']
-        ok('F1 font isi = Palatino Linotype', not salah_font,
+        salah_font = [d for d in isi if d['font'] != P['font_isi']]
+        ok(f"F1 font isi = {P['font_isi']}", not salah_font,
            f'{len(salah_font)}/{len(isi)} paragraf salah font: '
            f'{[d["font"] for d in salah_font][:3]}')
-        salah_sz = [d for d in isi if tw(d['sz']) != 20]
-        ok('F2 ukuran isi = 10 pt', not salah_sz,
+        salah_sz = [d for d in isi if tw(d['sz']) != P['sz_isi']]
+        ok(f"F2 ukuran isi = {P['sz_isi'] // 2} pt", not salah_sz,
            f'{len(salah_sz)}/{len(isi)} salah ukuran: {[d["sz"] for d in salah_sz][:3]}')
         salah_jc = [d for d in isi if d['jc'] != 'both']
         ok('F3 isi rata kanan-kiri (both)', not salah_jc,
@@ -215,10 +248,10 @@ def periksa(path, wajib_lebih=0):
             if not d['sp']:
                 continue
             ln = tw(ambil(d['sp'], r'w:line="(\d+)"'))
-            if ln is not None and ln > 240:
+            if ln is not None and ln > P['line_cap']:
                 lewat.append(ln)
-        ok('S1 jarak baris isi tidak melebihi template (<= 240)', not lewat,
-           f'{len(lewat)} paragraf line>240: {lewat[:4]}')
+        ok(f"S1 jarak baris isi tidak melebihi profil (<= {P['line_cap']})",
+           not lewat, f'{len(lewat)} paragraf line>{P["line_cap"]}: {lewat[:4]}')
 
     # ── F6/F7: SEMUA RUN isi zona konten (v2) ───────────────────────────
     # Zona konten = sesudah Heading1 pertama (KATA PENGANTAR). Paragraf
@@ -249,14 +282,14 @@ def periksa(path, wajib_lebih=0):
                 n_run += 1
                 f = ambil(run, r'w:ascii="([^"]+)"')
                 s = tw(ambil(run, r'<w:sz w:val="(\d+)"'))
-                if f != 'Palatino Linotype':
+                if f != P['font_isi']:
                     run_font_salah.append(f)
-                if s != 20:
+                if s != P['sz_isi']:
                     run_sz_salah.append(s)
     print(f'  {n_run} run teks diperiksa')
-    ok('F6 SEMUA run isi font = Palatino Linotype', bool(n_run) and not run_font_salah,
+    ok(f"F6 SEMUA run isi font = {P['font_isi']}", bool(n_run) and not run_font_salah,
        f'{len(run_font_salah)} run salah font: {run_font_salah[:3]}' if n_run else 'tidak ada run isi')
-    ok('F7 SEMUA run isi ukuran = 10 pt', bool(n_run) and not run_sz_salah,
+    ok(f"F7 SEMUA run isi ukuran = {P['sz_isi'] // 2} pt", bool(n_run) and not run_sz_salah,
        f'{len(run_sz_salah)} run salah ukuran: {run_sz_salah[:3]}' if n_run else 'tidak ada run isi')
 
     # ── JUDUL (styles.xml) ──────────────────────────────────────────────
@@ -267,11 +300,12 @@ def periksa(path, wajib_lebih=0):
     h1 = gaya.get('Heading1') or ''
     h2 = gaya.get('Heading2') or ''
     print('\n== JUDUL ==')
-    ok('F4 Heading1 font = Trajan Pro',
-       ambil(h1, r'w:ascii="([^"]+)"') == 'Trajan Pro',
+    ok(f"F4 Heading1 font = {P['font_judul']}",
+       ambil(h1, r'w:ascii="([^"]+)"') == P['font_judul'],
        str(ambil(h1, r'w:ascii="([^"]+)"')))
-    ok('F4b Heading1 ukuran = 22 pt', tw(ambil(h1, r'<w:sz w:val="(\d+)"')) == 44,
-       f'{ambil(h1, r"<w:sz w:val=.(\\d+).")} (wajib 44 = 22 pt)')
+    ok(f"F4b Heading1 ukuran = {P['sz_judul'] // 2} pt",
+       tw(ambil(h1, r'<w:sz w:val="(\d+)"')) == P['sz_judul'],
+       f'{ambil(h1, r"<w:sz w:val=.(\\d+).")} (wajib {P["sz_judul"]})')
     ok('F4c Heading1 tebal', '<w:b/>' in h1, 'tidak tebal')
     ok('F5 Heading2 ukuran = 13 pt', tw(ambil(h2, r'<w:sz w:val="(\d+)"')) == 26,
        f'{ambil(h2, r"<w:sz w:val=.(\\d+).")} (wajib 26 = 13 pt)')
@@ -282,9 +316,9 @@ def periksa(path, wajib_lebih=0):
     toc1 = gaya.get('TOC1') or ''
     toc2 = gaya.get('TOC2') or ''
     print('\n== GAYA LENGKAP ==')
-    ok('Y1 Normal = Times New Roman 12 pt',
-       ambil(normal, r'w:ascii="([^"]+)"') == 'Times New Roman'
-       and tw(ambil(normal, r'<w:sz w:val="(\d+)"')) == 24,
+    ok(f"Y1 Normal = {P['font_normal']} {P['sz_normal'] // 2} pt",
+       ambil(normal, r'w:ascii="([^"]+)"') == P['font_normal']
+       and tw(ambil(normal, r'<w:sz w:val="(\d+)"')) == P['sz_normal'],
        f'font={ambil(normal, r"w:ascii=.([^\"]+).")} sz={ambil(normal, r"<w:sz w:val=.(\d+).")}')
     sp_h1 = ambil(h1, r'<w:spacing ([^/>]*)/?>') or ''
     ok('Y2 Heading1 spasi before=100 after=240',
@@ -304,8 +338,8 @@ def periksa(path, wajib_lebih=0):
     sp_h2 = ambil(h2, r'<w:spacing ([^/>]*)/?>') or ''
     ok('Y7 Heading2 spasi before=40', tw(ambil(sp_h2, r'w:before="(\d+)"')) == 40,
        f'spacing H2: {sp_h2}')
-    ok('Y8 TOC1 + TOC2 tab kanan dot pos=5938',
-       'w:pos="5938"' in toc1 and 'w:pos="5938"' in toc2
+    ok(f"Y8 TOC1 + TOC2 tab kanan dot pos={P['tab_pos']}",
+       f'w:pos="{P["tab_pos"]}"' in toc1 and f'w:pos="{P["tab_pos"]}"' in toc2
        and 'w:leader="dot"' in toc1 and 'w:leader="dot"' in toc2,
        'tab daftar isi berubah')
 
@@ -354,7 +388,13 @@ def periksa(path, wajib_lebih=0):
                    if ambil(p, r'<w:pStyle w:val="(Heading1)"')
                    and teks_para(p).upper() == 'DAFTAR PUSTAKA'), None)
     if idx_dp is None:
-        print('  (dilewati) buku ini tidak memakai daftar pustaka')
+        if wajib_pustaka:
+            # Barang 4: untuk buku jadi, DAFTAR PUSTAKA itu WAJIB —
+            # tidak ada lagi kata "dilewati".
+            ok('DP0 DAFTAR PUSTAKA WAJIB ada', False,
+               'bagian DAFTAR PUSTAKA tidak ditemukan di buku jadi')
+        else:
+            print('  (dilewati) buku ini tidak memakai daftar pustaka')
     else:
         idx_bab_terakhir = max(i for i, p in enumerate(paras)
                                if ambil(p, r'<w:pStyle w:val="(Heading1)"')
@@ -545,12 +585,16 @@ def periksa(path, wajib_lebih=0):
 if __name__ == '__main__':
     arg = [a for a in sys.argv[1:] if not a.startswith('--')]
     lebih = 0
+    profil = None
+    wajib_pustaka = '--wajib-pustaka' in sys.argv
     for a in sys.argv[1:]:
         if a.startswith('--wajib-lebih'):
             lebih = int(a.split('=')[-1]) if '=' in a else 1
+        elif a.startswith('--profil='):
+            profil = json.loads(Path(a.split('=', 1)[1]).read_text(encoding='utf-8'))
     if not arg:
         sys.exit(__doc__)
     p = Path(arg[0])
     if not p.exists():
         sys.exit(f'Berkas tidak ada: {p}')
-    sys.exit(periksa(p, lebih))
+    sys.exit(periksa(p, lebih, profil=profil, wajib_pustaka=wajib_pustaka))
