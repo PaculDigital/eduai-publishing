@@ -321,3 +321,34 @@ def bagi_per_halaman(bab_per_num: dict[int, str], bab_awal: int = 1,
                 hasil[nomor] = potong
             nomor += 1
     return hasil
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  HALAMAN TERUKUR DARI RENDER (barang 7 RENCANA-BANGUN-SSOT, 23 Okt 2026)
+#  Menggantikan perkiraan 360 kata/halaman untuk nomor CETAK: teks diambil
+#  per halaman dari PDF hasil render (LibreOffice/Word), jadi nomor yang
+#  tertulis di indeks adalah nomor yang benar-benar dilihat pembaca.
+# ══════════════════════════════════════════════════════════════════════════
+def halaman_dari_render(path_pdf):
+    """Kembalikan list teks per halaman dari PDF render (indeks 0 = hlm 1)."""
+    import subprocess
+    r = subprocess.run(['pdftotext', '-layout', str(path_pdf), '-'],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError(f'pdftotext gagal: {r.stderr[:200]}')
+    return r.stdout.split('\x0c')
+
+
+def petakan_istilah_terukur(istilah, path_pdf):
+    """{istilah: [nomor halaman, ...]} diukur dari render — BUKAN perkiraan.
+
+    Inilah pengganti jalur bagi_per_halaman() untuk nomor indeks final.
+    bagi_per_halaman()/halaman_perkiraan() tetap ada untuk pratinjau kasar
+    dan DILARANG dipakai untuk nomor cetak.
+    """
+    halaman = halaman_dari_render(path_pdf)
+    hasil = {}
+    for kata in istilah:
+        pola = re.compile(rf'\b{re.escape(kata)}\b', re.I)
+        hasil[kata] = [i + 1 for i, teks in enumerate(halaman) if pola.search(teks)]
+    return hasil

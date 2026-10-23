@@ -52,6 +52,13 @@ PAKET = {
         "gaya_gambar": "premium-konseptual",
         "mode_brief": "konseptual",
         "ilustrasi": None,      # diambil dari brief_visual.STYLE_BUKU
+        #  Jangkar konsistensi (barang 14, Fase 4): ditempel prompt_gambar
+        #  ke setiap prompt jenis ini.
+        "jangkar": (
+            "Consistent series style for the whole book: the same flat "
+            "vector editorial style, the same deep navy and terracotta "
+            "palette, and one clear visual metaphor per illustration."
+        ),
         "palet": {
             "krem": "#FFF9EE",
             "tinta": "#1B3A57",
@@ -108,6 +115,12 @@ PAKET = {
             #  menjadi gambar "anak membayar di kasir toko").
             "SCENE — illustrate EXACTLY this moment, nothing else: {brief}. "
             "The scene above is the SUBJECT; keep every object named in it"
+        ),
+        #  Jangkar konsistensi (barang 14, Fase 4).
+        "jangkar": (
+            "Consistent series style for the whole book: the same cheerful "
+            "flat cartoon style and bright palette, and if a character "
+            "appears, the same character design in every illustration."
         ),
         "palet": {
             # Langit cerah + krem hangat: sama seperti latar ilustrasi clay

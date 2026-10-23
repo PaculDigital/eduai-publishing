@@ -95,6 +95,28 @@ TONE_MENULIS = {
             "Contoh: \"penguapan (perubahan air menjadi uap)\""
         ),
     },
+    # Ditambahkan 23 Okt 2026 (barang 9 Fase 4) — menyelaraskan aplikasi
+    # dengan profil SSOT (template-buku-resmi/jenis/*/profil.json), supaya
+    # monograf & buku ajar tidak lagi jatuh ke nada jenis lain.
+    "monograf": {
+        "tone": (
+            "Akademik formal — orang ketiga, tanpa sapaan 'Anda', istilah "
+            "konsisten, kalimat lugas. Nada peneliti yang melaporkan dan "
+            "membahas hasil, bukan menggurui pembaca."
+        ),
+        "sapaan": None,
+        "pembaca": "dosen, peneliti, mahasiswa pascasarjana",
+    },
+    "buku_ajar": {
+        "tone": (
+            "Instruksional akademik — terstruktur dan jelas, menyapa pembaca "
+            "'Anda', istilah konsisten, setiap konsep diikuti contoh konkret. "
+            "Setiap bab: tujuan pembelajaran di awal, latihan, checklist, "
+            "dan rangkuman di akhir."
+        ),
+        "sapaan": "Anda",
+        "pembaca": "mahasiswa, dibimbing dosen",
+    },
 }
 
 

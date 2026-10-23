@@ -50,17 +50,19 @@ STYLE_BUKU = {
     # krem + tekstur = kesan buku lawas/kotor.
     # OBAT: latar PUTIH bersih (hex eksplisit), outline tipis tegas, TANPA
     # tekstur kertas, TANPA warna krem/coklat di mana pun.
+    # Ditulis ulang POSITIF-DULU (barang 14, Fase 4, 23 Okt 2026): subjek &
+    # deskripsi di depan, larangan dipangkas pendek di ekor. Pilihan gaya
+    # (flat) TIDAK berubah — keputusan flat vs 3D tetap menunggu Bos.
     "premium-konseptual": (
         "Premium conceptual editorial illustration for a bestselling "
-        "non-fiction book, single clever visual metaphor, modern flat vector "
-        "style, limited palette of deep navy and warm terracotta, "
-        "on a clean PURE WHITE background (hex #FFFFFF), no cream, no beige, "
-        "no brown tint anywhere, crisp thin dark outlines around every shape, "
-        "one central focal subject with generous negative space, minimalist "
-        "elegant composition, smooth flat surfaces with no paper texture, "
-        "no grain, no stains, no vignette, no gradients, no photorealism, "
-        "no 3D, no clutter, no text, no words, no letters, no watermark. "
-        "Scene: {brief}"
+        "non-fiction book: {brief}. One clever visual metaphor as a single "
+        "central focal subject, modern flat vector style, limited palette "
+        "of deep navy and warm terracotta, crisp thin dark outlines around "
+        "every shape, generous negative space, minimalist elegant "
+        "composition, smooth flat surfaces, on a clean pure white "
+        "background (hex #FFFFFF). "
+        "No text, no words, no letters, no watermark, no gradients, "
+        "no photorealism, no 3D, no clutter, no cream or beige tint."
     ),
     # v1 lama — line art tipis. Disimpan untuk buku teknis/panduan.
     # ⚠️ Latar krem DIGANTI putih bersih 20 Okt 2026 (keluhan Bos: "kotor").
