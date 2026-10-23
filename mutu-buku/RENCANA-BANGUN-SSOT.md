@@ -68,8 +68,10 @@
   (entri pustaka tak dirujuk = gagal; sitasi tanpa entri pustaka = gagal),
   kata larangan budaya tidak muncul di teks, bagian wajib tulisan hadir
   (posisi penulis / novelty).
-- [ ] **11. Gate cek plagiarisme** sebelum buku final.
-- [ ] **12. Alur verifikasi sitasi 3 lapis** untuk peninjau — referensi
+- [x] **11. Gate cek plagiarisme** sebelum buku final.
+  ✅ 23 Okt 2026: cek_kemiripan.py — paragraf ganda/nyaris sama di dalam buku + irisan 8-gram vs korpus lokal (ambang 5%). JUJUR: ini cek kemiripan lokal, BUKAN Turnitin; untuk pengesahan resmi tetap Turnitin kampus / API komersial bila Bos putuskan.
+- [x] **12. Alur verifikasi sitasi 3 lapis** untuk peninjau — referensi
+  ✅ 23 Okt 2026: verifikasi_sitasi.py — lapis 1-2 via Crossref (DOI persis / pencarian bibliografis; terbukti dua arah: DOI Bandura 1977 TERBUKTI, DOI karangan 404 TIDAK-DITEMUKAN); lapis 3 makna disiapkan sebagai daftar kalimat pemakai untuk peninjau.
   benar ada, atribusi benar, makna tidak dipelintir — dibantu bukti dari
   kwitansi (nomor 16), bukan mulai dari nol.
 
@@ -82,17 +84,21 @@
 - [ ] **14. Blok gaya baru POSITIF-DULU** — deskripsi jelas di depan,
   larangan dipangkas pendek di ekor, + jangkar konsistensi (frasa gaya
   dan deskripsi tokoh yang SAMA untuk semua gambar dalam satu buku).
-- [ ] **15. Pemeriksaan isi gambar** — gambar hasil dibandingkan dengan
+- [x] **15. Pemeriksaan isi gambar** — gambar hasil dibandingkan dengan
+  ✅ 23 Okt 2026: periksa_gambar.py lapis 1 terukur + lapis 2 peninjau terprosedur; terbukti pada gambar uji nyata monograf (mentah 1920px tertangkap G2, sesudah skala lebar area 3/3 LULUS, isi sesuai brief kelima slot).
   brief-nya; meleset = dibuat ulang. Bukan cuma cek lebar.
 
 ## E. BUKTI & MUTU KESELURUHAN
 
-- [ ] **16. Kwitansi mutu otomatis** menyertai tiap buku: versi profil,
+- [x] **16. Kwitansi mutu otomatis** menyertai tiap buku: versi profil,
+  ✅ 23 Okt 2026: buat_kwitansi.py menerbitkan <buku>.kwitansi.md berisi hasil semua gerbang yang benar-benar dijalankan + statistik isi + status peninjau yang jujur.
   hasil semua gerbang (format, isi, tulisan, gambar), hasil plagiarisme,
   status sitasi & font.
-- [ ] **17. Buku emas per jenis** — contoh baku; setiap mesin berubah,
+- [x] **17. Buku emas per jenis** — contoh baku; setiap mesin berubah,
+  ✅ 23 Okt 2026: emas monograf & induk (sidik jari struktural SHA-256) + uji_regresi_emas.py; perubahan isi diam-diam tertangkap (uji v5). Emas jenis lain menyusul saat jenisnya dibangun (Fase 4).
   buku emas dirender ulang dan dibandingkan (uji regresi).
-- [ ] **18. Uji bergigi untuk semua gerbang baru** — setiap pemeriksa
+- [x] **18. Uji bergigi untuk semua gerbang baru** — setiap pemeriksa
+  ✅ 23 Okt 2026 untuk gerbang baru: uji_bergigi_v5.py 11/11 (kontrol + suntikan untuk #4, #6, #8, #10, #11, #15, #17).
   baru wajib dibuktikan BISA gagal.
 - [ ] **19. Buku contoh nyata per jenis + gambar uji nyata** — bukti
   ujung-ke-ujung tiap jenis sebelum dinyatakan selesai.

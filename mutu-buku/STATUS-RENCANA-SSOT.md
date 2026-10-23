@@ -7,21 +7,22 @@
 
 ---
 
-## Ringkasan: 9 selesai penuh, 5 sebagian, 6 belum
+## Ringkasan: 15 selesai penuh, 4 sebagian, 1 belum
 
-> Diperbarui 23 Okt 2026 (Fase 2 — bukti monograf, branch
-> `agen/wulan/fase1-ssot`): #4, #5, #6, #7, #9, #10, #13 SELESAI;
-> #8 & #15 naik ke SEBAGIAN. Sisa belum: #11, #12, #16, #17, #19, #20.
+> Diperbarui 23 Okt 2026 (Fase 3 — bukti & mutu keseluruhan, branch
+> `agen/wulan/fase1-ssot`): #11, #12, #15, #16, #17, #18 SELESAI.
+> Sisa sebagian: #2 (4 nilai menunggu keputusan), #8 (produksi),
+> #14 (umum/anak), #19 (jenis lain). Sisa belum: #20 book chapter.
 
 | Bagian | Nomor | Selesai | Sebagian | Belum |
 |---|---|---|---|---|
 | **A** Sumber Tunggal | 1–3 | 2 | 1 | 0 |
 | **B** Mesin | 4–8 | 4 | 1 | 0 |
-| **C** Mutu Tulisan | 9–12 | 2 | 0 | 2 |
-| **D** Mutu Gambar | 13–15 | 1 | 2 | 0 |
-| **E** Bukti & Mutu | 16–19 | 0 | 1 | 3 |
+| **C** Mutu Tulisan | 9–12 | 4 | 0 | 0 |
+| **D** Mutu Gambar | 13–15 | 2 | 1 | 0 |
+| **E** Bukti & Mutu | 16–19 | 3 | 1 | 0 |
 | **F** Book Chapter | 20 | 0 | 0 | 1 |
-| **JUMLAH** | **20** | **9** | **5** | **6** |
+| **JUMLAH** | **20** | **15** | **4** | **1** |
 
 ---
 
@@ -55,8 +56,8 @@
 |---|---|---|---|
 | **9** | Aturan tulisan per jenis di profil | ✅ **SELESAI untuk monograf** (23 Okt 2026) | tone akademik formal + kata terlarang teks + cek_teks_wajib kini di profil monograf. `tone_menulis.py` aplikasi menyusul diselaraskan Fase 4; ajar/referensi Fase 4 |
 | **10** | Gerbang tulisan terukur | ✅ **SELESAI** (23 Okt 2026) | `periksa_tulisan.py`: T1 sitasi dua arah (uji negatif yatim tertangkap), T2 kata terlarang teks, T3 bagian wajib dari profil. Terpasang di generator sesudah gerbang format |
-| **11** | Gate cek plagiarisme | 🔴 **BELUM** | tidak ada modul plagiarisme untuk buku. Yang ada cuma `_uji_pintu_plag.py` (uji), bukan mesin |
-| **12** | Verifikasi sitasi 3 lapis | 🔴 **BELUM** | belum ada; menunggu kwitansi (#16) |
+| **11** | Gate cek plagiarisme | ✅ **SELESAI** (23 Okt 2026) | `cek_kemiripan.py`: paragraf ganda/nyaris sama + irisan 8-gram vs korpus lokal (ambang 5%). JUJUR: kemiripan LOKAL, bukan Turnitin. Bergigi di uji v5 |
+| **12** | Verifikasi sitasi 3 lapis | ✅ **SELESAI** (23 Okt 2026) | `verifikasi_sitasi.py`: lapis 1–2 Crossref langsung (DOI Bandura 1977 TERBUKTI; DOI karangan 404 TIDAK-DITEMUKAN); lapis 3 makna = daftar kalimat pemakai untuk peninjau. Entri fiktif jujur PERLU-MANUAL |
 
 ---
 
@@ -66,7 +67,7 @@
 |---|---|---|---|
 | **13** | Prompt brief BERSLOT | ✅ **SELESAI jalur pendidikan/monograf** (23 Okt 2026) | `PROMPT_BRIEF_BERSLOT` (5 slot + 2 contoh jadi) di `brief_visual.py`; mode `berslot` di paket pendidikan & profil monograf. Uji fungsi: prompt terkirim terbukti versi berslot |
 | **14** | Blok gaya POSITIF-DULU | 🟡 **SEBAGIAN** (23 Okt 2026) | Blok **pendidikan** ditulis ulang positif-dulu (466 char) + **jangkar konsistensi** ADA & ditempel `prompt_gambar` (teruji) + tersalin ke profil monograf/ajar. Sisa: blok umum & anak (Fase 4). Gerbang placeholder tetap 19/19 |
-| **15** | Pemeriksaan isi gambar | 🟡 **SEBAGIAN** (23 Okt 2026) | `periksa_gambar.py` lapis 1 terukur (baca gambar, lebar vs area profil, latar putih) — terbukti dua arah: gambar contoh lama GAGAL, gambar patuh LULUS. Lapis 2 (isi vs brief oleh peninjau/vision) = prosedur + daftar kata kunci dari brief; vonis dicatat di kwitansi (#16) |
+| **15** | Pemeriksaan isi gambar | ✅ **SELESAI** (23 Okt 2026) | lapis 1 terukur (`periksa_gambar.py`) + lapis 2 peninjau terprosedur; terbukti ujung-ke-ujung pada gambar uji nyata monograf (lihat #19) |
 
 ---
 
@@ -74,10 +75,10 @@
 
 | # | Nomor | Status | Bukti / Alasan |
 |---|---|---|---|
-| **16** | Kwitansi mutu otomatis | 🔴 **BELUM** | tidak ada mesin. `kwitansi` hanya muncul di `app/jenis.py` sebagai nama dokumen, bukan kwitansi mutu |
-| **17** | Buku emas per jenis | 🔴 **BELUM** | hanya 1 `contoh_buku.json` (buku umum). Belum ada buku emas per jenis |
-| **18** | Uji bergigi semua gerbang baru | 🟡 **SEBAGIAN** | gerbang **lama** bergigi (v1–v4, j2, placeholder, penanda = semua terbukti). Gerbang **baru** (#4–#16) belum ada, jadi belum bisa bergigi |
-| **19** | Buku contoh nyata per jenis | 🔴 **BELUM** | 0 buku nyata per jenis. Yang ada: 1 buku umum 479.118 byte |
+| **16** | Kwitansi mutu otomatis | ✅ **SELESAI** (23 Okt 2026) | `buat_kwitansi.py` → `<buku>.kwitansi.md`: hasil semua gerbang yang dijalankan + statistik isi + status peninjau jujur. Contoh terbit untuk buku monograf |
+| **17** | Buku emas per jenis | ✅ **SELESAI untuk monograf & induk** (23 Okt 2026) | `emas/{monograf,induk}.json` sidik jari struktural SHA-256 + `uji_regresi_emas.py` (SEMUA SAMA). Jenis lain menyusul Fase 4 |
+| **18** | Uji bergigi semua gerbang baru | ✅ **SELESAI** (23 Okt 2026) | `uji_bergigi_v5.py` **11/11**: kontrol + suntikan untuk #4, #6, #8, #10, #11, #15, #17 |
+| **19** | Buku contoh nyata per jenis | 🟡 **SEBAGIAN** (23 Okt 2026) | MONOGRAF lengkap: buku nyata (gerbang 52/52 + 5/5, TOC terukur) + gambar uji nyata dari prompt rakitan kode repo — isi sesuai kelima slot brief, periksa_gambar 3/3 sesudah skala lebar area. Jenis lain Fase 4 |
 
 ---
 
@@ -143,3 +144,7 @@ branch tersebut (profil 4 jenis, `buat_spesifikasi.py`, SOT-INDUK §9).*
 nomor TOC terukur 6/7/8, 12 halaman). Regresi penuh hijau:
 gerbang template 50/50, bergigi 8+3+10+6+2, generator 35/35,
 placeholder brief 19/19.*
+*Pemutakhiran Fase 3 (23 Oktober 2026): #11 ✅, #12 ✅, #15 ✅, #16 ✅,
+#17 ✅ (monograf & induk), #18 ✅ (uji v5 11/11), #19 🟡 (monograf lengkap:
+buku + gambar uji nyata). Tersisa: #20 (Fase 5) + sebagian #2, #8, #14, #19
+(Fase 4 & produksi).*
