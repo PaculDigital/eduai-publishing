@@ -81,7 +81,8 @@
   ✅ 23 Okt 2026 jalur pendidikan/monograf: PROMPT_BRIEF_BERSLOT (5 slot + 2 contoh jadi) di brief_visual.py, mode "berslot" di paket pendidikan.
   latar, komposisi, warna per benda, suasana) + 2–3 contoh brief bagus
   sebagai pola tiruan; untuk mode konseptual (umum) dan literal (anak).
-- [ ] **14. Blok gaya baru POSITIF-DULU** — deskripsi jelas di depan,
+- [x] **14. Blok gaya baru POSITIF-DULU** — deskripsi jelas di depan,
+  ✅ 23 Okt 2026: blok pendidikan (Fase 2), umum premium-konseptual ditulis ulang positif-dulu (Fase 4), anak sudah positif-dulu sejak 20 Okt; JANGKAR konsistensi kini ada di ketiga paket jenis dan ditempel prompt_gambar (teruji untuk umum, anak, pendidikan).
   larangan dipangkas pendek di ekor, + jangkar konsistensi (frasa gaya
   dan deskripsi tokoh yang SAMA untuk semua gambar dalam satu buku).
 - [x] **15. Pemeriksaan isi gambar** — gambar hasil dibandingkan dengan
@@ -100,7 +101,8 @@
 - [x] **18. Uji bergigi untuk semua gerbang baru** — setiap pemeriksa
   ✅ 23 Okt 2026 untuk gerbang baru: uji_bergigi_v5.py 11/11 (kontrol + suntikan untuk #4, #6, #8, #10, #11, #15, #17).
   baru wajib dibuktikan BISA gagal.
-- [ ] **19. Buku contoh nyata per jenis + gambar uji nyata** — bukti
+- [x] **19. Buku contoh nyata per jenis + gambar uji nyata** — bukti
+  ✅ 23 Okt 2026: buku contoh nyata SEMUA jenis buku utuh — monograf, buku ajar (52+7 gerbang), buku referensi (56+5), umum (57+3), masing-masing dari profilnya + emas regresi; gambar uji nyata monograf (Fase 3). Catatan: indeks referensi ditambahkan pada tahap perakitan (modul indeks_referensi), bukan generator template.
   ujung-ke-ujung tiap jenis sebelum dinyatakan selesai.
 
 ## F. BOOK CHAPTER (terakhir, mode sendiri — BUKAN buku utuh)

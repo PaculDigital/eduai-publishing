@@ -7,22 +7,23 @@
 
 ---
 
-## Ringkasan: 15 selesai penuh, 4 sebagian, 1 belum
+## Ringkasan: 17 selesai penuh, 2 sebagian, 1 belum
 
-> Diperbarui 23 Okt 2026 (Fase 3 — bukti & mutu keseluruhan, branch
-> `agen/wulan/fase1-ssot`): #11, #12, #15, #16, #17, #18 SELESAI.
-> Sisa sebagian: #2 (4 nilai menunggu keputusan), #8 (produksi),
-> #14 (umum/anak), #19 (jenis lain). Sisa belum: #20 book chapter.
+> Diperbarui 23 Okt 2026 (Fase 4 — penyebaran ke semua jenis, branch
+> `agen/wulan/fase1-ssot`): #14 & #19 SELESAI. Semua jenis buku utuh
+> kini terbukti dari profilnya masing-masing. Sisa sebagian: #2
+> (4 nilai menunggu keputusan Bos), #8 (menunggu font di server
+> produksi). Sisa belum: #20 book chapter (Fase 5).
 
 | Bagian | Nomor | Selesai | Sebagian | Belum |
 |---|---|---|---|---|
 | **A** Sumber Tunggal | 1–3 | 2 | 1 | 0 |
 | **B** Mesin | 4–8 | 4 | 1 | 0 |
 | **C** Mutu Tulisan | 9–12 | 4 | 0 | 0 |
-| **D** Mutu Gambar | 13–15 | 2 | 1 | 0 |
-| **E** Bukti & Mutu | 16–19 | 3 | 1 | 0 |
+| **D** Mutu Gambar | 13–15 | 3 | 0 | 0 |
+| **E** Bukti & Mutu | 16–19 | 4 | 0 | 0 |
 | **F** Book Chapter | 20 | 0 | 0 | 1 |
-| **JUMLAH** | **20** | **15** | **4** | **1** |
+| **JUMLAH** | **20** | **17** | **2** | **1** |
 
 ---
 
@@ -66,7 +67,7 @@
 | # | Nomor | Status | Bukti / Alasan |
 |---|---|---|---|
 | **13** | Prompt brief BERSLOT | ✅ **SELESAI jalur pendidikan/monograf** (23 Okt 2026) | `PROMPT_BRIEF_BERSLOT` (5 slot + 2 contoh jadi) di `brief_visual.py`; mode `berslot` di paket pendidikan & profil monograf. Uji fungsi: prompt terkirim terbukti versi berslot |
-| **14** | Blok gaya POSITIF-DULU | 🟡 **SEBAGIAN** (23 Okt 2026) | Blok **pendidikan** ditulis ulang positif-dulu (466 char) + **jangkar konsistensi** ADA & ditempel `prompt_gambar` (teruji) + tersalin ke profil monograf/ajar. Sisa: blok umum & anak (Fase 4). Gerbang placeholder tetap 19/19 |
+| **14** | Blok gaya POSITIF-DULU | ✅ **SELESAI** (23 Okt 2026) | pendidikan ditulis ulang Fase 2; umum (premium-konseptual) ditulis ulang Fase 4; anak sudah positif-dulu. JANGKAR konsistensi ada di ketiga paket & ditempel prompt_gambar — teruji umum/anak/pendidikan; placeholder tetap 19/19 |
 | **15** | Pemeriksaan isi gambar | ✅ **SELESAI** (23 Okt 2026) | lapis 1 terukur (`periksa_gambar.py`) + lapis 2 peninjau terprosedur; terbukti ujung-ke-ujung pada gambar uji nyata monograf (lihat #19) |
 
 ---
@@ -78,7 +79,7 @@
 | **16** | Kwitansi mutu otomatis | ✅ **SELESAI** (23 Okt 2026) | `buat_kwitansi.py` → `<buku>.kwitansi.md`: hasil semua gerbang yang dijalankan + statistik isi + status peninjau jujur. Contoh terbit untuk buku monograf |
 | **17** | Buku emas per jenis | ✅ **SELESAI untuk monograf & induk** (23 Okt 2026) | `emas/{monograf,induk}.json` sidik jari struktural SHA-256 + `uji_regresi_emas.py` (SEMUA SAMA). Jenis lain menyusul Fase 4 |
 | **18** | Uji bergigi semua gerbang baru | ✅ **SELESAI** (23 Okt 2026) | `uji_bergigi_v5.py` **11/11**: kontrol + suntikan untuk #4, #6, #8, #10, #11, #15, #17 |
-| **19** | Buku contoh nyata per jenis | 🟡 **SEBAGIAN** (23 Okt 2026) | MONOGRAF lengkap: buku nyata (gerbang 52/52 + 5/5, TOC terukur) + gambar uji nyata dari prompt rakitan kode repo — isi sesuai kelima slot brief, periksa_gambar 3/3 sesudah skala lebar area. Jenis lain Fase 4 |
+| **19** | Buku contoh nyata per jenis | ✅ **SELESAI** (23 Okt 2026) | monograf (52+5), ajar (52+7), referensi (56+5), umum (57+3) — semua dari profil masing-masing + emas regresi 4 jenis SEMUA SAMA + gambar uji nyata monograf. Indeks referensi = tahap perakitan (modul indeks_referensi, nomor terukur dari render — fungsi baru petakan_istilah_terukur) |
 
 ---
 
@@ -148,3 +149,11 @@ placeholder brief 19/19.*
 #17 ✅ (monograf & induk), #18 ✅ (uji v5 11/11), #19 🟡 (monograf lengkap:
 buku + gambar uji nyata). Tersisa: #20 (Fase 5) + sebagian #2, #8, #14, #19
 (Fase 4 & produksi).*
+*Pemutakhiran Fase 4 (23 Oktober 2026): #14 ✅, #19 ✅. Temuan diperbaiki
+di perjalanan: cek_teks_wajib sempat dua rumah (disatukan ke
+aturan_tulisan); gerbang TB1/TB4 kini membaca profil & generator
+menskalakan lebar tabel ke area profil; contoh induk diperbaiki
+4 sitasi yatim pustaka (tertangkap gerbang tulisan sendiri);
+indeks_referensi dapat jalur halaman TERUKUR dari render.
+Regresi penuh hijau: bergigi 8+3+10+6+2+11, generator 35/35,
+emas 4 jenis SEMUA SAMA, template 50/50, placeholder 19/19.*
