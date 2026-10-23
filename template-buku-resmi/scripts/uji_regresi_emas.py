@@ -25,6 +25,10 @@ KASUS = [
     ('monograf', SINI / 'contoh_monograf.json',
      ['--profil', str(SINI.parent / 'jenis' / 'monograf' / 'profil.json'), '--tanpa-ukur']),
     ('induk', SINI / 'contoh_buku.json', ['--tanpa-gerbang']),
+    ('ajar', SINI / 'contoh_ajar.json',
+     ['--profil', str(SINI.parent / 'jenis' / 'buku-ajar-obe' / 'profil.json'), '--tanpa-ukur']),
+    ('referensi', SINI / 'contoh_referensi.json',
+     ['--profil', str(SINI.parent / 'jenis' / 'buku-referensi' / 'profil.json'), '--tanpa-ukur']),
 ]
 
 

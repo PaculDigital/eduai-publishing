@@ -67,10 +67,33 @@
     "daftar_pustaka_apa7_indentasi_gantung"
   ],
   "aturan_tulisan": {
-    "tone": null,
-    "tone_status": "BELUM ADA - tone_menulis hanya kenal umum/anak/pendidikan; nada buku ajar ditetapkan pada barang 9",
+    "tone": "instruksional akademik - terstruktur dan jelas, menyapa pembaca 'Anda', istilah konsisten, setiap konsep diikuti contoh konkret",
+    "tone_status": "ditetapkan 23 Okt 2026 (barang 9, Fase 4) - selaras nada pendidikan aplikasi",
     "sitasi": "terverifikasi, dilarang mengarang",
-    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)"
+    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)",
+    "kata_terlarang_teks": [
+      "babi",
+      "piggy bank",
+      "minuman keras"
+    ],
+    "cek_teks_wajib": [
+      {
+        "pola": "tujuan instruksional",
+        "label": "TIU/TIK hadir"
+      },
+      {
+        "pola": "latihan",
+        "label": "Latihan hadir"
+      },
+      {
+        "pola": "rangkuman",
+        "label": "Rangkuman hadir"
+      },
+      {
+        "pola": "checklist|daftar periksa",
+        "label": "Checklist hadir"
+      }
+    ]
   },
   "gambar": {
     "mode_brief": "literal",

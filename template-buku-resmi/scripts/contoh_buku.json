@@ -1,131 +1,131 @@
 {
- "alamat": "Jalan Contoh No. 1, Bandung",
- "bab": [
-  {
-   "judul": "Memulai dengan Peta yang Jelas",
-   "paragraf_pembuka": [
-    "Menulis buku bukanlah pekerjaan satu malam. Ia lebih mirip perjalanan jauh yang membutuhkan peta, perbekalan, dan kesabaran untuk tetap berjalan ketika semangat menurun. Bab pertama ini membahas fondasi yang membuat perjalanan menulis menjadi mungkin diselesaikan."
-   ],
-   "romawi": "I",
-   "sub": [
+  "alamat": "Jalan Contoh No. 1, Bandung",
+  "bab": [
     {
-     "judul": "Menemukan Gagasan Inti",
-     "nomor": "1.1.",
-     "paragraf": [
-      "Gagasan inti adalah satu kalimat yang menjelaskan buku ini tentang apa dan untuk siapa ia ditulis. Kalimat yang kabur akan melahirkan bab-bab yang kabur pula, sebab penulis sendiri tidak tahu persis janji apa yang sedang ia tepati kepada pembacanya di setiap halaman.",
-      {
-       "tabel": {
-        "judul": "Tabel 1.1 Contoh Tabel Tahapan Menulis",
-        "kolom": [
-         "Tahap",
-         "Kegiatan",
-         "Hasil"
-        ],
-        "baris": [
-         [
-          "Persiapan",
-          "Menentukan gagasan inti dan pembaca sasaran",
-          "Satu kalimat gagasan"
-         ],
-         [
-          "Penulisan",
-          "Menulis bab mengikuti kerangka yang disusun",
-          "Draf bab lengkap"
-         ],
-         [
-          "Penyuntingan",
-          "Memeriksa alur, bahasa, dan konsistensi istilah",
-          "Naskah siap terbit"
-         ]
-        ]
-       }
-      },
-      "Paragraf pendek pun harus tunduk pada format yang sama."
-     ]
+      "judul": "Memulai dengan Peta yang Jelas",
+      "paragraf_pembuka": [
+        "Menulis buku bukanlah pekerjaan satu malam. Ia lebih mirip perjalanan jauh yang membutuhkan peta, perbekalan, dan kesabaran untuk tetap berjalan ketika semangat menurun. Bab pertama ini membahas fondasi yang membuat perjalanan menulis menjadi mungkin diselesaikan."
+      ],
+      "romawi": "I",
+      "sub": [
+        {
+          "judul": "Menemukan Gagasan Inti",
+          "nomor": "1.1.",
+          "paragraf": [
+            "Gagasan inti adalah satu kalimat yang menjelaskan buku ini tentang apa dan untuk siapa ia ditulis. Kalimat yang kabur akan melahirkan bab-bab yang kabur pula, sebab penulis sendiri tidak tahu persis janji apa yang sedang ia tepati kepada pembacanya di setiap halaman. Keraf (2004) menyebut gagasan inti semacam ini sebagai tumpuan seluruh karangan, karena dari sanalah arah dan batas tulisan ditentukan sejak awal.",
+            {
+              "tabel": {
+                "judul": "Tabel 1.1 Contoh Tabel Tahapan Menulis",
+                "kolom": [
+                  "Tahap",
+                  "Kegiatan",
+                  "Hasil"
+                ],
+                "baris": [
+                  [
+                    "Persiapan",
+                    "Menentukan gagasan inti dan pembaca sasaran",
+                    "Satu kalimat gagasan"
+                  ],
+                  [
+                    "Penulisan",
+                    "Menulis bab mengikuti kerangka yang disusun",
+                    "Draf bab lengkap"
+                  ],
+                  [
+                    "Penyuntingan",
+                    "Memeriksa alur, bahasa, dan konsistensi istilah",
+                    "Naskah siap terbit"
+                  ]
+                ]
+              }
+            },
+            "Paragraf pendek pun harus tunduk pada format yang sama."
+          ]
+        },
+        {
+          "judul": "Menyusun Kerangka Bab",
+          "nomor": "1.2.",
+          "paragraf": [
+            "Kerangka bab bekerja seperti tulang punggung naskah. Ia menahan urutan berpikir agar tidak meloncat-loncat, membantu penulis melihat bagian yang terlalu gemuk dan bagian yang masih kosong, serta memudahkan editor memahami arah buku sejak halaman pertama dibaca. Dalam penelitian, Creswell (2014) menunjukkan bahwa kerangka yang jelas sejak awal menentukan mutu keseluruhan karya yang dihasilkan sesudahnya."
+          ]
+        }
+      ]
     },
     {
-     "judul": "Menyusun Kerangka Bab",
-     "nomor": "1.2.",
-     "paragraf": [
-      "Kerangka bab bekerja seperti tulang punggung naskah. Ia menahan urutan berpikir agar tidak meloncat-loncat, membantu penulis melihat bagian yang terlalu gemuk dan bagian yang masih kosong, serta memudahkan editor memahami arah buku sejak halaman pertama dibaca."
-     ]
+      "judul": "Merawat Kebiasaan Menulis",
+      "paragraf_pembuka": [
+        "Bakat sering dibesar-besarkan, padahal naskah yang selesai hampir selalu lahir dari kebiasaan kecil yang dirawat setiap hari. Bab kedua ini membahas cara menjaga ritme menulis yang realistis di tengah kesibukan pekerjaan dan kehidupan sehari-hari yang tidak pernah benar-benar lengang."
+      ],
+      "romawi": "II",
+      "sub": [
+        {
+          "judul": "Jadwal Kecil yang Konsisten",
+          "nomor": "2.1.",
+          "paragraf": [
+            "Menulis tiga puluh menit setiap hari jauh lebih produktif daripada menunggu akhir pekan yang belum tentu datang. Jadwal kecil menurunkan rasa takut terhadap halaman kosong, karena penulis tahu persis kapan ia duduk, apa yang akan dikerjakan, dan kapan ia boleh berhenti dengan tenang. Semi (2007) menegaskan hal serupa: keterampilan menulis tumbuh dari kebiasaan yang dilatih terus-menerus, bukan dari bakat yang ditunggu datangnya.",
+            {
+              "gambar": {
+                "berkas": "contoh_gambar.png",
+                "keterangan": "Gambar: Contoh diagram batang untuk menguji blok gambar generator.",
+                "lebar_cm": 9.0
+              }
+            },
+            "Konsistensi juga memudahkan penulis mengingat kembali alur pikir bab sebelumnya. Jeda yang terlalu panjang membuat naskah terasa asing, seolah ditulis oleh orang lain, dan penulis harus membayar waktu tambahan hanya untuk memanaskan kembali ingatannya setiap kali mulai menulis. Sugiyono (2019) mengingatkan bahwa konsistensi semacam ini adalah bagian dari disiplin metode: peneliti dan penulis sama-sama bekerja mengikuti rencana yang telah ditetapkan sejak awal, bukan mengubah arah di tengah jalan."
+          ],
+          "subsub": [
+            {
+              "judul": "Menyiapkan Ruang Kerja",
+              "label": "a.",
+              "paragraf": [
+                "Ruang kerja tidak harus mewah, tetapi harus jelas batasnya. Meja yang sama, kursi yang sama, dan jam yang sama memberi sinyal kepada otak bahwa sekarang waktunya menulis, bukan waktunya memeriksa pesan atau memikirkan hal lain yang tidak mendesak."
+              ]
+            },
+            {
+              "judul": "Mengukur Kemajuan",
+              "label": "b.",
+              "paragraf": [
+                "Kemajuan yang terukur membuat semangat lebih mudah dijaga. Catat jumlah kata atau jumlah paragraf setiap sesi, rayakan pencapaian kecilnya, dan gunakan catatan itu untuk menyusun target minggu berikutnya secara jujur dan masuk akal bagi kehidupanmu."
+              ]
+            }
+          ]
+        }
+      ]
     }
-   ]
+  ],
+  "cetakan": "Oktober 2026",
+  "desain_sampul": "Nama Desainer",
+  "editor": "Nama Editor",
+  "email": "redaksi@contoh-penerbit.id",
+  "facebook": "Penerbit Contoh",
+  "isbn": "978-602-000-000-0",
+  "isbn_pdf": "978-602-000-000-1",
+  "judul": "Belajar Menulis Buku Pertama",
+  "jumlah_halaman": null,
+  "kata_pengantar": [
+    "Buku ini lahir dari pertanyaan sederhana yang sering diajukan penulis pemula: bagaimana cara memulai menulis buku pertama tanpa merasa kewalahan di tengah jalan. Banyak naskah berhenti bukan karena idenya buruk, melainkan karena penulis tidak memiliki peta kerja yang jelas sejak awal.",
+    "Melalui bab-bab yang singkat dan terstruktur, buku ini mengajak pembaca menyusun gagasan, merawat kebiasaan menulis, dan menyelesaikan naskah sampai tuntas. Setiap bab ditutup dengan langkah praktis yang bisa langsung dicoba pada hari yang sama, tanpa menunggu waktu yang sempurna."
+  ],
+  "penerbit": "Nama Penerbit",
+  "penulis": "Nama Penulis Contoh",
+  "penyunting": "Nama Penyunting",
+  "tahun": "2026",
+  "tempat_tanggal": "Bandung, 1 Oktober 2026",
+  "tentang_penulis": {
+    "kutipan": "Naskah yang selesai selalu mengalahkan naskah sempurna yang tidak pernah ditulis.",
+    "nama": "Nama Penulis Contoh",
+    "paragraf": [
+      "Nama Penulis Contoh adalah penulis dan editor lepas yang tinggal di Bandung. Ia telah mendampingi puluhan penulis pemula menyelesaikan naskah pertamanya, dan percaya bahwa menulis adalah keterampilan yang bisa dilatih oleh siapa pun yang bersedia meluangkan waktu secara teratur.",
+      "Selain menulis, ia mengajar kelas penulisan daring dan menjadi pembicara pada berbagai lokakarya kepenulisan. Waktu luangnya dihabiskan untuk membaca, merawat tanaman, dan berjalan pagi sambil mencari gagasan baru untuk buku berikutnya yang sedang ia susun perlahan."
+    ]
   },
-  {
-   "judul": "Merawat Kebiasaan Menulis",
-   "paragraf_pembuka": [
-    "Bakat sering dibesar-besarkan, padahal naskah yang selesai hampir selalu lahir dari kebiasaan kecil yang dirawat setiap hari. Bab kedua ini membahas cara menjaga ritme menulis yang realistis di tengah kesibukan pekerjaan dan kehidupan sehari-hari yang tidak pernah benar-benar lengang."
-   ],
-   "romawi": "II",
-   "sub": [
-    {
-     "judul": "Jadwal Kecil yang Konsisten",
-     "nomor": "2.1.",
-     "paragraf": [
-      "Menulis tiga puluh menit setiap hari jauh lebih produktif daripada menunggu akhir pekan yang belum tentu datang. Jadwal kecil menurunkan rasa takut terhadap halaman kosong, karena penulis tahu persis kapan ia duduk, apa yang akan dikerjakan, dan kapan ia boleh berhenti dengan tenang.",
-      {
-       "gambar": {
-        "berkas": "contoh_gambar.png",
-        "keterangan": "Gambar: Contoh diagram batang untuk menguji blok gambar generator.",
-        "lebar_cm": 9.0
-       }
-      },
-      "Konsistensi juga memudahkan penulis mengingat kembali alur pikir bab sebelumnya. Jeda yang terlalu panjang membuat naskah terasa asing, seolah ditulis oleh orang lain, dan penulis harus membayar waktu tambahan hanya untuk memanaskan kembali ingatannya setiap kali mulai menulis."
-     ],
-     "subsub": [
-      {
-       "judul": "Menyiapkan Ruang Kerja",
-       "label": "a.",
-       "paragraf": [
-        "Ruang kerja tidak harus mewah, tetapi harus jelas batasnya. Meja yang sama, kursi yang sama, dan jam yang sama memberi sinyal kepada otak bahwa sekarang waktunya menulis, bukan waktunya memeriksa pesan atau memikirkan hal lain yang tidak mendesak."
-       ]
-      },
-      {
-       "judul": "Mengukur Kemajuan",
-       "label": "b.",
-       "paragraf": [
-        "Kemajuan yang terukur membuat semangat lebih mudah dijaga. Catat jumlah kata atau jumlah paragraf setiap sesi, rayakan pencapaian kecilnya, dan gunakan catatan itu untuk menyusun target minggu berikutnya secara jujur dan masuk akal bagi kehidupanmu."
-       ]
-      }
-     ]
-    }
-   ]
-  }
- ],
- "cetakan": "Oktober 2026",
- "desain_sampul": "Nama Desainer",
- "editor": "Nama Editor",
- "email": "redaksi@contoh-penerbit.id",
- "facebook": "Penerbit Contoh",
- "isbn": "978-602-000-000-0",
- "isbn_pdf": "978-602-000-000-1",
- "judul": "Belajar Menulis Buku Pertama",
- "jumlah_halaman": null,
- "kata_pengantar": [
-  "Buku ini lahir dari pertanyaan sederhana yang sering diajukan penulis pemula: bagaimana cara memulai menulis buku pertama tanpa merasa kewalahan di tengah jalan. Banyak naskah berhenti bukan karena idenya buruk, melainkan karena penulis tidak memiliki peta kerja yang jelas sejak awal.",
-  "Melalui bab-bab yang singkat dan terstruktur, buku ini mengajak pembaca menyusun gagasan, merawat kebiasaan menulis, dan menyelesaikan naskah sampai tuntas. Setiap bab ditutup dengan langkah praktis yang bisa langsung dicoba pada hari yang sama, tanpa menunggu waktu yang sempurna."
- ],
- "penerbit": "Nama Penerbit",
- "penulis": "Nama Penulis Contoh",
- "penyunting": "Nama Penyunting",
- "tahun": "2026",
- "tempat_tanggal": "Bandung, 1 Oktober 2026",
- "tentang_penulis": {
-  "kutipan": "Naskah yang selesai selalu mengalahkan naskah sempurna yang tidak pernah ditulis.",
-  "nama": "Nama Penulis Contoh",
-  "paragraf": [
-   "Nama Penulis Contoh adalah penulis dan editor lepas yang tinggal di Bandung. Ia telah mendampingi puluhan penulis pemula menyelesaikan naskah pertamanya, dan percaya bahwa menulis adalah keterampilan yang bisa dilatih oleh siapa pun yang bersedia meluangkan waktu secara teratur.",
-   "Selain menulis, ia mengajar kelas penulisan daring dan menjadi pembicara pada berbagai lokakarya kepenulisan. Waktu luangnya dihabiskan untuk membaca, merawat tanaman, dan berjalan pagi sambil mencari gagasan baru untuk buku berikutnya yang sedang ia susun perlahan."
+  "twitter": "@penerbitcontoh",
+  "web": "www.contoh-penerbit.id",
+  "whatsapp": "0812-0000-0000",
+  "daftar_pustaka": [
+    "Creswell, J. W. (2014). Research design: Qualitative, quantitative, and mixed methods approaches (4th ed.). SAGE Publications.",
+    "Keraf, G. (2004). Komposisi: Sebuah pengantar kemahiran bahasa. Nusa Indah.",
+    "Semi, M. A. (2007). Dasar-dasar keterampilan menulis. Angkasa.",
+    "Sugiyono. (2019). Metode penelitian kuantitatif, kualitatif, dan R&D. Alfabeta."
   ]
- },
- "twitter": "@penerbitcontoh",
- "web": "www.contoh-penerbit.id",
- "whatsapp": "0812-0000-0000",
- "daftar_pustaka": [
-  "Creswell, J. W. (2014). Research design: Qualitative, quantitative, and mixed methods approaches (4th ed.). SAGE Publications.",
-  "Keraf, G. (2004). Komposisi: Sebuah pengantar kemahiran bahasa. Nusa Indah.",
-  "Semi, M. A. (2007). Dasar-dasar keterampilan menulis. Angkasa.",
-  "Sugiyono. (2019). Metode penelitian kuantitatif, kualitatif, dan R&D. Alfabeta."
- ]
 }

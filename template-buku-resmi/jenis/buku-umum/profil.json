@@ -44,7 +44,13 @@
   "aturan_tulisan": {
     "tone": "buku umum: formal-santai naratif (skill buku-umum); buku anak: sapa 'kamu', kalimat pendek",
     "sitasi": "buku umum: sitasi menopang klaim faktual + verifikasi anekdot/kisah nyata; gate plagiarisme sebelum final (barang 11)",
-    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)"
+    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)",
+    "kata_terlarang_teks": [
+      "babi",
+      "piggy bank",
+      "minuman keras"
+    ],
+    "cek_teks_wajib": []
   },
   "gambar": {
     "umum": {
@@ -61,8 +67,13 @@
         "teks": "Children's educational illustration, clean flat cartoon style, clear dark outlines around every shape, simple rounded forms, cheerful but controlled colors, on a clean PURE WHITE background (hex #FFFFFF), no cream, no beige, no blue tint, no gradient background, no vignette, no paper texture, no grain, no shadows on the background, no gradients on objects, no 3D render, no photorealism, no text, no words, no letters, no numbers, no watermark. SCENE — illustrate EXACTLY this moment, nothing else: {brief}. The scene above is the SUBJECT; keep every object named in it"
       }
     },
-    "jangkar_konsistensi": null,
-    "status": "Blok gaya di bawah ini adalah teks yang SEDANG BERJALAN (disalin persis dari sumbernya). Penulisan ulang mutu = barang 13/14 RENCANA-BANGUN-SSOT; jangkar konsistensi belum ada."
+    "jangkar_konsistensi": "Consistent series style for the whole book: the same flat vector editorial style, the same deep navy and terracotta palette, and one clear visual metaphor per illustration.",
+    "status": "Blok gaya di bawah ini adalah teks yang SEDANG BERJALAN (disalin persis dari sumbernya). Penulisan ulang mutu = barang 13/14 RENCANA-BANGUN-SSOT; jangkar konsistensi belum ada.",
+    "blok_gaya_saat_ini": {
+      "sumber": "brief_visual.STYLE_BUKU['premium-konseptual'] - ditulis ulang positif-dulu 23 Okt 2026 (barang 14); gaya flat TIDAK berubah, keputusan flat vs 3D menunggu Bos",
+      "teks": "Premium conceptual editorial illustration for a bestselling non-fiction book: {brief}. One clever visual metaphor as a single central focal subject, modern flat vector style, limited palette of deep navy and warm terracotta, crisp thin dark outlines around every shape, generous negative space, minimalist elegant composition, smooth flat surfaces, on a clean pure white background (hex #FFFFFF). No text, no words, no letters, no watermark, no gradients, no photorealism, no 3D, no clutter, no cream or beige tint."
+    },
+    "jangkar_status": "ADA untuk umum & anak & pendidikan (23 Okt 2026)"
   },
   "menunggu_keputusan": [
     "buku umum dewasa: setelan induk 14x20 ini atau pindah B5/TNR (skill menulis B5; dokumen STANDAR menulis A5) - keputusan Bos",

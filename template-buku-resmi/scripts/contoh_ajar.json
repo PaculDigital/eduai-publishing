@@ -1,0 +1,82 @@
+{
+  "alamat": "Jl. Pendidikan No. 1",
+  "bab": [
+    {
+      "judul": "Konsep Dasar dan Data",
+      "paragraf_pembuka": [],
+      "romawi": "I",
+      "sub": [
+        {
+          "judul": "Tujuan Pembelajaran",
+          "paragraf": [
+            "Tujuan Instruksional Umum (TIU): sesudah mempelajari bab ini Anda mampu menjelaskan peran statistika dalam penelitian dan membedakan jenis-jenis data. Tujuan Instruksional Khusus (TIK): Anda mampu memberi contoh data nominal, ordinal, interval, dan rasio dari kehidupan sehari-hari di sekitar Anda.",
+            "Statistika adalah cara berpikir yang tertib ketika kita berhadapan dengan data. Sugiyono (2019) menekankan bahwa statistika membantu peneliti menarik kesimpulan yang dapat dipertanggungjawabkan dari data yang terkumpul di lapangan."
+          ],
+          "nomor": "1.1"
+        },
+        {
+          "judul": "Latihan dan Checklist",
+          "paragraf": [
+            "Latihan 1.1: kumpulkan sepuluh contoh data dari lingkungan Anda, lalu kelompokkan menurut jenisnya. Latihan dikerjakan mandiri dan dibahas pada pertemuan berikutnya bersama dosen pengampu di kelas.",
+            "Checklist pemahaman bab ini: saya dapat menjelaskan perbedaan data kualitatif dan kuantitatif; saya dapat memberi contoh keempat skala pengukuran; saya dapat menyebutkan langkah awal sebelum data diolah lebih lanjut.",
+            "Rangkuman: bab ini menegaskan bahwa statistika berangkat dari data, dan mutu kesimpulan tidak pernah melebihi mutu data yang dikumpulkan. Walpole (2018) mengingatkan hal yang sama: ketelitian sejak pengumpulan data menentukan nilai seluruh analisis sesudahnya."
+          ],
+          "nomor": "1.2"
+        }
+      ]
+    },
+    {
+      "judul": "Penyajian Data",
+      "paragraf_pembuka": [],
+      "romawi": "II",
+      "sub": [
+        {
+          "judul": "Tujuan Pembelajaran",
+          "paragraf": [
+            "Tujuan Instruksional Umum (TIU): Anda mampu menyajikan data dalam tabel dan grafik yang benar. Tujuan Instruksional Khusus (TIK): Anda mampu menyusun tabel distribusi frekuensi dan memilih grafik yang sesuai dengan jenis data yang Anda miliki."
+          ],
+          "nomor": "2.1"
+        },
+        {
+          "judul": "Latihan dan Checklist",
+          "paragraf": [
+            "Latihan 2.1: sajikan data tinggi badan kelas Anda dalam tabel distribusi frekuensi, lalu buatlah histogramnya. Latihan ini melatih ketelitian Anda membaca pola data sebelum masuk ke ukuran pemusatan.",
+            "Checklist pemahaman bab ini: saya dapat menyusun tabel frekuensi; saya dapat membedakan histogram dan diagram batang; saya dapat menuliskan judul dan sumber pada setiap tabel yang saya buat.",
+            "Rangkuman: penyajian yang baik membuat data berbicara dengan jelas. Tabel dan grafik bukan hiasan, melainkan alat pertama untuk mengenali pola, pencilan, dan kejanggalan pada data penelitian Anda."
+          ],
+          "nomor": "2.2"
+        }
+      ]
+    }
+  ],
+  "cetakan": "Pertama",
+  "daftar_pustaka": [
+    "Sugiyono. (2019). Metode penelitian kuantitatif. Bandung: Alfabeta.",
+    "Walpole, R. E. (2018). Pengantar statistika. Jakarta: Gramedia."
+  ],
+  "desain_sampul": "Desainer Contoh",
+  "editor": "Editor Contoh",
+  "email": "redaksi@contoh.id",
+  "facebook": "fb.contoh.id",
+  "isbn": "978-602-000-000-0",
+  "isbn_pdf": "978-602-000-000-1",
+  "judul": "Dasar-Dasar Statistika untuk Penelitian",
+  "jumlah_halaman": "0",
+  "kata_pengantar": [
+    "Buku ajar ini disusun mengikuti Rencana Pembelajaran Semester mata kuliah Statistika. Setiap bab dibuka dengan tujuan pembelajaran dan ditutup dengan latihan serta rangkuman, agar Anda dapat belajar secara bertahap dan terukur dari pertemuan ke pertemuan."
+  ],
+  "penerbit": "Penerbit Contoh",
+  "penulis": "Tim Dosen Statistika",
+  "penyunting": "Penyunting Contoh",
+  "tahun": "2026",
+  "tempat_tanggal": "Jakarta, Januari 2026",
+  "tentang_penulis": {
+    "nama": "Tim Dosen Statistika",
+    "paragraf": [
+      "Tim Dosen Statistika adalah kelompok pengajar yang telah mendampingi pembelajaran statistika terapan bagi mahasiswa ilmu sosial selama bertahun-tahun, dengan perhatian khusus pada cara belajar yang runtut dan ramah bagi pemula."
+    ]
+  },
+  "twitter": "@contoh",
+  "web": "www.contoh.id",
+  "whatsapp": "0812-0000-0000"
+}

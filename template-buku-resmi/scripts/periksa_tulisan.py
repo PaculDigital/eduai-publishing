@@ -115,7 +115,7 @@ def periksa(path, profil):
        not ketemu, f'ditemukan: {ketemu}')
 
     print('\n== BAGIAN WAJIB TULISAN ==')
-    for cek in profil.get('cek_teks_wajib', []):
+    for cek in profil.get('aturan_tulisan', {}).get('cek_teks_wajib', []):
         ok(f"T3 hadir: {cek['label']}",
            bool(re.search(cek['pola'], semua, re.I)),
            f"pola '{cek['pola']}' tidak ditemukan di teks")

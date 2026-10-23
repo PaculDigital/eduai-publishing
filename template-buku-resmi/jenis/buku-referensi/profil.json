@@ -24,7 +24,11 @@
       "pt": 12,
       "sz": 24
     },
-    "font_judul": null,
+    "font_judul": {
+      "nama": "Times New Roman",
+      "pt": 16,
+      "sz": 32
+    },
     "spasi": {
       "jenis": "kelipatan",
       "nilai": 1.15,
@@ -34,7 +38,8 @@
       "min": 150,
       "maks": null
     },
-    "target_bab": "8-12"
+    "target_bab": "8-12",
+    "font_judul_status": "SEMENTARA - usulan Wulan (TNR 16), menunggu keputusan Bos"
   },
   "unsur_wajib": [
     "indeks_subjek",
@@ -47,7 +52,23 @@
   "aturan_tulisan": {
     "tone": "akademik-presisi dengan suara/posisi penulis (skill buku-referensi)",
     "sitasi": "per-klaim: setiap klaim faktual wajib sumber; verifikasi anti-halusinasi 3 lapis (eksistensi, atribusi, makna) - barang 12",
-    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)"
+    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)",
+    "kata_terlarang_teks": [
+      "babi",
+      "piggy bank",
+      "minuman keras"
+    ],
+    "cek_teks_wajib": [
+      {
+        "pola": "posisi penulis|pandangan penulis",
+        "label": "Posisi penulis eksplisit"
+      },
+      {
+        "pola": "perbandingan|komparasi",
+        "label": "Tabel komparasi hadir"
+      }
+    ],
+    "cek_indeks": "Indeks subjek & nama WAJIB hadir di buku final - ditambahkan modul indeks_referensi.py pada jalur perakitan (bukan generator template); nomor halamannya dari render (petakan_istilah_terukur), bukan perkiraan."
   },
   "gambar": {
     "mode_brief": "konseptual",

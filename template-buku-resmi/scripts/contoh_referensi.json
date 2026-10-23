@@ -1,0 +1,91 @@
+{
+  "alamat": "Jl. Pendidikan No. 1",
+  "bab": [
+    {
+      "judul": "Peta Teori dan Perdebatan",
+      "paragraf_pembuka": [],
+      "romawi": "I",
+      "sub": [
+        {
+          "judul": "Akar dan Perkembangan Teori",
+          "paragraf": [
+            "Teori organisasi modern tumbuh dari kebutuhan memahami perilaku manusia di dalam struktur kerja yang makin kompleks. Weber (2019) meletakkan fondasi birokrasi sebagai bentuk rasional pengelolaan, sedangkan perkembangannya dikritisi secara tajam oleh Barnard (2020) melalui perhatian pada kerja sama dan unsur manusiawi.",
+            "Posisi penulis dalam perdebatan ini jelas: birokrasi tetap diperlukan sebagai kerangka ketertiban, tetapi ia hanya bekerja bila dilengkapi kepercayaan dan komunikasi yang hidup. Pandangan ini menengahi dua kutub yang selama ini dipertentangkan secara kaku dalam banyak buku teks pengantar."
+          ],
+          "nomor": "1.1"
+        }
+      ]
+    },
+    {
+      "judul": "Perbandingan Antar Aliran",
+      "paragraf_pembuka": [],
+      "romawi": "II",
+      "sub": [
+        {
+          "judul": "Tabel Komparasi",
+          "paragraf": [
+            "Perbandingan berikut merangkum perbedaan pokok antar aliran. Setiap aliran dibaca dari sumber primernya dan disilangkan dengan kajian mutakhir, agar pembaca melihat peta perdebatan secara utuh dan tidak terjebak pada ringkasan pihak kedua.",
+            {
+              "tabel": {
+                "baris": [
+                  [
+                    "Aliran klasik",
+                    "Struktur dan aturan",
+                    "Efisiensi"
+                  ],
+                  [
+                    "Aliran perilaku",
+                    "Manusia dan motivasi",
+                    "Kepuasan kerja"
+                  ],
+                  [
+                    "Aliran sistem",
+                    "Keterbukaan lingkungan",
+                    "Adaptasi"
+                  ]
+                ],
+                "judul": "Tabel 2.1 Perbandingan Tiga Aliran Teori Organisasi",
+                "kolom": [
+                  "Aliran",
+                  "Fokus utama",
+                  "Ukuran keberhasilan"
+                ]
+              }
+            }
+          ],
+          "nomor": "2.1"
+        }
+      ]
+    }
+  ],
+  "cetakan": "Pertama",
+  "daftar_pustaka": [
+    "Barnard, C. I. (2020). Fungsi-fungsi eksekutif. Jakarta: Penerbit Contoh.",
+    "Weber, M. (2019). Ekonomi dan masyarakat. Jakarta: Penerbit Contoh."
+  ],
+  "desain_sampul": "Desainer Contoh",
+  "editor": "Editor Contoh",
+  "email": "redaksi@contoh.id",
+  "facebook": "fb.contoh.id",
+  "isbn": "978-602-000-000-2",
+  "isbn_pdf": "978-602-000-000-3",
+  "judul": "Teori Organisasi: Peta dan Perdebatan",
+  "jumlah_halaman": "0",
+  "kata_pengantar": [
+    "Buku referensi ini memetakan teori organisasi dari sumber primernya. Setiap bab menghadirkan tabel komparasi antar aliran dan ditutup dengan posisi penulis yang dinyatakan secara eksplisit, agar pembaca dapat menilai kekuatan dan keterbatasan setiap aliran secara adil."
+  ],
+  "penerbit": "Penerbit Contoh",
+  "penulis": "J. T. Wirastomo",
+  "penyunting": "Penyunting Contoh",
+  "tahun": "2026",
+  "tempat_tanggal": "Jakarta, Januari 2026",
+  "tentang_penulis": {
+    "nama": "J. T. Wirastomo",
+    "paragraf": [
+      "Penulis adalah pengajar dan peneliti bidang manajemen yang menaruh perhatian pada sejarah pemikiran organisasi. Buku ini disusun dari catatan kuliah dan telaah pustaka selama lebih dari satu dasawarsa mengajar teori organisasi di kelas sarjana dan magister."
+    ]
+  },
+  "twitter": "@contoh",
+  "web": "www.contoh.id",
+  "whatsapp": "0812-0000-0000"
+}

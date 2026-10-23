@@ -440,7 +440,39 @@ def terapkan_profil(doc, sty, profil):
     tab_pos = f['area_teks_twip'] - 515
     assert sty.count('w:pos="5938"') == 2, 'tab TOC tidak persis 2'
     sty = sty.replace('w:pos="5938"', f'w:pos="{tab_pos}"')
+    doc = _skala_tabel(doc, f['area_teks_twip'])
     return doc, sty
+
+
+def _skala_tabel(doc, area_target):
+    """Lebar tabel mengikuti area teks profil (pembangun tabel memakai
+    lebar induk 6453). Kolom diskala proporsional; gridCol & tcW diubah
+    konsisten per kolom."""
+    def skala_tabel(m):
+        t = m.group(0)
+        grid = [int(x) for x in re.findall(r'<w:gridCol w:w="(\d+)"', t)]
+        total = sum(grid)
+        if not grid or total == area_target:
+            return t
+        baru, jalan = [], 0
+        for i, g in enumerate(grid):
+            if i == len(grid) - 1:
+                baru.append(area_target - jalan)
+            else:
+                v = round(g * area_target / total)
+                baru.append(v)
+                jalan += v
+        it = iter(baru)
+        t = re.sub(r'<w:gridCol w:w="\d+"',
+                   lambda mm: f'<w:gridCol w:w="{next(it)}"', t)
+        # tcW per sel mengikuti urutan kolom di setiap baris
+        def skala_baris(bm):
+            b = bm.group(0)
+            it2 = iter(baru)
+            return re.sub(r'<w:tcW w:w="\d+" w:type="dxa"/>',
+                          lambda mm: f'<w:tcW w:w="{next(it2, baru[-1])}" w:type="dxa"/>', b)
+        return re.sub(r'<w:tr(?: [^>]*)?>.*?</w:tr>', skala_baris, t, flags=re.S)
+    return re.sub(r'<w:tbl>.*?</w:tbl>', skala_tabel, doc, flags=re.S)
 
 
 def buat(spec, keluaran, spec_dir='.', profil=None):

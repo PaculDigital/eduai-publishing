@@ -58,6 +58,16 @@
       "babi",
       "piggy bank",
       "minuman keras"
+    ],
+    "cek_teks_wajib": [
+      {
+        "label": "pernyataan kebaruan / novelty",
+        "pola": "kebaruan|novelty"
+      },
+      {
+        "label": "keterbatasan penelitian",
+        "pola": "keterbatasan"
+      }
     ]
   },
   "gambar": {
@@ -71,15 +81,5 @@
   },
   "menunggu_keputusan": [
     "gutter A5/B5 (usulan Wulan: 0)"
-  ],
-  "cek_teks_wajib": [
-    {
-      "label": "pernyataan kebaruan / novelty",
-      "pola": "kebaruan|novelty"
-    },
-    {
-      "label": "keterbatasan penelitian",
-      "pola": "keterbatasan"
-    }
   ]
 }

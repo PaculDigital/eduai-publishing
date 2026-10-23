@@ -104,7 +104,7 @@ def periksa(path, wajib_lebih=0, profil=None, wajib_pustaka=False):
          'font_isi': 'Palatino Linotype', 'sz_isi': 20,
          'font_judul': 'Trajan Pro', 'sz_judul': 44,
          'font_normal': 'Times New Roman', 'sz_normal': 24,
-         'line_cap': 240, 'tab_pos': 5938}
+         'line_cap': 240, 'tab_pos': 5938, 'area_teks': 6453}
     if profil:
         f = profil['format']
         u = f['ukuran']
@@ -118,7 +118,8 @@ def periksa(path, wajib_lebih=0, profil=None, wajib_pustaka=False):
                   'font_normal': f['font_isi']['nama'],
                   'sz_normal': f['font_isi']['sz'],
                   'line_cap': f['spasi']['line_twip'],
-                  'tab_pos': f['area_teks_twip'] - 515})
+                  'tab_pos': f['area_teks_twip'] - 515,
+                  'area_teks': f['area_teks_twip']})
         if f.get('font_judul'):
             P.update({'font_judul': f['font_judul']['nama'],
                       'sz_judul': f['font_judul']['sz']})
@@ -450,7 +451,7 @@ def periksa(path, wajib_lebih=0, profil=None, wajib_pustaka=False):
         lebar_salah, garis_salah, kepala_salah, run_salah = [], [], [], []
         for ti, t in enumerate(tbls):
             grid = [tw(x) for x in re.findall(r'<w:gridCol w:w="(\d+)"', t)]
-            if sum(x for x in grid if x) != 6453:
+            if sum(x for x in grid if x) != P['area_teks']:
                 lebar_salah.append((ti, sum(x for x in grid if x)))
             borders = ambil(t, r'<w:tblBorders>(.*?)</w:tblBorders>') or ''
             if borders.count('w:val="single"') < 6 or borders.count('w:color="808080"') < 6:
@@ -461,16 +462,16 @@ def periksa(path, wajib_lebih=0, profil=None, wajib_pustaka=False):
             for run in re.findall(r'<w:r(?: [^>]*)?>.*?</w:r>', t, re.S):
                 if '<w:t' not in run:
                     continue
-                if (ambil(run, r'w:ascii="([^"]+)"') != 'Palatino Linotype'
-                        or tw(ambil(run, r'<w:sz w:val="(\d+)"')) != 20):
+                if (ambil(run, r'w:ascii="([^"]+)"') != P['font_isi']
+                        or tw(ambil(run, r'<w:sz w:val="(\d+)"')) != P['sz_isi']):
                     run_salah.append(ti)
-        ok('TB1 lebar total tiap tabel = 6453 twip (area teks)', not lebar_salah,
+        ok(f"TB1 lebar total tiap tabel = {P['area_teks']} twip (area teks)", not lebar_salah,
            f'tabel salah: {lebar_salah[:3]}')
         ok('TB2 garis tabel single warna 808080 (6 sisi)', not garis_salah,
            f'tabel salah: {garis_salah[:3]}')
         ok('TB3 baris kepala tabel latar F2F2F2', not kepala_salah,
            f'tabel salah: {kepala_salah[:3]}')
-        ok('TB4 semua run sel tabel Palatino 10 pt', not run_salah,
+        ok(f"TB4 semua run sel tabel {P['font_isi']} {P['sz_isi'] // 2} pt", not run_salah,
            f'tabel salah: {sorted(set(run_salah))[:3]}')
 
     # ── GB: GAMBAR zona konten (v2 generator) ──────────────────────────
