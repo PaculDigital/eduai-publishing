@@ -19,7 +19,7 @@
 | **Buku Referensi** | `buku_referensi` | **B5** 17,6 × 25,0 | 2,0 cm | Times New Roman **12 pt** | TNR **16 pt** ⚠️ | 1,15 | 150+ hlm |
 | **Buku Ajar OBE** | `buku_ajar` | **B5** default / **A5** pilihan | 2,0 cm | Times New Roman **12 pt** | TNR **16 pt** | 1,15 | — |
 | **Buku Umum** | `buku_umum` | **B5** 17,6 × 25,0 | 2,0 cm | Times New Roman **12 pt** | — | 1,15 | 8–12 bab |
-| **Book Chapter** | `book_chapter` | **A5** 14,8 × 21,0 | 2,0 cm | Cambria | Cambria | 1,15 | **maks 15 hlm** |
+| **Book Chapter** | `book_chapter` | **A5** 14,8 × 21,0 | 2,0 cm | Cambria **11 pt** | Cambria **14 pt** | **None** | **maks 15 hlm** |
 | **Buku Anak** | `buku_umum` (jenis anak) | **14 × 20 cm** | 1,60 / 1,02 cm | Palatino **10 pt** | Trajan Pro **22 pt** | line 240 | — |
 
 > ⚠️ = belum ditetapkan skill, usulan Wulan, **perlu ACC Bos**.
@@ -35,7 +35,7 @@
 |---|---|---|
 | **14 × 20** (template induk) | 14,0 × 20,0 | **7938 × 11340** |
 | **A5** | 14,8 × 21,0 | **8391 × 11906** |
-| **B5** | 17,6 × 25,0 | **9978 × 14173** |
+| **B5** | 17,6 × 25,0 | **9978 × 14174** |
 
 ### Batas halaman (margin) dalam twip
 
@@ -58,7 +58,7 @@
 |---|---|
 | Template induk | 11,38 cm (**6453** twip) |
 | A5 | 10,8 cm (**6123** twip) |
-| B5 | 13,6 cm (**7710** twip) |
+| B5 | 13,6 cm (**7711** twip) |
 
 ---
 
@@ -117,7 +117,7 @@ Format cuma separuh. **Kalau format benar tapi isi salah, hasilnya buku umum ber
 | **Monograf** | **pernyataan NOVELTY**, kebaruan tegas, keterbatasan penelitian |
 | **Buku referensi** | **indeks subjek + indeks nama**, tabel komparasi teori tiap bab, posisi penulis |
 | **Buku ajar OBE** | **TIU + TIK + Latihan + Checklist** tiap bab, diturunkan dari RPS OBE |
-| **Book chapter** | **maks 15 halaman**, glosarium tabel 2 kolom |
+| **Book chapter** | **maks 15 halaman A5**, glosarium **tabel 2 kolom**, 15 section A–O, ubah PDF Turnitin ke A4 |
 | Buku anak | "kamu", kalimat pendek, ilustrasi banyak, larangan budaya ketat |
 
 ---
@@ -151,6 +151,7 @@ periksa_buku_template.py --profil jenis/monograf/profil.json
 | Spesifikasi monograf | ✅ **ADA** (berkas ini) |
 | Spesifikasi buku referensi | ✅ **ADA** |
 | Spesifikasi buku ajar OBE | ✅ **ADA** |
+| Spesifikasi book chapter | ✅ **ADA** |
 | **Berkas template A5** | ⬜ **BELUM** |
 | **Berkas template B5** | ⬜ **BELUM** |
 | **`profil.json` per jenis** | ⬜ **BELUM** |

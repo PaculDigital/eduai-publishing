@@ -46,13 +46,13 @@
 | Item | cm | twip |
 |---|---|---|
 | Lebar B5 | 17,6 | **9978** |
-| Tinggi B5 | 25,0 | **14173** |
+| Tinggi B5 | 25,0 | **14174** |
 | Lebar A5 | 14,8 | **8391** |
 | Tinggi A5 | 21,0 | **11906** |
 | Margin semua sisi | 2,0 | **1134** |
-| Area teks B5 | 13,6 | **7710** |
+| Area teks B5 | 13,6 | **7711** |
 | Area teks A5 | 10,8 | **6123** |
-| Indentasi gantung | 0,6 | **340** |
+| Indentasi gantung | 0,6 | **341** |
 
 > Rumus: `twip = cm ÷ 2,54 × 1440`.
 

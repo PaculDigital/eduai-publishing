@@ -34,12 +34,12 @@
 | Item | cm | twip |
 |---|---|---|
 | Lebar B5 | 17,6 | **9978** |
-| Tinggi B5 | 25,0 | **14173** |
+| Tinggi B5 | 25,0 | **14174** |
 | Margin atas | 2,0 | **1134** |
 | Margin bawah | 2,0 | **1134** |
 | Margin kiri | 2,0 | **1134** |
 | Margin kanan | 2,0 | **1134** |
-| Area teks (lebar) | 13,6 | **7710** |
+| Area teks (lebar) | 13,6 | **7711** |
 
 > Rumus: `twip = cm ÷ 2,54 × 1440`. Contoh: 17,6 ÷ 2,54 × 1440 = **9978**.
 
