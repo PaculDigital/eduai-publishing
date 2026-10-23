@@ -1,0 +1,111 @@
+{
+  "aturan_tulisan": {
+    "cek_teks_wajib": [
+      {
+        "label": "Abstrak hadir",
+        "pola": "abstrak"
+      },
+      {
+        "label": "Kata Kunci hadir",
+        "pola": "kata kunci"
+      },
+      {
+        "label": "Pendahuluan hadir",
+        "pola": "pendahuluan"
+      },
+      {
+        "label": "Glosarium hadir",
+        "pola": "glosarium"
+      }
+    ],
+    "kata_terlarang_teks": [
+      "babi",
+      "piggy bank",
+      "minuman keras"
+    ],
+    "tone": "akademik formal (mengikuti bab & buku induk kolaborasi)"
+  },
+  "format": {
+    "area_teks_twip": 6123,
+    "font_heading": {
+      "nama": "Cambria",
+      "pt": 14,
+      "sz": 28,
+      "tebal": true,
+      "warna": "hitam (tanpa warna)"
+    },
+    "font_isi": {
+      "nama": "Cambria",
+      "pt": 11,
+      "sz": 22
+    },
+    "font_judul": {
+      "nama": "Cambria",
+      "pt": 14,
+      "sz": 28,
+      "tebal": true
+    },
+    "gutter_twip": 0,
+    "indentasi": {
+      "bullet_baris_pertama_twip": -284,
+      "bullet_kiri_twip": 567,
+      "isi_baris_pertama_twip": 567,
+      "isi_kiri_twip": 284,
+      "tujuan_pembelajaran_kiri_twip": 738
+    },
+    "judul_bab": {
+      "catatan": "BUKAN style Heading - koreksi resmi spesifikasi",
+      "rata": "tengah",
+      "style": "Normal"
+    },
+    "maks_halaman": 15,
+    "margin_twip": {
+      "atas": 1134,
+      "bawah": 1134,
+      "kanan": 1134,
+      "kiri": 1134
+    },
+    "pdf_turnitin": "A4 - DILARANG diubah ke A5",
+    "spasi": {
+      "catatan": "line_spacing TIDAK diset per paragraf - koreksi resmi spesifikasi",
+      "jenis": "bawaan (None)",
+      "line_twip": null
+    },
+    "ukuran": {
+      "lebar_cm": 14.8,
+      "lebar_twip": 8391,
+      "nama": "A5",
+      "tinggi_cm": 21.0,
+      "tinggi_twip": 11906
+    }
+  },
+  "gambar": {
+    "status": "Book chapter mengikuti aturan gambar buku induk kolaborasi; blok gaya sendiri belum ditetapkan penerbit bab."
+  },
+  "id": "book_chapter",
+  "menunggu_keputusan": [],
+  "mode": "book_chapter",
+  "nama": "Book Chapter",
+  "struktur": [
+    "A Judul Bab",
+    "B Penulis",
+    "C Abstrak",
+    "D Kata Kunci",
+    "(Tujuan Pembelajaran)",
+    "E-M Section isi (pertama = Pendahuluan)",
+    "N Referensi - page break sebelum",
+    "O Glosarium - page break sebelum, TABEL 2 kolom"
+  ],
+  "sumber_keputusan": "SPESIFIKASI.md jenis/book-chapter (diukur dari DOCX BAB 7 asli) + penegasan Bos 23 Okt 2026: book chapter = penggalan 1 bab, mode sendiri di luar daftar wajib-sama buku utuh",
+  "versi": 1,
+  "unsur_wajib": [
+    "Abstrak",
+    "Kata Kunci",
+    "Pendahuluan",
+    "Tujuan Pembelajaran (learning objectives)",
+    "Referensi (page break sebelum)",
+    "Glosarium TABEL 2 kolom (page break sebelum)",
+    "CV Penulis (style No Spacing, space_before 24 pt)",
+    "Maksimal 15 halaman A5"
+  ]
+}

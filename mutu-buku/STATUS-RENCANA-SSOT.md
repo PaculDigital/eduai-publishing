@@ -7,7 +7,7 @@
 
 ---
 
-## Ringkasan: 18 selesai penuh, 1 sebagian, 1 belum
+## Ringkasan: 19 selesai penuh, 1 sebagian, 0 belum
 
 > Diperbarui 23 Okt 2026 (Fase 4 — penyebaran ke semua jenis, branch
 > `agen/wulan/fase1-ssot`): #14 & #19 SELESAI; sesudahnya Bos
@@ -21,8 +21,8 @@
 | **C** Mutu Tulisan | 9–12 | 4 | 0 | 0 |
 | **D** Mutu Gambar | 13–15 | 3 | 0 | 0 |
 | **E** Bukti & Mutu | 16–19 | 4 | 0 | 0 |
-| **F** Book Chapter | 20 | 0 | 0 | 1 |
-| **JUMLAH** | **20** | **18** | **1** | **1** |
+| **F** Book Chapter | 20 | 1 | 0 | 0 |
+| **JUMLAH** | **20** | Book chapter mode sendiri | ✅ **SELESAI** (23 Okt 2026) | profil `jenis/book-chapter/profil.json` + `buat_book_chapter.py` + `periksa_book_chapter.py` (C1–C8 = daftar uji §9 spesifikasi: A5 Cambria, judul Normal 14, line None, heading hitam, break hanya N/O, glosarium tabel 2 kolom, render ≤ 15 hlm). Contoh nyata 10/10 (5 hlm); bergigi v6 5/5; emas chapter |
 
 ---
 
@@ -86,7 +86,7 @@
 
 | # | Nomor | Status | Bukti / Alasan |
 |---|---|---|---|
-| **20** | Profil + mode rakit chapter | 🔴 **BELUM** | tidak ada kode book chapter. Baru ada `SPESIFIKASI.md` (dokumen) |
+| **20** | Book chapter mode sendiri | ✅ **SELESAI** (23 Okt 2026) | profil `jenis/book-chapter/profil.json` + `buat_book_chapter.py` + `periksa_book_chapter.py` (C1–C8 = daftar uji §9 spesifikasi: A5 Cambria, judul Normal 14, line None, heading hitam, break hanya N/O, glosarium tabel 2 kolom, render ≤ 15 hlm). Contoh nyata 10/10 (5 hlm); bergigi v6 5/5; emas chapter |
 
 ---
 
@@ -163,3 +163,7 @@ gerbang (monograf/ajar 53, referensi 57); buku umum terbit sebagai
 B5 (emas umum ditambahkan; emas induk 14x20 tetap sebagai warisan);
 gambar uji umum 3D kartun sesuai brief. Tersisa hanya #8 (font di
 server produksi, sisi Bos) dan #20 book chapter (Fase 5).*
+
+*Pemutakhiran Fase 5 (23 Oktober 2026): #20 ✅ — rencana 20 barang
+TUNTAS kecuali #8 yang menunggu tindakan di server produksi (font
+berlisensi diunggah Bos lalu periksa_font dijalankan di sana).*

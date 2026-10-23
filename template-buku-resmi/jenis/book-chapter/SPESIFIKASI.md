@@ -180,13 +180,13 @@ O. Glosarium         ← PAGE BREAK sebelum ini (TABEL 2 kolom)
 
 | # | Uji | Status |
 |---|---|---|
-| 1 | `periksa_buku_template.py` bisa menerima profil A5 + Cambria | ⬜ belum |
-| 2 | Gerbang memeriksa judul BAB = **14 pt** (bukan 20) | ⬜ belum |
-| 3 | Gerbang memeriksa `line_spacing = None` (bukan 1,15) | ⬜ belum |
-| 4 | Gerbang memeriksa heading TANPA warna | ⬜ belum |
-| 5 | Gerbang memeriksa glosarium = **TABEL 2 kolom** | ⬜ belum |
-| 6 | Gerbang memeriksa batas 15 halaman | ⬜ belum |
-| 7 | Uji bergigi: judul BAB diubah ke 20 pt → GAGAL | ⬜ belum |
+| 1 | `periksa_buku_template.py` bisa menerima profil A5 + Cambria | ✅ 23 Okt 2026 (gerbang khusus `periksa_book_chapter.py` C1) |
+| 2 | Gerbang memeriksa judul BAB = **14 pt** (bukan 20) | ✅ C2 |
+| 3 | Gerbang memeriksa `line_spacing = None` (bukan 1,15) | ✅ C3b |
+| 4 | Gerbang memeriksa heading TANPA warna | ✅ C4 |
+| 5 | Gerbang memeriksa glosarium = **TABEL 2 kolom** | ✅ C6 |
+| 6 | Gerbang memeriksa batas 15 halaman | ✅ C7 (render) |
+| 7 | Uji bergigi: judul BAB diubah ke 20 pt → GAGAL | ✅ `uji_bergigi_v6.py` 5/5 |
 
 ---
 

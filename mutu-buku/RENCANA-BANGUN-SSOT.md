@@ -108,7 +108,8 @@
 
 ## F. BOOK CHAPTER (terakhir, mode sendiri — BUKAN buku utuh)
 
-- [ ] **20. Profil + mode rakit book chapter** — satu bab, 15 section
+- [x] **20. Profil + mode rakit book chapter** — satu bab, 15 section
+  ✅ 23 Okt 2026: mode chapter sendiri terbangun — profil book-chapter + buat_book_chapter.py + periksa_book_chapter.py (C1–C8 sesuai daftar uji §9 spesifikasinya) + contoh nyata (10/10, render 5 hlm) + uji_bergigi_v6 5/5 + emas chapter.
   A–O, glosarium tabel 2 kolom, maksimal 15 halaman A5; PDF Turnitin
   tetap A4, tidak disentuh; gerbangnya sendiri.
 

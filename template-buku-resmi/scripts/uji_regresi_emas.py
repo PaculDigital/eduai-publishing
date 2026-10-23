@@ -27,6 +27,7 @@ KASUS = [
     ('induk', SINI / 'contoh_buku.json', ['--tanpa-gerbang']),
     ('ajar', SINI / 'contoh_ajar.json',
      ['--profil', str(SINI.parent / 'jenis' / 'buku-ajar-obe' / 'profil.json'), '--tanpa-ukur']),
+    ('chapter', SINI / 'contoh_chapter.json', []),
     ('umum', SINI / 'contoh_buku.json',
      ['--profil', str(SINI.parent / 'jenis' / 'buku-umum' / 'profil.json'), '--tanpa-ukur']),
     ('referensi', SINI / 'contoh_referensi.json',
@@ -60,6 +61,10 @@ def sidik(path):
 
 def bangun(nama, spec, ekstra, tmp):
     keluar = tmp / f'{nama}.docx'
+    if nama == 'chapter':
+        r = subprocess.run([sys.executable, str(SINI / 'buat_book_chapter.py'),
+                            str(spec), str(keluar)], capture_output=True, text=True)
+        return sidik(keluar) if r.returncode == 0 else None
     r = subprocess.run([sys.executable, str(SINI / 'buat_buku.py'),
                         str(spec), str(keluar), *ekstra],
                        capture_output=True, text=True)
