@@ -1,0 +1,65 @@
+{
+  "id": "buku_referensi",
+  "nama": "Buku Referensi",
+  "versi": 1,
+  "sumber_keputusan": "skill buku-referensi (custom-skills/buku-referensi) via jenis/buku-referensi/SPESIFIKASI.md (22 Okt 2026)",
+  "format": {
+    "ukuran": {
+      "nama": "B5",
+      "lebar_cm": 17.6,
+      "tinggi_cm": 25.0,
+      "lebar_twip": 9978,
+      "tinggi_twip": 14174
+    },
+    "margin_twip": {
+      "atas": 1134,
+      "bawah": 1134,
+      "kiri": 1134,
+      "kanan": 1134
+    },
+    "gutter_twip": null,
+    "area_teks_twip": 7711,
+    "font_isi": {
+      "nama": "Times New Roman",
+      "pt": 12,
+      "sz": 24
+    },
+    "font_judul": null,
+    "spasi": {
+      "jenis": "kelipatan",
+      "nilai": 1.15,
+      "line_twip": 276
+    },
+    "target_halaman": {
+      "min": 150,
+      "maks": null
+    },
+    "target_bab": "8-12"
+  },
+  "unsur_wajib": [
+    "indeks_subjek",
+    "indeks_nama",
+    "tabel_komparasi_teori_per_bab (sub-bab N.3)",
+    "posisi_penulis_eksplisit (sub-bab N.4 / bab terakhir: sintesis & posisi penulis)",
+    "daftar_pustaka_apa7_indentasi_gantung",
+    "sitasi_per_klaim_terverifikasi"
+  ],
+  "aturan_tulisan": {
+    "tone": "akademik-presisi dengan suara/posisi penulis (skill buku-referensi)",
+    "sitasi": "per-klaim: setiap klaim faktual wajib sumber; verifikasi anti-halusinasi 3 lapis (eksistensi, atribusi, makna) - barang 12",
+    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)"
+  },
+  "gambar": {
+    "mode_brief": "konseptual",
+    "blok_gaya_saat_ini": {
+      "sumber": "jenis_buku.PAKET['pendidikan']['ilustrasi'] (kandidat terdekat; belum ditetapkan skill)",
+      "teks": "Educational instructional illustration, clean flat cartoon style, clear dark outlines around every shape, simple rounded forms, calm controlled colors, on a clean PURE WHITE background (hex #FFFFFF), no cream, no beige, no blue tint, no gradient background, no vignette, no paper texture, no grain, no gradients on objects, no 3D render, no photorealism, no text, no words, no letters, no numbers, no watermark. SCENE — illustrate EXACTLY this moment, nothing else: {brief}. The scene above is the SUBJECT; keep every object named in it"
+    },
+    "jangkar_konsistensi": null,
+    "status": "Blok gaya di bawah ini adalah teks yang SEDANG BERJALAN (disalin persis dari sumbernya). Penulisan ulang mutu = barang 13/14 RENCANA-BANGUN-SSOT; jangkar konsistensi belum ada."
+  },
+  "menunggu_keputusan": [
+    "font judul bab (skill belum menetapkan; usulan Wulan: TNR 16 pt)",
+    "gutter A5/B5 (usulan Wulan: 0)"
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "id": "buku_monograf",
+  "nama": "Buku Monograf",
+  "versi": 1,
+  "sumber_keputusan": "skill penelitian-ilmiah/buku-monograf via jenis/monograf/SPESIFIKASI.md (22 Okt 2026)",
+  "format": {
+    "ukuran": {
+      "nama": "A5",
+      "lebar_cm": 14.8,
+      "tinggi_cm": 21.0,
+      "lebar_twip": 8391,
+      "tinggi_twip": 11906
+    },
+    "margin_twip": {
+      "atas": 1134,
+      "bawah": 1134,
+      "kiri": 1134,
+      "kanan": 1134
+    },
+    "gutter_twip": null,
+    "area_teks_twip": 6123,
+    "font_isi": {
+      "nama": "Cambria",
+      "pt": 11,
+      "sz": 22
+    },
+    "font_judul": {
+      "nama": "Cambria",
+      "pt": 14,
+      "sz": 28,
+      "tebal": true
+    },
+    "spasi": {
+      "jenis": "kelipatan",
+      "nilai": 1.15,
+      "line_twip": 276
+    },
+    "target_halaman": {
+      "min": 150,
+      "maks": 180
+    },
+    "target_bab": "8 (rentang 5-8)"
+  },
+  "unsur_wajib": [
+    "pernyataan_novelty",
+    "kebaruan_tegas_di_bab4_atau_bab5",
+    "keterbatasan_penelitian",
+    "daftar_pustaka_apa7_indentasi_gantung",
+    "sitasi_terverifikasi_tidak_mengarang",
+    "struktur_buku_utuh: sampul, hak cipta, prakata, daftar isi, bab 1-5, daftar pustaka, tentang penulis"
+  ],
+  "aturan_tulisan": {
+    "tone": null,
+    "tone_status": "BELUM ADA - tone_menulis hanya kenal umum/anak/pendidikan; nada akademik monograf ditetapkan pada barang 9",
+    "sitasi": "terverifikasi, dilarang mengarang (skill buku-monograf)",
+    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_* / mutu-buku/gambar-dan-visual/prompt/larangan-budaya.md)"
+  },
+  "gambar": {
+    "mode_brief": null,
+    "mode_brief_status": "BELUM DITETAPKAN untuk monograf - kandidat paket pendidikan; diputuskan pada barang 13",
+    "blok_gaya_saat_ini": {
+      "sumber": "jenis_buku.PAKET['pendidikan']['ilustrasi'] (kandidat)",
+      "teks": "Educational instructional illustration, clean flat cartoon style, clear dark outlines around every shape, simple rounded forms, calm controlled colors, on a clean PURE WHITE background (hex #FFFFFF), no cream, no beige, no blue tint, no gradient background, no vignette, no paper texture, no grain, no gradients on objects, no 3D render, no photorealism, no text, no words, no letters, no numbers, no watermark. SCENE — illustrate EXACTLY this moment, nothing else: {brief}. The scene above is the SUBJECT; keep every object named in it"
+    },
+    "jangkar_konsistensi": null,
+    "status": "Blok gaya di bawah ini adalah teks yang SEDANG BERJALAN (disalin persis dari sumbernya). Penulisan ulang mutu = barang 13/14 RENCANA-BANGUN-SSOT; jangkar konsistensi belum ada."
+  },
+  "menunggu_keputusan": [
+    "gutter A5/B5 (usulan Wulan: 0)"
+  ]
+}
