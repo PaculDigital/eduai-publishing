@@ -174,6 +174,52 @@ CARA BERPIKIR (ikuti urutannya):
 RINGKASAN BAB:
 {ringkasan_bab}"""
 
+# Template brief BERSLOT (v3, barang 13 RENCANA-BANGUN-SSOT) — dipakai jalur
+# pendidikan/monograf. Brief lama 2-3 kalimat tanpa komposisi membuat model
+# mengarang sisanya (gambar generik). Di sini brief WAJIB mengisi 5 slot
+# berurutan dan diberi CONTOH JADI (few-shot) sebagai pola tiruan.
+PROMPT_BRIEF_BERSLOT = """Buatkan SATU brief visual (bahasa Inggris, 4-6 kalimat) untuk ilustrasi
+buku pendidikan/akademik, berdasarkan ringkasan bab di bawah. Brief HARUS
+mengisi lima slot ini BERURUTAN, satu-dua kalimat per slot:
+
+1. SUBJEK + AKSI: siapa/apa subjeknya, sedang melakukan apa — satu momen
+   paling visual dari isi bab, konkret, bisa dilihat.
+2. LATAR: di mana momen itu terjadi, benda apa saja yang mengelilinginya
+   (konteks Indonesia sehari-hari, sesuaikan contoh di bab bila ada).
+3. KOMPOSISI: satu fokus utama; sebutkan posisi & ukuran subjek dalam
+   bidang gambar dan ruang kosong di sekelilingnya.
+4. WARNA: sebutkan warna benda-benda utamanya satu per satu (palet buku:
+   navy tua dan oranye hangat di atas putih).
+5. SUASANA: satu kata suasana yang harus terasa (tenang, tekun, jernih...).
+
+CONTOH BRIEF YANG BAIK (tirulah strukturnya, bukan isinya):
+"A young Indonesian researcher in a navy shirt sits at a wooden desk,
+writing careful notes in an open notebook beside a neat stack of printed
+questionnaires. The scene is a quiet campus office; a laptop, a mug, and
+a small potted plant sit in the background. The researcher fills the
+right half of the frame, with generous empty white space on the left.
+The notebook is warm orange, the desk is light brown wood, the shirt is
+deep navy. The mood is calm, focused, and methodical."
+
+CONTOH LAIN:
+"Two hands arrange printed survey forms into three tidy piles on a
+table, each pile held by a colored paper clip. The setting is a simple
+study room with a bookshelf softly visible behind. The hands and piles
+sit in the lower center of the frame, surrounded by clean empty space.
+The clips are navy, warm orange, and soft green; the forms are white.
+The mood is orderly and careful, like work done properly."
+
+DILARANG: teks/huruf/angka/logo di dalam gambar; konsep abstrak tanpa
+wujud; lebih dari satu momen; unsur tidak pantas untuk pembaca Indonesia
+(babi/celengan babi, minuman keras, rokok, simbol agama, mata uang asing).
+Output HANYA brief-nya — tanpa label slot, tanpa penjelasan.
+
+RINGKASAN BAB:
+{ringkasan_bab}
+
+SUB-BAB DI SEKITAR POSISI GAMBAR:
+{sub_bab}"""
+
 # Alias lama (kompatibilitas)
 PROMPT_BRIEF = PROMPT_BRIEF_LITERAL
 
@@ -596,7 +642,8 @@ def brief_visual(ringkasan_bab, sub_bab="", panggil_llm=None, max_percobaan=3,
     if mode is None:
         mode = MODE_BRIEF_PER_GAYA.get(gaya or GAYA_DEFAULT, "konseptual")
 
-    pola = PROMPT_BRIEF_LITERAL if mode == "literal" else PROMPT_BRIEF_KONSEPTUAL
+    pola = {"literal": PROMPT_BRIEF_LITERAL,
+            "berslot": PROMPT_BRIEF_BERSLOT}.get(mode, PROMPT_BRIEF_KONSEPTUAL)
     prompt = pola.format(
         ringkasan_bab=(ringkasan_bab or "").strip()[:4000] or "(ringkasan kosong)",
         sub_bab=(sub_bab or "").strip()[:1200] or "(tidak disebutkan)",
@@ -692,18 +739,23 @@ def prompt_gambar(brief, gaya=None, jenis=None):
     kena, alasan = apa_brief_terlarang_budaya(brief)
     if kena:
         raise ValueError("brief memuat unsur terlarang budaya: " + "; ".join(alasan))
+    jangkar = ""
     if jenis is not None:
         import jenis_buku as JB
         pkg = JB.paket(jenis)
         gaya = pkg["gaya_gambar"]
         blok = pkg["ilustrasi"] or STYLE_BUKU.get(gaya) or STYLE_BUKU[GAYA_DEFAULT]
+        # Jangkar konsistensi (barang 14): frasa yang SAMA ditempel ke
+        # setiap prompt satu buku — gaya & tokoh tidak berubah antar bab.
+        jangkar = (pkg.get("jangkar") or "").strip()
     else:
         gaya = gaya or GAYA_DEFAULT
         blok = STYLE_BUKU.get(gaya) or STYLE_BUKU[GAYA_DEFAULT]
     brief = _bersihkan_brief(brief).rstrip('.')
     # Style block milik paket jenis SUDAH memuat "no text..." — jangan dobel
     ekor = "" if "no text" in blok.lower() else EKOR_LARANGAN
-    return f"{blok.format(brief=brief)}. {LARANGAN_BUDAYA_PROMPT}{ekor}"
+    tengah = f"{jangkar} " if jangkar else ""
+    return f"{blok.format(brief=brief)}. {tengah}{LARANGAN_BUDAYA_PROMPT}{ekor}"
 
 
 # ══════════════════════════════════════════════════════════════════════════
