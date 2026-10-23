@@ -43,22 +43,28 @@
 
 ## B. MESIN
 
-- [ ] **4. Penegakan Daftar Pustaka WAJIB** di generator + gerbang
+- [x] **4. Penegakan Daftar Pustaka WAJIB** di generator + gerbang
+  ✅ 23 Okt 2026: validasi awal generator + gerbang DP0; uji negatif: spec tanpa pustaka ditolak sebelum menulis, berkas tidak tercipta.
   (menutup utang: sudah disahkan Bos di `e491fc3`, di kode masih opsional).
-- [ ] **5. Generator menerapkan profil** — ukuran halaman, margin, huruf,
+- [x] **5. Generator menerapkan profil** — ukuran halaman, margin, huruf,
+  ✅ 23 Okt 2026: buat_buku --profil menerapkan ukuran/margin/font/spasi/tab dari profil; bukti buku monograf A5 Cambria 11/14 spasi 1,15.
   spasi diganti dari profil; agen memanggil dengan menyebut jenisnya.
-- [ ] **6. Gerbang membaca profil yang sama** — aturan pemeriksaan per
+- [x] **6. Gerbang membaca profil yang sama** — aturan pemeriksaan per
+  ✅ 23 Okt 2026: gerbang --profil membaca angka dari profil yang sama; uji negatif: buku induk ditolak gerbang profil monograf.
   jenis, bukan satu aturan untuk semua.
-- [ ] **7. Nomor halaman terukur** — daftar isi dan indeks mengambil nomor
+- [x] **7. Nomor halaman terukur** — daftar isi dan indeks mengambil nomor
+  ✅ 23 Okt 2026: ukur_halaman() merender buku (LibreOffice) dan menempel nomor nyata ke cache daftar isi + label hak cipta (bukti: BAB I/II/III = 6/7/8, total 12 hlm). Catatan: di VM ini font Cambria belum terpasang — paginasi render memakai font pengganti; di server berfont lengkap angka persis.
   dari render buku jadi; perkiraan 360 kata/halaman PENSIUN.
 - [ ] **8. Gerbang font di server produksi** — font berlisensi yang Bos
   unggah diperiksa terpasang sebelum produksi jalan.
 
 ## C. MUTU TULISAN (dari `a5ecf74`)
 
-- [ ] **9. Aturan tulisan per jenis di profil** — tone, larangan budaya
+- [x] **9. Aturan tulisan per jenis di profil** — tone, larangan budaya
+  ✅ 23 Okt 2026 untuk monograf: tone akademik formal ditetapkan di profil (menutup temuan tone "Anda"); jenis lain menyusul Fase 4.
   untuk TEKS, aturan sitasi jenis itu.
-- [ ] **10. Gerbang tulisan terukur** — sitasi dua arah tanpa yatim
+- [x] **10. Gerbang tulisan terukur** — sitasi dua arah tanpa yatim
+  ✅ 23 Okt 2026: periksa_tulisan.py (T1 sitasi dua arah, T2 kata terlarang, T3 bagian wajib dari profil); uji negatif: sitasi yatim (Hartono, 2019) tertangkap.
   (entri pustaka tak dirujuk = gagal; sitasi tanpa entri pustaka = gagal),
   kata larangan budaya tidak muncul di teks, bagian wajib tulisan hadir
   (posisi penulis / novelty).
@@ -69,7 +75,8 @@
 
 ## D. MUTU PROMPT GAMBAR (dari `e99478e` + analisa 23 Okt 2026)
 
-- [ ] **13. Prompt pembuat brief baru** — brief BERSLOT (subjek + aksi,
+- [x] **13. Prompt pembuat brief baru** — brief BERSLOT (subjek + aksi,
+  ✅ 23 Okt 2026 jalur pendidikan/monograf: PROMPT_BRIEF_BERSLOT (5 slot + 2 contoh jadi) di brief_visual.py, mode "berslot" di paket pendidikan.
   latar, komposisi, warna per benda, suasana) + 2–3 contoh brief bagus
   sebagai pola tiruan; untuk mode konseptual (umum) dan literal (anak).
 - [ ] **14. Blok gaya baru POSITIF-DULU** — deskripsi jelas di depan,

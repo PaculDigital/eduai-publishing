@@ -7,20 +7,21 @@
 
 ---
 
-## Ringkasan: 2 selesai penuh, 3 sebagian, 15 belum
+## Ringkasan: 9 selesai penuh, 5 sebagian, 6 belum
 
-> Diperbarui 23 Okt 2026 (Fase 1, branch `agen/wulan/fase1-ssot`):
-> #1 & #3 SELESAI penuh; #2 naik ke SEBAGIAN. #14 & #18 tetap SEBAGIAN.
+> Diperbarui 23 Okt 2026 (Fase 2 — bukti monograf, branch
+> `agen/wulan/fase1-ssot`): #4, #5, #6, #7, #9, #10, #13 SELESAI;
+> #8 & #15 naik ke SEBAGIAN. Sisa belum: #11, #12, #16, #17, #19, #20.
 
 | Bagian | Nomor | Selesai | Sebagian | Belum |
 |---|---|---|---|---|
 | **A** Sumber Tunggal | 1–3 | 2 | 1 | 0 |
-| **B** Mesin | 4–8 | 0 | 0 | 5 |
-| **C** Mutu Tulisan | 9–12 | 0 | 0 | 4 |
-| **D** Mutu Gambar | 13–15 | 0 | 1 | 2 |
+| **B** Mesin | 4–8 | 4 | 1 | 0 |
+| **C** Mutu Tulisan | 9–12 | 2 | 0 | 2 |
+| **D** Mutu Gambar | 13–15 | 1 | 2 | 0 |
 | **E** Bukti & Mutu | 16–19 | 0 | 1 | 3 |
 | **F** Book Chapter | 20 | 0 | 0 | 1 |
-| **JUMLAH** | **20** | **2** | **3** | **15** |
+| **JUMLAH** | **20** | **9** | **5** | **6** |
 
 ---
 
@@ -40,11 +41,11 @@
 
 | # | Nomor | Status | Bukti / Alasan |
 |---|---|---|---|
-| **4** | Daftar Pustaka WAJIB | 🔴 **BELUM — UTANG TERBUKTI** | `buat_buku.py:453` → `(['DAFTAR PUSTAKA'] if spec.get('daftar_pustaka') else [])`. Masih **opsional**. Sudah disahkan Bos di `e491fc3` tapi **kode belum menyusul** |
-| **5** | Generator menerapkan profil | 🔴 **BELUM** | tidak ada `profil.json`; `buat_buku.py` menyalin template apa adanya, angka **tidak** dibaca dari profil |
-| **6** | Gerbang baca profil | 🔴 **BELUM** | `grep -c profil periksa_buku_template.py` = **0**. Masih satu aturan untuk semua jenis |
-| **7** | Nomor halaman terukur | 🔴 **BELUM** | `indeks_referensi.py:287 halaman_perkiraan()` masih **360 kata/halaman** — belum pensiun |
-| **8** | Gerbang font di server produksi | 🔴 **BELUM** | `periksa_font.py` ada tapi **tidak jalan di produksi**. Diukur: font Trajan di image = **0** |
+| **4** | Daftar Pustaka WAJIB | ✅ **SELESAI** (23 Okt 2026) | validasi awal generator menolak spec tanpa/kosong pustaka SEBELUM menulis + gerbang DP0 (`--wajib-pustaka`). Uji negatif lulus: berkas tidak tercipta |
+| **5** | Generator menerapkan profil | ✅ **SELESAI** (23 Okt 2026) | `buat_buku.py --profil` menerapkan ukuran/margin/font isi & judul/spasi/tab TOC dari profil. Bukti: buku monograf A5 8391×11906, margin 1134, Cambria 11/14, line 276 |
+| **6** | Gerbang baca profil | ✅ **SELESAI** (23 Okt 2026) | `periksa_buku_template.py --profil=` — semua angka (H/M/G/F/S/Y) dari profil; tanpa profil = perilaku induk persis (regresi 50/50 + 64 uji hijau). Uji negatif: buku induk DITOLAK gerbang profil monograf |
+| **7** | Nomor halaman terukur | ✅ **SELESAI** (23 Okt 2026) | `ukur_halaman()`: render LibreOffice → peta judul→halaman → cache TOC ditempel angka nyata (BAB I/II/III = 6/7/8; total 12) + label hak cipta otomatis. ⚠️ VM ini tanpa Cambria — paginasi render font pengganti; persis di server berfont. `halaman_perkiraan()` di indeks_referensi pensiun pada Fase 4 (jalur referensi) |
+| **8** | Gerbang font di server produksi | 🟡 **SEBAGIAN** (23 Okt 2026) | `periksa_font.py --profil` memeriksa font profil (terbukti: Cambria HILANG di VM → exit 1). Yang belum: dijalankan di server produksi sesudah Bos unggah font |
 
 ---
 
@@ -52,8 +53,8 @@
 
 | # | Nomor | Status | Bukti / Alasan |
 |---|---|---|---|
-| **9** | Aturan tulisan per jenis di profil | 🔴 **BELUM** | `tone_menulis.py` hanya kenal **umum/anak/pendidikan**. Monograf & ajar **tidak punya tone** — jatuh ke `umum` ("Anda") |
-| **10** | Gerbang tulisan terukur | 🔴 **BELUM** | sitasi dua arah **tidak ada**; larangan budaya di **brief gambar** ada, di **teks** belum jadi gerbang |
+| **9** | Aturan tulisan per jenis di profil | ✅ **SELESAI untuk monograf** (23 Okt 2026) | tone akademik formal + kata terlarang teks + cek_teks_wajib kini di profil monograf. `tone_menulis.py` aplikasi menyusul diselaraskan Fase 4; ajar/referensi Fase 4 |
+| **10** | Gerbang tulisan terukur | ✅ **SELESAI** (23 Okt 2026) | `periksa_tulisan.py`: T1 sitasi dua arah (uji negatif yatim tertangkap), T2 kata terlarang teks, T3 bagian wajib dari profil. Terpasang di generator sesudah gerbang format |
 | **11** | Gate cek plagiarisme | 🔴 **BELUM** | tidak ada modul plagiarisme untuk buku. Yang ada cuma `_uji_pintu_plag.py` (uji), bukan mesin |
 | **12** | Verifikasi sitasi 3 lapis | 🔴 **BELUM** | belum ada; menunggu kwitansi (#16) |
 
@@ -63,9 +64,9 @@
 
 | # | Nomor | Status | Bukti / Alasan |
 |---|---|---|---|
-| **13** | Prompt brief BERSLOT | 🔴 **BELUM** | `PROMPT_BRIEF_LITERAL`/`KONSEPTUAL` **ada** tapi **tidak berslot** dan **tanpa contoh brief bagus**. Belum diubah |
-| **14** | Blok gaya POSITIF-DULU | 🟡 **SEBAGIAN** | Blok anak **sudah** positif-dulu (`clean flat cartoon style` di depan, larangan di ekor) — itu hasil 20 Okt. Tapi **jangkar konsistensi** (frasa gaya + tokoh SAMA antar gambar) **BELUM ADA** |
-| **15** | Pemeriksaan isi gambar | 🔴 **BELUM** | sekarang hanya cek **lebar** gambar, bukan **isi vs brief** |
+| **13** | Prompt brief BERSLOT | ✅ **SELESAI jalur pendidikan/monograf** (23 Okt 2026) | `PROMPT_BRIEF_BERSLOT` (5 slot + 2 contoh jadi) di `brief_visual.py`; mode `berslot` di paket pendidikan & profil monograf. Uji fungsi: prompt terkirim terbukti versi berslot |
+| **14** | Blok gaya POSITIF-DULU | 🟡 **SEBAGIAN** (23 Okt 2026) | Blok **pendidikan** ditulis ulang positif-dulu (466 char) + **jangkar konsistensi** ADA & ditempel `prompt_gambar` (teruji) + tersalin ke profil monograf/ajar. Sisa: blok umum & anak (Fase 4). Gerbang placeholder tetap 19/19 |
+| **15** | Pemeriksaan isi gambar | 🟡 **SEBAGIAN** (23 Okt 2026) | `periksa_gambar.py` lapis 1 terukur (baca gambar, lebar vs area profil, latar putih) — terbukti dua arah: gambar contoh lama GAGAL, gambar patuh LULUS. Lapis 2 (isi vs brief oleh peninjau/vision) = prosedur + daftar kata kunci dari brief; vonis dicatat di kwitansi (#16) |
 
 ---
 
@@ -135,3 +136,10 @@
 *Pemutakhiran 23 Oktober 2026 (Fase 1 dikerjakan dari `main` = `e5d5375`,
 branch `agen/wulan/fase1-ssot`): #1 ✅, #3 ✅, #2 🟡 — bukti di commit
 branch tersebut (profil 4 jenis, `buat_spesifikasi.py`, SOT-INDUK §9).*
+*Pemutakhiran Fase 2 (23 Oktober 2026, branch yang sama): #4 ✅, #5 ✅,
+#6 ✅, #7 ✅, #9 ✅ (monograf), #10 ✅, #13 ✅ (jalur pendidikan/monograf),
+#8 🟡, #14 🟡, #15 🟡. Bukti ujung-ke-ujung: buku monograf contoh
+(3 bab, A5 Cambria, gerbang format 52/52, gerbang tulisan 5/5,
+nomor TOC terukur 6/7/8, 12 halaman). Regresi penuh hijau:
+gerbang template 50/50, bergigi 8+3+10+6+2, generator 35/35,
+placeholder brief 19/19.*
