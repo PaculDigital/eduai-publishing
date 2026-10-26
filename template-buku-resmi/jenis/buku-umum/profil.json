@@ -1,0 +1,82 @@
+{
+  "id": "buku_umum",
+  "nama": "Buku Umum & Buku Anak (template induk)",
+  "versi": 1,
+  "sumber_keputusan": "template induk terukur (audit XML 22 Okt 2026) + skill buku-umum; profil ini = setelan yang SEDANG BERJALAN di generator",
+  "format": {
+    "ukuran": {
+      "nama": "B5",
+      "lebar_cm": 17.6,
+      "tinggi_cm": 25.0,
+      "lebar_twip": 9978,
+      "tinggi_twip": 14174,
+      "status": "DISAHKAN Bos 23 Okt 2026: buku umum pindah dari induk 14x20 ke B5; profil induk 14x20 tetap tersimpan sebagai warisan (template asli)"
+    },
+    "margin_twip": {
+      "atas": 1134,
+      "bawah": 1134,
+      "kiri": 1134,
+      "kanan": 1134
+    },
+    "gutter_twip": 0,
+    "area_teks_twip": 7711,
+    "font_isi": {
+      "nama": "Palatino Linotype",
+      "pt": 10,
+      "sz": 20
+    },
+    "font_judul": {
+      "nama": "Trajan Pro",
+      "pt": 22,
+      "sz": 44,
+      "tebal": true
+    },
+    "spasi": {
+      "jenis": "tetap",
+      "line_twip": 240
+    },
+    "target_halaman": null,
+    "target_bab": "8-12 (buku umum, skill buku-umum)",
+    "gutter_status": "Disahkan Bos 23 Okt 2026: gutter 0 untuk A5/B5 (margin 2 cm cukup untuk jilid)"
+  },
+  "unsur_wajib": [
+    "struktur_buku_utuh: sampul, hak cipta, kata pengantar, daftar isi, bab, daftar pustaka, tentang penulis",
+    "daftar_pustaka_apa7_indentasi_gantung"
+  ],
+  "aturan_tulisan": {
+    "tone": "buku umum: formal-santai naratif (skill buku-umum); buku anak: sapa 'kamu', kalimat pendek",
+    "sitasi": "buku umum: sitasi menopang klaim faktual + verifikasi anekdot/kisah nyata; gate plagiarisme sebelum final (barang 11)",
+    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)",
+    "kata_terlarang_teks": [
+      "babi",
+      "piggy bank",
+      "minuman keras"
+    ],
+    "cek_teks_wajib": []
+  },
+  "gambar": {
+    "umum": {
+      "mode_brief": "konseptual",
+      "blok_gaya_saat_ini": {
+        "sumber": "brief_visual.STYLE_BUKU['premium-konseptual']",
+        "teks": "Premium conceptual editorial illustration for a bestselling non-fiction book, single clever visual metaphor, modern flat vector style, limited palette of deep navy and warm terracotta, on a clean PURE WHITE background (hex #FFFFFF), no cream, no beige, no brown tint anywhere, crisp thin dark outlines around every shape, one central focal subject with generous negative space, minimalist elegant composition, smooth flat surfaces with no paper texture, no grain, no stains, no vignette, no gradients, no photorealism, no 3D, no clutter, no text, no words, no letters, no watermark. Scene: {brief}"
+      }
+    },
+    "anak": {
+      "mode_brief": "literal",
+      "blok_gaya_saat_ini": {
+        "sumber": "jenis_buku.PAKET['anak']['ilustrasi']",
+        "teks": "Children's educational illustration, clean flat cartoon style, clear dark outlines around every shape, simple rounded forms, cheerful but controlled colors, on a clean PURE WHITE background (hex #FFFFFF), no cream, no beige, no blue tint, no gradient background, no vignette, no paper texture, no grain, no shadows on the background, no gradients on objects, no 3D render, no photorealism, no text, no words, no letters, no numbers, no watermark. SCENE — illustrate EXACTLY this moment, nothing else: {brief}. The scene above is the SUBJECT; keep every object named in it"
+      }
+    },
+    "jangkar_konsistensi": "Consistent series style for the whole book: the same cheerful 3D cartoon infographic style, the same deep navy and warm orange palette, and the same friendly rounded character design in every illustration.",
+    "status": "Blok gaya di bawah ini adalah teks yang SEDANG BERJALAN (disalin persis dari sumbernya). Penulisan ulang mutu = barang 13/14 RENCANA-BANGUN-SSOT; jangkar konsistensi belum ada.",
+    "blok_gaya_saat_ini": {
+      "sumber": "brief_visual.STYLE_BUKU['premium-konseptual'] - DISAHKAN Bos 23 Okt 2026: infografis edukasi 3D kartun",
+      "teks": "Cheerful 3D cartoon educational infographic illustration for a bestselling non-fiction book: {brief}. One clear visual metaphor as a single central subject, friendly rounded 3D shapes with soft smooth shading, cheerful warm mood, bright controlled colors in deep navy and warm orange, generous empty space around the subject, on a clean pure white background (hex #FFFFFF). No text, no words, no letters, no numbers, no watermark, no photorealism, no clutter, no dark or dirty background."
+    },
+    "jangkar_status": "ADA untuk umum & anak & pendidikan (23 Okt 2026)",
+    "gaya_status": "SAH 3D kartun (Bos 23 Okt 2026); brief tetap mode konseptual"
+  },
+  "menunggu_keputusan": []
+}

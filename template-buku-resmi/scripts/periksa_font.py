@@ -78,6 +78,19 @@ def main():
         i = sys.argv.index('--folder')
         folder = Path(sys.argv[i + 1])
 
+    # --profil (barang 8): font wajib diambil dari profil jenis —
+    # gerbang yang sama memeriksa font yang sungguh dipakai buku itu.
+    font_wajib = FONT_WAJIB
+    if '--profil' in sys.argv:
+        import json
+        i = sys.argv.index('--profil')
+        profil = json.loads(Path(sys.argv[i + 1]).read_text(encoding='utf-8'))
+        f = profil['format']
+        font_wajib = {f['font_isi']['nama']: 'font isi (profil)'}
+        if f.get('font_judul'):
+            font_wajib[f['font_judul']['nama']] = 'font judul (profil)'
+        print(f"PROFIL: {profil['id']}")
+
     terpasang = dari_fc_list(folder) if folder else dari_fc_list()
     if not folder:
         for f in FOLDER_UMUM:
@@ -89,14 +102,14 @@ def main():
 
     print(f"SUMBER: {'folder ' + str(folder) if folder else 'mesin ini'}")
     hilang = []
-    for nama, peran in FONT_WAJIB.items():
+    for nama, peran in font_wajib.items():
         lokasi = terpasang.get(nama.lower())
         if lokasi:
             print(f'  ADA     {nama:20s} {peran}  [{lokasi}]')
         else:
             hilang.append(nama)
             print(f'  HILANG  {nama:20s} {peran}')
-    print(f'\nRINGKAS: {len(FONT_WAJIB) - len(hilang)}/{len(FONT_WAJIB)} font ada')
+    print(f'\nRINGKAS: {len(font_wajib) - len(hilang)}/{len(font_wajib)} font ada')
     if hilang:
         print('Yang hilang:', ', '.join(hilang))
         print('Cara memperoleh yang sah: lihat fonts/README.md')

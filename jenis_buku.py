@@ -52,6 +52,14 @@ PAKET = {
         "gaya_gambar": "premium-konseptual",
         "mode_brief": "konseptual",
         "ilustrasi": None,      # diambil dari brief_visual.STYLE_BUKU
+        #  Jangkar konsistensi (barang 14, Fase 4): ditempel prompt_gambar
+        #  ke setiap prompt jenis ini.
+        "jangkar": (
+            "Consistent series style for the whole book: the same "
+            "cheerful 3D cartoon infographic style, the same deep navy "
+            "and warm orange palette, and the same friendly rounded "
+            "character design in every illustration."
+        ),
         "palet": {
             "krem": "#FFF9EE",
             "tinta": "#1B3A57",
@@ -109,6 +117,12 @@ PAKET = {
             "SCENE — illustrate EXACTLY this moment, nothing else: {brief}. "
             "The scene above is the SUBJECT; keep every object named in it"
         ),
+        #  Jangkar konsistensi (barang 14, Fase 4).
+        "jangkar": (
+            "Consistent series style for the whole book: the same cheerful "
+            "flat cartoon style and bright palette, and if a character "
+            "appears, the same character design in every illustration."
+        ),
         "palet": {
             # Langit cerah + krem hangat: sama seperti latar ilustrasi clay
             "krem": "#FFF6E5",
@@ -142,20 +156,30 @@ PAKET = {
     # ── BUKU PENDIDIKAN (lebih terstruktur, tetap kartun bersih) ─────────
     "pendidikan": {
         "gaya_gambar": "anak",       # gaya gambar SAMA (kartun), beda arahan
-        "mode_brief": "literal",
+        "mode_brief": "berslot",     # barang 13: brief berslot + contoh jadi
         #  ⚠️ Sama seperti `anak`: latar putih + outline (perintah Bos
         #  20 Okt 2026). Versi lama `light blue background` + `3D render`.
+        #  Ditulis ulang POSITIF-DULU (barang 14, 23 Okt 2026): subjek &
+        #  deskripsi jelas di depan, larangan dipangkas pendek di ekor.
+        #  ⚠️ {brief} WAJIB ada (lihat catatan paket `anak`).
         "ilustrasi": (
-            "Educational instructional illustration, clean flat cartoon style, "
-            "clear dark outlines around every shape, simple rounded forms, "
-            "calm controlled colors, on a clean PURE WHITE background "
-            "(hex #FFFFFF), no cream, no beige, no blue tint, "
-            "no gradient background, no vignette, no paper texture, no grain, "
-            "no gradients on objects, no 3D render, no photorealism, "
-            "no text, no words, no letters, no numbers, no watermark. "
-            #  ⚠️ Sama: {brief} WAJIB ada (lihat catatan paket `anak`).
-            "SCENE — illustrate EXACTLY this moment, nothing else: {brief}. "
-            "The scene above is the SUBJECT; keep every object named in it"
+            "Illustrate exactly this scene for an educational book: {brief}. "
+            "Clean flat educational cartoon illustration, clear dark outlines "
+            "around every shape, simple rounded forms, one clear focal "
+            "subject with generous empty space around it, calm controlled "
+            "colors - deep navy and warm orange accents - on a clean pure "
+            "white background (hex #FFFFFF). "
+            "No text, no words, no letters, no numbers, no watermark, "
+            "no gradients, no 3D render, no photorealism, "
+            "no cream or beige tint."
+        ),
+        #  Jangkar konsistensi (barang 14): ditempel brief_visual ke SETIAP
+        #  prompt jenis ini — gaya & tokoh sama di semua gambar satu buku.
+        "jangkar": (
+            "Consistent series style for the whole book: the same flat "
+            "educational cartoon style, the same deep navy and warm orange "
+            "palette, and if a person appears, the same simple character "
+            "design in every illustration."
         ),
         "palet": {
             # Lebih kalem dari buku anak: untuk belajar, bukan bermain

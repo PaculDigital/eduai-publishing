@@ -180,13 +180,13 @@ O. Glosarium         ← PAGE BREAK sebelum ini (TABEL 2 kolom)
 
 | # | Uji | Status |
 |---|---|---|
-| 1 | `periksa_buku_template.py` bisa menerima profil A5 + Cambria | ⬜ belum |
-| 2 | Gerbang memeriksa judul BAB = **14 pt** (bukan 20) | ⬜ belum |
-| 3 | Gerbang memeriksa `line_spacing = None` (bukan 1,15) | ⬜ belum |
-| 4 | Gerbang memeriksa heading TANPA warna | ⬜ belum |
-| 5 | Gerbang memeriksa glosarium = **TABEL 2 kolom** | ⬜ belum |
-| 6 | Gerbang memeriksa batas 15 halaman | ⬜ belum |
-| 7 | Uji bergigi: judul BAB diubah ke 20 pt → GAGAL | ⬜ belum |
+| 1 | `periksa_buku_template.py` bisa menerima profil A5 + Cambria | ✅ 23 Okt 2026 (gerbang khusus `periksa_book_chapter.py` C1) |
+| 2 | Gerbang memeriksa judul BAB = **14 pt** (bukan 20) | ✅ C2 |
+| 3 | Gerbang memeriksa `line_spacing = None` (bukan 1,15) | ✅ C3b |
+| 4 | Gerbang memeriksa heading TANPA warna | ✅ C4 |
+| 5 | Gerbang memeriksa glosarium = **TABEL 2 kolom** | ✅ C6 |
+| 6 | Gerbang memeriksa batas 15 halaman | ✅ C7 (render) |
+| 7 | Uji bergigi: judul BAB diubah ke 20 pt → GAGAL | ✅ `uji_bergigi_v6.py` 5/5 |
 
 ---
 
@@ -196,3 +196,43 @@ O. Glosarium         ← PAGE BREAK sebelum ini (TABEL 2 kolom)
 - **Tapi** buku chapter tidak selalu identik: tiap buku kolaborasi bisa punya template penerbit sendiri. Angka BAB 7 = **acuan default**, bukan hukum mutlak.
 - **Batas 15 halaman** bergantung jumlah kata. 15 halaman A5 Cambria 11 pt ≈ **5.000–6.000 kata**. Perlu ukur nyata.
 - Template `.docx` book chapter **belum ada berkasnya** — baru spesifikasi.
+
+---
+
+## 11. KOREKSI DARI CONTOH NYATA — Book Chapter BAB 10 (23 Okt 2026)
+
+> Bos memberikan berkas hasil nyata `Book_Chapter_BAB_10_...docx`.
+> Wulan mengukurnya langsung (python-docx + XML mentah). Berkas ini
+> adalah acuan tertinggi; bila bertentangan dengan §1–10, BAGIAN INI
+> yang berlaku untuk generator & gerbang.
+
+**Struktur sebenarnya (berbeda dari §5):**
+- Kepala bab HANYA "BAB 10" + JUDUL HURUF BESAR. **Tidak ada** nama
+  penulis, abstrak, dan kata kunci di kepala bab.
+- Huruf A–O adalah label **section isi**: A. Pendahuluan, B…, sampai
+  section isi terakhir (di BAB 10: L. Ringkasan Bab, butir "- ").
+  **M dilompati**; N. Referensi dan O. Glosarium tetap.
+- **Tujuan Pembelajaran ada di dalam Pendahuluan**: kalimat "Setelah
+  mempelajari bab ini, pembaca diharapkan mampu:" + daftar berhuruf
+  a, b, c … dengan indentasi kiri **737 twip** (bukan 738).
+- Tabel isi berjudul (tengah, tebal 11 pt); ada keterangan diagram
+  ("Diagram 10: Kerangka Konsep", tengah tebal).
+- Page break sebelum N dan O berbentuk **paragraf berisi page break**
+  (bukan pageBreakBefore) — gerbang menerima kedua mekanisme.
+- CV Penulis sesudah Glosarium: judul CV **Cambria 14 tebal**
+  (No Spacing, before 24 pt), lalu baris Nama:, Email:, biografi.
+- Glosarium: tabel 2 kolom **sama lebar 3059 + 3059**, garis single
+  **hitam**, kepala tebal **tanpa latar**.
+
+**Angka mentah berkas asli** (konversi python-docx pipeline Bos):
+halaman **8395 × 11909**, margin **1138**, isi kiri **283** +
+firstLine 567, ringkasan kiri 567 gantung **283**, referensi
+gantung 720. (Tabel ceil di §4 berbeda 1–4 twip — tak terlihat mata,
+gerbang memberi toleransi ±8.)
+
+**Konflik halaman:** BAB 10 berisi **4.940 kata** (sesuai taksiran
+§10) tetapi ter-render **40 halaman** di LibreOffice (font pengganti
+Cambria). Klaim "maksimal 15 halaman" di §1/§6 terikat paginasi
+Word dan TIDAK terbukti di render mesin ini — gerbang kini
+melaporkan jumlah halaman & kata sebagai INFO, bukan penentu
+lulus. Keputusan akhir soal batas halaman ada di Bos.

@@ -1,0 +1,109 @@
+{
+  "id": "buku_ajar",
+  "nama": "Buku Ajar OBE",
+  "versi": 1,
+  "sumber_keputusan": "skill penelitian-ilmiah/buku-ajar-obe via jenis/buku-ajar-obe/SPESIFIKASI.md (22 Okt 2026)",
+  "format": {
+    "ukuran": {
+      "nama": "B5 default / A5 pilihan",
+      "lebar_cm": 17.6,
+      "tinggi_cm": 25.0,
+      "lebar_twip": 9978,
+      "tinggi_twip": 14174,
+      "alternatif_a5": {
+        "lebar_twip": 8391,
+        "tinggi_twip": 11906,
+        "area_teks_twip": 6123
+      }
+    },
+    "margin_twip": {
+      "atas": 1134,
+      "bawah": 1134,
+      "kiri": 1134,
+      "kanan": 1134
+    },
+    "gutter_twip": 0,
+    "area_teks_twip": 7711,
+    "font_isi": {
+      "nama": "Times New Roman",
+      "pt": 12,
+      "sz": 24
+    },
+    "font_judul": {
+      "nama": "Times New Roman",
+      "pt": 16,
+      "sz": 32
+    },
+    "font_tiu_tik": {
+      "nama": "Times New Roman",
+      "pt": 9,
+      "sz": 18,
+      "miring": true
+    },
+    "font_daftar": {
+      "nama": "Times New Roman",
+      "pt": 11,
+      "sz": 22,
+      "space_pt": 3,
+      "spasi": 1.15
+    },
+    "indentasi_gantung_daftar_twip": 341,
+    "spasi": {
+      "jenis": "kelipatan",
+      "nilai": 1.15,
+      "line_twip": 276
+    },
+    "target_halaman": null,
+    "target_bab": "mengikuti RPS OBE (CPL/CPMK)",
+    "gutter_status": "Disahkan Bos 23 Okt 2026: gutter 0 untuk A5/B5 (margin 2 cm cukup untuk jilid)"
+  },
+  "unsur_wajib": [
+    "tiu_per_bab",
+    "tik_per_bab",
+    "uraian_materi",
+    "latihan_daftar_bernomor_per_bab",
+    "checklist_per_bab",
+    "rangkuman_per_bab",
+    "halaman_cpl_cpmk",
+    "daftar_pustaka_apa7_indentasi_gantung"
+  ],
+  "aturan_tulisan": {
+    "tone": "instruksional akademik - terstruktur dan jelas, menyapa pembaca 'Anda', istilah konsisten, setiap konsep diikuti contoh konkret",
+    "tone_status": "ditetapkan 23 Okt 2026 (barang 9, Fase 4) - selaras nada pendidikan aplikasi",
+    "sitasi": "terverifikasi, dilarang mengarang",
+    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_*)",
+    "kata_terlarang_teks": [
+      "babi",
+      "piggy bank",
+      "minuman keras"
+    ],
+    "cek_teks_wajib": [
+      {
+        "pola": "tujuan instruksional",
+        "label": "TIU/TIK hadir"
+      },
+      {
+        "pola": "latihan",
+        "label": "Latihan hadir"
+      },
+      {
+        "pola": "rangkuman",
+        "label": "Rangkuman hadir"
+      },
+      {
+        "pola": "checklist|daftar periksa",
+        "label": "Checklist hadir"
+      }
+    ]
+  },
+  "gambar": {
+    "mode_brief": "literal",
+    "blok_gaya_saat_ini": {
+      "sumber": "jenis_buku.PAKET['pendidikan']['ilustrasi'] — ditulis ulang positif-dulu 23 Okt 2026 (barang 14)",
+      "teks": "Illustrate exactly this scene for an educational book: {brief}. Clean flat educational cartoon illustration, clear dark outlines around every shape, simple rounded forms, one clear focal subject with generous empty space around it, calm controlled colors - deep navy and warm orange accents - on a clean pure white background (hex #FFFFFF). No text, no words, no letters, no numbers, no watermark, no gradients, no 3D render, no photorealism, no cream or beige tint."
+    },
+    "jangkar_konsistensi": "Consistent series style for the whole book: the same flat educational cartoon style, the same deep navy and warm orange palette, and if a person appears, the same simple character design in every illustration.",
+    "status": "Blok gaya versi positif-dulu + jangkar berlaku 23 Okt 2026 (barang 13/14 untuk jalur pendidikan/monograf)."
+  },
+  "menunggu_keputusan": []
+}

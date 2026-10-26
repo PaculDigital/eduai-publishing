@@ -1,0 +1,84 @@
+{
+  "id": "buku_monograf",
+  "nama": "Buku Monograf",
+  "versi": 1,
+  "sumber_keputusan": "skill penelitian-ilmiah/buku-monograf via jenis/monograf/SPESIFIKASI.md (22 Okt 2026)",
+  "format": {
+    "ukuran": {
+      "nama": "A5",
+      "lebar_cm": 14.8,
+      "tinggi_cm": 21.0,
+      "lebar_twip": 8391,
+      "tinggi_twip": 11906
+    },
+    "margin_twip": {
+      "atas": 1134,
+      "bawah": 1134,
+      "kiri": 1134,
+      "kanan": 1134
+    },
+    "gutter_twip": 0,
+    "area_teks_twip": 6123,
+    "font_isi": {
+      "nama": "Cambria",
+      "pt": 11,
+      "sz": 22
+    },
+    "font_judul": {
+      "nama": "Cambria",
+      "pt": 14,
+      "sz": 28,
+      "tebal": true
+    },
+    "spasi": {
+      "jenis": "kelipatan",
+      "nilai": 1.15,
+      "line_twip": 276
+    },
+    "target_halaman": {
+      "min": 150,
+      "maks": 180
+    },
+    "target_bab": "8 (rentang 5-8)",
+    "gutter_status": "Disahkan Bos 23 Okt 2026: gutter 0 untuk A5/B5 (margin 2 cm cukup untuk jilid)"
+  },
+  "unsur_wajib": [
+    "pernyataan_novelty",
+    "kebaruan_tegas_di_bab4_atau_bab5",
+    "keterbatasan_penelitian",
+    "daftar_pustaka_apa7_indentasi_gantung",
+    "sitasi_terverifikasi_tidak_mengarang",
+    "struktur_buku_utuh: sampul, hak cipta, prakata, daftar isi, bab 1-5, daftar pustaka, tentang penulis"
+  ],
+  "aturan_tulisan": {
+    "tone": "akademik formal — orang ketiga, tanpa sapaan 'Anda', istilah teknis dipakai konsisten, kalimat lugas",
+    "tone_status": "Ditetapkan 23 Okt 2026 (barang 9) dari sifat monograf sebagai karya akademik satu penelitian; menutup temuan STATUS: monograf jatuh ke tone 'Anda'. Boleh diubah Bos.",
+    "sitasi": "terverifikasi, dilarang mengarang (skill buku-monograf)",
+    "larangan_teks": "larangan budaya berlaku untuk teks (daftar kata: brief_visual KATA_* / mutu-buku/gambar-dan-visual/prompt/larangan-budaya.md)",
+    "kata_terlarang_teks": [
+      "babi",
+      "piggy bank",
+      "minuman keras"
+    ],
+    "cek_teks_wajib": [
+      {
+        "label": "pernyataan kebaruan / novelty",
+        "pola": "kebaruan|novelty"
+      },
+      {
+        "label": "keterbatasan penelitian",
+        "pola": "keterbatasan"
+      }
+    ]
+  },
+  "gambar": {
+    "mode_brief": "berslot",
+    "blok_gaya_saat_ini": {
+      "sumber": "jenis_buku.PAKET['pendidikan']['ilustrasi'] — ditulis ulang positif-dulu 23 Okt 2026 (barang 14)",
+      "teks": "Illustrate exactly this scene for an educational book: {brief}. Clean flat educational cartoon illustration, clear dark outlines around every shape, simple rounded forms, one clear focal subject with generous empty space around it, calm controlled colors - deep navy and warm orange accents - on a clean pure white background (hex #FFFFFF). No text, no words, no letters, no numbers, no watermark, no gradients, no 3D render, no photorealism, no cream or beige tint."
+    },
+    "jangkar_konsistensi": "Consistent series style for the whole book: the same flat educational cartoon style, the same deep navy and warm orange palette, and if a person appears, the same simple character design in every illustration.",
+    "status": "Blok gaya versi positif-dulu + jangkar berlaku 23 Okt 2026 (barang 13/14 untuk jalur pendidikan/monograf)."
+  },
+  "menunggu_keputusan": []
+}

@@ -1,0 +1,112 @@
+{
+  "aturan_tulisan": {
+    "cek_teks_wajib": [
+      {
+        "label": "Abstrak hadir",
+        "pola": "abstrak"
+      },
+      {
+        "label": "Kata Kunci hadir",
+        "pola": "kata kunci"
+      },
+      {
+        "label": "Pendahuluan hadir",
+        "pola": "pendahuluan"
+      },
+      {
+        "label": "Glosarium hadir",
+        "pola": "glosarium"
+      }
+    ],
+    "kata_terlarang_teks": [
+      "babi",
+      "piggy bank",
+      "minuman keras"
+    ],
+    "tone": "akademik formal (mengikuti bab & buku induk kolaborasi)"
+  },
+  "format": {
+    "area_teks_twip": 6119,
+    "font_heading": {
+      "nama": "Cambria",
+      "pt": 14,
+      "sz": 28,
+      "tebal": true,
+      "warna": "hitam (tanpa warna)"
+    },
+    "font_isi": {
+      "nama": "Cambria",
+      "pt": 11,
+      "sz": 22
+    },
+    "font_judul": {
+      "nama": "Cambria",
+      "pt": 14,
+      "sz": 28,
+      "tebal": true
+    },
+    "gutter_twip": 0,
+    "indentasi": {
+      "isi_kiri_twip": 283,
+      "isi_baris_pertama_twip": 567,
+      "tujuan_pembelajaran_kiri_twip": 737,
+      "bullet_kiri_twip": 567,
+      "bullet_gantung_twip": 283,
+      "status": "diukur mentah dari XML berkas asli BAB 10"
+    },
+    "judul_bab": {
+      "catatan": "BUKAN style Heading - koreksi resmi spesifikasi",
+      "rata": "tengah",
+      "style": "Normal"
+    },
+    "maks_halaman": {
+      "nilai_di_spesifikasi_lama": 15,
+      "status": "KONFLIK: contoh nyata BAB 10 = 4.940 kata ter-render 40 hlm di LibreOffice; batas 15 hlm terikat paginasi Word. Gerbang melapor (C7 info), tidak menggagalkan."
+    },
+    "margin_twip": {
+      "atas": 1138,
+      "bawah": 1138,
+      "kiri": 1138,
+      "kanan": 1138
+    },
+    "pdf_turnitin": "A4 - DILARANG diubah ke A5",
+    "spasi": {
+      "catatan": "line_spacing TIDAK diset per paragraf - koreksi resmi spesifikasi",
+      "jenis": "bawaan (None)",
+      "line_twip": null
+    },
+    "ukuran": {
+      "nama": "A5",
+      "lebar_cm": 14.8,
+      "tinggi_cm": 21.0,
+      "lebar_twip": 8395,
+      "tinggi_twip": 11909,
+      "status": "diukur dari berkas asli BAB 10 (23 Okt 2026) - konversi python-docx pipeline Bos"
+    }
+  },
+  "gambar": {
+    "status": "Book chapter mengikuti aturan gambar buku induk kolaborasi; blok gaya sendiri belum ditetapkan penerbit bab."
+  },
+  "id": "book_chapter",
+  "menunggu_keputusan": [],
+  "mode": "book_chapter",
+  "nama": "Book Chapter",
+  "struktur": [
+    "BAB n + JUDUL (huruf besar) - TANPA penulis/abstrak/kata kunci",
+    "Section isi berhuruf A.. (pertama: A. Pendahuluan + Tujuan Pembelajaran a/b/c kiri 737)",
+    "Sub bernomor 1, 2, 3 per section",
+    "Section terakhir isi: Ringkasan Bab (butir - kiri 567 gantung 283)",
+    "N. Referensi (page break sebelum; M dilompati; entri gantung 720)",
+    "O. Glosarium (page break sebelum; TABEL 2 kolom 3059+3059, garis hitam)",
+    "CV Penulis No Spacing sesudah glosarium (judul 14 tebal, before 24 pt)"
+  ],
+  "sumber_keputusan": "SPESIFIKASI.md jenis/book-chapter (BAB 7) DIKOREKSI contoh nyata Book Chapter BAB 10 dari Bos 23 Okt 2026 - berkas asli adalah acuan tertinggi",
+  "versi": 1,
+  "unsur_wajib": [
+    "Section berhuruf mulai A. Pendahuluan",
+    "Tujuan Pembelajaran di Pendahuluan",
+    "Referensi (page break sebelum)",
+    "Glosarium TABEL 2 kolom (page break sebelum)",
+    "CV Penulis (No Spacing)"
+  ]
+}

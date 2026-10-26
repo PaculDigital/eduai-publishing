@@ -356,7 +356,126 @@ def buat_tabel(item):
         f'<w:tblGrid>{grid}</w:tblGrid>{kepala}{isi}</w:tbl>')
 
 
-def buat(spec, keluaran, spec_dir='.'):
+def fmt_cm(v):
+    """14.8 -> '14,8' ; 21.0 -> '21' (pola label ukuran di hak cipta)."""
+    s = ('%g' % v).replace('.', ',')
+    return s
+
+
+def terapkan_profil(doc, sty, profil):
+    """Terapkan angka profil (barang 5) ke document.xml + styles.xml.
+
+    Yang diubah HANYA yang profil tetapkan: ukuran halaman & margin di
+    sectPr, font isi pada run Palatino (nama + ukuran), style Normal
+    (font/ukuran/spasi), style Heading1 (font judul), posisi tab TOC
+    (= area teks - 515, pola inset template). gutter hanya diubah bila
+    profil menetapkannya (None = keputusan belum ada, jangan dikarang).
+    """
+    f = profil['format']
+    u = f['ukuran']
+    m = f['margin_twip']
+
+    sect = re.search(r'<w:sectPr.*?</w:sectPr>', doc, re.S)
+    assert sect, 'sectPr tidak ditemukan'
+    s = sect.group(0)
+    sz = re.search(r'<w:pgSz[^/]*/>', s).group(0)
+    sz_baru = (sz.replace(re.search(r'w:w="\d+"', sz).group(0), f'w:w="{u["lebar_twip"]}"')
+                 .replace(re.search(r'w:h="\d+"', sz).group(0), f'w:h="{u["tinggi_twip"]}"'))
+    s = s.replace(sz, sz_baru)
+    mar = re.search(r'<w:pgMar[^/]*/>', s).group(0)
+    mar_baru = mar
+    for kunci, nilai in (('top', m['atas']), ('right', m['kanan']),
+                         ('bottom', m['bawah']), ('left', m['kiri']),
+                         ('gutter', f.get('gutter_twip'))):
+        if nilai is None:
+            continue
+        mar_baru = re.sub(rf'w:{kunci}="\d+"', f'w:{kunci}="{nilai}"', mar_baru, count=1)
+    s = s.replace(mar, mar_baru)
+    doc = doc.replace(sect.group(0), s)
+
+    fi = f['font_isi']
+    def _run_baru(mrun):
+        r = mrun.group(0)
+        if 'Palatino Linotype' not in r:
+            return r
+        r = r.replace('Palatino Linotype', fi['nama'])
+        if fi['sz'] != 20:
+            r = r.replace('<w:sz w:val="20"/>', f'<w:sz w:val="{fi["sz"]}"/>', 1)
+            r = r.replace('<w:szCs w:val="20"/>', f'<w:szCs w:val="{fi["sz"]}"/>', 1)
+        return r
+    doc = re.sub(r'<w:r(?: [^>]*)?>.*?</w:r>', _run_baru, doc, flags=re.S)
+
+    # rPr tingkat paragraf (<w:pPr><w:rPr> — sifat run tanda paragraf):
+    # gerbang membaca w:ascii PERTAMA di paragraf, yang justru dari sini.
+    def _rpr_baru(mrpr):
+        r = mrpr.group(0)
+        if 'Palatino Linotype' not in r:
+            return r
+        r = r.replace('Palatino Linotype', fi['nama'])
+        if fi['sz'] != 20:
+            r = r.replace('<w:sz w:val="20"/>', f'<w:sz w:val="{fi["sz"]}"/>', 1)
+            r = r.replace('<w:szCs w:val="20"/>', f'<w:szCs w:val="{fi["sz"]}"/>', 1)
+        return r
+    doc = re.sub(r'<w:rPr>.*?</w:rPr>', _rpr_baru, doc, flags=re.S)
+
+    def blok_style(sty, sid):
+        m = re.search(r'<w:style [^>]*w:styleId="%s".*?</w:style>' % sid, sty, re.S)
+        return m
+
+    mn = blok_style(sty, 'Normal')
+    if mn:
+        b = mn.group(0)
+        b = b.replace('Times New Roman', fi['nama'])
+        b = b.replace('<w:sz w:val="24"/>', f'<w:sz w:val="{fi["sz"]}"/>')
+        b = b.replace('w:line="240"', f'w:line="{f["spasi"]["line_twip"]}"')
+        sty = sty.replace(mn.group(0), b)
+    fj = f.get('font_judul')
+    if fj:
+        mh = blok_style(sty, 'Heading1')
+        if mh:
+            b = mh.group(0)
+            b = b.replace('Trajan Pro', fj['nama'])
+            b = b.replace('<w:sz w:val="44"/>', f'<w:sz w:val="{fj["sz"]}"/>')
+            sty = sty.replace(mh.group(0), b)
+    tab_pos = f['area_teks_twip'] - 515
+    assert sty.count('w:pos="5938"') == 2, 'tab TOC tidak persis 2'
+    sty = sty.replace('w:pos="5938"', f'w:pos="{tab_pos}"')
+    doc = _skala_tabel(doc, f['area_teks_twip'])
+    return doc, sty
+
+
+def _skala_tabel(doc, area_target):
+    """Lebar tabel mengikuti area teks profil (pembangun tabel memakai
+    lebar induk 6453). Kolom diskala proporsional; gridCol & tcW diubah
+    konsisten per kolom."""
+    def skala_tabel(m):
+        t = m.group(0)
+        grid = [int(x) for x in re.findall(r'<w:gridCol w:w="(\d+)"', t)]
+        total = sum(grid)
+        if not grid or total == area_target:
+            return t
+        baru, jalan = [], 0
+        for i, g in enumerate(grid):
+            if i == len(grid) - 1:
+                baru.append(area_target - jalan)
+            else:
+                v = round(g * area_target / total)
+                baru.append(v)
+                jalan += v
+        it = iter(baru)
+        t = re.sub(r'<w:gridCol w:w="\d+"',
+                   lambda mm: f'<w:gridCol w:w="{next(it)}"', t)
+        # tcW per sel mengikuti urutan kolom di setiap baris
+        def skala_baris(bm):
+            b = bm.group(0)
+            it2 = iter(baru)
+            return re.sub(r'<w:tcW w:w="\d+" w:type="dxa"/>',
+                          lambda mm: f'<w:tcW w:w="{next(it2, baru[-1])}" w:type="dxa"/>', b)
+        return re.sub(r'<w:tr(?: [^>]*)?>.*?</w:tr>', skala_baris, t, flags=re.S)
+    return re.sub(r'<w:tbl>.*?</w:tbl>', skala_tabel, doc, flags=re.S)
+
+
+def buat(spec, keluaran, spec_dir='.', profil=None):
     konteks = None   # dibuat sesudah isi_zip dibaca (di dalam buat)
     mentah = TEMPLATE.read_bytes()
     md5 = hashlib.md5(mentah).hexdigest()
@@ -433,7 +552,12 @@ def buat(spec, keluaran, spec_dir='.'):
         46: f"Cetakan Pertama, {spec['cetakan']}",
     }
     if spec.get('jumlah_halaman'):
-        ganti_idx[47] = f"{spec['jumlah_halaman']} halaman; 14 x 20 cm"
+        if profil:
+            u = profil['format']['ukuran']
+            label = f"{fmt_cm(u['lebar_cm'])} x {fmt_cm(u['tinggi_cm'])} cm"
+        else:
+            label = '14 x 20 cm'
+        ganti_idx[47] = f"{spec['jumlah_halaman']} halaman; {label}"
     for idx, baru in ganti_idx.items():
         depan[idx] = ganti_semua_teks(depan[idx], baru)
 
@@ -451,7 +575,7 @@ def buat(spec, keluaran, spec_dir='.'):
     daftar_isi = list(paras[65:77])
     entri1 = (['KATA PENGANTAR']
               + [f"BAB {b['romawi']} {b['judul'].upper()}" for b in spec['bab']]
-              + (['DAFTAR PUSTAKA'] if spec.get('daftar_pustaka') else [])
+              + ['DAFTAR PUSTAKA']
               + ['TENTANG PENULIS'])
     entri2 = [f"{s['nomor']} {s['judul']}"
               for b in spec['bab'] for s in b['sub']]
@@ -562,12 +686,13 @@ def buat(spec, keluaran, spec_dir='.'):
         return p
 
     pustaka_xml = []
-    if spec.get('daftar_pustaka'):
-        pustaka_xml.append(klon(P_H1, 'DAFTAR PUSTAKA'))
-        for e in spec['daftar_pustaka']:
-            pustaka_xml.append(entri_pustaka(e))
-            pustaka_xml.append(KOSONG)
-        pustaka_xml.append(P_PB)   # Tentang Penulis mulai halaman baru
+    # DAFTAR PUSTAKA = WAJIB (putusan Bos, e491fc3; barang 4 rencana SSOT).
+    # Validasi awal di main() menjamin kolom ini ada & tak kosong.
+    pustaka_xml.append(klon(P_H1, 'DAFTAR PUSTAKA'))
+    for e in spec['daftar_pustaka']:
+        pustaka_xml.append(entri_pustaka(e))
+        pustaka_xml.append(KOSONG)
+    pustaka_xml.append(P_PB)   # Tentang Penulis mulai halaman baru
 
     # ── TENTANG PENULIS (105..116 dipertahankan, isi diganti) ──
     penulis_xml = [paras[105], paras[106],
@@ -591,6 +716,17 @@ def buat(spec, keluaran, spec_dir='.'):
     except ET.ParseError as e:
         raise SystemExit(f'document.xml hasil rakitan RUSAK: {e}')
     isi_zip['word/document.xml'] = doc_baru.encode('utf-8')
+
+    # ── PROFIL JENIS (barang 5): terapkan angka profil ke salinan ──
+    if profil:
+        doc_baru, sty_baru = terapkan_profil(
+            doc_baru, isi_zip['word/styles.xml'].decode('utf-8'), profil)
+        try:
+            ET.fromstring(doc_baru)
+        except ET.ParseError as e:
+            raise SystemExit(f'document.xml rusak sesudah profil: {e}')
+        isi_zip['word/document.xml'] = doc_baru.encode('utf-8')
+        isi_zip['word/styles.xml'] = sty_baru.encode('utf-8')
 
     # ── MEDIA GAMBAR BARU (v2): relasi + urutan berkas zip ──
     konteks.terapkan_rels()
@@ -616,18 +752,143 @@ def buat(spec, keluaran, spec_dir='.'):
     print(f'TERTULIS: {keluaran} ({Path(keluaran).stat().st_size} byte)', flush=True)
 
 
+def ukur_halaman(keluaran, spec):
+    """Barang 7: nomor halaman DAFTAR ISI dari RENDER NYATA.
+
+    Buku dirender ke PDF (WordCraft — SATU-SATUNYA perender gerbang
+    sejak desain akar 26 Okt 2026; `soffice` tidak dipakai lagi),
+    tiap judul dicari di halaman berapa ia sungguh tampil, lalu
+    angka cache PAGEREF di daftar isi diganti angka terukur itu.
+    Perkiraan tidak dipakai lagi.
+    Mengembalikan (peta_judul_ke_halaman, total_halaman).
+    Judul yang tidak ditemukan mempertahankan angka cache lama dan
+    dilaporkan — tidak dikarang.
+    """
+    import tempfile
+    entri1 = (['KATA PENGANTAR']
+              + [f"BAB {b['romawi']} {b['judul'].upper()}" for b in spec['bab']]
+              + ['DAFTAR PUSTAKA', 'TENTANG PENULIS'])
+    entri2 = [f"{s['nomor']} {s['judul']}"
+              for b in spec['bab'] for s in b['sub']]
+    from perender_halaman import hitung_halaman, render_pdf
+    with tempfile.TemporaryDirectory() as td:
+        pdf = Path(td) / (Path(keluaran).stem + '.pdf')
+        if not render_pdf(keluaran, pdf):
+            raise RuntimeError('WordCraft gagal merender buku ke PDF — '
+                               'nomor daftar isi tidak terukur')
+        total = hitung_halaman(keluaran)
+        if total is None:
+            raise RuntimeError('WordCraft gagal menghitung halaman — '
+                               'nomor daftar isi tidak terukur')
+        halaman_teks = []
+        for i in range(1, total + 1):
+            t = subprocess.run(['pdftotext', '-f', str(i), '-l', str(i),
+                                '-layout', str(pdf), '-'],
+                               check=True, capture_output=True, text=True).stdout
+            halaman_teks.append(t.upper())
+    # halaman daftar isi = halaman yang memuat 'DAFTAR ISI' + banyak entri
+    toc_page = next((i + 1 for i, t in enumerate(halaman_teks)
+                     if 'DAFTAR ISI' in t and 'KATA PENGANTAR' in t), None)
+
+    def cari(entri, sesudah=None, sebelum=None):
+        e = entri.upper()
+        # judul BAB = DUA token pertama ('BAB I'); entri lain utuh.
+        kunci = ' '.join(e.split()[:2]) if e.startswith('BAB ') else e
+        for i, t in enumerate(halaman_teks):
+            h = i + 1
+            if sesudah and h <= sesudah:
+                continue
+            if sebelum and h >= sebelum:
+                continue
+            for baris in t.splitlines():
+                b = baris.strip()
+                if b.startswith(kunci + ' ') or b == kunci:
+                    return h
+        return None
+
+    peta = {}
+    for e in entri1:
+        if e == 'KATA PENGANTAR':
+            peta[e] = cari(e, sebelum=toc_page) if toc_page else cari(e)
+        else:
+            peta[e] = cari(e, sesudah=toc_page) if toc_page else cari(e)
+    peta2 = {}
+    for e in entri2:
+        peta2[e] = cari(e, sesudah=toc_page) if toc_page else cari(e)
+
+    # tempel angka terukur ke cache PAGEREF + jumlah halaman hak cipta
+    with zipfile.ZipFile(keluaran) as z:
+        isi = {n: z.read(n) for n in z.namelist()}
+        urutan = z.namelist()
+    doc = isi['word/document.xml'].decode('utf-8')
+    paras = RE_PARA.findall(doc)
+    i1 = i2 = 0
+    for j, p in enumerate(paras):
+        target = None
+        if '<w:pStyle w:val="TOC1"' in p and i1 < len(entri1):
+            target = peta.get(entri1[i1]); i1 += 1
+        elif '<w:pStyle w:val="TOC2"' in p and i2 < len(entri2):
+            target = peta2.get(entri2[i2]); i2 += 1
+        if target:
+            k = p.find('fldCharType="separate"')
+            if k >= 0:
+                ekor = re.sub(r'(<w:t[^>]*>)\d+(</w:t>)',
+                              lambda mm: f'{mm.group(1)}{target}{mm.group(2)}',
+                              p[k:], count=1)
+                paras[j] = p[:k] + ekor
+    # rakit ulang: substitusi paragraf per indeks lewat finditer
+    hasil, terakhir = [], 0
+    for idx, m in enumerate(RE_PARA.finditer(doc)):
+        hasil.append(doc[terakhir:m.start()])
+        hasil.append(paras[idx] if idx < len(paras) else m.group(0))
+        terakhir = m.end()
+    hasil.append(doc[terakhir:])
+    doc_baru = ''.join(hasil)
+    doc_baru = re.sub(r'(<w:t[^>]*>)\d+ halaman;',
+                      lambda mm: f'{mm.group(1)}{total} halaman;', doc_baru, count=1)
+    try:
+        ET.fromstring(doc_baru)
+    except ET.ParseError as e:
+        raise SystemExit(f'document.xml rusak sesudah ukur halaman: {e}')
+    isi['word/document.xml'] = doc_baru.encode('utf-8')
+    with zipfile.ZipFile(keluaran, 'w', zipfile.ZIP_DEFLATED) as z:
+        for n in urutan:
+            z.writestr(n, isi[n])
+    ketemu = {**{k: v for k, v in peta.items() if v},
+              **{k: v for k, v in peta2.items() if v}}
+    hilang = [e for e in entri1 + entri2 if e not in ketemu]
+    return ketemu, hilang, total
+
+
 def main():
-    arg = [a for a in sys.argv[1:] if not a.startswith('--')]
+    mentah_argv = sys.argv[1:]
+    profil_path = None
+    if '--profil' in mentah_argv:
+        i = mentah_argv.index('--profil')
+        profil_path = mentah_argv[i + 1]
+        del mentah_argv[i:i + 2]
+    profil = (json.loads(Path(profil_path).read_text(encoding='utf-8'))
+              if profil_path else None)
+    arg = [a for a in mentah_argv if not a.startswith('--')]
     if len(arg) != 2:
         sys.exit(__doc__)
     spec = json.loads(Path(arg[0]).read_text(encoding='utf-8'))
     wajib = ['judul', 'penulis', 'penerbit', 'tahun', 'isbn', 'editor',
              'penyunting', 'desain_sampul', 'alamat', 'web', 'email',
              'facebook', 'twitter', 'whatsapp', 'cetakan', 'tempat_tanggal',
-             'kata_pengantar', 'bab', 'tentang_penulis']
+             'kata_pengantar', 'bab', 'tentang_penulis', 'daftar_pustaka']
     kurang = [k for k in wajib if k not in spec]
     if kurang:
         sys.exit(f'Spec kurang kolom: {kurang}')
+
+    # ── DAFTAR PUSTAKA WAJIB (barang 4) ──
+    # Disahkan Bos di e491fc3; dulu kolom ini opsional sehingga buku
+    # tanpa pustaka bisa terbit. Sekarang ditolak SEBELUM menulis.
+    dp = spec.get('daftar_pustaka')
+    if (not isinstance(dp, list) or not dp
+            or any(not isinstance(e, str) or not e.strip() for e in dp)):
+        sys.exit('Spec ditolak: "daftar_pustaka" WAJIB berisi minimal 1 '
+                 'entri teks (Daftar Pustaka sudah disahkan wajib).')
 
     # ── VALIDASI AWAL (temuan review 22 Okt 2026, cacat 2) ──
     # Romawi & daftar bab diperiksa SEBELUM menulis apa pun: generator
@@ -669,17 +930,45 @@ def main():
     keluaran = Path(arg[1])
     sementara = keluaran.with_name(keluaran.name + '.tmp.docx')
     try:
-        buat(spec, str(sementara), spec_dir=Path(arg[0]).resolve().parent)
-        if '--tanpa-gerbang' not in sys.argv:
+        buat(spec, str(sementara), spec_dir=Path(arg[0]).resolve().parent,
+             profil=profil)
+        if '--tanpa-gerbang' not in mentah_argv:
             print('\n— menjalankan GERBANG —')
-            r = subprocess.run([sys.executable, str(GERBANG), str(sementara)])
+            cmd = [sys.executable, str(GERBANG), str(sementara),
+                   '--wajib-pustaka']
+            if profil_path:
+                cmd.append(f'--profil={profil_path}')
+            r = subprocess.run(cmd)
             if r.returncode != 0:
                 sementara.unlink(missing_ok=True)
                 print(f'\nGAGAL gerbang — berkas sementara dihapus, '
                       f'{keluaran} TIDAK ditulis.')
                 sys.exit(r.returncode)
+            if profil_path:
+                print('\n— menjalankan GERBANG TULISAN —')
+                r = subprocess.run(
+                    [sys.executable, str(HERE / 'periksa_tulisan.py'),
+                     str(sementara), f'--profil={profil_path}'])
+                if r.returncode != 0:
+                    sementara.unlink(missing_ok=True)
+                    print(f'\nGAGAL gerbang tulisan — berkas sementara '
+                          f'dihapus, {keluaran} TIDAK ditulis.')
+                    sys.exit(r.returncode)
         sementara.replace(keluaran)
         print(f'SELESAI: {keluaran} ({keluaran.stat().st_size} byte)')
+        if profil and '--tanpa-ukur' not in mentah_argv:
+            print('\n— mengukur halaman dari render nyata —')
+            try:
+                ketemu, hilang, total = ukur_halaman(keluaran, spec)
+                print(f'  total halaman terukur: {total}')
+                for k, v in ketemu.items():
+                    print(f'  {k[:52]:52s} -> hlm {v}')
+                if hilang:
+                    print(f'  PERINGATAN: tidak ditemukan di render '
+                          f'(angka cache lama dipertahankan): {hilang}')
+            except Exception as e:  # render gagal ≠ buku gagal; laporkan keras
+                print(f'  PERINGATAN: ukur halaman GAGAL ({e}) — nomor '
+                      f'daftar isi masih angka cache, BELUM terukur.')
     except BaseException:
         sementara.unlink(missing_ok=True)
         raise
