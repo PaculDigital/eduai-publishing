@@ -10,7 +10,8 @@ DOCX BAB 7 asli) — daftar uji §9 spesifikasi itu sendiri:
   C5 struktur: Abstrak & Kata Kunci hadir; Referensi & Glosarium ada;
      page break HANYA sebelum Referensi & Glosarium
   C6 glosarium = TABEL 2 kolom, kepala tebal
-  C7 halaman hasil render <= 15 (LibreOffice; di mesin tanpa Cambria
+  C7 halaman hasil render (WordCraft — SATU-SATUNYA perender gerbang
+     sejak desain akar 26 Okt 2026; di mesin tanpa font Cambria
      paginasi memakai font pengganti — angka indikatif)
   C8 referensi tidak kosong
 
@@ -18,11 +19,11 @@ Pakai:
     python3 periksa_book_chapter.py chapter.docx [--tanpa-halaman]
 """
 import re
-import subprocess
 import sys
-import tempfile
 import zipfile
 from pathlib import Path
+
+from perender_halaman import hitung_halaman
 
 LULUS = GAGAL = 0
 
@@ -182,21 +183,16 @@ def main():
     ok('C8 referensi tidak kosong', len(ref_isi) >= 1, '0 entri')
 
     if not tanpa_halaman:
-        with tempfile.TemporaryDirectory() as tmp:
-            subprocess.run(['soffice', '--headless', '--convert-to', 'pdf',
-                            str(path), '--outdir', tmp],
-                           capture_output=True, text=True, timeout=300)
-            pdf = Path(tmp) / (path.stem + '.pdf')
-            n = 0
-            if pdf.exists():
-                r = subprocess.run(['pdfinfo', str(pdf)], capture_output=True, text=True)
-                m = re.search(r'Pages:\s+(\d+)', r.stdout)
-                n = int(m.group(1)) if m else 0
-            kata = sum(len(t.split()) for _, t, _ in P)
-            print(f'  INFO   C7 halaman render mesin ini: {n} | total kata: {kata} '
-                  '(batas 15 hlm pada spesifikasi lama terikat paginasi Word; '
-                  'contoh nyata BAB 10 = 4.940 kata ter-render 40 hlm di '
-                  'LibreOffice — C7 bersifat laporan, BUKAN penentu lulus)')
+        n = hitung_halaman(path)
+        kata = sum(len(t.split()) for _, t, _ in P)
+        if n is None:
+            print(f'  INFO   C7 halaman render: TIDAK TERUKUR '
+                  f'(WordCraft tidak tersedia di mesin ini) | total kata: {kata} '
+                  f'— C7 bersifat laporan, BUKAN penentu lulus')
+        else:
+            print(f'  INFO   C7 halaman render (WordCraft): {n} | total kata: {kata} '
+                  f'— C7 bersifat laporan, BUKAN penentu lulus '
+                  f'(batas 15 hlm spesifikasi lama terikat paginasi Word)')
 
     print(f'\nRINGKAS: {LULUS} LULUS / {GAGAL} GAGAL')
     return 1 if GAGAL else 0

@@ -755,9 +755,11 @@ def buat(spec, keluaran, spec_dir='.', profil=None):
 def ukur_halaman(keluaran, spec):
     """Barang 7: nomor halaman DAFTAR ISI dari RENDER NYATA.
 
-    Buku dirender ke PDF (LibreOffice headless), tiap judul dicari di
-    halaman berapa ia sungguh tampil, lalu angka cache PAGEREF di daftar
-    isi diganti angka terukur itu. Perkiraan tidak dipakai lagi.
+    Buku dirender ke PDF (WordCraft — SATU-SATUNYA perender gerbang
+    sejak desain akar 26 Okt 2026; `soffice` tidak dipakai lagi),
+    tiap judul dicari di halaman berapa ia sungguh tampil, lalu
+    angka cache PAGEREF di daftar isi diganti angka terukur itu.
+    Perkiraan tidak dipakai lagi.
     Mengembalikan (peta_judul_ke_halaman, total_halaman).
     Judul yang tidak ditemukan mempertahankan angka cache lama dan
     dilaporkan — tidak dikarang.
@@ -768,14 +770,16 @@ def ukur_halaman(keluaran, spec):
               + ['DAFTAR PUSTAKA', 'TENTANG PENULIS'])
     entri2 = [f"{s['nomor']} {s['judul']}"
               for b in spec['bab'] for s in b['sub']]
+    from perender_halaman import hitung_halaman, render_pdf
     with tempfile.TemporaryDirectory() as td:
-        subprocess.run(['soffice', '--headless', '--convert-to', 'pdf',
-                        '--outdir', td, str(keluaran)],
-                       check=True, capture_output=True, timeout=300)
-        pdf = next(Path(td).glob('*.pdf'))
-        total = int(subprocess.run(['pdfinfo', str(pdf)], check=True,
-                                   capture_output=True, text=True)
-                    .stdout.split('Pages:')[1].split()[0])
+        pdf = Path(td) / (Path(keluaran).stem + '.pdf')
+        if not render_pdf(keluaran, pdf):
+            raise RuntimeError('WordCraft gagal merender buku ke PDF — '
+                               'nomor daftar isi tidak terukur')
+        total = hitung_halaman(keluaran)
+        if total is None:
+            raise RuntimeError('WordCraft gagal menghitung halaman — '
+                               'nomor daftar isi tidak terukur')
         halaman_teks = []
         for i in range(1, total + 1):
             t = subprocess.run(['pdftotext', '-f', str(i), '-l', str(i),

@@ -278,8 +278,11 @@ def main():
     keluar = Path(arg[1])
     sementara = keluar.with_suffix('.tmp.docx')
     bangun(spec, sementara)
-    r = subprocess.run([sys.executable, str(SINI / 'periksa_book_chapter.py'),
-                        str(sementara)], capture_output=True, text=True)
+    perintah = [sys.executable, str(SINI / 'periksa_book_chapter.py'),
+                str(sementara)]
+    if '--tanpa-halaman' in sys.argv:
+        perintah.append('--tanpa-halaman')
+    r = subprocess.run(perintah, capture_output=True, text=True)
     print(r.stdout)
     if r.returncode != 0:
         sementara.unlink(missing_ok=True)
