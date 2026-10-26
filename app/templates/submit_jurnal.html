@@ -104,6 +104,7 @@ select:disabled,input:disabled{background:#F4F6F5;color:var(--teks-abu)}
 </style>
 </head>
 <body>
+{{ ikon_sprite() }}
 
 <header>
   <div class="nav">
@@ -272,7 +273,7 @@ select:disabled,input:disabled{background:#F4F6F5;color:var(--teks-abu)}
              buka di Tridarma</a>` : ''}
           ${sudahDiterima(a) ? `<br><button class="tombol putih btn-loa"
              data-berkas="${a.berkas_id}" style="margin-top:6px;font-size:12px">
-             📄 Unduh LoA</button>` : ''}</td>
+             <svg class="ik" width="14" height="14" aria-hidden="true"><use href="#ik-file-text"></use></svg> Unduh LoA</button>` : ''}</td>
       </tr>`).join('');
   }
 
@@ -315,7 +316,7 @@ select:disabled,input:disabled{background:#F4F6F5;color:var(--teks-abu)}
       //  buka PDF di tab baru
       window.open('/api/ai/v1/loa/unduh?berkas_id=' + encodeURIComponent(berkas), '_blank');
       b.disabled = false;
-      b.textContent = '📄 Unduh LoA (' + j.nomor + ')';
+      b.textContent = 'Unduh LoA (' + j.nomor + ')';
     } catch (e) {
       alert('Gagal menghubungi server.');
       b.disabled = false; b.textContent = asal;

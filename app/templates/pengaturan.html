@@ -102,7 +102,7 @@
         <tr>
           <td><b>{{ k.label }}</b><br>
               <span style="color:var(--tinta2);font-size:12px">{{ k.catatan }}</span></td>
-          <td>{% if k.ada %}<span class="badge db">✅ ada</span>
+          <td>{% if k.ada %}<span class="badge db">{{ ikon('check', 12) }} ada</span>
               {% else %}<span class="badge def">belum ada</span>{% endif %}</td>
           <td><code>{{ k.tersamar or '—' }}</code><br>
               <span style="color:var(--tinta2);font-size:12px">{{ k.panjang }} karakter
@@ -124,7 +124,7 @@
 
     {% if kuota_scite %}
     <div style="margin-top:16px;padding:14px 16px;background:#f5f1ea;border-radius:10px">
-      <b>📊 Kuota Scite</b>
+      <b>{{ ikon('file-spreadsheet', 15) }} Kuota Scite</b>
       <span class="badge {{ 'db' if kuota_scite.status != 'trialing' else 'def' }}"
             style="margin-left:6px">{{ kuota_scite.status }}</span>
       <div style="margin-top:8px;font-size:14px">

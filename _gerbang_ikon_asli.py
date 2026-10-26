@@ -128,16 +128,40 @@ def ambil_resmi(nama: str, online: bool) -> str | None:
 
 def nama_dipakai() -> set[str]:
     kumpul: set[str] = set()
+    #  ⚠️ LUBANG YANG DITUTUP (26 Okt 2026, ketemu saat UJI GIGI):
+    #  pola lama HANYA mengenal kutip TUNGGAL — `ikon('x')`. Begitu nama ikon
+    #  ditulis dengan kutip GANDA `ikon("x")`, gerbang BUTA total dan bilang
+    #  HIJAU walau namanya karangan. Uji gigi membuktikan: `ikon("zz-palsu-xyz")`
+    #  LOLOS 5/0. Sekarang kedua kutip diterima + spasi bebas.
+    #
+    #  ⚠️ JEBAKAN KE-2 (juga ketemu saat uji gigi): pola `'#ik-' + nama` yang
+    #  mengambil SEMUA string di variabel `nama` TERLALU RAKUS — di
+    #  _topup_popup.html `nama` berisi 'QRIS-...eduai.png', di naskah.html
+    #  berisi id 'kb-nama'. Akibatnya gerbang protes 'eduai' & 'kb-nama' yang
+    #  BUKAN nama ikon (gagal palsu). Sekarang hanya string yang MUNCUL SEBAGAI
+    #  NAMA IKON sah (huruf kecil, tanpa titik/garis bawah, ≤40) yang diambil.
+    POLA_KUTIP = re.compile(
+        r"""ikon\(\s*['"]([A-Za-z0-9._-]+)['"]""", re.I)
     for f in TPL.glob('*.html'):
         t = f.read_text(encoding='utf-8')
-        kumpul |= set(re.findall(r"ikon\(\s*'([a-z0-9-]+)'", t))
-        kumpul |= set(re.findall(r"IKON\(\s*'([a-z0-9-]+)'", t))
-        kumpul |= set(re.findall(r'href="#ik-([a-z0-9-]+)', t))
+        kumpul |= set(POLA_KUTIP.findall(t))
+        kumpul |= set(re.findall(r'href=["\']#ik-([a-z0-9-]+)', t))
         for baris in t.splitlines():
-            m = re.search(r"'#ik-' \+ ([A-Za-z_][A-Za-z0-9_]*)", baris)
+            m = re.search(r"""['"]#ik-['"]\s*\+\s*([A-Za-z_][A-Za-z0-9_]*)""", baris)
             if m:
-                for mm in re.finditer(r'var\s+' + re.escape(m.group(1)) + r'\s*=\s*([^;]+);', t):
-                    kumpul |= set(re.findall(r"'([a-z0-9-]+)'", mm.group(1)))
+                var = m.group(1)
+                #  ⚠️ JANGAN ambil SEMUA string di variabel `nama` — variabel itu
+                #  dipakai untuk BANYAK tujuan. Bukti nyata (26 Okt 2026):
+                #    _topup_popup.html  nama = 'QRIS-' + (orderAktif || 'eduai') + '.png'
+                #                       → 'eduai' = cadangan NAMA BERKAS QRIS
+                #    naskah.html        nama = (kb('kb-nama').value || '').trim()
+                #                       → 'kb-nama' = ID ELEMEN DOM
+                #  Keduanya BUKAN ikon → gerbang protes palsu. Aturan sekarang:
+                #  variabel hanya dipercaya sebagai nama ikon bila di berkas itu
+                #  ada pemberian LANGSUNG satu kata: var nama = 'check';
+                for mm in re.finditer(
+                        r'var\s+' + re.escape(var) + r"""\s*=\s*['"]([A-Za-z0-9-]+)['"]\s*;""", t):
+                    kumpul.add(mm.group(1))
     return kumpul
 
 

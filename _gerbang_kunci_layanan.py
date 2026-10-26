@@ -27,7 +27,14 @@ def cek(nama, syarat, ket=''):
 print('══ A. MODUL KUNCI ══')
 from app.kunci_layanan import LAYANAN, ambil, hapus, pasang, samar, status_semua
 
-cek('A1 3 layanan terdaftar', set(LAYANAN) == {'scopus', 'openalex', 'scite'})
+#  ⚠️ JANGAN PAKU JUMLAH (26 Okt 2026): dulu ditulis mati == {'scopus','openalex','scite'}
+#  sehingga penambahan layanan SAH (statistik, 4 layanan) membuat gerbang MERAH
+#  padahal aplikasi benar. Yang diuji sekarang: layanan WAJIB ada + sifatnya benar,
+#  bukan jumlahnya. Layanan baru tidak lagi memerahkan gerbang.
+WAJIB = {'scopus', 'openalex', 'scite'}
+hilang = WAJIB - set(LAYANAN)
+cek('A1 layanan wajib terdaftar', not hilang, f'hilang: {sorted(hilang)}')
+print(f'         (terdaftar: {len(LAYANAN)} — {sorted(LAYANAN)})')
 cek('A2 Scopus = kunci mati', LAYANAN['scopus']['sifat'] == 'mati')
 cek('A3 Scite = token hidup', LAYANAN['scite']['sifat'] == 'hidup')
 
