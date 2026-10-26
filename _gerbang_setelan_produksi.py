@@ -50,8 +50,10 @@ DAFTAR_KECUALI: dict[str, str] = {
         'jalur JEV (model jev-1.13 lewat jembatan 8130) — bukan model berpikir',
     'app/_gerbang_jev_jalantol.py':
         'gerbang jalur-tol JEV — menyentuh jalur JEV, bukan 9router',
-    '_uji_3peran_jev_betul.py':
-        'uji 3 peran JEV — JEMBATAN 8130 + model jev-1.13 (bukan 9router)',
+    #  ⚠️ `_uji_3peran_jev_betul.py` DICABUT dari daftar 26 Okt 2026:
+    #  berkasnya sudah DIARSIPKAN ke `_arsip/bersih-23okt26/` (bukan dihapus
+    #  sembarangan). Mendaftar berkas yang tidak ada = daftar berisi nama hantu
+    #  ⇒ gerbang G5/G7 MERAH dan deploy terhenti karena hal yang sudah beres.
 }
 
 #  Berkas produksi yang WAJIB `False` (bukan cuma "ada").
@@ -59,7 +61,7 @@ PRODUKSI_WAJIB_FALSE = ['app/ai.py']
 
 #  Pengecualian karena JALUR BEDA (bukan karena lupa) — dikecualikan dari G6.
 PENYEBAB_JALUR_JEV = (
-    'app/jev.py', 'app/_gerbang_jev_jalantol.py', '_uji_3peran_jev_betul.py',
+    'app/jev.py', 'app/_gerbang_jev_jalantol.py',
 )
 
 
