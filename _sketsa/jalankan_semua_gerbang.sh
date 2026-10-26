@@ -19,16 +19,37 @@ GERBANG="_gerbang_jurnal.py _gerbang_jurnal2.py _gerbang_jurnal3.py _gerbang_jat
          app/_gerbang_pagar_unggah.py"
 for g in $GERBANG; do
   #  GERBANG SOT butuh salinan dokumen + skrip gerbang + mesin sot.py.
+  #  BERGIGI (26 Okt 2026, temuan agen Boss A): setiap cp SOT WAJIB dicek.
+  #  Dulu semua cp ditelan >/dev/null 2>&1 tanpa cek gagal, dan daftarnya
+  #  masih menyebut MASTER_PLAN/FLAG/CATATAN_PROYEK yang sudah diarsipkan.
+  #  Daftar kini: SOT.md + docs/sot/* + sot.py + lampiran root (*.md).
+  #  Gagal cp SOT = skrip BERHENTI di sini, bukan lanjut dengan hijau palsu.
   if [ "$g" = "_gerbang_sot.py" ]; then
-    docker cp sot.py eduai-app:/app/ >/dev/null 2>&1
-    docker exec eduai-app mkdir -p /app/sot-dok >/dev/null 2>&1
-    for d in SOT.md MASTER_PLAN.md FLAG_LANJUT_DISINI.md CATATAN_PROYEK.md \
-             _sketsa/jalankan_semua_gerbang.sh; do
-      docker cp "$d" eduai-app:/app/sot-dok/ >/dev/null 2>&1
+    if ! docker cp sot.py eduai-app:/app/ >/dev/null 2>&1; then
+      echo "  ❌ GAGAL cp sot.py ke container — gerbang SOT dibatalkan"; exit 1
+    fi
+    if ! docker exec eduai-app mkdir -p /app/sot-dok/docs/sot /app/sot-dok/_sketsa >/dev/null 2>&1; then
+      echo "  ❌ GAGAL mkdir /app/sot-dok — gerbang SOT dibatalkan"; exit 1
+    fi
+    if ! docker cp SOT.md eduai-app:/app/sot-dok/ >/dev/null 2>&1; then
+      echo "  ❌ GAGAL cp SOT.md — gerbang SOT dibatalkan"; exit 1
+    fi
+    if ! docker cp sot.py eduai-app:/app/sot-dok/sot.py >/dev/null 2>&1; then
+      echo "  ❌ GAGAL cp sot.py ke sot-dok — gerbang SOT dibatalkan"; exit 1
+    fi
+    for d in docs/sot/*.md; do
+      if ! docker cp "$d" eduai-app:/app/sot-dok/docs/sot/ >/dev/null 2>&1; then
+        echo "  ❌ GAGAL cp $d — gerbang SOT dibatalkan"; exit 1
+      fi
     done
-    #  Berkas ber-penanda SOT (label) perlu IKUT supaya pemeriksa label jalan.
+    if ! docker cp _sketsa/jalankan_semua_gerbang.sh eduai-app:/app/sot-dok/_sketsa/ >/dev/null 2>&1; then
+      echo "  ❌ GAGAL cp jalankan_semua_gerbang.sh — gerbang SOT dibatalkan"; exit 1
+    fi
+    #  Lampiran root (*.md) perlu IKUT supaya pemeriksa label jalan.
     for d in *.md; do
-      docker cp "$d" eduai-app:/app/sot-dok/ >/dev/null 2>&1
+      if ! docker cp "$d" eduai-app:/app/sot-dok/ >/dev/null 2>&1; then
+        echo "  ❌ GAGAL cp $d — gerbang SOT dibatalkan"; exit 1
+      fi
     done
   fi
   docker cp "$g" eduai-app:/app/ >/dev/null 2>&1

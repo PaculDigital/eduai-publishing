@@ -9,7 +9,7 @@
 # ║  CARA KERJA WAJIB (jangan dilanggar):                                    ║
 # ║   1. REPRODUKSI error dulu — jangan menebak.                             ║
 # ║   2. UKUR: pakai alat ukur nyata (pyflakes, grep SELURUH repo, log).     ║
-# ║   3. BUKA RUJUKAN: MASTER_PLAN.md / docs / skill ini dulu.              ║
+# ║   3. BUKA RUJUKAN: SOT.md / docs/sot/ / skill ini dulu.                 ║
 # ║   4. Cari AKAR (kenapa ini bisa terjadi), bukan gejala.                  ║
 # ║   5. Perbaiki AKAR-nya + TULIS gerbang/uji supaya tak terulang.          ║
 # ║                                                                          ║
