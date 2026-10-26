@@ -80,6 +80,7 @@ HERE = Path(__file__).resolve().parent
 TEMPLATE = HERE.parent / 'templates' / 'template-buku-resmi.docx'
 MD5_WAJIB = '0bb7bc5cdae9a99f489feb87387b64b6'
 GERBANG = HERE / 'periksa_buku_template.py'
+GERBANG_JENIS = HERE / 'periksa_jenis_buku.py'
 
 RE_PARA = re.compile(r'<w:p(?: [^>]*)?>.*?</w:p>|<w:p(?: [^>]*)?/>', re.S)
 RE_T = re.compile(r'<w:t(?:\s[^>]*)?>([^<]*)</w:t>')
@@ -641,6 +642,24 @@ def main():
         if not r_ or not ROMAWI_SAH.match(r_):
             sys.exit(f'Spec ditolak: romawi bab tidak sah: {r_!r} '
                      '(wajib angka Romawi: I, II, III, IV, ...)')
+
+    # ── GERBANG JENIS (Gas Boss 26 Okt 2026) ──
+    # Dijalankan SEBELUM menulis apa pun, hanya bila spec menyatakan
+    # "jenis". Spec lama tanpa kolom jenis TIDAK dipatahkan: gerbang
+    # dilewati dengan peringatan, supaya contoh lama tetap jalan.
+    # Spec ber-jenis yang gagal gerbang jenis DITOLAK di sini —
+    # buku salah jenis tidak boleh sempat ditulis, apalagi diserahkan.
+    if '--tanpa-gerbang' not in sys.argv:
+        if spec.get('jenis'):
+            print('\n— menjalankan GERBANG JENIS —')
+            r = subprocess.run([sys.executable, str(GERBANG_JENIS),
+                                str(Path(arg[0]).resolve())])
+            if r.returncode != 0:
+                print('\nGAGAL gerbang jenis — buku TIDAK ditulis.')
+                sys.exit(r.returncode)
+        else:
+            print('\nPERINGATAN: spec tanpa kolom "jenis" — gerbang jenis '
+                  'dilewati. Spec baru WAJIB menyatakan jenis.')
 
     # ── TULIS-SEMENTARA (temuan review 22 Okt 2026, cacat 1) ──
     # Buku ditulis ke berkas SEMENTARA, gerbang memeriksa berkas itu,
