@@ -604,7 +604,9 @@ def periksa_berkas_luar_pengawasan(d: dict) -> list[str]:
 def periksa_berkas_induk(d: dict) -> list[str]:
     """Dokumen INDUK wajib tetap ada & tidak kosong."""
     masalah = []
-    for nama in DOK_STATUS + ['SOT.md']:
+    #  Deduplikasi: DOK_STATUS sudah berisi 'SOT.md' sejak 26 Okt 2026,
+    #  jadi tanpa ini SOT.md yang hilang dihitung 2 kali (bukan 1 masalah).
+    for nama in dict.fromkeys(DOK_STATUS + ['SOT.md']):
         p = DOK_DIR / nama
         if not p.exists():
             masalah.append(f'{nama} (dokumen INDUK) HILANG')
@@ -676,6 +678,71 @@ def periksa_judul_menyesatkan(d: dict) -> list[str]:
     return masalah
 
 
+def periksa_berkas_peran(d: dict) -> list[str]:
+    """AKAR LUBANG (temuan agen Boss 26 Okt 2026, ronde 2, butir 2):
+    semua pemeriksa isi di atas melewati berkas yang TIDAK ADA
+    (`if not p.exists(): continue`) — jadi dokumen yang hilang tidak
+    pernah gagal di cek isinya, ia hanya MENGHILANG dari pemeriksaan.
+    Satu-satunya yang dulu menangkap hilangnya dokumen adalah
+    periksa_berkas_induk, dan itu hanya untuk DOK_STATUS + SOT.md.
+    Pemeriksa ini menutup lubang itu di AKAR (di sot.py sendiri, bukan
+    hanya di _gerbang_sot.py): SETIAP berkas PERAN yang hilang = masalah.
+    Dikecualikan: 'SOT.md' (sudah ditangkap periksa_berkas_induk, supaya
+    tidak dihitung 2 kali) dan 'sot.py' (pemeriksa itu sendiri — adanya
+    dibuktikan oleh berjalannya skrip ini; _gerbang_sot.py memeriksanya
+    secara terpisah lewat /app/sot.py)."""
+    masalah = []
+    sudah = set(DOK_STATUS) | {'SOT.md', 'sot.py'}
+    for nama in PERAN_DOKUMEN:
+        if nama in sudah:
+            continue
+        if not (DOK_DIR / nama).exists():
+            masalah.append(f'{nama} (berkas PERAN) HILANG')
+    return masalah
+
+
+def periksa_harga(d: dict) -> list[str]:
+    """Harga di docs/sot/04 harus = harga di app/config.py.
+    Ini pindahan cek docs-vs-config dari _uji_c5_label.py (temuan ronde 2,
+    butir 1): cek itu TIDAK BOLEH tinggal di uji container, karena
+    dokumen tidak ada di image dan path host-nya dilewati diam-diam.
+    Di sini dokumen ADA — di host (DOK_DIR = folder proyek) maupun di
+    container (DOK_DIR = /app/sot-dok, salinan gerbang) — dan kode ADA
+    di DOK_DIR/app/config.py (host) atau /app/app/config.py (container).
+    Kalau docs/sot/04 hilang, pemeriksa ini diam (periksa_berkas_peran
+    sudah menangkapnya); kalau config tidak ditemukan padahal docs ada,
+    itu GAGAL, bukan dilewati."""
+    masalah = []
+    p04 = DOK_DIR / 'docs/sot/04-harga-dan-kuota.md'
+    if not p04.exists():
+        return masalah
+    isi = _baca(p04)
+    if 'app/config.py' not in isi:
+        masalah.append('docs/sot/04 tidak menyebut app/config.py '
+                       'sebagai sumber tunggal angka')
+    if 'Rp 100.000' not in isi or 'Rp 300.000' not in isi:
+        masalah.append('docs/sot/04 harga tidak sesuai '
+                       'Rp 100.000 / Rp 300.000')
+    cfg_path = None
+    #  Kandidat config: folder proyek (host), /app (container), dan folder
+    #  tempat sot.py ini berada (sot-dok uji di VM memakai sot.py repo).
+    for kandidat in (DOK_DIR / 'app/config.py', Path('/app/app/config.py'),
+                     Path(__file__).resolve().parent / 'app/config.py'):
+        if kandidat.exists():
+            cfg_path = kandidat
+            break
+    if cfg_path is None:
+        masalah.append('app/config.py tidak ditemukan '
+                       '(DOK_DIR/app, /app/app, maupun folder sot.py) '
+                       '— harga di docs/sot/04 tidak bisa diverifikasi')
+    else:
+        cfg = _baca(cfg_path)
+        if '100_000' not in cfg or '300_000' not in cfg:
+            masalah.append(f'{cfg_path} harga tidak 100_000 / 300_000 '
+                           f'(tidak selaras dengan docs/sot/04)')
+    return masalah
+
+
 def periksa(d: dict) -> int:
     """0 = selaras. >0 = jumlah masalah."""
     masalah: list[str] = []
@@ -687,6 +754,8 @@ def periksa(d: dict) -> int:
     masalah.extend(periksa_judul_status(d))
     masalah.extend(periksa_judul_menyesatkan(d))
     masalah.extend(periksa_berkas_induk(d))
+    masalah.extend(periksa_berkas_peran(d))
+    masalah.extend(periksa_harga(d))
     masalah.extend(periksa_berkas_luar_pengawasan(d))
 
     print('═' * 74)

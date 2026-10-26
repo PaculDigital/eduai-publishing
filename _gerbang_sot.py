@@ -44,20 +44,27 @@ except ImportError as e:
 def main() -> int:
     d = sot.kumpulkan()
     masalah = sot.periksa(d)
-    #  BERGIGI: setiap berkas PERAN harus benar-benar ADA di DOK_DIR.
-    #  Dulu, berkas PERAN yang tidak tersalin ke sot-dok tidak diperiksa
-    #  sama sekali, sehingga gerbang bisa lulus padahal salinannya hilang.
+    #  BERGIGI (lanjutan, temuan agen Boss ronde 2, butir 2): sejak
+    #  sot.periksa() sendiri sudah menghitung berkas PERAN yang hilang
+    #  (periksa_berkas_peran), gerbang ini TIDAK BOLEH menghitungnya
+    #  2 kali. Satu-satunya yang masih ditambahkan di sini adalah
+    #  'sot.py' — pemeriksa itu sendiri, yang sengaja dikecualikan
+    #  dari periksa_berkas_peran karena adanya dibuktikan oleh
+    #  berjalannya skrip ini. Di container, sot.py sah di /app/sot.py
+    #  (salinan utama gerbang) maupun di sot-dok/sot.py (salinan gerbang).
+    #  Daftar hilang tetap dicetak sebagai rincian, supaya jelas berkas
+    #  mana yang hilang, bukan hanya angka.
     dok_dir = pathlib.Path(getattr(sot, 'DOK_DIR', _env))
     hilang = []
     for nama in sot.PERAN_DOKUMEN:
         p = dok_dir / nama
         if nama == 'sot.py' and not p.exists():
-            #  sot.py juga sah di /app/sot.py (salinan utama gerbang).
             if pathlib.Path('/app/sot.py').exists():
                 continue
         if not p.exists():
             hilang.append(nama)
-    total_gagal = masalah + len(hilang)
+    sot_py_hilang = 1 if 'sot.py' in hilang else 0
+    total_gagal = masalah + sot_py_hilang
     if total_gagal == 0:
         print(f'TOTAL: {len(sot.PERAN_DOKUMEN)} LULUS / 0 GAGAL '
               f'(SOT selaras: image={d["image"]}, {d["tabel"]} tabel, '
@@ -66,7 +73,7 @@ def main() -> int:
     for nama in hilang:
         print(f'  ❌ BERKAS PERAN HILANG di sot-dok: {nama}')
     print(f'TOTAL: 0 LULUS / {total_gagal} GAGAL '
-          f'(periksa={masalah}, berkas PERAN hilang={len(hilang)})')
+          f'(periksa={masalah}, sot.py hilang={sot_py_hilang})')
     return 1
 
 

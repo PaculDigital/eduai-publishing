@@ -5,8 +5,8 @@ KENAPA ADA (ACC Bos 24Sep26 "C5"):
     membaca aturan yang SALAH (harga/kuota vs Token Revisi) → bisa merusak
     rumus yang sudah dikunci Bos.
 
-FAKTA (sumber kebenaran kini: app/config.py + docs/sot/04-harga-dan-kuota.md,
-BUKAN berkas arsip):
+FAKTA (sumber kebenaran uji ini: app/config.py di image, BUKAN berkas
+arsip dan BUKAN path host; cek docs-vs-config ada di sot.py periksa_harga):
     §4.10 (nomor bagian historis) = SISTEM KUOTA & CREDIT AI
     §4.13 (nomor bagian historis) = SISTEM TOKEN REVISI (KUNCI HARGA & MESIN UANG)
     Nomor §4.10/§4.13 dipertahankan di komentar kode sebagai label historis;
@@ -48,44 +48,47 @@ def baca(p):
     return open(p, encoding='utf-8').read()
 
 
-# ── 0. Fakta harga/kuota dari SUMBER YANG ADA DI IMAGE ───────────────────
-#  BERGIGI (26 Okt 2026, temuan agen Boss C): bagian ini DULU membaca berkas
-#  arsip dari path host dan MELEWATI 2 cek begitu saja kalau berkasnya tidak
-#  ada — cek hilang tanpa gagal. Sekarang sumbernya adalah app/config.py,
-#  yang ADA di dalam image (Dockerfile COPY app ./app), sehingga cek ini
-#  TIDAK PERNAH dilewati. Kalau config.py hilang/rusak, cek ini GAGAL keras.
-#  docs/sot/04 hanya dicek tambahan bila ada di host; tidak adanya di
-#  container bukan kegagalan, karena cek inti sudah ada di config.py.
+# ── 0. Fakta harga/kuota HANYA dari SUMBER YANG ADA DI IMAGE ─────────────
+#  BERGIGI (26 Okt 2026, temuan agen Boss C, lalu ronde 2 butir 1):
+#  Bagian ini DULU membaca berkas arsip dari path host dan MELEWATI cek
+#  begitu saja kalau berkasnya tidak ada. Perbaikan ronde 1 memindahkan
+#  sumber ke config.py, TAPI masih menyisakan 2 cek docs/sot/04 dari path
+#  host /opt/... yang di container TIDAK ADA — jadi 2 cek itu tetap
+#  dilewati diam-diam dengan alasan "bukan kegagalan". Itu pola yang SAMA,
+#  cuma pindah tempat — belum dicabut akarnya.
+#  AKAR YANG DICABUT DI SINI: uji container ini TIDAK BOLEH membaca path
+#  host sama sekali. Semua cek [0] di bawah hanya memakai /app/app/config.py
+#  (ADA di image, Dockerfile COPY app ./app) — tanpa cabang opsional,
+#  tidak ada cek yang dilewati. Kalau config hilang, cek GAGAL keras.
+#  Cek docs-vs-config TIDAK HILANG: ia pindah ke tempat yang benar, yaitu
+#  sot.py periksa_harga(), di mana dokumen memang tersedia (host maupun
+#  salinan sot-dok di container). Uji ini tidak lagi berpura-pura
+#  memeriksanya dari container.
 import os
 
 print('═' * 60)
-print('UJI C5 — label rujukan harga/kuota (sumber: config.py + docs/sot/04)')
+print('UJI C5 — label rujukan harga/kuota (sumber: config.py di image saja)')
 print('═' * 60)
 
 CONFIG = '/app/app/config.py'
-print('\n[0] Sumber nilai: app/config.py (di image) + docs/sot/04 (host, bila ada)')
+print('\n[0] Sumber nilai: app/config.py (di image saja, tanpa path host)')
 if os.path.exists(CONFIG):
     cfg = baca(CONFIG)
     cek('config.py memuat KUOTA_PAKET (paket & revisi/bulan)',
         'KUOTA_PAKET' in cfg)
-    cek('config.py: Peneliti Rp100.000 / Penerbit Rp300.000 (sesuai docs/sot/04)',
+    cek('config.py: Peneliti Rp100.000 / Penerbit Rp300.000',
         '100_000' in cfg and '300_000' in cfg)
     cek('config.py: rumus Token Revisi ÷10.000, cap 60 (TOKEN_REVISI_PER/CAP)',
         'TOKEN_REVISI_PER' in cfg and '10000' in cfg
         and 'TOKEN_REVISI_CAP' in cfg and '60' in cfg)
+    cek('config.py: KUOTA_PAKET peneliti & penerbit lengkap (nama, mb, harga)',
+        "'peneliti'" in cfg and "'penerbit'" in cfg
+        and "'nama'" in cfg and "'mb'" in cfg and "'harga'" in cfg)
+    cek('config.py: label harga Rp 100.000 / Rp 300.000',
+        'Rp 100.000' in cfg and 'Rp 300.000' in cfg)
 else:
     cek('config.py ADA di image (sumber nilai tidak boleh hilang)',
         False, f'path={CONFIG} tidak ditemukan')
-SOT04 = '/opt/data/services/eduai-publishing/docs/sot/04-harga-dan-kuota.md'
-if os.path.exists(SOT04):
-    s04 = baca(SOT04)
-    cek('docs/sot/04 menyebut config.py sebagai sumber tunggal angka',
-        'app/config.py' in s04)
-    cek('docs/sot/04: Peneliti Rp100.000 / Penerbit Rp300.000',
-        'Rp 100.000' in s04 and 'Rp 300.000' in s04)
-else:
-    print('     (catatan: docs/sot/04 tidak ada di container — bukan kegagalan, '
-          'cek inti di config.py sudah di atas)')
 
 # ── A. Kode: rujukan HARUS cocok dengan isi komentarnya ───────────────────
 #  Kata kunci yang menandakan TOPIK "Token Revisi" (harus §4.13)
