@@ -4,7 +4,7 @@
 Tujuan: MENGHENTIKAN kebingungan "tiap dokumen punya status sendiri".
 Skrip ini:
   1. MENGHITUNG keadaan nyata dari KODE/IMAGE (bukan dari catatan).
-  2. MEMERIKSA dokumen (MASTER_PLAN · FLAG · CATATAN_PROYEK · PETA_*) apakah
+  2. MEMERIKSA dokumen SOT (SOT.md + docs/sot/*) apakah
      bertabrakan dengan kenyataan itu.
   3. `--periksa` → protes + EXIT 1 kalau ada yang bertabrakan.
 
@@ -39,97 +39,103 @@ DOMAIN = 'https://eduai.bikinaja.id'
 DOK_DIR = Path(os.environ.get('SOT_DIREKTORI_DOKUMEN', str(BASE)))
 
 #  Dokumen yang boleh memuat klaim STATUS (harus selaras satu sama lain).
-DOK_STATUS = ['MASTER_PLAN.md', 'FLAG_LANJUT_DISINI.md', 'CATATAN_PROYEK.md']
+#  26 Okt 2026 (perapihan dokumen): hanya SOT.md. MASTER_PLAN, FLAG_LANJUT_DISINI
+#  dan CATATAN_PROYEK sudah diarsipkan ke _arsip/usang-26okt2026/; isinya yang
+#  masih berlaku dipindahkan ke docs/sot/.
+DOK_STATUS = ['SOT.md']
 
 #  PETA PERAN DOKUMEN — supaya tidak ada "informasi sendiri-sendiri".
 #  Aturan: SATU hal hanya ditulis di SATU tempat; dokumen lain MENUNJUK ke sana.
 PERAN_DOKUMEN = {
     'SOT.md':
-        '⭐ PINTU MASUK TUNGGAL — baca ini dulu, lalu berhenti',
-    'FLAG_LANJUT_DISINI.md':
-        'STATUS terkini (blok 🆕 teratas) + riwayat peristiwa',
-    'MASTER_PLAN.md':
-        'RENCANA & keputusan terkunci (§4/§5b) + §7 status ringkas',
-    'CATATAN_PROYEK.md':
-        'Aturan keras proyek + catatan sesi (RIWAYAT)',
+        '⭐ PINTU MASUK TUNGGAL — baca ini dulu, lalu ikuti tautannya (26 Okt 2026)',
+    'docs/sot/01-produk-dan-flow.md':
+        'Produk & flow mahasiswa/pembimbing; BAB IV: sudah merge, belum deploy',
+    'docs/sot/02-arsitektur.md':
+        'Modul app/, rute, tabel DB, deploy & verifikasi',
+    'docs/sot/03-keputusan-terkunci.md':
+        'Keputusan Boss yang masih berlaku (ber tanggal) + yang masih terbuka',
+    'docs/sot/04-harga-dan-kuota.md':
+        'Harga & kuota SESUAI app/config.py (kode menang atas dokumen lama)',
+    'docs/sot/05-jembatan-dan-layanan-luar.md':
+        'Statistik Lab, OJS/JEMT, 9router, OnlyOffice, Pakasir, WA',
+    'docs/sot/06-buku-dan-mutu.md':
+        '5 jenis buku + SSOT mutu buku (detail di mutu-buku/)',
+    'docs/sot/07-aturan-agen.md':
+        'Cara kerja agen: BAHAS DULU → Gas, cabang, gerbang, larangan',
+    'docs/sot/INDEKS-ARSIP.md':
+        'Indeks 141 berkas yang diarsipkan 26 Okt 2026 (RIWAYAT, bukan panduan)',
     'sot.py':
         '⭐ SUMBER KEBENARAN STATUS — dihitung dari kode, bukan dihafal',
-    'FITUR_PLAN_JURNAL_WORKSPACE_06OKT2026.md':
-        'RANCANGAN fitur jurnal/workspace (putusan 10 butir)',
-    'SOT_KONVERSI_JURNAL.md':
-        '⭐ SOT TUNGGAL fitur KONVERSI → ARTIKEL JURNAL (16 bagian A–P, 07 Okt)',
-    'PANDUAN_PAKAI_JEV.md':
-        '⭐ CARA PAKAI JEV YANG BENAR (berlaku SEMUA titik app) — acuan tunggal, 07 Okt',
-    'RENCANA_AGENTIC_TELEGRAM_WA.md':
-        'RENCANA tertunda: agentic + Telegram/WA (8 pagar)',
-    'RENCANA_PEMBIMBING_AI_SEDERHANA.md':
-        'PUTUSAN D1-D9 pembimbing AI (alat sama)',
+    'README.md':
+        'LAMPIRAN: pengantar repo (bukan SOT)',
+    'AGEN_LUAR_ATURAN.md':
+        'LAMPIRAN: tata kelola repo untuk agen luar (bukan SOT)',
+    'ATURAN_FORMAT_PEDOMAN_26SEP2026.md':
+        'LAMPIRAN TEKNIS: format pedoman penulisan',
+    'ATURAN_SITASI_PEDOMAN_26SEP2026.md':
+        'LAMPIRAN TEKNIS: sitasi pedoman',
     'ATURAN_BATAS_PROYEK_03OKT2026.md':
-        'ATURAN: satu proyek = satu dunia (jangan pinjam kredensial)',
-    'DOKUMENTASI_PEMBIMBING_AI_03OKT2026.md':
-        'BUKTI uji pembimbing AI (03 Okt)',
+        'LAMPIRAN TEKNIS: satu proyek = satu dunia',
     'PAGAR_PINTU_NASKAH_10OKT2026.md':
-        '⭐ PAGAR PINTU UNGGAH — format standar + pagar isi + pasal ③ mutu (10 Okt)',
+        'LAMPIRAN TEKNIS: pagar pintu unggah',
+    'PAGAR_MUTU_PETA_DAN_HEMAT_JEV_14OKT2026.md':
+        'LAMPIRAN TEKNIS: pagar mutu peta + hemat Jev',
+    'PAGAR_BATAS_BAB_15OKT2026.md':
+        'LAMPIRAN TEKNIS: batas bab',
+    'PANDUAN_PAKAI_JEV.md':
+        'LAMPIRAN TEKNIS: cara pakai Jev yang benar',
+    'URUTAN_RESMI_PETA_NASKAH_TERKUNCI.md':
+        'LAMPIRAN TEKNIS: urutan resmi peta naskah',
+    'SOT_KONVERSI_JURNAL.md':
+        'LAMPIRAN PER FITUR: konversi → artikel jurnal',
+    'SOT_LOA_QR_17OKT2026.md':
+        'LAMPIRAN PER FITUR: LoA otomatis + verifikasi QR',
+    'SOT_PUBLISH_BUKU_17OKT2026.md':
+        'LAMPIRAN PER FITUR: publish buku',
+    'SOT_JEV_BUKU_UMUM_20OKT2026.md':
+        'LAMPIRAN PER FITUR: Jev buku umum',
+    'SOT_PETA_NASKAH_SATU_PINTU_08OKT2026.md':
+        'LAMPIRAN PER FITUR: peta naskah satu pintu',
+    'DOKUMENTASI_BAB4_RANCANGAN_FINAL_21OKT2026.md':
+        'LAMPIRAN: rancangan induk BAB IV',
+    'STANDAR_PEMBUATAN_BUKU_20OKT2026.md':
+        'LAMPIRAN TEKNIS: standar pembuatan buku',
+    'PUTUSAN_FITUR_LOA_16OKT2026.md':
+        'LAMPIRAN PUTUSAN: fitur LoA JEMT (masih hidup)',
+    'PUTUSAN_SUBMIT_ARTIKEL_JURNAL_16OKT2026.md':
+        'LAMPIRAN PUTUSAN: submit artikel jurnal (masih hidup)',
+    'PUTUSAN_TIKET_LOLOS_LAPIS3_16OKT2026.md':
+        'LAMPIRAN PUTUSAN: tiket lolos Lapis 3 (masih hidup)',
+    'PUTUSAN_UJI_PLAGIARISME_16OKT2026.md':
+        'LAMPIRAN PUTUSAN: uji plagiarisme (masih hidup)',
+    'PUTUSAN_JEMBATAN_KONVERSI_15OKT2026.md':
+        'LAMPIRAN PUTUSAN: jembatan konversi (masih hidup)',
     'PUTUSAN_SISIP_ARTIKEL_KE_BAB_13OKT2026.md':
-        '📄 PUTUSAN 13Okt26: sisip artikel ke bab — "sisip saja" + dua jalur '
-        'penunjukan paragraf + pakai ulang antar bab (BELUM DIKODING)',
-    'KAMUS_25_DAN_SCOPUS_DIAM_12OKT2026.md': '🔍 Kamus 25 konsep & Scopus diam: temuan + ide 3 lapis (belum dikoding)',
-    'HASIL_UJI_SCOPUS_MCP_12OKT2026.md':
-        '🔬 UJI 12Okt26: repo scopus-mcp-extended DITOLAK (9/11 alat mati dgn '
-        'kunci kita) · metrik jurnal SJR/CiteScore BISA · kuartil Q1-Q4 TIDAK BISA '
-        '(Elsevier tdk kirim + SciMago 403)',
-    'JEBAKAN_EDITOR_OO.md':
-        '🚨 AKAR & CARA CEPAT saat editor OO nyangkut — BACA INI DULU sebelum '
-        'menebak (cache CF, cookie lintas-iframe, jangan buang prefix hash)',
+        'LAMPIRAN PUTUSAN: sisip artikel ke bab (BELUM DIKODING)',
+    'HASIL_UJI_12_KASUS_BATAS_09OKT2026.md':
+        'BUKTI UJI (dirujuk gerbang Jev), bukan panduan',
+    'HASIL_VALIDASI_SILANG_K5_09OKT2026.md':
+        'BUKTI UJI (dirujuk gerbang Jev), bukan panduan',
+    'HASIL_PENYELIDIKAN_PETA_14OKT2026.md':
+        'BUKTI UJI (dirujuk Hakim), bukan panduan',
+    'PENUTUP_UJI_K5_09OKT2026.md':
+        'BUKTI UJI (dirujuk Hakim), bukan panduan',
+    'DEMOSI_CURIGA.md':
+        'LOG RUNTIME Hakim, bukan panduan',
     '_sketsa/jalankan_semua_gerbang.sh':
         'ALAT: jalankan 18 gerbang dari dalam container',
-    'PAGAR_MUTU_PETA_DAN_HEMAT_JEV_14OKT2026.md':
-        '⭐ 14Okt26: pagar mutu peta + hemat Jev + bukti Jev tidak berulang',
-    'CATATAN_SAMBUNGAN_CATATAN_PEMBIMBING_14OKT2026.md':
-        '⭐ 14Okt26: catatan pembimbing → peta Jev (rapi_bab)',
-    'RANCANGAN_RAPI_BAB_14OKT2026.md':
-        '⭐ 14Okt26: rancangan 1 halaman rapi_bab()',
-    'PAGAR_BATAS_BAB_15OKT2026.md':
-        '⭐ 15Okt26: bug batas bab (disertasi 7 bab mati) — diperbaiki',
-    'PUTUSAN_JEMBATAN_KONVERSI_15OKT2026.md':
-        '⭐ 15Okt26: jembatan konversi (bab kurang → tombol Perbaiki) + '
-        'harga mutu bertingkat 2/3/5 — LIVE',
-    'PUTUSAN_TIKET_LOLOS_LAPIS3_16OKT2026.md':
-        '⭐ 16Okt26: TIKET LOLOS (Lapis 3) — sudah bayar + bab makna tetap '
-        '⇒ elemen Done, tidak ditanyakan lagi. LIVE',
-    'PUTUSAN_UJI_PLAGIARISME_16OKT2026.md':
-        '🔍 16Okt26: UJI PLAGIARISME — putusan diskusi (11 domain · 8 token · '
-        'naskah hanya dari EduAi · gratis 1× + watermark). LIVE mode gratis',
-    'PUTUSAN_SUBMIT_ARTIKEL_JURNAL_16OKT2026.md':
-        '📤 16Okt26: SUBMIT ARTIKEL JURNAL (tab ke-7) — 2 kartu submit + '
-        'kartu Daftar Artikel. Username OJS=email, sandi awal Pass1EduAi. '
-        '1 AddOn Publish = 1 artikel. 5 dari 8 lapis SUDAH ADA',
 }
 #  Berkas yang WAJIB punya penanda `<!-- … SOT: … -->` di kepala (putusan
 #  Bos Opsi A, 06 Okt 2026): 19 berkas di luar pengawasan dokumen induk.
 #  Kalau salah satu hilang, periksa_berkas_luar_pengawasan() protes.
-PENANDA_SOT_WAJIB = [
-    'ATURAN_FORMAT_PEDOMAN_26SEP2026.md', 'ATURAN_SITASI_PEDOMAN_26SEP2026.md',
-    'CARA_MESIN_TAHU_ISI_ARTIKEL_06OKT2026.md',
-    'DOKUMENTASI_PARSER_DAN_GERBANG_05OKT2026.md',
-    'DOKUMENTASI_PEMBIMBING_AI_03OKT2026.md',
-    'DOKUMENTASI_SINKRON_KODE_06OKT2026.md',
-    'FLAG_SESI_24SEP2026.md', 'LAPORAN_KEASLIAN_IKON_06OKT2026.md',
-    'LAPORAN_RAPI_BERKAS_UJI_04OKT2026.md',
-    'LAPORAN_TAHAP1_1_KOLOM_JURNAL_06OKT2026.md',
-    'LAPORAN_UNDUH_WORKSPACE_06OKT2026.md',
-    'RENCANA_PEMBIMBING_AI_SEDERHANA.md',
-    'PAGAR_PINTU_NASKAH_10OKT2026.md',
-    'CATATAN_TEMUAN_STITCH_10OKT2026.md',
-    'POSISI_PRODUKSI_VS_BELUM_MASUK_10OKT2026.md',
-    'DEFINISI_BARU_PUTUSAN_BOS_09OKT2026.md',
-]
-#  ⚠️ 10 Okt 2026 — 12 dokumen lama (16–29 Sep) DIPINDAH ke
-#     `_arsip/usang-10okt26/` (putusan Bos Opsi A). Daftar di atas sudah
-#     dibersihkan supaya TIDAK menunjuk berkas yang sudah pindah.
+PENANDA_SOT_WAJIB = []
+#  ⚠️ 26 Okt 2026 — 141 dokumen lama DIPINDAH ke `_arsip/usang-26okt2026/`
+#     (perintah Boss: arsipkan, bukan hapus permanen). Daftar penanda di atas
+#     dikosongkan supaya TIDAK menunjuk berkas yang sudah pindah.
 
 #  Dokumen riwayat: WAJAR memuat status lama (dikecualikan dari pemeriksaan).
-#  Yang dipindah ke `_arsip/usang-10okt26/` TIDAK lagi didaftarkan di sini.
+#  Yang dipindah ke `_arsip/usang-26okt2026/` TIDAK lagi didaftarkan di sini.
 DOK_RIWAYAT = []
 
 

@@ -1,5 +1,7 @@
 # EduAi — Platform Revisi Naskah Akademik
 
+> Pintu masuk dokumen: **SOT.md** (lalu `docs/sot/`). Berkas di `_arsip/` adalah riwayat, bukan panduan.
+
 > Asisten penulisan akademik: **membaca bentuk naskah, merevisi terkontrol,
 > menyusun buku, dan mengonversi ke artikel jurnal.**
 > Bukan generator tulisan dari nol — mesin **merevisi naskah yang sudah ada**.
