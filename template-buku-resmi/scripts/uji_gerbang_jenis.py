@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""UJI BERGIGI gerbang jenis (Gas Boss 26 Okt 2026).
+"""UJI BERGIGI gerbang jenis (Gas Boss 26 Okt 2026, v1.1 atas temuan
+agen Boss: celah "cari kata").
 
 Prinsip uji bergigi: setiap gerbang WAJIB dibuktikan BISA gagal.
 Uji ini memakai spec sintetis kecil (bukan contoh fase1-ssot, supaya
@@ -9,6 +10,10 @@ uji jalan di cabang mana pun), lalu menegaskan exit code gerbang:
   - spec tanpa jenis / jenis tidak dikenal HARUS gagal
   - spec salah label HARUS gagal, dan --dugaan HARUS menunjuk jenis
     lain yang lolos penuh
+  - v1.1, SERANGAN: spec palsu yang hanya menempel kata kunci dalam
+    satu kalimat, dan spec sampah (["-"] semua), HARUS gagal — inilah
+    kasus yang lolos di v1 (ajar palsu 9/0, umum sampah 5/0) dan
+    menjadi alasan v1.1 dibuat
 
 Pakai:  python3 uji_gerbang_jenis.py
 EXIT 0 = semua kasus uji sesuai harapan, EXIT 1 = ada yang meleset.
@@ -30,8 +35,11 @@ def dasar(jenis, bab):
         'jenis': jenis,
         'judul': 'Buku Uji Gerbang Jenis',
         'penulis': 'Penulis Uji',
-        'kata_pengantar': ['Kata pengantar uji.'],
-        'tentang_penulis': ['Tentang penulis uji.'],
+        'kata_pengantar': ['Kata pengantar buku uji ini menjelaskan tujuan '
+                           'dan pembaca sasaran buku ini dengan jelas.'],
+        'tentang_penulis': ['Tentang penulis buku uji ini adalah seorang '
+                            'pendidik berpengalaman yang menulis untuk '
+                            'pembaca pemula di bidangnya.'],
         'daftar_pustaka': ['Penulis, A. (2020). Buku uji. Penerbit Uji.'],
         'bab': bab,
     }
@@ -43,13 +51,35 @@ def bab(judul, teks_sub):
             'sub': [{'judul': 'Sub-bab uji', 'paragraf': [teks_sub]}]}
 
 
-AJAR = dasar('buku-ajar', [
-    bab('Konsep Dasar', 'Tujuan Instruksional Umum (TIU): sesudah bab ini '
-        'pembaca mampu menjelaskan konsep. Tujuan Instruksional Khusus '
-        '(TIK): pembaca mampu memberi contoh. Latihan 1: kerjakan soal '
-        'berikut. Rangkuman: bab ini menegaskan konsep dasar. '
-        'Checklist pemahaman bab ini: saya dapat menjelaskan konsep.'),
-])
+def bab_ajar(judul):
+    """Bab ajar v1.1 yang benar: tiap unsur di paragraf BERBEDA,
+    masing-masing >=10 kata, tujuan dulu, latihan sesudahnya."""
+    return {'judul': judul, 'romawi': 'I',
+            'sub': [
+                {'judul': 'Tujuan Pembelajaran', 'paragraf': [
+                    'Tujuan Instruksional Umum (TIU): sesudah bab ini '
+                    'pembaca mampu menjelaskan konsep dasar dengan '
+                    'bahasa sendiri dan memberi contoh yang tepat. '
+                    'Tujuan Instruksional Khusus (TIK): pembaca mampu '
+                    'menyebutkan ciri utama konsep dan membedakannya '
+                    'dari konsep yang mirip.']},
+                {'judul': 'Latihan dan Checklist', 'paragraf': [
+                    'Latihan 1: kerjakan soal berikut dengan teliti, '
+                    'lalu bandingkan jawaban Anda dengan pembahasan '
+                    'di akhir bab ini sebelum melanjutkan ke bab '
+                    'berikutnya.',
+                    'Checklist pemahaman bab ini: saya dapat menjelaskan '
+                    'konsep dasar, saya dapat memberi contoh yang tepat, '
+                    'dan saya dapat membedakan konsep ini dari konsep '
+                    'yang mirip.',
+                    'Rangkuman: bab ini menegaskan bahwa konsep dasar '
+                    'harus dipahami sebelum masuk ke penerapan, karena '
+                    'kesalahan pada fondasi akan terbawa ke semua '
+                    'langkah berikutnya.']},
+            ]}
+
+
+AJAR = dasar('buku-ajar', [bab_ajar('Konsep Dasar')])
 
 REFERENSI = dasar('buku-referensi', [
     {'judul': 'Peta Teori', 'romawi': 'I',
@@ -84,21 +114,43 @@ MONOGRAF = dasar('monograf', [
 ])
 
 PANDUAN = dasar('panduan-praktis', [
-    bab('Memulai', 'Contoh praktis: ikuti langkah berikut satu per satu '
-        'untuk membuat basis data pertama Anda. Cara ini sudah dicoba '
-        'pada contoh nyata.'),
+    {'judul': 'Memulai', 'romawi': 'I',
+     'sub': [{'judul': 'Sub-bab uji', 'paragraf': [
+         'Contoh praktis berikut diambil dari pekerjaan nyata: sebuah '
+         'basis data kecil untuk mencatat pinjaman buku di perpustakaan '
+         'sekolah dengan tiga tabel utama yang saling berhubungan.',
+         'Langkah pertama: buat tabel anggota, lalu tabel buku, kemudian '
+         'tabel pinjaman yang menghubungkan keduanya dengan kunci yang '
+         'tepat dan teruji pada contoh di atas.']}]},
 ])
 
 CHAPTER = {
     'jenis': 'book-chapter',
     'judul': 'Bab Uji',
     'section': [{'judul': 'Pendahuluan',
-                 'tujuan': ['Menjelaskan konsep dasar.'],
+                 'tujuan': ['Menjelaskan tiga pertanyaan dasar dalam '
+                            'membaca data secara kritis.'],
                  'paragraf': ['Pendahuluan chapter uji.']}],
     'referensi': ['Penulis, A. (2020). Buku uji. Penerbit.'],
-    'glosarium': [['Data', 'Fakta yang dikumpulkan.']],
+    'glosarium': [['Data', 'Fakta atau keterangan yang dikumpulkan dari '
+                            'lapangan untuk diolah dan ditarik kesimpulan.']],
     'cv': {'nama': 'Penulis Uji', 'bio': ['Dosen uji.']},
 }
+
+# ── Serangan v1.1 (harus GAGAL; di v1 ketiganya LOLOS) ──
+FAKE_AJAR = dasar('buku-ajar', [
+    bab('Bab Uji', 'Capaian pembelajaran latihan rangkuman checklist'),
+])
+SAMPAH_UMUM = {
+    'jenis': 'buku-umum', 'judul': '-', 'penulis': '-',
+    'kata_pengantar': ['-'], 'tentang_penulis': ['-'],
+    'daftar_pustaka': ['-'],
+    'bab': [{'judul': '-', 'romawi': 'I',
+             'sub': [{'judul': '-', 'paragraf': ['-']}]}],
+}
+FAKE_MONOGRAF = dasar('monograf', [
+    bab('Bab Uji', 'Kebaruan keterbatasan metode penelitian hasil'),
+])
 
 
 def jalankan(spec, extra=None):
@@ -137,10 +189,40 @@ _ref_tanpa_posisi['bab'][1]['sub'][0]['paragraf'][0] = \
 kasus('referensi tanpa posisi penulis GAGAL', _ref_tanpa_posisi, False)
 
 _ajar_tanpa_latihan = copy.deepcopy(AJAR)
-_ajar_tanpa_latihan['bab'][0]['sub'][0]['paragraf'][0] = \
-    _ajar_tanpa_latihan['bab'][0]['sub'][0]['paragraf'][0].replace(
-        'Latihan 1: kerjakan soal berikut. ', '')
+# Hapus paragraf latihan (paragraf pertama sub kedua); checklist +
+# rangkuman tetap ada, tapi tanpa latihan bab harus gagal.
+del _ajar_tanpa_latihan['bab'][0]['sub'][1]['paragraf'][0]
 kasus('ajar tanpa latihan GAGAL', _ajar_tanpa_latihan, False)
+
+_ajar_latihan_duluan = copy.deepcopy(AJAR)
+# Tukar urutan: latihan dulu, tujuan belakangan -> posisi salah.
+_subs = _ajar_latihan_duluan['bab'][0]['sub']
+_subs[0], _subs[1] = _subs[1], _subs[0]
+kasus('ajar latihan sebelum tujuan GAGAL (cek posisi)',
+      _ajar_latihan_duluan, False)
+
+kasus('SERANGAN: buku ajar palsu satu kalimat kata kunci GAGAL',
+      FAKE_AJAR, False)
+kasus('SERANGAN: buku-umum sampah ["-"] semua GAGAL',
+      SAMPAH_UMUM, False)
+kasus('SERANGAN: monograf palsu satu kalimat kata kunci GAGAL',
+      FAKE_MONOGRAF, False)
+
+_umum_pendek = dasar('buku-umum', [
+    bab('Bab Pendek', 'Isi bab ini terlalu pendek untuk disebut bab.'),
+])
+kasus('buku-umum bab terlalu pendek (<30 kata) GAGAL',
+      _umum_pendek, False)
+
+_umum_lengkap = dasar('buku-umum', [
+    {'judul': 'Bab Lengkap', 'romawi': 'I',
+     'sub': [{'judul': 'Sub-bab uji', 'paragraf': [
+         'Bab ini menguraikan perjalanan panjang sebuah gagasan dari '
+         'awal yang sederhana sampai menjadi praktik yang dipakai '
+         'banyak orang, dengan contoh, hambatan, dan pelajaran yang '
+         'dapat dipetik oleh pembaca dari berbagai latar belakang.']}]},
+])
+kasus('buku-umum lengkap (>=30 kata/bab) lolos', _umum_lengkap, True)
 
 _mono_tanpa_batas = copy.deepcopy(MONOGRAF)
 _mono_tanpa_batas['bab'][3]['sub'][0]['paragraf'][0] = \

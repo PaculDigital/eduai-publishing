@@ -1,4 +1,73 @@
-# Gerbang Jenis Buku v1 — Gas Boss 26 Okt 2026
+# Gerbang Jenis Buku v1.1 — Gas Boss 26 Okt 2026, diperbaiki atas temuan agen Boss
+
+## v1.1: menutup celah "cari kata" (temuan agen Boss, terverifikasi Wulan)
+
+Celah v1 yang terbukti di cabang `047cc4d`:
+- Buku ajar palsu (satu kalimat "Capaian pembelajaran latihan rangkuman
+  checklist", nol isi ajar) = **9 LULUS / 0 GAGAL**.
+- Buku-umum sampah total (semua kolom `"-"`) = **5 LULUS / 0 GAGAL**.
+- Akar: cek v1 hanya `substring in teks` dan `len(...) > 0`.
+
+Aturan anti-palsu v1.1 (di `periksa_jenis_buku.py`):
+1. **Isi bermakna, bukan sekadar ada.** `"-"` / `"..."` / `"x"` bukan
+   isi. Judul/penulis harus mengandung huruf; kata pengantar dan
+   tentang penulis minimal 10 kata; tiap entri daftar pustaka minimal
+   4 kata; tiap entri indeks/glosarium harus punya isi.
+2. **Unsur berdiri sendiri.** Tiap unsur wajib harus ada di paragraf
+   yang BERBEDA dan cukup panjang (minimal 10 kata). Satu paragraf
+   yang menumpuk semua kata kunci hanya dihitung untuk SATU unsur.
+3. **Posisi.** Tujuan harus muncul SEBELUM latihan di bab yang sama
+   (tujuan di awal, latihan di akhir); latihan yang muncul sebelum
+   tujuan = gagal.
+4. **Buku-umum/anak bukan lagi pintu belakang.** Tiap bab minimal
+   30 kata bermakna + judul bermakna.
+5. **Tabel komparasi harus nyata** (kolom >= 2 dan baris berisi),
+   bukan sekadar judul tabel.
+
+Kalibrasi ambang (diukur dari contoh nyata fase1-ssot, bukan tebak):
+sub-bab buku ajar nyata 35-89 kata, bab monograf nyata 88-133 kata,
+kata pengantar nyata 35-80 kata — jadi ambang 10 kata per unsur dan
+30 kata per bab umum TIDAK mematahkan contoh nyata, tapi membunuh
+kalimat palsu 5 kata dan isi `"-"`.
+
+## Bukti uji v1.1 (26 Okt 2026)
+
+- `uji_gerbang_jenis.py`: **21/21 kasus sesuai harapan** — 15 kasus
+  v1 (diperbarui ke format paragraf terpisah) + 6 kasus baru: 3
+  serangan (ajar palsu, umum sampah, monograf palsu — semuanya
+  GAGAL), ajar latihan-sebelum-tujuan GAGAL (cek posisi), umum bab
+  pendek GAGAL, umum lengkap LOLOS.
+- Serangan lama di v1.1: ajar palsu **3 LULUS / 6 GAGAL** (hanya
+  U1/U5 dan satu unsur yang lolos, sisanya gagal — cukup untuk
+  menolak), umum sampah **1 LULUS / 5 GAGAL**.
+- Contoh nyata fase1-ssot (hanya ditambah kolom jenis, isi tidak
+  diubah): ajar **13/0 LOLOS**, chapter **4/0 LOLOS**, referensi
+  **6/3 GAGAL** (tanpa indeks + tanpa komparasi per bab — memang
+  belum lengkap, sama seperti v1).
+- **KOREKSI atas laporan v1:** contoh monograf fase1-ssot di v1.1
+  menjadi **8/1 GAGAL** (M3 metode). Penyelidikan Wulan: satu-satunya
+  kemunculan frasa "metode penelitian" di spec itu ada di JUDUL
+  DAFTAR PUSTAKA ("Rahman, A. (2021). Metode penelitian manajemen"),
+  bukan di isi bab mana pun — spec itu memang tidak punya paragraf
+  metode sama sekali (babnya hanya Pendahuluan, Tinjauan, Hasil).
+  Jadi klaim v1 "monograf contoh 9/0 lolos" adalah **false pass**
+  dari celah yang sama, dan v1.1 memperbaikinya dengan benar:
+  contoh monograf itu perlu ditambah paragraf metode sebelum boleh
+  disebut monograf. Wulan TIDAK melemahkan gerbang supaya contoh
+  mainan itu lolos — itu justru akan membuka lagi celahnya.
+
+## Yang BELUM di v1.1 (jujur, jangan diklaim sudah)
+
+- Gerbang memeriksa spec JSON, bukan PDF/DOCX jadi.
+- Belum di-push (commit v1.1 masih lokal di cabang yang sama) dan
+  belum di-merge — merge dilakukan sesudah Boss setuju atas v1.1 ini.
+- Rekonsiliasi dengan profil.json fase1-ssot dan menjadikan kolom
+  `jenis` WAJIB untuk semua spec baru tetap menjadi langkah
+  berikutnya (v2), bukan bagian v1.1.
+
+---
+
+# Gerbang Jenis Buku v1 — Gas Boss 26 Okt 2026 (arsip, digantikan v1.1 di atas)
 
 ## Masalah yang ditutup
 
