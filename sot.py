@@ -232,12 +232,19 @@ def hitung_gerbang() -> int:
     berikutnya (lanjutan baris dengan indentasi) — `re.search` tanpa re.S
     hanya menangkap baris pertama. Ambil seluruh isi sampai loop `for g in`.
     ⚠️ JEBAKAN 2: DI DALAM container skrip itu TIDAK ADA (folder `_sketsa/`
-    tidak ikut image). Pakai salinan di `/app/sot-dok/` kalau ada; kalau
-    sama sekali tidak ketemu → 0 (dan pemeriksa angka gerbang otomatis
-    dilewati, supaya TIDAK protes palsu).
+    tidak ikut image). Pakai salinan di `/app/sot-dok/` kalau ada.
+    ⚠️ JEBAKAN 3 (temuan agen Boss 26 Okt 2026, sisa kecil): skrip ini
+    HIDUP di `_sketsa/` (bukan di root), dan salinan gerbang SOT kini
+    menyalinnya ke `sot-dok/_sketsa/` (sesuai PERAN). Daftar kandidat
+    lama tidak memuat jalur `_sketsa/` di DOK_DIR/sot-dok sama sekali,
+    sehingga di container maupun di VM angkanya selalu 0 dan cek gerbang
+    dilewati diam-diam — padahal skripnya ADA, hanya dicari di tempat
+    yang salah. Kandidat `_sketsa/` di bawah menutup lubang itu.
     """
-    kandidat = [BASE / '_sketsa' / 'jalankan_semua_gerbang.sh',
+    kandidat = [DOK_DIR / '_sketsa' / 'jalankan_semua_gerbang.sh',
+                BASE / '_sketsa' / 'jalankan_semua_gerbang.sh',
                 DOK_DIR / 'jalankan_semua_gerbang.sh',
+                Path('/app/sot-dok/_sketsa/jalankan_semua_gerbang.sh'),
                 Path('/app/sot-dok/jalankan_semua_gerbang.sh')]
     isi = ''
     for f in kandidat:
@@ -498,6 +505,16 @@ def periksa_gerbang(d: dict) -> list[str]:
     """Jumlah gerbang di dokumen STATUS harus = yang terdaftar (klaim kini)."""
     masalah = []
     if not d['gerbang']:
+        #  AKAR POLA C, VERSI KECIL (temuan agen Boss 26 Okt 2026):
+        #  dulu angka 0 membuat cek ini dilewati diam-diam. Sekarang
+        #  angka 0 = GAGAL: skrip gerbang tidak ditemukan di semua
+        #  kandidat, jadi klaim gerbang tidak BISA diverifikasi — itu
+        #  masalah, bukan alasan untuk melewati. (Berkas yang hilang
+        #  juga sudah ditangkap periksa_berkas_peran; ini menegaskan
+        #  bahwa cek gerbangnya sendiri tidak pernah dilewati.)
+        masalah.append('skrip jalankan_semua_gerbang.sh tidak ditemukan '
+                       'di semua kandidat — angka gerbang tidak bisa '
+                       'diverifikasi, cek gerbang TIDAK dilewati')
         return masalah
     PENANDA = re.compile(r'sekarang|kini|LIVE|produksi|jumlah|total', re.I)
     for nama in DOK_STATUS:
