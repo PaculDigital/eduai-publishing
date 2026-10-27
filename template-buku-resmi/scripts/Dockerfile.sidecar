@@ -1,0 +1,8 @@
+# Image layanan sidecar buku (Opsi B2) — dibangun SEKALI oleh operator.
+# Isinya hanya python + python-docx (dependensi yang sudah dipakai proyek);
+# kode mesin + WordCraft + pdftotext TIDAK masuk image — semuanya di-mount
+# read-only saat jalan (lihat jalankan_sidecar.sh), supaya sidecar selalu
+# memakai mesin main terbaru tanpa rebuild.
+FROM python:3.13
+RUN pip install --no-cache-dir python-docx==1.1.0
+ENTRYPOINT ["python3", "/mesin/scripts/sidecar_buku.py"]

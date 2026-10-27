@@ -379,6 +379,12 @@ def buku_susun(
     if not kartu:
         return RedirectResponse('/buku?galat=' + quote('Jenis buku tidak dikenal'),
                                 status_code=303)
+    #  Kartu belum siap (mis. buku-referensi) WAJIB ditolak di sini juga —
+    #  buku_mulai sudah menolak, tapi susun adalah pintu yang mengeksekusi.
+    if not kartu.get('siap'):
+        return RedirectResponse(
+            '/buku?galat=' + quote('Jenis ini belum bisa dijalankan'),
+            status_code=303)
     judul = (judul or '').strip()
     if len(judul) < 5:
         return RedirectResponse(
@@ -460,7 +466,7 @@ def buku_susun(
                 _lapor.tahap(str(teks))
 
             hasil = _susun.susun(sdb, _u, judul, bidang, untuk, kunci_jenis,
-                                 lapor=lapor_teks)
+                                 lapor=lapor_teks, kartu_jenis=jenis)
             _proses.tandai_selesai(
                 kode, hasil=judul, hasil_json=_json.dumps(hasil, default=str),
                 token_revisi=hasil.get('token') or 0)

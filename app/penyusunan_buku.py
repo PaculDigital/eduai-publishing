@@ -106,7 +106,8 @@ def folder_buku(fid_unik):
     return os.path.join(dasar, str(fid_unik))
 
 
-def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None):
+def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
+          kartu_jenis=None):
     """Susun buku + potong kuota di depan. Return dict hasil.
 
     Raise HTTPException 402/403 dari kuota kalau saldo kurang (tidak menyusun).
@@ -213,6 +214,47 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None):
             hasil['docx_alasan'] = f"{type(e).__name__}: {e}"
             if lapor:
                 lapor(f"Bab sudah jadi, tapi perakitan dokumen gagal: {e}")
+
+        # ── GERBANG PER BUKU VIA SIDECAR (Opsi B2, 28 Okt 2026) ──────────
+        #  Buku web selama ini TIDAK diperiksa apa-apa. Sekarang, sesudah
+        #  rakit dan SEBELUM didaftar ke files:
+        #   1. isi_nomor_toc: PERBAIKAN — nomor TOC kosong diisi dari render
+        #      nyata. Gagal total (exit 2) = gagal teknis -> token kembali
+        #      (pola except di bawah). Sebagian hilang (exit 1) = lanjut
+        #      dengan catatan (filler bukan gerbang penolak).
+        #   2. ukur: judul bab HARUS tampil di rendernya sendiri; hilang =
+        #      buku cacat -> gagal (raise -> token kembali).
+        #   3. chapter gate: HANYA untuk kartu book-chapter.
+        #  Sidecar mati/kunci salah = gagal teknis (buku tidak diterbitkan
+        #  tanpa gerbang; token kembali). Gerbang jenis ISI penuh (aturan
+        #  substansi v1.1) tetap di jalur operator — web tidak punya spec
+        #  JSON, jadi yang diperiksa di sini adalah identitas kartu
+        #  (di route: siap + id_dokumen + porsi_alat) + berkas jadi.
+        if hasil.get('docx') and os.path.exists(hasil['docx']):
+            from . import sidecar_buku as _sc
+            try:
+                bernomor, terisi, hilang_toc = _sc.isi_nomor(hasil['docx'])
+                if hilang_toc:
+                    hasil['toc_hilang'] = hilang_toc
+                    if lapor:
+                        lapor('Nomor TOC belum terisi: ' +
+                              ', '.join(hilang_toc))
+                os.replace(hasil['docx'], hasil['docx'] + '.pra-nomor')
+                os.replace(bernomor, hasil['docx'])
+                hasil['toc_terisi'] = terisi
+                judul_bab = [outline[n]['title'] for n in outline
+                             if isinstance(n, int) and outline[n].get('title')]
+                _peta, hilang_ukur, _total = _sc.ukur(hasil['docx'],
+                                                       judul_bab)
+                if hilang_ukur:
+                    raise RuntimeError(
+                        'judul bab tidak tampil di render: ' +
+                        ', '.join(hilang_ukur))
+                hasil['ukur_peta'] = _peta
+                if kartu_jenis == 'book-chapter':
+                    _sc.chapter(hasil['docx'])
+            except _sc.SidecarGagal as e:
+                raise RuntimeError(f'gerbang buku gagal: {e}')
 
         # ── DAFTARKAN .docx KE TABEL `files` (ACC Bos 19 Okt 2026) ────────
         #  Tanpa ini dokumen ADA di disk tapi TIDAK bisa dibuka di OnlyOffice
