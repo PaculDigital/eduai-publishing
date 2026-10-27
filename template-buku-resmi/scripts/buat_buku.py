@@ -802,6 +802,14 @@ def ukur_halaman(keluaran, spec):
                 continue
             for baris in t.splitlines():
                 b = baris.strip()
+                # LEWATI baris daftar isi: entri TOC memakai titik-titik
+                # penghubung ('BAB III ... 5'). Tanpa ini, daftar isi
+                # yang melintasi 2 halaman membuat BAB III terpetakan
+                # ke halaman lanjutan TOC (5) mendahului BAB I (6),
+                # padahal judul bab aslinya ada di halaman sesudahnya.
+                # Judul asli tidak pernah memakai 4+ titik berurutan.
+                if '....' in b:
+                    continue
                 if b.startswith(kunci + ' ') or b == kunci:
                     return h
         return None
