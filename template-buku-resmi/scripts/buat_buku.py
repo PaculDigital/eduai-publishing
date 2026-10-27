@@ -803,12 +803,20 @@ def ukur_halaman(keluaran, spec):
             for baris in t.splitlines():
                 b = baris.strip()
                 # LEWATI baris daftar isi: entri TOC memakai titik-titik
-                # penghubung ('BAB III ... 5'). Tanpa ini, daftar isi
-                # yang melintasi 2 halaman membuat BAB III terpetakan
-                # ke halaman lanjutan TOC (5) mendahului BAB I (6),
-                # padahal judul bab aslinya ada di halaman sesudahnya.
-                # Judul asli tidak pernah memakai 4+ titik berurutan.
-                if '....' in b:
+                # penghubung. Tanpa ini, daftar isi yang melintasi
+                # 2 halaman membuat BAB III terpetakan ke halaman
+                # lanjutan TOC (5) mendahului BAB I (6), padahal
+                # judul bab aslinya ada di halaman sesudahnya.
+                # Ambang 2 titik (bukan 4): rumus sisip_titik
+                # memberi minimum 3 titik (n = max(3, ...)), jadi
+                # judul panjang hanya bertitik 3 dan lolos saringan
+                # 4 titik (temuan review agen 27 Okt 2026, terbukti
+                # reproduksi). Judul asli tidak bertitik berurutan;
+                # subjudul '1.1'/'3.1' hanya bertitik tunggal, jadi
+                # aman dari saringan ini. Risiko sisa: judul asli
+                # yang mengandung elipsis '...' akan terlewat —
+                # itu hanya jadi peringatan, bukan halaman salah.
+                if '..' in b:
                     continue
                 if b.startswith(kunci + ' ') or b == kunci:
                     return h
