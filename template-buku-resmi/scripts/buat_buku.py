@@ -790,12 +790,41 @@ def ukur_halaman(keluaran, spec):
     toc_page = next((i + 1 for i, t in enumerate(halaman_teks)
                      if 'DAFTAR ISI' in t and 'KATA PENGANTAR' in t), None)
 
+    # SPAN HALAMAN DAFTAR ISI (perbaikan dari akar, 27 Okt 2026):
+    # saringan titik saja rapuh lintas perender — WordCraft 0.7.0
+    # membungkus judul TOC panjang ke 2 baris, dan baris pertamanya
+    # ('BAB III METODE PENELITIAN DAN') tidak bertitik sama sekali,
+    # sehingga lolos saringan apa pun (terbukti: uji cari-toc 1/2
+    # di 0.7.0 vs 2/2 di 0.11.0). Karena itu cari() melewati
+    # SELURUH halaman daftar isi: halaman TOC + halaman lanjutan
+    # berurutan yang masing-masing memuat >=3 baris bertitik 10+.
+    # Halaman isi praktis tidak pernah memenuhi itu (elipsis isi
+    # hanya 3 titik, satu baris) — jadi span tidak meluas ke
+    # halaman isi dalam praktik. Bila span meluas satu halaman
+    # terlalu jauh, judul di halaman itu terlewat menjadi
+    # peringatan (angka cache dipertahankan), bukan halaman salah.
+    # Saringan '..' di bawah dipertahankan sebagai lapis kedua.
+    def _hitung_baris_titik_panjang(teks):
+        return sum(1 for baris in teks.splitlines()
+                   if re.search(r'\.{10,}', baris.strip()))
+
+    toc_pages = set()
+    if toc_page:
+        toc_pages.add(toc_page)
+        h = toc_page + 1
+        while (h <= len(halaman_teks)
+               and _hitung_baris_titik_panjang(halaman_teks[h - 1]) >= 3):
+            toc_pages.add(h)
+            h += 1
+
     def cari(entri, sesudah=None, sebelum=None):
         e = entri.upper()
         # judul BAB = DUA token pertama ('BAB I'); entri lain utuh.
         kunci = ' '.join(e.split()[:2]) if e.startswith('BAB ') else e
         for i, t in enumerate(halaman_teks):
             h = i + 1
+            if h in toc_pages:
+                continue
             if sesudah and h <= sesudah:
                 continue
             if sebelum and h >= sebelum:
