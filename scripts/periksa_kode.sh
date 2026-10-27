@@ -51,6 +51,32 @@ judul(){ echo; echo "${TEBAL}${BIRU}═══ $* ═══${NORMAL}"; }
 GAGAL=0
 PY="${PY_PEMERIKSA:-/opt/data/.venv/bin/python3}"
 
+# ── 0a. Ruang kerja SEMENTARA yang unik per run ──────────────────────────
+#  AKAR (27 Okt 2026): dulu semua hasil ditulis ke nama TETAP di /tmp
+#  (/tmp/eduai_sintaks.txt, /tmp/g_perbaikan.log, …). Kalau sekali saja
+#  skrip ini dijalankan sebagai root, berkasnya jadi milik root dan run
+#  berikutnya sebagai user lain kena "Permission denied". Akibatnya:
+#    • compileall gagal MENULIS → blok else jalan → "ADA GALAT SINTAKS"
+#      padahal sintaksnya BERSIH (merah palsu, deploy dibatalkan).
+#    • `tee /tmp/g_*.log | grep -q '0 GAGAL'` dapat masukan KOSONG →
+#      hasil cek bisa merah palsu (dan hijau palsu bila pola kebetulan cocok).
+#  PERBAIKAN AKAR: mktemp -d membuat direktori BARU milik user ini, jadi
+#  tak mungkin bertabrakan dengan sisa run lain. Nama berkas TETAP (tanpa
+#  akhiran acak) supaya isi skrip lain tidak perlu diubah.
+RUANG="$(mktemp -d "${TMPDIR:-/tmp}/eduai-periksa.XXXXXXXX")" || {
+    echo "  ✗ tidak bisa membuat ruang sementara di ${TMPDIR:-/tmp}" >&2
+    exit 1
+}
+SINTAKS="$RUANG/eduai_sintaks.txt"
+PYFLAKES="$RUANG/eduai_pyflakes.txt"
+LOG_QC_BRIEF="$RUANG/g_qc_brief.log"
+LOG_ILUSTRASI="$RUANG/g_ilustrasi.log"
+LOG_SAPAAN="$RUANG/g_sapaan.log"
+LOG_PERBAIKAN="$RUANG/g_perbaikan.log"
+bersihkan() { rm -rf "$RUANG" 2>/dev/null || true; }
+trap bersihkan EXIT INT TERM
+info "ruang sementara: $RUANG"
+
 echo "${TEBAL}PERIKSA KODE EDUAI${NORMAL} — $(date '+%d %b %Y %H:%M')"
 
 # ── 0. Alat pemeriksa tersedia? (kalau tidak, pasang sekali) ─────────────
@@ -77,11 +103,11 @@ fi
 
 # ── 1. Sintaks ───────────────────────────────────────────────────────────
 judul "1. Sintaks (compileall)"
-if "$PY" -m compileall -q app/ >/tmp/eduai_sintaks.txt 2>&1; then
+if "$PY" -m compileall -q app/ >"$SINTAKS" 2>&1; then
     ok "semua berkas .py di app/ bisa dikompilasi"
 else
     bad "ADA GALAT SINTAKS:"
-    sed 's/^/      /' /tmp/eduai_sintaks.txt | head -20
+    sed 's/^/      /' "$SINTAKS" | head -20
     GAGAL=1
 fi
 
@@ -89,21 +115,21 @@ fi
 #    "undefined name" = KERAS (kode pasti meledak saat barisnya dijalankan)
 #    sisanya          = LAPORAN (bersih-bersih, tidak menolak deploy)
 judul "2. pyflakes — nama tak terdefinisi (MENOLAK deploy)"
-"$PY" -m pyflakes app/ >/tmp/eduai_pyflakes.txt 2>&1
-KERAS=$(grep -c "undefined name" /tmp/eduai_pyflakes.txt || true)
+"$PY" -m pyflakes app/ >"$PYFLAKES" 2>&1
+KERAS=$(grep -c "undefined name" "$PYFLAKES" || true)
 if [ "$KERAS" -gt 0 ]; then
     bad "$KERAS nama TAK TERDEFINISI — kode ini akan meledak saat dipakai:"
-    grep "undefined name" /tmp/eduai_pyflakes.txt | sed 's/^/      /'
+    grep "undefined name" "$PYFLAKES" | sed 's/^/      /'
     info "Ini kelas bug yang menjatuhkan kita 16Sep26 (tulis_docx/_sidik_jari)."
     GAGAL=1
 else
     ok "tidak ada nama tak terdefinisi"
 fi
 
-N_LAPOR=$(grep -vc "undefined name" /tmp/eduai_pyflakes.txt || true)
+N_LAPOR=$(grep -vc "undefined name" "$PYFLAKES" || true)
 if [ "${N_LAPOR:-0}" -gt 0 ]; then
     judul "2b. Laporan bersih-bersih (TIDAK menolak deploy)"
-    head -25 /tmp/eduai_pyflakes.txt | grep -v "undefined name" | sed 's/^/      /'
+    head -25 "$PYFLAKES" | grep -v "undefined name" | sed 's/^/      /'
     info "$N_LAPOR temuan. Rapikan saat senggang, bukan penghalang deploy."
 fi
 
@@ -289,20 +315,20 @@ fi
 if [ -f "$PROYEK/_gerbang_qc_brief_dua_bahasa.py" ]; then
     echo
     echo "── QC BRIEF DUA BAHASA (19 Okt 2026) ──"
-    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_qc_brief_dua_bahasa.py" 2>&1 | tee /tmp/g_qc_brief.log | grep -qE "0 GAGAL"; then
-        grep -E "LULUS /" /tmp/g_qc_brief.log | tail -1
+    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_qc_brief_dua_bahasa.py" 2>&1 | tee "$LOG_QC_BRIEF" | grep -qE "0 GAGAL"; then
+        grep -E "LULUS /" "$LOG_QC_BRIEF" | tail -1
     else
-        echo "  ✗ GAGAL — QC brief dua bahasa tidak lulus"; tail -20 /tmp/g_qc_brief.log; GAGAL=$((GAGAL+1))
+        echo "  ✗ GAGAL — QC brief dua bahasa tidak lulus"; tail -20 "$LOG_QC_BRIEF"; GAGAL=$((GAGAL+1))
     fi
 fi
 
 if [ -f "$PROYEK/_gerbang_ilustrasi_tak_dibuang.py" ]; then
     echo
     echo "── ILUSTRASI TIDAK DIBUANG (19 Okt 2026) ──"
-    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_ilustrasi_tak_dibuang.py" 2>&1 | tee /tmp/g_ilustrasi.log | grep -qE "0 GAGAL"; then
-        grep -E "LULUS /" /tmp/g_ilustrasi.log | tail -1
+    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_ilustrasi_tak_dibuang.py" 2>&1 | tee "$LOG_ILUSTRASI" | grep -qE "0 GAGAL"; then
+        grep -E "LULUS /" "$LOG_ILUSTRASI" | tail -1
     else
-        echo "  ✗ GAGAL — ilustrasi bisa dibuang lagi"; tail -20 /tmp/g_ilustrasi.log; GAGAL=$((GAGAL+1))
+        echo "  ✗ GAGAL — ilustrasi bisa dibuang lagi"; tail -20 "$LOG_ILUSTRASI"; GAGAL=$((GAGAL+1))
     fi
 fi
 
@@ -310,10 +336,10 @@ fi
 if [ -f "$PROYEK/_gerbang_sapaan_jenis.py" ]; then
     echo
     echo "── SAPAAN PER JENIS BUKU (20 Okt 2026) ──"
-    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_sapaan_jenis.py" 2>&1 | tee /tmp/g_sapaan.log | grep -qE "0 GAGAL"; then
-        grep -E "LULUS /" /tmp/g_sapaan.log | tail -1
+    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_sapaan_jenis.py" 2>&1 | tee "$LOG_SAPAAN" | grep -qE "0 GAGAL"; then
+        grep -E "LULUS /" "$LOG_SAPAAN" | tail -1
     else
-        echo "  ✗ GAGAL — sapaan jenis buku bocor"; tail -20 /tmp/g_sapaan.log; GAGAL=$((GAGAL+1))
+        echo "  ✗ GAGAL — sapaan jenis buku bocor"; tail -20 "$LOG_SAPAAN"; GAGAL=$((GAGAL+1))
     fi
 fi
 
@@ -322,10 +348,10 @@ fi
 if [ -f "$PROYEK/_gerbang_perbaikan_bab.py" ]; then
     echo
     echo "── PERBAIKAN BAB BERMASALAH (19-20 Okt 2026) ──"
-    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_perbaikan_bab.py" 2>&1 | tee /tmp/g_perbaikan.log | grep -qE "0 GAGAL"; then
-        grep -E "LULUS /" /tmp/g_perbaikan.log | tail -1
+    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_perbaikan_bab.py" 2>&1 | tee "$LOG_PERBAIKAN" | grep -qE "0 GAGAL"; then
+        grep -E "LULUS /" "$LOG_PERBAIKAN" | tail -1
     else
-        echo "  ✗ GAGAL — perbaikan bab bermasalah tidak lulus"; tail -20 /tmp/g_perbaikan.log; GAGAL=$((GAGAL+1))
+        echo "  ✗ GAGAL — perbaikan bab bermasalah tidak lulus"; tail -20 "$LOG_PERBAIKAN"; GAGAL=$((GAGAL+1))
     fi
 fi
 

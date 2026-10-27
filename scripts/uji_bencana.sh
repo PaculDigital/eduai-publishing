@@ -24,6 +24,13 @@
 # ═══════════════════════════════════════════════════════════════════════
 set -uo pipefail
 
+# Ruang sementara unik per run — akar yang sama dengan periksa_kode.sh:
+# nama TETAP di /tmp bisa jadi milik user lain (mis. root) → "Permission
+# denied" → log kosong & diagnosa menyesatkan. mktemp -d selalu milik kita.
+RUANG="$(mktemp -d "${TMPDIR:-/tmp}/eduai-bencana.XXXXXXXX")" || exit 1
+LOG_PERBAIKAN="$RUANG/perbaikan.log"
+trap 'rm -rf "$RUANG" 2>/dev/null || true' EXIT INT TERM
+
 CT=oo-converter
 APP=eduai-app
 IP_OO=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $CT 2>/dev/null)
@@ -187,7 +194,7 @@ if [ "$SKENARIO" = "semua" ] || [ "$SKENARIO" = "B3" ]; then
     periksa
     echo
     echo "    ${K}--- SETELAH jalankan perbaiki_oo.sh ---${N}"
-    bash "$(dirname "$0")/perbaiki_oo.sh" >/tmp/perbaikan.log 2>&1
+    bash "$(dirname "$0")/perbaiki_oo.sh" >"$LOG_PERBAIKAN" 2>&1
     bash "$(dirname "$0")/jalankan.sh" >/dev/null 2>&1
     sleep 14
     periksa

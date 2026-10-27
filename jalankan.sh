@@ -183,6 +183,16 @@ echo
 echo "── [4/5] VERIFIKASI ISI IMAGE ─────────────────────────────────"
 GAGAL=0
 
+# Ruang sementara unik per run (akar 27 Okt 2026): dulu nama TETAP
+# /tmp/sot_image.txt & /tmp/sot_source.txt. Bila sudah ada milik user lain
+# (root), redirect ditolak → berkas kosong → "file .py di image: 0" dan
+# pembanding image-vs-source memutuskan hal yang SALAH. mktemp -d milik kita.
+RUANG_SOT="$(mktemp -d "${TMPDIR:-/tmp}/eduai-sot.XXXXXXXX")" || { echo "  ❌ tidak bisa membuat ruang sementara"; exit 1; }
+SOT_IMAGE="$RUANG_SOT/sot_image.txt"
+SOT_SOURCE="$RUANG_SOT/sot_source.txt"
+SOT_JALAN="$RUANG_SOT/sot_jalan.txt"
+trap 'rm -rf "$RUANG_SOT" 2>/dev/null || true' EXIT INT TERM
+
 # 4a. Image benar-benar ada
 docker image inspect "${IMAGE_BASE}:${TAG}" >/dev/null 2>&1 || { echo "  ❌ image tidak ada"; exit 1; }
 echo "  ✅ Image ada di daemon"
@@ -209,21 +219,21 @@ fi
 # 4b. File kunci ada di dalam image & hash-nya SAMA dengan source
 echo "  Membandingkan isi image vs source:"
 docker run --rm --entrypoint sh "${IMAGE_BASE}:${TAG}" -c \
-  "cd /app && find app -type f -name '*.py' -exec md5sum {} \;" | sort -k2 > /tmp/sot_image.txt
-find app -type f -name '*.py' -exec md5sum {} \; | sort -k2 > /tmp/sot_source.txt
+  "cd /app && find app -type f -name '*.py' -exec md5sum {} \;" | sort -k2 > "$SOT_IMAGE"
+find app -type f -name '*.py' -exec md5sum {} \; | sort -k2 > "$SOT_SOURCE"
 
-N_IMG=$(wc -l < /tmp/sot_image.txt)
-N_SRC=$(wc -l < /tmp/sot_source.txt)
+N_IMG=$(wc -l < "$SOT_IMAGE")
+N_SRC=$(wc -l < "$SOT_SOURCE")
 echo "     file .py di image  : $N_IMG"
 echo "     file .py di source : $N_SRC"
 
 if [ "$N_IMG" != "$N_SRC" ]; then
   echo "  ❌ JUMLAH FILE BEDA — image tidak lengkap!"
-  diff /tmp/sot_image.txt /tmp/sot_source.txt | head -20
+  diff "$SOT_IMAGE" "$SOT_SOURCE" | head -20
   GAGAL=1
-elif ! diff -q /tmp/sot_image.txt /tmp/sot_source.txt >/dev/null; then
+elif ! diff -q "$SOT_IMAGE" "$SOT_SOURCE" >/dev/null; then
   echo "  ❌ ISI BERBEDA — ada file di image yang tidak sesuai source!"
-  diff /tmp/sot_image.txt /tmp/sot_source.txt | head -20
+  diff "$SOT_IMAGE" "$SOT_SOURCE" | head -20
   GAGAL=1
 else
   echo "  ✅ SEMUA $N_IMG file .py IDENTIK dengan source"
@@ -364,12 +374,12 @@ fi
 echo
 echo "── Verifikasi akhir: container vs source ───────────────────────"
 docker exec "$NAMA_CONTAINER" sh -c \
-  "cd /app && find app -type f -name '*.py' -exec md5sum {} \;" | sort -k2 > /tmp/sot_jalan.txt
-if diff -q /tmp/sot_jalan.txt /tmp/sot_source.txt >/dev/null; then
-  echo "  ✅ Container BERISI kode yang IDENTIK dengan source ($(wc -l < /tmp/sot_jalan.txt) file)"
+  "cd /app && find app -type f -name '*.py' -exec md5sum {} \;" | sort -k2 > "$SOT_JALAN"
+if diff -q "$SOT_JALAN" "$SOT_SOURCE" >/dev/null; then
+  echo "  ✅ Container BERISI kode yang IDENTIK dengan source ($(wc -l < "$SOT_JALAN") file)"
 else
   echo "  ⚠️  Container BEDA dari source!"
-  diff /tmp/sot_jalan.txt /tmp/sot_source.txt | head -10
+  diff "$SOT_JALAN" "$SOT_SOURCE" | head -10
 fi
 
 # ── CONTOH DOKUMEN untuk UJI (AKAR 16Sep26) ───────────────────────────
