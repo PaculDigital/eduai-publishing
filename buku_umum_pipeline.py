@@ -180,6 +180,14 @@ except ModuleNotFoundError:                        # pragma: no cover
         def text(self):
             return self._r.text
 
+        @property
+        def content(self):
+            #  🚨 BUG NYATA: `requests.get(...).content` dipakai jalur gambar,
+            #  tapi shim ini dulu TIDAK punya `content` ⇒ AttributeError saat
+            #  `requests` asli tak terpasang (fallback httpx). Ditambahkan
+            #  28 Okt 2026, bukan cuma untuk membungkam Pyright.
+            return self._r.content
+
         def json(self):
             return self._r.json()
 
@@ -216,6 +224,24 @@ BASE_URL = "http://172.17.0.1:20128/v1"          # 9router — TEKS
 #  TERUJI 18 Okt: cb/gemini-2.5-flash-image = SATU-SATUNYA model gambar hidup
 #  di InferHub (45 penjual) · 6,9–9,2 s · $0,00043/gambar (~Rp 7).
 GAMBAR_BASE = "https://api.inferhub.dev/v1"
+
+# ── MESIN GAMBAR: 3 JALUR TERKUNCI (diuji nyata 28 Okt 2026) ─────────────
+# Urutan = murah dulu, mahal terakhir. TIDAK boleh menambah kandidat tanpa uji.
+#   ① gpt-image-2-codex        InferHub    $0,0031  55–180 s   (polos = hidup)
+#   ② cx/gpt-image-2-codex     InferHub    $0,0031  ~59 s
+#   ③ gemini-3.1-flash-lite-image OpenRouter $0,034  3,85 s   (jaring terakhir)
+# Terbukti MATI (jangan dimasukkan lagi): cb/gemini-2.5-flash-image (22
+# tawaran harga tapi "route config not found"), 23 nama lain "unknown model",
+# SELURUH keluarga FLUX tidak ada di InferHub maupun OpenRouter.
+GAMBAR_MODEL = "gpt-image-2-codex"
+GAMBAR_RANTAI = [
+    ("inferhub",   "gpt-image-2-codex"),
+    ("inferhub",   "cx/gpt-image-2-codex"),
+    ("openrouter", "google/gemini-3.1-flash-lite-image"),
+]
+GAMBAR_TIMEOUT = 280           # per percobaan; model lambat jangan dipotong
+GAMBAR_MATI = set()            # model yg gagal di proses ini → tidak dicoba lagi
+
 #  🚨 CACAT TERUKUR 20 Okt 2026 — SALAH PREFIX.
 #  Dulu `cb/gemini-2.5-flash-image` = model melalui **CodeBuddy**, dan
 #  kredit CodeBuddy HABIS (galat 14018 "Credits exhausted", 429).
@@ -1374,6 +1400,102 @@ def _sub_bab_tengah(bab_text):
     return "\n\n".join(s[:900] for s in pilih)
 
 
+def _gambar_satu(prompt, ukuran="1024x1024", seed=1000, timeout=None):
+    """Coba SATU jalur gambar sesuai GAMBAR_RANTAI. Return (raw_bytes, model, galat).
+
+    Pintu TUNGGAL ke semua penyedia gambar — InferHub maupun OpenRouter.
+    Tidak ada pemanggil lain yang boleh menembak API gambar langsung.
+    """
+    timeout = timeout or GAMBAR_TIMEOUT
+    raw, model, galat = None, None, []
+
+    for penyedia, nama_model in GAMBAR_RANTAI:
+        if nama_model in GAMBAR_MATI:
+            galat.append(f"{nama_model}: dilewati (gagal sebelumnya)")
+            continue
+
+        # ── ① InferHub: POST /images/generations ────────────────────────
+        if penyedia == "inferhub":
+            if not GAMBAR_KEY:
+                galat.append(f"{nama_model}: INFERHUB_KEY kosong")
+                continue
+            try:
+                resp = requests.post(
+                    f"{GAMBAR_BASE}/images/generations",
+                    headers={"Content-Type": "application/json",
+                             "Authorization": f"Bearer {GAMBAR_KEY}"},
+                    json={"model": nama_model, "prompt": prompt, "n": 1,
+                          "size": ukuran, "response_format": "b64_json",
+                          "seed": seed},
+                    timeout=timeout)
+                data = resp.json()
+                item = (data.get("data") or [{}])[0]
+                b64 = item.get("b64_json") or ""
+                if b64:
+                    import base64 as _b64
+                    raw = _b64.b64decode(b64)
+                elif item.get("url"):
+                    raw = requests.get(item["url"], timeout=90).content
+                if not raw:
+                    galat.append(f"{nama_model}: kosong {str(data)[:80]}")
+                    GAMBAR_MATI.add(nama_model)
+                    continue
+                model = nama_model
+            except Exception as e:                                  # noqa: BLE001
+                galat.append(f"{nama_model}: {type(e).__name__} {str(e)[:70]}")
+                GAMBAR_MATI.add(nama_model)
+                continue
+
+        # ── ② OpenRouter: POST /chat/completions modalities=image ───────
+        else:
+            kunci_or = ""
+            for nama_kunci in ("EDUAI_GAMBAR_FALLBACK_KEY", "JEV_OPENROUTER_KEY"):
+                try:
+                    kunci_or = _baca_env(nama_kunci) or ""
+                except RuntimeError:
+                    kunci_or = ""          # wajib: _baca_env MELEMPAR, bukan None
+                if kunci_or:
+                    break
+            if not kunci_or:
+                galat.append(f"{nama_model}: kunci OpenRouter kosong")
+                continue
+            try:
+                import base64 as _b64
+                resp = requests.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={"Content-Type": "application/json",
+                             "Authorization": f"Bearer {kunci_or}",
+                             "HTTP-Referer": "https://eduai.bikinaja.id",
+                             "X-Title": "EduAi"},
+                    json={"model": nama_model,
+                          "messages": [{"role": "user", "content": prompt}],
+                          "modalities": ["image", "text"]},
+                    timeout=timeout)
+                data = resp.json()
+                pesan = (data.get("choices") or [{}])[0].get("message") or {}
+                daftar_img = pesan.get("images") or []
+                url = (daftar_img[0].get("image_url") or {}).get("url", "") \
+                    if daftar_img else ""
+                if url.startswith("data:"):
+                    raw = _b64.b64decode(url.split(",", 1)[1])
+                elif url:
+                    raw = requests.get(url, timeout=90).content
+                if not raw:
+                    galat.append(f"{nama_model}: tanpa gambar {str(data)[:80]}")
+                    GAMBAR_MATI.add(nama_model)
+                    continue
+                model = nama_model
+            except Exception as e:                                  # noqa: BLE001
+                galat.append(f"{nama_model}: {type(e).__name__} {str(e)[:70]}")
+                GAMBAR_MATI.add(nama_model)
+                continue
+
+        if raw:
+            return raw, model, galat
+
+    return None, None, galat
+
+
 def _gambar_inferhub(prompt, simpan=None, ukuran="1024x1024", seed=1000,
                      timeout=280):
     """Panggil InferHub → simpan PNG. Return path atau None.
@@ -1399,37 +1521,17 @@ def _gambar_inferhub(prompt, simpan=None, ukuran="1024x1024", seed=1000,
     folder = os.path.dirname(simpan) or VISUAL_DIR
     os.makedirs(folder, exist_ok=True)
 
-    try:
-        resp = requests.post(
-            f"{GAMBAR_BASE}/images/generations",
-            headers={"Content-Type": "application/json",
-                     "Authorization": f"Bearer {GAMBAR_KEY}"},
-            json={"model": GAMBAR_MODEL, "prompt": prompt, "n": 1,
-                  "size": ukuran, "response_format": "b64_json",
-                  "seed": seed},
-            timeout=timeout)
-        data = resp.json()
-    except Exception as e:                                    # noqa: BLE001
-        print(f"       ⚠️ InferHub error: {type(e).__name__}: {e}")
-        return None
-
-    if not data.get("data"):
-        print(f"       ⚠️ InferHub kosong: {str(data)[:120]}")
-        return None
-
-    item = data["data"][0]
-    raw = None
-    if item.get("b64_json"):
-        import base64 as _b64
-        raw = _b64.b64decode(item["b64_json"])
-    elif item.get("url"):
-        raw = requests.get(item["url"], timeout=90).content
+    raw, model, galat = _gambar_satu(prompt, ukuran=ukuran, seed=seed,
+                                     timeout=timeout)
     if not raw:
+        for g in galat:
+            print(f"       ⚠️ {g}")
+        print("       ❌ Semua jalur gambar gagal — tidak ada gambar dibuat.")
         return None
 
     with open(simpan, 'wb') as f:
         f.write(raw)
-    print(f"       ✅ Gambar: {simpan} ({round(len(raw)/1024)} KB)")
+    print(f"       ✅ Gambar: {simpan} ({round(len(raw)/1024)} KB) · {model}")
     return simpan
 
 
@@ -1467,40 +1569,21 @@ def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
     #  Kecepatan 6,9–9,2 s · biaya $0,00043/gambar (~Rp 7) · hasil b64 inline.
     berhasil = []
     for k in range(1, max(1, varian) + 1):
-        try:
-            resp = requests.post(f"{GAMBAR_BASE}/images/generations",
-                headers={"Content-Type": "application/json",
-                         "Authorization": f"Bearer {GAMBAR_KEY}"},
-                json={"model": GAMBAR_MODEL,
-                      "prompt": prompt, "n": 1, "size": "1024x1024",
-                      "response_format": "b64_json",
-                      # seed beda per varian = komposisi berbeda, GAYA tetap sama
-                      "seed": 1000 + k},
-                timeout=280)
-            data = resp.json()
-            if "data" not in data or not data["data"]:
-                print(f"       ⚠️ Varian {k} kosong: {str(data)[:100]}")
-                continue
-            item = data["data"][0]
-            raw = None
-            if item.get("b64_json"):                 # InferHub: inline base64
-                import base64 as _b64
-                raw = _b64.b64decode(item["b64_json"])
-            elif item.get("url"):                    # cadangan: kalau ada URL
-                raw = requests.get(item["url"], timeout=60).content
-            if not raw:
-                continue
-            os.makedirs(VISUAL_DIR, exist_ok=True)
-            if varian > 1:
-                p = os.path.join(visual_ini(), f"ilustrasi_bab{bab_num}_var{k}.png")
-            else:
-                p = os.path.join(visual_ini(), f"ilustrasi_bab{bab_num}.png")
-            with open(p, 'wb') as f:
-                f.write(raw)
-            berhasil.append(p)
-            print(f"       ✅ Varian {k}: {round(len(raw)/1024)} KB")
-        except Exception as e:
-            print(f"       ⚠️ Varian {k} error: {type(e).__name__}: {e}")
+        # seed beda per varian = komposisi berbeda, GAYA tetap sama
+        raw, model, galat = _gambar_satu(prompt, ukuran="1024x1024", seed=1000 + k)
+        if not raw:
+            for g in galat:
+                print(f"       ⚠️ Varian {k}: {g}")
+            continue
+        os.makedirs(VISUAL_DIR, exist_ok=True)
+        if varian > 1:
+            p = os.path.join(visual_ini(), f"ilustrasi_bab{bab_num}_var{k}.png")
+        else:
+            p = os.path.join(visual_ini(), f"ilustrasi_bab{bab_num}.png")
+        with open(p, 'wb') as f:
+            f.write(raw)
+        berhasil.append(p)
+        print(f"       ✅ Varian {k}: {round(len(raw)/1024)} KB · {model}")
     if not berhasil:
         return None
 
