@@ -1,13 +1,17 @@
-"""GERBANG SALINAN MESIN BUKU — berkas di proyek HARUS identik dengan di /opt/data.
+"""GERBANG SALINAN MESIN BUKU — berkas di /opt/data HARUS identik dengan proyek.
 
-KENAPA: mesin buku tinggal di `/opt/data` (host), tetapi Docker hanya bisa
-`COPY` berkas yang ada DI DALAM konteks build (`services/eduai-publishing/`).
-Jadi berkas mesin harus DISALIN ke folder proyek.
+ARAH SALINAN DIBALIK 28 Okt 2026 (putusan Bos).
+  Dulu: /opt/data = SUMBER, proyek = salinan. Zaman itu mesin ditulis di
+        /opt/data lalu disalin ke proyek supaya bisa di-COPY Docker.
+  Sekarang: PROYEK = SUMBER. Mesin buku sudah masuk git dan diubah di repo;
+        /opt/data hanya cermin untuk alat host yang masih memanggil path lama.
 
-BAHAYA SALINAN: dua berkas yang mestinya sama bisa MENYIMPANG diam-diam.
-Kalau Wulan memperbaiki `/opt/data/buku_umum_assembly.py` tetapi lupa menyalin,
-maka: gerbang host LULUS, image produksi masih versi LAMA ⇒ kerusakan lolos
-deploy. Gerbang ini membuat penyimpangan itu MUSTAHIL dilewatkan.
+KENAPA GERBANG INI MASIH PERLU: pokok soalnya bukan arahnya, tapi bahwa dua
+berkas yang mestinya sama bisa MENYIMPANG diam-diam. Kalau berkas proyek
+diperbaiki tetapi cermin /opt/data ketinggalan, alat host memakai versi lama
+⇒ gerbang host LULUS padahal produksi memakai kode lain. (Kejadian nyata
+28 Okt: /opt/data tertinggal di 20-27 Okt dan masih memuat ENOWX_KEY yang
+sudah dihapus dari repo.)
 
 Jalankan: /opt/data/.venv/bin/python _gerbang_salinan_mesin.py
 """
@@ -35,8 +39,8 @@ SALINAN = [
     #     Memasukkannya = memaksa aturan yang tidak berlaku (gagal palsu).
 ]
 
-SUMBER = '/opt/data'
-PROYEK = os.path.dirname(os.path.abspath(__file__))
+SUMBER = PROYEK = os.path.dirname(os.path.abspath(__file__))
+CERMIN = '/opt/data'        # cermin untuk alat host (bukan sumber lagi)
 
 
 def cek(nama, syarat, bukti=''):
@@ -55,23 +59,25 @@ def sha(path):
 
 
 def main():
-    print(f'\nsumber: {SUMBER}\nproyek: {PROYEK}\n')
+    print(f'\nsumber (git): {PROYEK}\ncermin      : {CERMIN}\n')
     for nama, opsional in SALINAN:
-        a = os.path.join(SUMBER, nama)
-        b = os.path.join(PROYEK, nama)
+        a = os.path.join(SUMBER, nama)      # proyek = sumber
+        b = os.path.join(CERMIN, nama)      # /opt/data = cermin
         if not os.path.exists(a):
             if opsional:
                 continue
-            cek(f'{nama}: ADA di sumber', False, a)
+            cek(f'{nama}: ADA di proyek', False, a)
             continue
-        cek(f'{nama}: disalin ke proyek', os.path.exists(b),
-            'TIDAK ADA di proyek → Dockerfile COPY akan gagal')
+        cek(f'{nama}: ada di proyek', True)
         if not os.path.exists(b):
+            cek(f'{nama}: ada di cermin /opt/data', False,
+                f'TIDAK ADA di {CERMIN} → alat host yg memanggil path lama '
+                f'akan gagal')
             continue
         ha, hb = sha(a), sha(b)
-        cek(f'{nama}: salinan IDENTIK dengan sumber', ha == hb,
-            f'sumber={ha[:12]} proyek={hb[:12]} — '
-            f'SALIN ULANG: cp {a} {b}')
+        cek(f'{nama}: cermin /opt/data IDENTIK dengan proyek', ha == hb,
+            f'proyek={ha[:12]} cermin={hb[:12]} — '
+            f'PERBARUI CERMIN: cp {a} {b}')
 
     #  Berkas assembly WAJIB ikut Dockerfile
     df_path = os.path.join(PROYEK, 'Dockerfile')
