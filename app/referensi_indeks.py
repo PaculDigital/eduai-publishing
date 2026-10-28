@@ -211,10 +211,16 @@ def isi_indeks(path_docx, teks_per_halaman, glosarium, nama_list):
             entri_nama[nm] = cocok
 
     doc = Document(path_docx)
-    paras = doc.paragraphs
 
     def cari_judul(predikat):
-        for idx, pr in enumerate(paras):
+        # WAJIB baca doc.paragraphs SEGAR tiap panggilan (temuan review
+        # agen 28 Okt 2026 — bug mematikan): doc.paragraphs adalah daftar
+        # yang dibuat ulang tiap diakses; snapshot lama (`paras = ...`)
+        # TIDAK melihat judul yang baru dibuat buat_judul() sehingga
+        # cari_judul mengembalikan None -> hapus_entri_lama(None) crash.
+        # Di produksi, fallback add_indeks hanya menulis 'INDEKS' (tanpa
+        # 'Indeks Nama') sehingga jalur buat_judul SELALU terpicu.
+        for idx, pr in enumerate(doc.paragraphs):
             if predikat(pr.text.strip().upper()):
                 return idx
         return None
@@ -225,6 +231,8 @@ def isi_indeks(path_docx, teks_per_halaman, glosarium, nama_list):
 
     def hapus_entri_lama(idx_judul):
         """Hapus paragraf sesudah judul sampai seksi berikut/akhir."""
+        if idx_judul is None:
+            return  # tidak ada judul = tidak ada entri lama untuk dihapus
         j = idx_judul + 1
         while j < len(doc.paragraphs):
             if _adalah_judul_seksi(doc.paragraphs[j].text):
@@ -236,6 +244,10 @@ def isi_indeks(path_docx, teks_per_halaman, glosarium, nama_list):
 
     def sisipkan_entri(idx_judul, entri):
         """Sisipkan baris 'Istilah .... 3, 7' sesudah judul, urut."""
+        if idx_judul is None:
+            # Jangan pernah crash TypeError samar: judul hilang = gagal
+            # jelas, pemanggil (susun) menggagalkan buku + refund token.
+            raise RuntimeError('judul seksi indeks tidak ditemukan')
         anchor = doc.paragraphs[idx_judul]._p
         for istilah in sorted(entri, key=str.lower):
             halaman_str = ', '.join(str(p) for p in entri[istilah])
