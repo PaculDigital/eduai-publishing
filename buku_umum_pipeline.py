@@ -1711,17 +1711,120 @@ GLOSARIUM = {
     "Robo-Advisor": "Platform advisory keuangan otomatis yang menggunakan algoritma AI.",
 }
 
+_HARVEST_CACHE = {}
+
+
+def _adaptasi_harvest(artikel):
+    """Pustaka dict -> refs verifikasi_sitasi (authors LIST).
+
+    Pustaka memberi authors STRING gabungan ', ' (nama lengkap urutan
+    natural, mis. 'Nura Siti Nuraiman, Dewi Sartika') — dipecah per koma.
+    Nama yang ditulis 'Marga, Nama' akan terpecah kurang sempurna; judul +
+    tahun + DOI tetap benar, jadi sitasi tetap teridentifikasi.
+    """
+    adapted = []
+    for a in artikel or []:
+        judul = (a.get('title') or '').strip()
+        try:
+            tahun = int(a.get('year') or 0)
+        except (TypeError, ValueError):
+            tahun = 0
+        if not judul or not tahun:
+            continue
+        authors = a.get('authors') or ''
+        if isinstance(authors, str):
+            authors = [x.strip() for x in authors.split(',')
+                       if x.strip()]
+        adapted.append({
+            'authors': authors, 'year': tahun, 'title': judul,
+            'journal': a.get('journal') or '',
+            'doi': a.get('doi') or '', 'type': 'article',
+            'source': a.get('source') or '',
+        })
+    return adapted
+
+
+def _refs_dari_harvest(bab_title):
+    """Referensi satu bab dari mesin Harvest app (pustaka).
+
+    28 Okt 2026 (teguran Boss: Garuda kok tidak ada): mesin Harvest app
+    SUDAH komplit 4 sumber (Scopus, OpenAlex, Garuda, CrossRef) — tapi
+    jalur buku selama ini hanya memakai verifikasi_sitasi (OpenAlex +
+    CrossRef). Untuk buku referensi, Harvest dipakai dulu supaya jurnal
+    lokal Indonesia (Garuda) ikut terverifikasi.
+    Tiga leg (fail-soft, leg gagal -> leg berikut):
+      1. cari_semua (orkestrator 4 sumber) — TAPI gerbang kamusnya
+         mengembalikan kosong untuk topik yang tidak terpetakan (terbukti
+         live: 'pembelian impulsif' -> belum_dipetakan, 0 artikel).
+      2. cari_garuda langsung per frasa judul bab (terbukti live: 4 hasil
+         Indonesia) — inilah yang menjamin Garuda selalu ikut.
+      3. search_real_references (OpenAlex+CrossRef) digabung, dedup judul.
+    Cache per judul bab: sub-sub satu bab berbagi refs yang sama (hemat
+    panggilan; bab dikerjakan per utas sehingga kunci berbeda tidak
+    balapan). Gagal total -> None (pemanggil jatuh ke jalur biasa).
+    """
+    if bab_title in _HARVEST_CACHE:
+        return _HARVEST_CACHE[bab_title]
+    refs = None
+    try:
+        try:
+            from app import pustaka as _pus
+        except Exception:
+            import importlib.util as _ilu
+            _spec = _ilu.spec_from_file_location(
+                'pustaka_harvest',
+                os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             'app', 'pustaka.py'))
+            _pus = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_pus)
+        adapted = []
+        try:
+            hasil = _pus.cari_semua(bab_title) or {}
+            adapted = _adaptasi_harvest(hasil.get('artikel'))
+        except Exception:
+            adapted = []
+        if not adapted:
+            try:
+                adapted = _adaptasi_harvest(_pus.cari_garuda([bab_title]))
+            except Exception:
+                adapted = []
+        try:
+            intl = search_real_references(
+                f"{bab_title} teori konsep jurnal penelitian", n=5) or []
+        except Exception:
+            intl = []
+        ada = {a['title'].lower()[:80] for a in adapted}
+        gabung = list(adapted)
+        gabung.extend(r for r in intl
+                      if (r.get('title') or '').lower()[:80] not in ada)
+        refs = gabung[:8] or None
+    except Exception as e:
+        print(f"       [HARVEST] gagal ({type(e).__name__}) — "
+              f"jatuh ke verifikasi biasa")
+        refs = None
+    _HARVEST_CACHE[bab_title] = refs
+    return refs
+
+
 def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, refs=None, jenis="umum"):
     """Generate 1 sub-bab via 4-agen council."""
     print(f"  [{sub_num}] {sub_title}")
-    
+
     # Cari referensi nyata jika belum ada
     if refs is None:
-        # FIX: Jangan masukkan key_points yang mengandung nama author+tahun
-        # Gunakan bab_title + sub_title saja sebagai query
-        topic = f"{bab_title} {sub_title} teori konsep jurnal penelitian"
-        refs = search_real_references(topic, n=5)
-        print(f"       Refs: {len(refs)} terverifikasi")
+        # 28 Okt 2026: buku referensi memakai mesin Harvest dulu (4 sumber
+        # incl. Garuda); gagal/kosong -> jalur verifikasi biasa.
+        if jenis == 'referensi':
+            refs = _refs_dari_harvest(bab_title)
+            if refs:
+                print(f"       Refs Harvest: {len(refs)} "
+                      f"(Scopus/OpenAlex/Garuda/CrossRef)")
+        if not refs:
+            # FIX: Jangan masukkan key_points yang mengandung nama author+tahun
+            # Gunakan bab_title + sub_title saja sebagai query
+            topic = f"{bab_title} {sub_title} teori konsep jurnal penelitian"
+            refs = search_real_references(topic, n=5)
+            print(f"       Refs: {len(refs)} terverifikasi")
     
     print(f"       Architect...", end="", flush=True)
     t0 = time.time()
