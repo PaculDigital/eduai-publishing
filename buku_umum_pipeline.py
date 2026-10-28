@@ -1809,6 +1809,13 @@ def _refs_dari_harvest(bab_title):
                              'app', 'pustaka.py'))
             _pus = _ilu.module_from_spec(_spec)
             _spec.loader.exec_module(_pus)
+    except Exception:
+        _pus = None
+    if _pus is None:
+        # Pustaka tidak bisa diimpor -> pemanggil jatuh ke jalur biasa.
+        _HARVEST_CACHE[bab_title] = None
+        return None
+    try:
         adapted = []
         try:
             hasil = _pus.cari_semua(bab_title) or {}
@@ -1820,20 +1827,55 @@ def _refs_dari_harvest(bab_title):
                 adapted = _adaptasi_harvest(_pus.cari_garuda([bab_title]))
             except Exception:
                 adapted = []
+        # Leg 3 — TIRU APP (cek sebenarnya 28 Okt, perintah Boss):
+        # verifikasi_sitasi.search_real_references TIDAK dipakai lagi di
+        # jalur referensi, karena mutunya di bawah pustaka:
+        #  - pustaka mengurutkan per JUMLAH SITASI (citedby/cited_by_count/
+        #    is-referenced-by-count desc); verifikasi mengurutkan per
+        #    relevansi (OpenAlex) / default (Crossref).
+        #  - pustaka memakai kueri frasa konsep (PICO; Scopus TITLE-ABS-KEY,
+        #    Crossref query.bibliographic); verifikasi memakai string topik
+        #    mentah (search=/query=).
+        #  - pustaka memfilter RENTANG tahun; verifikasi hanya batas bawah.
+        #  - pustaka OpenAlex menjalankan kueri language:id khusus (konten
+        #    Indonesia); verifikasi tidak punya kueri ID.
+        #  - pustaka punya Scopus; verifikasi tidak punya sama sekali.
+        # Bahasa (aturan Boss 28 Okt): EN untuk internasional, ID untuk
+        # OpenAlex-ID. Tiap sumber fail-soft sendiri (gagal -> []).
         try:
-            # Leg internasional WAJIB Inggris (aturan Boss 28 Okt); gagal
-            # terjemahan -> judul asli (fallback, bukan gagal total).
-            en = _en_keywords(bab_title)
-            query_intl = (f"{en} theory concept journal research" if en
-                          else f"{bab_title} teori konsep jurnal penelitian")
-            intl = search_real_references(query_intl, n=5) or []
+            en_list = [k.strip() for k in
+                       (_en_keywords(bab_title) or '').split(',')
+                       if k.strip()]
+            id_list = [w for w in re.split(r'[^A-Za-z]+', bab_title or '')
+                       if len(w) > 3][:4]
+            api_hasil = []
+            if en_list:
+                try:
+                    api_hasil.extend(_pus.cari_scopus(en_list))
+                except Exception:
+                    pass
+                try:
+                    api_hasil.extend(_pus.cari_crossref(en_list))
+                except Exception:
+                    pass
+            if en_list or id_list:
+                try:
+                    api_hasil.extend(_pus.cari_openalex(en_list, id_list))
+                except Exception:
+                    pass
+            # Dedup HARUS memperbarui himpunan saat menambah: judul yang
+            # sama bisa muncul di 2-3 sumber API sekaligus (Scopus +
+            # OpenAlex + CrossRef). Himpunan beku (bug tangkapan uji)
+            # meloloskan duplikat antar-sumber.
+            ada = {a['title'].lower()[:80] for a in adapted}
+            for a in _adaptasi_harvest(api_hasil):
+                kunci = a['title'].lower()[:80]
+                if kunci not in ada:
+                    ada.add(kunci)
+                    adapted.append(a)
         except Exception:
-            intl = []
-        ada = {a['title'].lower()[:80] for a in adapted}
-        gabung = list(adapted)
-        gabung.extend(r for r in intl
-                      if (r.get('title') or '').lower()[:80] not in ada)
-        refs = gabung[:8] or None
+            pass
+        refs = adapted[:8] or None
     except Exception as e:
         print(f"       [HARVEST] gagal ({type(e).__name__}) — "
               f"jatuh ke verifikasi biasa")
