@@ -64,11 +64,11 @@ def cek_impor(modul):
     """
     if IMAGE_UJI:
         #  `-e` kosong: cukup untuk menguji KEBERADAAN modul. Modul yang
-        #  menuntut kunci (mis. buku_umum_pipeline → ENOWX_KEY) akan gagal
+        #  menuntut kunci (mis. buku_umum_pipeline → EDUAI_ROUTER_KEY) akan gagal
         #  diuji tanpa env, padahal di produksi env ADA (ditempel jalankan.sh).
         #  Yang diuji di sini = bisa/tidaknya DIimpor, bukan isi konfigurasi.
         argv = ['docker', 'run', '--rm', '--entrypoint', 'python3',
-                '-e', 'ENOWX_KEY=uji', '-e', 'EDUAI_ROUTER_KEY=uji',
+                '-e', 'EDUAI_ROUTER_KEY=uji',
                 '-e', 'INFERHUB_KEY=uji', '-e', 'OPENALEX_KEY=uji',
                 '-e', 'SCOPUS_KEY=uji', '-e', 'SCITE_KEY=uji',
                 IMAGE_UJI, '-c', f"import {modul}; print({modul}.__file__)"]

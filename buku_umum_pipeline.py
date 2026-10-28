@@ -114,11 +114,11 @@ OUT_DIR = _DirUtas(OUT_DIR)
 CKPT_FILE = _BerkasUtas(CKPT_FILE, "checkpoint.json")
 STATE_FILE = _BerkasUtas(STATE_FILE, "state.json")
 
-# === ENOWX API ===
+# === 9router API (satu-satunya pintu AI) ===
 #  ⚠️ KUNCI TIDAK DITULIS DI SINI (dipindah 17 Okt 2026).
 #  Alasan: kunci tertanam di berkas = bocor ke mana-mana (terbukti tersebar di
-#  11 skill + 5 pipeline). Sumber tunggal sekarang: /opt/data/.env (ENOWX_KEY).
-def _baca_env(nama='ENOWX_KEY', berkas=('/opt/data/.env',
+#  11 skill + 5 pipeline). Sumber tunggal sekarang: .env (EDUAI_ROUTER_KEY).
+def _baca_env(nama='EDUAI_ROUTER_KEY', berkas=('/opt/data/.env',
                                        '/opt/data/services/eduai-publishing/.env')):
     """Ambil kunci dari environment dulu, lalu dari .env. Tanpa kunci = gagal jelas."""
     nilai = os.environ.get(nama)
@@ -138,17 +138,15 @@ def _baca_env(nama='ENOWX_KEY', berkas=('/opt/data/.env',
 
 
 #  ══════════════════════════════════════════════════════════════════════════
-#  DUA PINTU (putusan Bos 17 Okt 2026) — TEKS lewat 9router, GAMBAR lewat enowx
+#  DUA PINTU — TEKS & GAMBAR. Tidak ada enowx lagi (dihapus 28 Okt 2026).
 #  ══════════════════════════════════════════════════════════════════════════
-#  Kenapa dipisah, bukan satu pintu:
-#    TEKS    → 9router (satu pintu AI Bos). TERUJI: HTTP 200, stream jalan.
-#    GAMBAR  → enowx. TERUJI 17 Okt: 9router MENOLAK semua model gambar
+#  Kenapa tetap dua pintu:
+#    TEKS    → 9router (:20128). TERUJI 28 Okt: HTTP 200, `SIAP`, 1,37 s.
+#    GAMBAR  → InferHub LANGSUNG. 9router MENOLAK model gambar
 #              (`provider does not support image generation`, 3 model dicoba).
-#              Jadi enowx DIPERTAHANKAN KHUSUS GAMBAR sampai 9router punya
-#              jalur gambar. Begitu ada, hapus enowx dari sini.
+#              Jalur gambar sudah lama pindah ke InferHub, bukan enowx.
 #  ⚠️ Kunci TIDAK ditulis di berkas ini — sumber tunggal: .env
-ENOWX_KEY = _baca_env("ENOWX_KEY")        # khusus gambar
-ROUTER_KEY = _baca_env("EDUAI_ROUTER_KEY")  # khusus teks (kunci 9router)
+ROUTER_KEY = _baca_env("EDUAI_ROUTER_KEY")  # TEKS (kunci 9router)
 
 #  ── SETELAN PRODUKSI (gerbang G3 menolak deploy tanpa ini) ────────────────
 #  Jangan hardcode batas token di berkas ini. Ambil dari SATU sumber:
@@ -212,8 +210,8 @@ except ModuleNotFoundError:                        # pragma: no cover
     requests = _RequestsShim()
 
 BASE_URL = "http://172.17.0.1:20128/v1"          # 9router — TEKS
-#  ── GAMBAR: InferHub LANGSUNG (putusan Bos 18 Okt 2026) ────────────────────
-#  enowx ditinggalkan: `cbc/*` akun KOSONG, `infer/*` provider TOLAK gambar.
+#  ── GAMBAR: InferHub LANGSUNG ──────────────────────────────────────────────
+#  Jalur lama (`cbc/*` lewat enowx, akun KOSONG) sudah dibuang 28 Okt 2026.
 #  9router juga tidak bisa: `inferhub/*` rusak, `JEV/nano-banana` kolam bersama.
 #  TERUJI 18 Okt: cb/gemini-2.5-flash-image = SATU-SATUNYA model gambar hidup
 #  di InferHub (45 penjual) · 6,9–9,2 s · $0,00043/gambar (~Rp 7).
@@ -1462,8 +1460,8 @@ def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
     print(f"       📝 Brief {MODE_BRIEF} ({hasil['brief_meta']['percobaan']}x): "
           f"{hasil['brief'][:110]}...")
 
-    #  ── InferHub LANGSUNG (putusan Bos 18 Okt 2026) ──────────────────────
-    #  Diganti dari enowx (cbc/hunyuan-image-v3.0) karena akun enowx KOSONG.
+    #  ── InferHub LANGSUNG ────────────────────────────────────────────────
+    #  Jalur lama (enowx, cbc/hunyuan-image-v3.0) sudah dibuang 28 Okt 2026.
     #  TERUJI 18 Okt: cb/gemini-2.5-flash-image = satu-satunya model gambar
     #  yang HIDUP di InferHub (45 penjual). 29 nama lain 0 penjual = mati.
     #  Kecepatan 6,9–9,2 s · biaya $0,00043/gambar (~Rp 7) · hasil b64 inline.
