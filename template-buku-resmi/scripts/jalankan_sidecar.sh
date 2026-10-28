@@ -28,7 +28,7 @@ docker run -d --name wordcraft-sidecar --network eduai-net \
     --restart unless-stopped \
     -v /root/.hermes/services/eduai-publishing/template-buku-resmi:/mesin:ro \
     -v /root/.hermes/services/wordcraft-uji:/wordcraft:ro \
-    -v /root/.hermes/services/pdftotext:/pdftotext:ro \
+    -v /root/.hermes/services/pdftotext-arah:/pdftotext:ro \  # pdftotext-arah: direktori yang benar lewat bind mount (pdftotext asli rusak lewat mount)
     -e WORDCRAFT_CLI=/wordcraft/bin/wordcraft-cli \
     -e PATH=/pdftotext/bin:/usr/local/bin:/usr/bin:/bin \
     -e EDUAI_SIDECAR_KUNCI="$KUNCI" \
