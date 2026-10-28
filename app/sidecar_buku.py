@@ -119,6 +119,21 @@ def chapter(path_docx):
     return True
 
 
+def teks_halaman(path_docx):
+    """Teks per halaman dari render nyata (list; indeks 0 = halaman 1).
+
+    Dipakai pengisi indeks referensi. Gagal render/pdftotext -> SidecarGagal
+    (fail-closed: buku referensi tanpa teks halaman tidak bisa diindeks).
+    """
+    with open(path_docx, 'rb') as f:
+        data = {'docx_b64': base64.b64encode(f.read()).decode()}
+    hasil = _panggil('/teks-halaman', data, timeout=300)
+    if hasil.get('exit') != 0:
+        raise SidecarGagal('teks halaman gagal: ' +
+                           str(hasil.get('galat', ''))[:300])
+    return hasil.get('halaman', [])
+
+
 def referensi(path_docx):
     """Gerbang buku-referensi (R1-R4 + struktur). True bila lolos."""
     with open(path_docx, 'rb') as f:

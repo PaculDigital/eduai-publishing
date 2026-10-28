@@ -133,8 +133,14 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
         if lapor:
             lapor("Menyusun kerangka buku…")
         #  Outline disusun dari PILIHAN USER — bukan outline buku lain.
-        outline = OB.susun_outline(judul, bidang, jenis,
-                                   jumlah_bab=jumlah_bab)
+        if kartu_jenis == 'buku-referensi':
+            # Kerangka referensi TIDAK lewat OB (host tidak punya jenis
+            # referensi): builder repo dengan 5 sub tetap N.1-N.5 per bab.
+            from . import referensi_outline as _RO
+            outline = _RO.susun_outline(judul, bidang, jumlah_bab)
+        else:
+            outline = OB.susun_outline(judul, bidang, jenis,
+                                       jumlah_bab=jumlah_bab)
 
         #  JANGAN mulai menulis kalau outline cacat — token sudah dipotong,
         #  jadi cacat di sini WAJIB mengembalikan token.
@@ -190,17 +196,31 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
             lapor("Merangkai buku jadi satu dokumen…")
         hasil['docx'] = None
         hasil['docx_alasan'] = ''
-        try:
-            import buku_umum_assembly as ASM
-            glos = {}
+        # Glosarium + pustaka referensi disiapkan SEBELUM rakit (dipakai
+        # juga blok sidecar di bawah untuk mengisi indeks). Jalur lain
+        # tidak berubah: glosarium statis, pustaka dari rakit sendiri.
+        glos, refs_rakit = {}, None
+        if kartu_jenis == 'buku-referensi':
+            # Gagal kumpul -> lanjut dengan glosarium/pustaka kosong;
+            # gerbang referensi di bawah yang menilai jujur (bukan diam).
+            try:
+                from . import referensi_indeks as _RI
+                glos, _diambil = _RI.kumpulkan_istilah(keluar, outline)
+                refs_rakit = _RI.kumpulkan_pustaka(keluar, outline)
+            except Exception:
+                glos, refs_rakit = {}, None
+        else:
             try:
                 import buku_umum_pipeline as P
                 glos = dict(getattr(P, 'GLOSARIUM', {}) or {})
             except Exception:
                 glos = {}
+        try:
+            import buku_umum_assembly as ASM
             rakit = ASM.rakit(
                 judul, keluar, outline,
                 glosarium=glos,
+                references=refs_rakit,
                 penulis=(getattr(u, 'nama', '') or getattr(u, 'nama_lengkap', '') or ''),
                 institusi=(getattr(u, 'nama_kampus', '') or ''),
             )
@@ -251,6 +271,24 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                         'judul bab tidak tampil di render: ' +
                         ', '.join(hilang_ukur))
                 hasil['ukur_peta'] = _peta
+                if kartu_jenis == 'buku-referensi':
+                    # Indeks bernomor + gerbang referensi. Urutan sengaja:
+                    # isi_nomor dulu (nomor TOC dari render), lalu teks
+                    # halaman render ITU dipakai mengisi indeks, lalu
+                    # gerbang membaca docx final. Gagal di sini = gagal
+                    # teknis -> token kembali (pola except di bawah).
+                    try:
+                        from . import referensi_indeks as _RI
+                        _hal = _sc.teks_halaman(hasil['docx'])
+                        _isi = _RI.isi_indeks(
+                            hasil['docx'], _hal, glos,
+                            _RI.kumpulkan_nama(refs_rakit))
+                        if lapor:
+                            lapor(f"Indeks terisi: { _isi['subjek']} subjek, "
+                                  f"{_isi['nama']} nama")
+                    except Exception as e:
+                        raise RuntimeError(f'indeks referensi gagal: {e}')
+                    _sc.referensi(hasil['docx'])
                 if kartu_jenis == 'book-chapter':
                     _sc.chapter(hasil['docx'])
                 # Sukses: salinan pra-nomor tidak lagi diperlukan — hapus

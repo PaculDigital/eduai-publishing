@@ -396,6 +396,11 @@ def buku_susun(
             kunci_jenis = _buku.jenis_gaya(bidang, untuk)
         except ValueError as e:
             return RedirectResponse('/buku?galat=' + quote(str(e)), status_code=303)
+    elif jenis == 'buku-referensi':
+        # Gaya tulis referensi (tone + prompt N.1-N.5) — kartu masih
+        # ditolak di atas selama siap=False; cabang ini aktif bersama
+        # aktivasi kartu.
+        kunci_jenis = 'referensi'
 
     # ── ID DOKUMEN (ACC Bos 19 Okt 2026) ─────────────────────────────────
     #  Buku WAJIB punya ID sendiri supaya alat dipilih TEPAT: buku TIDAK

@@ -192,6 +192,26 @@ def chapter(data, td):
     return {'exit': r.returncode, 'keluar': (r.stdout + r.stderr)[-2000:]}
 
 
+def teks_halaman(data, td):
+    """Teks per halaman dari render nyata (untuk pengisi indeks).
+
+    Mengembalikan list: indeks 0 = halaman 1 (pisah form feed dari
+    pdftotext). Pemanggil (app/referensi_indeks) yang menentukan halaman
+    isi vs TOC/back-matter dari isinya.
+    """
+    from perender_halaman import render_pdf
+    masuk = Path(td) / 'masuk.docx'
+    pdf = Path(td) / 'masuk.pdf'
+    masuk.write_bytes(_docx_dari(data))
+    if not render_pdf(str(masuk), str(pdf)):
+        return {'exit': 2, 'galat': 'WordCraft gagal merender ke PDF'}
+    try:
+        halaman = _halaman_teks(pdf)
+    except Exception as e:
+        return {'exit': 2, 'galat': f'pdftotext gagal: {e}'}
+    return {'exit': 0, 'halaman': halaman}
+
+
 def _pasangan_indeks(baris):
     """'Istilah ..... 12' -> ['Istilah', '12']; tanpa angka -> [baris, ''].
 
@@ -357,7 +377,7 @@ def referensi(data, td):
 
 
 TANGAN = {'/isi-nomor': isi_nomor, '/ukur': ukur, '/chapter': chapter,
-          '/referensi': referensi}
+          '/referensi': referensi, '/teks-halaman': teks_halaman}
 
 
 class Tangan(BaseHTTPRequestHandler):
