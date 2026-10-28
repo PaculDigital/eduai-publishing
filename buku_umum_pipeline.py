@@ -242,17 +242,15 @@ GAMBAR_RANTAI = [
 GAMBAR_TIMEOUT = 280           # per percobaan; model lambat jangan dipotong
 GAMBAR_MATI = set()            # model yg gagal di proses ini → tidak dicoba lagi
 
-#  🚨 CACAT TERUKUR 20 Okt 2026 — SALAH PREFIX.
+#  🚨 CATATAN 20 Okt 2026 — SALAH PREFIX (masih berlaku sebagai peringatan).
 #  Dulu `cb/gemini-2.5-flash-image` = model melalui **CodeBuddy**, dan
 #  kredit CodeBuddy HABIS (galat 14018 "Credits exhausted", 429).
 #  Padahal saldo InferHub sendiri masih $7,57.
-#  TERUJI 20 Okt 2026 langsung ke API (9 kandidat, 1 hidup):
-#    ✅ `gemini-2.5-flash-image`  (TANPA `cb/`) → HTTP 200, b64 782 KB
-#    ❌ `cb/...`  → 429/14018 kredit habis
-#    ❌ gpt-image-1.5, gpt-image-2, flux-schnell, flux-dev,
-#       nano-banana-2-lite, seedream-4.0, recraft-v4 → 404 unknown model
-#  Jadi prefix `cb/` DILARANG untuk gambar: beda prefix = beda tagihan.
-GAMBAR_MODEL = "gemini-2.5-flash-image"
+#  ⚠️ TAPI per 28 Okt 2026 `gemini-2.5-flash-image` (TANPA `cb/`) JUGA MATI:
+#     HTTP 400 "route config not found". Jangan dipakai lagi di jalur mana pun.
+#  Pelajaran yang MASIH BERLAKU: prefix beda = tagihan beda. `cb/` dilarang
+#  untuk gambar. Nama model HANYA boleh diambil dari GAMBAR_RANTAI di atas,
+#  karena hanya itu yang sudah diuji hidup.
 GAMBAR_KEY = _baca_env("INFERHUB_KEY")
 #  ⚠️ JANGAN pakai glm-5.2 — model BERPIKIR: max_tokens habis untuk reasoning,
 #     jawaban jadi 2 karakter (terukur 18 Okt: content=2 kar, reasoning=1156 kar).
