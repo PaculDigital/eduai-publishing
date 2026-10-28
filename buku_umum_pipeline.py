@@ -397,6 +397,33 @@ def architect_prompt(bab_num, bab_title, sub_num, sub_title, key_points, rolling
     import tone_menulis as TM
     _t = TM.tone(jenis)
     MASTER_OUTLINE = outline or MASTER_OUTLINE_SEMENTARA
+    # 28 Okt 2026 (mesin referensi web) — aturan yang hanya berlaku untuk
+    # buku referensi (skill buku-referensi). Judul sub-bab N.3/N.4 dikenali
+    # dari kata di judulnya, bukan dari nomornya, supaya tidak rapuh.
+    if jenis == 'referensi':
+        aturan_referensi = """
+ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
+- Sub-bab berjudul 'Perbandingan Kritis' (N.3) WAJIB memuat SATU blok
+  [TABEL ...] komparasi teori (kolom: tokoh, tahun, proposisi inti,
+  kekuatan, keterbatasan) — BUKAN 'jika relevan'.
+- Sub-bab berjudul 'Posisi'/'Sintesis Penulis' (N.4) WAJIB memuat paragraf
+  posisi eksplisit yang diawali salah satu frasa ini: 'Posisi penulis',
+  'Pandangan penulis', 'Sintesis penulis', 'Penulis berpendapat', atau
+  'Penulis berpendirian'. Tanpa frasa itu = bab gagal.
+- Satu unit argumen (satu perbandingan atau satu posisi) TIDAK BOLEH
+  terpotong: tulis utuh dalam sub-bab ini.
+- Akhiri sub-bab dengan blok [ISTILAH BARU] (satu baris per istilah baru:
+  Istilah: definisi operasional yang dipakai buku ini). Blok ini dipisah
+  dari narasi saat perakitan — jangan selipkan istilahnya ke narasi saja.
+"""
+        aturan_ringkasan = (
+            'Tulis section "Ringkasan Bab" FORMAL dalam poin-poin substansi '
+            '(bukan paragraf mengalir)')
+    else:
+        aturan_referensi = ''
+        aturan_ringkasan = (
+            'JANGAN buat section "Ringkasan" formal — tulis paragraf penutup '
+            'yang natural')
     # Build verified references section
     refs_section = ""
     if refs:
@@ -452,7 +479,7 @@ Penutup bab yang mengikat ide + transisi ke bab berikutnya.
 
 ATURAN:
 - {_t['penutup_kata']}, 2-3 paragraf naratif
-- JANGAN buat section "Ringkasan" formal — tulis paragraf penutup yang natural
+- {aturan_ringkasan}
 - Transisi: "Bab selanjutnya akan membahas..." (natural, tidak dipaksakan)
 - 0 markdown, EYD
 - {_t['sitasi']}
@@ -502,10 +529,25 @@ ATURAN:
   JANGAN cuma header tanpa data baris. JANGAN menaruh "Baris1" di luar
   kurung siku.
 - [DIAGRAM {sub_num}: Judul - deskripsi singkat visual] jika relevan
-
+{aturan_referensi}
 Target: 800-1200 kata. Output: teks langsung. JANGAN POTONG sebelum selesai."""
 
-def skeptic_prompt(sub_title, draft):
+def skeptic_prompt(sub_title, draft, refs=None, jenis='umum'):
+    # 28 Okt 2026 (mesin referensi web) — Skeptic referensi = verifikator
+    # atribusi: setiap Tokoh (Tahun) dicek ke daftar referensi. Argumen
+    # refs/jenis opsional supaya pemanggil lama (2 argumen) tidak rusak.
+    if jenis == 'referensi':
+        daftar = ''
+        if refs:
+            daftar = '\nDAFTAR REFERENSI (satu-satunya sumber sitasi yang sah):\n' + '\n'.join(
+                f'- {format_in_text(r)}' for r in refs)
+        return f"""Kamu Skeptic + VERIFIKATOR ATRIBUSI. KRITIK SUB-BAB "{sub_title}":
+{draft[:3000]}{daftar}
+Kritik: gap konten, inkonsistensi, panjang paragraf (<60 atau >100 kata),
+transisi berlebihan, tone tidak akademik-presisi, DAN verifikasi atribusi:
+setiap 'Tokoh (Tahun)' WAJIB ada di daftar referensi di atas — tokoh, tahun,
+atau karya yang tertukar = CACAT FATAL. Klaim faktual tanpa sitasi = gap.
+Sitasi di luar daftar = HALLUSINASI. Max 300 kata. JANGAN rewrite."""
     return f"""Kamu Skeptic. KRITIK SUB-BAB "{sub_title}":
 {draft[:3000]}
 Kritik: gap konten, inkonsistensi, panjang paragraf (<60 atau >100 kata), transisi berlebihan, hook lemah, tone terlalu akademik/kaku, sitasi kurang. Max 300 kata. JANGAN rewrite."""
@@ -564,6 +606,29 @@ def editor_prompt(sub_title, draft, kritik, saran, jenis="umum"):
         aturan_tanya = '5. 0 pertanyaan di body narasi'
         aturan_paragraf = '1. Paragraf 60-100 kata, 3-5 kalimat. <50 kata = GAGAL'
 
+    # 28 Okt 2026 (mesin referensi web) — aturan editor yang diganti untuk
+    # referensi (skill menolak hitungan sitasi + hook cerita + sapaan personal).
+    if jenis == 'referensi':
+        aturan_hook_editor = '2. Pembuka: peta/definisi, BUKAN cerita/kasus'
+        aturan_sitasi_editor = (
+            '6. Sitasi PER-KLAIM dari daftar referensi: setiap klaim faktual '
+            'wajib sitasi; TIDAK ada angka minimum (angka minimum = sitasi '
+            'tempelan)')
+        aturan_referensi_editor = (
+            '6b. Sub-bab Perbandingan Kritis WAJIB mempertahankan blok '
+            '[TABEL ...] komparasi; sub-bab Posisi WAJIB mempertahankan '
+            'paragraf posisi eksplisit (frasa "Posisi penulis" dkk). '
+            'Menghapus keduanya = GAGAL.\n'
+            '6c. Pertahankan blok [ISTILAH BARU] di akhir sub-bab — jangan '
+            'dihapus, jangan digabung ke narasi.')
+        aturan_personal = (
+            '4. Suara penulis lewat POSISI ILMIAH, bukan sapaan personal — '
+            'jangan kejar persentase sapaan')
+    else:
+        aturan_hook_editor = '2. Hook: cerita/kasus di awal, BUKAN teori'
+        aturan_sitasi_editor = '6. Sitasi APA 7: WAJIB 2+ — KURANG dari 2 = GAGAL'
+        aturan_referensi_editor = ''
+
     return f"""Kamu Editor. Tulis SUB-BAB "{sub_title}" FINAL:
 DRAFT: {draft}
 KRITIK: {kritik}
@@ -571,12 +636,12 @@ SARAN: {saran}
 
 ATURAN FINAL (WAJIB SEMUA):
 {aturan_paragraf}
-2. Hook: cerita/kasus di awal, BUKAN teori
+{aturan_hook_editor}
 3. Transisi: maksimal 2 frasa per sub-bab
 {aturan_personal}
 {aturan_tanya}
-6. Sitasi APA 7: WAJIB 2+ — KURANG dari 2 = GAGAL
-6a. ANTI-HALLUSINASI SITASI — WAJIB: HANYA gunakan sitasi dari daftar referensi yang diberikan. DILARANG MENULIS SITASI yang tidak ada di daftar referensi. Setiap (Nama, Tahun) di teks WAJIB match dengan entri di daftar referensi. Sitasi palsu = HALLUSINASI = GAGAL TOTAL. Jika ragu, HAPUS sitasi tersebut — lebih baik kurang daripada mengarang.
+{aturan_sitasi_editor}
+{aturan_referensi_editor}6a. ANTI-HALLUSINASI SITASI — WAJIB: HANYA gunakan sitasi dari daftar referensi yang diberikan. DILARANG MENULIS SITASI yang tidak ada di daftar referensi. Setiap (Nama, Tahun) di teks WAJIB match dengan entri di daftar referensi. Sitasi palsu = HALLUSINASI = GAGAL TOTAL. Jika ragu, HAPUS sitasi tersebut — lebih baik kurang daripada mengarang.
 7. DILARANG KERAS MENGURANGI NARASI. Jika draft 800 kata, output WAJIB minimal 800 kata. Jika draft 1000 kata, output WAJIB minimal 1000 kata. Mengurangi narasi = GAGAL TOTAL. JANGAN ringkas, JANGAN potong, JANGAN hapus paragraf.
 8. Tone: {_t['tone']}
 8a. SAPAAN: sapa pembaca dengan "{sapaan}" — pakai kata "{sapaan}" untuk menyapa. DILARANG memakai sapaan lain.

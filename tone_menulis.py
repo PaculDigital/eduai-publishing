@@ -117,6 +117,50 @@ TONE_MENULIS = {
         "sapaan": "Anda",
         "pembaca": "mahasiswa, dibimbing dosen",
     },
+    # Ditambahkan 28 Okt 2026 (mesin referensi web) — skill buku-referensi:
+    # akademik-presisi DENGAN suara penulis. Entri LENGKAP (semua kunci yang
+    # dipakai architect_prompt/editor_prompt) supaya jenis ini tidak KeyError
+    # seperti entri minimal monograf/buku_ajar.
+    "referensi": {
+        "tone": (
+            "Akademik-presisi: kalimat definisional, lugas, tidak berputar. "
+            "Padat dan presisi, TAPI suara penulis hadir lewat definisi yang "
+            "ditegakkan dan posisi ilmiah yang dinyatakan eksplisit. Bukan "
+            "ensiklopedia kering, bukan narasi populer."
+        ),
+        "sapaan": "Anda",
+        "pembaca": "pembaca yang merujuk: akademisi, peneliti, mahasiswa pascasarjana",
+        "paragraf": "60-100 kata, 3-5 kalimat",
+        "kata_target": "800-1200 kata",
+        "intro_kata": "300-400 kata",
+        "penutup_kata": "200-300 kata",
+        "sitasi": (
+            "Sitasi APA 7 PER-KLAIM dari daftar referensi terverifikasi: "
+            "setiap klaim faktual wajib sitasi; definisi dari sumber primer; "
+            "TIDAK ada angka minimum per bab (angka minimum = sitasi tempelan)"
+        ),
+        "hook": (
+            "buka dengan PETA BAB: ruang lingkup bab, urgensi ilmiahnya, "
+            "dan struktur pembahasan — BUKAN anekdot, BUKAN cerita, BUKAN data "
+            "mengejutkan"
+        ),
+        "personal": (
+            "- Suara penulis hadir lewat POSISI ILMIAH eksplisit (sub-bab N.4), "
+            "bukan lewat sapaan personal"
+        ),
+        "larangan": (
+            "- DILARANG: anekdot/kisah pembuka, \"Menurut para ahli...\" tanpa "
+            "menyebut nama ahli dan karyanya, klaim faktual tanpa sitasi, "
+            "ilustrasi 3D dekoratif, dan ciri AI: \"Penting untuk dicatat\", "
+            "\"Secara komprehensif\", \"Di era digital ini\""
+        ),
+        "istilah": (
+            "- Satu istilah = satu makna, konsisten di seluruh buku; istilah "
+            "asing miring. Istilah baru WAJIB dicatat di akhir sub-bab dalam "
+            "blok [ISTILAH BARU] (satu baris per istilah: Istilah: definisi "
+            "operasional yang dipakai buku ini)"
+        ),
+    },
 }
 
 
