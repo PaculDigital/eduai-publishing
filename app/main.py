@@ -350,6 +350,10 @@ def buku_mulai(
             kunci_jenis = _buku.jenis_gaya(bidang, untuk)
         except ValueError as e:
             return RedirectResponse('/buku?galat=' + quote(str(e)), status_code=303)
+    elif jenis == 'buku-referensi':
+        # Gaya referensi (paket 'referensi' di jenis_buku) — siapkan
+        # memvalidasi gaya ini, jadi WAJIB diteruskan, bukan 'umum'.
+        bidang, untuk, kunci_jenis = '', '', 'referensi'
     else:
         # Kartu lain belum punya pilihan — tetap gaya umum (perilaku lama)
         bidang, untuk, kunci_jenis = '', '', 'umum'
@@ -359,6 +363,70 @@ def buku_mulai(
     return RedirectResponse('/buku/siapkan?' + q, status_code=303)
 
 
+@_router_kolaborasi.post('/buku/outline')
+def buku_outline(
+    request: Request,
+    jenis: str = Form(''),
+    judul: str = Form(''),
+    penulis: str = Form(''),
+    penelaah: str = Form(''),
+    jumlah_bab: str = Form(''),
+    db: Session = Depends(get_db),
+):
+    """Gate 1 buku referensi: bangun kerangka GRATIS, tampilkan untuk disetujui.
+
+    Token TIDAK dipotong di sini — potong di /buku/susun, sesudah user
+    menekan Setuju. Kerangka disimpan di server (berkas + token acak);
+    form persetujuan hanya membawa token, jadi kerangka yang diproduksi
+    PERSIS kerangka yang ditampilkan (bukan kiriman form yang bisa diubah).
+    """
+    u = _wajib_login_kolab(request, db)
+    if jenis != 'buku-referensi':
+        return RedirectResponse('/buku', status_code=303)
+    kartu = _buku.cari(jenis)
+    if not kartu or not kartu.get('siap'):
+        return RedirectResponse(
+            '/buku?galat=' + quote('Jenis ini belum bisa dijalankan'),
+            status_code=303)
+    judul = (judul or '').strip()
+    if len(judul) < 5:
+        return RedirectResponse(
+            '/buku?galat=' + quote('Judul buku minimal 5 huruf'),
+            status_code=303)
+    try:
+        jml = int(jumlah_bab or 8)
+    except ValueError:
+        jml = 8
+    jml = max(1, min(12, jml))
+    try:
+        from . import referensi_outline as _RO
+        outline = _RO.susun_outline(judul, '', jml)
+    except Exception:
+        return RedirectResponse(
+            '/buku?galat=' + quote('Kerangka gagal disusun, coba lagi'),
+            status_code=303)
+    # Validasi bentuk sebelum ditampilkan (kerangka rusak jangan tampil).
+    try:
+        import outline_buku as _OB
+        if _OB.periksa(outline):
+            return RedirectResponse(
+                '/buku?galat=' + quote('Kerangka gagal disusun, coba lagi'),
+                status_code=303)
+    except Exception:
+        pass  # tanpa OB, validasi menyusul di susun()
+    from . import referensi_pesanan as _RP
+    token = _RP.simpan_outline_pending(outline)
+    kembali = '/buku/siapkan?' + urlencode({
+        'jenis': jenis, 'gaya': 'referensi', 'judul': judul,
+        'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml})
+    return templates.TemplateResponse('buku_outline.html', {
+        'request': request, 'user': u, 'kartu': kartu,
+        'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
+        'jumlah_bab': jml, 'token': token, 'kembali': kembali,
+        'babs': sorted(outline.items()),
+    })
+
+
 @_router_kolaborasi.post('/buku/susun')
 def buku_susun(
     request: Request,
@@ -366,6 +434,10 @@ def buku_susun(
     bidang: str = Form(''),
     untuk: str = Form(''),
     judul: str = Form(''),
+    penulis: str = Form(''),
+    penelaah: str = Form(''),
+    jumlah_bab: str = Form(''),
+    outline_token: str = Form(''),
     db: Session = Depends(get_db),
 ):
     """SUSUN buku sungguhan — kuota dipotong di DEPAN, hasil jadi berkas.
@@ -428,6 +500,28 @@ def buku_susun(
             '/buku?galat=' + quote('Mesin penyusun belum siap: ' + alasan),
             status_code=303)
 
+    # ── GATE 1 REFERENSI: produksi WAJIB dari kerangka yang disetujui ────
+    #  Tanpa token outline = user melompati halaman persetujuan (atau token
+    #  sudah dipakai) -> tolak, jangan produksi dari kerangka karangan.
+    outline_siaps = None
+    jml_bab = None
+    if jenis == 'buku-referensi':
+        if not outline_token:
+            return RedirectResponse(
+                '/buku?galat=' + quote(
+                    'Setujui kerangka dulu di halaman outline'),
+                status_code=303)
+        try:
+            from . import referensi_pesanan as _RP
+            outline_siaps = _RP.muat_outline_pending(outline_token)
+        except ValueError as e:
+            return RedirectResponse(
+                '/buku?galat=' + quote(str(e)), status_code=303)
+        try:
+            jml_bab = max(1, min(12, int(jumlah_bab or 8)))
+        except ValueError:
+            jml_bab = 8
+
     # ── TITIPKAN PEKERJAAN, JANGAN MENUNGGU (ACC Bos 19 Okt 2026) ────────
     #  Bukti masalah: buku 6 bab = ±36 menit SATU request. Tab ditutup =
     #  pekerjaan tetap jalan tapi user tidak tahu apa-apa, dan Cloudflare
@@ -454,6 +548,12 @@ def buku_susun(
     p.komentar_json = _json.dumps({
         'judul': judul, 'bidang': bidang, 'untuk': untuk,
         'kunci_jenis': kunci_jenis, 'jenis': jenis, 'id_dok': id_dok,
+        'penulis': penulis, 'penelaah': penelaah,
+        'jumlah_bab': jml_bab,
+        # Kerangka disetujui (catatan saja; utas memakai closure di bawah,
+        # bukan salinan ini — kunci JSON jadi string, tidak bisa dipakai
+        # langsung sebagai outline).
+        'outline_disetujui': bool(outline_siaps),
     }, ensure_ascii=False)
     db.commit()
 
@@ -471,7 +571,11 @@ def buku_susun(
                 _lapor.tahap(str(teks))
 
             hasil = _susun.susun(sdb, _u, judul, bidang, untuk, kunci_jenis,
-                                 lapor=lapor_teks, kartu_jenis=jenis)
+                                 lapor=lapor_teks, kartu_jenis=jenis,
+                                 jumlah_bab=jml_bab,
+                                 outline_siaps=outline_siaps,
+                                 penulis=(penulis or None),
+                                 penelaah=(penelaah or None))
             _proses.tandai_selesai(
                 kode, hasil=judul, hasil_json=_json.dumps(hasil, default=str),
                 token_revisi=hasil.get('token') or 0)
@@ -564,9 +668,17 @@ def halaman_buku_siapkan(
     bidang: str = '',
     untuk: str = '',
     gaya: str = 'umum',
+    judul: str = '',
+    penulis: str = '',
+    penelaah: str = '',
+    jumlah_bab: str = '',
     db: Session = Depends(get_db),
 ):
-    """Halaman konfirmasi: pilihan sudah dikunci, tampilkan wajah bukunya."""
+    """Halaman konfirmasi: pilihan sudah dikunci, tampilkan wajah bukunya.
+
+    Param judul/penulis/penelaah/jumlah_bab HANYA untuk mengisi ulang form
+    saat user kembali dari halaman outline (Gate 1) lewat tombol Ubah.
+    """
     u = _wajib_login_kolab(request, db)
     kartu = _buku.cari(jenis)
     if not kartu:
@@ -584,6 +696,8 @@ def halaman_buku_siapkan(
         'nama_untuk': (_buku.cari_untuk_siapa(untuk) or {}).get('nama', ''),
         'nama_bidang': next((b['nama'] for b in _buku.BIDANG_UMUM
                              if b['kode'] == bidang), ''),
+        'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
+        'jumlah_bab': jumlah_bab,
     })
 
 

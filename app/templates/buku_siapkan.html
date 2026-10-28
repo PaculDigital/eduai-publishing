@@ -121,7 +121,7 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
 
   <div class="kartu">
     <h2>Judul buku</h2>
-    <form method="post" action="/buku/susun" id="form-susun">
+    <form method="post" action="{% if kartu.kode == 'buku-referensi' %}/buku/outline{% else %}/buku/susun{% endif %}" id="form-susun">
       <input type="hidden" name="jenis" value="{{ kartu.kode }}">
       <input type="hidden" name="bidang" value="{{ bidang }}">
       <input type="hidden" name="untuk" value="{{ untuk }}">
@@ -133,6 +133,27 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
       </label>
       <p class="ket-judul">Judul ini yang menentukan isi seluruh bab. Pilih yang
          benar-benar kamu mau tulis — bukan contoh.</p>
+      {% if kartu.kode == 'buku-referensi' %}
+      <label class="baris-pilih">
+        <input class="kolom-judul" type="text" name="penulis" maxlength="120"
+               autocomplete="off"
+               placeholder="Nama penulis (kosong = nama akunmu)"
+               value="{{ penulis or user.nama or user.nama_lengkap or '' }}">
+      </label>
+      <label class="baris-pilih">
+        <input class="kolom-judul" type="text" name="penelaah" maxlength="120"
+               autocomplete="off"
+               placeholder="Nama pakar penelaah (opsional — ditulis di Tentang Penulis)"
+               value="{{ penelaah or '' }}">
+      </label>
+      <label class="baris-pilih">Jumlah bab (1–12):
+        <input class="kolom-judul" type="number" name="jumlah_bab" min="1" max="12"
+               value="{{ jumlah_bab or 8 }}">
+      </label>
+      <p class="ket-judul">Sesudah ini kamu melihat kerangkanya dulu (GRATIS) dan
+         menyetujuinya sebelum produksi jalan — token baru dipotong sesudah
+         kamu setuju. Daftar Pustaka diletakkan di akhir buku.</p>
+      {% endif %}
     </form>
   </div>
 
@@ -160,7 +181,7 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
 
   <div class="aksi">
     <button class="tombol utama" type="submit" form="form-susun">
-      {{ ikon('file-pen', 14) }} Susun sekarang
+      {{ ikon('file-pen', 14) }} {% if kartu.kode == 'buku-referensi' %}Lihat kerangka dulu{% else %}Susun sekarang{% endif %}
     </button>
     <a class="tombol batal" href="/buku">{{ ikon('arrow-left', 14) }} Ubah pilihan</a>
   </div>

@@ -88,6 +88,52 @@ PAKET = {
         "tone_visual": "metafora konseptual, negative space lega, tenang & mahal",
     },
 
+    # ── BUKU REFERENSI (mesin web, 28 Okt 2026) ──────────────────────────
+    #  Palet + label disamakan dengan 'umum' (satu keluarga visual buku);
+    #  yang beda hanya tone/tone_visual (akademik-presisi, bukan naratif).
+    #  Ilustrasi: TIDAK ADA (skill buku-referensi melarang ilustrasi
+    #  dekoratif; generate_bab_visuals melewati API ilustrasi untuk jenis
+    #  ini) — jangkar di bawah tidak pernah dipakai, tapi tetap diisi
+    #  supaya konsumen paket yang membacanya tidak KeyError.
+    "referensi": {
+        "gaya_gambar": "referensi",
+        "mode_brief": "konseptual",
+        "ilustrasi": None,
+        "jangkar": (
+            "Consistent series style for the whole book: the same "
+            "cheerful 3D cartoon infographic style, the same deep navy "
+            "and warm orange palette, and the same friendly rounded "
+            "character design in every illustration."
+        ),
+        "palet": {
+            "krem": "#FFF9EE",
+            "tinta": "#1B3A57",
+            "aksen": "#F2994A",
+            "hijau": "#27AE60",
+            "biru": "#2D9CDB",
+            "kuning": "#F2C94C",
+            "merah": "#EB5757",
+            "langit": "#E8F4FB",
+        },
+        "label": {
+            "bentuk": "kotak",
+            "radius": "18px",
+            "font": "'DejaVu Sans', Arial, sans-serif",
+            "tebal": "700",
+            "ukuran": "22px",
+            "huruf_besar": False,
+            "bayangan": "0 4px 0 #1B3A57",
+        },
+        "judul": {"ukuran": "44px", "huruf_besar": True, "tebal": "800"},
+        "tone": (
+            "Akademik-presisi dengan suara penulis (bukan naratif santai, "
+            "bukan buku ajar). Tiap bab: Peta Bab, Definisi, Perkembangan "
+            "Teori, Perbandingan Kritis (tabel wajib), Posisi Penulis "
+            "eksplisit, Implikasi. Sitasi per-klaim dari sumber terverifikasi."
+        ),
+        "tone_visual": "tabel komparasi dan diagram konsep, tanpa ilustrasi dekoratif",
+    },
+
     # ── BUKU ANAK (gaya contoh Bos) ──────────────────────────────────────
     "anak": {
         "gaya_gambar": "anak",

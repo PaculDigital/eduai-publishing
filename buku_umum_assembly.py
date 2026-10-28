@@ -38,7 +38,7 @@ _ASLI = {}
 
 
 def siapkan(judul, keluar_dir, penulis='', institusi='', tahun=None,
-            subjudul='', nama_berkas=None):
+            subjudul='', nama_berkas=None, penelaah=''):
     """Setel global assembly untuk SATU buku. Return (docx_out, pemulih).
 
     Pemanggil WAJIB memanggil `pemulih()` di blok finally — kalau tidak,
@@ -60,6 +60,7 @@ def siapkan(judul, keluar_dir, penulis='', institusi='', tahun=None,
         'subjudul': subjudul or '',
         'penulis': penulis or '',
         'institusi': institusi or '',
+        'penelaah': (penelaah or '').strip(),
         'tahun': str(tahun or _t.strftime('%Y')),
         'ukuran': 'B5',
     }
@@ -1116,9 +1117,16 @@ def add_bio(doc):
     for para in bio.split('\n\n'):
         add_para(doc, para.strip(), align='justify', space_after=10)
 
+    # Kredit penelaah (pesanan referensi): hanya bila diisi pemesan —
+    # JANGAN karang nama pakar.
+    penelaah = (BUKU.get('penelaah') or '').strip()
+    if penelaah:
+        add_para(doc, f"Buku ini ditelaah oleh {penelaah}.",
+                 align='justify', space_after=10)
+
 def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
           penulis='', institusi='', tahun=None, subjudul='',
-          nama_berkas=None, judul_kartu=None):
+          nama_berkas=None, judul_kartu=None, penelaah=''):
     """Rakit SEMUA bab jadi SATU .docx. Return dict hasil (bukan cuma print).
 
     Dipakai rute `/buku/susun` supaya user dapat 1 dokumen utuh — bukan
@@ -1176,7 +1184,8 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
 
     docx_out, pulih = siapkan(judul, keluar_dir, penulis=penulis,
                               institusi=institusi, tahun=tahun,
-                              subjudul=subjudul, nama_berkas=nama_berkas)
+                              subjudul=subjudul, nama_berkas=nama_berkas,
+                              penelaah=penelaah)
     t0 = time.time()
     try:
         doc = Document()

@@ -121,16 +121,19 @@ JENIS_BUKU = [
         'ikon': 'list',
         'tanya': 'Butuh buku rujukan teori & konsep?',
         'isi': ['Teori + definisi dari sumber nyata',
-                'Sitasi padat (minimal 15 per bab)',
-                'Tema bebas atau bahan sendiri'],
-        'lencana': 'Segera',
+                'Sitasi per-klaim dari sumber terverifikasi',
+                'Indeks subjek + nama bernomor'],
+        'lencana': 'Tema bebas',
         'warna': 'kuning',
-        #  ⚠️ BELUM ADA skill `buku-referensi` (diperiksa 17 Okt 2026).
-        #     JANGAN diubah jadi True sebelum skill + mesinnya benar-benar ada
-        #     dan teruji — tombol yang menjanjikan fitur kosong = janji palsu.
-        'siap': False,
-        'sumber': ['tema', 'bahan_sendiri'],
-        'mesin': '(belum ada — rencana: sambung buku_umum_pipeline + prompt teori)',
+        #  AKTIF 28 Okt 2026 (mesin referensi web selesai + teruji unit):
+        #  outline N.1-N.5, sitasi Harvest terverifikasi, indeks bernomor,
+        #  gerbang /referensi. Catatan jujur: bahan sendiri (upload) BELUM
+        #  ada di form web v1 — sumber v1 hanya tema/judul.
+        'siap': True,
+        'sumber': ['tema'],
+        'mesin': ('buku_umum_pipeline.py (jenis referensi) + '
+                  'app/referensi_outline.py + app/referensi_indeks.py + '
+                  'gerbang sidecar /referensi'),
         'skill': 'buku-referensi',
     },
 ]

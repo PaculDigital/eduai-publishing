@@ -107,10 +107,15 @@ def folder_buku(fid_unik):
 
 
 def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
-          kartu_jenis=None):
+          kartu_jenis=None, outline_siaps=None, penulis=None, penelaah=None):
     """Susun buku + potong kuota di depan. Return dict hasil.
 
     Raise HTTPException 402/403 dari kuota kalau saldo kurang (tidak menyusun).
+
+    outline_siaps: outline yang SUDAH disetujui user (Gate 1 referensi) —
+    dipakai apa adanya (tetap divalidasi OB.periksa), tanpa membangun ulang.
+    penulis: nama penulis pesanan (ganti nama profil bila diisi).
+    penelaah: nama pakar penelaah (ditulis di Tentang Penulis + hasil).
     """
     _pastikan_modul()
     import outline_buku as OB
@@ -133,7 +138,11 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
         if lapor:
             lapor("Menyusun kerangka buku…")
         #  Outline disusun dari PILIHAN USER — bukan outline buku lain.
-        if kartu_jenis == 'buku-referensi':
+        if outline_siaps is not None:
+            # Gate 1: outline yang SUDAH disetujui user di /buku/outline.
+            # Tetap divalidasi OB.periksa di bawah (bentuk wajib sama).
+            outline = outline_siaps
+        elif kartu_jenis == 'buku-referensi':
             # Kerangka referensi TIDAK lewat OB (host tidak punya jenis
             # referensi): builder repo dengan 5 sub tetap N.1-N.5 per bab.
             from . import referensi_outline as _RO
@@ -221,11 +230,14 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                 judul, keluar, outline,
                 glosarium=glos,
                 references=refs_rakit,
-                penulis=(getattr(u, 'nama', '') or getattr(u, 'nama_lengkap', '') or ''),
+                penulis=(penulis or getattr(u, 'nama', '')
+                         or getattr(u, 'nama_lengkap', '') or ''),
                 institusi=(getattr(u, 'nama_kampus', '') or ''),
+                penelaah=(penelaah or ''),
             )
             hasil['docx'] = rakit.get('docx')
             hasil['docx_hasil'] = rakit
+            hasil['penelaah'] = penelaah or ''
             if lapor:
                 lapor(f"Buku jadi: {os.path.basename(hasil['docx'])} "
                       f"({rakit.get('ukuran_byte', 0) // 1024} KB, "

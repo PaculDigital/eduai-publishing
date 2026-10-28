@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setujui Kerangka — EduAi Publishing</title>
+<link rel="icon" href="/static/logo-96.png">
+<link rel="stylesheet" href="/static/ikon.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--hijau:#198E3B;--hijau-gelap:#104F22;--hijau-muda:#E9F6EE;--oranye:#F4A025;
+      --teks:#272530;--teks-abu:#68666E;--garis:#E7E7EA;--merah:#C0392B}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);background:#FAFCFB;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer;border:none}
+header{background:linear-gradient(135deg,#104F22 0%,#17702F 55%,#198E3B 100%);
+       border-bottom:1px solid rgba(255,255,255,.13);position:sticky;top:0;z-index:50}
+.nav{max-width:1080px;margin:0 auto;padding:0 22px;height:70px;display:flex;
+     align-items:center;justify-content:space-between}
+.nav img{height:52px;width:auto}
+.nav-kanan{display:flex;align-items:center;gap:16px;font-size:14.5px;color:rgba(255,255,255,.9)}
+.nav-kanan .keluar{color:#fff;font-weight:600;border:1.5px solid rgba(255,255,255,.34);
+                   padding:6px 15px;border-radius:70px}
+main{max-width:820px;margin:0 auto;padding:28px 22px 60px}
+h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.sub{font-size:13.5px;color:var(--teks-abu);line-height:1.7;margin-bottom:22px}
+.kartu{background:#fff;border:1.5px solid var(--garis);border-radius:14px;
+       padding:18px 20px;margin-bottom:16px}
+.kartu h2{font-size:15px;font-weight:700;margin-bottom:10px}
+.bab-judul{font-size:15px;font-weight:700;margin-bottom:8px}
+.sub-daftar{list-style:none}
+.sub-daftar li{font-size:13.5px;line-height:1.6;padding:6px 0;border-top:1px solid var(--garis)}
+.sub-daftar li:first-child{border-top:none}
+.sub-nomor{font-weight:700;color:var(--hijau-gelap)}
+.sub-kunci{font-size:12px;color:var(--teks-abu);display:block;margin-top:2px}
+.aksi{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.tombol{display:inline-block;padding:13px 22px;border-radius:10px;font-size:14.5px;font-weight:700}
+.tombol.utama{background:var(--hijau);color:#fff}
+.tombol.batal{background:#fff;color:var(--teks);border:1.5px solid var(--garis)}
+.gratis{font-size:13px;color:var(--hijau-gelap);background:var(--hijau-muda);
+        border-radius:10px;padding:12px 14px;line-height:1.7}
+</style>
+</head>
+<body>
+<header><div class="nav">
+  <a href="/"><img src="/static/logo-96.png" alt="EduAi"></a>
+  <div class="nav-kanan"><span>{{ user.nama or user.nama_lengkap or '' }}</span>
+    <a class="keluar" href="/keluar">Keluar</a></div>
+</div></header>
+<main>
+  {% set menu_aktif = 'buku' %}
+  {% set menu_kelas = 'pita' %}
+  {% include '_menu.html' %}
+
+  <h1>{{ ikon('list-checks', 22) }} Setujui Kerangka Buku</h1>
+  <p class="sub">Ini kerangka buku referensimu — <b>{{ jumlah_bab }} bab</b>, tiap bab
+     berisi 5 sub tetap (Definisi, Perkembangan Teori, Perbandingan Kritis,
+     Posisi Penulis, Implikasi). Produksi menulis PERSIS dari kerangka ini.</p>
+
+  <div class="kartu">
+    <h2>{{ judul }}</h2>
+    <p style="font-size:13.5px;color:var(--teks-abu);line-height:1.7">
+      Penulis: <b>{{ penulis or '—' }}</b>
+      {% if penelaah %} · Ditelaah oleh: <b>{{ penelaah }}</b>{% endif %}</p>
+  </div>
+
+  {% for n, bab in babs %}
+  <div class="kartu">
+    <div class="bab-judul">BAB {{ n }} — {{ bab.title }}</div>
+    <ul class="sub-daftar">
+      {% for sub in bab.subs %}
+      <li><span class="sub-nomor">{{ sub[0] }}</span> {{ sub[1] }}
+        {% if sub[2] %}<span class="sub-kunci">{{ sub[2] }}</span>{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+
+  <div class="kartu gratis">
+    Kerangka ini <b>gratis</b> — tokenmu baru dipotong saat kamu menekan
+    Setuju. Kalau kerangka belum pas, tekan Ubah: kamu kembali ke form dan
+    kerangka dibangun ulang (gratis juga).
+  </div>
+
+  <div class="aksi">
+    <form method="post" action="/buku/susun">
+      <input type="hidden" name="jenis" value="buku-referensi">
+      <input type="hidden" name="judul" value="{{ judul }}">
+      <input type="hidden" name="penulis" value="{{ penulis }}">
+      <input type="hidden" name="penelaah" value="{{ penelaah }}">
+      <input type="hidden" name="jumlah_bab" value="{{ jumlah_bab }}">
+      <input type="hidden" name="outline_token" value="{{ token }}">
+      <button class="tombol utama" type="submit">
+        {{ ikon('file-pen', 14) }} Setuju, lanjut produksi
+      </button>
+    </form>
+    <a class="tombol batal" href="{{ kembali }}">{{ ikon('arrow-left', 14) }} Ubah</a>
+  </div>
+</main>
+</body>
+</html>
