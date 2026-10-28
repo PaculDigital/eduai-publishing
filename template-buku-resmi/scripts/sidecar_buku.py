@@ -27,6 +27,14 @@ ENDPOINT (JSON; docx dikirim base64 agar tanpa multipart):
            punya >=3 baris bertitik-panjang >=10 ikut dilewati).
     POST /chapter  {docx_b64}       -> {exit, keluar}
            Gerbang book-chapter (scripts/periksa_book_chapter.py); exit 0 lolos.
+    POST /referensi {docx_b64}      -> {exit, lulus, gagal, keluar}
+           Gerbang buku-referensi: docx diekstrak jadi spec (gaya keluaran
+           assembly: 'BAB N' + judul, sub 'N.M ...', tabel + caption
+           'Tabel ...', seksi Glosarium/Indeks/Daftar Pustaka), lalu
+           periksa_jenis_buku.jalankan(spec, 'buku-referensi'). exit 0 =
+           semua cek lolos (gagal == 0). Satu tabel komparasi per bab/sub
+           sudah cukup untuk R3; tabel tambahan di bab/sub yang sama tidak
+           masuk spec (keterbatasan jujur ekstraktor, bukan gerbang).
 
 KEAMANAN: semua POST wajib header X-Kunci-Sidecar == EDUAI_SIDECAR_KUNCI.
 Berkas sementara SELALU di direktori mktemp per request + dibersihkan
@@ -184,7 +192,172 @@ def chapter(data, td):
     return {'exit': r.returncode, 'keluar': (r.stdout + r.stderr)[-2000:]}
 
 
-TANGAN = {'/isi-nomor': isi_nomor, '/ukur': ukur, '/chapter': chapter}
+def _pasangan_indeks(baris):
+    """'Istilah ..... 12' -> ['Istilah', '12']; tanpa angka -> [baris, ''].
+
+    Bentuk pasangan WAJIB karena entri_indeks_bermakna di gerbang hanya
+    menerima [istilah, acuan] (string polos = gagal). Acuan kosong =
+    gagal jujur: indeks tanpa nomor halaman tidak lolos R1/R2.
+    """
+    m = re.match(r'^(.*?)[\.\s]+(\d+(?:,\s*\d+)*)\s*$', baris.strip())
+    if m and m.group(1).strip():
+        return [m.group(1).strip(), m.group(2)]
+    return [baris.strip(), '']
+
+
+def ekstrak_spec_referensi(path_docx):
+    """Docx gaya assembly -> spec untuk periksa_jenis_buku.
+
+    Mengerti: 'BAB N' (paragraf angka saja, judul di paragraf berikut),
+    sub 'N.M ...', Heading 1/2, caption 'Tabel ...', seksi Glosarium /
+    Indeks Subjek / Indeks Nama / Daftar Singkatan / Daftar Pustaka.
+    Entri DAFTAR ISI dilewati (berhenti di page break sesudahnya).
+    """
+    from docx import Document
+    from docx.document import Document as _Doc
+    from docx.table import Table as _Tabel
+    from docx.text.paragraph import Paragraph as _Para
+    doc = Document(str(path_docx))
+    babs, idx_subjek, idx_nama, glos, singk = [], [], [], [], []
+    pengantar, tentang, pustaka = [], [], []
+    judul = ''
+    bab = sub = None
+    seksi = None
+    caption = ''
+    lewati_toc = False
+    for anak in doc.element.body.iterchildren():
+        if anak.tag.endswith('}p'):
+            p = _Para(anak, doc)
+            teks = p.text.strip()
+            xml = p._p.xml
+            # Cek page break DULU, sebelum buang paragraf kosong: paragraf
+            # page break memang kosong (hanya run <w:br type=page/>).
+            # Kalau cek ini sesudah 'if not teks', lewati_toc tidak pernah
+            # mati dan seluruh isi sesudah TOC terbuang (bug tangkapan uji).
+            if lewati_toc:
+                if 'w:type="page"' in xml:
+                    lewati_toc = False
+                continue
+            if not teks:
+                continue
+            if teks.upper() == 'DAFTAR ISI':
+                lewati_toc = True
+                continue
+            atas = teks.upper()
+            if atas == 'KATA PENGANTAR':
+                seksi = 'pengantar'
+                continue
+            if atas in ('GLOSARIUM', 'INDEKS', 'INDEKS SUBJEK'):
+                seksi = 'glosarium' if atas == 'GLOSARIUM' else 'subjek'
+                continue
+            if atas == 'INDEKS NAMA':
+                seksi = 'nama'
+                continue
+            if atas == 'DAFTAR SINGKATAN':
+                seksi = 'singkatan'
+                singk.append('Daftar Singkatan')
+                continue
+            if atas == 'DAFTAR PUSTAKA':
+                seksi = 'pustaka'
+                continue
+            if atas == 'TENTANG PENULIS':
+                seksi = 'penulis'
+                continue
+            if re.fullmatch(r'BAB\s+\d+', atas):
+                bab = {'judul': teks, 'paragraf_pembuka': [], 'sub': []}
+                babs.append(bab)
+                sub, seksi = None, None
+                continue
+            if re.match(r'^\d+\.\d+\s+\S+', teks):
+                if bab is not None:
+                    sub = {'judul': teks, 'paragraf': []}
+                    bab['sub'].append(sub)
+                continue
+            gaya = (p.style.name or '')
+            if gaya.startswith('Heading 1'):
+                bab = {'judul': teks, 'paragraf_pembuka': [], 'sub': []}
+                babs.append(bab)
+                sub, seksi = None, None
+                continue
+            if gaya.startswith('Heading 2'):
+                if bab is not None:
+                    sub = {'judul': teks, 'paragraf': []}
+                    bab['sub'].append(sub)
+                continue
+            if teks.startswith('Tabel ') and re.match(r'Tabel\s+\d', teks):
+                caption = teks
+                continue
+            if seksi == 'subjek':
+                idx_subjek.append(_pasangan_indeks(teks))
+            elif seksi == 'nama':
+                idx_nama.append(_pasangan_indeks(teks))
+            elif seksi == 'glosarium':
+                glos.append(teks)
+            elif seksi == 'singkatan':
+                singk.append(teks)
+            elif seksi == 'pengantar':
+                pengantar.append(teks)
+            elif seksi == 'penulis':
+                tentang.append(teks)
+            elif seksi == 'pustaka':
+                pustaka.append(teks)
+            elif sub is not None:
+                sub['paragraf'].append(teks)
+            elif bab is not None:
+                bab['paragraf_pembuka'].append(teks)
+            elif not judul:
+                # Paragraf pertama sebelum bab/seksi = judul sampul
+                # (urutan assembly: Cover -> Kata Pengantar -> Daftar Isi).
+                judul = teks
+        elif anak.tag.endswith('}tbl'):
+            t = _Tabel(anak, doc)
+            baris = [[c.text.strip() for c in r.cells] for r in t.rows]
+            baris = [r for r in baris if any(r)]
+            if len(baris) < 2:
+                continue
+            tabel = {'judul': caption, 'kolom': baris[0], 'baris': baris[1:]}
+            caption = ''
+            if sub is not None and 'tabel' not in sub:
+                sub['tabel'] = tabel
+            elif bab is not None and 'tabel' not in bab:
+                bab['tabel'] = tabel
+    try:
+        penulis = (doc.core_properties.author or '').strip()
+    except Exception:
+        penulis = ''
+    if not penulis and tentang:
+        penulis = tentang[0]
+    return {'bab': babs, 'judul': judul, 'penulis': penulis,
+            'kata_pengantar': ' '.join(pengantar),
+            'tentang_penulis': ' '.join(tentang),
+            'daftar_pustaka': pustaka,
+            'indeks_subjek': idx_subjek,
+            'indeks_nama': idx_nama, 'glosarium': glos,
+            'daftar_singkatan': singk}
+
+
+_KUNCI_JALANKAN = __import__('threading').Lock()
+
+
+def referensi(data, td):
+    import contextlib
+    import io
+    import periksa_jenis_buku as _gj
+    masuk = Path(td) / 'masuk.docx'
+    masuk.write_bytes(_docx_dari(data))
+    spec = ekstrak_spec_referensi(masuk)
+    # jalankan() memakai global LULUS/GAGAL — panggilan bersamaan dari
+    # dua buku web akan merusak hitungan; kunci ini menyerikannya.
+    # Endpoint lain memakai subprocess (proses terpisah) jadi aman.
+    buf = io.StringIO()
+    with _KUNCI_JALANKAN, contextlib.redirect_stdout(buf):
+        lulus, gagal = _gj.jalankan(spec, 'buku-referensi', diam=False)
+    return {'exit': 0 if gagal == 0 else 1, 'lulus': lulus, 'gagal': gagal,
+            'keluar': buf.getvalue()[-2000:]}
+
+
+TANGAN = {'/isi-nomor': isi_nomor, '/ukur': ukur, '/chapter': chapter,
+          '/referensi': referensi}
 
 
 class Tangan(BaseHTTPRequestHandler):

@@ -117,3 +117,16 @@ def chapter(path_docx):
         raise SidecarGagal('gerbang book-chapter gagal:\n' +
                            str(hasil.get('keluar', ''))[-800:])
     return True
+
+
+def referensi(path_docx):
+    """Gerbang buku-referensi (R1-R4 + struktur). True bila lolos."""
+    with open(path_docx, 'rb') as f:
+        data = {'docx_b64': base64.b64encode(f.read()).decode()}
+    hasil = _panggil('/referensi', data, timeout=300)
+    if hasil.get('exit') != 0:
+        raise SidecarGagal(
+            f"gerbang buku-referensi gagal "
+            f"({hasil.get('lulus')} lulus / {hasil.get('gagal')} gagal):\n" +
+            str(hasil.get('keluar', ''))[-800:])
+    return True
