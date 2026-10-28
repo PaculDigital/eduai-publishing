@@ -1,5 +1,13 @@
 #!/bin/bash
 # Buat/jalankan ulang container sidecar buku (Opsi B2) — OPERATOR, SEKALI.
+# JALANKAN DARI TERMINAL HOST (tempat perintah `docker exec hermes` biasa
+# dijalankan), BUKAN dari dalam hermes. Path /root/.hermes/... adalah path
+# HOST yang dilihat docker daemon — jangan diganti ke /opt/data/services/...
+# (itu pohon data app di host, bukan checkout; hermes melihat checkout
+# sebagai /opt/data/services/... HANYA karena /root/.hermes di-mount ke
+# /opt/data di dalam hermes).
+# Skrip ini butuh berkas cabang ini (checkout pasca-merge, atau checkout
+# cabang untuk uji pra-merge).
 # TIDAK menyentuh jalankan.sh / app / image app: sidecar hidup sendiri di
 # jaringan eduai-net, seperti oo-converter. Bila container ini dihapus,
 # buat ulang dengan perintah ini (buku web gagal jelas, bukan diam-diam).

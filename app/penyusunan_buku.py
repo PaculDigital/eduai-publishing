@@ -253,6 +253,14 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                 hasil['ukur_peta'] = _peta
                 if kartu_jenis == 'book-chapter':
                     _sc.chapter(hasil['docx'])
+                # Sukses: salinan pra-nomor tidak lagi diperlukan — hapus
+                # supaya tidak menumpuk di disk (temuan review agen).
+                # Gagal di atas (raise) membiarkannya tetap ada untuk
+                # ditelusuri bersama _GAGAL.txt.
+                try:
+                    os.remove(hasil['docx'] + '.pra-nomor')
+                except OSError:
+                    pass  # pembersihan saja; buku sudah lolos
             except _sc.SidecarGagal as e:
                 raise RuntimeError(f'gerbang buku gagal: {e}')
 
