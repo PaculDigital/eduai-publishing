@@ -1744,6 +1744,38 @@ def _adaptasi_harvest(artikel):
     return adapted
 
 
+_EN_CACHE = {}
+
+
+def _en_keywords(bab_title):
+    """Judul bab (Indonesia) -> kata kunci Inggris untuk sumber internasional.
+
+    ATURAN BOSS 28 Okt 2026: pencarian internasional WAJIB bahasa Inggris
+    (query Indonesia di sumber internasional jarang/tidak ada; Scopus
+    PASTI tidak ada bahasa Indonesia; OpenAlex/Crossref punya sebagian
+    konten Indonesia tapi tetap utamakan Inggris). Garuda TIDAK pakai ini
+    (Garuda = sumber Indonesia = query Indonesia).
+    Fail-soft: gagal/kosong -> None (pemanggil pakai judul asli).
+    """
+    if bab_title in _EN_CACHE:
+        return _EN_CACHE[bab_title]
+    hasil = None
+    try:
+        teks = call_llm(
+            'Translate this Indonesian book chapter title into English '
+            'search keywords. Output ONLY 3-6 English words, comma-separated, '
+            f'no explanation, no quotes: {bab_title}',
+            max_tokens=100, timeout=60)
+        kata = [k.strip() for k in (teks or '').split(',') if k.strip()]
+        kata = [k for k in kata if all(
+            ord(c) < 128 for c in k)][:6]
+        hasil = ', '.join(kata) or None
+    except Exception:
+        hasil = None
+    _EN_CACHE[bab_title] = hasil
+    return hasil
+
+
 def _refs_dari_harvest(bab_title):
     """Referensi satu bab dari mesin Harvest app (pustaka).
 
@@ -1789,8 +1821,12 @@ def _refs_dari_harvest(bab_title):
             except Exception:
                 adapted = []
         try:
-            intl = search_real_references(
-                f"{bab_title} teori konsep jurnal penelitian", n=5) or []
+            # Leg internasional WAJIB Inggris (aturan Boss 28 Okt); gagal
+            # terjemahan -> judul asli (fallback, bukan gagal total).
+            en = _en_keywords(bab_title)
+            query_intl = (f"{en} theory concept journal research" if en
+                          else f"{bab_title} teori konsep jurnal penelitian")
+            intl = search_real_references(query_intl, n=5) or []
         except Exception:
             intl = []
         ada = {a['title'].lower()[:80] for a in adapted}
