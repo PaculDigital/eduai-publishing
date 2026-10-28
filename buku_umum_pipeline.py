@@ -1528,8 +1528,15 @@ def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
         return pilih
     return default
 
-def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab=""):
-    """ONE-PASS: Generate semua visual untuk 1 bab setelah teks selesai."""
+def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab="",
+                         jenis="umum"):
+    """ONE-PASS: Generate semua visual untuk 1 bab setelah teks selesai.
+
+    28 Okt 2026 (mesin referensi web): buku referensi DILARANG memakai
+    ilustrasi 3D dekoratif (skill) — visualnya = tabel komparasi + bagan.
+    Maka ilustrasi API dilewati untuk jenis referensi (diagram dari marker
+    tetap jalan, karena bagan memang dianjurkan).
+    """
     print(f"\n  🎨 Generating visuals for BAB {bab_num}...")
 
     # 1. Parse tabel & diagram markers dari teks
@@ -1581,9 +1588,14 @@ def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab=""):
             print(f"     ❌ Diagram {did}: PNG GAGAL — akan hilang dari buku")
 
     # 4. Generate ilustrasi (2 tahap: brief dari ISI bab → line art buku)
-    ilust_path = generate_ilustrasi_api(bab_num, bab_title,
-                                        ringkasan_bab=ringkasan_bab,
-                                        bab_text=bab_text)
+    # DILARANG untuk buku referensi (skill: tanpa pemanis dekoratif).
+    if jenis == 'referensi':
+        print("     🖼️ Ilustrasi: dilewati (buku referensi tanpa dekorasi)")
+        ilust_path = None
+    else:
+        ilust_path = generate_ilustrasi_api(bab_num, bab_title,
+                                            ringkasan_bab=ringkasan_bab,
+                                            bab_text=bab_text)
     if ilust_path:
         print(f"     🖼️ Ilustrasi: {os.path.getsize(ilust_path)//1024}KB ✅")
     else:
@@ -1726,7 +1738,7 @@ def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling
     #  Lihat catatan "YANG MASIH BISA DIPARALELKAN" di bawah.
     print(f"       Skeptic...", end="", flush=True)
     t2 = time.time()
-    kritik = call_llm(skeptic_prompt(sub_title, draft), max_tokens=3000, timeout=90)
+    kritik = call_llm(skeptic_prompt(sub_title, draft, refs=refs, jenis=jenis), max_tokens=3000, timeout=90)
     t3 = time.time()
     print(f" {t3-t2:.1f}s")
 
@@ -1924,7 +1936,7 @@ def generate_bab(bab_num, bab_data, prev_summary, jenis="umum"):
         bab_summary = call_llm(summarize_prompt(bab_text[:5000]),
                                max_tokens=2500, timeout=90)
 
-    generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab=bab_summary or "")
+    generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab=bab_summary or "", jenis=jenis)
 
     # Simpan referensi bab ini (dari semua sub-bab) untuk daftar pustaka
     bab_refs_path = os.path.join(visual_ini(), f"refs_bab{bab_num}.json")
