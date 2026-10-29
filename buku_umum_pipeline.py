@@ -444,6 +444,10 @@ ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
   Sub-bab tanpa istilah baru TETAP menulis bloknya dengan satu baris
   '(tidak ada istilah baru)'. Blok ini dipisah dari narasi saat perakitan
   — jangan selipkan istilahnya ke narasi saja, jangan hapus bloknya.
+  Penanda [ISTILAH BARU] HARUS sendirian di barisnya — JANGAN tulis
+  istilah di baris yang sama dengan penanda (bentuk '[ISTILAH BARU: ...]'
+  DILARANG). JANGAN tulis penanda penutup '[/ISTILAH BARU]' — blok
+  berakhir di baris kosong, tanpa penutup.
   Tanpa blok ini = sub-bab tidak lengkap.
 """
         aturan_ringkasan = (
@@ -650,7 +654,15 @@ def editor_prompt(sub_title, draft, kritik, saran, jenis="umum"):
             'paragraf posisi eksplisit (frasa "Posisi penulis" dkk). '
             'Menghapus keduanya = GAGAL.\n'
             '6c. Pertahankan blok [ISTILAH BARU] di akhir sub-bab — jangan '
-            'dihapus, jangan digabung ke narasi.')
+            'dihapus, jangan digabung ke narasi.\n'
+            '6d. BENTUK SITASI WAJIB (Nama Belakang, Tahun) '
+            'lengkap dari daftar referensi — contoh (Yang, '
+            '2020). Sitasi inisial-saja seperti (E., 2021), '
+            '(N., 2025), (T.S., 2025) WAJIB ditulis ulang ke '
+            'bentuk lengkap; JANGAN biarkan satu pun '
+            'inisial-saja lolos. Jika nama belakang tidak ada '
+            'di daftar, HAPUS sitasi itu — lebih baik kurang '
+            'daripada cacat.')
         aturan_personal = (
             '4. Suara penulis lewat POSISI ILMIAH, bukan sapaan personal — '
             'jangan kejar persentase sapaan')

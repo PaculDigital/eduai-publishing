@@ -246,6 +246,19 @@ def tabel_nyata(obj):
     return hasil
 
 
+def hitung_sitasi_inisial(spec):
+    # Jumlah sitasi inisial-saja (E., 2021) / (T.S., 2025) di paragraf
+    # + sel tabel spec. Pola (?:[A-Z]\.)+ menangkap multi-inisial juga.
+    pola = re.compile(r'\(\s*(?:[A-Z]\.\s*)+,\s*(?:19|20)\d{2}\s*\)')
+    jum = sum(len(pola.findall(t or '')) for t in paragraf_dari_spec(spec))
+    for b in bab_dari_spec(spec):
+        for t in tabel_nyata(b):
+            for baris in (t.get('baris') or []):
+                for sel in (baris or []):
+                    jum += len(pola.findall(str(sel or '')))
+    return jum
+
+
 def periksa_referensi(spec, teks):
     print('-- buku referensi: harus bisa DIRUJUK, bukan dibaca berurutan --')
     ok('R1 indeks subjek bermakna',
@@ -279,6 +292,18 @@ def periksa_referensi(spec, teks):
     ingatkan('Rw daftar singkatan ada',
              'daftar singkatan' in teks,
              'daftar singkatan wajib untuk buku referensi menurut skill')
+    _inisial = hitung_sitasi_inisial(spec)
+    ingatkan('Rw bentuk sitasi lengkap (tanpa inisial-saja)',
+             _inisial == 0,
+             f'{_inisial} sitasi inisial-saja (E., 2021) — tulis ulang '
+             f'ke (Nama Belakang, Tahun) lengkap agar tertelusur')
+    _nama = spec.get('indeks_nama')
+    if isinstance(_nama, list):
+        _j_nama = sum(1 for e in _nama if entri_indeks_bermakna(e))
+        ingatkan('Rw indeks nama tidak tipis (>=3 nama)',
+                 _j_nama >= 3,
+                 f'indeks nama hanya {_j_nama} nama — nama tak cocok '
+                 f'halaman bila sitasi inisial-saja')
 
 
 def periksa_ajar(spec, teks):

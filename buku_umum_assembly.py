@@ -1303,6 +1303,11 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
             add_daftar_pustaka(doc, sorted(all_refs))
 
         add_bio(doc)
+        # 29 Okt 2026 (temuan uji 219): metadata penulis/judul HANYA diset
+        # di main() (2ef8a02), bukan di jalur rakit() produksi — docx
+        # produksi ber-author 'python-docx' dan judul kosong. Samakan.
+        doc.core_properties.author = (penulis or '').strip()
+        doc.core_properties.title = (judul or '').strip()
         doc.save(docx_out)
 
         # === VERIFIKASI NYATA — baca ulang berkasnya ===

@@ -41,7 +41,14 @@ SUMBER = "penyusun_buku.py"
 #  Ini pilihan sadar: BENAR dulu, cepat kemudian.
 # ══════════════════════════════════════════════════════════════════════════
 _KUNCI_GLOBAL = None
-_BATAS_BAB = 4          # maks 4 bab bersamaan per buku (anggaran global 4 aliran, 29 Okt 2026)
+# 29 Okt 2026 (perintah 'perbaiki menjadi sempurna'): batas paralel bab
+# bisa diubah lewat env tanpa ubah kode (default 4 = perilaku teruji;
+# 6 belum teruji lintas kuota Scopus — naikkan hanya untuk uji ukur).
+# Dijepit 1..8 (0 = macet, >8 = di luar bukti 9router); env rusak = 4.
+try:
+    _BATAS_BAB = min(8, max(1, int(os.environ.get('EDUAI_BAB_PARALEL', '4') or 4)))
+except (TypeError, ValueError):
+    _BATAS_BAB = 4
 #  Perbaikan-otomatis bab bermasalah (Lapis 3c-2, ACC Bos 19 Okt 2026).
 #  MAKSIMAL 1 putaran per bab: cukup untuk memperbaiki isi berulang, tapi
 #  TIDAK boleh berputar sampai token user habis.

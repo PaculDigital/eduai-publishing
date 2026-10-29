@@ -164,6 +164,20 @@ def periksa_buku(isi_bab, outline, min_sitasi=2, min_kata=300):
             curiga.append(f'BAB {n}: hanya {jum} sitasi (disarankan '
                           f'≥{min_sitasi})')
 
+    #  [5] Bentuk sitasi LENGKAP (29 Okt 2026, temuan uji bersih 219):
+    #  sitasi inisial-saja (E., 2021) / (T.S., 2025) TIDAK bisa ditelusur
+    #  ke penulis mana, dan membuat indeks nama kosong (nama tak cocok
+    #  halaman). Ini MASALAH (memicu putaran perbaikan Lapis 3c-2), bukan
+    #  curiga: perbaikan menulis ulang bab dengan aturan editor 6d.
+    for n in nomor:
+        temu = re.findall(r'\(\s*(?:[A-Z]\.\s*)+,\s*(?:19|20)\d{2}\s*\)',
+                           isi_bab[n] or '')
+        if temu:
+            masalah.append(
+                f'BAB {n}: {len(temu)} sitasi inisial-saja (contoh: '
+                f'{temu[0]}) — tulis ulang ke bentuk (Nama Belakang, '
+                f'Tahun) lengkap dari daftar referensi')
+
     return {'lolos': not masalah, 'masalah': masalah, 'curiga': curiga}
 
 

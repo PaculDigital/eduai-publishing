@@ -154,6 +154,15 @@ def kumpulkan_istilah(keluar, outline):
         i = 0
         while i < len(baris):
             b = baris[i].strip()
+            # 29 Okt 2026 (temuan uji 219): penanda SEBARIS ('[ISTILAH BARU:
+            # ...]') dan penutup yatim ('[/ISTILAH BARU]') TIDAK ditangkap
+            # cek standar di bawah (yang menuntut ']' sesudah BARU) —
+            # keduanya nyasar ke docx final. Hapus barisnya (istilah tanpa
+            # definisi TIDAK dikarang ke glosarium; perbaikan format ada di
+            # prompt arsitek, bukan di sini).
+            if b.startswith('[ISTILAH BARU:') or b.startswith('[/ISTILAH BARU]'):
+                i += 1
+                continue
             if b.startswith('[ISTILAH BARU]'):
                 # Sisa baris penanda setelah ']' diabaikan; kumpulkan
                 # baris istilah berikutnya.
