@@ -437,11 +437,18 @@ def buku_outline(
     babs = sorted(((n, b) for n, b in outline.items()
                    if isinstance(n, int)),
                   key=lambda x: x[0])
+    #  Cek awal point 1+2 (30 Okt 2026): tampilkan hasil cek + risiko di
+    #  halaman persetujuan (gratis, sebelum token dipotong). Template
+    #  menyembunyikan tombol Setuju bila cek keras tidak lolos.
+    from . import cek_awal as _CA_outline
+    _cek_outline = _CA_outline.periksa_outline(outline, jml)
+    _risiko_level, _risiko_alasan = _CA_outline.skor_risiko(outline, jml)
     return templates.TemplateResponse('buku_outline.html', {
         'request': request, 'user': u, 'kartu': kartu,
         'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
         'jumlah_bab': jml, 'tier': tier_nama, 'token': token, 'kembali': kembali,
-        'babs': babs,
+        'babs': babs, 'cek': _cek_outline,
+        'risiko_level': _risiko_level, 'risiko_alasan': _risiko_alasan,
     })
 
 
@@ -544,6 +551,27 @@ def buku_susun(
             jml_bab = max(1, min(12, int(jumlah_bab or 8)))
         except ValueError:
             jml_bab = 8
+
+        #  Cek awal point 1 (30 Okt 2026): kerangka tertunda yang cacat
+        #  struktur JANGAN dibuatkan pekerjaan. Token BELUM dipotong di
+        #  sini (potong di susun(), sesudah validasi), jadi gagal di sini
+        #  gratis; user bangun ulang kerangka (gratis). Token tertunda
+        #  sudah terhapus saat dimuat di atas (sekali pakai).
+        if outline_siaps is not None:
+            from . import cek_awal as _CA_susun
+            try:
+                from tier_buku import jumlah_bab as _bab_tier
+                _harus = _bab_tier(tier_untuk_susun) if tier_untuk_susun else jml_bab
+            except Exception:
+                _harus = jml_bab
+            _cek_susun = _CA_susun.periksa_outline(outline_siaps, _harus)
+            if not _cek_susun['lolos']:
+                return RedirectResponse(
+                    '/buku?galat=' + quote(
+                        'Kerangka tidak lolos cek awal: '
+                        + '; '.join(_cek_susun['masalah'][:3])
+                        + ', bangun ulang kerangka (gratis)'),
+                    status_code=303)
 
     # ── TITIPKAN PEKERJAAN, JANGAN MENUNGGU (ACC Bos 19 Okt 2026) ────────
     #  Bukti masalah: buku 6 bab = ±36 menit SATU request. Tab ditutup =
