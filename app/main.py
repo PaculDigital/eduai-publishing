@@ -543,7 +543,7 @@ def buku_susun(
     #     notifikasi, dan endpoint status SUDAH ADA di `app/proses.py` +
     #     `/api/ai/v1/proses/{kode}`. Buku hanya menumpang jalur itu.
     #
-    #  ✅ KUOTA TETAP DIPOTONG DI DALAM `susun()` (di depan) — TIDAK dipindah
+    #  ✅ KUOTA TETAP DIPOTONG DI DALAM `susun()` (saat giliran tiba) — TIDAK dipindah
     #     ke sini, supaya gerbang biaya lama tetap satu pintu.
     from . import proses as _proses
 

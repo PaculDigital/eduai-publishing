@@ -1,7 +1,9 @@
 """JALUR PENYUSUNAN BUKU — sambungan /buku/siapkan ke mesin (Lapis 3-4-5).
 
-ATURAN YANG DIPATUHI (Bos 18 Okt 2026 + putusan token 07 Okt):
-  • KUOTA DIPOTONG DI DEPAN (`potong_banyak`), bukan setelah kerja.
+ATURAN YANG DIPATUHI (18 Okt 2026 + putusan token 07 Okt, diubah 29 Okt 2026):
+  • KUOTA DIPOTONG SAAT GILIRAN PRODUKSI TIBA (`potong_banyak` lewat
+    `on_mulai` di `susun_buku`) — tetap satu pintu di `susun()`, bukan
+    di rute. Buku yang masih mengantre BELUM dipotong.
   • GAGAL TEKNIS → token kembali UTUH (`kembalikan_banyak`).
     GAGAL MUTU (hasil jelek tapi jadi) → TIDAK kembali: itu hasil, bukan error.
   • HASIL JADI BERKAS DULU, layar cuma membaca. Tekan Back tidak menghilangkan
@@ -108,7 +110,7 @@ def folder_buku(fid_unik):
 
 def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
           kartu_jenis=None, outline_siaps=None, penulis=None, penelaah=None):
-    """Susun buku + potong kuota di depan. Return dict hasil.
+    """Susun buku + potong kuota saat giliran tiba. Return dict hasil.
 
     Raise HTTPException 402/403 dari kuota kalau saldo kurang (tidak menyusun).
 
@@ -129,8 +131,20 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
     if not (judul or '').strip():
         raise ValueError("Judul buku belum diisi")
 
-    # ── GERBANG KUOTA: TOLAK DI DEPAN, sebelum satu kata ditulis ──────────
-    info = kuota.potong_banyak(db, u, TOKEN_PER_BUKU)
+    # ── KUOTA: DIPOTONG SAAT GILIRAN TIBA, bukan di depan ─────────────────
+    #  Buku bisa mengantre (di antrean proses + antrean buku di mesin).
+    #  Memotong di depan berarti token hangus menunggu — tidak adil.
+    #  Jadi potong dititipkan ke `on_mulai`: dipanggil `susun_buku` TEPAT
+    #  saat giliran tiba, sebelum satu kata ditulis. Tetap satu pintu di
+    #  sini (bukan di rute). Gagal SEBELUM potong ⇒ tidak perlu refund.
+    terpotong = False
+    info_kotak = {}
+
+    def _potong_saat_mulai():
+        nonlocal terpotong
+        info_kotak['info'] = kuota.potong_banyak(db, u, TOKEN_PER_BUKU)
+        terpotong = True
+        return info_kotak['info']
 
     fid = f"{int(time.time())}-{getattr(u, 'id', 0)}"
     keluar = folder_buku(fid)
@@ -151,8 +165,9 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
             outline = OB.susun_outline(judul, bidang, jenis,
                                        jumlah_bab=jumlah_bab)
 
-        #  JANGAN mulai menulis kalau outline cacat — token sudah dipotong,
-        #  jadi cacat di sini WAJIB mengembalikan token.
+        #  JANGAN mulai menulis kalau outline cacat — potong BELUM terjadi
+        #  di titik ini (baru di `on_mulai` sesudah validasi), jadi gagal
+        #  di sini tidak menyentuh token sama sekali.
         masalah = OB.periksa(outline)
         if masalah:
             raise ValueError(f"outline cacat: {masalah[:3]}")
@@ -160,7 +175,8 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
         if lapor:
             lapor(f"Menulis {len([k for k in outline if isinstance(k, int)])} bab…")
         hasil = S.susun_buku(judul, outline, jenis=jenis,
-                             keluar_dir=keluar, lapor=lapor)
+                             keluar_dir=keluar, lapor=lapor,
+                             on_mulai=_potong_saat_mulai)
 
         #  Hasil HARUS benar-benar ada di disk — bukan cuma diklaim.
         #
@@ -194,7 +210,7 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
             hasil['bab'][n]['path'] = _ketemu[n]
         hasil['bab_ada'] = bab_ada
         hasil['token'] = TOKEN_PER_BUKU
-        hasil['saldo'] = info
+        hasil['saldo'] = info_kotak.get('info')
 
         # ── RAKIT SATU .docx (ACC Bos 19 Okt 2026, opsi B) ────────────────
         #  Tanpa ini hasilnya cuma berkas bab terpisah — tidak bisa dibuka di
@@ -339,10 +355,14 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
         # ── ANTI-RUGI: gagal TEKNIS → token kembali UTUH ──────────────────
         #  Folder setengah jadi TIDAK dihapus (biar bisa ditelusuri), tapi
         #  ditandai GAGAL supaya tidak dikira buku selesai.
-        try:
-            kuota.kembalikan_banyak(db, u, TOKEN_PER_BUKU)
-        except Exception:
-            pass
+        #  HANYA refund kalau potong sudah terjadi (`terpotong`): gagal
+        #  sebelum giliran (mis. saldo habis di `on_mulai`) tidak pernah
+        #  memotong — refund di sana justru MEMBERI token gratis.
+        if terpotong:
+            try:
+                kuota.kembalikan_banyak(db, u, TOKEN_PER_BUKU)
+            except Exception:
+                pass
         try:
             os.makedirs(keluar, exist_ok=True)
             with open(os.path.join(keluar, '_GAGAL.txt'), 'w') as f:
