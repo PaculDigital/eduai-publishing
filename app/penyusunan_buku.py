@@ -179,11 +179,48 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
         if masalah:
             raise ValueError(f"outline cacat: {masalah[:3]}")
 
+        #  Cek awal point 1 (30 Okt 2026): OB memeriksa bentuk, cek_awal
+        #  memeriksa struktur referensi (jumlah bab vs paket, 5 sub, kata
+        #  kunci N.3/N.4, judul ganda). Potong BELUM terjadi di sini.
+        try:
+            from tier_buku import jumlah_bab as _bab_tier_susun
+            _jumlah_harus_susun = _bab_tier_susun(tier) if tier else None
+        except Exception:
+            _jumlah_harus_susun = None
+        from . import cek_awal as _CA
+        _cek_outline = _CA.periksa_outline(outline, _jumlah_harus_susun)
+        if not _cek_outline['lolos']:
+            raise ValueError(
+                'outline tidak lolos cek awal: '
+                + '; '.join(_cek_outline['masalah'][:3]))
+
         if lapor:
             lapor(f"Menulis {len([k for k in outline if isinstance(k, int)])} bab…")
+        #  Cek awal point 3 (30 Okt 2026): tiap bab dicek saat hasilnya
+        #  terkumpul (hanya cek BARU R3/R4/surname; cek kata/sitasi/
+        #  bentuk sudah di Lapisan 1). Hasilnya dipakai Lapisan 3c
+        #  (repair) + dilapor langsung; gagal cek TIDAK menggagalkan
+        #  buku di sini, gerbang final yang memutuskan.
+        def _cek_bab(n, teks, folder_bab):
+            try:
+                from . import cek_awal as _CA_bab
+                hasil_cek = _CA_bab.periksa_bab_awal(
+                    n, teks, folder_bab, outline.get(n))
+                if lapor:
+                    for _m in hasil_cek['masalah']:
+                        lapor(f'Cek awal {_m}')
+                    for _c in hasil_cek['curiga'][:2]:
+                        lapor(f'Catatan cek awal: {_c}')
+                return hasil_cek
+            except Exception as _e_cek:
+                if lapor:
+                    lapor(f'Cek awal BAB {n} dilewati: {_e_cek}')
+                return {'masalah': [], 'curiga': []}
+
         hasil = S.susun_buku(judul, outline, jenis=jenis,
                              keluar_dir=keluar, lapor=lapor,
-                             on_mulai=_potong_saat_mulai, tier=tier)
+                             on_mulai=_potong_saat_mulai, tier=tier,
+                             on_bab_selesai=_cek_bab)
 
         #  Hasil HARUS benar-benar ada di disk — bukan cuma diklaim.
         #
@@ -315,12 +352,21 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     try:
                         from . import referensi_indeks as _RI
                         _hal = _sc.teks_halaman(hasil['docx'])
+                        _nama_kandidat = _RI.kumpulkan_nama(refs_rakit)
                         _isi = _RI.isi_indeks(
                             hasil['docx'], _hal, glos,
-                            _RI.kumpulkan_nama(refs_rakit))
+                            _nama_kandidat)
                         if lapor:
                             lapor(f"Indeks terisi: { _isi['subjek']} subjek, "
-                                  f"{_isi['nama']} nama")
+                                  f"{_isi['nama']} nama "
+                                  f"(kandidat {len(_nama_kandidat)}, "
+                                  f"isi {_isi['isi_awal']}-{_isi['back_awal']})")
+                            if _isi['nama'] == 0:
+                                lapor("Peringatan indeks nama kosong "
+                                      f"(kandidat {len(_nama_kandidat)})")
+                            if _isi['subjek'] == 0:
+                                lapor("Peringatan indeks subjek kosong "
+                                      f"(glosarium {len(glos)})")
                     except Exception as e:
                         raise RuntimeError(f'indeks referensi gagal: {e}')
                     # Daftar Singkatan (29 Okt 2026): deterministik dari
@@ -338,7 +384,39 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     except Exception as e:
                         if lapor:
                             lapor(f"Daftar singkatan dilewati: {e}")
-                    _sc.referensi(hasil['docx'])
+                    # Sapuan em dash sesudah singkatan (30 Okt 2026):
+                    # entri singkatan disisipkan SESUDAH sapuan rakit(),
+                    # sehingga 2 em dash di entri singkatan lolos di job
+                    # 220. Sapuan di sini tidak fatal: bila gagal hanya
+                    # dilapor, gerbang yang menilai hasil akhir.
+                    try:
+                        from docx import Document as _DocSapu
+                        import buku_umum_assembly as _ASMSapu
+                        _doc_sapu = _DocSapu(hasil['docx'])
+                        _ASMSapu.bersihkan_em_dash_dokumen(_doc_sapu)
+                        _doc_sapu.save(hasil['docx'])
+                    except Exception as e:
+                        if lapor:
+                            lapor(f"Sapuan em dash dilewati: {e}")
+                    #  Perbaiki dulu baru gagal (point 4, 30 Okt 2026):
+                    #  gerbang gagal pada hal deterministik -> isi ulang
+                    #  indeks + singkatan + sapuan sekali -> gerbang ulang.
+                    #  _hal tetap sah: isi ulang hanya mengubah back matter.
+                    #  Baru bila tetap gagal, buku gagal + refund seperti biasa.
+                    def _gerbang_ref():
+                        _sc.referensi(hasil['docx'])
+                    def _perbaiki_ref():
+                        from . import referensi_indeks as _RI_ref
+                        _sing_ref = _RI_ref.kumpulkan_singkatan(keluar, outline)
+                        _RI_ref.isi_indeks(hasil['docx'], _hal, glos, _nama_kandidat)
+                        _RI_ref.isi_singkatan(hasil['docx'], _hal, _sing_ref)
+                        from docx import Document as _DocRef
+                        import buku_umum_assembly as _ASMRef
+                        _doc_ref = _DocRef(hasil['docx'])
+                        _ASMRef.bersihkan_em_dash_dokumen(_doc_ref)
+                        _doc_ref.save(hasil['docx'])
+                    from . import cek_awal as _CA_gate
+                    _CA_gate.gerbang_dengan_perbaikan(_gerbang_ref, _perbaiki_ref, lapor=lapor)
                 if kartu_jenis == 'book-chapter':
                     _sc.chapter(hasil['docx'])
                 # Sukses: salinan pra-nomor tidak lagi diperlukan — hapus

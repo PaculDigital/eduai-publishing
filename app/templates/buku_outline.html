@@ -65,6 +65,20 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
       {% if penelaah %} · Ditelaah oleh: <b>{{ penelaah }}</b>{% endif %}</p>
   </div>
 
+  {% if cek is defined and cek %}
+  <div class="kartu">
+    {% if not cek.lolos %}
+    <h2 style="color:var(--merah)">Kerangka belum bisa diproduksi</h2>
+    <p style="font-size:13.5px;color:var(--teks-abu);line-height:1.7">Alasan cek awal (token tidak dipotong):</p>
+    <ul class="sub-daftar">{% for m in cek.masalah %}<li>{{ m }}</li>{% endfor %}</ul>
+    <p style="font-size:13.5px;line-height:1.7;margin-top:10px">Tekan Ubah di bawah untuk membangun ulang kerangka (gratis).</p>
+    {% else %}
+    <h2>Risiko produksi: {{ risiko_level }}</h2>
+    {% if risiko_alasan %}<ul class="sub-daftar">{% for a in risiko_alasan %}<li>{{ a }}</li>{% endfor %}</ul>{% else %}<p style="font-size:13.5px;color:var(--teks-abu);line-height:1.7">Kerangka bersih, tidak ada peringatan.</p>{% endif %}
+    {% endif %}
+  </div>
+  {% endif %}
+
   {% for n, bab in babs %}
   <div class="kartu">
     <div class="bab-judul">BAB {{ n }} — {{ bab.title }}</div>
@@ -84,6 +98,7 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
   </div>
 
   <div class="aksi">
+    {% if cek is not defined or cek.lolos %}
     <form method="post" action="/buku/susun">
       <input type="hidden" name="jenis" value="buku-referensi">
       <input type="hidden" name="judul" value="{{ judul }}">
@@ -95,6 +110,7 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
         {{ ikon('file-pen', 14) }} Setuju, lanjut produksi
       </button>
     </form>
+    {% endif %}
     <a class="tombol batal" href="{{ kembali }}">{{ ikon('arrow-left', 14) }} Ubah</a>
   </div>
 </main>

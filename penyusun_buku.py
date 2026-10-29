@@ -162,7 +162,7 @@ def apakah_bisa():
 
 
 def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
-               batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None):
+               batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None, on_bab_selesai=None):
     """Susun buku dari outline yang SUDAH dibuat. Return dict hasil.
 
     Satu buku diproduksi dalam satu waktu (antrean FIFO global — lihat
@@ -187,7 +187,8 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
     try:
         _antrian_tunggu_giliran(token, lapor=lapor)
         return _susun_buku_dalam(judul, outline, jenis, keluar_dir,
-                                 batas_bab, lapor, ulang, on_mulai, tier=tier)
+                                 batas_bab, lapor, ulang, on_mulai, tier=tier,
+                                 on_bab_selesai=on_bab_selesai)
     finally:
         _antrian_selesai(token)
         #  Pulihkan tambalan prompt — SEKALIGUS untuk semua jalan keluar
@@ -205,7 +206,7 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
 
 
 def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
-                      batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None):
+                      batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None, on_bab_selesai=None):
     """Isi susun_buku (lihat docstring-nya). Dipanggil HANYA dari wrapper
     antrean di atas — jangan dipanggil langsung, supaya antrean tidak
     bisa dilewati diam-diam."""
@@ -329,6 +330,7 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
                 "berkas": berkas}
 
     gagal = {}
+    cek_bab = {}  # point 3: hasil cek awal per bab (R3/R4/surname)
     try:
         pekerjaan = []
         for n in target:
@@ -341,6 +343,21 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
                                 "file": lama.get("file"), "dilewati": True}
                 total_kata += lama.get("words", 0)
                 total_sitasi += lama.get("citations", 0)
+
+                if on_bab_selesai is not None:
+                    _f_lewat = os.path.join(keluar_dir, f"bab{n}", f"bab{n}.txt")
+                    if os.path.exists(_f_lewat):
+                        try:
+                            _cek_bab_hasil = on_bab_selesai(
+                                n, open(_f_lewat, encoding="utf-8").read(),
+                                os.path.join(keluar_dir, f"bab{n}"))
+                            cek_bab[n] = {
+                                "masalah": list(_cek_bab_hasil.get("masalah") or []),
+                                "curiga": list(_cek_bab_hasil.get("curiga") or []),
+                            }
+                        except Exception as _e_cek:  # noqa: BLE001
+                            if lapor:
+                                lapor(f"Cek awal BAB {n} dilewati: {_e_cek}")
                 continue
             #  Ganti `prev_summary` dengan JANGKAR dari outline.
             #  ⚠️ JEBAKAN 19 Okt: outline TIDAK punya kunci `points`.
@@ -393,6 +410,22 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
                 if lapor:
                     lapor(f"BAB {n} selesai: {r['kata']} kata, "
                           f"{r['sitasi']} sitasi")
+
+                if on_bab_selesai is not None:
+                    try:
+                        _teks_bab = open(os.path.join(
+                            keluar_dir, f"bab{n}", f"bab{n}.txt"),
+                            encoding="utf-8").read()
+                        _cek_bab_hasil = on_bab_selesai(
+                            n, _teks_bab,
+                            os.path.join(keluar_dir, f"bab{n}"))
+                        cek_bab[n] = {
+                            "masalah": list(_cek_bab_hasil.get("masalah") or []),
+                            "curiga": list(_cek_bab_hasil.get("curiga") or []),
+                        }
+                    except Exception as _e_cek:  # noqa: BLE001
+                        if lapor:
+                            lapor(f"Cek awal BAB {n} dilewati: {_e_cek}")
     finally:
         #  Pemulihan tambalan prompt TIDAK di sini lagi: putaran PERBAIKAN
         #  (Lapis 3c-2, di bawah) masih butuh wrapper outline. Pemulihan
@@ -420,6 +453,18 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
     periksa = {'lolos': True, 'masalah': [], 'curiga': []}
     if isi_bab:
         periksa = MI.periksa_buku(isi_bab, outline)
+
+        #  Cek awal point 3: gabungkan masalah/curiga per bab (R3/R4/
+        #  surname) SEBELUM putaran perbaikan, supaya bab-bab itu ikut
+        #  diperbaiki (bab_bermasalah membaca teks 'BAB N: ...').
+        for _n in sorted(cek_bab):
+            for _m in cek_bab[_n].get('masalah') or []:
+                if _m not in periksa['masalah']:
+                    periksa['masalah'].append(_m)
+            for _c in cek_bab[_n].get('curiga') or []:
+                if _c not in periksa['curiga']:
+                    periksa['curiga'].append(_c)
+        periksa['lolos'] = not periksa['masalah']
         if lapor:
             lapor(MI.ringkas(periksa))
         for c in periksa['curiga'][:3]:
@@ -471,6 +516,18 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
                         break
                     baru = open(f_baru, encoding='utf-8').read()
                     uji = MI.periksa_buku({**isi_bab, n: baru}, outline)
+
+                    #  Cek awal point 3: nilai ulang cek per bab pada teks
+                    #  perbaikan (R3/R4/surname), supaya skor perbaikan
+                    #  tidak buta terhadap cek baru.
+                    _cek_baru = {'masalah': [], 'curiga': []}
+                    if on_bab_selesai is not None:
+                        try:
+                            _cek_baru = on_bab_selesai(
+                                n, baru, os.path.join(keluar_dir, f"bab{n}")) or _cek_baru
+                        except Exception as _e_cek2:  # noqa: BLE001
+                            if lapor:
+                                lapor(f"Cek awal BAB {n} (perbaikan) dilewati: {_e_cek2}")
                     #  ⚠️ `masalah` = LIST TEKS. Hitung yang MENYEBUT bab ini
                     #     (bukan `m['bab']` — tidak ada kuncinya).
                     pola_n = re.compile(r'BAB\s+' + str(n) + r'\b')
@@ -478,9 +535,26 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
                                      if pola_n.search(str(m))])
                     skor_lama = len([m for m in periksa['masalah']
                                      if pola_n.search(str(m))])
+                    skor_baru = skor_baru + len(_cek_baru.get('masalah') or [])
                     if skor_baru < skor_lama:
                         isi_bab[n] = baru
                         periksa = uji
+
+                        #  Periksa diganti uji (MI saja), gabungkan lagi
+                        #  cek per bab terbaru supaya sinyal R3/R4/surname
+                        #  tidak hilang sesudah perbaikan diterima.
+                        cek_bab[n] = {
+                            'masalah': list(_cek_baru.get('masalah') or []),
+                            'curiga': list(_cek_baru.get('curiga') or []),
+                        }
+                        for _n2 in sorted(cek_bab):
+                            for _m2 in cek_bab[_n2].get('masalah') or []:
+                                if _m2 not in periksa['masalah']:
+                                    periksa['masalah'].append(_m2)
+                            for _c2 in cek_bab[_n2].get('curiga') or []:
+                                if _c2 not in periksa['curiga']:
+                                    periksa['curiga'].append(_c2)
+                        periksa['lolos'] = not periksa['masalah']
                         hasil_bab[n] = {"kata": r["kata"], "sitasi": r["sitasi"],
                                         "file": f"bab{n}.txt",
                                         "diperbaiki": True}

@@ -17,8 +17,9 @@ Alur (sesudah S.susun_buku, sebelum/sesudah isi_nomor):
      BAB (keluar/bab{n}/visual/) — rakit HANYA mencari di satu folder
      visual, sehingga pustaka bab-bab awal hilang tanpa langkah ini
      (cacat lama jalur umum, tidak diubah di sini).
-  3. kumpulkan_nama(): nama keluarga dari string APA pustaka (entri
-     Indeks Nama v1: penulis pertama + rekan yang tercantum APA).
+  3. kumpulkan_nama(): kandidat surname dari string pustaka (APA
+     maupun Nama Depan Nama Belakang; pencocokan badan menyaring
+     kandidat yang salah).
   4. isi_indeks(): sesudah isi_nomor, isi nomor halaman entri indeks di
      docx dari teks per halaman sidecar; halaman TOC dan halaman
      back-matter DIKECUALIKAN dari pencarian.
@@ -569,12 +570,44 @@ def kumpulkan_pustaka(keluar, outline):
 
 
 def kumpulkan_nama(daftar_pustaka):
-    """Nama keluarga dari string APA ('Nama, I., & Rekan, J. (2024)...').
+    """Kandidat surname dari string pustaka (APA maupun Nama Depan
+    Nama Belakang).
 
-    Ambil segmen sebelum ' (Tahun)'; pecah koma/'&'; buang inisial
-    ('J.', 'A. B.') dan 'et al'. Urut kemunculan, dedup.
+    30 Okt 2026 (akar R2 job 220): versi lama mengembalikan NAMA LENGKAP
+    per token ('Wan Laura Hardilawati' utuh), tapi badan hanya memuat
+    surname di sitasi ('Hardilawati'), sehingga kunci lengkap tidak pernah
+    cocok dan entri nama 0. Versi baru mengembalikan kata PERTAMA dan
+    kata TERAKHIR tiap token penulis; pencocokan badan di isi_indeks
+    menyaring kandidat yang salah (nama depan tidak muncul di sitasi,
+    jadi tidak jadi entri). Posisi surname bervariasi (terakhir untuk
+    Indonesia/Barat, pertama untuk Tionghoa/Slavik), jadi kedua ujung
+    dikembalikan. Inisial murni dan token institusi dibuang. Urut
+    kemunculan, dedup.
     """
+    _INSTITUSI = {'universitas', 'institut', 'kementerian', 'badan',
+                  'bank', 'perusahaan', 'pt', 'cv', 'yayasan',
+                  'sekolah', 'fakultas', 'jurusan', 'program'}
     nama, lihat = [], set()
+
+    def _tambah(kata):
+        if kata and kata not in lihat:
+            lihat.add(kata)
+            nama.append(kata)
+
+    def _inisial(kata):
+        # True bila kata murni inisial: satu huruf, atau 2-4 huruf
+        # kapital semua ('RPIR'), atau bentuk bertitik ('J.', 'J.P.').
+        w = kata.replace('.', '')
+        if not w:
+            return True
+        if len(w) == 1:
+            return True
+        if len(w) <= 4 and w.isupper():
+            return True
+        if '.' in kata and len(w) <= 2:
+            return True
+        return False
+
     for entri in (daftar_pustaka or []):
         m = re.search(r'^(.*?)\s*\(\d{4}\)', entri)
         segmen = m.group(1) if m else entri.split('(')[0]
@@ -582,11 +615,18 @@ def kumpulkan_nama(daftar_pustaka):
             t = tok.strip().rstrip('.')
             if not t or t.lower().startswith('et al'):
                 continue
-            if re.fullmatch(r'[A-Z](?:\s+[A-Z])?', t):
-                continue  # inisial, bukan nama
-            if t not in lihat:
-                lihat.add(t)
-                nama.append(t)
+            kata = t.split()
+            if not kata:
+                continue
+            if kata[0].lower() in _INSTITUSI:
+                continue  # token institusi, bukan nama orang
+            if len(kata) == 1:
+                if not _inisial(kata[0]):
+                    _tambah(kata[0])
+                continue
+            for w in (kata[0], kata[-1]):
+                if not _inisial(w):
+                    _tambah(w.rstrip('.'))
     return nama
 
 
@@ -719,7 +759,22 @@ def isi_indeks(path_docx, teks_per_halaman, glosarium, nama_list):
         # Indeks Subjek asli: entri indeks tersisip di depan (wilayah
         # TOC yang dilewati konverter) sehingga gerbang tidak melihatnya
         # dan R1 gagal walau glosarium sudah terisi.
-        for idx, pr in enumerate(doc.paragraphs):
+        # 30 Okt 2026 (akar R2 job 220): cari dari AKHIR dan hanya
+        # sesudah Bab terakhir. Baris badan 'Indeks' di Bab 1 (paragraf
+        # 131 job 220, dari teks bab, tanpa tab) dulu dicocokkan duluan
+        # oleh pencarian maju, sehingga hapus menghapus 124 paragraf
+        # badan Bab 1 dan 124 entri subjek tersisip di tengah Bab 1,
+        # sementara seksi indeks asli tidak pernah disentuh. Seksi back
+        # matter selalu sesudah Bab terakhir; pencarian mundur menemukan
+        # judul asli duluan. Filter tab (TOC) tetap berlaku. Paras dibaca
+        # segar tiap panggilan (doc.paragraphs dibuat ulang tiap akses).
+        paras = doc.paragraphs
+        mulai = 0
+        for _i, _pr in enumerate(paras):
+            if re.match(r'^BAB \d+\b', _pr.text.strip().upper()):
+                mulai = _i + 1
+        for idx in range(len(paras) - 1, mulai - 1, -1):
+            pr = paras[idx]
             if '\t' in pr.text:
                 continue
             if predikat(pr.text.strip().upper()):
@@ -845,7 +900,22 @@ def isi_singkatan(path_docx, teks_per_halaman, singkatan):
         # Sama seperti isi_indeks: paragraf segar tiap panggilan, dan
         # LEWATI entri Daftar Isi (bertab) supaya tidak membayangi
         # seksi asli di badan akhir.
-        for idx, pr in enumerate(doc.paragraphs):
+        # 30 Okt 2026 (akar R2 job 220): cari dari AKHIR dan hanya
+        # sesudah Bab terakhir. Baris badan 'Indeks' di Bab 1 (paragraf
+        # 131 job 220, dari teks bab, tanpa tab) dulu dicocokkan duluan
+        # oleh pencarian maju, sehingga hapus menghapus 124 paragraf
+        # badan Bab 1 dan 124 entri subjek tersisip di tengah Bab 1,
+        # sementara seksi indeks asli tidak pernah disentuh. Seksi back
+        # matter selalu sesudah Bab terakhir; pencarian mundur menemukan
+        # judul asli duluan. Filter tab (TOC) tetap berlaku. Paras dibaca
+        # segar tiap panggilan (doc.paragraphs dibuat ulang tiap akses).
+        paras = doc.paragraphs
+        mulai = 0
+        for _i, _pr in enumerate(paras):
+            if re.match(r'^BAB \d+\b', _pr.text.strip().upper()):
+                mulai = _i + 1
+        for idx in range(len(paras) - 1, mulai - 1, -1):
+            pr = paras[idx]
             if '\t' in pr.text:
                 continue
             if predikat(pr.text.strip().upper()):
