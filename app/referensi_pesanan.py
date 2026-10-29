@@ -56,17 +56,17 @@ def outline_dari_json(data):
     return outline
 
 
-def simpan_outline_pending(outline):
-    """Simpan outline -> token acak (dipakai form persetujuan)."""
+def simpan_outline_pending(outline, tier=None):
+    """Simpan outline + tier -> token acak (dipakai form persetujuan)."""
     token = secrets.token_hex(16)
     path = os.path.join(_dir_pending(), token + '.json')
     with open(path, 'w', encoding='utf-8') as f:
-        json.dump(outline_ke_json(outline), f, ensure_ascii=False)
+        json.dump({'outline': outline_ke_json(outline), 'tier': tier}, f, ensure_ascii=False)
     return token
 
 
 def muat_outline_pending(token):
-    """Muat + HAPUS berkas outline tertunda -> outline (kunci int).
+    """Muat + HAPUS berkas outline tertunda -> (outline, tier).
 
     Token tidak dikenal / berkas rusak -> ValueError (rute mengalihkan
     ke /buku dengan pesan, bukan memproduksi buku tanpa outline).
@@ -82,10 +82,17 @@ def muat_outline_pending(token):
     try:
         with open(path, encoding='utf-8') as f:
             data = json.load(f)
-        outline = outline_dari_json(data)
+        if isinstance(data, dict) and 'outline' in data and isinstance(data['outline'], dict):
+            # Format baru (tier ikut tersimpan): outline + tier.
+            outline = outline_dari_json(data['outline'])
+            tier = data.get('tier')
+        else:
+            # Format lama (hanya outline): tier tak dikenal.
+            outline = outline_dari_json(data)
+            tier = None
     finally:
         try:
             os.remove(path)
         except OSError:
             pass
-    return outline
+    return outline, tier

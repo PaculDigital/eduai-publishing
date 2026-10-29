@@ -95,7 +95,7 @@ def main():
     asli_generate = PIPE.generate_bab
     catatan = {'perbaikan': [], 'bab': []}
 
-    def generate_palsu(n, info, ringkasan, jenis=None):
+    def generate_palsu(n, info, ringkasan, jenis=None, tier=None):
         diperbaiki = 'ARAHAN WAJIB' in (ringkasan or '')
         catatan['bab'].append((n, diperbaiki))
         if diperbaiki:
@@ -113,7 +113,7 @@ def main():
         catatan['perbaikan'] = []
         catatan['bab'] = []
 
-        def gen(n, info, ringkasan, jenis=None):
+        def gen(n, info, ringkasan, jenis=None, tier=None):
             diperbaiki = 'ARAHAN WAJIB' in (ringkasan or '')
             catatan['bab'].append((n, diperbaiki))
             if diperbaiki:

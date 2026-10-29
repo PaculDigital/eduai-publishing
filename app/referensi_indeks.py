@@ -154,6 +154,15 @@ def kumpulkan_istilah(keluar, outline):
         i = 0
         while i < len(baris):
             b = baris[i].strip()
+            # 29 Okt 2026 (temuan uji 219): penanda SEBARIS ('[ISTILAH BARU:
+            # ...]') dan penutup yatim ('[/ISTILAH BARU]') TIDAK ditangkap
+            # cek standar di bawah (yang menuntut ']' sesudah BARU) —
+            # keduanya nyasar ke docx final. Hapus barisnya (istilah tanpa
+            # definisi TIDAK dikarang ke glosarium; perbaikan format ada di
+            # prompt arsitek, bukan di sini).
+            if b.startswith('[ISTILAH BARU:') or b.startswith('[/ISTILAH BARU]'):
+                i += 1
+                continue
             if b.startswith('[ISTILAH BARU]'):
                 # Sisa baris penanda setelah ']' diabaikan; kumpulkan
                 # baris istilah berikutnya.
@@ -652,6 +661,24 @@ def _adalah_judul_seksi(teks):
     return t in _SEKSI or re.match(r'^BAB \d+\b', t) is not None
 
 
+
+def _tandai_judul_tetap(doc):
+    """Set keep_with_next pada judul seksi back-matter (29 Okt 2026).
+
+    Judul yang orphan di bawah halaman (isi di halaman berikut) adalah
+    keluhan Boss di buku 219. keep_with_next = Word memindahkan judul
+    bersama isi ke halaman berikut bila isi tidak muat — persis yang
+    Boss minta ('judul pindah ke halaman berikutnya saja').
+    Dipanggil isi_indeks + isi_singkatan sebelum save, sehingga berlaku
+    apapun modul yang membuat judulnya (rakit, indeks_referensi, atau
+    buat_judul fallback di sini).
+    """
+    for pr in doc.paragraphs:
+        if pr.text.strip().upper() in ('INDEKS SUBJEK', 'INDEKS NAMA',
+                                       'INDEKS', 'DAFTAR SINGKATAN'):
+            pr.paragraph_format.keep_with_next = True
+
+
 def isi_indeks(path_docx, teks_per_halaman, glosarium, nama_list):
     """Isi nomor halaman entri Indeks Subjek + Indeks Nama di docx.
 
@@ -723,10 +750,24 @@ def isi_indeks(path_docx, teks_per_halaman, glosarium, nama_list):
             # jelas, pemanggil (susun) menggagalkan buku + refund token.
             raise RuntimeError('judul seksi indeks tidak ditemukan')
         anchor = doc.paragraphs[idx_judul]._p
+        # 29 Okt 2026 (keluhan Boss di buku 219: indeks berantakan):
+        # URUTAN sudah benar (key=str.lower, 0 inversi di 219) — dipertahankan.
+        # FORMAT: titik literal '....' diganti tab leader Word (titik mengisi
+        # sampai margin, nomor rata kanan — rapi seperti indeks cetak).
+        # BATAS: maks 10 halaman pertama per entri (urutan halaman =
+        # pembahasan awal/definisi dulu). Tanpa batas, 'UMKM' 188 halaman
+        # dan 'Literasi digital' 162 halaman — tidak bisa dipakai.
+        from docx.enum.text import WD_TAB_ALIGNMENT, WD_TAB_LEADER
+        _seksi = doc.sections[0]
+        _tab_pos = _seksi.page_width - _seksi.left_margin - _seksi.right_margin
         for istilah in sorted(entri, key=str.lower):
-            halaman_str = ', '.join(str(p) for p in entri[istilah])
+            halaman_str = ', '.join(str(p) for p in entri[istilah][:10])
             pr = doc.add_paragraph()
-            pr.add_run(f'{istilah} .... {halaman_str}')
+            pr.paragraph_format.tab_stops.add_tab_stop(
+                _tab_pos, WD_TAB_ALIGNMENT.RIGHT, WD_TAB_LEADER.DOTS)
+            _r1 = pr.add_run(istilah)
+            _r1.add_tab()
+            pr.add_run(halaman_str)
             anchor.addnext(pr._p)
             anchor = pr._p
 
@@ -764,7 +805,12 @@ def isi_indeks(path_docx, teks_per_halaman, glosarium, nama_list):
     idx_subjek = cari_judul(lambda t: t in ('INDEKS SUBJEK', 'INDEKS'))
     idx_nama = cari_judul(lambda t: t == 'INDEKS NAMA')
     sisipkan_entri(idx_subjek, entri_subjek)
+    # Geseran: sisipan subjek menggeser semua paragraf sesudahnya.
+    # Hitung ulang posisi judul nama SEBELUM menyisipkan entri nama
+    # (tanpa ini entri nama tersisip di bawah entri subjek pertama).
+    idx_nama = cari_judul(lambda t: t == 'INDEKS NAMA')
     sisipkan_entri(idx_nama, entri_nama)
+    _tandai_judul_tetap(doc)
     doc.save(path_docx)
     return {'subjek': len(entri_subjek), 'nama': len(entri_nama),
             'isi_awal': awal, 'back_awal': back}
@@ -849,5 +895,6 @@ def isi_singkatan(path_docx, teks_per_halaman, singkatan):
     hapus_entri_lama(idx_sing)
     idx_sing = cari_judul(lambda t: t == 'DAFTAR SINGKATAN')
     sisipkan_entri(idx_sing)
+    _tandai_judul_tetap(doc)
     doc.save(path_docx)
     return len(entri)

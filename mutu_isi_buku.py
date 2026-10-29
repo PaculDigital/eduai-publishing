@@ -164,6 +164,40 @@ def periksa_buku(isi_bab, outline, min_sitasi=2, min_kata=300):
             curiga.append(f'BAB {n}: hanya {jum} sitasi (disarankan '
                           f'≥{min_sitasi})')
 
+    #  [5] Bentuk sitasi LENGKAP (29 Okt 2026, temuan uji bersih 219):
+    #  sitasi inisial-saja (E., 2021) / (T.S., 2025) TIDAK bisa ditelusur
+    #  ke penulis mana, dan membuat indeks nama kosong (nama tak cocok
+    #  halaman). Ini MASALAH (memicu putaran perbaikan Lapis 3c-2), bukan
+    #  curiga: perbaikan menulis ulang bab dengan aturan editor 6d.
+    for n in nomor:
+        temu = re.findall(r'\(\s*(?:[A-Z]\.\s*)+,\s*(?:19|20)\d{2}\s*\)',
+                           isi_bab[n] or '')
+        if temu:
+            masalah.append(
+                f'BAB {n}: {len(temu)} sitasi inisial-saja (contoh: '
+                f'{temu[0]}) — tulis ulang ke bentuk (Nama Belakang, '
+                f'Tahun) lengkap dari daftar referensi')
+
+    #  [6] Penanda BELUM SELESAI (29 Okt 2026, temuan Boss di buku 219):
+    # blank/placeholder BUKAN format (tidak boleh di-strip diam-diam —
+    # isinya hilang), melainkan MASALAH -> repair menulis kalimat
+    # lengkap atau menghapus penanda. Blank ISBN/Penerbit front matter
+    # TIDAK di sini (itu add_isbn_page, sudah dihilangkan).
+    for n in nomor:
+        _teks = isi_bab[n] or ''
+        # Gabung semua pola (bukan or): or berantai hanya melaporkan
+        # jenis pertama, perbaikan jadi tidak menyeluruh (audit agen 29 Okt).
+        _per_pola = [re.findall(r'_{4,}', _teks),
+                     re.findall(r'\bTODO\b', _teks, flags=re.IGNORECASE),
+                     re.findall(r'\[\.\.\.\]', _teks),
+                     re.findall(r'\(\.\.\.\)', _teks),
+                     re.findall(r'\bXXX\b', _teks)]
+        _temu = [m[0] for m in _per_pola if m]
+        if _temu:
+            masalah.append(
+                f'BAB {n}: penanda belum selesai ({", ".join(_temu)}) — tulis '
+                f'kalimat lengkap atau hapus penanda, jangan tinggalkan kosong')
+
     return {'lolos': not masalah, 'masalah': masalah, 'curiga': curiga}
 
 

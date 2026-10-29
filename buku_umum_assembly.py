@@ -353,7 +353,7 @@ def _tulis_daftar(doc, teks_daftar):
 def add_para(doc, text="", size=FONT_SIZE, bold=False, italic=False,
              align=None, space_before=0, space_after=6, indent=None,
              first_line_indent=None, line_spacing=1.15, page_break_before=False,
-             inden_otomatis=False):
+             inden_otomatis=False, keep_next=False):
     p = doc.add_paragraph()
     pf = p.paragraph_format
     pf.space_before = Pt(space_before)
@@ -382,6 +382,12 @@ def add_para(doc, text="", size=FONT_SIZE, bold=False, italic=False,
         pf.first_line_indent = Pt(_pt)
     if page_break_before:
         pf.page_break_before = True
+    # 29 Okt 2026 (keluhan Boss di buku 219: judul orphan di bawah
+    # halaman): keep_with_next = judul pindah bersama isi ke halaman
+    # berikut bila isi tidak muat. widow_control yang sudah ada hanya
+    # mencegah 1 baris menggantung, BUKAN mengikat judul ke isi.
+    if keep_next:
+        pf.keep_with_next = True
     if text:
         r = p.add_run(text)
         set_font(r, size=size, bold=bold, italic=italic)
@@ -463,21 +469,83 @@ def no_border_table(tbl):
         borders.append(el)
     tblPr.append(borders)
 
+def _baris_label(doc, label, nilai):
+    """Satu baris data halaman hak cipta: label tebal + nilai biasa."""
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(6)
+    r1 = p.add_run(label)
+    set_font(r1, bold=True)
+    r2 = p.add_run(nilai)
+    set_font(r2)
+    return p
+
+
+def _kotak_hakcipta(doc, teks):
+    """Kotak bergaris satu sel untuk kalimat hak cipta (gaya template)."""
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+    tbl = doc.add_table(rows=1, cols=1)
+    sel = tbl.cell(0, 0)
+    tcPr = sel._tc.get_or_add_tcPr()
+    borders = tcPr.first_child_found_in("w:tcBorders")
+    if borders is None:
+        borders = OxmlElement('w:tcBorders')
+        tcPr.append(borders)
+    for sisi in ('top', 'left', 'bottom', 'right'):
+        el = borders.find(qn('w:' + sisi))
+        if el is None:
+            el = OxmlElement('w:' + sisi)
+            borders.append(el)
+        el.set(qn('w:val'), 'single')
+        el.set(qn('w:sz'), '6')
+        el.set(qn('w:color'), '000000')
+        el.set(qn('w:space'), '0')
+    p = sel.paragraphs[0]
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r = p.add_run(teks)
+    set_font(r)
+    return tbl
+
+
 def add_isbn_page(doc):
-    """Halaman 2: Lembar hak cipta/ISBN — 1 halaman kosong minimalis."""
-    add_para(doc, "", space_after=300)
-    add_para(doc, f"© {BUKU['tahun']} {BUKU['penulis']}", align='center', space_before=200, space_after=12)
-    add_para(doc, "", space_after=6)
-    add_para(doc, "Hak cipta dilindungi undang-undang.", align='center', space_after=6)
+    """Halaman 2: Lembar hak cipta standar cetak (blok penerbit Bayana).
+
+    Mengikuti halaman hak cipta FINAL Bayana (berkas Boss 29 Okt 2026).
+    Data penerbit (alamat, telepon, surel, Instagram, WhatsApp, SK, NIB,
+    keanggotaan IKAPI) diisi nyata dari halaman FINAL itu. Surel hanya
+    satu (bayanahasanaduna@gmail.com, yang pertama di halaman FINAL).
+    NPWP TIDAK dicantumkan (perintah Boss 29 Okt 2026). Nilai per buku
+    (ISBN, editor, penyunting, sampul, jumlah halaman) tetap ditulis
+    [diisi penerbit], jelas isian, bukan blank, supaya penerbit
+    melengkapinya sebelum cetak. Berlaku SEMUA jenis buku.
+    """
+    judul = BUKU.get('judul', '') if isinstance(BUKU, dict) else ''
+    if judul:
+        add_para(doc, judul, size=Pt(14), bold=True, space_after=6)
+    add_para(doc, "Copyright \u00a9 PT Bayana Hasana Duna, " + str(BUKU['tahun']), space_after=12)
+    _baris_label(doc, "Penulis: ", str(BUKU['penulis']))
+    _baris_label(doc, "ISBN: ", "[diisi penerbit] (cetak)")
+    _baris_label(doc, "ISBN: ", "[diisi penerbit] (PDF)")
+    _baris_label(doc, "Editor: ", "[diisi penerbit]")
+    _baris_label(doc, "Penyunting dan Penata Letak: ", "[diisi penerbit]")
+    _baris_label(doc, "Desain Sampul: ", "[diisi penerbit]")
+    _baris_label(doc, "Penerbit: ", "PT Bayana Hasana Duna, anggota IKAPI")
+    _baris_label(doc, "Redaksi: ", "Jl. Palem Raya No.21, Kelurahan Jatimekar, Kecamatan Jatiasih, Kota Bekasi, Jawa Barat 17422")
+    _baris_label(doc, "Telepon: ", "0813-1710-7179 / 0851-1155-5246")
+    _baris_label(doc, "Web: ", "bayana.id")
+    _baris_label(doc, "E-mail: ", "bayanahasanaduna@gmail.com")
+    _baris_label(doc, "Instagram: ", "@bayana.id")
+    _baris_label(doc, "WhatsApp: ", "0851-1155-5248")
+    _baris_label(doc, "SK Kemenkumham: ", "SK.AHU-0074567.AH.01.01. | NIB: 1709260023459")
+    add_para(doc, "", space_after=12)
+    add_para(doc, "Cetakan Pertama, " + str(BUKU['tahun']), space_after=6)
+    add_para(doc, "[jumlah halaman diisi penerbit] halaman; 17,6 x 25 cm", space_after=12)
+    _kotak_hakcipta(doc, "Hak cipta dilindungi undang-undang.")
     add_para(doc, "Dilarang memperbanyak atau mengutip sebagian atau seluruh isi buku ini", align='center', space_after=6)
     add_para(doc, "tanpa izin tertulis dari penerbit.", align='center', space_after=6)
-    add_para(doc, "", space_after=150)
-    add_para(doc, "ISBN: ____________________", align='center', space_after=6)
-    add_para(doc, "", space_after=100)
-    add_para(doc, "Penerbit: ____________________", align='center', space_after=6)
-    add_para(doc, "", space_after=6)
     add_para(doc, "Dicetak di Indonesia", align='center', space_after=6)
     doc.add_page_break()
+
 
 def add_kata_pengantar(doc, judul, penulis, institusi):
     """Kata Pengantar — MENGIKUTI JUDUL BUKU, bukan buku contoh.
@@ -486,10 +554,10 @@ def add_kata_pengantar(doc, judul, penulis, institusi):
        "ekonomi digital". Buku berjudul "Petualangan di Laut" keluar dengan
        pengantar ekonomi digital ⇒ gerbang assembly menangkapnya (1 GAGAL).
     """
-    add_para(doc, "KATA PENGANTAR", size=Pt(16), bold=True, align='center', space_before=12, space_after=12)
+    add_para(doc, "KATA PENGANTAR", size=Pt(16), bold=True, align='center', space_before=12, space_after=12, keep_next=True)
 
     judul_bersih = (judul or 'buku ini').strip() or 'buku ini'
-    pengantar = f"""Buku ini disusun untuk memberi pembaca pemahaman yang utuh tentang {judul_bersih}. Banyak pembaca mengenal topiknya sekilas, tetapi belum sempat memahaminya secara berurutan — dari dasar, ke penerapan, sampai ke hal yang sering ditanyakan.
+    pengantar = f"""Buku ini disusun untuk memberi pembaca pemahaman yang utuh tentang {judul_bersih}. Banyak pembaca mengenal topiknya sekilas, tetapi belum sempat memahaminya secara berurutan, dari dasar, ke penerapan, sampai ke hal yang sering ditanyakan.
 
 Karena itu, setiap bab disusun mengalir dan saling menyambung. Penjelasan dimulai dari hal yang paling dekat dengan pengalaman pembaca, lalu bertahap menuju gagasan yang lebih dalam. Setiap istilah penting dijelaskan saat pertama kali muncul, sehingga pembaca tidak perlu berhenti untuk membuka kamus.
 
@@ -505,7 +573,7 @@ Buku ini ditujukan bagi siapa pun yang ingin memahami {judul_bersih} tanpa meras
 
 def add_daftar_isi(doc, outline):
     """Daftar isi dengan dot leader."""
-    add_para(doc, "DAFTAR ISI", size=Pt(16), bold=True, align='center', space_before=12, space_after=12)
+    add_para(doc, "DAFTAR ISI", size=Pt(16), bold=True, align='center', space_before=12, space_after=12, keep_next=True)
 
     # Kata Pengantar
     p = add_para(doc, "", space_after=6)
@@ -645,6 +713,141 @@ def _pecah_judul_tempel(isi):
     return judul, sisa
 
 
+
+def bersihkan_markdown_teks(teks):
+    """Bersihkan simbol markdown/AI dari teks bab SEBELUM di-parse.
+
+    Temuan uji 219: 41 paragraf berdash '- ', 1 berdash panjang, 1 ber-*,
+    6 baris pipa (tabel markdown BAB 8), 2 blank ISBN/Penerbit (itu
+    front matter — ditangani add_isbn_page, bukan di sini).
+    Aturan: HANYA format yang dihapus, isi TIDAK PERNAH hilang.
+    Yang DIPERTAHANKAN: '## ' (bab_heading), '###' (sub_heading),
+    judul bernomor, penanda [TABEL]/[DIAGRAM], dan pipa (ditangani
+    _gabung_tabel_pipa sesudah parse, bukan di sini).
+    """
+    import re as _re
+    keluar = []
+    for baris in (teks or '').split('\n'):
+        s = baris.strip()
+        if s in ('-', '--', '---', '***', '___', '...'):
+            continue  # baris simbol saja = pemisah tanpa isi
+        if _re.match(r'^#{1}\s', s) or _re.match(r'^#{4,}\s', s):
+            s = _re.sub(r'^#+\s+', '', s)  # '# '/'#### ' -> teks; '## '/'###' dipertahankan
+        elif _re.match(r'^[*\-–—]\s+', s):
+            s = _re.sub(r'^[*\-–—]\s+', '', s)  # bullet markdown -> teks
+        elif s.startswith('> '):
+            s = s[2:].strip()  # quote markdown -> teks
+        s = s.replace('**', '').replace('`', '')
+        s = _re.sub(r'(?<![A-Za-z0-9_])_([^_\n]+?)_(?![A-Za-z0-9_])', r'\1', s)
+        s = _re.sub(r'(?<!\S)\*([^*\n]+?)\*(?!\S)', r'\1', s)
+        if s:
+            keluar.append(s)
+    hasil = '\n'.join(keluar)
+    # Larangan em dash (U+2014, 29 Okt 2026): model AI selalu menyelipkan
+    # em dash sebagai pemisah klausa; ganti dengan koma agar isi tidak
+    # hilang dan tanda itu hilang. Hanya U+2014 yang dihapus; hyphen (-)
+    # dan en dash (U+2013, untuk rentang) dipertahankan.
+    hasil = _re.sub(r'\s*\u2014\s*', ', ', hasil)
+    hasil = hasil.replace(',,', ',').replace(', ,', ',')
+    hasil = _re.sub(r'(?m)^, ', '', hasil)
+    hasil = hasil.replace(', \n', '\n').strip()
+    if hasil.endswith(','):
+        hasil = hasil[:-1].rstrip()
+    return hasil
+
+
+def bersihkan_em_dash_dokumen(doc):
+    """Sapuan akhir anti em dash (U+2014) untuk SELURUH dokumen.
+
+    Dipanggil sebelum save di rakit() dan main() supaya tidak ada bagian
+    yang lolos: judul bab (dari outline), Kata Pengantar (template),
+    glosarium, indeks, pustaka, bio, daftar isi, header/footer.
+    Pengganti = koma, sama seperti filter bab. Hanya U+2014 yang dihapus;
+    hyphen (-) dan en dash (U+2013, untuk rentang) dipertahankan.
+    """
+    import re as _re
+    def _sapu_teks(teks):
+        hasil = _re.sub(r'\s*\u2014\s*', ', ', teks or '')
+        hasil = hasil.replace(',,', ',').replace(', ,', ',')
+        hasil = hasil.strip()
+        if hasil.endswith(','):
+            hasil = hasil[:-1].rstrip()
+        return hasil
+    def _sapu_paragraf(para):
+        for run in para.runs:
+            if '\u2014' in run.text:
+                run.text = _sapu_teks(run.text)
+    def _sapu_tabel(tabel):
+        for baris in tabel.rows:
+            for sel in baris.cells:
+                for para in sel.paragraphs:
+                    _sapu_paragraf(para)
+    for para in doc.paragraphs:
+        _sapu_paragraf(para)
+    for tabel in doc.tables:
+        _sapu_tabel(tabel)
+    for seksi in doc.sections:
+        for bagian in (seksi.header, seksi.footer):
+            for para in bagian.paragraphs:
+                _sapu_paragraf(para)
+            for tabel in bagian.tables:
+                _sapu_tabel(tabel)
+    return doc
+
+
+def _gabung_tabel_pipa(blocks):
+    """Ubah run paragraf pipa ('| A | B |') jadi blok tabel.
+
+    Dipakai add_bab SESUDAH parse (Jev maupun regex sama-sama memberi
+    baris pipa sebagai blok paragraf, jadi deteksi ini berlaku untuk
+    kedua jalur). Baris pemisah ('|---|---|') dilewati; baris pertama
+    non-pemisah = header; tanpa baris data -> kembali jadi prosa
+    (prinsip 20 Okt: tabel tanpa data tidak dibuat).
+    """
+    import re as _re
+    hasil, i = [], 0
+    while i < len(blocks):
+        blk = blocks[i]
+        tipe = blk[0] if isinstance(blk, (tuple, list)) else '?'
+        isi = blk[1] if isinstance(blk, (tuple, list)) else blk
+        if tipe in ('paragraf', 'isi') and isinstance(isi, str) \
+                and isi.strip().startswith('|') and isi.strip().count('|') >= 2:
+            run = []
+            while i < len(blocks):
+                b2 = blocks[i]
+                t2 = b2[0] if isinstance(b2, (tuple, list)) else '?'
+                c2 = b2[1] if isinstance(b2, (tuple, list)) else b2
+                if t2 in ('paragraf', 'isi') and isinstance(c2, str) \
+                        and c2.strip().startswith('|') and c2.strip().count('|') >= 2:
+                    run.append(c2.strip())
+                    i += 1
+                else:
+                    break
+            baris = []
+            for r in run:
+                t = r.strip()
+                if t.startswith('|'):
+                    t = t[1:]
+                if t.endswith('|'):
+                    t = t[:-1]
+                sel = [c.strip() for c in t.split('|')]
+                if sel and all(_re.match(r'^:?-{3,}:?$', c) for c in sel):
+                    continue  # baris pemisah markdown
+                baris.append(sel)
+            if len(baris) >= 2:
+                nkol = max(len(r) for r in baris)
+                header = baris[0] + [''] * (nkol - len(baris[0]))
+                data = [r + [''] * (nkol - len(r)) for r in baris[1:]]
+                hasil.append(('tabel_pipa', (header, data)))
+            else:
+                for r in baris:
+                    hasil.append(('paragraf', ', '.join(r)))
+            continue
+        hasil.append(blk)
+        i += 1
+    return hasil
+
+
 def parse_bab_file(content):
     """Parse bab txt content jadi struktur: headings + paragraphs + markers.
 
@@ -731,14 +934,17 @@ def add_bab(doc, bab_num, bab_data, bab_text):
     """Tambah bab ke docx."""
     # Bab heading dengan page break
     add_para(doc, f"BAB {bab_num}", size=Pt(16), bold=True, align='center',
-             space_before=0, space_after=6, page_break_before=True)
-    add_para(doc, bab_data['title'], size=Pt(16), bold=True, align='center', space_after=12)
+             space_before=0, space_after=6, page_break_before=True, keep_next=True)
+    add_para(doc, bab_data['title'], size=Pt(16), bold=True, align='center', space_after=12, keep_next=True)
 
     #  ── JEV BUKU UMUM = JEV DI DEPAN (SOT 20 Okt 2026) ──────────────────
     #  Prinsip induk Bos (08 Okt): "selalu nomor satukan jev dulu".
     #  Jev membaca BENTUK naskah lebih dulu; mesin merakit ikut jawaban Jev.
     #  Regex tetap ada sebagai CADANGAN kalau Jev mati — jangan sampai buku
     #  gagal terbit gara-gara Jev gangguan sesaat.
+    # 29 Okt 2026 (temuan Boss di buku 219): bersihkan simbol markdown
+    # SEBELUM Jev/regex membaca teks, supaya kedua jalur dapat teks bersih.
+    bab_text = bersihkan_markdown_teks(bab_text)
     blocks = None
     _peta_jev = None
     try:
@@ -824,6 +1030,10 @@ def add_bab(doc, bab_num, bab_data, bab_text):
                  bab_num, _dibuang2)
         blocks = _bersih
 
+    # 29 Okt 2026 (temuan Boss di buku 219): baris pipa markdown yang lolos
+    # parse (Jev maupun regex memberinya sebagai paragraf) diubah jadi tabel.
+    blocks = _gabung_tabel_pipa(blocks)
+
     #  SOT 2.4: paragraf pertama setelah judul bab = rata kiri (tanpa inden).
     baru_setelah_judul = True
 
@@ -862,6 +1072,7 @@ def add_bab(doc, bab_num, bab_data, bab_text):
         if ilustrasi_inserted is False and ilustrasi_path and os.path.exists(ilustrasi_path) and idx >= target_pos:
             p = doc.add_paragraph()
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.paragraph_format.keep_with_next = True
             p.paragraph_format.space_before = Pt(6)
             p.paragraph_format.space_after = Pt(4)
             run = p.add_run()
@@ -873,7 +1084,7 @@ def add_bab(doc, bab_num, bab_data, bab_text):
         if block_type == 'bab_heading':
             continue  # sudah di-add manual
         elif block_type == 'sub_heading':
-            add_para(doc, content, size=Pt(14), bold=True, space_before=12, space_after=8)
+            add_para(doc, content, size=Pt(14), bold=True, space_before=12, space_after=8, keep_next=True)
             #  SOT 2.4 (S1 CMOS faq0223): paragraf pertama SETELAH judul
             #  dimulai rata kiri — inden tidak diperlukan karena batas
             #  paragraf sudah jelas dari judulnya.
@@ -958,7 +1169,7 @@ def add_bab(doc, bab_num, bab_data, bab_text):
                 #  naskah), bukan judul contoh.
                 judul_tabel = data.get('title') or ttitle
                 # Caption
-                add_para(doc, f"Tabel {tid} {judul_tabel}", bold=True, align='center', space_before=10, space_after=6)
+                add_para(doc, f"Tabel {tid} {judul_tabel}", bold=True, align='center', space_before=10, space_after=6, keep_next=True)
                 # Tabel dengan border (comot dari buku ajar: table.style = 'Table Grid')
                 n_rows = len(rows_data) + 1
                 n_cols = len(headers)
@@ -989,6 +1200,32 @@ def add_bab(doc, bab_num, bab_data, bab_text):
                 #  kode mati yang menyesatkan. Placeholder "..." itulah yang
                 #  membuat pembaca melihat "tabel bohong" tanpa data.
                 add_para(doc, "", space_after=6)
+        elif block_type == 'tabel_pipa':
+            # Tabel dari baris pipa markdown (29 Okt 2026). Tanpa caption
+            # bernomor — nomor TIDAK dikarang; prosa sekitarnya sudah
+            # memperkenalkannya. Gaya disamakan dengan [TABEL].
+            _header, _rows = content
+            _n_rows = len(_rows) + 1
+            _n_cols = len(_header)
+            _table = doc.add_table(rows=_n_rows, cols=_n_cols)
+            _table.style = 'Table Grid'
+            _table.alignment = WD_TABLE_ALIGNMENT.CENTER
+            for _ci, _h in enumerate(_header):
+                _cell = _table.rows[0].cells[_ci]
+                _cell.text = _h
+                for _pp in _cell.paragraphs:
+                    _pp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    for _rr in _pp.runs:
+                        _rr.bold = True; _rr.font.size = Pt(10)
+            for _ri, _row in enumerate(_rows):
+                for _ci in range(_n_cols):
+                    _cell = _table.rows[_ri + 1].cells[_ci]
+                    _cell.text = _row[_ci] if _ci < len(_row) else ''
+                    for _pp in _cell.paragraphs:
+                        _pp.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                        for _rr in _pp.runs:
+                            _rr.font.size = Pt(10)
+            add_para(doc, '', space_after=6)
         elif block_type == 'diagram_marker':
             # Parse: [DIAGRAM 1.3: Judul - deskripsi] atau DIAGRAM 1.3 Judul
             m = re.match(r'(?:\[)?DIAGRAM\s+(\d+\.\d+)[:\s]*', content)
@@ -996,7 +1233,7 @@ def add_bab(doc, bab_num, bab_data, bab_text):
                 did = m.group(1)
                 img_path = os.path.join(VISUAL_DIR, f"diagram_{did}.png")
                 # Caption
-                add_para(doc, f"Diagram {did}", bold=True, align='center', space_before=10, space_after=6)
+                add_para(doc, f"Diagram {did}", bold=True, align='center', space_before=10, space_after=6, keep_next=True)
                 # Insert image jika PNG ada
                 if os.path.exists(img_path):
                     p = doc.add_paragraph()
@@ -1018,7 +1255,7 @@ def add_glosarium(doc, glosarium, kosong=False):
     """
     from docx.enum.table import WD_TABLE_ALIGNMENT
     add_para(doc, "GLOSARIUM", size=Pt(16), bold=True, align='center',
-             space_before=12, space_after=12, page_break_before=True)
+             space_before=12, space_after=12, page_break_before=True, keep_next=True)
 
     if not glosarium:
         add_para(doc, "Glosarium belum tersedia untuk buku ini.",
@@ -1068,7 +1305,7 @@ def add_indeks(doc, glosarium, teks_per_halaman=None):
     except ImportError:
         #  titik mundur: perilaku lama (tanpa nomor halaman) — jangan crash
         add_para(doc, "INDEKS", size=Pt(16), bold=True, align='center',
-                 space_before=12, space_after=12, page_break_before=True)
+                 space_before=12, space_after=12, page_break_before=True, keep_next=True)
         for term in sorted(glosarium.keys()):
             add_para(doc, term, space_after=4)
         return
@@ -1079,7 +1316,7 @@ def add_indeks(doc, glosarium, teks_per_halaman=None):
 
 def add_daftar_pustaka(doc, references):
     add_para(doc, "DAFTAR PUSTAKA", size=Pt(16), bold=True, align='center',
-             space_before=12, space_after=12, page_break_before=True)
+             space_before=12, space_after=12, page_break_before=True, keep_next=True)
     for ref in references:
         p = add_para(doc, "", space_after=8)
         pf = p.paragraph_format
@@ -1096,7 +1333,7 @@ def add_bio(doc):
        dengan biografi orang lain ⇒ harus dari BUKU['penulis']/['institusi'].
     """
     add_para(doc, "TENTANG PENULIS", size=Pt(16), bold=True, align='center',
-             space_before=12, space_after=12, page_break_before=True)
+             space_before=12, space_after=12, page_break_before=True, keep_next=True)
     penulis = (BUKU.get('penulis') or '').strip()
     institusi = (BUKU.get('institusi') or '').strip()
     judul = (BUKU.get('judul') or 'buku ini').strip() or 'buku ini'
@@ -1303,6 +1540,12 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
             add_daftar_pustaka(doc, sorted(all_refs))
 
         add_bio(doc)
+        # 29 Okt 2026 (temuan uji 219): metadata penulis/judul HANYA diset
+        # di main() (2ef8a02), bukan di jalur rakit() produksi — docx
+        # produksi ber-author 'python-docx' dan judul kosong. Samakan.
+        doc.core_properties.author = (penulis or '').strip()
+        doc.core_properties.title = (judul or '').strip()
+        bersihkan_em_dash_dokumen(doc)
         doc.save(docx_out)
 
         # === VERIFIKASI NYATA — baca ulang berkasnya ===
@@ -1434,6 +1677,7 @@ def main():
     add_bio(doc)
 
     # === SAVE ===
+    bersihkan_em_dash_dokumen(doc)
     doc.save(DOCX_OUT)
     size = os.path.getsize(DOCX_OUT)
     print(f"✅ {DOCX_OUT}")

@@ -91,8 +91,20 @@ STYLE_BUKU = {
         "crisp thin outlines, no cream, no beige, no gradients, "
         "no 3D, no photorealism, non-fiction book interior art. Scene: {brief}"
     ),
+    "realistis-referensi": (
+        "Realistic painterly book illustration (digital painting with "
+        "visible brushwork, clearly an illustration, NOT a photograph) "
+        "for a non-fiction reference book: {brief}. One single clear "
+        "subject (one person + one focused activity) showing the "
+        "chapter's problem, simple uncluttered setting, generous empty "
+        "space around the subject, calm warm mood, natural colors. Vary the composition across chapters: different settings, poses, and activities — a seller standing, walking, handing packages, arranging stock, or talking with a customer — NOT always a person sitting behind a table looking at a phone. "
+        "No text, no words, no letters, no numbers, no watermark, "
+        "no clutter, no crowd, no busy market, no dark or dirty background."
+    ),
 }
 GAYA_DEFAULT = "premium-konseptual"
+# 29 Okt 2026 (perintah Boss): gaya ilustrasi buku referensi.
+GAYA_REFERENSI = "realistis-referensi"
 
 # Gaya buku ANAK / PENDIDIKAN.
 #  🚨 CACAT TERUKUR 20 Okt 2026 (dilihat mata dari PNG hasil uji):
@@ -125,6 +137,7 @@ GAYA_DEFAULT = "premium-konseptual"
 MODE_BRIEF_PER_GAYA = {
     "anak": "literal",
     "premium-konseptual": "konseptual",
+    "realistis-referensi": "konseptual",
     "editorial-lineart": "konseptual",
 }
 

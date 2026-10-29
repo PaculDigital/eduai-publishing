@@ -41,7 +41,14 @@ SUMBER = "penyusun_buku.py"
 #  Ini pilihan sadar: BENAR dulu, cepat kemudian.
 # ══════════════════════════════════════════════════════════════════════════
 _KUNCI_GLOBAL = None
-_BATAS_BAB = 4          # maks 4 bab bersamaan per buku (anggaran global 4 aliran, 29 Okt 2026)
+# 29 Okt 2026 (perintah 'perbaiki menjadi sempurna'): batas paralel bab
+# bisa diubah lewat env tanpa ubah kode (default 4 = perilaku teruji;
+# 6 belum teruji lintas kuota Scopus — naikkan hanya untuk uji ukur).
+# Dijepit 1..8 (0 = macet, >8 = di luar bukti 9router); env rusak = 4.
+try:
+    _BATAS_BAB = min(8, max(1, int(os.environ.get('EDUAI_BAB_PARALEL', '4') or 4)))
+except (TypeError, ValueError):
+    _BATAS_BAB = 4
 #  Perbaikan-otomatis bab bermasalah (Lapis 3c-2, ACC Bos 19 Okt 2026).
 #  MAKSIMAL 1 putaran per bab: cukup untuk memperbaiki isi berulang, tapi
 #  TIDAK boleh berputar sampai token user habis.
@@ -155,7 +162,7 @@ def apakah_bisa():
 
 
 def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
-               batas_bab=None, lapor=None, ulang=0, on_mulai=None):
+               batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None):
     """Susun buku dari outline yang SUDAH dibuat. Return dict hasil.
 
     Satu buku diproduksi dalam satu waktu (antrean FIFO global — lihat
@@ -169,6 +176,7 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
     on_mulai  : dipanggil TEPAT saat giliran produksi tiba (sebelum satu
                 kata ditulis). Pemanggil memotong kuota di sini — jadi
                 buku yang masih mengantre BELUM dipotong.
+    tier      : paket Hemat/Normal/Full (None = perilaku lama); diteruskan ke visuals.
 
     TIDAK memotong kuota sendiri. Pemotongan kuota = tugas pemanggil
     lewat `on_mulai`, supaya modul ini bisa diuji tanpa menyentuh saldo
@@ -179,7 +187,7 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
     try:
         _antrian_tunggu_giliran(token, lapor=lapor)
         return _susun_buku_dalam(judul, outline, jenis, keluar_dir,
-                                 batas_bab, lapor, ulang, on_mulai)
+                                 batas_bab, lapor, ulang, on_mulai, tier=tier)
     finally:
         _antrian_selesai(token)
         #  Pulihkan tambalan prompt — SEKALIGUS untuk semua jalan keluar
@@ -197,7 +205,7 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
 
 
 def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
-                      batas_bab=None, lapor=None, ulang=0, on_mulai=None):
+                      batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None):
     """Isi susun_buku (lihat docstring-nya). Dipanggil HANYA dari wrapper
     antrean di atas — jangan dipanggil langsung, supaya antrean tidak
     bisa dilewati diam-diam."""
@@ -298,7 +306,7 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
             if lapor:
                 lapor(f"BAB {n} mulai: {outline[n]['title']}")
             teks, summ, wc, cit = P.generate_bab(
-                n, outline[n], ringkasan_awal, jenis=jenis)
+                n, outline[n], ringkasan_awal, jenis=jenis, tier=tier)
         finally:
             P.lepas_folder()
         #  ⚠️ PENJAGA: bab kosong TIDAK boleh dicatat "done".

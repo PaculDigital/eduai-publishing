@@ -134,13 +134,16 @@ def parse_outline(teks):
     return outline
 
 
-def susun_outline(judul, bidang, jumlah_bab=8):
+def susun_outline(judul, bidang, jumlah_bab=8, tier=None):
     """Bangun outline referensi via LLM (maks 2 percobaan, lalu raise).
 
     Percobaan ke-2 membawa daftar masalah percobaan ke-1 sebagai perintah
     perbaikan — bukan pengulangan buta.
     """
     import buku_umum_pipeline as P
+    if tier is not None:
+        from tier_buku import jumlah_bab as _bab_dari_tier
+        jumlah_bab = _bab_dari_tier(tier)
     jumlah_bab = max(1, min(12, int(jumlah_bab or 8)))
     prompt = prompt_outline(judul, bidang, jumlah_bab)
     masalah = ''

@@ -47,6 +47,7 @@ WAJIB = [
     ('indeks_referensi',   'indeks referensi'),
     ('outline_buku',       'outline buku'),
     ('penyusun_buku',      'penyusun buku'),
+    ('tier_buku',          'tier buku Hemat/Normal/Full'),
 ]
 
 lulus = 0
@@ -129,7 +130,7 @@ try:
               encoding='utf-8').read()
 except FileNotFoundError:
     df = ''
-for berkas in ('jev_buku_umum.py', 'diagram_buku.py', 'tata_paragraf.py'):
+for berkas in ('jev_buku_umum.py', 'diagram_buku.py', 'tata_paragraf.py', 'tier_buku.py'):
     if f'COPY {berkas}' in df:
         lulus += 1
         print(f'  ✅ Dockerfile: COPY {berkas}')

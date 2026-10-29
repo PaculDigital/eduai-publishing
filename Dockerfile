@@ -42,6 +42,8 @@ COPY buku_umum_pipeline.py ./buku_umum_pipeline.py
 #  dan semua diagram balik ke template, padahal di host tampak "sudah jalan".
 COPY tahapan_diagram.py ./tahapan_diagram.py
 COPY mutu_isi_buku.py ./mutu_isi_buku.py
+# 29 Okt 2026: tier buku, import tanpa syarat di pipeline (wajib).
+COPY tier_buku.py ./tier_buku.py
 COPY jenis_buku.py ./jenis_buku.py
 COPY tone_menulis.py ./tone_menulis.py
 COPY brief_visual.py ./brief_visual.py

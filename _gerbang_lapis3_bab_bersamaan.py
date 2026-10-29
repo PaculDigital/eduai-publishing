@@ -186,8 +186,8 @@ def main():
     cek('tidak ada folder utas tertinggal', len(P._FOLDER_UTAS) == 0,
         f'sisa={P._FOLDER_UTAS}')
 
-    print('\n[6] BATAS BERSAMAAN = 2 (putusan Bos)')
-    cek('batas bab bersamaan = 2', getattr(PB, '_BATAS_BAB', None) == 2,
+    print('\n[6] BATAS BERSAMAAN = 4 (putusan Bos)')
+    cek('batas bab bersamaan = 4', getattr(PB, '_BATAS_BAB', None) == 4,
         f'_BATAS_BAB={getattr(PB, "_BATAS_BAB", None)}')
 
     print('\n[7] SATU BAB GAGAL → BAB LAIN TETAP JADI (jujur)')

@@ -246,6 +246,45 @@ def tabel_nyata(obj):
     return hasil
 
 
+def hitung_sitasi_inisial(spec):
+    # Jumlah sitasi inisial-saja (E., 2021) / (T.S., 2025) di paragraf
+    # + sel tabel spec. Pola (?:[A-Z]\.)+ menangkap multi-inisial juga.
+    pola = re.compile(r'\(\s*(?:[A-Z]\.\s*)+,\s*(?:19|20)\d{2}\s*\)')
+    jum = sum(len(pola.findall(t or '')) for t in paragraf_dari_spec(spec))
+    for b in bab_dari_spec(spec):
+        for t in tabel_nyata(b):
+            for baris in (t.get('baris') or []):
+                for sel in (baris or []):
+                    jum += len(pola.findall(str(sel or '')))
+    return jum
+
+
+def hitung_markdown_tersisa(spec):
+    """Paragraf yang masih mengandung simbol markdown (jaring pengaman:
+    strip di rakit seharusnya membuat ini 0; bila >0 berarti strip lolos)."""
+    pola = [re.compile(r'^\s*[-*–—]\s'), re.compile(r'\*\*'), re.compile(r'`'),
+            re.compile(r'^\s*#{1}\s'), re.compile(r'^\s*#{4,}\s'),
+            re.compile(r'^\s*>'), re.compile(r'^\s*\|'),
+            re.compile(r'^\s*(---|___|\*\*\*)\s*$')]
+    jum = 0
+    for t in paragraf_dari_spec(spec):
+        if any(p.search(t or '') for p in pola):
+            jum += 1
+    return jum
+
+
+def hitung_placeholder_tersisa(spec):
+    """Paragraf yang masih mengandung penanda kosong (repair gagal / lolos)."""
+    pola = [re.compile(r'_{4,}'), re.compile(r'\bTODO\b', re.IGNORECASE),
+            re.compile(r'\[\.\.\.\]'), re.compile(r'\(\.\.\.\)'),
+            re.compile(r'\bXXX\b')]
+    jum = 0
+    for t in paragraf_dari_spec(spec):
+        if any(p.search(t or '') for p in pola):
+            jum += 1
+    return jum
+
+
 def periksa_referensi(spec, teks):
     print('-- buku referensi: harus bisa DIRUJUK, bukan dibaca berurutan --')
     ok('R1 indeks subjek bermakna',
@@ -279,6 +318,28 @@ def periksa_referensi(spec, teks):
     ingatkan('Rw daftar singkatan ada',
              'daftar singkatan' in teks,
              'daftar singkatan wajib untuk buku referensi menurut skill')
+    _inisial = hitung_sitasi_inisial(spec)
+    ingatkan('Rw bentuk sitasi lengkap (tanpa inisial-saja)',
+             _inisial == 0,
+             f'{_inisial} sitasi inisial-saja (E., 2021) — tulis ulang '
+             f'ke (Nama Belakang, Tahun) lengkap agar tertelusur')
+    _nama = spec.get('indeks_nama')
+    if isinstance(_nama, list):
+        _j_nama = sum(1 for e in _nama if entri_indeks_bermakna(e))
+        ingatkan('Rw indeks nama tidak tipis (>=3 nama)',
+                 _j_nama >= 3,
+                 f'indeks nama hanya {_j_nama} nama — nama tak cocok '
+                 f'halaman bila sitasi inisial-saja')
+    _md = hitung_markdown_tersisa(spec)
+    ingatkan('Rw tanpa simbol markdown',
+             _md == 0,
+             f'{_md} paragraf masih mengandung simbol markdown — '
+             f'strip di rakit seharusnya sudah membersihkannya')
+    _ph = hitung_placeholder_tersisa(spec)
+    ingatkan('Rw tanpa penanda kosong',
+             _ph == 0,
+             f'{_ph} paragraf masih mengandung penanda kosong — '
+             f'repair seharusnya sudah mengisinya')
 
 
 def periksa_ajar(spec, teks):

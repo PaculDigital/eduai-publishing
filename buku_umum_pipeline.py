@@ -444,6 +444,10 @@ ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
   Sub-bab tanpa istilah baru TETAP menulis bloknya dengan satu baris
   '(tidak ada istilah baru)'. Blok ini dipisah dari narasi saat perakitan
   — jangan selipkan istilahnya ke narasi saja, jangan hapus bloknya.
+  Penanda [ISTILAH BARU] HARUS sendirian di barisnya — JANGAN tulis
+  istilah di baris yang sama dengan penanda (bentuk '[ISTILAH BARU: ...]'
+  DILARANG). JANGAN tulis penanda penutup '[/ISTILAH BARU]' — blok
+  berakhir di baris kosong, tanpa penutup.
   Tanpa blok ini = sub-bab tidak lengkap.
 """
         aturan_ringkasan = (
@@ -650,7 +654,15 @@ def editor_prompt(sub_title, draft, kritik, saran, jenis="umum"):
             'paragraf posisi eksplisit (frasa "Posisi penulis" dkk). '
             'Menghapus keduanya = GAGAL.\n'
             '6c. Pertahankan blok [ISTILAH BARU] di akhir sub-bab — jangan '
-            'dihapus, jangan digabung ke narasi.')
+            'dihapus, jangan digabung ke narasi.\n'
+            '6d. BENTUK SITASI WAJIB (Nama Belakang, Tahun) '
+            'lengkap dari daftar referensi — contoh (Yang, '
+            '2020). Sitasi inisial-saja seperti (E., 2021), '
+            '(N., 2025), (T.S., 2025) WAJIB ditulis ulang ke '
+            'bentuk lengkap; JANGAN biarkan satu pun '
+            'inisial-saja lolos. Jika nama belakang tidak ada '
+            'di daftar, HAPUS sitasi itu — lebih baik kurang '
+            'daripada cacat.')
         aturan_personal = (
             '4. Suara penulis lewat POSISI ILMIAH, bukan sapaan personal — '
             'jangan kejar persentase sapaan')
@@ -675,9 +687,10 @@ ATURAN FINAL (WAJIB SEMUA):
 7. DILARANG KERAS MENGURANGI NARASI. Jika draft 800 kata, output WAJIB minimal 800 kata. Jika draft 1000 kata, output WAJIB minimal 1000 kata. Mengurangi narasi = GAGAL TOTAL. JANGAN ringkas, JANGAN potong, JANGAN hapus paragraf.
 8. Tone: {_t['tone']}
 8a. SAPAAN: sapa pembaca dengan "{sapaan}" — pakai kata "{sapaan}" untuk menyapa. DILARANG memakai sapaan lain.
-9. 0 markdown (tidak ada * _ `). EYD.
+9. 0 markdown: DILARANG keras * _ ` # > | dan daftar berdash ('- ' di awal baris) — daftar ditulis sebagai kalimat berurutan (Pertama, ... Kedua, ...) BUKAN dash; tabel ditulis sebagai blok [TABEL ...], BUKAN pipa '| ... |'; JANGAN tulis '---', '***', atau penanda kosong ('___', 'TODO', '[...]') — bila isi belum ada, tulis kalimat lengkap atau hapus, jangan tinggalkan penanda kosong. EYD.
 10. Pertahankan [TABEL/DIAGRAM] markers
 11. DILARANG: "Penting untuk dicatat", "Secara komprehensif", "Di era digital ini"
+12. TANDA EM DASH: DILARANG memakai tanda em dash (garis pisah panjang, U+2014) di mana pun dalam teks. Pisahkan klausa dengan koma atau titik. Jangan memakai em dash sebagai pemisah klausa, penjelas, atau jeda dramatis.
 Output: teks langsung. JANGAN POTONG sebelum selesai."""
 
 def summarize_prompt(text):
@@ -1542,7 +1555,7 @@ def _gambar_inferhub(prompt, simpan=None, ukuran="1024x1024", seed=1000,
 
 
 def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
-                           varian=3):
+                           varian=3, gaya=None):
     """Generate ilustrasi (2 tahap + kurasi): brief dari isi bab → gambar.
 
     varian > 1 → simpan SEMUA varian (ilustrasi_babN_varK.png) dan pakai
@@ -1551,6 +1564,8 @@ def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
     (LANGKAH 3 kurasi 3-pilih-1 — tidak memilih buta).
     """
     from brief_visual import prompt_dari_bab, GAYA_DEFAULT, MODE_BRIEF
+    if gaya is None:
+        gaya = GAYA_DEFAULT
 
     if not ringkasan_bab:
         print("       ⚠️ Ilustrasi dilewati: ringkasan bab kosong "
@@ -1559,7 +1574,7 @@ def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
 
     hasil = prompt_dari_bab(bab_num, ringkasan_bab,
                             sub_bab=_sub_bab_tengah(bab_text),
-                            gaya=GAYA_DEFAULT, panggil_llm=call_llm,
+                            gaya=gaya, panggil_llm=call_llm,
                             mode=MODE_BRIEF)
     if not hasil["prompt"]:
         print(f"       ⚠️ Ilustrasi dilewati: {hasil['galat']}")
@@ -1616,13 +1631,13 @@ def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
     return default
 
 def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab="",
-                         jenis="umum"):
+                         jenis="umum", tier=None):
     """ONE-PASS: Generate semua visual untuk 1 bab setelah teks selesai.
 
-    28 Okt 2026 (mesin referensi web): buku referensi DILARANG memakai
-    ilustrasi 3D dekoratif (skill) — visualnya = tabel komparasi + bagan.
-    Maka ilustrasi API dilewati untuk jenis referensi (diagram dari marker
-    tetap jalan, karena bagan memang dianjurkan).
+    29 Okt 2026 (perintah Boss, mencabut larangan 28 Okt SEBAGIAN):
+    buku referensi memakai ilustrasi ADEGAN REALISTIS (gaya
+    realistis-referensi) — BUKAN 3D dekoratif (yang tetap dilarang).
+    Visualnya = tabel komparasi + bagan + adegan realistis.
     """
     print(f"\n  🎨 Generating visuals for BAB {bab_num}...")
 
@@ -1674,18 +1689,28 @@ def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab="",
             laporan_visual['diagram_gagal'].append(did)
             print(f"     ❌ Diagram {did}: PNG GAGAL — akan hilang dari buku")
 
-    # 4. Generate ilustrasi (2 tahap: brief dari ISI bab → line art buku)
-    # DILARANG untuk buku referensi (skill: tanpa pemanis dekoratif).
-    if jenis == 'referensi':
-        print("     🖼️ Ilustrasi: dilewati (buku referensi tanpa dekorasi)")
+    # 4. Generate ilustrasi (2 tahap: brief dari ISI bab → adegan realistis)
+    # 29 Okt 2026 (perintah Boss): referensi BOLEH pakai ilustrasi adegan
+    # REALISTIS sederhana + fokus ke permasalahan bab (gaya
+    # realistis-referensi, disetujui Boss 29 Okt sore, contoh Bab 1 v2).
+    # Larangan 28 Okt berlaku untuk 3D dekoratif, bukan adegan ini.
+    from tier_buku import boleh_ilustrasi
+    if not boleh_ilustrasi(tier, bab_num):
+        print("     Ilustrasi: dilewati (tier hemat, maks 2 gambar)")
         ilust_path = None
+    elif jenis == 'referensi':
+        from brief_visual import GAYA_REFERENSI
+        ilust_path = generate_ilustrasi_api(bab_num, bab_title,
+                                            ringkasan_bab=ringkasan_bab,
+                                            bab_text=bab_text,
+                                            gaya=GAYA_REFERENSI)
     else:
         ilust_path = generate_ilustrasi_api(bab_num, bab_title,
                                             ringkasan_bab=ringkasan_bab,
                                             bab_text=bab_text)
     if ilust_path:
         print(f"     🖼️ Ilustrasi: {os.path.getsize(ilust_path)//1024}KB ✅")
-    else:
+    elif boleh_ilustrasi(tier, bab_num):
         print(f"     🖼️ Ilustrasi: skipped (API error)")
 
     print(f"  ✅ Visuals BAB {bab_num} complete: {len(tables)} tabel + "
@@ -2136,7 +2161,7 @@ def generate_closing(bab_num, bab_title, rolling_summary, jenis="umum"):
     closing = post_process(closing, jenis=jenis)
     return closing
 
-def generate_bab(bab_num, bab_data, prev_summary, jenis="umum"):
+def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None):
     """Generate 1 bab lengkap: intro + sub-bab + penutup."""
     bab_title = bab_data["title"]
     subs = bab_data["subs"]
@@ -2204,7 +2229,7 @@ def generate_bab(bab_num, bab_data, prev_summary, jenis="umum"):
         bab_summary = call_llm(summarize_prompt(bab_text[:5000]),
                                max_tokens=2500, timeout=90)
 
-    generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab=bab_summary or "", jenis=jenis)
+    generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab=bab_summary or "", jenis=jenis, tier=tier)
 
     # Simpan referensi bab ini (dari semua sub-bab) untuk daftar pustaka
     bab_refs_path = os.path.join(visual_ini(), f"refs_bab{bab_num}.json")
