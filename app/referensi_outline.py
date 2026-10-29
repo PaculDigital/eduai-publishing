@@ -12,8 +12,10 @@ Kenapa ada builder sendiri, bukan OB.susun_outline (host)?
 
 Bentuk keluar = bentuk yang diterima OB.periksa + host susun_buku:
     {n: {'title': str, 'subs': [(nomor, judul, key_points), ...]},
-     '_judul': ..., '_bidang': ..., '_jenis': 'referensi',
-     '_sumber': 'referensi_outline'}
+     }
+
+Kontrak kunci: HANYA int (nomor bab). Kunci meta teks DILARANG — lihat
+catatan di akhir susun_outline().
 (nomor sub = string 'N.M'; OB.periksa hanya menuntut tiap sub beranggota
 >=3 dengan judul + key_points tidak kosong.)
 
@@ -152,9 +154,14 @@ def susun_outline(judul, bidang, jumlah_bab=8):
         except ValueError as e:
             masalah = str(e)
             continue
-        outline['_judul'] = judul
-        outline['_bidang'] = bidang or ''
-        outline['_jenis'] = 'referensi'
-        outline['_sumber'] = 'referensi_outline'
+        #  ⚠️ JANGAN menyisipkan kunci meta ('_judul', '_bidang', '_jenis',
+        #  '_sumber') ke dalam dict ini. Kontraknya: kunci = nomor bab (int),
+        #  nilai = {'title': str, 'subs': [...]}. Kunci teks di dalamnya
+        #  merusak SEMUA pembaca hilir:
+        #    - `sorted(outline.items())` -> TypeError str vs int (HTTP 500)
+        #    - `outline_dari_json()` -> 'kunci outline bukan nomor bab'
+        #  Tidak ada satu pun pembaca kunci meta di jalur web (hanya
+        #  outline_buku.py lama & _arsip/). Data yang dibutuhkan (judul,
+        #  bidang) sudah tersimpan di pesanan/pending.
         return outline
     raise ValueError(f'outline referensi gagal 2x: {masalah}')
