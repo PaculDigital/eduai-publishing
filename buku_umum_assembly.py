@@ -472,9 +472,10 @@ def add_isbn_page(doc):
     add_para(doc, "Dilarang memperbanyak atau mengutip sebagian atau seluruh isi buku ini", align='center', space_after=6)
     add_para(doc, "tanpa izin tertulis dari penerbit.", align='center', space_after=6)
     add_para(doc, "", space_after=150)
-    add_para(doc, "ISBN: ____________________", align='center', space_after=6)
+    # 29 Okt 2026 (temuan Boss di buku 219): tanpa data ISBN, barisnya
+    # DIHILANGKAN (bukan dicetak blank) — ISBN diisi saat sudah ada.
     add_para(doc, "", space_after=100)
-    add_para(doc, "Penerbit: ____________________", align='center', space_after=6)
+    # 29 Okt 2026: sama seperti ISBN — tanpa data penerbit, barisnya dihilangkan.
     add_para(doc, "", space_after=6)
     add_para(doc, "Dicetak di Indonesia", align='center', space_after=6)
     doc.add_page_break()
@@ -645,6 +646,91 @@ def _pecah_judul_tempel(isi):
     return judul, sisa
 
 
+
+def bersihkan_markdown_teks(teks):
+    """Bersihkan simbol markdown/AI dari teks bab SEBELUM di-parse.
+
+    Temuan uji 219: 41 paragraf berdash '- ', 1 berdash panjang, 1 ber-*,
+    6 baris pipa (tabel markdown BAB 8), 2 blank ISBN/Penerbit (itu
+    front matter — ditangani add_isbn_page, bukan di sini).
+    Aturan: HANYA format yang dihapus, isi TIDAK PERNAH hilang.
+    Yang DIPERTAHANKAN: '## ' (bab_heading), '###' (sub_heading),
+    judul bernomor, penanda [TABEL]/[DIAGRAM], dan pipa (ditangani
+    _gabung_tabel_pipa sesudah parse, bukan di sini).
+    """
+    import re as _re
+    keluar = []
+    for baris in (teks or '').split('\n'):
+        s = baris.strip()
+        if s in ('-', '--', '---', '***', '___', '...'):
+            continue  # baris simbol saja = pemisah tanpa isi
+        if _re.match(r'^#{1}\s', s) or _re.match(r'^#{4,}\s', s):
+            s = _re.sub(r'^#+\s+', '', s)  # '# '/'#### ' -> teks; '## '/'###' dipertahankan
+        elif _re.match(r'^[*\-–—]\s+', s):
+            s = _re.sub(r'^[*\-–—]\s+', '', s)  # bullet markdown -> teks
+        elif s.startswith('> '):
+            s = s[2:].strip()  # quote markdown -> teks
+        s = s.replace('**', '').replace('`', '')
+        s = _re.sub(r'(?<![A-Za-z0-9_])_([^_\n]+?)_(?![A-Za-z0-9_])', r'\1', s)
+        s = _re.sub(r'(?<!\S)\*([^*\n]+?)\*(?!\S)', r'\1', s)
+        if s:
+            keluar.append(s)
+    return '\n'.join(keluar)
+
+
+def _gabung_tabel_pipa(blocks):
+    """Ubah run paragraf pipa ('| A | B |') jadi blok tabel.
+
+    Dipakai add_bab SESUDAH parse (Jev maupun regex sama-sama memberi
+    baris pipa sebagai blok paragraf, jadi deteksi ini berlaku untuk
+    kedua jalur). Baris pemisah ('|---|---|') dilewati; baris pertama
+    non-pemisah = header; tanpa baris data -> kembali jadi prosa
+    (prinsip 20 Okt: tabel tanpa data tidak dibuat).
+    """
+    import re as _re
+    hasil, i = [], 0
+    while i < len(blocks):
+        blk = blocks[i]
+        tipe = blk[0] if isinstance(blk, (tuple, list)) else '?'
+        isi = blk[1] if isinstance(blk, (tuple, list)) else blk
+        if tipe in ('paragraf', 'isi') and isinstance(isi, str) \
+                and isi.strip().startswith('|') and isi.strip().count('|') >= 2:
+            run = []
+            while i < len(blocks):
+                b2 = blocks[i]
+                t2 = b2[0] if isinstance(b2, (tuple, list)) else '?'
+                c2 = b2[1] if isinstance(b2, (tuple, list)) else b2
+                if t2 in ('paragraf', 'isi') and isinstance(c2, str) \
+                        and c2.strip().startswith('|') and c2.strip().count('|') >= 2:
+                    run.append(c2.strip())
+                    i += 1
+                else:
+                    break
+            baris = []
+            for r in run:
+                t = r.strip()
+                if t.startswith('|'):
+                    t = t[1:]
+                if t.endswith('|'):
+                    t = t[:-1]
+                sel = [c.strip() for c in t.split('|')]
+                if sel and all(_re.match(r'^:?-{3,}:?$', c) for c in sel):
+                    continue  # baris pemisah markdown
+                baris.append(sel)
+            if len(baris) >= 2:
+                nkol = max(len(r) for r in baris)
+                header = baris[0] + [''] * (nkol - len(baris[0]))
+                data = [r + [''] * (nkol - len(r)) for r in baris[1:]]
+                hasil.append(('tabel_pipa', (header, data)))
+            else:
+                for r in baris:
+                    hasil.append(('paragraf', ', '.join(r)))
+            continue
+        hasil.append(blk)
+        i += 1
+    return hasil
+
+
 def parse_bab_file(content):
     """Parse bab txt content jadi struktur: headings + paragraphs + markers.
 
@@ -739,6 +825,9 @@ def add_bab(doc, bab_num, bab_data, bab_text):
     #  Jev membaca BENTUK naskah lebih dulu; mesin merakit ikut jawaban Jev.
     #  Regex tetap ada sebagai CADANGAN kalau Jev mati — jangan sampai buku
     #  gagal terbit gara-gara Jev gangguan sesaat.
+    # 29 Okt 2026 (temuan Boss di buku 219): bersihkan simbol markdown
+    # SEBELUM Jev/regex membaca teks, supaya kedua jalur dapat teks bersih.
+    bab_text = bersihkan_markdown_teks(bab_text)
     blocks = None
     _peta_jev = None
     try:
@@ -823,6 +912,10 @@ def add_bab(doc, bab_num, bab_data, bab_text):
         log.info('[buku] bab %s: %s heading pengulang dibuang',
                  bab_num, _dibuang2)
         blocks = _bersih
+
+    # 29 Okt 2026 (temuan Boss di buku 219): baris pipa markdown yang lolos
+    # parse (Jev maupun regex memberinya sebagai paragraf) diubah jadi tabel.
+    blocks = _gabung_tabel_pipa(blocks)
 
     #  SOT 2.4: paragraf pertama setelah judul bab = rata kiri (tanpa inden).
     baru_setelah_judul = True
@@ -989,6 +1082,32 @@ def add_bab(doc, bab_num, bab_data, bab_text):
                 #  kode mati yang menyesatkan. Placeholder "..." itulah yang
                 #  membuat pembaca melihat "tabel bohong" tanpa data.
                 add_para(doc, "", space_after=6)
+        elif block_type == 'tabel_pipa':
+            # Tabel dari baris pipa markdown (29 Okt 2026). Tanpa caption
+            # bernomor — nomor TIDAK dikarang; prosa sekitarnya sudah
+            # memperkenalkannya. Gaya disamakan dengan [TABEL].
+            _header, _rows = content
+            _n_rows = len(_rows) + 1
+            _n_cols = len(_header)
+            _table = doc.add_table(rows=_n_rows, cols=_n_cols)
+            _table.style = 'Table Grid'
+            _table.alignment = WD_TABLE_ALIGNMENT.CENTER
+            for _ci, _h in enumerate(_header):
+                _cell = _table.rows[0].cells[_ci]
+                _cell.text = _h
+                for _pp in _cell.paragraphs:
+                    _pp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    for _rr in _pp.runs:
+                        _rr.bold = True; _rr.font.size = Pt(10)
+            for _ri, _row in enumerate(_rows):
+                for _ci in range(_n_cols):
+                    _cell = _table.rows[_ri + 1].cells[_ci]
+                    _cell.text = _row[_ci] if _ci < len(_row) else ''
+                    for _pp in _cell.paragraphs:
+                        _pp.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                        for _rr in _pp.runs:
+                            _rr.font.size = Pt(10)
+            add_para(doc, '', space_after=6)
         elif block_type == 'diagram_marker':
             # Parse: [DIAGRAM 1.3: Judul - deskripsi] atau DIAGRAM 1.3 Judul
             m = re.match(r'(?:\[)?DIAGRAM\s+(\d+\.\d+)[:\s]*', content)

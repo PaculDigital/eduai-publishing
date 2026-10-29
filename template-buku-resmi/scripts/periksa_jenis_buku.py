@@ -259,6 +259,32 @@ def hitung_sitasi_inisial(spec):
     return jum
 
 
+def hitung_markdown_tersisa(spec):
+    """Paragraf yang masih mengandung simbol markdown (jaring pengaman:
+    strip di rakit seharusnya membuat ini 0; bila >0 berarti strip lolos)."""
+    pola = [re.compile(r'^\s*[-*–—]\s'), re.compile(r'\*\*'), re.compile(r'`'),
+            re.compile(r'^\s*#{1}\s'), re.compile(r'^\s*#{4,}\s'),
+            re.compile(r'^\s*>'), re.compile(r'^\s*\|'),
+            re.compile(r'^\s*(---|___|\*\*\*)\s*$')]
+    jum = 0
+    for t in paragraf_dari_spec(spec):
+        if any(p.search(t or '') for p in pola):
+            jum += 1
+    return jum
+
+
+def hitung_placeholder_tersisa(spec):
+    """Paragraf yang masih mengandung penanda kosong (repair gagal / lolos)."""
+    pola = [re.compile(r'_{4,}'), re.compile(r'\bTODO\b', re.IGNORECASE),
+            re.compile(r'\[\.\.\.\]'), re.compile(r'\(\.\.\.\)'),
+            re.compile(r'\bXXX\b')]
+    jum = 0
+    for t in paragraf_dari_spec(spec):
+        if any(p.search(t or '') for p in pola):
+            jum += 1
+    return jum
+
+
 def periksa_referensi(spec, teks):
     print('-- buku referensi: harus bisa DIRUJUK, bukan dibaca berurutan --')
     ok('R1 indeks subjek bermakna',
@@ -304,6 +330,16 @@ def periksa_referensi(spec, teks):
                  _j_nama >= 3,
                  f'indeks nama hanya {_j_nama} nama — nama tak cocok '
                  f'halaman bila sitasi inisial-saja')
+    _md = hitung_markdown_tersisa(spec)
+    ingatkan('Rw tanpa simbol markdown',
+             _md == 0,
+             f'{_md} paragraf masih mengandung simbol markdown — '
+             f'strip di rakit seharusnya sudah membersihkannya')
+    _ph = hitung_placeholder_tersisa(spec)
+    ingatkan('Rw tanpa penanda kosong',
+             _ph == 0,
+             f'{_ph} paragraf masih mengandung penanda kosong — '
+             f'repair seharusnya sudah mengisinya')
 
 
 def periksa_ajar(spec, teks):

@@ -178,6 +178,23 @@ def periksa_buku(isi_bab, outline, min_sitasi=2, min_kata=300):
                 f'{temu[0]}) — tulis ulang ke bentuk (Nama Belakang, '
                 f'Tahun) lengkap dari daftar referensi')
 
+    #  [6] Penanda BELUM SELESAI (29 Okt 2026, temuan Boss di buku 219):
+    # blank/placeholder BUKAN format (tidak boleh di-strip diam-diam —
+    # isinya hilang), melainkan MASALAH -> repair menulis kalimat
+    # lengkap atau menghapus penanda. Blank ISBN/Penerbit front matter
+    # TIDAK di sini (itu add_isbn_page, sudah dihilangkan).
+    for n in nomor:
+        _teks = isi_bab[n] or ''
+        _temu = (re.findall(r'_{4,}', _teks)
+                 or re.findall(r'\bTODO\b', _teks, flags=re.IGNORECASE)
+                 or re.findall(r'\[\.\.\.\]', _teks)
+                 or re.findall(r'\(\.\.\.\)', _teks)
+                 or re.findall(r'\bXXX\b', _teks))
+        if _temu:
+            masalah.append(
+                f'BAB {n}: penanda belum selesai ({_temu[0]}) — tulis '
+                f'kalimat lengkap atau hapus penanda, jangan tinggalkan kosong')
+
     return {'lolos': not masalah, 'masalah': masalah, 'curiga': curiga}
 
 
