@@ -97,7 +97,7 @@ STYLE_BUKU = {
         "for a non-fiction reference book: {brief}. One single clear "
         "subject (one person + one focused activity) showing the "
         "chapter's problem, simple uncluttered setting, generous empty "
-        "space around the subject, calm warm mood, natural colors. "
+        "space around the subject, calm warm mood, natural colors. Vary the composition across chapters: different settings, poses, and activities — a seller standing, walking, handing packages, arranging stock, or talking with a customer — NOT always a person sitting behind a table looking at a phone. "
         "No text, no words, no letters, no numbers, no watermark, "
         "no clutter, no crowd, no busy market, no dark or dirty background."
     ),
