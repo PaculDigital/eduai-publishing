@@ -316,6 +316,21 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                                   f"{_isi['nama']} nama")
                     except Exception as e:
                         raise RuntimeError(f'indeks referensi gagal: {e}')
+                    # Daftar Singkatan (29 Okt 2026): deterministik dari
+                    # teks bab, ditulis bernomor halaman seperti indeks.
+                    # Gagal di sini TIDAK menggagalkan buku (singkatan
+                    # hanya peringatan gerbang Rw, bukan cek keras).
+                    try:
+                        from . import referensi_indeks as _RI
+                        _sing = _RI.kumpulkan_singkatan(keluar, outline)
+                        _n_sing = _RI.isi_singkatan(
+                            hasil['docx'], _hal, _sing)
+                        if lapor:
+                            lapor(f"Daftar singkatan terisi: {_n_sing} "
+                                  f"singkatan")
+                    except Exception as e:
+                        if lapor:
+                            lapor(f"Daftar singkatan dilewati: {e}")
                     _sc.referensi(hasil['docx'])
                 if kartu_jenis == 'book-chapter':
                     _sc.chapter(hasil['docx'])
