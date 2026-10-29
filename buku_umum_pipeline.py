@@ -1554,7 +1554,7 @@ def _gambar_inferhub(prompt, simpan=None, ukuran="1024x1024", seed=1000,
 
 
 def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
-                           varian=3):
+                           varian=3, gaya=None):
     """Generate ilustrasi (2 tahap + kurasi): brief dari isi bab → gambar.
 
     varian > 1 → simpan SEMUA varian (ilustrasi_babN_varK.png) dan pakai
@@ -1563,6 +1563,8 @@ def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
     (LANGKAH 3 kurasi 3-pilih-1 — tidak memilih buta).
     """
     from brief_visual import prompt_dari_bab, GAYA_DEFAULT, MODE_BRIEF
+    if gaya is None:
+        gaya = GAYA_DEFAULT
 
     if not ringkasan_bab:
         print("       ⚠️ Ilustrasi dilewati: ringkasan bab kosong "
@@ -1571,7 +1573,7 @@ def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
 
     hasil = prompt_dari_bab(bab_num, ringkasan_bab,
                             sub_bab=_sub_bab_tengah(bab_text),
-                            gaya=GAYA_DEFAULT, panggil_llm=call_llm,
+                            gaya=gaya, panggil_llm=call_llm,
                             mode=MODE_BRIEF)
     if not hasil["prompt"]:
         print(f"       ⚠️ Ilustrasi dilewati: {hasil['galat']}")
@@ -1631,10 +1633,10 @@ def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab="",
                          jenis="umum"):
     """ONE-PASS: Generate semua visual untuk 1 bab setelah teks selesai.
 
-    28 Okt 2026 (mesin referensi web): buku referensi DILARANG memakai
-    ilustrasi 3D dekoratif (skill) — visualnya = tabel komparasi + bagan.
-    Maka ilustrasi API dilewati untuk jenis referensi (diagram dari marker
-    tetap jalan, karena bagan memang dianjurkan).
+    29 Okt 2026 (perintah Boss, mencabut larangan 28 Okt SEBAGIAN):
+    buku referensi memakai ilustrasi ADEGAN REALISTIS (gaya
+    realistis-referensi) — BUKAN 3D dekoratif (yang tetap dilarang).
+    Visualnya = tabel komparasi + bagan + adegan realistis.
     """
     print(f"\n  🎨 Generating visuals for BAB {bab_num}...")
 
@@ -1686,11 +1688,17 @@ def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab="",
             laporan_visual['diagram_gagal'].append(did)
             print(f"     ❌ Diagram {did}: PNG GAGAL — akan hilang dari buku")
 
-    # 4. Generate ilustrasi (2 tahap: brief dari ISI bab → line art buku)
-    # DILARANG untuk buku referensi (skill: tanpa pemanis dekoratif).
+    # 4. Generate ilustrasi (2 tahap: brief dari ISI bab → adegan realistis)
+    # 29 Okt 2026 (perintah Boss): referensi BOLEH pakai ilustrasi adegan
+    # REALISTIS sederhana + fokus ke permasalahan bab (gaya
+    # realistis-referensi, disetujui Boss 29 Okt sore, contoh Bab 1 v2).
+    # Larangan 28 Okt berlaku untuk 3D dekoratif, bukan adegan ini.
     if jenis == 'referensi':
-        print("     🖼️ Ilustrasi: dilewati (buku referensi tanpa dekorasi)")
-        ilust_path = None
+        from brief_visual import GAYA_REFERENSI
+        ilust_path = generate_ilustrasi_api(bab_num, bab_title,
+                                            ringkasan_bab=ringkasan_bab,
+                                            bab_text=bab_text,
+                                            gaya=GAYA_REFERENSI)
     else:
         ilust_path = generate_ilustrasi_api(bab_num, bab_title,
                                             ringkasan_bab=ringkasan_bab,
