@@ -742,7 +742,18 @@ def bersihkan_markdown_teks(teks):
         s = _re.sub(r'(?<!\S)\*([^*\n]+?)\*(?!\S)', r'\1', s)
         if s:
             keluar.append(s)
-    return '\n'.join(keluar)
+    hasil = '\n'.join(keluar)
+    # Larangan em dash (U+2014, 29 Okt 2026): model AI selalu menyelipkan
+    # em dash sebagai pemisah klausa; ganti dengan koma agar isi tidak
+    # hilang dan tanda itu hilang. Hanya U+2014 yang dihapus; hyphen (-)
+    # dan en dash (U+2013, untuk rentang) dipertahankan.
+    hasil = _re.sub(r'\s*\u2014\s*', ', ', hasil)
+    hasil = hasil.replace(',,', ',').replace(', ,', ',')
+    hasil = _re.sub(r'(?m)^, ', '', hasil)
+    hasil = hasil.replace(', \n', '\n').strip()
+    if hasil.endswith(','):
+        hasil = hasil[:-1].rstrip()
+    return hasil
 
 
 def _gabung_tabel_pipa(blocks):

@@ -690,6 +690,7 @@ ATURAN FINAL (WAJIB SEMUA):
 9. 0 markdown: DILARANG keras * _ ` # > | dan daftar berdash ('- ' di awal baris) — daftar ditulis sebagai kalimat berurutan (Pertama, ... Kedua, ...) BUKAN dash; tabel ditulis sebagai blok [TABEL ...], BUKAN pipa '| ... |'; JANGAN tulis '---', '***', atau penanda kosong ('___', 'TODO', '[...]') — bila isi belum ada, tulis kalimat lengkap atau hapus, jangan tinggalkan penanda kosong. EYD.
 10. Pertahankan [TABEL/DIAGRAM] markers
 11. DILARANG: "Penting untuk dicatat", "Secara komprehensif", "Di era digital ini"
+12. TANDA EM DASH: DILARANG memakai tanda em dash (garis pisah panjang, U+2014) di mana pun dalam teks. Pisahkan klausa dengan koma atau titik. Jangan memakai em dash sebagai pemisah klausa, penjelas, atau jeda dramatis.
 Output: teks langsung. JANGAN POTONG sebelum selesai."""
 
 def summarize_prompt(text):
