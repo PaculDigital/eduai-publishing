@@ -510,13 +510,14 @@ def _kotak_hakcipta(doc, teks):
 def add_isbn_page(doc):
     """Halaman 2: Lembar hak cipta standar cetak (blok penerbit Bayana).
 
-    Mengikuti template buku fisik (screenshot Boss 29 Okt sore).
-    Nilai yang belum ada saat buku disusun (ISBN, editor, alamat, surel,
-    WA, jumlah halaman) ditulis [diisi penerbit] — jelas isian, bukan
-    blank — supaya penerbit melengkapinya sebelum cetak. Info penerbit
-    dari bayana.id (29 Okt 2026): PT Bayana Hasana Duna, web bayana.id;
-    alamat/surel/WA/keanggotaan IKAPI TIDAK tercantum di situs, jadi
-    tidak dikarang — ditulis sebagai isian. Berlaku SEMUA jenis buku.
+    Mengikuti halaman hak cipta FINAL Bayana (berkas Boss 29 Okt 2026).
+    Data penerbit (alamat, telepon, surel, Instagram, WhatsApp, SK, NIB,
+    keanggotaan IKAPI) diisi nyata dari halaman FINAL itu. Surel hanya
+    satu (bayanahasanaduna@gmail.com, yang pertama di halaman FINAL).
+    NPWP TIDAK dicantumkan (perintah Boss 29 Okt 2026). Nilai per buku
+    (ISBN, editor, penyunting, sampul, jumlah halaman) tetap ditulis
+    [diisi penerbit], jelas isian, bukan blank, supaya penerbit
+    melengkapinya sebelum cetak. Berlaku SEMUA jenis buku.
     """
     judul = BUKU.get('judul', '') if isinstance(BUKU, dict) else ''
     if judul:
@@ -528,11 +529,14 @@ def add_isbn_page(doc):
     _baris_label(doc, "Editor: ", "[diisi penerbit]")
     _baris_label(doc, "Penyunting dan Penata Letak: ", "[diisi penerbit]")
     _baris_label(doc, "Desain Sampul: ", "[diisi penerbit]")
-    _baris_label(doc, "Penerbit: ", "PT Bayana Hasana Duna")
-    _baris_label(doc, "Redaksi: ", "[alamat redaksi diisi penerbit]")
+    _baris_label(doc, "Penerbit: ", "PT Bayana Hasana Duna, anggota IKAPI")
+    _baris_label(doc, "Redaksi: ", "Jl. Palem Raya No.21, Kelurahan Jatimekar, Kecamatan Jatiasih, Kota Bekasi, Jawa Barat 17422")
+    _baris_label(doc, "Telepon: ", "0813-1710-7179 / 0851-1155-5246")
     _baris_label(doc, "Web: ", "bayana.id")
-    _baris_label(doc, "E-mail: ", "[diisi penerbit]")
-    _baris_label(doc, "WhatsApp: ", "[diisi penerbit]")
+    _baris_label(doc, "E-mail: ", "bayanahasanaduna@gmail.com")
+    _baris_label(doc, "Instagram: ", "@bayana.id")
+    _baris_label(doc, "WhatsApp: ", "0851-1155-5248")
+    _baris_label(doc, "SK Kemenkumham: ", "SK.AHU-0074567.AH.01.01. | NIB: 1709260023459")
     add_para(doc, "", space_after=12)
     add_para(doc, "Cetakan Pertama, " + str(BUKU['tahun']), space_after=6)
     add_para(doc, "[jumlah halaman diisi penerbit] halaman; 17,6 x 25 cm", space_after=12)
