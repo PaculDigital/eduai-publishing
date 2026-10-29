@@ -62,7 +62,12 @@ ATURAN STRUKTUR (WAJIB):
 - Bahasa Indonesia EYD. 0 markdown di dalam nilai JSON.
 
 KELUARAN — HANYA JSON ini, tanpa teks lain:
-{{"bab": [{{"title": "Judul Bab", "subs": [{{"nomor": "1.1", "judul": "1.1 Definisi dan Konsep Kunci ...", "key_points": "..."}}, ...]}}], ...]}}
+{{"bab": [{{"title": "Judul Bab", "subs": [{{"nomor": "1.1", "judul": "Definisi dan Konsep Kunci ...", "key_points": "..."}}, ...]}}], ...]}}
+
+⚠️ `judul` sub-bab TIDAK boleh diawali nomornya. Jangan tulis
+"1.1 Definisi ..." — cukup "Definisi ...". Nomor sudah ada di field
+`nomor` dan ditampilkan terpisah; menuliskannya di judul membuat nomor
+tampil DOBEL.
 """
 
 
@@ -109,12 +114,21 @@ def parse_outline(teks):
         raise ValueError('outline cacat: ' + '; '.join(masalah[:3]))
     outline = {}
     for i, b in enumerate(babs, 1):
-        outline[i] = {
-            'title': b['title'].strip(),
-            'subs': [(s.get('nomor', '').strip() or f'{i}.{j}',
-                      s['judul'].strip(), s['key_points'].strip())
-                     for j, s in enumerate(b['subs'], 1)],
-        }
+        subs = []
+        for j, s in enumerate(b['subs'], 1):
+            nomor = (s.get('nomor', '') or '').strip() or f'{i}.{j}'
+            judul_sub = s['judul'].strip()
+            #  Jaring: LLM kadang menyalin nomor ke dalam judul walau contoh
+            #  prompt sudah bersih ("1.1 Definisi ..."). Buang awalan nomor
+            #  itu supaya tidak tampil dobel (nomor + judul bernomor).
+            while judul_sub.startswith(nomor):
+                judul_sub = judul_sub[len(nomor):].lstrip(' .–—-\t')
+            if not judul_sub:
+                raise ValueError(
+                    f'outline cacat: bab {i} sub {nomor} judul kosong '
+                    'sesudah nomor dibuang')
+            subs.append((nomor, judul_sub, s['key_points'].strip()))
+        outline[i] = {'title': b['title'].strip(), 'subs': subs}
     return outline
 
 
