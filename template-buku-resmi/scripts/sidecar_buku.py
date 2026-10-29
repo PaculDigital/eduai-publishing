@@ -255,9 +255,17 @@ def ekstrak_spec_referensi(path_docx):
             # Kalau cek ini sesudah 'if not teks', lewati_toc tidak pernah
             # mati dan seluruh isi sesudah TOC terbuang (bug tangkapan uji).
             if lewati_toc:
-                if 'w:type="page"' in xml:
+                # Akhir TOC: jeda halaman eksplisit (w:br) ATAU judul
+                # bab/seksi yang memakai pageBreakBefore. Gaya assembly
+                # buku: 'BAB N' + pageBreakBefore, TANPA elemen br —
+                # tanpa klausul kedua ini, lewati_toc tidak pernah mati
+                # dan seluruh isi sesudah TOC terbuang (6 gagal gerbang
+                # pada uji 29 Okt 2026). Paragraf pemutus HARUS diproses
+                # (bukan di-continue) karena ia adalah isi.
+                if 'w:type="page"' in xml or 'pageBreakBefore' in xml:
                     lewati_toc = False
-                continue
+                else:
+                    continue
             if not teks:
                 continue
             if teks.upper() == 'DAFTAR ISI':
