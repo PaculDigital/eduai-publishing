@@ -2161,7 +2161,7 @@ def generate_closing(bab_num, bab_title, rolling_summary, jenis="umum"):
     closing = post_process(closing, jenis=jenis)
     return closing
 
-def generate_bab(bab_num, bab_data, prev_summary, jenis="umum"):
+def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None):
     """Generate 1 bab lengkap: intro + sub-bab + penutup."""
     bab_title = bab_data["title"]
     subs = bab_data["subs"]
@@ -2229,7 +2229,7 @@ def generate_bab(bab_num, bab_data, prev_summary, jenis="umum"):
         bab_summary = call_llm(summarize_prompt(bab_text[:5000]),
                                max_tokens=2500, timeout=90)
 
-    generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab=bab_summary or "", jenis=jenis)
+    generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab=bab_summary or "", jenis=jenis, tier=tier)
 
     # Simpan referensi bab ini (dari semua sub-bab) untuk daftar pustaka
     bab_refs_path = os.path.join(visual_ini(), f"refs_bab{bab_num}.json")

@@ -109,7 +109,8 @@ def folder_buku(fid_unik):
 
 
 def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
-          kartu_jenis=None, outline_siaps=None, penulis=None, penelaah=None):
+          kartu_jenis=None, outline_siaps=None, penulis=None, penelaah=None,
+          tier=None):
     """Susun buku + potong kuota saat giliran tiba. Return dict hasil.
 
     Raise HTTPException 402/403 dari kuota kalau saldo kurang (tidak menyusun).
@@ -118,6 +119,8 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
     dipakai apa adanya (tetap divalidasi OB.periksa), tanpa membangun ulang.
     penulis: nama penulis pesanan (ganti nama profil bila diisi).
     penelaah: nama pakar penelaah (ditulis di Tentang Penulis + hasil).
+    tier: paket Hemat/Normal/Full (None = perilaku lama); tier menang
+    atas jumlah_bab untuk outline, dan diteruskan ke visuals.
     """
     _pastikan_modul()
     import outline_buku as OB
@@ -160,8 +163,12 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
             # Kerangka referensi TIDAK lewat OB (host tidak punya jenis
             # referensi): builder repo dengan 5 sub tetap N.1-N.5 per bab.
             from . import referensi_outline as _RO
-            outline = _RO.susun_outline(judul, bidang, jumlah_bab)
+            outline = _RO.susun_outline(judul, bidang, jumlah_bab, tier=tier)
         else:
+            # Tier menang atas jumlah_bab (paket); tanpa tier, jumlah_bab lama dipakai.
+            if tier:
+                from tier_buku import jumlah_bab as _bab_dari_tier
+                jumlah_bab = _bab_dari_tier(tier)
             outline = OB.susun_outline(judul, bidang, jenis,
                                        jumlah_bab=jumlah_bab)
 
@@ -176,7 +183,7 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
             lapor(f"Menulis {len([k for k in outline if isinstance(k, int)])} bab…")
         hasil = S.susun_buku(judul, outline, jenis=jenis,
                              keluar_dir=keluar, lapor=lapor,
-                             on_mulai=_potong_saat_mulai)
+                             on_mulai=_potong_saat_mulai, tier=tier)
 
         #  Hasil HARUS benar-benar ada di disk — bukan cuma diklaim.
         #

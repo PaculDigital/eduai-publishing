@@ -54,7 +54,7 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
   {% include '_menu.html' %}
 
   <h1>{{ ikon('list-checks', 22) }} Setujui Kerangka Buku</h1>
-  <p class="sub">Ini kerangka buku referensimu — <b>{{ jumlah_bab }} bab</b>, tiap bab
+  <p class="sub">Ini kerangka buku referensimu — <b>{{ jumlah_bab }} bab</b>{% if tier %}, tier {{ tier }}{% endif %}, tiap bab
      berisi 5 sub tetap (Definisi, Perkembangan Teori, Perbandingan Kritis,
      Posisi Penulis, Implikasi). Produksi menulis PERSIS dari kerangka ini.</p>
 

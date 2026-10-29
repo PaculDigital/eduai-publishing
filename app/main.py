@@ -371,6 +371,7 @@ def buku_outline(
     penulis: str = Form(''),
     penelaah: str = Form(''),
     jumlah_bab: str = Form(''),
+    tier: str = Form(''),
     db: Session = Depends(get_db),
 ):
     """Gate 1 buku referensi: bangun kerangka GRATIS, tampilkan untuk disetujui.
@@ -398,9 +399,15 @@ def buku_outline(
     except ValueError:
         jml = 8
     jml = max(1, min(12, jml))
+    # Tier menang atas jumlah_bab (paket); jumlah_bab hanya cadangan
+    # bila tier tak dikirim (form lama). Tier kosong/tak dikenal -> normal.
+    from tier_buku import tier_buku as _normal_tier, jumlah_bab as _bab_dari_tier
+    tier_nama = _normal_tier(tier)
+    if (tier or '').strip():
+        jml = _bab_dari_tier(tier)
     try:
         from . import referensi_outline as _RO
-        outline = _RO.susun_outline(judul, '', jml)
+        outline = _RO.susun_outline(judul, '', jml, tier=tier)
     except Exception:
         return RedirectResponse(
             '/buku?galat=' + quote('Kerangka gagal disusun, coba lagi'),
@@ -415,10 +422,10 @@ def buku_outline(
     except Exception:
         pass  # tanpa OB, validasi menyusul di susun()
     from . import referensi_pesanan as _RP
-    token = _RP.simpan_outline_pending(outline)
+    token = _RP.simpan_outline_pending(outline, tier=tier_nama)
     kembali = '/buku/siapkan?' + urlencode({
         'jenis': jenis, 'gaya': 'referensi', 'judul': judul,
-        'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml})
+        'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml, 'tier': tier_nama})
     #  ⚠️ `susun_outline()` menyisipkan kunci META bertipe teks
     #  ('_judul', '_bidang', '_jenis', '_sumber') ke dalam dict yang kuncinya
     #  angka bab. `sorted()` atas campuran str+int melempar
@@ -433,7 +440,7 @@ def buku_outline(
     return templates.TemplateResponse('buku_outline.html', {
         'request': request, 'user': u, 'kartu': kartu,
         'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
-        'jumlah_bab': jml, 'token': token, 'kembali': kembali,
+        'jumlah_bab': jml, 'tier': tier_nama, 'token': token, 'kembali': kembali,
         'babs': babs,
     })
 
@@ -448,6 +455,7 @@ def buku_susun(
     penulis: str = Form(''),
     penelaah: str = Form(''),
     jumlah_bab: str = Form(''),
+    tier: str = Form(''),
     outline_token: str = Form(''),
     db: Session = Depends(get_db),
 ):
@@ -516,6 +524,9 @@ def buku_susun(
     #  sudah dipakai) -> tolak, jangan produksi dari kerangka karangan.
     outline_siaps = None
     jml_bab = None
+    # Tier dari form (jalur langsung / non-referensi). Untuk referensi
+    # Gate 1, tier DIKUNCI dari berkas pending (bukan dari form) di bawah.
+    tier_untuk_susun = (tier or '').strip() or None
     if jenis == 'buku-referensi':
         if not outline_token:
             return RedirectResponse(
@@ -524,7 +535,8 @@ def buku_susun(
                 status_code=303)
         try:
             from . import referensi_pesanan as _RP
-            outline_siaps = _RP.muat_outline_pending(outline_token)
+            outline_siaps, tier_pending = _RP.muat_outline_pending(outline_token)
+            tier_untuk_susun = tier_pending
         except ValueError as e:
             return RedirectResponse(
                 '/buku?galat=' + quote(str(e)), status_code=303)
@@ -561,6 +573,7 @@ def buku_susun(
         'kunci_jenis': kunci_jenis, 'jenis': jenis, 'id_dok': id_dok,
         'penulis': penulis, 'penelaah': penelaah,
         'jumlah_bab': jml_bab,
+        'tier': tier_untuk_susun,
         # Kerangka disetujui (catatan saja; utas memakai closure di bawah,
         # bukan salinan ini — kunci JSON jadi string, tidak bisa dipakai
         # langsung sebagai outline).
@@ -586,7 +599,8 @@ def buku_susun(
                                  jumlah_bab=jml_bab,
                                  outline_siaps=outline_siaps,
                                  penulis=(penulis or None),
-                                 penelaah=(penelaah or None))
+                                 penelaah=(penelaah or None),
+                                 tier=tier_untuk_susun)
             _proses.tandai_selesai(
                 kode, hasil=judul, hasil_json=_json.dumps(hasil, default=str),
                 token_revisi=hasil.get('token') or 0)
@@ -683,6 +697,7 @@ def halaman_buku_siapkan(
     penulis: str = '',
     penelaah: str = '',
     jumlah_bab: str = '',
+    tier: str = '',
     db: Session = Depends(get_db),
 ):
     """Halaman konfirmasi: pilihan sudah dikunci, tampilkan wajah bukunya.
@@ -709,6 +724,7 @@ def halaman_buku_siapkan(
                              if b['kode'] == bidang), ''),
         'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
         'jumlah_bab': jumlah_bab,
+        'tier': tier,
     })
 
 
