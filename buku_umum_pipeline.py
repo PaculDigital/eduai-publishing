@@ -434,9 +434,17 @@ ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
   'Penulis berpendirian'. Tanpa frasa itu = bab gagal.
 - Satu unit argumen (satu perbandingan atau satu posisi) TIDAK BOLEH
   terpotong: tulis utuh dalam sub-bab ini.
-- Akhiri sub-bab dengan blok [ISTILAH BARU] (satu baris per istilah baru:
-  Istilah: definisi operasional yang dipakai buku ini). Blok ini dipisah
-  dari narasi saat perakitan — jangan selipkan istilahnya ke narasi saja.
+- Akhiri sub-bab dengan blok [ISTILAH BARU] — WAJIB di setiap sub-bab,
+  bukan opsional. Satu baris per istilah yang DIDEFINISIKAN di sub-bab
+  ini (bukan istilah yang hanya disebut): 'Istilah: definisi operasional
+  yang dipakai buku ini'. Contoh:
+  [ISTILAH BARU]
+  UMKM: usaha produktif milik orang perorangan atau badan usaha perorangan.
+  Ekonomi digital: sistem aktivitas ekonomi berbasis infrastruktur digital.
+  Sub-bab tanpa istilah baru TETAP menulis bloknya dengan satu baris
+  '(tidak ada istilah baru)'. Blok ini dipisah dari narasi saat perakitan
+  — jangan selipkan istilahnya ke narasi saja, jangan hapus bloknya.
+  Tanpa blok ini = sub-bab tidak lengkap.
 """
         aturan_ringkasan = (
             'Tulis section "Ringkasan Bab" FORMAL dalam poin-poin substansi '

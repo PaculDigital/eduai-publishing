@@ -255,9 +255,30 @@ def ekstrak_spec_referensi(path_docx):
             # Kalau cek ini sesudah 'if not teks', lewati_toc tidak pernah
             # mati dan seluruh isi sesudah TOC terbuang (bug tangkapan uji).
             if lewati_toc:
-                if 'w:type="page"' in xml:
+                # Akhir TOC: jeda halaman eksplisit (w:br) ATAU judul
+                # bab/seksi yang memakai pageBreakBefore ATAU judul bab
+                # telanjang 'BAB N' ATAU paragraf bergaya Heading 1.
+                # Gaya assembly buku: 'BAB N' + pageBreakBefore, TANPA
+                # elemen br — tanpa klausul kedua ini, lewati_toc tidak
+                # pernah mati dan seluruh isi sesudah TOC terbuang
+                # (6 gagal gerbang pada uji 29 Okt 2026). Paragraf
+                # pemutus HARUS diproses (bukan di-continue) karena
+                # ia adalah isi.
+                # Tambahan 29 Okt (temuan agen): docx impor/template
+                # lama TANPA pageBreakBefore bocor — skip baru mati di
+                # page break pertama di dalam isi sehingga Bab 1
+                # tertelan (agen: 2 bab terbaca dari 3). Judul bab
+                # telanjang disyaratkan TANPA tab: entri DAFTAR ISI
+                # selalu bertab (nomor halaman), jadi entri TOC tidak
+                # pernah memicu terminator ini.
+                if ('w:type="page"' in xml or 'pageBreakBefore' in xml
+                        or ('\t' not in teks
+                            and re.fullmatch(r'BAB\s+\d+',
+                                             teks.upper()))
+                        or (p.style.name or '').startswith('Heading 1')):
                     lewati_toc = False
-                continue
+                else:
+                    continue
             if not teks:
                 continue
             if teks.upper() == 'DAFTAR ISI':

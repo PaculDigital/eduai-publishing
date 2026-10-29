@@ -1341,6 +1341,12 @@ def main():
     from buku_umum_pipeline import OUTLINE, REFERENCES, GLOSARIUM
 
     doc = Document()
+    # Metadata docx dari BUKU (bukan default 'python-docx'): gerbang
+    # membaca penulis dari core_properties.author; tanpa ini U1 lolos
+    # semu atas nama library. Penulis kosong = jujur gagal bila buku
+    # tanpa penulis.
+    doc.core_properties.author = (BUKU.get('penulis') or '').strip()
+    doc.core_properties.title = (BUKU.get('judul') or '').strip()
 
     # === PAGE SETUP B5 ===
     sec = doc.sections[0]

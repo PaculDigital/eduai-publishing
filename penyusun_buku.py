@@ -10,16 +10,18 @@ KENAPA PEMBUNGKUS, BUKAN MESIN BARU (aturan Bos: jangan bikin yang sudah ada):
 API:
     apakah_bisa() -> (bool, alasan)
     susun_buku(judul, outline, jenis, keluar_dir, batas_bab=None,
-               lapor=None, ulang=0) -> dict hasil
+               lapor=None, ulang=0, on_mulai=None) -> dict hasil
+    info_antrian() -> (sedang_jalan?, jumlah_menunggu) [non-blokir]
 """
 import os
 import re
+import threading
 import time
 
 SUMBER = "penyusun_buku.py"
 
 # ══════════════════════════════════════════════════════════════════════════
-#  LAPIS 3a — STATE PER BAB (ACC Bos 19 Okt 2026, batas 2 bab)
+#  LAPIS 3a — STATE PER BAB (ACC Bos 19 Okt 2026, batas 4 bab sejak 29 Okt 2026)
 # ══════════════════════════════════════════════════════════════════════════
 #  MASALAH: `buku_umum_pipeline` memakai variabel GLOBAL (`OUT_DIR`,
 #  `CKPT_FILE`, `VISUAL_DIR`, `OUTLINE`) di 20 titik. Kalau 2 bab jalan
@@ -39,12 +41,97 @@ SUMBER = "penyusun_buku.py"
 #  Ini pilihan sadar: BENAR dulu, cepat kemudian.
 # ══════════════════════════════════════════════════════════════════════════
 _KUNCI_GLOBAL = None
-_BATAS_BAB = 2          # putusan Bos: maksimal 2 bab bersamaan
+_BATAS_BAB = 4          # maks 4 bab bersamaan per buku (anggaran global 4 aliran, 29 Okt 2026)
 #  Perbaikan-otomatis bab bermasalah (Lapis 3c-2, ACC Bos 19 Okt 2026).
 #  MAKSIMAL 1 putaran per bab: cukup untuk memperbaiki isi berulang, tapi
 #  TIDAK boleh berputar sampai token user habis.
 _PERBAIKAN_MAKS = 1
 
+
+# ══════════════════════════════════════════════════════════════════════════
+#  ANTREAN BUKU GLOBAL (29 Okt 2026): SATU buku diproduksi dalam satu
+#  waktu; di dalamnya bab dikerjakan bersamaan (maks `_BATAS_BAB`).
+# ══════════════════════════════════════════════════════════════════════════
+#  KENAPA FIFO PER BUKU (bukan berbagi slot antarbuku): `susun_buku`
+#  menyetel GLOBAL pipeline per buku (P.OUT_DIR, P.OUTLINE, dan tambalan
+#  P.architect_prompt). Dua pemanggilan bersamaan akan saling menimpa
+#  global itu ⇒ isi buku tercampur (pencemaran lintas buku — terbukti
+#  dari cara `generate_sub_bab` memanggil `architect_prompt` global).
+#  Jadi antrean ini JUGA perbaikan kebenaran, bukan cuma keadilan.
+#  Catatan: kunci ini berlaku dalam SATU proses aplikasi (uvicorn
+#  1 worker). Jalur operator di proses lain tetap wajib eksklusif manual.
+#  Pesan antrean dikirim berkala lewat `lapor` selama menunggu (halaman
+#  proses memantau tiap 4 detik) — user melihat posisi + perkiraan, bukan
+#  layar diam.
+_ANTRIAN_KONDISI = threading.Condition()
+_ANTRIAN_DEPAN = []        # token pesanan yang MENUNGGU giliran (FIFO)
+_ANTRIAN_JALAN = None      # token pesanan yang SEDANG diproduksi
+_ASLI_ARSITEK_TERSIMPAN = None  # original P.architect_prompt (slot pemulihan)
+
+
+def _pesan_antrian(depan):
+    """Pesan antrean yang lembut untuk user (tanpa jargon)."""
+    return (
+        "Buku sudah diterima dan masuk antrian produksi. "
+        f"Ada {depan} buku lain di depan. "
+        f"Perkiraan mulai ditulis sekitar {30 * depan}–{30 * (depan + 1)} menit lagi. "
+        "Tidak perlu menunggu di halaman ini — lonceng akan menyala saat buku selesai."
+    )
+
+
+def _antrian_masuk():
+    """Daftarkan pesanan ke antrean. Return token pesanan (objek unik)."""
+    token = object()
+    with _ANTRIAN_KONDISI:
+        _ANTRIAN_DEPAN.append(token)
+    return token
+
+
+def _antrian_tunggu_giliran(token, lapor=None, jeda_pesan=30):
+    """Blokir sampai giliran token tiba (FIFO + tidak ada buku berjalan).
+
+    Selama menunggu, kirim pesan antrean berkala lewat `lapor` (tiap
+    `jeda_pesan` detik) supaya tahap di halaman proses tetap hidup.
+    `lapor` TIDAK pernah dipanggil sambil memegang kunci (hindari
+    antrean macet karena tulis DB yang lambat).
+    """
+    global _ANTRIAN_JALAN
+    while True:
+        with _ANTRIAN_KONDISI:
+            if _ANTRIAN_JALAN is None and _ANTRIAN_DEPAN and _ANTRIAN_DEPAN[0] is token:
+                _ANTRIAN_DEPAN.pop(0)
+                _ANTRIAN_JALAN = token
+                return
+            depan = (1 if _ANTRIAN_JALAN is not None else 0) + _ANTRIAN_DEPAN.index(token)
+        if lapor is not None:
+            try:
+                lapor(_pesan_antrian(depan))
+            except Exception:
+                pass
+        with _ANTRIAN_KONDISI:
+            #  Cek ulang sebelum tidur (hindari kehilangan notify).
+            if _ANTRIAN_JALAN is None and _ANTRIAN_DEPAN and _ANTRIAN_DEPAN[0] is token:
+                _ANTRIAN_DEPAN.pop(0)
+                _ANTRIAN_JALAN = token
+                return
+            _ANTRIAN_KONDISI.wait(timeout=jeda_pesan)
+
+
+def _antrian_selesai(token):
+    """Lepaskan giliran + bangunkan antrean (aman dipanggil berkali-kali)."""
+    global _ANTRIAN_JALAN
+    with _ANTRIAN_KONDISI:
+        if token in _ANTRIAN_DEPAN:
+            _ANTRIAN_DEPAN.remove(token)
+        if _ANTRIAN_JALAN is token:
+            _ANTRIAN_JALAN = None
+        _ANTRIAN_KONDISI.notify_all()
+
+
+def info_antrian():
+    """NON-BLOKIR: (sedang_jalan?, jumlah_menunggu) — untuk pemantauan."""
+    with _ANTRIAN_KONDISI:
+        return (_ANTRIAN_JALAN is not None, len(_ANTRIAN_DEPAN))
 
 def _ambil_kunci():
     """Buat/lambda kunci global sekali saja (aman dipanggil banyak utas)."""
@@ -68,17 +155,54 @@ def apakah_bisa():
 
 
 def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
-               batas_bab=None, lapor=None, ulang=0):
+               batas_bab=None, lapor=None, ulang=0, on_mulai=None):
     """Susun buku dari outline yang SUDAH dibuat. Return dict hasil.
+
+    Satu buku diproduksi dalam satu waktu (antrean FIFO global — lihat
+    blok ANTREAN di atas): pemanggilan kedua menunggu sampai yang pertama
+    selesai penuh. Di dalamnya, bab dikerjakan bersamaan (maks `_BATAS_BAB`).
 
     batas_bab : kalau diisi, hanya bab 1..batas_bab yang dikerjakan
                 (dipakai untuk uji murah — jangan bakar token 6 bab).
     lapor     : fungsi(teks) untuk memberi kabar ke pemanggil (progress).
     ulang     : 0 = mulai dari awal; >0 = lanjutkan bab yang belum selesai.
+    on_mulai  : dipanggil TEPAT saat giliran produksi tiba (sebelum satu
+                kata ditulis). Pemanggil memotong kuota di sini — jadi
+                buku yang masih mengantre BELUM dipotong.
 
-    TIDAK memotong kuota. Pemotongan kuota = tugas pemanggil (rute), supaya
-    modul ini bisa diuji tanpa menyentuh saldo siapa pun.
+    TIDAK memotong kuota sendiri. Pemotongan kuota = tugas pemanggil
+    lewat `on_mulai`, supaya modul ini bisa diuji tanpa menyentuh saldo
+    siapa pun.
     """
+    global _ASLI_ARSITEK_TERSIMPAN
+    token = _antrian_masuk()
+    try:
+        _antrian_tunggu_giliran(token, lapor=lapor)
+        return _susun_buku_dalam(judul, outline, jenis, keluar_dir,
+                                 batas_bab, lapor, ulang, on_mulai)
+    finally:
+        _antrian_selesai(token)
+        #  Pulihkan tambalan prompt — SEKALIGUS untuk semua jalan keluar
+        #  (normal, gagal, dibatalkan). Sebelumnya pemulihan ada di
+        #  `finally` loop utama, sehingga putaran PERBAIKAN (yang jalan
+        #  sesudahnya) memakai prompt ASLI tanpa outline buku ⇒ jangkar
+        #  [MASTER OUTLINE] jatuh ke outline Ekonomi Digital sementara.
+        if _ASLI_ARSITEK_TERSIMPAN is not None:
+            try:
+                import buku_umum_pipeline as _P
+                _P.architect_prompt = _ASLI_ARSITEK_TERSIMPAN
+            except Exception:
+                pass
+            _ASLI_ARSITEK_TERSIMPAN = None
+
+
+def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
+                      batas_bab=None, lapor=None, ulang=0, on_mulai=None):
+    """Isi susun_buku (lihat docstring-nya). Dipanggil HANYA dari wrapper
+    antrean di atas — jangan dipanggil langsung, supaya antrean tidak
+    bisa dilewati diam-diam."""
+    global _ASLI_ARSITEK_TERSIMPAN
+
     bisa, alasan = apakah_bisa()
     if not bisa:
         raise RuntimeError(alasan)
@@ -93,6 +217,13 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
     nomor = sorted(k for k in outline if isinstance(k, int))
     if not nomor:
         raise ValueError("outline tidak punya bab")
+
+    #  GILIRAN TIBA = PRODUKSI DIMULAI: baru di sini pemanggil memotong
+    #  kuota (lewat `on_mulai`). Validasi di atas sudah lolos, jadi gagal
+    #  di titik ini bukan soal outline — dan buku yang masih mengantre
+    #  di wrapper TIDAK PERNAH sampai ke sini (belum dipotong).
+    if on_mulai is not None:
+        on_mulai()
 
     if keluar_dir is None:
         raise ValueError("keluar_dir wajib — hasil harus jadi BERKAS, "
@@ -116,6 +247,7 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
 
     _architect_asli = P.architect_prompt
     P.architect_prompt = _architect
+    _ASLI_ARSITEK_TERSIMPAN = _architect_asli
 
     ckpt = {"judul": judul, "jenis": jenis, "babs": {}}
     if ulang and os.path.exists(P.CKPT_FILE):
@@ -254,9 +386,12 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
                     lapor(f"BAB {n} selesai: {r['kata']} kata, "
                           f"{r['sitasi']} sitasi")
     finally:
-        #  GLOBAL WAJIB dipulihkan — kalau tidak, pemanggil berikutnya
-        #  memakai outline buku sebelumnya (pencemaran lintas buku).
-        P.architect_prompt = _architect_asli
+        #  Pemulihan tambalan prompt TIDAK di sini lagi: putaran PERBAIKAN
+        #  (Lapis 3c-2, di bawah) masih butuh wrapper outline. Pemulihan
+        #  dilakukan wrapper antrean di `finally`-nya (mencakup SEMUA
+        #  jalan keluar) — supaya bab perbaikan tidak jatuh ke outline
+        #  Ekonomi Digital sementara.
+        pass
 
     if gagal:
         #  JANGAN pura-pura selesai. Bab yang gagal dilaporkan apa adanya.
