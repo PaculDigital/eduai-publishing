@@ -1630,7 +1630,7 @@ def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
     return default
 
 def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab="",
-                         jenis="umum"):
+                         jenis="umum", tier=None):
     """ONE-PASS: Generate semua visual untuk 1 bab setelah teks selesai.
 
     29 Okt 2026 (perintah Boss, mencabut larangan 28 Okt SEBAGIAN):
@@ -1693,7 +1693,11 @@ def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab="",
     # REALISTIS sederhana + fokus ke permasalahan bab (gaya
     # realistis-referensi, disetujui Boss 29 Okt sore, contoh Bab 1 v2).
     # Larangan 28 Okt berlaku untuk 3D dekoratif, bukan adegan ini.
-    if jenis == 'referensi':
+    from tier_buku import boleh_ilustrasi
+    if not boleh_ilustrasi(tier, bab_num):
+        print("     Ilustrasi: dilewati (tier hemat, maks 2 gambar)")
+        ilust_path = None
+    elif jenis == 'referensi':
         from brief_visual import GAYA_REFERENSI
         ilust_path = generate_ilustrasi_api(bab_num, bab_title,
                                             ringkasan_bab=ringkasan_bab,
@@ -1705,7 +1709,7 @@ def generate_bab_visuals(bab_num, bab_title, bab_text, ringkasan_bab="",
                                             bab_text=bab_text)
     if ilust_path:
         print(f"     🖼️ Ilustrasi: {os.path.getsize(ilust_path)//1024}KB ✅")
-    else:
+    elif boleh_ilustrasi(tier, bab_num):
         print(f"     🖼️ Ilustrasi: skipped (API error)")
 
     print(f"  ✅ Visuals BAB {bab_num} complete: {len(tables)} tabel + "
