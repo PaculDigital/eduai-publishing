@@ -764,6 +764,10 @@ def isi_indeks(path_docx, teks_per_halaman, glosarium, nama_list):
     idx_subjek = cari_judul(lambda t: t in ('INDEKS SUBJEK', 'INDEKS'))
     idx_nama = cari_judul(lambda t: t == 'INDEKS NAMA')
     sisipkan_entri(idx_subjek, entri_subjek)
+    # Geseran: sisipan subjek menggeser semua paragraf sesudahnya.
+    # Hitung ulang posisi judul nama SEBELUM menyisipkan entri nama
+    # (tanpa ini entri nama tersisip di bawah entri subjek pertama).
+    idx_nama = cari_judul(lambda t: t == 'INDEKS NAMA')
     sisipkan_entri(idx_nama, entri_nama)
     doc.save(path_docx)
     return {'subjek': len(entri_subjek), 'nama': len(entri_nama),
