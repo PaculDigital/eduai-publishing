@@ -469,22 +469,79 @@ def no_border_table(tbl):
         borders.append(el)
     tblPr.append(borders)
 
+def _baris_label(doc, label, nilai):
+    """Satu baris data halaman hak cipta: label tebal + nilai biasa."""
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(6)
+    r1 = p.add_run(label)
+    set_font(r1, bold=True)
+    r2 = p.add_run(nilai)
+    set_font(r2)
+    return p
+
+
+def _kotak_hakcipta(doc, teks):
+    """Kotak bergaris satu sel untuk kalimat hak cipta (gaya template)."""
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+    tbl = doc.add_table(rows=1, cols=1)
+    sel = tbl.cell(0, 0)
+    tcPr = sel._tc.get_or_add_tcPr()
+    borders = tcPr.first_child_found_in("w:tcBorders")
+    if borders is None:
+        borders = OxmlElement('w:tcBorders')
+        tcPr.append(borders)
+    for sisi in ('top', 'left', 'bottom', 'right'):
+        el = borders.find(qn('w:' + sisi))
+        if el is None:
+            el = OxmlElement('w:' + sisi)
+            borders.append(el)
+        el.set(qn('w:val'), 'single')
+        el.set(qn('w:sz'), '6')
+        el.set(qn('w:color'), '000000')
+        el.set(qn('w:space'), '0')
+    p = sel.paragraphs[0]
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r = p.add_run(teks)
+    set_font(r)
+    return tbl
+
+
 def add_isbn_page(doc):
-    """Halaman 2: Lembar hak cipta/ISBN — 1 halaman kosong minimalis."""
-    add_para(doc, "", space_after=300)
-    add_para(doc, f"© {BUKU['tahun']} {BUKU['penulis']}", align='center', space_before=200, space_after=12)
-    add_para(doc, "", space_after=6)
-    add_para(doc, "Hak cipta dilindungi undang-undang.", align='center', space_after=6)
+    """Halaman 2: Lembar hak cipta standar cetak (blok penerbit Bayana).
+
+    Mengikuti template buku fisik (screenshot Boss 29 Okt sore).
+    Nilai yang belum ada saat buku disusun (ISBN, editor, alamat, surel,
+    WA, jumlah halaman) ditulis [diisi penerbit] — jelas isian, bukan
+    blank — supaya penerbit melengkapinya sebelum cetak. Info penerbit
+    dari bayana.id (29 Okt 2026): PT Bayana Hasana Duna, web bayana.id;
+    alamat/surel/WA/keanggotaan IKAPI TIDAK tercantum di situs, jadi
+    tidak dikarang — ditulis sebagai isian. Berlaku SEMUA jenis buku.
+    """
+    judul = BUKU.get('judul', '') if isinstance(BUKU, dict) else ''
+    if judul:
+        add_para(doc, judul, size=Pt(14), bold=True, space_after=6)
+    add_para(doc, "Copyright \u00a9 PT Bayana Hasana Duna, " + str(BUKU['tahun']), space_after=12)
+    _baris_label(doc, "Penulis: ", str(BUKU['penulis']))
+    _baris_label(doc, "ISBN: ", "[diisi penerbit] (cetak)")
+    _baris_label(doc, "ISBN: ", "[diisi penerbit] (PDF)")
+    _baris_label(doc, "Editor: ", "[diisi penerbit]")
+    _baris_label(doc, "Penyunting dan Penata Letak: ", "[diisi penerbit]")
+    _baris_label(doc, "Desain Sampul: ", "[diisi penerbit]")
+    _baris_label(doc, "Penerbit: ", "PT Bayana Hasana Duna")
+    _baris_label(doc, "Redaksi: ", "[alamat redaksi diisi penerbit]")
+    _baris_label(doc, "Web: ", "bayana.id")
+    _baris_label(doc, "E-mail: ", "[diisi penerbit]")
+    _baris_label(doc, "WhatsApp: ", "[diisi penerbit]")
+    add_para(doc, "", space_after=12)
+    add_para(doc, "Cetakan Pertama, " + str(BUKU['tahun']), space_after=6)
+    add_para(doc, "[jumlah halaman diisi penerbit] halaman; 17,6 x 25 cm", space_after=12)
+    _kotak_hakcipta(doc, "Hak cipta dilindungi undang-undang.")
     add_para(doc, "Dilarang memperbanyak atau mengutip sebagian atau seluruh isi buku ini", align='center', space_after=6)
     add_para(doc, "tanpa izin tertulis dari penerbit.", align='center', space_after=6)
-    add_para(doc, "", space_after=150)
-    # 29 Okt 2026 (temuan Boss di buku 219): tanpa data ISBN, barisnya
-    # DIHILANGKAN (bukan dicetak blank) — ISBN diisi saat sudah ada.
-    add_para(doc, "", space_after=100)
-    # 29 Okt 2026: sama seperti ISBN — tanpa data penerbit, barisnya dihilangkan.
-    add_para(doc, "", space_after=6)
     add_para(doc, "Dicetak di Indonesia", align='center', space_after=6)
     doc.add_page_break()
+
 
 def add_kata_pengantar(doc, judul, penulis, institusi):
     """Kata Pengantar — MENGIKUTI JUDUL BUKU, bukan buku contoh.
