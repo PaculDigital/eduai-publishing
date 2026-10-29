@@ -557,7 +557,7 @@ def add_kata_pengantar(doc, judul, penulis, institusi):
     add_para(doc, "KATA PENGANTAR", size=Pt(16), bold=True, align='center', space_before=12, space_after=12, keep_next=True)
 
     judul_bersih = (judul or 'buku ini').strip() or 'buku ini'
-    pengantar = f"""Buku ini disusun untuk memberi pembaca pemahaman yang utuh tentang {judul_bersih}. Banyak pembaca mengenal topiknya sekilas, tetapi belum sempat memahaminya secara berurutan — dari dasar, ke penerapan, sampai ke hal yang sering ditanyakan.
+    pengantar = f"""Buku ini disusun untuk memberi pembaca pemahaman yang utuh tentang {judul_bersih}. Banyak pembaca mengenal topiknya sekilas, tetapi belum sempat memahaminya secara berurutan, dari dasar, ke penerapan, sampai ke hal yang sering ditanyakan.
 
 Karena itu, setiap bab disusun mengalir dan saling menyambung. Penjelasan dimulai dari hal yang paling dekat dengan pengalaman pembaca, lalu bertahap menuju gagasan yang lebih dalam. Setiap istilah penting dijelaskan saat pertama kali muncul, sehingga pembaca tidak perlu berhenti untuk membuka kamus.
 
@@ -754,6 +754,45 @@ def bersihkan_markdown_teks(teks):
     if hasil.endswith(','):
         hasil = hasil[:-1].rstrip()
     return hasil
+
+
+def bersihkan_em_dash_dokumen(doc):
+    """Sapuan akhir anti em dash (U+2014) untuk SELURUH dokumen.
+
+    Dipanggil sebelum save di rakit() dan main() supaya tidak ada bagian
+    yang lolos: judul bab (dari outline), Kata Pengantar (template),
+    glosarium, indeks, pustaka, bio, daftar isi, header/footer.
+    Pengganti = koma, sama seperti filter bab. Hanya U+2014 yang dihapus;
+    hyphen (-) dan en dash (U+2013, untuk rentang) dipertahankan.
+    """
+    import re as _re
+    def _sapu_teks(teks):
+        hasil = _re.sub(r'\s*\u2014\s*', ', ', teks or '')
+        hasil = hasil.replace(',,', ',').replace(', ,', ',')
+        hasil = hasil.strip()
+        if hasil.endswith(','):
+            hasil = hasil[:-1].rstrip()
+        return hasil
+    def _sapu_paragraf(para):
+        for run in para.runs:
+            if '\u2014' in run.text:
+                run.text = _sapu_teks(run.text)
+    def _sapu_tabel(tabel):
+        for baris in tabel.rows:
+            for sel in baris.cells:
+                for para in sel.paragraphs:
+                    _sapu_paragraf(para)
+    for para in doc.paragraphs:
+        _sapu_paragraf(para)
+    for tabel in doc.tables:
+        _sapu_tabel(tabel)
+    for seksi in doc.sections:
+        for bagian in (seksi.header, seksi.footer):
+            for para in bagian.paragraphs:
+                _sapu_paragraf(para)
+            for tabel in bagian.tables:
+                _sapu_tabel(tabel)
+    return doc
 
 
 def _gabung_tabel_pipa(blocks):
@@ -1506,6 +1545,7 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
         # produksi ber-author 'python-docx' dan judul kosong. Samakan.
         doc.core_properties.author = (penulis or '').strip()
         doc.core_properties.title = (judul or '').strip()
+        bersihkan_em_dash_dokumen(doc)
         doc.save(docx_out)
 
         # === VERIFIKASI NYATA — baca ulang berkasnya ===
@@ -1637,6 +1677,7 @@ def main():
     add_bio(doc)
 
     # === SAVE ===
+    bersihkan_em_dash_dokumen(doc)
     doc.save(DOCX_OUT)
     size = os.path.getsize(DOCX_OUT)
     print(f"✅ {DOCX_OUT}")
