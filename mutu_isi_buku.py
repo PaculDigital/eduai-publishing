@@ -185,14 +185,17 @@ def periksa_buku(isi_bab, outline, min_sitasi=2, min_kata=300):
     # TIDAK di sini (itu add_isbn_page, sudah dihilangkan).
     for n in nomor:
         _teks = isi_bab[n] or ''
-        _temu = (re.findall(r'_{4,}', _teks)
-                 or re.findall(r'\bTODO\b', _teks, flags=re.IGNORECASE)
-                 or re.findall(r'\[\.\.\.\]', _teks)
-                 or re.findall(r'\(\.\.\.\)', _teks)
-                 or re.findall(r'\bXXX\b', _teks))
+        # Gabung semua pola (bukan or): or berantai hanya melaporkan
+        # jenis pertama, perbaikan jadi tidak menyeluruh (audit agen 29 Okt).
+        _per_pola = [re.findall(r'_{4,}', _teks),
+                     re.findall(r'\bTODO\b', _teks, flags=re.IGNORECASE),
+                     re.findall(r'\[\.\.\.\]', _teks),
+                     re.findall(r'\(\.\.\.\)', _teks),
+                     re.findall(r'\bXXX\b', _teks)]
+        _temu = [m[0] for m in _per_pola if m]
         if _temu:
             masalah.append(
-                f'BAB {n}: penanda belum selesai ({_temu[0]}) — tulis '
+                f'BAB {n}: penanda belum selesai ({", ".join(_temu)}) — tulis '
                 f'kalimat lengkap atau hapus penanda, jangan tinggalkan kosong')
 
     return {'lolos': not masalah, 'masalah': masalah, 'curiga': curiga}
