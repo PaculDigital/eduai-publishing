@@ -353,7 +353,7 @@ def _tulis_daftar(doc, teks_daftar):
 def add_para(doc, text="", size=FONT_SIZE, bold=False, italic=False,
              align=None, space_before=0, space_after=6, indent=None,
              first_line_indent=None, line_spacing=1.15, page_break_before=False,
-             inden_otomatis=False):
+             inden_otomatis=False, keep_next=False):
     p = doc.add_paragraph()
     pf = p.paragraph_format
     pf.space_before = Pt(space_before)
@@ -382,6 +382,12 @@ def add_para(doc, text="", size=FONT_SIZE, bold=False, italic=False,
         pf.first_line_indent = Pt(_pt)
     if page_break_before:
         pf.page_break_before = True
+    # 29 Okt 2026 (keluhan Boss di buku 219: judul orphan di bawah
+    # halaman): keep_with_next = judul pindah bersama isi ke halaman
+    # berikut bila isi tidak muat. widow_control yang sudah ada hanya
+    # mencegah 1 baris menggantung, BUKAN mengikat judul ke isi.
+    if keep_next:
+        pf.keep_with_next = True
     if text:
         r = p.add_run(text)
         set_font(r, size=size, bold=bold, italic=italic)
@@ -487,7 +493,7 @@ def add_kata_pengantar(doc, judul, penulis, institusi):
        "ekonomi digital". Buku berjudul "Petualangan di Laut" keluar dengan
        pengantar ekonomi digital ⇒ gerbang assembly menangkapnya (1 GAGAL).
     """
-    add_para(doc, "KATA PENGANTAR", size=Pt(16), bold=True, align='center', space_before=12, space_after=12)
+    add_para(doc, "KATA PENGANTAR", size=Pt(16), bold=True, align='center', space_before=12, space_after=12, keep_next=True)
 
     judul_bersih = (judul or 'buku ini').strip() or 'buku ini'
     pengantar = f"""Buku ini disusun untuk memberi pembaca pemahaman yang utuh tentang {judul_bersih}. Banyak pembaca mengenal topiknya sekilas, tetapi belum sempat memahaminya secara berurutan — dari dasar, ke penerapan, sampai ke hal yang sering ditanyakan.
@@ -506,7 +512,7 @@ Buku ini ditujukan bagi siapa pun yang ingin memahami {judul_bersih} tanpa meras
 
 def add_daftar_isi(doc, outline):
     """Daftar isi dengan dot leader."""
-    add_para(doc, "DAFTAR ISI", size=Pt(16), bold=True, align='center', space_before=12, space_after=12)
+    add_para(doc, "DAFTAR ISI", size=Pt(16), bold=True, align='center', space_before=12, space_after=12, keep_next=True)
 
     # Kata Pengantar
     p = add_para(doc, "", space_after=6)
@@ -817,8 +823,8 @@ def add_bab(doc, bab_num, bab_data, bab_text):
     """Tambah bab ke docx."""
     # Bab heading dengan page break
     add_para(doc, f"BAB {bab_num}", size=Pt(16), bold=True, align='center',
-             space_before=0, space_after=6, page_break_before=True)
-    add_para(doc, bab_data['title'], size=Pt(16), bold=True, align='center', space_after=12)
+             space_before=0, space_after=6, page_break_before=True, keep_next=True)
+    add_para(doc, bab_data['title'], size=Pt(16), bold=True, align='center', space_after=12, keep_next=True)
 
     #  ── JEV BUKU UMUM = JEV DI DEPAN (SOT 20 Okt 2026) ──────────────────
     #  Prinsip induk Bos (08 Okt): "selalu nomor satukan jev dulu".
@@ -955,6 +961,7 @@ def add_bab(doc, bab_num, bab_data, bab_text):
         if ilustrasi_inserted is False and ilustrasi_path and os.path.exists(ilustrasi_path) and idx >= target_pos:
             p = doc.add_paragraph()
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.paragraph_format.keep_with_next = True
             p.paragraph_format.space_before = Pt(6)
             p.paragraph_format.space_after = Pt(4)
             run = p.add_run()
@@ -966,7 +973,7 @@ def add_bab(doc, bab_num, bab_data, bab_text):
         if block_type == 'bab_heading':
             continue  # sudah di-add manual
         elif block_type == 'sub_heading':
-            add_para(doc, content, size=Pt(14), bold=True, space_before=12, space_after=8)
+            add_para(doc, content, size=Pt(14), bold=True, space_before=12, space_after=8, keep_next=True)
             #  SOT 2.4 (S1 CMOS faq0223): paragraf pertama SETELAH judul
             #  dimulai rata kiri — inden tidak diperlukan karena batas
             #  paragraf sudah jelas dari judulnya.
@@ -1051,7 +1058,7 @@ def add_bab(doc, bab_num, bab_data, bab_text):
                 #  naskah), bukan judul contoh.
                 judul_tabel = data.get('title') or ttitle
                 # Caption
-                add_para(doc, f"Tabel {tid} {judul_tabel}", bold=True, align='center', space_before=10, space_after=6)
+                add_para(doc, f"Tabel {tid} {judul_tabel}", bold=True, align='center', space_before=10, space_after=6, keep_next=True)
                 # Tabel dengan border (comot dari buku ajar: table.style = 'Table Grid')
                 n_rows = len(rows_data) + 1
                 n_cols = len(headers)
@@ -1115,7 +1122,7 @@ def add_bab(doc, bab_num, bab_data, bab_text):
                 did = m.group(1)
                 img_path = os.path.join(VISUAL_DIR, f"diagram_{did}.png")
                 # Caption
-                add_para(doc, f"Diagram {did}", bold=True, align='center', space_before=10, space_after=6)
+                add_para(doc, f"Diagram {did}", bold=True, align='center', space_before=10, space_after=6, keep_next=True)
                 # Insert image jika PNG ada
                 if os.path.exists(img_path):
                     p = doc.add_paragraph()
@@ -1137,7 +1144,7 @@ def add_glosarium(doc, glosarium, kosong=False):
     """
     from docx.enum.table import WD_TABLE_ALIGNMENT
     add_para(doc, "GLOSARIUM", size=Pt(16), bold=True, align='center',
-             space_before=12, space_after=12, page_break_before=True)
+             space_before=12, space_after=12, page_break_before=True, keep_next=True)
 
     if not glosarium:
         add_para(doc, "Glosarium belum tersedia untuk buku ini.",
@@ -1187,7 +1194,7 @@ def add_indeks(doc, glosarium, teks_per_halaman=None):
     except ImportError:
         #  titik mundur: perilaku lama (tanpa nomor halaman) — jangan crash
         add_para(doc, "INDEKS", size=Pt(16), bold=True, align='center',
-                 space_before=12, space_after=12, page_break_before=True)
+                 space_before=12, space_after=12, page_break_before=True, keep_next=True)
         for term in sorted(glosarium.keys()):
             add_para(doc, term, space_after=4)
         return
@@ -1198,7 +1205,7 @@ def add_indeks(doc, glosarium, teks_per_halaman=None):
 
 def add_daftar_pustaka(doc, references):
     add_para(doc, "DAFTAR PUSTAKA", size=Pt(16), bold=True, align='center',
-             space_before=12, space_after=12, page_break_before=True)
+             space_before=12, space_after=12, page_break_before=True, keep_next=True)
     for ref in references:
         p = add_para(doc, "", space_after=8)
         pf = p.paragraph_format
@@ -1215,7 +1222,7 @@ def add_bio(doc):
        dengan biografi orang lain ⇒ harus dari BUKU['penulis']/['institusi'].
     """
     add_para(doc, "TENTANG PENULIS", size=Pt(16), bold=True, align='center',
-             space_before=12, space_after=12, page_break_before=True)
+             space_before=12, space_after=12, page_break_before=True, keep_next=True)
     penulis = (BUKU.get('penulis') or '').strip()
     institusi = (BUKU.get('institusi') or '').strip()
     judul = (BUKU.get('judul') or 'buku ini').strip() or 'buku ini'
