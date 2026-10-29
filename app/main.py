@@ -419,11 +419,22 @@ def buku_outline(
     kembali = '/buku/siapkan?' + urlencode({
         'jenis': jenis, 'gaya': 'referensi', 'judul': judul,
         'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml})
+    #  ⚠️ `susun_outline()` menyisipkan kunci META bertipe teks
+    #  ('_judul', '_bidang', '_jenis', '_sumber') ke dalam dict yang kuncinya
+    #  angka bab. `sorted()` atas campuran str+int melempar
+    #  `TypeError: '<' not supported between instances of 'str' and 'int'`
+    #  (HTTP 500 di /buku/outline, 28 Okt 2026). Template hanya butuh bab
+    #  bernomor — saring dulu, jangan mengubah bentuk data dari
+    #  `susun_outline()` (pembaca lain: penyusunan_buku.py:277 sudah pakai
+    #  `isinstance(n, int)`).
+    babs = sorted(((n, b) for n, b in outline.items()
+                   if isinstance(n, int)),
+                  key=lambda x: x[0])
     return templates.TemplateResponse('buku_outline.html', {
         'request': request, 'user': u, 'kartu': kartu,
         'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
         'jumlah_bab': jml, 'token': token, 'kembali': kembali,
-        'babs': sorted(outline.items()),
+        'babs': babs,
     })
 
 

@@ -64,7 +64,7 @@ JENIS_BUKU = [
         'siap': True,
         'sumber': ['rps'],
         'mesin': 'bcp_full_pipeline.py + bcp_phase3_visual.py',
-        'skill': 'buku-ajar-obe',
+        'skill': 'buku-ssot',   # SSOT tunggal (skill lama sudah diarsip 28 Okt 2026)
     },
     {
         'kode': 'buku-umum',
@@ -80,7 +80,7 @@ JENIS_BUKU = [
         'siap': True,
         'sumber': ['tema'],
         'mesin': 'buku_umum_pipeline.py + buku_umum_assembly.py',
-        'skill': 'buku-umum',
+        'skill': 'buku-ssot',   # SSOT tunggal
     },
     {
         'kode': 'buku-monograf',
@@ -96,7 +96,7 @@ JENIS_BUKU = [
         'siap': True,
         'sumber': ['naskah_penelitian'],
         'mesin': 'pipeline 5 tahap monograf',
-        'skill': 'buku-monograf',
+        'skill': 'buku-ssot',   # SSOT tunggal
     },
     {
         'kode': 'book-chapter',
@@ -112,7 +112,7 @@ JENIS_BUKU = [
         'siap': True,
         'sumber': ['judul_bab'],
         'mesin': 'scripts/book_chapter_pipeline.py',
-        'skill': 'book-chapter',
+        'skill': 'buku-ssot',   # SSOT tunggal
     },
     {
         'kode': 'buku-referensi',
@@ -134,7 +134,7 @@ JENIS_BUKU = [
         'mesin': ('buku_umum_pipeline.py (jenis referensi) + '
                   'app/referensi_outline.py + app/referensi_indeks.py + '
                   'gerbang sidecar /referensi'),
-        'skill': 'buku-referensi',
+        'skill': 'buku-ssot',   # SSOT tunggal
     },
 ]
 
