@@ -424,7 +424,7 @@ Bab 3: Ekosistem Pembayaran Digital dan Masa Depan
 
 # === PROMPTS ===
 
-def architect_prompt(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, is_intro=False, is_closing=False, refs=None, jenis="umum", outline=None):
+def architect_prompt(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, is_intro=False, is_closing=False, refs=None, jenis="umum", outline=None, dari_snapshot=False):
     """Prompt penulis. `jenis` menentukan TONE (Bos 18 Okt 2026).
 
     ⚠️ TONE TIDAK BOLEH ditulis langsung di sini — ambil dari tone_menulis.py.
@@ -491,6 +491,9 @@ ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
         refs_lines.append("  - DILARANG menulis sitasi di luar daftar: (Nama, Tahun) yang tidak ada di list = HALLUSINASI")
         refs_lines.append("  - Jika tidak ada referensi yang cocok, TIDAK perlu sitasi di bagian itu")
         refs_lines.append("  - Verifikasi sebelum menulis: cek apakah (Nama, Tahun) ada di daftar referensi")
+        if dari_snapshot:
+            refs_lines.append("KUOTA SITASI SUB-BAB INI: WAJIB memakai 2-3 sitasi dari daftar di atas.")
+            refs_lines.append("Bagi rata: di 5 sub-bab bab ini, semua referensi daftar harus terpakai minimal sekali. Utamakan referensi yang belum dikutip di sub-bab sebelumnya (lihat ringkasan bergulir).")
         refs_section = "\n".join(refs_lines)
     
     if is_intro:
@@ -586,7 +589,7 @@ ATURAN:
 {aturan_referensi}
 Target: 800-1200 kata. Output: teks langsung. JANGAN POTONG sebelum selesai."""
 
-def skeptic_prompt(sub_title, draft, refs=None, jenis='umum'):
+def skeptic_prompt(sub_title, draft, refs=None, jenis='umum', dari_snapshot=False):
     # 28 Okt 2026 (mesin referensi web) — Skeptic referensi = verifikator
     # atribusi: setiap Tokoh (Tahun) dicek ke daftar referensi. Argumen
     # refs/jenis opsional supaya pemanggil lama (2 argumen) tidak rusak.
@@ -595,13 +598,18 @@ def skeptic_prompt(sub_title, draft, refs=None, jenis='umum'):
         if refs:
             daftar = '\nDAFTAR REFERENSI (satu-satunya sumber sitasi yang sah):\n' + '\n'.join(
                 f'- {format_in_text(r)}' for r in refs)
+        cakupan = ""
+        if dari_snapshot:
+            cakupan = ("Juga hitung cakupan: berapa referensi dari daftar "
+                       "yang sudah dikutip di draf (tulis di akhir kritik "
+                       "sebagai [CAKUPAN: X dari Y]).\n")
         return f"""Kamu Skeptic + VERIFIKATOR ATRIBUSI. KRITIK SUB-BAB "{sub_title}":
 {draft[:3000]}{daftar}
 Kritik: gap konten, inkonsistensi, panjang paragraf (<60 atau >100 kata),
 transisi berlebihan, tone tidak akademik-presisi, DAN verifikasi atribusi:
 setiap 'Tokoh (Tahun)' WAJIB ada di daftar referensi di atas — tokoh, tahun,
 atau karya yang tertukar = CACAT FATAL. Klaim faktual tanpa sitasi = gap.
-Sitasi di luar daftar = HALLUSINASI. Max 300 kata. JANGAN rewrite."""
+Sitasi di luar daftar = HALLUSINASI. {cakupan}Max 300 kata. JANGAN rewrite."""
     return f"""Kamu Skeptic. KRITIK SUB-BAB "{sub_title}":
 {draft[:3000]}
 Kritik: gap konten, inkonsistensi, panjang paragraf (<60 atau >100 kata), transisi berlebihan, hook lemah, tone terlalu akademik/kaku, sitasi kurang. Max 300 kata. JANGAN rewrite."""
@@ -612,7 +620,7 @@ DRAFT: {draft[:2000]}
 KRITIK: {kritik}
 Saran: paragraf perlu dipisah/digabung, hook diperkuat, konten ditambah/dihapus, tone diperbaiki. Max 300 kata. JANGAN rewrite."""
 
-def editor_prompt(sub_title, draft, kritik, saran, jenis="umum"):
+def editor_prompt(sub_title, draft, kritik, saran, jenis="umum", refs=None, dari_snapshot=False):
     """Prompt Editor. `jenis` WAJIB — kalau tidak, aturan buku dewasa bocor ke anak.
 
     ⚠️ TERUKUR 18 Okt 2026: tanpa `jenis`, editor menulis aturan
@@ -691,11 +699,41 @@ def editor_prompt(sub_title, draft, kritik, saran, jenis="umum"):
         aturan_sitasi_editor = '6. Sitasi APA 7: WAJIB 2+ — KURANG dari 2 = GAGAL'
         aturan_referensi_editor = ''
 
+    # Snapshot: editor menerima daftar referensi (sebelumnya tidak
+    # pernah menerima daftar, padahal aturan 6a merujuk ke daftar itu).
+    # Aturan 6a diubah dari HAPUS diam-diam menjadi LAPOR plus tulis
+    # ulang, dan penanda [SITASI-DILUAR] dihapus pemanggil supaya
+    # tidak bocor ke buku.
+    daftar_editor = ""
+    if dari_snapshot and refs and jenis == "referensi":
+        daftar_editor = (
+            "\nDAFTAR REFERENSI (satu-satunya sumber sitasi yang sah):\n"
+            + "\n".join(f"- {format_in_text(r)}" for r in refs) + "\n")
+    if dari_snapshot and jenis == "referensi":
+        aturan_anti_halusinasi = (
+            "6a. ANTI-HALLUSINASI SITASI, WAJIB: HANYA gunakan sitasi "
+            "dari daftar referensi di atas. DILARANG MENULIS SITASI "
+            "yang tidak ada di daftar referensi. Setiap (Nama, Tahun) "
+            "di teks WAJIB match dengan entri di daftar referensi. "
+            "Sitasi palsu = HALLUSINASI = GAGAL TOTAL. Jika ada sitasi "
+            "di luar daftar, JANGAN hapus diam-diam. Laporkan di akhir "
+            "jawaban sebagai [SITASI-DILUAR: (Nama, Tahun), ...] dan "
+            "tulis ulang kalimat itu memakai sitasi dari daftar yang "
+            "mendukung pernyataan tersebut.")
+    else:
+        aturan_anti_halusinasi = (
+            "6a. ANTI-HALLUSINASI SITASI, WAJIB: HANYA gunakan sitasi "
+            "dari daftar referensi yang diberikan. DILARANG MENULIS "
+            "SITASI yang tidak ada di daftar referensi. Setiap (Nama, "
+            "Tahun) di teks WAJIB match dengan entri di daftar "
+            "referensi. Sitasi palsu = HALLUSINASI = GAGAL TOTAL. "
+            "Jika ragu, HAPUS sitasi tersebut, lebih baik kurang "
+            "daripada mengarang.")
     return f"""Kamu Editor. Tulis SUB-BAB "{sub_title}" FINAL:
 DRAFT: {draft}
 KRITIK: {kritik}
 SARAN: {saran}
-
+{daftar_editor}
 ATURAN FINAL (WAJIB SEMUA):
 {aturan_paragraf}
 {aturan_hook_editor}
@@ -703,7 +741,7 @@ ATURAN FINAL (WAJIB SEMUA):
 {aturan_personal}
 {aturan_tanya}
 {aturan_sitasi_editor}
-{aturan_referensi_editor}6a. ANTI-HALLUSINASI SITASI — WAJIB: HANYA gunakan sitasi dari daftar referensi yang diberikan. DILARANG MENULIS SITASI yang tidak ada di daftar referensi. Setiap (Nama, Tahun) di teks WAJIB match dengan entri di daftar referensi. Sitasi palsu = HALLUSINASI = GAGAL TOTAL. Jika ragu, HAPUS sitasi tersebut — lebih baik kurang daripada mengarang.
+{aturan_referensi_editor}{aturan_anti_halusinasi}
 7. DILARANG KERAS MENGURANGI NARASI. Jika draft 800 kata, output WAJIB minimal 800 kata. Jika draft 1000 kata, output WAJIB minimal 1000 kata. Mengurangi narasi = GAGAL TOTAL. JANGAN ringkas, JANGAN potong, JANGAN hapus paragraf.
 8. Tone: {_t['tone']}
 8a. SAPAAN: sapa pembaca dengan "{sapaan}" — pakai kata "{sapaan}" untuk menyapa. DILARANG memakai sapaan lain.
@@ -2017,12 +2055,69 @@ def _refs_dari_harvest(bab_title):
     return refs
 
 
-def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, refs=None, jenis="umum"):
+def _strip_penanda_sitasi_diluar(teks):
+    """Hapus baris penanda [SITASI-DILUAR: ...] dari teks editor.
+
+    Editor snapshot diminta melapor sitasi di luar daftar dengan
+    penanda ini (bukan menghapus diam-diam). Penanda tidak boleh
+    bocor ke buku, jadi dihapus di sini dan dicatat pemanggil di log.
+    Return (teks_bersih, daftar_penanda).
+    """
+    penanda = re.findall(r"\[SITASI-DILUAR:[^\]]*\]", teks or "")
+    bersih = re.sub(r"[ \t]*\[SITASI-DILUAR:[^\]]*\]\n?", "",
+                    teks or "")
+    return bersih, penanda
+
+
+def _perbaiki_sitasi_diluar(final, refs, unverified, jenis="referensi"):
+    """Satu kali tulis ulang untuk sitasi di luar daftar (snapshot).
+
+    Meminta LLM menghapus atau mengganti sitasi di luar daftar dengan
+    sitasi dari daftar yang mendukung pernyataan itu. Return teks
+    perbaikan (sudah post_process) atau None bila LLM gagal atau hasil
+    terlalu pendek (pemanggil memakai teks lama, lalu hapus sisa
+    sebagai jalan terakhir).
+    """
+    daftar = "\n".join(f"- {format_apa(r)}" for r in refs)
+    luar = ", ".join(unverified)
+    perbaikan = call_llm(
+        f"""Teks di bawah memuat sitasi di luar daftar referensi yang sah:
+{luar}
+
+DAFTAR REFERENSI (HANYA ini yang boleh dikutip):
+{daftar}
+
+TEKS:
+{final[:6000]}
+
+ATURAN:
+- Hapus sitasi di luar daftar, atau ganti dengan sitasi dari daftar
+  yang memang mendukung pernyataan itu. JANGAN mengarang nama atau
+  tahun di luar daftar.
+- JANGAN mengubah isi, JANGAN memotong narasi, JANGAN menambah markdown.
+- Kalau tidak ada referensi yang cocok untuk suatu bagian, biarkan
+  bagian itu tanpa sitasi, lebih baik daripada sitasi palsu.
+
+Output: teks lengkap hasil perbaikan saja.""",
+        max_tokens=4000, timeout=120)
+    if not perbaikan or len(perbaikan) <= len(final) * 0.7:
+        return None
+    return post_process(perbaikan, jenis=jenis)
+
+
+def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, refs=None, jenis="umum", dari_snapshot=False):
     """Generate 1 sub-bab via 4-agen council."""
     print(f"  [{sub_num}] {sub_title}")
 
-    # Cari referensi nyata jika belum ada
-    if refs is None:
+    # Snapshot: refs WAJIB dari snapshot beku (pra-panen). Hilang =
+    # gagal cepat, tanpa panen ulang, tanpa fallback diam-diam.
+    if dari_snapshot:
+        if refs is None:
+            raise ValueError(
+                "Snapshot referensi bab %s hilang, gagal cepat tanpa fallback"
+                % bab_num)
+    # Cari referensi nyata jika belum ada (jalur lama, bukan snapshot)
+    elif refs is None:
         # 28 Okt 2026: buku referensi memakai mesin Harvest dulu (4 sumber
         # incl. Garuda); gagal/kosong -> jalur verifikasi biasa.
         if jenis == 'referensi':
@@ -2039,7 +2134,7 @@ def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling
     
     print(f"       Architect...", end="", flush=True)
     t0 = time.time()
-    draft = call_llm(architect_prompt(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, refs=refs, jenis=jenis))
+    draft = call_llm(architect_prompt(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, refs=refs, jenis=jenis, dari_snapshot=dari_snapshot))
     t1 = time.time()
     print(f" {t1-t0:.1f}s ({word_count(draft)} kata)")
 
@@ -2052,7 +2147,7 @@ def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling
     #  Lihat catatan "YANG MASIH BISA DIPARALELKAN" di bawah.
     print(f"       Skeptic...", end="", flush=True)
     t2 = time.time()
-    kritik = call_llm(skeptic_prompt(sub_title, draft, refs=refs, jenis=jenis), max_tokens=3000, timeout=90)
+    kritik = call_llm(skeptic_prompt(sub_title, draft, refs=refs, jenis=jenis, dari_snapshot=dari_snapshot), max_tokens=3000, timeout=90)
     t3 = time.time()
     print(f" {t3-t2:.1f}s")
 
@@ -2064,34 +2159,63 @@ def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling
 
     print(f"       Editor...", end="", flush=True)
     t6 = time.time()
-    final = call_llm(editor_prompt(sub_title, draft, kritik, saran, jenis=jenis))
+    final = call_llm(editor_prompt(sub_title, draft, kritik, saran, jenis=jenis, refs=refs, dari_snapshot=dari_snapshot))
     t7 = time.time()
     print(f" {t7-t6:.1f}s ({word_count(final)} kata)")
 
     # Post-process
     final = post_process(final, jenis=jenis)
     
-    # VERIFIKASI SITASI: hapus sitasi yang tidak ada di list referensi
+    # VERIFIKASI SITASI snapshot: lapor dulu, tulis ulang sekali,
+    # hapus hanya sebagai jalan terakhir (dicatat, bukan diam-diam).
+    # Jalur lama (bukan snapshot) tetap hapus plus menumpuk seperti dulu.
     if refs:
-        verif = verify_text_citations(final, refs)
-        final = verif["clean_text"]
-        if verif["unverified"]:
-            print(f"       [VERIF] Hapus {len(verif['unverified'])} sitasi tidak terverifikasi: {verif['unverified'][:3]}")
-        # Simpan referensi terverifikasi untuk daftar pustaka
-        refs_path = os.path.join(visual_ini(), f"refs_bab{bab_num}.json")
-        existing_refs = []
-        if os.path.exists(refs_path):
-            try:
-                with open(refs_path) as f:
-                    existing_refs = json.load(f)
-            except:
-                existing_refs = []
-        for r in refs:
-            apa = format_apa(r)
-            if apa not in existing_refs:
-                existing_refs.append(apa)
-        with open(refs_path, 'w') as f:
-            json.dump(existing_refs, f, indent=2, ensure_ascii=False)
+        if dari_snapshot:
+            final, _penanda = _strip_penanda_sitasi_diluar(final)
+            if _penanda:
+                print(f"       [VERIF-SNAP] editor melapor {_penanda[:3]}")
+            verif = verify_text_citations(final, refs, mode="lapor")
+            if verif["unverified"]:
+                print(f"       [VERIF-SNAP] {len(verif['unverified'])} sitasi di luar daftar, tulis ulang sekali")
+                perbaikan_snap = _perbaiki_sitasi_diluar(
+                    final, refs, verif["unverified"], jenis=jenis)
+                if perbaikan_snap is not None:
+                    perbaikan_snap, _penanda2 = _strip_penanda_sitasi_diluar(perbaikan_snap)
+                    verif2 = verify_text_citations(perbaikan_snap, refs, mode="lapor")
+                    if not verif2["unverified"]:
+                        final = perbaikan_snap
+                    else:
+                        bersih = verify_text_citations(perbaikan_snap, refs, mode="hapus")
+                        final = bersih["clean_text"]
+                        print(f"       [VERIF-SNAP] hapus {len(verif2['unverified'])} sisa sesudah tulis ulang: {verif2['unverified'][:3]}")
+                else:
+                    bersih = verify_text_citations(final, refs, mode="hapus")
+                    final = bersih["clean_text"]
+                    print(f"       [VERIF-SNAP] tulis ulang gagal, hapus {len(verif['unverified'])} sitasi di luar daftar")
+            # Simpan referensi snapshot SEKALI (tulis penuh, bukan menumpuk).
+            refs_path = os.path.join(visual_ini(), f"refs_bab{bab_num}.json")
+            with open(refs_path, 'w') as f:
+                json.dump([format_apa(r) for r in refs], f, indent=2, ensure_ascii=False)
+        else:
+            verif = verify_text_citations(final, refs)
+            final = verif["clean_text"]
+            if verif["unverified"]:
+                print(f"       [VERIF] Hapus {len(verif['unverified'])} sitasi tidak terverifikasi: {verif['unverified'][:3]}")
+            # Simpan referensi terverifikasi untuk daftar pustaka
+            refs_path = os.path.join(visual_ini(), f"refs_bab{bab_num}.json")
+            existing_refs = []
+            if os.path.exists(refs_path):
+                try:
+                    with open(refs_path) as f:
+                        existing_refs = json.load(f)
+                except:
+                    existing_refs = []
+            for r in refs:
+                apa = format_apa(r)
+                if apa not in existing_refs:
+                    existing_refs.append(apa)
+            with open(refs_path, 'w') as f:
+                json.dump(existing_refs, f, indent=2, ensure_ascii=False)
 
     #  ── PENJAGA SITASI (18 Okt 2026) ────────────────────────────────────
     #  ⚠️ SEBELUM INI: "KURANG dari 2 = GAGAL" hanya TULISAN di prompt.
@@ -2128,8 +2252,18 @@ Output: teks lengkap hasil perbaikan saja.""",
         if perbaikan and len(perbaikan) > len(final) * 0.7:
             perbaikan = post_process(perbaikan, jenis=jenis)
             if refs:
-                verif2 = verify_text_citations(perbaikan, refs)
-                perbaikan = verif2["clean_text"]
+                if dari_snapshot:
+                    verif2 = verify_text_citations(perbaikan, refs, mode="lapor")
+                    if verif2["unverified"]:
+                        # Jalan terakhir (tanpa tulis ulang kedua):
+                        # hapus sisa, dicatat, supaya sitasi palsu
+                        # tidak terkirim.
+                        bersih2 = verify_text_citations(perbaikan, refs, mode="hapus")
+                        perbaikan = bersih2["clean_text"]
+                        print(f"       [VERIF-SNAP] hapus {len(verif2['unverified'])} sitasi di luar daftar sesudah perbaikan MIN_SITASI")
+                else:
+                    verif2 = verify_text_citations(perbaikan, refs)
+                    perbaikan = verif2["clean_text"]
             cit2 = count_citations(perbaikan)
             if cit2 > cit:
                 print(f"       [SITASI] {cit} -> {cit2} setelah perbaikan",
@@ -2182,10 +2316,16 @@ def generate_closing(bab_num, bab_title, rolling_summary, jenis="umum"):
     closing = post_process(closing, jenis=jenis)
     return closing
 
-def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None):
+def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None, refs_bab=None, dari_snapshot=False):
     """Generate 1 bab lengkap: intro + sub-bab + penutup."""
     bab_title = bab_data["title"]
     subs = bab_data["subs"]
+    # Snapshot: refs bab WAJIB ada (dari pra-panen). Hilang = gagal
+    # cepat sebelum intro, tanpa panen ulang, tanpa fallback.
+    if dari_snapshot and refs_bab is None:
+        raise ValueError(
+            "Snapshot referensi bab %s hilang, gagal cepat tanpa fallback"
+            % bab_num)
     print(f"\n{'='*60}")
     print(f"BAB {bab_num}: {bab_title}")
     print(f"{'='*60}")
@@ -2201,10 +2341,19 @@ def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None):
     ringkasan_subs = []
 
     for sub_num, sub_title, key_points in subs:
-        final, summary, wc, cit = generate_sub_bab(
-            bab_num, bab_title, sub_num, sub_title, key_points, rolling,
-            jenis=jenis
-        )
+        # Panggilan kondisional: jalur lama memakai argumen lama persis
+        # (pembungkus gerbang RINGKASAN menolak kwarg dari_snapshot);
+        # jalur snapshot memakai refs + dari_snapshot.
+        if dari_snapshot:
+            final, summary, wc, cit = generate_sub_bab(
+                bab_num, bab_title, sub_num, sub_title, key_points, rolling,
+                refs=refs_bab, jenis=jenis, dari_snapshot=True
+            )
+        else:
+            final, summary, wc, cit = generate_sub_bab(
+                bab_num, bab_title, sub_num, sub_title, key_points, rolling,
+                jenis=jenis
+            )
         bab_parts.append(f"\n### {sub_num} {sub_title}\n\n{final}\n")
         rolling = summary  # next sub gets this summary
         if summary:

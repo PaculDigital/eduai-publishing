@@ -277,7 +277,7 @@ def jalankan_semua_bab(nomor_bab, eksekutor, folder_checkpoint=None,
 
 def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
           kartu_jenis=None, outline_siaps=None, penulis=None, penelaah=None,
-          tier=None):
+          tier=None, kode=None):
     """Susun buku + potong kuota saat giliran tiba. Return dict hasil.
 
     Raise HTTPException 402/403 dari kuota kalau saldo kurang (tidak menyusun).
@@ -288,6 +288,8 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
     penelaah: nama pakar penelaah (ditulis di Tentang Penulis + hasil).
     tier: paket Hemat/Normal/Full (None = perilaku lama); tier menang
     atas jumlah_bab untuk outline, dan diteruskan ke visuals.
+    kode: kode proses (untuk job_kode snapshot pra-panen). Bila None
+    (pemanggil lama), dipakai fid folder sebagai job_kode.
     """
     _pastikan_modul()
     import outline_buku as OB
@@ -318,6 +320,7 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
 
     fid = f"{int(time.time())}-{getattr(u, 'id', 0)}"
     keluar = folder_buku(fid)
+    _job_kode = kode or fid
     try:
         if lapor:
             lapor("Menyusun kerangka buku…")
@@ -360,6 +363,24 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
             raise ValueError(
                 'outline tidak lolos cek awal: '
                 + '; '.join(_cek_outline['masalah'][:3]))
+
+        # Pra-panen Fase 1 (31 Okt 2026): hanya buku-referensi.
+        # Panen TIDAK jalan di sini (sebelum antrean host), supaya
+        # token tidak dipotong selagi mengantre. Panen jalan di
+        # on_mulai (_mulai_dan_panen), tepat saat giliran tiba:
+        # potong dulu, lalu panen, lalu bekukan. Gagal gerbang
+        # adalah ValueError (subclass GagalPraPanen), jadi loop
+        # retry di bawah TIDAK mengulanginya, dan except di bawah
+        # mengembalikan token lewat jalur refund yang sudah ada.
+        _is_referensi = (kartu_jenis == 'buku-referensi'
+                         or jenis == 'referensi')
+        _refs_holder = {}
+
+        def _mulai_dan_panen():
+            _potong_saat_mulai()
+            from . import pra_panen as _PP
+            _refs_holder['refs'] = _PP.panen_semua(
+                db, _job_kode, bidang, outline, lapor=lapor)
 
         if lapor:
             lapor(f"Menulis {len([k for k in outline if isinstance(k, int)])} bab…")
@@ -408,9 +429,13 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                 hasil = S.susun_buku(
                     judul, outline, jenis=jenis,
                     keluar_dir=keluar, lapor=lapor,
-                    on_mulai=(_potong_saat_mulai if not terpotong else None),
+                    on_mulai=((_mulai_dan_panen if _is_referensi
+                               else _potong_saat_mulai)
+                              if not terpotong else None),
                     tier=tier, on_bab_selesai=_cek_bab,
-                    ulang=(1 if _percobaan_susun > 1 else 0))
+                    ulang=(1 if _percobaan_susun > 1 else 0),
+                    refs_holder=(_refs_holder if _is_referensi else None),
+                    dari_snapshot=_is_referensi)
                 break
             except Exception as _e_susun:
                 if type(_e_susun).__name__ == 'HTTPException' or isinstance(
@@ -487,6 +512,25 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     continue
                 with open(_p_bab, encoding='utf-8') as _f:
                     _teks_bab = _f.read()
+                # Snapshot dulu (pra-panen): bila ada, checker
+                # membaca kunci dari snapshot, bukan parse ulang
+                # string JSON. Bila tidak ada (job lama, jalur
+                # non-pra-panen), jatuh kembali ke JSON seperti dulu.
+                _rows_snap = []
+                try:
+                    from . import pra_panen as _PP_sg
+                    _rows_snap = _PP_sg.ambil_snapshot(db, _job_kode, _n)
+                except Exception:
+                    _rows_snap = []
+                if _rows_snap:
+                    _hasil_sg = _SG.periksa_dan_perbaiki_bab_snapshot(
+                        _n, _teks_bab, _rows_snap, gagal_keras=True)
+                    if _hasil_sg['teks_baru'] != _teks_bab:
+                        with open(_p_bab, 'w', encoding='utf-8') as _f:
+                            _f.write(_hasil_sg['teks_baru'])
+                        if lapor:
+                            lapor('Sitasi bab %s diperbaiki' % _n)
+                    continue
                 _folder_bab = os.path.dirname(_p_bab)
                 _refs_bab = []
                 for _calon_ref in (

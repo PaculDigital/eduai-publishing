@@ -1478,3 +1478,94 @@ class SaldoToken(Base):
     catatan: Mapped[str] = mapped_column(String(200), default='')
     order_id: Mapped[str] = mapped_column(String(100), default='', index=True)
     dibuat: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class Artikel(Base):
+    """Artikel referensi dedup (pustaka EduAi, pra-panen Fase 1).
+
+    Satu baris = SATU artikel unik (bukan satu sitasi). Dedup: DOI
+    dulu, tanpa DOI pakai judul_normal plus tahun plus surname_key.
+    penulis_json terstruktur: {authors, surname_key, surname_tampil,
+    alias}. surname_key diputuskan saat parse (bukan saat cek), plus
+    alias dan bentuk lipat diakritik, supaya sitasi badan (Marina,
+    2019) tetap cocok dengan ref Dabic Marina (2019).
+
+    Tabel BARU, dibuat create_all(). Tidak ada hapus otomatis: baris
+    ini disimpan selamanya (lihat kebijakan retensi di pra_panen.py).
+    """
+
+    __tablename__ = 'artikel'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    doi: Mapped[str] = mapped_column(String(100), unique=True, index=True,
+                                      nullable=True)
+    judul: Mapped[str] = mapped_column(String(500), nullable=False)
+    judul_normal: Mapped[str] = mapped_column(String(500), index=True,
+                                               nullable=False)
+    tahun: Mapped[int] = mapped_column(Integer, index=True, nullable=True)
+    jurnal: Mapped[str] = mapped_column(String(300), default='')
+    sumber: Mapped[str] = mapped_column(String(30), default='', index=True)
+    penulis_json: Mapped[str] = mapped_column(Text, nullable=False,
+                                               default='{}')
+    surname_key: Mapped[str] = mapped_column(String(100), index=True,
+                                              nullable=False)
+    dibuat: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class CacheTopik(Base):
+    """Cache panen per topik (bidang plus judul bab ternormalisasi).
+
+    Kunci unik (bidang, judul_bab_normal), cocok persis sesudah
+    normalisasi (bukan bidang saja, supaya referensi UMKM tidak bocor
+    ke buku perbankan syariah). artikel_ids adalah JSON list id
+    artikel, urut panen. dipanen adalah tanggal panen (kesegaran 12
+    bulan, 365 hari). Kosong tidak pernah disimpan (lihat pra_panen).
+
+    Tabel BARU, dibuat create_all().
+    """
+
+    __tablename__ = 'cache_topik'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    bidang: Mapped[str] = mapped_column(String(50), index=True,
+                                         nullable=False)
+    judul_bab_normal: Mapped[str] = mapped_column(String(300), index=True,
+                                                   nullable=False)
+    artikel_ids: Mapped[str] = mapped_column(Text, nullable=False,
+                                              default='[]')
+    dipanen: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+    __table_args__ = (UniqueConstraint('bidang', 'judul_bab_normal'),)
+
+
+class SnapshotJob(Base):
+    """Snapshot beku referensi per job per bab (satu sumber tunggal).
+
+    Satu baris = SATU referensi di SATU bab di SATU job, urut sesuai
+    urutan snapshot. kunci_sitasi adalah surname_key plus tahun
+    (contoh marina-2019), alias_json adalah token nama lain
+    (contoh dabic untuk ref Dabic Marina), supaya pemeriksa sitasi
+    membaca kunci dari sini, bukan parse ulang string format APA.
+    Sesudah ditulis, tidak ada tulis lagi selama job berjalan.
+
+    Tabel BARU, dibuat create_all(). Retensi 90 hari adalah kebijakan
+    (bukan hapus otomatis di Fase 1), lihat pra_panen.py.
+    """
+
+    __tablename__ = 'snapshot_job'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    job_kode: Mapped[str] = mapped_column(String(64), index=True,
+                                           nullable=False)
+    bab: Mapped[int] = mapped_column(Integer, index=True, nullable=False)
+    urutan: Mapped[int] = mapped_column(Integer, nullable=False)
+    artikel_id: Mapped[int] = mapped_column(ForeignKey('artikel.id'),
+                                            index=True, nullable=False)
+    kunci_sitasi: Mapped[str] = mapped_column(String(120), index=True,
+                                               nullable=False)
+    surname_tampil: Mapped[str] = mapped_column(String(100), default='')
+    tahun: Mapped[int] = mapped_column(Integer, nullable=True)
+    alias_json: Mapped[str] = mapped_column(Text, default='[]')
+    sumber: Mapped[str] = mapped_column(String(30), default='')
+
+    __table_args__ = (UniqueConstraint('job_kode', 'bab', 'urutan'),)
