@@ -141,7 +141,10 @@ case "$IMAGE" in --image) IMAGE="${2:-}";; esac
 if [ -n "$IMAGE" ]; then
     # Diperiksa di IMAGE BARU, sebelum container lama diganti.
     if docker image inspect "$IMAGE" >/dev/null 2>&1; then
-        HASIL="$(docker run --rm --entrypoint python3 "$IMAGE" -c "
+        # env SAMA seperti produksi (tanpa itu import menolak: EDUAI_SECRET_KEY belum diset).
+        ENV_ARG="--env-file .env"
+        [ -f .env ] || ENV_ARG=""
+        HASIL="$(docker run --rm $ENV_ARG --entrypoint python3 "$IMAGE" -c "
 import app.main as m
 print('RUTE', len(m.app.routes))
 " 2>&1)"
@@ -374,20 +377,25 @@ if [ -f "$PROYEK/_gerbang_lapis3_bab_bersamaan.py" ]; then
 fi
 
 #  BUKU LATAR (19 Okt 2026) — butuh fastapi, jadi DIJALANKAN DI DALAM IMAGE,
-#  bukan di host. Memakai image terakhir yang berhasil dibangun.
-if [ -f "_gerbang_buku_latar.py" ]; then
+#  bukan di host. Memakai image eksplisit yang baru dibangun.
+if [ "${PERIKSA_TANPA_BUKU_LATAR:-}" = "1" ]; then
+    echo
+    echo "BUKU LATAR DILEWATI di pra-build (jalan di Langkah 4 sesudah build, pakai image baru)"
+elif [ -f "_gerbang_buku_latar.py" ]; then
     echo
     echo "── BUKU LATAR (titip pekerjaan · 19 Okt 2026) ──"
     #  ⚠️ JEBAKAN 19 Okt: gerbang ini DILEWATI DIAM-DIAM kalau image kosong,
     #     lalu `periksa_kode.sh` tetap LULUS — gerbang hiasan. Sekarang:
     #     tidak ada image = GAGAL, bukan lewat.
+    # 30 Okt 2026: TIDAK ADA lagi fallback ke image teratas (menyesatkan).
     IMG_UJI="$IMAGE"
     if [ -z "$IMG_UJI" ] || ! docker image inspect "$IMG_UJI" >/dev/null 2>&1; then
-        IMG_UJI="$(docker images --format '{{.Repository}}:{{.Tag}}' \
-                   | grep '^eduai-app:' | grep -v cadangan | head -1)"
+        echo "  GAGAL: BUKU LATAR butuh image eksplisit yang baru dibangun."
+        echo "     Contoh: bash scripts/periksa_kode.sh --image eduai-app:<tag-baru>"
+        echo "     Gerbang ini TIDAK memakai image teratas sebelum build (menyesatkan)."
     fi
-    if [ -z "$IMG_UJI" ]; then
-        echo "  ❌ tidak ada image untuk menjalankan gerbang — build dulu"
+    if [ -z "$IMG_UJI" ] || ! docker image inspect "$IMG_UJI" >/dev/null 2>&1; then
+        echo "  ❌ image uji tidak ada / tidak disebut (beri image baru eksplisit)"
         GAGAL=1
     else
         echo "  (image uji: $IMG_UJI)"

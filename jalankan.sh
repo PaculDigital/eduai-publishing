@@ -100,7 +100,7 @@ fi
 # ═══════════════════════════════════════════════════════════════════════
 echo
 echo "── [0/5] PERIKSA KODE (gerbang wajib) ────────────────────────"
-if ! bash scripts/periksa_kode.sh; then
+if ! PERIKSA_TANPA_BUKU_LATAR=1 bash scripts/periksa_kode.sh; then
   echo
   echo "⛔ DEPLOY DIBATALKAN — kode belum sehat."
   echo "   Tidak ada yang diubah: image lama masih jalan, DB tidak disentuh."
@@ -215,6 +215,21 @@ if [ -f "gerbang_modul_di_image.py" ]; then
   fi
   echo "  ✅ Semua modul mesin buku bisa diimpor dari IMAGE"
 fi
+
+# 4a-ter. GERBANG PENUH ULANG PAKAI IMAGE BARU (30 Okt 2026).
+# AKAR: dulu BUKU LATAR jalan di Langkah 0 tanpa image, lalu memakai image
+# teratas sebelum build (image live lama), sehingga hasil menyesatkan dan
+# deploy batal padahal kode sehat. Sekarang: BUKU LATAR dilewati di
+# Langkah 0, dan di sini, sesudah build, seluruh gerbang jalan ulang
+# dengan image baru eksplisit, sehingga BUKU LATAR menguji image baru.
+echo "  Menjalankan ulang gerbang penuh dengan image baru:"
+if ! bash scripts/periksa_kode.sh --image "${IMAGE_BASE}:${TAG}"; then
+  echo
+  echo "  GAGAL: gerbang pasca-build tidak lolos, image baru belum teruji."
+  echo "  DEPLOY DIBATALKAN sebelum ganti container."
+  exit 1
+fi
+echo "  OK: gerbang pasca-build lolos di IMAGE BARU"
 
 # 4b. File kunci ada di dalam image & hash-nya SAMA dengan source
 echo "  Membandingkan isi image vs source:"
