@@ -544,6 +544,24 @@ async def buku_outline_simpan(
     })
 
 
+@_router_kolaborasi.post('/buku/judul-alternatif')
+async def buku_judul_alternatif(request: Request, db: Session = Depends(get_db)):
+    """Alternatif judul (tombol di siapkan): 1 panggilan LLM baru per judul,
+    maks 3 panggilan baru per user per hari, sisanya dari cache."""
+    u = _wajib_login_kolab(request, db)
+    try:
+        data = await request.json()
+    except Exception:
+        data = {}
+    from .judul_alternatif import ambil_alternatif
+    daftar, dari_cache, galat = ambil_alternatif(
+        db, u.id, str(data.get('judul') or ''),
+        str(data.get('jenis') or ''), str(data.get('bidang') or ''))
+    if galat:
+        return {'ok': False, 'galat': galat}
+    return {'ok': True, 'alternatif': daftar, 'dari_cache': dari_cache}
+
+
 @_router_kolaborasi.post('/buku/susun')
 def buku_susun(
     request: Request,
@@ -854,6 +872,7 @@ def halaman_buku_siapkan(
         'nama_untuk': (_buku.cari_untuk_siapa(untuk) or {}).get('nama', ''),
         'nama_bidang': next((b['nama'] for b in _buku.BIDANG_UMUM
                              if b['kode'] == bidang), ''),
+        'daftar_bidang': _buku.BIDANG_UMUM,
         'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
         'jumlah_bab': jumlah_bab,
         'tier': tier,
