@@ -217,7 +217,10 @@ except ModuleNotFoundError:                        # pragma: no cover
 
     requests = _RequestsShim()
 
-BASE_URL = "http://172.17.0.1:20128/v1"          # 9router — TEKS
+try:
+    from app.config import ROUTER_BASE as BASE_URL
+except Exception:
+    BASE_URL = os.getenv("EDUAI_ROUTER_BASE", "http://172.17.0.1:20128/v1")  # 9router, TEKS
 #  ── GAMBAR: InferHub LANGSUNG ──────────────────────────────────────────────
 #  Jalur lama (`cbc/*` lewat enowx, akun KOSONG) sudah dibuang 28 Okt 2026.
 #  9router juga tidak bisa: `inferhub/*` rusak, `JEV/nano-banana` kolam bersama.
@@ -254,10 +257,19 @@ GAMBAR_MATI = set()            # model yg gagal di proses ini → tidak dicoba l
 GAMBAR_KEY = _baca_env("INFERHUB_KEY")
 #  ⚠️ JANGAN pakai glm-5.2 — model BERPIKIR: max_tokens habis untuk reasoning,
 #     jawaban jadi 2 karakter (terukur 18 Okt: content=2 kar, reasoning=1156 kar).
-MODEL = "inferhub/cb/glm-5.3"
-# Fallback: semua TERUJI menghasilkan 170-200 kata pada max_tokens=3000 (18 Okt)
-MODEL_FALLBACK = ["inferhub/cb/glm-5.3", "inferhub/cb/deepseek-v4.1-flash",
-                  "inferhub/cb/glm-5.3-flash", "inferhub/cb/kimi-k2.7"]
+#  SATU PINTU TEKS (wajib Bos 30 Okt 2026): teks WAJIB lewat combo EduAi di
+#  9router. Urutan model & fallback diatur Bos dari panel 9router — JANGAN
+#  hardcode daftar model di sini. Dulu MODEL_FALLBACK berisi 4 nama cb/;
+#  dihapus 30 Okt 2026 karena mem-bypass combo dan menimbulkan fallback ganda
+#  (aplikasi mengulang model, 9router juga fallback di dalam tiap permintaan).
+#  Nama combo diambil dari app.config (AI_MODEL, env EDUAI_AI_MODEL, default
+#  'EduAi') seperti jalur AI umum (ai.py); bila config tak bisa diimpor,
+#  pakai env langsung. Bos mengganti combo cukup lewat env, tanpa ubah kode.
+try:
+    from app.config import AI_MODEL as COMBO
+except Exception:
+    COMBO = os.getenv("EDUAI_AI_MODEL", "EduAi")
+MODEL = COMBO  # alias kompatibilitas: nama COMBO 9router, bukan model tunggal.
 
 #  ══════════════════════════════════════════════════════════════════════════
 #  AKAR "EMPTY RESPONSE" (terukur 18 Okt 2026) — model GLM BERPIKIR dulu.
@@ -307,61 +319,64 @@ def _jalankan_bersamaan(pekerjaan, tenggat=300):
 
 
 def call_llm(prompt, max_tokens=3000, timeout=120, retries=5):
-    """Call LLM dengan retry 5x, exponential backoff, dan model fallback.
-    Returns: str (response) atau None kalau semua model gagal total."""
-    for model in MODEL_FALLBACK:
-        for attempt in range(retries):
-            try:
-                resp = requests.post(f"{BASE_URL}/chat/completions",
-                    headers={"Content-Type": "application/json",
-                             "Authorization": f"Bearer {ROUTER_KEY}"},
-                    json={"model": model, "stream": True,
-                          "messages": [{"role": "user", "content": prompt}],
-                          #  ⚠️ WAJIB False: tanpa ini model reasoning bisa
-                          #  "berpikir" panjang ⇒ lambat + boros token.
-                          #  Setelan produksi (gerbang G1/G2 menolak deploy).
-                          "enable_thinking": False,
-                          #  Batas token WAJIB ikut setelan produksi — dulu
-                          #  hardcode 3000/4000 di sini, jauh di bawah 32.000
-                          #  yang sudah disetujui Bos (16 Sep 2026).
-                          "max_tokens": AI_MAX_TOKENS},
-                    stream=True, timeout=timeout)
-                full = ""
-                for line in resp.iter_lines():
-                    if line:
-                        line = line.decode("utf-8", "ignore")
-                        if line.startswith("data: "):
-                            data = line[6:]
-                            if data.strip() == "[DONE]": break
-                            try:
-                                chunk = json.loads(data)
-                                #  ⚠️ JANGAN pakai chunk.get("choices",[{}])[0] —
-                                #  stream 9router mengirim chunk `choices: []` di akhir
-                                #  (berisi usage) → IndexError → ditelan except →
-                                #  tampak "empty response" padahal cuma crash parsing.
-                                #  Terukur 18 Okt 2026: content 1473 kar hilang karena ini.
-                                _chs = chunk.get("choices") or []
-                                if not _chs: continue
-                                delta = _chs[0].get("delta") or {}
-                                if delta.get("content"): full += delta["content"]
-                            except Exception: continue
-                if full.strip():
-                    if model != MODEL:
-                        print(f"       [fallback] Using {model} instead of {MODEL}")
-                    return full
-                print(f"       [retry {attempt+1}/{retries}] empty response from {model}...")
-                time.sleep(3 * (2 ** attempt))
-            except requests.exceptions.Timeout:
-                print(f"       [retry {attempt+1}/{retries}] timeout from {model}...")
-                time.sleep(3 * (2 ** attempt))
-            except Exception as e:
-                err_msg = str(e)
-                if "no usable account" in err_msg or "insufficient" in err_msg:
-                    print(f"       [model-switch] {model} → no usable account, trying next model...")
-                    break
-                print(f"       [retry {attempt+1}/{retries}] {type(e).__name__}: {err_msg[:80]}")
-                time.sleep(3 * (2 ** attempt))
-    print(f"       [FATAL] All models exhausted. Returning None.")
+    """Call LLM lewat SATU PINTU: combo EduAi di 9router.
+
+    Urutan model & fallback diatur Bos dari panel 9router — JANGAN hardcode
+    daftar model di sini (aturan wajib Bos 30 Okt 2026; loop MODEL_FALLBACK
+    lama dihapus karena mem-bypass combo dan menimbulkan fallback ganda).
+    Retry hanya untuk gangguan transport (timeout, respons kosong, error)
+    dengan exponential backoff.
+    Returns: str (response) atau None kalau combo gagal total.
+    """
+    for attempt in range(retries):
+        try:
+            resp = requests.post(f"{BASE_URL}/chat/completions",
+                headers={"Content-Type": "application/json",
+                         "Authorization": f"Bearer {ROUTER_KEY}"},
+                json={"model": COMBO, "stream": True,
+                      "messages": [{"role": "user", "content": prompt}],
+                      #  WAJIB False: tanpa ini model reasoning bisa
+                      #  "berpikir" panjang, lambat + boros token.
+                      #  Setelan produksi (gerbang G1/G2 menolak deploy).
+                      "enable_thinking": False,
+                      #  Batas token WAJIB ikut setelan produksi, jauh di
+                      #  bawah 32.000 yang sudah disetujui Bos (16 Sep 2026).
+                      "max_tokens": AI_MAX_TOKENS},
+                stream=True, timeout=timeout)
+            full = ""
+            for line in resp.iter_lines():
+                if line:
+                    line = line.decode("utf-8", "ignore")
+                    if line.startswith("data: "):
+                        data = line[6:]
+                        if data.strip() == "[DONE]": break
+                        try:
+                            chunk = json.loads(data)
+                            #  JANGAN pakai chunk.get("choices",[{}])[0] —
+                            #  stream 9router mengirim chunk `choices: []` di akhir
+                            #  (berisi usage), IndexError ditelan except hingga
+                            #  tampak "empty response" padahal cuma crash parsing.
+                            #  Terukur 18 Okt 2026: content 1473 kar hilang karena ini.
+                            _chs = chunk.get("choices") or []
+                            if not _chs: continue
+                            delta = _chs[0].get("delta") or {}
+                            if delta.get("content"): full += delta["content"]
+                        except Exception: continue
+            if full.strip():
+                return full
+            print(f"       [retry {attempt+1}/{retries}] empty response from combo {COMBO}...")
+            time.sleep(3 * (2 ** attempt))
+        except requests.exceptions.Timeout:
+            print(f"       [retry {attempt+1}/{retries}] timeout from combo {COMBO}...")
+            time.sleep(3 * (2 ** attempt))
+        except Exception as e:
+            err_msg = str(e)
+            if "no usable account" in err_msg or "insufficient" in err_msg:
+                print(f"       [combo] {COMBO} -> no usable account, berhenti (fallback tugas 9router).")
+                return None
+            print(f"       [retry {attempt+1}/{retries}] {type(e).__name__}: {err_msg[:80]}")
+            time.sleep(3 * (2 ** attempt))
+    print(f"       [FATAL] Combo {COMBO} gagal total setelah {retries}x percobaan. Returning None.")
     return None
 
 # === MASTER OUTLINE ===
