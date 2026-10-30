@@ -204,6 +204,11 @@ except ModuleNotFoundError:                        # pragma: no cover
 
         Response = _Resp
 
+        #  30 Okt 2026: call_llm menangkap requests.exceptions.Timeout.
+        #  Tanpa ini, timeout crash AttributeError, bukan retry.
+        class exceptions:
+            Timeout = _httpx.TimeoutException
+
         @staticmethod
         def post(url, headers=None, json=None, stream=False, timeout=None,
                  **kw):
