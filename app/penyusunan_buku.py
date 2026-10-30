@@ -275,6 +275,36 @@ def jalankan_semua_bab(nomor_bab, eksekutor, folder_checkpoint=None,
     return hasil
 
 
+def _peta_sumber_pustaka(db, job_kode, outline):
+    """Bangun {teks_pustaka: [sumber]} dari snapshot beku pra-panen.
+
+    Dipakai tag [Sumber: X] di Daftar Pustaka DOCX. Fail-soft: bila
+    DB atau snapshot gagal dibaca, kembalikan {} (tanpa tag, tanpa
+    gagal), supaya perakitan buku tidak pernah gagal hanya karena
+    tag sumber. Casing sumber disimpan apa adanya dari DB (tidak
+    dinormalisasi di sini).
+    """
+    try:
+        from . import pra_panen as _PP
+        import verifikasi_sitasi as _VS
+        _peta = {}
+        for _n in sorted(n for n in (outline or {}) if isinstance(n, int)):
+            for _row in _PP.ambil_snapshot(db, job_kode, _n):
+                _sumber = (_row.get("sumber") or
+                           (_row.get("ref_dict") or {}).get("source") or "").strip()
+                if not _sumber:
+                    continue
+                _teks = _VS.format_apa(_row.get("ref_dict") or {})
+                if not _teks:
+                    continue
+                _daftar = _peta.setdefault(_teks, [])
+                if _sumber not in _daftar:
+                    _daftar.append(_sumber)
+        return _peta
+    except Exception:
+        return {}
+
+
 def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
           kartu_jenis=None, outline_siaps=None, penulis=None, penelaah=None,
           tier=None, kode=None):
@@ -600,12 +630,16 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     with open(_p_bab2, encoding='utf-8') as _f2:
                         _teks_per_bab[_n] = _f2.read()
             refs_rakit = _SG.gabung_pustaka(_teks_per_bab, refs_rakit or [])
+        _peta_sumber = None
+        if kartu_jenis == 'buku-referensi':
+            _peta_sumber = _peta_sumber_pustaka(db, _job_kode, outline)
         try:
             import buku_umum_assembly as ASM
             rakit = ASM.rakit(
                 judul, keluar, outline,
                 glosarium=glos,
                 references=refs_rakit,
+                peta_sumber=_peta_sumber,
                 penulis=(penulis or getattr(u, 'nama', '')
                          or getattr(u, 'nama_lengkap', '') or ''),
                 institusi=(getattr(u, 'nama_kampus', '') or ''),
