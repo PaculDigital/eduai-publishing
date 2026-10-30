@@ -196,9 +196,16 @@ def main():
             'progress WAJIB tahap nyata: Menyiapkan → Menulis bab → Merakit → Selesai')
         cek('memantau endpoint proses yang SUDAH ADA',
             '/api/ai/v1/proses/' in tpl_bersih)
-        cek('memakai endpoint hasil', '/hasil' in tpl_bersih)
+        #  30 Okt 2026 (G1/A4): halaman proses tidak lagi memanggil
+        #  /hasil dan tidak lagi menampilkan kartu gagal. Tiga cek di
+        #  bawah dibalik ke invarian baru: gagal bila perilaku lama
+        #  kembali (fetch /hasil, kartu pesan-gagal, parse hasil_json
+        #  di JS). Selesai resolve by kode dari server, bukan /hasil.
+        cek('tidak memakai endpoint hasil (G1: resolve by kode)',
+            '/hasil' not in tpl_bersih)
         cek('mengalihkan ke halaman hasil', '/buku/selesai?' in tpl_bersih)
-        cek('ada keadaan GAGAL yang terlihat', 'pesan-gagal' in tpl_bersih)
+        cek('tidak ada keadaan GAGAL yang terlihat (A4: sabar)',
+            'pesan-gagal' not in tpl_bersih)
         cek('BISA DITINGGAL: halaman menyatakan boleh tutup tab',
             'tutup tab' in tpl)
 
@@ -215,7 +222,8 @@ def main():
                 bocor.append(mm.group(0))
         cek('tidak menampilkan isi naskah (`hasil`/`jawaban`)',
             not bocor, 'yang dipantau: ' + ', '.join(sorted(set(bocor))))
-        cek('metadata hasil TETAP dipakai (hasil_json)', 'hasil_json' in tpl_bersih)
+        cek('tidak memakai metadata hasil di template (G1: hasil_json di server)',
+            'hasil_json' not in tpl_bersih)
 
     finally:
         db.close()

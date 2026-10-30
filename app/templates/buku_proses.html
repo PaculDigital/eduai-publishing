@@ -105,14 +105,16 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
 
   <div class="hijau">
     <h3>{{ ikon('file-text', 15) }} {{ judul or 'Buku' }}</h3>
-    <p>Tahap sekarang: <b id="tahap">{{ tahap or 'Menyiapkan' }}</b>
-       <span class="bar-info" id="bab-info"></span>
+    <p>Tahap sekarang: <b id="tahap">{% if status == 'gagal' %}{% if galat and 'Token sudah kembali' in galat %}{{ galat }}{% else %}Maaf, buku belum berhasil dibuat. Silakan coba lagi atau hubungi admin.{% endif %}{% elif sedang_disempurnakan %}buku sedang disempurnakan, mohon sabar{% else %}{{ tahap or 'Menyiapkan' }}{% endif %}</b>
+       <span class="bar-info" id="bab-info">{% if bab_selesai and bab_total %}Bab {{ bab_selesai }} dari {{ bab_total }}{% endif %}</span>
        <br>Kode pekerjaan: <b>{{ kode }}</b></p>
+    <p class="bar-info" id="teks-sabar" {% if not sedang_disempurnakan or status == 'gagal' %}style="display:none"{% endif %}>buku sedang disempurnakan, mohon sabar</p>
+    <p class="bar-info" id="teks-akhir" {% if status != 'gagal' %}style="display:none"{% endif %}><a href="/buku">Kembali ke halaman buku untuk mencoba lagi</a></p>
     <div class="bar-luar"><div class="bar-isi hidup" id="bar-isi"></div></div>
   </div>
 
   <div class="kartu">
-    <h2>Kemajuan</h2>
+    <h2>PROGRESS</h2>
     <div class="langkah" id="langkah">
       <div class="lgk" data-i="0"><span class="dot"></span>
         <span class="isi">Menyiapkan kerangka buku</span></div>
@@ -123,6 +125,7 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
       <div class="lgk" data-i="3"><span class="dot"></span>
         <span class="isi">Selesai</span></div>
     </div>
+    <p class="bar-info" id="subbab-info">{% for nomor, teks in (subbab_per_bab or {}).items() %}Bab {{ nomor }}: {{ teks }} {% endfor %}</p>
   </div>
 
   <div class="kartu" id="kartu-hasil" style="display:none">
@@ -135,10 +138,6 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
       <span class="v" id="h-docx">—</span></div>
   </div>
 
-  <div class="merah" id="kartu-gagal" style="display:none">
-    <h3>{{ ikon('alert-triangle', 15) }} Belum berhasil</h3>
-    <p id="pesan-gagal"></p>
-  </div>
 
   <div class="aksi">
     <a class="tombol batal" href="/buku">{{ ikon('book-open', 14) }} Buat buku lain</a>
@@ -154,8 +153,11 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
 const KODE = {{ kode|tojson }};
 const elTahap = document.getElementById('tahap');
 const elLangkah = document.getElementById('langkah');
-const kartuHasil = document.getElementById('kartu-hasil');
-const kartuGagal = document.getElementById('kartu-gagal');
+const elSabar = document.getElementById('teks-sabar');
+const elSubbab = document.getElementById('subbab-info');
+function tampilkanSabar(ya) {
+  if (elSabar) elSabar.style.display = ya ? '' : 'none';
+}
 
 function gambarLangkah(i, selesai) {
   elLangkah.querySelectorAll('.lgk').forEach(function (n) {
@@ -193,7 +195,7 @@ function babKini(t) {
 //  Bar digerakkan tahap nyata: tiap tahap = seperempat bar; di tahap
 //  menulis, pecahan = bab selesai / total bab (bukan persen karangan).
 //  Minimum 4% di tahap awal hanya supaya bar terlihat hidup, bukan ukuran.
-var TOTAL_BAB = 0;
+var TOTAL_BAB = {{ bab_total or 0 }};
 function aturBar(i, bab, total) {
   var isi = document.getElementById('bar-isi');
   var info = document.getElementById('bab-info');
@@ -201,13 +203,12 @@ function aturBar(i, bab, total) {
   var persen = 4;
   if (i === 3) persen = 100;
   else if (i === 2) persen = 50;
-  else if (i === 1 && total > 0 && bab > 0) persen = 25 + 25 * ((bab - 1) / total);
+  else if (i === 1 && total > 0 && bab > 0) persen = 25 + 25 * (bab / total);
   else if (i === 1) persen = 25;
   isi.style.width = persen + '%';
   isi.classList.toggle('hidup', i !== 3);
   if (info) {
     if (i === 1 && bab > 0 && total > 0) info.textContent = 'Bab ' + bab + ' dari ' + total;
-    else if (i === 1 && bab > 0) info.textContent = 'Bab ' + bab;
     else info.textContent = '';
   }
 }
@@ -218,54 +219,72 @@ async function pantau() {
   if (sudah) return;
   try {
     const r = await fetch('/api/ai/v1/proses/' + KODE, {credentials: 'same-origin'});
-    if (!r.ok) return;
+    //  Poll kosong: pertahankan tampilan sebelumnya, tampilkan teks
+    //  sabar, jangan nol-kan apa pun.
+    if (!r.ok) { tampilkanSabar(true); return; }
     const j = await r.json();
     var th = j.tahap || j.pesan || '';
     var ix = indeksTahap(th);
-    elTahap.textContent = labelTahap(th, ix);
-    if (typeof j.jumlah_bab === 'number' && j.jumlah_bab > 0) TOTAL_BAB = j.jumlah_bab;
-    aturBar(ix, babKini(th), TOTAL_BAB);
+    var ag = j.agregat || null;
+    //  Jumlah bab dari agregator (monoton). babKini dari teks mentah
+    //  hanya cadangan bila agregator belum ada.
+    var babAg = (ag && typeof ag.bab_selesai === 'number') ? ag.bab_selesai : babKini(th);
+    if (ag && typeof ag.bab_total === 'number' && ag.bab_total > 0) TOTAL_BAB = ag.bab_total;
+    else if (typeof j.jumlah_bab === 'number' && j.jumlah_bab > 0) TOTAL_BAB = j.jumlah_bab;
+    if (ag && ag.sedang_disempurnakan) {
+      elTahap.textContent = 'buku sedang disempurnakan, mohon sabar';
+      tampilkanSabar(true);
+    } else {
+      elTahap.textContent = labelTahap(th, ix);
+      tampilkanSabar(false);
+    }
+    if (ag && ag.subbab_per_bab && elSubbab) {
+      var daftar = [];
+      Object.keys(ag.subbab_per_bab).sort(function (a, b) { return a - b; }).forEach(function (k) {
+        daftar.push('Bab ' + k + ': ' + ag.subbab_per_bab[k]);
+      });
+      elSubbab.textContent = daftar.join(' ');
+    }
+    aturBar(ix, babAg, TOTAL_BAB);
     if (j.status === 'selesai') {
       sudah = true;
       gambarLangkah(3, true);
       elTahap.textContent = 'Selesai';
+      tampilkanSabar(false);
       aturBar(3, 0, TOTAL_BAB);
       tampilkanHasil();
       return;
     }
-    if (j.status === 'gagal' || j.status === 'dibatalkan') {
-      sudah = true;
-      document.getElementById('pesan-gagal').textContent =
-        j.pesan || 'Penyusunan belum berhasil. Kuota sudah dikembalikan.';
-      kartuGagal.style.display = '';
+    //  Terminal (30 Okt 2026): bukan sabar lagi, tampilkan pesan
+    //  manusia. Bila galat membawa kabar refund, tampilkan galat itu;
+    //  bila tidak, pesan generik tanpa klaim refund.
+    if (j.status !== 'jalan' && j.status !== 'menunggu' && j.status !== 'selesai') {
+      var g = j.galat || '';
+      elTahap.textContent = (g.indexOf('Token sudah kembali') >= 0) ? g : 'Maaf, buku belum berhasil dibuat. Silakan coba lagi atau hubungi admin.';
+      tampilkanSabar(false);
+      var elAkhir = document.getElementById('teks-akhir');
+      if (elAkhir) elAkhir.style.display = '';
+      return;
+    }
+    //  Status apa pun selain jalan/menunggu (termasuk terminal yang
+    //  sedang diperbaiki otomatis): tampilkan teks sabar, tetap pantau.
+    if (j.status !== 'jalan' && j.status !== 'menunggu') {
+      elTahap.textContent = 'buku sedang disempurnakan, mohon sabar';
+      tampilkanSabar(true);
       return;
     }
     gambarLangkah(indeksTahap(j.tahap || j.pesan), false);
-  } catch (e) { /* diam: jaringan putus sesaat, coba lagi */ }
+  } catch (e) { tampilkanSabar(true); /* diam: jaringan putus sesaat, coba lagi, tampilan lama dipertahankan */ }
 }
 
-async function tampilkanHasil() {
-  kartuHasil.style.display = '';
-  try {
-    const r = await fetch('/api/ai/v1/proses/' + KODE + '/hasil',
-                          {credentials: 'same-origin'});
-    if (!r.ok) return;
-    const j = await r.json();
-    let h = {};
-    try { h = JSON.parse(j.hasil_json || '{}'); } catch (e) { h = {}; }
-    document.getElementById('h-bab').textContent = h.bab_selesai || '—';
-    document.getElementById('h-kata').textContent = h.total_kata || '—';
-    const nama = h.docx ? h.docx.split('/').pop() : 'belum jadi';
-    document.getElementById('h-docx').textContent = nama;
-    //  Pindah ke halaman hasil yang SUDAH ADA, bawa data apa adanya.
-    const q = new URLSearchParams({
-      judul: h.judul || '', bab: h.bab_selesai || 0, kata: h.total_kata || 0,
-      folder: h.folder || '', docx: h.docx || '',
-      docx_alasan: h.docx_alasan || '', fid: h.file_id || 0,
-      file_alasan: h.file_alasan || ''
-    });
-    window.location.replace('/buku/selesai?' + q.toString());
-  } catch (e) { /* biarkan kartu hasil tampil apa adanya */ }
+function tampilkanHasil() {
+  //  W1 (30 Okt 2026, TERBUKTI): endpoint /hasil TIDAK PERNAH
+  //  mengembalikan hasil_json, hanya jawaban berisi judul. Dulu JS
+  //  mem-parse j.hasil_json sehingga selalu dapat objek kosong lalu
+  //  redirect dengan bab 0 dan kata 0. Karena itu fungsi ini TIDAK
+  //  lagi memanggil /hasil sama sekali: redirect hanya membawa kode,
+  //  dan rute selesai membaca baris job + hasil_json dari server.
+  window.location.replace('/buku/selesai?kode=' + encodeURIComponent(KODE));
 }
 
 pantau();

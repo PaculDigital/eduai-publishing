@@ -530,13 +530,235 @@ def kumpulkan_singkatan(keluar, outline):
         if kep and akr:
             kandidat.setdefault(akr, []).append(
                 (len(re.split(r'[\s-]+', kep)), m.start(), kep))
+    # --- Pola baru G7 (30 Okt 2026): kenapa dulu hanya 3 ---
+    # Dulu: (1) kepanjangan hanya dari kurung, padahal naskah ini
+    # hampir tidak pernah menulis akronim dalam kurung (hanya UMKM
+    # 2x); teori ditulis utuh ('Resource Based View' 7x) tanpa
+    # akronimnya, jadi tidak tertangkap. (2) Akronim sering muncul
+    # butuh >=3x, padahal TAM/RBV/DOI/ROI hanya 1x di badan.
+    # (3) Tanpa saringan kemunculan, sitasi 'RPIR et al.' (16x) dan
+    # penanda 'SUB-BAB' (SUB 4x) justru tertangkap sebagai singkatan.
+    # Perbaikan: (a) kemunculan SAH: bukan pecahan kata berhubung,
+    # bukan sitasi 'et al.', bukan kata penanda huruf besar berurutan
+    # (3+ kata kapital berturut-turut, misal baris 'SUB-BAB 5.1
+    # DEFINISI DAN KONSEP KUNCI ...'); ambang turun ke >=1x karena
+    # akronim yang dipakai sekali tetap dipakai. (b) derivasi inisial:
+    # frasa multi-kata yang huruf awalnya membentuk token yang juga
+    # muncul mandiri (misal 'Resource Based View' + token RBV)
+    # memberi kepanjangan terverifikasi huruf per huruf, tanpa
+    # mengarang. (c) urutan menang: kepanjangan kurung yang
+    # TERverifikasi inisialnya dulu, lalu derivasi, lalu kepanjangan
+    # kurung tak terverifikasi (perilaku lama), lalu token mandiri
+    # tanpa kepanjangan.
+    import bisect as _bisect
+
+    _KONEKTOR = {'dan', 'and', 'of', 'the', 'di', 'atau', 'or',
+                   'akan'}
+
+    def _inisial_cocok(frasa, token):
+        """True bila inisial frasa (konektor dihitung atau dilewat)
+        sama dengan token. Dipakai memverifikasi kepanjangan kurung
+        ('Usaha Mikro, Kecil, dan Menengah' -> UMKM lewat varian
+        lepas-konektor; 'Kesiapan teknologi' -> KT, bukan TOE)."""
+        kata = [w.strip(',.()') for w in re.split(r'[\s-]+', frasa)
+                if w.strip(',.()')]
+        if not kata:
+            return False
+        rendah = [w.lower() for w in kata]
+        penuh = ''.join(w[0].upper() for w in rendah if w)
+        lepas = ''.join(w[0].upper() for w in rendah
+                        if w and w not in _KONEKTOR)
+        return token in (penuh, lepas)
+
+    def _turunan_inisial(mandiri):
+        """{token: frasa tampil} dari frasa yang inisialnya = token.
+
+        Frasa tidak boleh melewati batas kalimat, tidak boleh
+        mengandung kata huruf besar semua (penanda), dan kata isinya
+        minimal 2 huruf. Tambahan anti-kebetulan: satu kemunculan
+        frasa hanya dihitung bila minimal 2 kata isinya berhuruf
+        awal kapital (ciri frasa istilah, bukan kalimat biasa yang
+        kebetulan inisialnya sama, misal 'firma tunggal akan
+        menghasilkan' untuk TAM). Bila satu token punya beberapa
+        frasa, frasa tersering menang, seri = yang pertama muncul.
+        Tampilan frasa diambil dari token mentah aslinya, jadi koma
+        ('Usaha Mikro, Kecil, dan Menengah') dan pemisah hubung
+        ('Technology Organization Environment') dipertahankan
+        bentuk wajarnya.
+        """
+        mentahan = teks.split()
+        bagian = []
+        for ri, mentah in enumerate(mentahan):
+            inti = mentah.strip('.,;:!?()[]{}')
+            if not inti:
+                bagian.append(None)
+                continue
+            akhir = mentah.endswith(('.', '!', '?'))
+            potongan = inti.split('-')
+            for j, pot in enumerate(potongan):
+                if not pot.isalpha():
+                    bagian.append(None)
+                    continue
+                bagian.append((pot, akhir and j == len(potongan) - 1, ri))
+        temu = {}
+        for token in mandiri:
+            per_mulai = {}
+            for i, ent in enumerate(bagian):
+                if ent is None:
+                    continue
+                kata0, _, _ = ent
+                if len(kata0) < 2 or kata0.isupper():
+                    continue
+                if kata0[0].upper() != token[0]:
+                    continue
+                for lewati in (False, True):
+                    huruf = []
+                    kata_frasa = []
+                    raw_awal = None
+                    raw_akhir = None
+                    j = i
+                    cocok = False
+                    while j < len(bagian) and len(huruf) < len(token) \
+                            and len(kata_frasa) <= len(token) + 2:
+                        ent2 = bagian[j]
+                        if ent2 is None:
+                            break
+                        w2, akhir2, ri2 = ent2
+                        if len(w2) < 2 or not w2.isalpha() \
+                                or w2.isupper():
+                            break
+                        rendah = w2.lower()
+                        if lewati and rendah in _KONEKTOR and j != i:
+                            kata_frasa.append(w2)
+                            raw_akhir = ri2
+                            if akhir2:
+                                break
+                            j += 1
+                            continue
+                        huruf.append(w2[0].upper())
+                        kata_frasa.append(w2)
+                        if raw_awal is None:
+                            raw_awal = ri2
+                        raw_akhir = ri2
+                        if ''.join(huruf) != token[:len(huruf)]:
+                            break
+                        if akhir2 and len(huruf) < len(token):
+                            break
+                        if len(huruf) == len(token):
+                            cocok = True
+                            break
+                        j += 1
+                    if not cocok:
+                        continue
+                    # Kata isi = kata frasa di luar konektor.
+                    isi = [w for w in kata_frasa
+                           if w.lower() not in _KONEKTOR]
+                    kapital = sum(1 for w in isi if w[0].isupper())
+                    if kapital < 2:
+                        continue
+                    if raw_awal is None:
+                        continue
+                    if raw_awal == raw_akhir:
+                        tampil_mentah = mentahan[raw_awal].replace(
+                            '-', ' ')
+                    else:
+                        tampil_mentah = ' '.join(
+                            mentahan[raw_awal:raw_akhir + 1])
+                    tampil_mentah = tampil_mentah.strip('.,;:!?()[]{}')
+                    tampil = _kepanjangan_sah(tampil_mentah)
+                    if tampil is None:
+                        continue
+                    kunci = ' '.join(w.lower() for w in kata_frasa)
+                    sudah = per_mulai.setdefault(i, set())
+                    if kunci in sudah:
+                        continue
+                    sudah.add(kunci)
+                    entri = temu.setdefault(token, {}).setdefault(
+                        kunci, [{}, 0])
+                    entri[0][tampil] = entri[0].get(tampil, 0) + 1
+                    entri[1] += 1
+        # Frasa derivasi wajib muncul minimal 2x: ciri istilah yang
+        # dipakai berulang, bukan kebetulan satu kalimat (misal
+        # 'Temuan Alfarizi menunjukkan' yang hanya 1x untuk TAM).
+        # Bentuk tampil yang dipakai = bentuk tersering frasa itu
+        # (misal 'Resource Based View' 7x menang atas bentuk hubung
+        # 'Resource-Based View' 1x).
+        hasil = {}
+        for token, daftar in temu.items():
+            terbaik = None
+            for kunci, (bentuk_hitung, total) in daftar.items():
+                if total < 2:
+                    continue
+                bentuk = max(bentuk_hitung.items(),
+                             key=lambda kv: kv[1])[0]
+                if terbaik is None or total > terbaik[0]:
+                    terbaik = (total, bentuk)
+            if terbaik is not None:
+                hasil[token] = terbaik[1]
+        return hasil
+
+
+    # Kemunculan SAH per token (bukan hitung mentah): lewati pecahan
+    # kata berhubung (SUB dalam SUB-BAB), sitasi 'et al.' (RPIR),
+    # dan kata yang hanya muncul dalam runtunan 3+ kata kapital
+    # (kata penanda SUB-BAB, bukan singkatan yang dipakai di prosa).
+    kata_urut = [(m.start(), m.group(0)) for m in
+                 re.finditer(r'[A-Za-z]+(?:-[A-Za-z]+)*', teks)]
+    mulai_kata = [s for s, _ in kata_urut]
+    baik = Counter()
+    for m in re.finditer(r'\b[A-Z]{2,8}\b', teks):
+        token = m.group(0)
+        if token in _SINGKATAN_STOP or _akronim_sah(token) is None:
+            continue
+        if m.start() > 0 and teks[m.start() - 1] == '-':
+            continue
+        if m.end() < len(teks) and teks[m.end()] == '-':
+            continue
+        if re.match(r'\s+et al\.', teks[m.end():m.end() + 10]):
+            continue
+        idx = _bisect.bisect_right(mulai_kata, m.start()) - 1
+        if idx >= 0:
+            kiri = idx
+            while kiri - 1 >= 0 and kata_urut[kiri - 1][1].isupper() \
+                    and len(kata_urut[kiri - 1][1]) >= 2:
+                kiri -= 1
+            kanan = idx
+            while kanan + 1 < len(kata_urut) \
+                    and kata_urut[kanan + 1][1].isupper() \
+                    and len(kata_urut[kanan + 1][1]) >= 2:
+                kanan += 1
+            if kanan - kiri + 1 >= 3:
+                continue
+            # Label huruf besar berurutan yang diakhiri titik dua
+            # ('CATATAN EDITORIAL: ...') bukan singkatan yang dipakai.
+            if kanan - kiri + 1 >= 2:
+                akhir_run = kata_urut[kanan][0] + len(kata_urut[kanan][1])
+                j = akhir_run
+                while j < len(teks) and teks[j] == ' ':
+                    j += 1
+                if j < len(teks) and teks[j] == ':':
+                    continue
+        baik[token] += 1
+
     sing = {}
     for akr, daftar in kandidat.items():
-        daftar.sort()
-        sing[akr] = daftar[0][2]
-    hitung = Counter(re.findall(r'\b[A-Z]{2,8}\b', teks))
-    for akr, c in hitung.most_common():
-        if c < 3 or akr in sing or akr in _SINGKATAN_STOP:
+        terverifikasi = [d for d in daftar
+                         if _inisial_cocok(d[2], akr)]
+        if terverifikasi:
+            terverifikasi.sort()
+            sing[akr] = terverifikasi[0][2]
+    turunan = _turunan_inisial(set(baik))
+    for akr, frasa in turunan.items():
+        if akr not in sing:
+            sing[akr] = frasa
+    for akr, daftar in kandidat.items():
+        if akr not in sing:
+            daftar.sort()
+            sing[akr] = daftar[0][2]
+    for akr, c in baik.most_common():
+        if akr in sing or akr in _SINGKATAN_STOP:
+            continue
+        if _akronim_sah(akr) is None:
             continue
         sing[akr] = ''
         if len(sing) >= 100:

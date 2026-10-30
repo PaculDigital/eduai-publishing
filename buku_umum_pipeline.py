@@ -977,7 +977,8 @@ def post_process(text, jenis="umum"):
     return text
 
 def word_count(text):
-    return len(text.split())
+    # None dari provider kosong dihitung 0 kata, bukan crash (job 221).
+    return len((text or '').split())
 
 def count_citations(text):
     """Hitung sitasi APA 7 bentuk (Nama, Tahun) di dalam tanda kurung.
