@@ -7,11 +7,17 @@ lalu bab pertama memanggil combo EduAi. Kalau combo sedang down
 terpotong padahal buku belum tentu jadi.
 
 Aturan modul ini:
-  1. Probe memakai jalur HTTP yang SAMA dengan pipeline teks, yaitu
-     POST {ROUTER_BASE}/chat/completions dengan header Bearer yang
-     sama dan model combo yang sama (app/ai.py, _panggil_9router).
+  1. Probe memakai jalur STREAMING yang SAMA dengan pipeline buku
+     (buku_umum_pipeline.py, call_llm), yaitu POST
+     {ROUTER_BASE}/chat/completions dengan header Bearer yang sama
+     dan model combo yang sama, plus stream True, lalu baca
+     delta.content per baris SSE (lewati chunk choices kosong).
      Bedanya hanya muatan: max_tokens kecil dan prompt pendek,
-     jadi probe murah dan cepat.
+     jadi probe murah dan cepat. Alasan stream: non-streaming
+     lewat kombo terbukti gagal (502 sesudah 46-52 detik, 30 Okt
+     2026 20:00 WIB), padahal streaming muatan yang sama berhasil
+     3,0 detik. Pengirim bawaan menambahkan stream True; muatan
+     probe sendiri tidak berubah, supaya uji suntik lama tetap berlaku.
   2. Satu gagal TIDAK memblokir. Probe mengulang sampai percobaan
      habis dengan backoff. Baru down sesudah semua percobaan gagal
      yang boleh menunda order.
@@ -27,11 +33,14 @@ Penerapan di pemanggil (lihat laporan G2/A3 untuk cuplikan lengkap):
   kalau hasil['status'] != 'up', pemanggil menunda SOPAN tanpa
   potong token dengan pesan PESAN_SIBUK, bukan halaman gagal.
 
-Catatan: susun() itu sinkron, jadi probe ini sinkron (httpx.Client).
-Pipeline teks memakai httpx.AsyncClient, tapi URL, header, model,
-dan bentuk muatan sama, jadi probe menguji jalur yang sama.
+Catatan: susun() itu sinkron, jadi probe ini sinkron (httpx.Client
+streaming). Jalur umum app/ai.py (_panggil_9router) memang
+non-streaming, tapi probe TIDAK mengikutinya lagi, karena
+non-streaming lewat kombo terbukti gagal (lihat aturan 1).
+Probe mengikuti pipeline buku (call_llm, streaming).
 """
 
+import json
 import os
 import time
 
@@ -73,10 +82,51 @@ def _konfigurasi(dasar=None, kunci=None, model=None):
     return str(dasar).rstrip('/'), str(kunci or ''), str(model or 'EduAi')
 
 
+class _Jawaban:
+    """Hasil pengirim bawaan: status_code + text terkumpul."""
+
+    def __init__(self, kode, teks=""):
+        self.status_code = kode
+        self.text = teks
+
+
 def _post_httpx(url, headers, muatan, timeout):
-    """Post sinkron bawaan, dipakai kalau pemanggil tidak menyuntik post."""
+    """Post streaming bawaan, dipakai kalau pemanggil tidak menyuntik post.
+
+    Muatan disalin + stream True (jalur sama dengan call_llm buku).
+    Kembalikan status_code + text = delta.content yang terkumpul.
+    Chunk choices kosong dilewati (9router mengirim chunk usage di akhir).
+    Status bukan 200 langsung dikembalikan dengan text kosong, supaya
+    probe memberi alasan HTTP xxx dan mengulang seperti sebelumnya.
+    """
+    muatan_stream = dict(muatan)
+    muatan_stream["stream"] = True
     with httpx.Client(timeout=timeout) as klien:
-        return klien.post(url, headers=headers, json=muatan)
+        with klien.stream("POST", url, headers=headers, json=muatan_stream) as resp:
+            kode = int(resp.status_code or 0)
+            if kode != 200:
+                return _Jawaban(kode, "")
+            isi = ""
+            for baris in resp.iter_lines():
+                if not baris:
+                    continue
+                teks = baris.decode("utf-8", "ignore") if isinstance(baris, bytes) else baris
+                if not teks.startswith("data: "):
+                    continue
+                data = teks[6:].strip()
+                if data == "[DONE]":
+                    break
+                try:
+                    potong = json.loads(data)
+                except Exception:
+                    continue
+                pilihan = potong.get("choices") or []
+                if not pilihan:
+                    continue
+                delta = (pilihan[0].get("delta") or {}).get("content") or ""
+                if delta:
+                    isi += delta
+            return _Jawaban(kode, isi)
 
 
 def probe_combo(post=None, *, dasar=None, kunci=None, model=None,
@@ -86,7 +136,7 @@ def probe_combo(post=None, *, dasar=None, kunci=None, model=None,
 
     post: callable opsional untuk uji, signature
       post(url, headers, muatan, timeout) dan kembalikan objek dengan
-      atribut status_code dan text. Kalau None, pakai httpx.Client.
+      atribut status_code dan text. Kalau None, pakai pengirim streaming bawaan.
     timeout: detik per percobaan, default 10 atau EDUAI_PREFLIGHT_TIMEOUT.
     percobaan: jumlah percobaan, default 3 atau EDUAI_PREFLIGHT_PERCOBAAN.
     backoff_dasar: jeda sebelum percobaan ulang = backoff_dasar * nomor
