@@ -81,6 +81,21 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
 .bar-isi.hidup{background-image:linear-gradient(45deg,rgba(255,255,255,.35) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.35) 50%,rgba(255,255,255,.35) 75%,transparent 75%);background-size:22px 22px;animation:geser 1.2s linear infinite}
 @keyframes geser{from{background-position:0 0}to{background-position:22px 0}}
 .bar-info{font-size:12.5px;color:var(--teks-abu)}
+.lampu{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;vertical-align:middle;animation:lampu-pulsa 1.6s ease-in-out infinite}
+.lampu.hijau{background:var(--hijau)}
+.lampu.kuning{background:var(--oranye)}
+.lampu.merah{background:var(--merah)}
+@keyframes lampu-pulsa{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.65}}
+.status-server{display:flex;gap:12px;align-items:flex-start}
+.status-server h2{font-size:16px;text-transform:none;letter-spacing:0;color:var(--teks);margin-bottom:4px}
+.status-server p{font-size:13.5px;color:var(--teks-abu);line-height:1.7}
+.bab-daftar{list-style:none;margin:0;padding:0}
+.bab-daftar li{padding:8px 0;border-bottom:1px dashed var(--garis);font-size:14px;line-height:1.6}
+.bab-daftar li:last-child{border-bottom:none}
+.st{display:inline-block;font-weight:700;font-size:12.5px;padding:2px 9px;border-radius:20px;margin-right:8px;white-space:nowrap}
+.st-tulis{color:#92400e;background:#fef3c7}
+.st-tunggu{color:var(--teks-abu);background:#eef0f2}
+.st-selesai{color:var(--hijau-gelap);background:var(--hijau-muda)}
 </style>
 </head>
 <body>
@@ -113,6 +128,13 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
     <div class="bar-luar"><div class="bar-isi hidup" id="bar-isi"></div></div>
   </div>
 
+  <div class="kartu status-server" id="kartu-server" {% if status == 'selesai' or status == 'gagal' %}style="display:none"{% endif %}>
+    <span class="lampu {% if sedang_disempurnakan %}kuning{% elif status == 'menunggu' %}kuning{% elif status == 'jalan' %}hijau{% else %}hijau{% endif %}" id="server-lampu"></span>
+    <div>
+      <h2 id="server-judul">{% if sedang_disempurnakan %}buku sedang disempurnakan, mohon sabar{% elif status == 'menunggu' %}{% if antrean_pos %}Antrean Kamu {{ antrean_pos }} dari {{ antrean_total }}, Mohon tunggu.{% else %}Pekerjaan kamu mengantre, mohon tunggu.{% endif %}{% elif status == 'jalan' %}Status Server: Ready Production{% else %}Status Server: Ready Production{% endif %}</h2>
+      <p id="server-teks">{% if sedang_disempurnakan %}Perbaikan otomatis sedang berjalan, mohon sabar.{% elif status == 'menunggu' %}Pekerjaan kamu mengantre, giliran akan maju otomatis.{% elif status == 'jalan' %}Buku kamu sedang diproduksi.{% else %}Buku kamu sedang diproduksi.{% endif %}</p>
+    </div>
+  </div>
   <div class="kartu">
     <h2>PROGRESS</h2>
     <div class="langkah" id="langkah">
@@ -125,7 +147,7 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
       <div class="lgk" data-i="3"><span class="dot"></span>
         <span class="isi">Selesai</span></div>
     </div>
-    <p class="bar-info" id="subbab-info">{% for nomor, teks in (subbab_per_bab or {}).items() %}Bab {{ nomor }}: {{ teks }} {% endfor %}</p>
+    <ul class="bab-daftar" id="subbab-info">{% for nomor, teks in (subbab_per_bab or {}).items() %}{% set teks2 = (teks or '')|string %}{% if ': ' in teks2 %}{% set judul_bab = teks2.split(': ', 1)[1] %}{% elif teks2.startswith('BAB ' ~ (nomor|string) ~ ' ') %}{% set judul_bab = '' %}{% else %}{% set judul_bab = teks2 %}{% endif %}{% set st = 'selesai' if 'selesai' in teks2|lower else ('tulis' if 'mulai' in teks2|lower else 'tunggu') %}<li><span class="st st-{{ st }}">{% if st == 'selesai' %}Selesai{% elif st == 'tulis' %}Sedang Ditulis{% else %}Menunggu...{% endif %}</span> Bab {{ nomor }}{% if judul_bab %}: {{ judul_bab }}{% endif %}</li>{% endfor %}</ul>
   </div>
 
   <div class="kartu" id="kartu-hasil" style="display:none">
@@ -239,12 +261,27 @@ async function pantau() {
       tampilkanSabar(false);
     }
     if (ag && ag.subbab_per_bab && elSubbab) {
-      var daftar = [];
-      Object.keys(ag.subbab_per_bab).sort(function (a, b) { return a - b; }).forEach(function (k) {
-        daftar.push('Bab ' + k + ': ' + ag.subbab_per_bab[k]);
+      elSubbab.innerHTML = '';
+      var daftarK = [];
+      if (TOTAL_BAB > 0) { for (var k = 1; k <= TOTAL_BAB; k++) daftarK.push(k); }
+      else { Object.keys(ag.subbab_per_bab).sort(function (a, b) { return a - b; }).forEach(function (k) { daftarK.push(k); }); }
+      daftarK.forEach(function (k) {
+        var t = ag.subbab_per_bab[k] || ag.subbab_per_bab[String(k)] || '';
+        var judul = '';
+        if (t.indexOf(': ') >= 0) judul = t.slice(t.indexOf(': ') + 2);
+        else if (t.indexOf('BAB ' + k + ' ') === 0) judul = '';
+        else judul = t;
+        var st = 'tunggu', label = 'Menunggu...';
+        if (/selesai/i.test(t)) { st = 'selesai'; label = 'Selesai'; }
+        else if (/mulai/i.test(t)) { st = 'tulis'; label = 'Sedang Ditulis'; }
+        var li = document.createElement('li');
+        var sp = document.createElement('span'); sp.className = 'st st-' + st; sp.textContent = label;
+        li.appendChild(sp);
+        li.appendChild(document.createTextNode(' Bab ' + k + (judul ? ': ' + judul : '')));
+        elSubbab.appendChild(li);
       });
-      elSubbab.textContent = daftar.join(' ');
     }
+    aturServer(j);
     aturBar(ix, babAg, TOTAL_BAB);
     if (j.status === 'selesai') {
       sudah = true;
@@ -275,6 +312,27 @@ async function pantau() {
     }
     gambarLangkah(indeksTahap(j.tahap || j.pesan), false);
   } catch (e) { tampilkanSabar(true); /* diam: jaringan putus sesaat, coba lagi, tampilan lama dipertahankan */ }
+}
+
+function aturServer(j) {
+  var kartu = document.getElementById('kartu-server');
+  var lampu = document.getElementById('server-lampu');
+  var judul = document.getElementById('server-judul');
+  var teks = document.getElementById('server-teks');
+  if (!kartu || !lampu || !judul || !teks) return;
+  var st = j.status || '';
+  var ag = j.agregat || null;
+  if (st === 'selesai' || st === 'gagal' || ((st !== 'jalan' && st !== 'menunggu') && !(ag && ag.sedang_disempurnakan))) { kartu.style.display = 'none'; return; }
+  kartu.style.display = '';
+  if (ag && ag.sedang_disempurnakan) {
+    lampu.className = 'lampu kuning'; judul.textContent = 'buku sedang disempurnakan, mohon sabar'; teks.textContent = 'Perbaikan otomatis sedang berjalan, mohon sabar.';
+  } else if (st === 'menunggu') {
+    lampu.className = 'lampu kuning';
+    if (j.antrean_pos && j.antrean_total) { judul.textContent = 'Antrean Kamu ' + j.antrean_pos + ' dari ' + j.antrean_total + ', Mohon tunggu.'; teks.textContent = 'Pekerjaan kamu mengantre, giliran akan maju otomatis.'; }
+    else { judul.textContent = 'Pekerjaan kamu mengantre, mohon tunggu.'; teks.textContent = 'Giliran akan maju otomatis.'; }
+  } else {
+    lampu.className = 'lampu hijau'; judul.textContent = 'Status Server: Ready Production'; teks.textContent = 'Buku kamu sedang diproduksi.';
+  }
 }
 
 function tampilkanHasil() {
