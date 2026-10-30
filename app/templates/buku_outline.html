@@ -47,6 +47,21 @@ input[type="text"],textarea{font-family:inherit}
 .edit-nomor{font-weight:700;color:var(--hijau-gelap)}
 .edit-note{font-size:12.5px;color:var(--teks-abu);line-height:1.7}
 .edit-ok{background:var(--hijau-muda);border:1.5px solid #CFE9D8;border-radius:10px;padding:12px 14px;line-height:1.7;font-size:13px}
+.lampu{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;vertical-align:middle;animation:lampu-pulsa 1.6s ease-in-out infinite}
+.lampu.hijau{background:var(--hijau)}
+.lampu.kuning{background:var(--oranye)}
+.lampu.merah{background:var(--merah)}
+@keyframes lampu-pulsa{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.65}}
+.status-server{display:flex;gap:12px;align-items:flex-start}
+.status-server h2{font-size:16px;text-transform:none;letter-spacing:0;color:var(--teks);margin-bottom:4px}
+.status-server p{font-size:13.5px;color:var(--teks-abu);line-height:1.7}
+.bab-daftar{list-style:none;margin:0;padding:0}
+.bab-daftar li{padding:8px 0;border-bottom:1px dashed var(--garis);font-size:14px;line-height:1.6}
+.bab-daftar li:last-child{border-bottom:none}
+.st{display:inline-block;font-weight:700;font-size:12.5px;padding:2px 9px;border-radius:20px;margin-right:8px;white-space:nowrap}
+.st-tulis{color:#92400e;background:#fef3c7}
+.st-tunggu{color:var(--teks-abu);background:#eef0f2}
+.st-selesai{color:var(--hijau-gelap);background:var(--hijau-muda)}
 </style>
 </head>
 <body>
@@ -72,16 +87,42 @@ input[type="text"],textarea{font-family:inherit}
       {% if penelaah %} · Ditelaah oleh: <b>{{ penelaah }}</b>{% endif %}</p>
   </div>
 
+  {% if server_status is defined %}
+  <div class="kartu status-server">
+    <span class="lampu {% if server_status == 'ready' %}hijau{% else %}merah{% endif %}"></span>
+    <div>
+      <h2>Status Server: {% if server_status == 'ready' %}Ready Production{% else %}Sibuk{% endif %}</h2>
+      {% if server_status == 'ready' %}
+      <p>Server produksi siap menerima pesanan.{% if antrean_jalan is defined and antrean_tunggu is defined and (antrean_jalan or antrean_tunggu) %} Saat ini {{ antrean_jalan }} pekerjaan sedang berjalan dan {{ antrean_tunggu }} mengantre.{% endif %}</p>
+      {% else %}
+      <p>Server AI sedang sibuk, silakan coba lagi nanti. Kerangka tetap bisa dilihat, token belum dipotong.</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
   {% if cek is defined and cek %}
   <div class="kartu">
     {% if not cek.lolos %}
-    <h2 style="color:var(--merah)">Kerangka belum bisa diproduksi</h2>
+    <h2 style="color:var(--merah)"><span class="lampu merah"></span> Kerangka belum bisa diproduksi</h2>
     <p style="font-size:13.5px;color:var(--teks-abu);line-height:1.7">Alasan cek awal (token tidak dipotong):</p>
     <ul class="sub-daftar">{% for m in cek.masalah %}<li>{{ m }}</li>{% endfor %}</ul>
     <p style="font-size:13.5px;line-height:1.7;margin-top:10px">Perbaiki lewat form edit di bawah, atau tekan Ubah untuk membangun ulang kerangka (gratis).</p>
     {% else %}
+    {% if risiko_level == 'Hijau' %}
+    <h2><span class="lampu hijau"></span> Kerangka Siap Produksi</h2>
+    <p style="font-size:13.5px;color:var(--teks-abu);line-height:1.7">Kerangka sudah bersih, tidak ada masalah yang menghambat produksi.</p>
+    {% elif risiko_level == 'Kuning' %}
+    <h2><span class="lampu kuning"></span> Kerangka Perlu Perhatian</h2>
+    {% if risiko_alasan %}<ul class="sub-daftar">{% for a in risiko_alasan %}<li>{{ a }}</li>{% endfor %}</ul>{% endif %}
+    <p style="font-size:13.5px;line-height:1.7;margin-top:10px">Masih bisa diproduksi, tapi sebaiknya dibaca dulu.</p>
+    {% elif risiko_level == 'Merah' %}
+    <h2><span class="lampu merah"></span> Kerangka Bermasalah</h2>
+    {% if risiko_alasan %}<ul class="sub-daftar">{% for a in risiko_alasan %}<li>{{ a }}</li>{% endfor %}</ul>{% endif %}
+    <p style="font-size:13.5px;line-height:1.7;margin-top:10px">Sebaiknya diperbaiki dulu sebelum Setuju, supaya token tidak terbuang.</p>
+    {% else %}
     <h2>Risiko produksi: {{ risiko_level }}</h2>
     {% if risiko_alasan %}<ul class="sub-daftar">{% for a in risiko_alasan %}<li>{{ a }}</li>{% endfor %}</ul>{% else %}<p style="font-size:13.5px;color:var(--teks-abu);line-height:1.7">Kerangka bersih, tidak ada peringatan.</p>{% endif %}
+    {% endif %}
     {% endif %}
   </div>
   {% endif %}

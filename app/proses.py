@@ -736,6 +736,22 @@ def _posisi_antrean(kode: str) -> tuple[int, int]:
             return (0, len(_antrean))
 
 
+def info_antrean(kode=None):
+    # Status antrean untuk ditampilkan: (posisi_kode, total_menunggu, sedang_jalan).
+    # posisi_kode 0 = tidak mengantre (sedang jalan / tidak ada). Angka nyata dari
+    # deque + penghitung jalan, bukan karangan. Satu kunci saja, tidak memanggil
+    # _posisi_antrean (kunci tidak reentrant).
+    with _kunci_antrean:
+        if kode is None:
+            pos = 0
+        else:
+            try:
+                pos = _antrean.index(kode) + 1
+            except ValueError:
+                pos = 0
+        return (pos, len(_antrean), _sedang_jalan)
+
+
 def _antre_atau_jalan(kode: str, kerja) -> bool:
     """Coba JALANKAN sekarang; kalau penuh → masuk antrean.
 

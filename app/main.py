@@ -449,7 +449,24 @@ def buku_outline(
         'jumlah_bab': jml, 'tier': tier_nama, 'token': token, 'kembali': kembali,
         'babs': babs, 'cek': _cek_outline,
         'risiko_level': _risiko_level, 'risiko_alasan': _risiko_alasan,
+        **_kartu_status_server(),
     })
+
+
+def _kartu_status_server():
+    # Konteks kartu Status Server untuk halaman kerangka: probe 1x (timeout 10,
+    # tanpa ulang) + hitung antrean global. Gagal apa pun = sibuk (konservatif).
+    # Dipanggil dari rute outline (tampil + simpan); 1 panggilan kombo kecil
+    # per render halaman kerangka.
+    from . import proses as _pr
+    _pos, total_tunggu, sedang = _pr.info_antrean()
+    try:
+        from . import preflight_provider as _pf
+        siap = _pf.probe_combo(timeout=10, percobaan=1).get('status') == 'up'
+    except Exception:
+        siap = False
+    return {'server_status': 'ready' if siap else 'sibuk',
+            'antrean_jalan': sedang, 'antrean_tunggu': total_tunggu}
 
 
 @_router_kolaborasi.post('/buku/outline/simpan')
@@ -530,6 +547,7 @@ async def buku_outline_simpan(
             'jumlah_bab': len(outline_baru), 'tier': tier_nama or '', 'token': token_lama,
             'kembali': kembali, 'babs': babs, 'cek': cek_tampil,
             'risiko_level': risiko_level, 'risiko_alasan': risiko_alasan,
+            **_kartu_status_server(),
             'edit_pesan': 'Perubahan belum tersimpan. Perbaiki alasan di atas, lalu simpan lagi.',
         })
     token_baru = _RP.simpan_outline_pending(outline_baru, tier_nama)
@@ -540,6 +558,7 @@ async def buku_outline_simpan(
         'jumlah_bab': len(outline_baru), 'tier': tier_nama or '', 'token': token_baru,
         'kembali': kembali, 'babs': babs, 'cek': cek_tampil,
         'risiko_level': risiko_level, 'risiko_alasan': risiko_alasan,
+        **_kartu_status_server(),
         'edit_pesan': 'Kerangka diperbarui. Silakan periksa lagi sebelum menekan Setuju.',
     })
 
@@ -813,6 +832,7 @@ def halaman_buku_proses(kode: str, request: Request,
 
     #  G3 (30 Okt 2026): halaman membaca agregator, bukan slot mentah.
     agregat = _proses.agregat_progres(p)
+    _ap, _at, _aj = _proses.info_antrean(p.kode)
     return templates.TemplateResponse('buku_proses.html', {
         'request': request, 'user': u,
         'kode': p.kode, 'judul': judul,
@@ -826,6 +846,8 @@ def halaman_buku_proses(kode: str, request: Request,
         'sedang_disempurnakan': agregat['sedang_disempurnakan'],
         'teks_sabar': agregat['teks_sabar'],
         'galat': p.galat or '',
+        'antrean_pos': _ap,
+        'antrean_total': _at,
         'subbab_per_bab': agregat['subbab_per_bab'],
     })
 
