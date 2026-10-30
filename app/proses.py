@@ -364,6 +364,20 @@ def _jumlah_bab_dari_komentar(komentar_json):
     return None
 
 
+_POLA_GALAT_KELAS = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*:\s*')
+
+
+def galat_tampil(galat):
+    """Pesan galat untuk user: buang awalan nama kelas (mis. GagalSitasiBersih:).
+
+    DB tidak diubah (nama kelas tetap tersimpan untuk diagnosa); hanya
+    tampilan yang dibersihkan supaya user melihat pesan manusia saja.
+    """
+    teks = galat if isinstance(galat, str) else ('' if galat is None else str(galat))
+    m = _POLA_GALAT_KELAS.match(teks)
+    return teks[m.end():] if m else teks
+
+
 def ringkas(p: ProsesAI) -> dict:
     """Bentuk ringkas untuk dikirim ke halaman (JSON).
 
@@ -483,6 +497,9 @@ def gabung_slot_bab(komentar_json, bab, *, selesai=False, terakhir='') -> str:
     hanya ditulis ke slot bab itu sendiri. Komentar berbentuk list
     (pekerjaan revisi) dikembalikan apa adanya, slot hanya untuk buku
     yang komentarnya berbentuk dict.
+    Catatan diagnosa (teks diawali 'Catatan') TIDAK menimpa 'terakhir';
+    ia disimpan di 'diagnosa' (maks 2 terakhir) supaya daftar bab user
+    tetap menampilkan judul, bukan jargon diagnosa.
     """
     try:
         data = json.loads(komentar_json or '{}')
@@ -497,9 +514,18 @@ def gabung_slot_bab(komentar_json, bab, *, selesai=False, terakhir='') -> str:
     lama = slot.get(kunci)
     lama_dict = dict(lama) if isinstance(lama, dict) else {}
     baru_selesai = bool(lama_dict.get('selesai')) or bool(selesai)
-    baru_terakhir = ((terakhir or '')[:200] if terakhir
-                     else (lama_dict.get('terakhir') or ''))
-    slot[kunci] = {'selesai': baru_selesai, 'terakhir': baru_terakhir}
+    baru_terakhir = (lama_dict.get('terakhir') or '')
+    baru_diagnosa = lama_dict.get('diagnosa') if isinstance(lama_dict.get('diagnosa'), list) else []
+    if (terakhir or '').startswith('Catatan'):
+        # Diagnosa (catatan cek sitasi) BUKAN progres: jangan timpa judul
+        # terakhir; simpan di 'diagnosa' (maks 2) untuk audit.
+        baru_diagnosa = (baru_diagnosa + [(terakhir or '')[:200]])[-2:]
+    elif terakhir:
+        baru_terakhir = (terakhir or '')[:200]
+    slot_dict = {'selesai': baru_selesai, 'terakhir': baru_terakhir}
+    if baru_diagnosa:
+        slot_dict['diagnosa'] = baru_diagnosa
+    slot[kunci] = slot_dict
     data['progres_bab'] = slot
     return json.dumps(data, ensure_ascii=False)
 

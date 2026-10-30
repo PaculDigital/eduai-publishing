@@ -3907,6 +3907,7 @@ async def ai_proses_status(
     if p is None:
         raise HTTPException(404, detail={'ok': False, 'pesan': 'Proses tidak ditemukan.'})
     out = proses_mod.ringkas(p)
+    out['galat'] = proses_mod.galat_tampil(out.get('galat') or '')
     out['ok'] = True
     _ap, _at, _aj = proses_mod.info_antrean(kode)
     out['antrean_pos'] = _ap
