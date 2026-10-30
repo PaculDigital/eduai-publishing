@@ -636,6 +636,27 @@ def buku_susun(
             '/buku?galat=' + quote('Mesin penyusun belum siap: ' + alasan),
             status_code=303)
 
+    #  A3 pre-flight provider (30 Okt 2026): probe combo SEBELUM token
+    #  outline Gate 1 dipakai dan SEBELUM pekerjaan dibuat + token
+    #  dipotong. Bila provider jelas down sesudah retry berulang, tunda
+    #  sopan TANPA pekerjaan dan TANPA potong (halaman di bawah, bukan
+    #  halaman gagal). Satu probe gagal saja tidak memblokir (probe
+    #  sendiri me-retry 3x di dalam).
+    from .preflight_provider import periksa_sebelum_potong as _preflight
+    _boleh_potong, _pesan_sibuk = _preflight()
+    if not _boleh_potong:
+        return HTMLResponse(
+            '<!doctype html><html lang="id"><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>Server AI sibuk</title></head>'
+            '<body style="font-family:sans-serif;padding:24px">'
+            '<h1>Server AI sedang sibuk</h1>'
+            '<p>' + _pesan_sibuk + '</p>'
+            '<p>Token belum dipotong dan belum ada pekerjaan yang dibuat. '
+            'Silakan coba lagi nanti.</p>'
+            '<p><a href="/buku">Kembali ke halaman buku</a></p>'
+            '</body></html>')
+
     # ── GATE 1 REFERENSI: produksi WAJIB dari kerangka yang disetujui ────
     #  Tanpa token outline = user melompati halaman persetujuan (atau token
     #  sudah dipakai) -> tolak, jangan produksi dari kerangka karangan.
@@ -739,9 +760,11 @@ def buku_susun(
                                  penulis=(penulis or None),
                                  penelaah=(penelaah or None),
                                  tier=tier_untuk_susun)
+            _fid_buku = hasil.get('file_id') if isinstance(hasil, dict) else None
             _proses.tandai_selesai(
                 kode, hasil=judul, hasil_json=_json.dumps(hasil, default=str),
                 token_revisi=hasil.get('token') or 0,
+                file_id=_fid_buku,
                 jenis_notifikasi='buku_selesai')
         finally:
             sdb.close()
@@ -788,51 +811,65 @@ def halaman_buku_proses(kode: str, request: Request,
     except Exception:
         wa_aktif = False
 
+    #  G3 (30 Okt 2026): halaman membaca agregator, bukan slot mentah.
+    agregat = _proses.agregat_progres(p)
     return templates.TemplateResponse('buku_proses.html', {
         'request': request, 'user': u,
         'kode': p.kode, 'judul': judul,
         'tahap': p.tahap or 'Menyiapkan',
         'status': p.status,
         'wa_aktif': wa_aktif,
+        'agregat': agregat,
+        'fase': agregat['fase'],
+        'bab_selesai': agregat['bab_selesai'],
+        'bab_total': agregat['bab_total'],
+        'sedang_disempurnakan': agregat['sedang_disempurnakan'],
+        'teks_sabar': agregat['teks_sabar'],
+        'galat': p.galat or '',
+        'subbab_per_bab': agregat['subbab_per_bab'],
     })
 
 
 @_router_kolaborasi.get('/buku/selesai', response_class=HTMLResponse)
 def halaman_buku_selesai(
     request: Request,
-    judul: str = '',
-    bab: int = 0,
-    kata: int = 0,
-    folder: str = '',
-    docx: str = '',
-    docx_alasan: str = '',
-    fid: int = 0,
-    file_alasan: str = '',
+    kode: str = '',
     db: Session = Depends(get_db),
 ):
+    """Halaman hasil buku, resolve by kode (G1, 30 Okt 2026).
+
+    Semua data dibaca dari baris job + hasil_json di server. Parameter
+    URL selain kode DIABAIKAN: redirect lama yang membawa bab=0 dan
+    kata=0 (job 222) tidak boleh lagi menentukan tampilan. Tanpa kode
+    yang sah milik user ini, halaman menolak (404), bukan menebak
+    dari parameter.
+    """
     u = _wajib_login_kolab(request, db)
-    #  Dokumen hanya ditampilkan kalau BERKASNYA ADA. Jangan percaya parameter
-    #  URL begitu saja — halaman bisa dibuka dengan ?docx=apa-saja.
+    if not kode:
+        raise HTTPException(status_code=404, detail='Pekerjaan tidak ditemukan')
+    from . import proses as _proses
+    p = _proses.ambil(db, kode, u.id)
+    if p is None or p.status != 'selesai':
+        raise HTTPException(status_code=404, detail='Pekerjaan tidak ditemukan')
+    data = _proses.data_selesai_dari_hasil(p)
+    judul = data['judul']
+    bab = data['bab']
+    kata = data['kata']
+    docx = data['docx']
+    folder = data['folder']
     ada = bool(docx) and os.path.exists(docx)
     ukuran_kb = (os.path.getsize(docx) // 1024) if ada else 0
-
-    #  `fid` hanya dipakai kalau baris `files` MILIK user ini dan tidak di
-    #  sampah. Tanpa cek ini, siapa pun bisa menyodorkan ?fid=1 milik orang lain.
-    fid_sah = 0
-    if fid:
-        fb = db.get(FileBerkas, fid)
-        if fb and fb.user_id == u.id and not fb.di_sampah:
-            fid_sah = fid
-
+    fid_sah = _proses.fid_selesai(db, u.id, data['hasil'],
+                                  getattr(p, 'file_id', None), docx)
     return templates.TemplateResponse('buku_selesai.html', {
         'request': request, 'user': u,
         'judul': judul, 'bab': bab, 'kata': kata, 'folder': folder,
         'docx': docx if ada else '',
         'docx_nama': os.path.basename(docx) if ada else '',
         'docx_kb': ukuran_kb,
-        'docx_alasan': docx_alasan if not ada else '',
+        'docx_alasan': data['docx_alasan'] if not ada else '',
         'fid': fid_sah,
-        'file_alasan': file_alasan if ada and not fid_sah else '',
+        'file_alasan': data['file_alasan'] if ada and not fid_sah else '',
     })
 
 

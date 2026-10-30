@@ -6,6 +6,8 @@ B5, TNR 12pt, footer PAGE, page break per bab
 """
 
 import json, os, re, random, time
+import zipfile
+from datetime import datetime, timezone
 import logging
 import tata_paragraf
 from docx import Document
@@ -1361,9 +1363,118 @@ def add_bio(doc):
         add_para(doc, f"Buku ini ditelaah oleh {penelaah}.",
                  align='justify', space_after=10)
 
+def _hitung_kata_docx(doc):
+    """Hitung kata nyata: semua paragraf badan + semua sel tabel.
+
+    Paragraf sel tabel tidak termasuk doc.paragraphs, jadi keduanya
+    dijumlah tanpa ganda. Header/footer tidak dihitung (di luar
+    cakupan tugas: paragraf + tabel).
+    """
+    total = 0
+    for p in doc.paragraphs:
+        total += len(p.text.split())
+    for tabel in doc.tables:
+        for baris in tabel.rows:
+            for sel in baris.cells:
+                for p in sel.paragraphs:
+                    total += len(p.text.split())
+    return total
+
+
+_TANPA_PERUBAHAN = object()
+
+
+def _tulis_metadata_zip(path_docx, words=None, pages=_TANPA_PERUBAHAN,
+                         modified=None):
+    """Tulis ulang docProps/app.xml (dan core modified bila diminta).
+
+    python-docx tidak mengekspos app.xml (Words/Pages), jadi penulisan
+    dilakukan di level zip dengan string surgery: semua entri lain
+    disalin apa adanya, hanya elemen Words/Pages/modified yang diubah.
+    pages punya tiga arti: angka = tulis angka itu; None = HAPUS
+    elemen Pages (jumlah halaman tidak diketahui, bukan dikarang);
+    default = jangan sentuh Pages. words None = jangan sentuh Words.
+    Bila app.xml tidak ada, berkas dibiarkan (jangan crash rakit).
+    """
+    import re as _re
+
+    def _setel_elemen(xml, tag, nilai):
+        pola = _re.compile(r'<' + tag + r'( [^>]*)?>.*?</' + tag + r'>',
+                           _re.DOTALL)
+        m = pola.search(xml)
+        if nilai is None:
+            return pola.sub('', xml, count=1) if m else xml
+        if m:
+            return pola.sub(f'<{tag}>{nilai}</{tag}>', xml, count=1)
+        if tag == 'Pages' and '<Words>' in xml:
+            return xml.replace('<Words>', f'<{tag}>{nilai}</{tag}><Words>',
+                               1)
+        if tag == 'Words' and '</Pages>' in xml:
+            return xml.replace('</Pages>',
+                               f'</Pages><{tag}>{nilai}</{tag}>', 1)
+        return xml.replace('</Properties>',
+                           f'<{tag}>{nilai}</{tag}></Properties>', 1)
+
+    with zipfile.ZipFile(path_docx, 'r') as masuk:
+        entri = [(masuk.getinfo(n), masuk.read(n))
+                 for n in masuk.namelist()]
+    isi = dict((info.filename, data) for info, data in entri)
+    berubah = False
+    if 'docProps/app.xml' in isi:
+        xml = isi['docProps/app.xml'].decode('utf-8')
+        baru = xml
+        if words is not None:
+            baru = _setel_elemen(baru, 'Words', words)
+        if pages is not _TANPA_PERUBAHAN:
+            baru = _setel_elemen(baru, 'Pages', pages)
+        if baru != xml:
+            isi['docProps/app.xml'] = baru.encode('utf-8')
+            berubah = True
+    if modified is not None and 'docProps/core.xml' in isi:
+        xml = isi['docProps/core.xml'].decode('utf-8')
+        cap = modified.strftime('%Y-%m-%dT%H:%M:%SZ')
+        pola = _re.compile(
+            r'<dcterms:modified([^>]*)>.*?</dcterms:modified>', _re.DOTALL)
+        if pola.search(xml):
+            baru = pola.sub(
+                lambda m: f'<dcterms:modified{m.group(1)}>{cap}'
+                f'</dcterms:modified>',
+                xml, count=1)
+        else:
+            baru = xml.replace('</cp:coreProperties>',
+                               f'<dcterms:modified>{cap}</dcterms:modified>'
+                               f'</cp:coreProperties>', 1)
+        if baru != xml:
+            isi['docProps/core.xml'] = baru.encode('utf-8')
+            berubah = True
+    if not berubah:
+        return
+    with zipfile.ZipFile(path_docx, 'w') as keluar:
+        for info, data in entri:
+            keluar.writestr(info, isi[info.filename])
+
+
+def isi_halaman_docx(path_docx, pages):
+    """Langkah pasca-rakit: isi Pages app.xml dari hasil ukur nyata.
+
+    Dipakai sesudah sidecar ukur mengembalikan total halaman (bukan
+    di rakit, karena rakit belum tahu jumlah halaman). Juga
+    memperbarui core modified ke waktu pengisian. Mengembalikan
+    pages yang ditulis. pages harus int positif, else ValueError.
+    """
+    if (not isinstance(pages, int) or isinstance(pages, bool)
+            or pages < 1):
+        raise ValueError('pages harus int positif')
+    _tulis_metadata_zip(
+        path_docx, pages=pages,
+        modified=datetime.now(timezone.utc).replace(microsecond=0))
+    return pages
+
+
 def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
           penulis='', institusi='', tahun=None, subjudul='',
-          nama_berkas=None, judul_kartu=None, penelaah=''):
+          nama_berkas=None, judul_kartu=None, penelaah='',
+          tier=None, pages=None):
     """Rakit SEMUA bab jadi SATU .docx. Return dict hasil (bukan cuma print).
 
     Dipakai rute `/buku/susun` supaya user dapat 1 dokumen utuh — bukan
@@ -1476,6 +1587,15 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
 
         # === BAB (hanya yang ada) ===
         visual_hilang = []          #  pagar: cacat gambar HARUS kelihatan
+        visual_dilewati_tier = []   #  G7: ilustrasi yang memang tidak
+        #  dijadwalkan tier (cap Hemat: bab 1-2 saja), BUKAN cacat.
+        #  Diagram/tabel TIDAK kena cap tier, jadi tetap visual_hilang.
+        _boleh_ilustrasi = None
+        if tier is not None:
+            try:
+                from tier_buku import boleh_ilustrasi as _boleh_ilustrasi
+            except Exception:
+                _boleh_ilustrasi = None
         for n in sorted(ada):
             #  Gambar tiap bab tinggal di `visual/` MILIK BAB ITU
             #  (`keluar_dir/bab{n}/visual/`, Lapis 3a), bukan di akar.
@@ -1506,7 +1626,10 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
                 if not os.path.exists(os.path.join(VISUAL_DIR, f'diagram_{did}.png')):
                     visual_hilang.append(f'b{n}-diagram-{did}')
             if not os.path.exists(os.path.join(VISUAL_DIR, f'ilustrasi_bab{n}.png')):
-                visual_hilang.append(f'b{n}-ilustrasi')
+                if _boleh_ilustrasi is not None and not _boleh_ilustrasi(tier, n):
+                    visual_dilewati_tier.append(f'b{n}-ilustrasi')
+                else:
+                    visual_hilang.append(f'b{n}-ilustrasi')
             add_bab(doc, n, outline[n], isi_bab)
 
         # === BACK MATTER ===
@@ -1545,8 +1668,18 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
         # produksi ber-author 'python-docx' dan judul kosong. Samakan.
         doc.core_properties.author = (penulis or '').strip()
         doc.core_properties.title = (judul or '').strip()
+        #  G7 metadata: created/modified = waktu rakit (bukan default
+        #  template 2013). Words dihitung nyata sesudah save.
+        _waktu_rakit = datetime.now(timezone.utc).replace(microsecond=0)
+        doc.core_properties.created = _waktu_rakit
+        doc.core_properties.modified = _waktu_rakit
         bersihkan_em_dash_dokumen(doc)
         doc.save(docx_out)
+        _kata = _hitung_kata_docx(doc)
+        #  Pages: hanya bila parameter pages diisi. Tanpa pages,
+        #  elemen Pages dihapus (jujur tidak tahu) dan diisi belakangan
+        #  lewat isi_halaman_docx sesudah sidecar ukur. Jangan karang.
+        _tulis_metadata_zip(docx_out, words=_kata, pages=pages)
 
         # === VERIFIKASI NYATA — baca ulang berkasnya ===
         ukuran = os.path.getsize(docx_out)
@@ -1564,6 +1697,9 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
             'tabel': len(doc2.tables),
             'gambar': len(doc2.inline_shapes),
             'visual_hilang': visual_hilang,
+            'visual_dilewati_tier': visual_dilewati_tier,
+            'jumlah_kata': _kata,
+            'halaman_tertulis': pages,
             'heading_bab_terbaca': bab_heading,
             'halaman_b5': (round(sec2.page_width.cm, 1),
                            round(sec2.page_height.cm, 1)),

@@ -50,6 +50,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import secrets
 import threading
 import traceback
@@ -70,6 +71,20 @@ TAHAP_MENYUSUN = 'Menyusun rencana revisi'
 TAHAP_MEMERIKSA = 'Memeriksa hasil'
 TAHAP_SELESAI = 'Selesai'
 TAHAP_GAGAL = 'Gagal'
+
+# -- G3: agregator progres monoton (30 Okt 2026) --
+# Kunci ini menyeragamkan tulis slot per bab antar utas worker paralel
+# (pipeline bab memakai ThreadPoolExecutor, satu proses). Tanpa kunci,
+# dua worker yang membaca lalu menulis komentar_json bergantian bisa
+# saling menghapus slot (last-writer-wins), persis bug job 222.
+_KUNCI_SLOT = threading.RLock()
+# Teks sabar user-facing (A4). Satu sumber, dipakai rute dan template.
+TEKS_SABAR = 'buku sedang disempurnakan, mohon sabar'
+# Pola teks tahap pipeline: "BAB 3 selesai", "BAB 3 sudah ada",
+# "BAB 3 diperbaiki" menandai bab tuntas. "BAB 3 mulai" hanya mencatat
+# subbab terakhir bab itu, bukan menandai tuntas.
+_POLA_BAB_SELESAI = re.compile(r'BAB\s+(\d+)\s+(selesai|sudah ada|diperbaiki)', re.IGNORECASE)
+_POLA_BAB = re.compile(r'BAB\s+(\d+)', re.IGNORECASE)
 
 
 def tahap_menulis(ke: int, dari: int) -> str:
@@ -142,32 +157,46 @@ def ambil(db, kode: str, user_id: Optional[int] = None) -> Optional[ProsesAI]:
 
 def ubah_tahap(kode: str, tahap: str, *, bagian_ke: int | None = None,
                status: str | None = None) -> None:
-    """Perbarui tahap yang dilihat user. Aman dipanggil dari utas."""
-    db = _sesi_baru()
-    try:
-        p = ambil(db, kode)
-        if p is None:
-            return
-        p.tahap = tahap
-        if bagian_ke is not None:
-            p.bagian_ke = int(bagian_ke)
-        if status is not None:
-            p.status = status
-        db.commit()
-    except Exception as e:                                        # noqa: BLE001
-        log.warning('[proses] ubah_tahap gagal: %s', e)
-    finally:
-        db.close()
+    """Perbarui tahap yang dilihat user. Aman dipanggil dari utas.
+
+    Tambahan 30 Okt 2026 (G3): selain menimpa teks tahap global, fungsi
+    ini JUGA menggabungkan slot per bab dari teks tahap (mis. "BAB 3
+    selesai") ke `komentar_json['progres_bab']`. Slot bab lain tidak
+    disentuh, jadi hitungan bab selesai dari agregator tidak pernah
+    turun walau 4 worker paralel menulis bergantian.
+    """
+    with _KUNCI_SLOT:
+        db = _sesi_baru()
+        try:
+            p = ambil(db, kode)
+            if p is None:
+                return
+            p.tahap = tahap
+            if bagian_ke is not None:
+                p.bagian_ke = int(bagian_ke)
+            if status is not None:
+                p.status = status
+            _gabung_slot_dari_teks(p, tahap)
+            db.commit()
+        except Exception as e:                                        # noqa: BLE001
+            log.warning('[proses] ubah_tahap gagal: %s', e)
+        finally:
+            db.close()
 
 
 def tandai_selesai(kode: str, *, hasil: str, hasil_json: str = '',
                    model_ai: str = '', token_in: int = 0,
                    token_out: int = 0, token_revisi: int = 0,
+                   file_id: int | None = None,
                    jenis_notifikasi: str = 'revisi_selesai') -> None:
     """Tandai proses SELESAI beserta hasilnya.
 
-    Hasil disimpan di sini dulu (bukan langsung ditulis ke .docx) — lihat
+    Hasil disimpan di sini dulu (bukan langsung ditulis ke .docx), lihat
     penjelasan di kepala modul, poin 2.
+
+    file_id: kalau diisi, p.file_id ditimpa (backfill G2, 30 Okt 2026).
+    Kalau None, file_id lama dibiarkan, jadi pemanggil revisi yang sudah
+    mengisi file_id saat mulai tidak berubah perilakunya.
     """
     db = _sesi_baru()
     try:
@@ -182,6 +211,8 @@ def tandai_selesai(kode: str, *, hasil: str, hasil_json: str = '',
         p.token_in = int(token_in or 0)
         p.token_out = int(token_out or 0)
         p.token_revisi = int(token_revisi or 0)
+        if file_id is not None:
+            p.file_id = int(file_id)
         p.selesai = datetime.utcnow()
         p.dibaca = 0                    # belum dibaca → lonceng menyala
         #  Simpan dulu pekerjaan utama.
@@ -381,6 +412,9 @@ def ringkas(p: ProsesAI) -> dict:
         #  buku_susun) — untuk counter "Bab X dari N" di halaman proses.
         #  Revisi: komentar_json bukan dict -> None (halaman tetap jalan).
         'jumlah_bab': _jumlah_bab_dari_komentar(p.komentar_json),
+        #  30 Okt 2026 (G3): agregator progres monoton + fase, untuk
+        #  halaman proses. Tambahan saja, kunci lama tidak diubah.
+        'agregat': agregat_progres(p),
         'jumlah_bagian': p.jumlah_bagian,
         'panjang': p.panjang,
         'jenis_dokumen': p.jenis_dokumen,
@@ -423,6 +457,263 @@ def ringkas(p: ProsesAI) -> dict:
 #  (`EDUAI_AI_KONKUREN`) — KEPUTUSAN BOS, bukan diam-diam diubah Wulan.
 #
 #  PENTING: mahasiswa TIDAK melihat error apa pun. Yang terlihat hanyalah
+def _slot_dari_komentar(komentar_json) -> dict:
+    """Slot per bab dari komentar_json (dict kosong bila bukan dict)."""
+    try:
+        data = json.loads(komentar_json or '{}')
+    except Exception:                                                # noqa: BLE001
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    slot = data.get('progres_bab')
+    return dict(slot) if isinstance(slot, dict) else {}
+
+
+def _slot_selesai(nilai) -> bool:
+    if isinstance(nilai, dict):
+        return bool(nilai.get('selesai'))
+    return bool(nilai)
+
+
+def gabung_slot_bab(komentar_json, bab, *, selesai=False, terakhir='') -> str:
+    """Gabungkan SATU slot bab, tanpa menyentuh slot bab lain.
+
+    Fungsi murni (tidak menyentuh DB), jadi mudah diuji. Aturan monoton:
+    flag selesai yang sudah True tidak pernah dihapus, dan teks terakhir
+    hanya ditulis ke slot bab itu sendiri. Komentar berbentuk list
+    (pekerjaan revisi) dikembalikan apa adanya, slot hanya untuk buku
+    yang komentarnya berbentuk dict.
+    """
+    try:
+        data = json.loads(komentar_json or '{}')
+    except Exception:                                                # noqa: BLE001
+        return komentar_json or ''
+    if not isinstance(data, dict):
+        return komentar_json or ''
+    slot = data.get('progres_bab')
+    if not isinstance(slot, dict):
+        slot = {}
+    kunci = str(int(bab))
+    lama = slot.get(kunci)
+    lama_dict = dict(lama) if isinstance(lama, dict) else {}
+    baru_selesai = bool(lama_dict.get('selesai')) or bool(selesai)
+    baru_terakhir = ((terakhir or '')[:200] if terakhir
+                     else (lama_dict.get('terakhir') or ''))
+    slot[kunci] = {'selesai': baru_selesai, 'terakhir': baru_terakhir}
+    data['progres_bab'] = slot
+    return json.dumps(data, ensure_ascii=False)
+
+
+def _gabung_slot_dari_teks(p, tahap) -> None:
+    """Perbarui slot per bab dari teks tahap, di sesi ubah_tahap."""
+    teks = tahap or ''
+    m = _POLA_BAB.search(teks)
+    if not m:
+        return
+    try:
+        bab = int(m.group(1))
+    except ValueError:
+        return
+    selesai = bool(_POLA_BAB_SELESAI.search(teks))
+    baru = gabung_slot_bab(p.komentar_json or '', bab,
+                           selesai=selesai, terakhir=teks)
+    if baru != (p.komentar_json or ''):
+        p.komentar_json = baru
+
+
+def catat_bab_selesai(kode: str, bab: int) -> None:
+    """Tandai bab selesai di slotnya sendiri. Aman dipanggil paralel."""
+    with _KUNCI_SLOT:
+        db = _sesi_baru()
+        try:
+            p = ambil(db, kode)
+            if p is None:
+                return
+            p.komentar_json = gabung_slot_bab(p.komentar_json or '', bab,
+                                              selesai=True)
+            db.commit()
+        except Exception as e:                                        # noqa: BLE001
+            log.warning('[proses] catat_bab_selesai gagal: %s', e)
+        finally:
+            db.close()
+
+
+def catat_subbab(kode: str, bab: int, subbab: str) -> None:
+    """Catat subbab terakhir untuk SATU bab saja."""
+    with _KUNCI_SLOT:
+        db = _sesi_baru()
+        try:
+            p = ambil(db, kode)
+            if p is None:
+                return
+            p.komentar_json = gabung_slot_bab(p.komentar_json or '', bab,
+                                              terakhir=subbab or '')
+            db.commit()
+        except Exception as e:                                        # noqa: BLE001
+            log.warning('[proses] catat_subbab gagal: %s', e)
+        finally:
+            db.close()
+
+
+def agregat_progres(p) -> dict:
+    """Hitung progres dari penanda tahan lama, bukan teks tahap mentah.
+
+    bab_selesai = gabungan flag selesai per bab di komentar_json DAN
+    kunci bab di hasil_json final. Keduanya hanya bertambah, tidak
+    pernah berkurang, jadi angka tampil tidak pernah turun. Sengaja
+    TIDAK memakai bagian_ke (slot global yang ditulis 4 worker paralel
+    bergantian, sumber lompatan 4, 5, 4, 1 di job 222) dan tidak memakai
+    urutan teks tahap. subbab_per_bab = teks terakhir tiap bab, dari
+    slotnya masing-masing, bukan satu slot global. fase dibaca dari
+    status job + teks tahap terakhir; fase ini hanya untuk tampilan.
+    """
+    slot = _slot_dari_komentar(getattr(p, 'komentar_json', '') or '')
+    try:
+        hasil = json.loads(getattr(p, 'hasil_json', '') or '{}') or {}
+    except Exception:                                                # noqa: BLE001
+        hasil = {}
+    if not isinstance(hasil, dict):
+        hasil = {}
+    bab_hasil = hasil.get('bab') if isinstance(hasil.get('bab'), dict) else {}
+    selesai_set = set()
+    for kunci, nilai in slot.items():
+        try:
+            nomor = int(kunci)
+        except (TypeError, ValueError):
+            continue
+        if _slot_selesai(nilai):
+            selesai_set.add(nomor)
+    for kunci in bab_hasil:
+        try:
+            selesai_set.add(int(kunci))
+        except (TypeError, ValueError):
+            continue
+    subbab = {}
+    for kunci, nilai in slot.items():
+        if isinstance(nilai, dict) and nilai.get('terakhir'):
+            subbab[str(kunci)] = nilai['terakhir']
+    total = _jumlah_bab_dari_komentar(getattr(p, 'komentar_json', '') or '')
+    if not total:
+        urut = sorted(selesai_set)
+        total = urut[-1] if urut else 0
+    status = getattr(p, 'status', '') or ''
+    tahap = (getattr(p, 'tahap', '') or '').lower()
+    if status == 'selesai':
+        fase = 'selesai'
+    elif status in ('gagal', 'dibatalkan'):
+        # Tampilan saja: user tidak pernah melihat kata gagal (A4),
+        # perbaikan otomatis di belakang memakai fase penyempurnaan.
+        fase = 'penyempurnaan'
+    elif any(k in tahap for k in ('perbaik', 'disempurnakan', 'mengulang',
+                                  'coba lagi', 'retry', 'repair', 'gagal')):
+        fase = 'penyempurnaan'
+    elif any(k in tahap for k in ('merangkai', 'menyusun dokumen', 'rakit',
+                                  'toc', 'indeks', 'daftar singkatan',
+                                  'buku jadi')):
+        fase = 'perakitan'
+    elif any(k in tahap for k in ('memeriksa', 'periksa', 'gerbang',
+                                  'mutu')):
+        fase = 'gerbang'
+    elif status == 'menunggu':
+        fase = 'menyiapkan'
+    else:
+        fase = 'menulis'
+    sedang = fase == 'penyempurnaan'
+    return {
+        'fase': fase,
+        'sedang_disempurnakan': sedang,
+        'teks_sabar': TEKS_SABAR if sedang else '',
+        'bab_selesai': len(selesai_set),
+        'bab_selesai_daftar': sorted(selesai_set),
+        'bab_total': int(total or 0),
+        'subbab_per_bab': subbab,
+    }
+
+
+def data_selesai_dari_hasil(p) -> dict:
+    """Ekstrak tampilan selesai dari baris job + hasil_json server (G1).
+
+    Dipakai rute selesai. Parameter URL tidak pernah masuk ke sini.
+    bab = bab_selesai hasil_json, atau jumlah kunci bab bila kosong.
+    kata = total_kata hasil_json, atau jumlah kata per bab bila kosong.
+    """
+    try:
+        hasil = json.loads(getattr(p, 'hasil_json', '') or '{}') or {}
+    except Exception:                                                # noqa: BLE001
+        hasil = {}
+    if not isinstance(hasil, dict):
+        hasil = {}
+    judul = hasil.get('judul') or getattr(p, 'hasil', '') or 'Buku'
+    bab_data = hasil.get('bab') if isinstance(hasil.get('bab'), dict) else {}
+    try:
+        bab = int(hasil.get('bab_selesai') or 0) or len(bab_data)
+    except (TypeError, ValueError):
+        bab = len(bab_data)
+    try:
+        kata = int(hasil.get('total_kata') or 0)
+    except (TypeError, ValueError):
+        kata = 0
+    if not kata:
+        try:
+            kata = sum(int((b or {}).get('kata') or 0)
+                       for b in bab_data.values() if isinstance(b, dict))
+        except Exception:                                            # noqa: BLE001
+            kata = 0
+    return {
+        'judul': judul, 'bab': bab, 'kata': kata,
+        'docx': hasil.get('docx') or '', 'folder': hasil.get('folder') or '',
+        'docx_alasan': hasil.get('docx_alasan') or '',
+        'file_alasan': hasil.get('file_alasan') or '',
+        'hasil': hasil,
+    }
+
+
+def fid_selesai(db, user_id, hasil, p_file_id, docx_path) -> int:
+    """Cari fid dokumen selesai milik user, berurutan (G1).
+
+    Sumber: (1) hasil_json.file_id, (2) baris job (backfill G2),
+    (3) fallback cari baris files milik user ini. Fallback dipakai
+    karena job 222 membuktikan file_id bisa tercatat di hasil_json tapi
+    kosong di baris job: cari nama tampil yang dibuat _daftarkan_berkas
+    dari judul (judul + '.docx'), terbaru dulu, yang tidak di sampah.
+    Kalau nama tidak ketemu, cocokkan ukuran berkas docx di disk.
+    Bila tidak ada yang cocok, kembalikan 0, jangan menebak id lain.
+    """
+    from .models import FileBerkas
+    for klaim in ((hasil or {}).get('file_id'), p_file_id):
+        try:
+            fid = int(klaim or 0)
+        except (TypeError, ValueError):
+            continue
+        if not fid:
+            continue
+        fb = db.get(FileBerkas, fid)
+        if fb is not None and fb.user_id == user_id and not fb.di_sampah:
+            return int(fid)
+    judul = ((hasil or {}).get('judul') or '').strip() or 'Buku'
+    nama_cari = judul if judul.lower().endswith('.docx') else judul + '.docx'
+    fb = db.execute(
+        select(FileBerkas).where(
+            FileBerkas.user_id == user_id,
+            FileBerkas.terhapus_pada.is_(None),
+            FileBerkas.nama == nama_cari,
+        ).order_by(FileBerkas.id.desc()).limit(1)
+    ).scalar_one_or_none()
+    if fb is not None:
+        return int(fb.id)
+    if docx_path and os.path.exists(docx_path):
+        fb = db.execute(
+            select(FileBerkas).where(
+                FileBerkas.user_id == user_id,
+                FileBerkas.terhapus_pada.is_(None),
+                FileBerkas.ukuran == os.path.getsize(docx_path),
+            ).order_by(FileBerkas.id.desc()).limit(1)
+        ).scalar_one_or_none()
+        if fb is not None:
+            return int(fb.id)
+    return 0
+
+
 #  tahap yang jujur: 'Menunggu antrean (posisi N dari M)' → lalu jalan.
 # ══════════════════════════════════════════════════════════════════════════
 
@@ -717,6 +1008,12 @@ class Lapor:
 
     def menulis(self, ke: int, dari: int) -> None:
         self.tahap(tahap_menulis(ke, dari), bagian_ke=ke)
+
+    def bab_selesai(self, bab: int) -> None:
+        catat_bab_selesai(self.kode, bab)
+
+    def subbab(self, bab: int, teks: str) -> None:
+        catat_subbab(self.kode, bab, teks)
 
 
 def kembalikan_bila_gagal(db, kode: str, user_id: int, info_potong: list) -> None:

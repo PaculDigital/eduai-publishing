@@ -48,6 +48,29 @@ bad()  { echo "  ${MERAH}✗${NORMAL} $*"; }
 info() { echo "  ${BIRU}→${NORMAL} $*"; }
 judul(){ echo; echo "${TEBAL}${BIRU}═══ $* ═══${NORMAL}"; }
 
+#  G6 30 Okt 2026: laporkan hasil gerbang BUKU LATAR dari berkas log.
+#  Lolos: hanya ekor 3 baris, ringkas seperti dulu.
+#  Gagal: daftar baris cek gagal (tanda gagal) lalu ekor 3 baris untuk konteks.
+#  Bila tidak ada baris gagal (misal gerbang crash), tetap tampilkan ekor
+#  supaya kegagalan tidak diam, dan GAGAL tetap 1.
+laporkan_buku_latar() {
+    local berkas="$1"
+    if grep -q "0 GAGAL" "$berkas"; then
+        tail -3 "$berkas"
+    else
+        GAGAL=1
+        echo "  CEK BUKU LATAR YANG GAGAL:"
+        if grep -q "❌" "$berkas"; then
+            grep "❌" "$berkas" | sed 's/^/  /'
+        elif [ -s "$berkas" ]; then
+            echo "  (tidak ada baris cek gagal, lihat ekor output di bawah)"
+        else
+            echo "  (output gerbang kosong, docker run mungkin gagal)"
+        fi
+        tail -3 "$berkas"
+    fi
+}
+
 GAGAL=0
 PY="${PY_PEMERIKSA:-/opt/data/.venv/bin/python3}"
 
@@ -73,6 +96,7 @@ LOG_QC_BRIEF="$RUANG/g_qc_brief.log"
 LOG_ILUSTRASI="$RUANG/g_ilustrasi.log"
 LOG_SAPAAN="$RUANG/g_sapaan.log"
 LOG_PERBAIKAN="$RUANG/g_perbaikan.log"
+LOG_BUKU_LATAR="$RUANG/g_buku_latar.log"
 bersihkan() { rm -rf "$RUANG" 2>/dev/null || true; }
 trap bersihkan EXIT INT TERM
 info "ruang sementara: $RUANG"
@@ -399,12 +423,11 @@ elif [ -f "_gerbang_buku_latar.py" ]; then
         GAGAL=1
     else
         echo "  (image uji: $IMG_UJI)"
-        HASIL_BL="$(docker run --rm --entrypoint python -w /app \
+        docker run --rm --entrypoint python -w /app \
             -e EDUAI_SECRET_KEY=uji -e EDUAI_OO_JWT_SECRET=uji \
             -e EDUAI_ROUTER_KEY=uji -i "$IMG_UJI" \
-            - < _gerbang_buku_latar.py 2>&1)"
-        echo "$HASIL_BL" | tail -3
-        echo "$HASIL_BL" | grep -q "0 GAGAL" || GAGAL=1
+            - < _gerbang_buku_latar.py > "$LOG_BUKU_LATAR" 2>&1
+        laporkan_buku_latar "$LOG_BUKU_LATAR"
     fi
 fi
 

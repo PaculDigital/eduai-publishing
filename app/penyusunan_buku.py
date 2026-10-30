@@ -108,6 +108,173 @@ def folder_buku(fid_unik):
     return os.path.join(dasar, str(fid_unik))
 
 
+
+#  -- RETRY PER BAB A1 (30 Okt 2026, job 221) ------------------------------
+#  Latar: provider kosong membuat teks bab None, lalu word_count(None)
+#  crash AttributeError dan job gagal total padahal bab lain sudah jadi.
+#  Aturan baru, hanya di wilayah loop bab ini:
+#    1. Satu bab gagal (exception atau teks None/kosong) diulang BAB ITU
+#       SAJA, bukan dari bab 1.
+#    2. Maksimal 3 pengulangan per bab, jadi total 4 percobaan.
+#       Backoff antar percobaan: 5 detik, 15 detik, 30 detik.
+#       Urutan backoff sengaja membesar supaya provider yang sedang
+#       kosong punya waktu pulih, tanpa menunggu berjam-jam.
+#    3. Bab None atau kosong adalah percobaan GAGAL yang bisa di-retry,
+#       bukan crash dan bukan lolos diam-diam.
+#    4. Resume dari checkpoint: bab yang sudah tercatat selesai di
+#       checkpoint.json dilewati, eksekutornya tidak dipanggil lagi.
+#  Catatan jujur: loop paralel nyata tetap di modul host penyusun_buku
+#  (di luar repo git ini). Di repo ini, retry produksi diwujudkan oleh
+#  loop di susun() di bawah: pemanggilan ulang S.susun_buku dengan
+#  ulang=1 memakai checkpoint host yang sama, sehingga bab yang sudah
+#  selesai dilewati host dan hanya bab yang belum selesai yang
+#  dieksekusi lagi. Helper di bawah ini adalah logika murni yang sama,
+#  dipakai uji mock tanpa LLM. Helper berjalan berurutan, bukan paralel,
+#  karena tujuannya membuktikan semantik retry dan resume, bukan
+#  kecepatan paralel.
+RETRY_BAB_BACKOFF_DETIK = (5, 15, 30)
+RETRY_BAB_ULANG_MAKS = 3
+RETRY_BAB_PERCOBAAN_MAKS = 1 + RETRY_BAB_ULANG_MAKS
+
+
+class BabGagal(RuntimeError):
+    """Gagal bersih per bab sesudah semua percobaan habis.
+
+    Subclass RuntimeError supaya jalur except refund yang sudah ada di
+    susun() menangkapnya sebagai gagal teknis, bukan sebagai crash
+    mentah seperti AttributeError.
+    """
+
+
+def hitung_kata_aman(teks):
+    """Hitung kata tanpa pernah crash pada teks None.
+
+    Penjaga .split(): teks yang bukan str (termasuk None) dihitung 0
+    kata. Pemanggil yang memakai fungsi ini tidak perlu try AttributeError.
+    """
+    if not isinstance(teks, str):
+        return 0
+    return len(teks.split())
+
+
+def periksa_teks_bab(n, teks):
+    """Validasi hasil satu percobaan bab. Return jumlah kata.
+
+    Raise BabGagal bila teks None atau kosong. Ini yang membuat None
+    menjadi retryable, bukan crash dan bukan lolos diam-diam.
+    """
+    if teks is None or (isinstance(teks, str) and not teks.strip()):
+        raise BabGagal(
+            'BAB %s kosong (teks None atau kosong dari provider)' % n)
+    if not isinstance(teks, str):
+        raise BabGagal(
+            'BAB %s hasil bukan teks: %s' % (n, type(teks).__name__))
+    return hitung_kata_aman(teks)
+
+
+def baca_checkpoint_selesai(folder):
+    """Nomor bab yang sudah selesai menurut checkpoint.json di folder.
+
+    Format checkpoint host: {'babs': {'1': {'status': 'done',
+    'words': 123}, ...}}. Kunci str dan int sama-sama diterima. Hanya
+    status done dengan words > 0 yang dilewati, sama seperti logika
+    lewati di modul host. Berkas hilang, rusak, atau bentuk lain
+    menghasilkan set kosong, bukan crash, supaya run tetap jalan dari
+    awal.
+    """
+    import json
+    selesai = set()
+    if not folder:
+        return selesai
+    path = os.path.join(folder, 'checkpoint.json')
+    try:
+        with open(path, encoding='utf-8') as fh:
+            data = json.load(fh)
+    except Exception:
+        return selesai
+    babs = data.get('babs') if isinstance(data, dict) else None
+    if not isinstance(babs, dict):
+        return selesai
+    for kunci, info in babs.items():
+        try:
+            n = int(kunci)
+        except (TypeError, ValueError):
+            continue
+        if isinstance(info, dict) and info.get('status') == 'done':
+            try:
+                kata = info.get('words', 0) or 0
+            except Exception:
+                kata = 0
+            if kata > 0:
+                selesai.add(n)
+    return selesai
+
+
+def jalankan_bab_dengan_retry(n, eksekutor, tidur=None, lapor=None):
+    """Jalankan satu bab dengan retry. Return teks bab yang lolos.
+
+    eksekutor(n) mengembalikan teks bab, atau raise exception, atau
+    mengembalikan None. None, teks kosong, dan exception apa pun
+    (termasuk AttributeError dari .split() atas None di jalur lama)
+    dihitung satu percobaan gagal. Sesudah percobaan terakhir, raise
+    BabGagal bersih yang menyebut galat terakhir, bukan galat mentah.
+    tidur: fungsi(detik), default time.sleep. Uji mock menyuntik
+    perekam supaya tidak menunggu betulan.
+    """
+    if tidur is None:
+        tidur = time.sleep
+    galat_terakhir = None
+    for percobaan in range(1, RETRY_BAB_PERCOBAAN_MAKS + 1):
+        try:
+            teks = eksekutor(n)
+            periksa_teks_bab(n, teks)
+            return teks
+        except BabGagal as e:
+            galat_terakhir = e
+        except Exception as e:
+            galat_terakhir = e
+        if percobaan >= RETRY_BAB_PERCOBAAN_MAKS:
+            break
+        jeda = RETRY_BAB_BACKOFF_DETIK[percobaan - 1]
+        if lapor:
+            try:
+                lapor('BAB %s percobaan %s gagal (%s), ulang sesudah %s detik'
+                      % (n, percobaan, galat_terakhir, jeda))
+            except Exception:
+                pass
+        tidur(jeda)
+    nama_galat = type(galat_terakhir).__name__ if galat_terakhir is not None else 'tanpa galat'
+    raise BabGagal(
+        'BAB %s gagal sesudah %s percobaan, galat terakhir: %s: %s'
+        % (n, RETRY_BAB_PERCOBAAN_MAKS, nama_galat, galat_terakhir))
+
+
+def jalankan_semua_bab(nomor_bab, eksekutor, folder_checkpoint=None,
+                       tidur=None, lapor=None):
+    """Jalankan daftar bab berurutan dengan retry per bab dan resume.
+
+    Bab yang tercatat selesai di checkpoint dilewati tanpa memanggil
+    eksekutornya. Bab lain dijalankan lewat jalankan_bab_dengan_retry,
+    sehingga gagal 2x lalu berhasil tidak mengulang bab lain, dan bab
+    yang gagal total menggagalkan run dengan BabGagal bersih pada bab
+    itu (pemanggil di atas yang memutuskan refund).
+    Return dict {nomor: teks} hanya untuk bab yang dijalankan di run ini.
+    """
+    selesai = baca_checkpoint_selesai(folder_checkpoint)
+    hasil = {}
+    for n in nomor_bab:
+        if n in selesai:
+            if lapor:
+                try:
+                    lapor('BAB %s sudah ada di checkpoint, dilewati' % n)
+                except Exception:
+                    pass
+            continue
+        hasil[n] = jalankan_bab_dengan_retry(n, eksekutor, tidur=tidur,
+                                             lapor=lapor)
+    return hasil
+
+
 def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
           kartu_jenis=None, outline_siaps=None, penulis=None, penelaah=None,
           tier=None):
@@ -204,8 +371,10 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
         def _cek_bab(n, teks, folder_bab):
             try:
                 from . import cek_awal as _CA_bab
+                #  Penjaga None A1: teks None diperlakukan sebagai teks
+                #  kosong oleh cek, bukan crash .split() di jalur cek.
                 hasil_cek = _CA_bab.periksa_bab_awal(
-                    n, teks, folder_bab, outline.get(n))
+                    n, teks or '', folder_bab, outline.get(n))
                 if lapor:
                     for _m in hasil_cek['masalah']:
                         lapor(f'Cek awal {_m}')
@@ -217,10 +386,56 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     lapor(f'Cek awal BAB {n} dilewati: {_e_cek}')
                 return {'masalah': [], 'curiga': []}
 
-        hasil = S.susun_buku(judul, outline, jenis=jenis,
-                             keluar_dir=keluar, lapor=lapor,
-                             on_mulai=_potong_saat_mulai, tier=tier,
-                             on_bab_selesai=_cek_bab)
+        #  Retry A1 di wilayah loop bab: gagal eksekusi bab (exception
+        #  dari S.susun_buku, termasuk crash None dari provider) TIDAK
+        #  langsung menggagalkan job. Pemanggilan diulang maksimal 3x
+        #  dengan backoff RETRY_BAB_BACKOFF_DETIK, dan percobaan ulang
+        #  memakai ulang=1 supaya checkpoint host dilewati bab yang
+        #  sudah selesai, jadi hanya bab yang belum selesai yang
+        #  dieksekusi lagi. Token TIDAK dipotong ulang: percobaan ulang
+        #  memakai on_mulai=None bila potong sudah terjadi, dan memakai
+        #  pemotong asli bila percobaan pertama gagal sebelum potong.
+        #  Galat kuota (HTTPException) dan galat validasi (ValueError,
+        #  PermissionError) TIDAK di-retry dan dilempar apa adanya,
+        #  supaya pesan saldo dan outline tidak berubah menjadi gagal
+        #  teknis. Sesudah percobaan terakhir, raise RuntimeError bersih
+        #  (bukan galat mentah) supaya jalur except refund di bawah
+        #  menangkap sebagai gagal teknis.
+        hasil = None
+        _galat_susun = None
+        for _percobaan_susun in range(1, RETRY_BAB_PERCOBAAN_MAKS + 1):
+            try:
+                hasil = S.susun_buku(
+                    judul, outline, jenis=jenis,
+                    keluar_dir=keluar, lapor=lapor,
+                    on_mulai=(_potong_saat_mulai if not terpotong else None),
+                    tier=tier, on_bab_selesai=_cek_bab,
+                    ulang=(1 if _percobaan_susun > 1 else 0))
+                break
+            except Exception as _e_susun:
+                if type(_e_susun).__name__ == 'HTTPException' or isinstance(
+                        _e_susun, (ValueError, PermissionError)):
+                    raise
+                _galat_susun = _e_susun
+                if _percobaan_susun >= RETRY_BAB_PERCOBAAN_MAKS:
+                    break
+                _jeda_susun = RETRY_BAB_BACKOFF_DETIK[_percobaan_susun - 1]
+                if lapor:
+                    try:
+                        lapor(
+                            'Penyusunan bab gagal percobaan %s (%s: %s), '
+                            'diulang sesudah %s detik, bab yang sudah selesai '
+                            'tidak diulang' % (_percobaan_susun,
+                                               type(_e_susun).__name__, _e_susun,
+                                               _jeda_susun))
+                    except Exception:
+                        pass
+                time.sleep(_jeda_susun)
+        if hasil is None:
+            raise RuntimeError(
+                'penyusunan bab gagal sesudah %s percobaan, galat terakhir: '
+                '%s: %s' % (RETRY_BAB_PERCOBAAN_MAKS,
+                            type(_galat_susun).__name__, _galat_susun))
 
         #  Hasil HARUS benar-benar ada di disk — bukan cuma diklaim.
         #
@@ -256,6 +471,49 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
         hasil['token'] = TOKEN_PER_BUKU
         hasil['saldo'] = info_kotak.get('info')
 
+        #  A2/G4 Path B (30 Okt 2026): pass sitasi deterministik sesudah
+        #  bab selesai dan SEBELUM rakit, supaya DOCX memakai teks yang
+        #  sudah diperbaiki. Hanya buku-referensi (tipe lain tidak punya
+        #  refs per bab). Gagal di sini raise di dalam try susun(),
+        #  sehingga except di bawah mengembalikan token + pesan manusia.
+        #  panggil_llm=None: repair deterministik saja, tanpa biaya LLM.
+        if kartu_jenis == 'buku-referensi':
+            import json as _json_sg
+            from . import sitasi_anti_gagal as _SG
+            for _n in sorted(n for n in outline if isinstance(n, int)):
+                _p_bab = _path_bab(
+                    _n, hasil['bab'].get(_n) or hasil['bab'].get(str(_n)) or {})
+                if not _p_bab:
+                    continue
+                with open(_p_bab, encoding='utf-8') as _f:
+                    _teks_bab = _f.read()
+                _folder_bab = os.path.dirname(_p_bab)
+                _refs_bab = []
+                for _calon_ref in (
+                        os.path.join(_folder_bab, 'visual',
+                                     'refs_bab%d.json' % _n),
+                        os.path.join(_folder_bab,
+                                     'refs_bab%d.json' % _n),
+                        os.path.join(keluar, 'visual',
+                                     'refs_bab%d.json' % _n),
+                        os.path.join(keluar, 'refs_bab%d.json' % _n)):
+                    try:
+                        with open(_calon_ref, encoding='utf-8') as _fr:
+                            _coba = _SG.refs_dari_data(_json_sg.load(_fr))
+                    except Exception:
+                        continue
+                    if _coba:
+                        _refs_bab = _coba
+                        break
+                _hasil_sg = _SG.periksa_dan_perbaiki_bab(
+                    _n, _teks_bab, _refs_bab, panggil_llm=None,
+                    gagal_keras=True)
+                if _hasil_sg['teks_baru'] != _teks_bab:
+                    with open(_p_bab, 'w', encoding='utf-8') as _f:
+                        _f.write(_hasil_sg['teks_baru'])
+                    if lapor:
+                        lapor('Sitasi bab %s diperbaiki' % _n)
+
         # ── RAKIT SATU .docx (ACC Bos 19 Okt 2026, opsi B) ────────────────
         #  Tanpa ini hasilnya cuma berkas bab terpisah — tidak bisa dibuka di
         #  OnlyOffice. Mesin assembly SUDAH ADA; ini PEMASANGAN, bukan mesin
@@ -284,6 +542,20 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                 glos = dict(getattr(P, 'GLOSARIUM', {}) or {})
             except Exception:
                 glos = {}
+        #  A2/G4: konsolidasi pustaka (30 Okt 2026), gabungan sitasi
+        #  badan (teks bab sesudah repair Path B di atas) + refs panen,
+        #  bukan panen saja. Di luar try/except kumpul di atas supaya
+        #  gagal konsolidasi tidak ditelan menjadi pustaka kosong.
+        if kartu_jenis == 'buku-referensi':
+            from . import sitasi_anti_gagal as _SG
+            _teks_per_bab = {}
+            for _n in sorted(n for n in outline if isinstance(n, int)):
+                _p_bab2 = _path_bab(
+                    _n, hasil['bab'].get(_n) or hasil['bab'].get(str(_n)) or {})
+                if _p_bab2:
+                    with open(_p_bab2, encoding='utf-8') as _f2:
+                        _teks_per_bab[_n] = _f2.read()
+            refs_rakit = _SG.gabung_pustaka(_teks_per_bab, refs_rakit or [])
         try:
             import buku_umum_assembly as ASM
             rakit = ASM.rakit(
@@ -294,6 +566,7 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                          or getattr(u, 'nama_lengkap', '') or ''),
                 institusi=(getattr(u, 'nama_kampus', '') or ''),
                 penelaah=(penelaah or ''),
+                tier=tier,
             )
             hasil['docx'] = rakit.get('docx')
             hasil['docx_hasil'] = rakit
@@ -403,6 +676,49 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     #  indeks + singkatan + sapuan sekali -> gerbang ulang.
                     #  _hal tetap sah: isi ulang hanya mengubah back matter.
                     #  Baru bila tetap gagal, buku gagal + refund seperti biasa.
+                    #  G5 urutan (30 Okt 2026): isi_nomor pertama jalan
+                    #  SEBELUM indeks + singkatan disisipkan, sehingga
+                    #  nomor TOC bisa bergeser sesudah penyisipan. Pass
+                    #  kedua di sini (sesudah semua sisipan, sebelum
+                    #  gerbang) menyegarkan nomor TOC + total halaman
+                    #  untuk dokumen final, lalu Pages metadata diisi
+                    #  dari total ukur final. Pass ini best-effort:
+                    #  bila gagal, lanjut dengan nomor pass pertama
+                    #  dan tanpa Pages (bukan gagal buku), kecuali
+                    #  berkas docx hilang (itu gagal, fail-closed).
+                    try:
+                        _bernomor2, _terisi2, _hilang2 = _sc.isi_nomor(
+                            hasil['docx'])
+                        if _hilang2:
+                            hasil['toc_hilang'] = _hilang2
+                            if lapor:
+                                lapor('Nomor TOC belum terisi (pass 2): ' +
+                                      ', '.join(_hilang2))
+                        os.replace(hasil['docx'],
+                                   hasil['docx'] + '.pra-nomor')
+                        try:
+                            os.replace(_bernomor2, hasil['docx'])
+                        except Exception:
+                            os.replace(hasil['docx'] + '.pra-nomor',
+                                       hasil['docx'])
+                            raise
+                        hasil['toc_terisi'] = _terisi2
+                        _peta2, hilang_ukur2, _total2 = _sc.ukur(
+                            hasil['docx'], judul_bab)
+                        if hilang_ukur2:
+                            raise RuntimeError(
+                                'judul bab tidak tampil di render (pass 2): ' +
+                                ', '.join(hilang_ukur2))
+                        hasil['ukur_peta'] = _peta2
+                        import buku_umum_assembly as _ASMhal
+                        _ASMhal.isi_halaman_docx(hasil['docx'], int(_total2))
+                    except Exception as _e2:
+                        if lapor:
+                            lapor('Penyegaran nomor TOC pass 2 dilewati: %s'
+                                  % _e2)
+                        if not os.path.exists(hasil['docx']):
+                            raise RuntimeError(
+                                'docx hilang sesudah pass 2: %s' % _e2)
                     def _gerbang_ref():
                         _sc.referensi(hasil['docx'])
                     def _perbaiki_ref():

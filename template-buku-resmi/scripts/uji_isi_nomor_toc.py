@@ -74,6 +74,45 @@ def bangun_buku(path):
     doc.save(str(path))
 
 
+def bangun_buku_jebakan(path):
+    """Buku jebakan first-match: paragraf badan yang menyebut judul
+    back matter SEBELUM heading back matter yang asli.
+
+    Halaman: 1 sampul, 2 kata pengantar, 3 daftar isi, 4 BAB 1,
+    5 paragraf badan 'Daftar Pustaka induk ...' (satu baris, diawali
+    persis 'Daftar Pustaka '), 6 DAFTAR PUSTAKA, 7 TENTANG PENULIS.
+    Kode lama (startswith) memetakan Daftar Pustaka ke 5; kode baru
+    (heading-match) harus memetakannya ke 6. Entri TOC Daftar
+    Pustaka sengaja dibuat TANPA tab untuk menguji jaminan tab.
+    """
+    doc = Document()
+    doc.add_paragraph('SAMPUL')
+    doc.add_page_break()
+    doc.add_paragraph('KATA PENGANTAR')
+    doc.add_paragraph('Isi kata pengantar.')
+    doc.add_page_break()
+    h = doc.add_paragraph('DAFTAR ISI')
+    h.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    _entri(doc, 'Kata Pengantar')
+    doc.paragraphs[-1].add_run('iii')
+    _entri(doc, 'BAB 1. Mengamati Langit', ukuran=12, tebal=True)
+    _entri(doc, 'Daftar Pustaka', tab=False)
+    _entri(doc, 'Tentang Penulis')
+    doc.add_page_break()
+    doc.add_paragraph('BAB 1')
+    doc.add_paragraph('Isi bab satu.')
+    doc.add_page_break()
+    doc.add_paragraph('Daftar Pustaka induk wajib diverifikasi '
+                      'sebelum naskah dikunci.')
+    doc.add_page_break()
+    doc.add_paragraph('DAFTAR PUSTAKA')
+    doc.add_paragraph('Alexandrova E. (2021). Contoh referensi.')
+    doc.add_page_break()
+    doc.add_paragraph('TENTANG PENULIS')
+    doc.add_paragraph('Bio penulis.')
+    doc.save(str(path))
+
+
 def toc_terakhir(doc):
     """judul -> run terakhir, untuk paragraf sesudah DAFTAR ISI."""
     paras = doc.paragraphs
@@ -136,8 +175,46 @@ def main():
               f'[idempotent, jalan kedua]: {toc2}')
         if not (sama and r2.returncode == 0):
             gagal.append('idempotent')
+        # Kasus jebakan first-match + jaminan tab (G5).
+        jebakan_masuk, jebakan_keluar = (tmp / 'jebakan.docx',
+                                         tmp / 'jebakan1.docx')
+        bangun_buku_jebakan(jebakan_masuk)
+        rj = subprocess.run([sys.executable, str(HERE / 'isi_nomor_toc.py'),
+                             str(jebakan_masuk), str(jebakan_keluar)],
+                            capture_output=True, text=True)
+        print(rj.stdout, end='')
+        if rj.returncode != 0:
+            print(f'GAGAL: filler jebakan exit {rj.returncode}\n{rj.stderr}')
+            gagal.append('jebakan exit')
+        else:
+            tocj = toc_terakhir(Document(str(jebakan_keluar)))
+            for judul, angka in [('Daftar Pustaka', '6'),
+                                 ('Tentang Penulis', '7')]:
+                got = tocj.get(judul)
+                tag = 'LULUS' if got == angka else 'GAGAL'
+                print(f'{tag} [jebakan {judul}]: {got} (harap {angka})')
+                if got != angka:
+                    gagal.append('jebakan ' + judul)
+            dj = Document(str(jebakan_keluar))
+            parasj = dj.paragraphs
+            awalj = next(i for i, p in enumerate(parasj)
+                         if p.text.strip().upper() == 'DAFTAR ISI')
+            pj = next(p for p in parasj[awalj + 1:]
+                      if p.runs and p.runs[0].text.strip() == 'Daftar Pustaka')
+            ada_tab = '\t' in pj.text
+            ada_stop = any(ts.alignment == WD_ALIGN_PARAGRAPH.RIGHT
+                           for ts in pj.paragraph_format.tab_stops)
+            print(f'{"LULUS" if ada_tab else "GAGAL"} '
+                  f'[jebakan tab ditambahkan]: {pj.text!r}')
+            print(f'{"LULUS" if ada_stop else "GAGAL"} '
+                  f'[jebakan tab stop rata kanan]: '
+                  f'{[(round(ts.position.cm, 1), int(ts.alignment)) for ts in pj.paragraph_format.tab_stops]}')
+            if not ada_tab:
+                gagal.append('jebakan tab')
+            if not ada_stop:
+                gagal.append('jebakan tab stop')
         print(f'RINGKAS UJI ISI NOMOR TOC: '
-              f'{len(harap) + 2 - len(gagal)} LULUS / {len(gagal)} GAGAL')
+              f'{len(harap) + 2 + 4 - len(gagal)} LULUS / {len(gagal)} GAGAL')
         return 1 if gagal else 0
 
 
