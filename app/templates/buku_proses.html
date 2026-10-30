@@ -76,6 +76,11 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
   .baris{font-size:13px}
   .tombol{width:100%;justify-content:center}
 }
+.bar-luar{height:10px;background:#EDEDEF;border-radius:999px;overflow:hidden;margin:10px 0 6px}
+.bar-isi{height:100%;width:4%;background:var(--hijau);border-radius:999px;transition:width .8s ease}
+.bar-isi.hidup{background-image:linear-gradient(45deg,rgba(255,255,255,.35) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.35) 50%,rgba(255,255,255,.35) 75%,transparent 75%);background-size:22px 22px;animation:geser 1.2s linear infinite}
+@keyframes geser{from{background-position:0 0}to{background-position:22px 0}}
+.bar-info{font-size:12.5px;color:var(--teks-abu)}
 </style>
 </head>
 <body>
@@ -94,12 +99,16 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
   <h1>{{ ikon('book-open', 22) }} Buku sedang disusun</h1>
   <p class="sub">Buku ditulis di server. <b>Boleh tutup tab</b> — pekerjaan
      tetap jalan dan hasilnya tersimpan. Kembali ke halaman ini kapan saja
-     untuk melihat kemajuannya.</p>
+     untuk melihat kemajuannya.
+     {% if wa_aktif %}Kamu akan diinfo WA jika sudah selesai.
+     {% else %}Isi nomor WA di <a href="/setelan-wa"><b>Setelan WA</b></a> agar kamu diinfo WA saat selesai.{% endif %}</p>
 
   <div class="hijau">
     <h3>{{ ikon('file-text', 15) }} {{ judul or 'Buku' }}</h3>
     <p>Tahap sekarang: <b id="tahap">{{ tahap or 'Menyiapkan' }}</b>
+       <span class="bar-info" id="bab-info"></span>
        <br>Kode pekerjaan: <b>{{ kode }}</b></p>
+    <div class="bar-luar"><div class="bar-isi hidup" id="bar-isi"></div></div>
   </div>
 
   <div class="kartu">
@@ -133,8 +142,9 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
 
   <div class="aksi">
     <a class="tombol batal" href="/buku">{{ ikon('book-open', 14) }} Buat buku lain</a>
-    <a class="tombol batal" href="/naskah">{{ ikon('folder-open', 14) }} Naskah Saya</a>
+    <a class="tombol batal" href="/naskah">{{ ikon('folder-open', 14) }} Lihat Naskah Saya</a>
   </div>
+  <p class="bar-info">Buku jadi muncul di Naskah Saya.</p>
 </main>
 
 <script>
@@ -166,6 +176,43 @@ function indeksTahap(t) {
   return 0;
 }
 
+//  Label singkat dari tahap nyata (teks mentah server bisa panjang).
+function labelTahap(t, i) {
+  if (i === 3) return 'Selesai';
+  if (i === 2) return 'Merakit dokumen utuh';
+  if (i === 1) return 'Menulis bab';
+  return 'Menyiapkan kerangka buku';
+}
+
+//  Bab yang sedang ditulis, dari teks tahap ("BAB 4 mulai: ...").
+function babKini(t) {
+  const m = /BAB\s+(\d+)/i.exec(t || '');
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+//  Bar digerakkan tahap nyata: tiap tahap = seperempat bar; di tahap
+//  menulis, pecahan = bab selesai / total bab (bukan persen karangan).
+//  Minimum 4% di tahap awal hanya supaya bar terlihat hidup, bukan ukuran.
+var TOTAL_BAB = 0;
+function aturBar(i, bab, total) {
+  var isi = document.getElementById('bar-isi');
+  var info = document.getElementById('bab-info');
+  if (!isi) return;
+  var persen = 4;
+  if (i === 3) persen = 100;
+  else if (i === 2) persen = 50;
+  else if (i === 1 && total > 0 && bab > 0) persen = 25 + 25 * ((bab - 1) / total);
+  else if (i === 1) persen = 25;
+  isi.style.width = persen + '%';
+  isi.classList.toggle('hidup', i !== 3);
+  if (info) {
+    if (i === 1 && bab > 0 && total > 0) info.textContent = 'Bab ' + bab + ' dari ' + total;
+    else if (i === 1 && bab > 0) info.textContent = 'Bab ' + bab;
+    else info.textContent = '';
+  }
+}
+
+
 let sudah = false;
 async function pantau() {
   if (sudah) return;
@@ -173,11 +220,16 @@ async function pantau() {
     const r = await fetch('/api/ai/v1/proses/' + KODE, {credentials: 'same-origin'});
     if (!r.ok) return;
     const j = await r.json();
-    elTahap.textContent = j.pesan || j.tahap || 'Bekerja';
+    var th = j.tahap || j.pesan || '';
+    var ix = indeksTahap(th);
+    elTahap.textContent = labelTahap(th, ix);
+    if (typeof j.jumlah_bab === 'number' && j.jumlah_bab > 0) TOTAL_BAB = j.jumlah_bab;
+    aturBar(ix, babKini(th), TOTAL_BAB);
     if (j.status === 'selesai') {
       sudah = true;
       gambarLangkah(3, true);
       elTahap.textContent = 'Selesai';
+      aturBar(3, 0, TOTAL_BAB);
       tampilkanHasil();
       return;
     }

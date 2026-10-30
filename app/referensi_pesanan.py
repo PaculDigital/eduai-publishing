@@ -65,6 +65,41 @@ def simpan_outline_pending(outline, tier=None):
     return token
 
 
+def baca_outline_pending(token):
+    """Muat TANPA menghapus -> (outline, tier).
+
+    Dipakai rute edit kerangka (Gate 1): edit dibaca dulu, divalidasi,
+    baru sesudah pending BARU tersimpan, pending lama dihapus lewat
+    hapus_outline_pending(). Gagal validasi = pending lama UTUH.
+    """
+    if not token or not all(c in '0123456789abcdef' for c in token):
+        raise ValueError('token outline tidak dikenal')
+    path = os.path.join(_dir_pending(), token + '.json')
+    if not os.path.exists(path):
+        raise ValueError('outline tertunda tidak ditemukan (mungkin sudah '
+                         'dipakai / kedaluwarsa — pesan ulang)')
+    with open(path, encoding='utf-8') as f:
+        data = json.load(f)
+    if isinstance(data, dict) and 'outline' in data and isinstance(data['outline'], dict):
+        # Format baru (tier ikut tersimpan): outline + tier.
+        outline = outline_dari_json(data['outline'])
+        tier = data.get('tier')
+    else:
+        # Format lama (hanya outline): tier tak dikenal.
+        outline = outline_dari_json(data)
+        tier = None
+    return outline, tier
+
+
+def hapus_outline_pending(token):
+    """Hapus berkas pending bila ada (abaikan bila tidak ada)."""
+    try:
+        if token and all(c in '0123456789abcdef' for c in token):
+            os.remove(os.path.join(_dir_pending(), token + '.json'))
+    except OSError:
+        pass
+
+
 def muat_outline_pending(token):
     """Muat + HAPUS berkas outline tertunda -> (outline, tier).
 
@@ -73,26 +108,7 @@ def muat_outline_pending(token):
     Token hanya berlaku SEKALI: dimuat = terhapus, walau produksi
     sesudahnya gagal (pesan ulang = outline dibangun ulang, gratis).
     """
-    if not token or not all(c in '0123456789abcdef' for c in token):
-        raise ValueError('token outline tidak dikenal')
-    path = os.path.join(_dir_pending(), token + '.json')
-    if not os.path.exists(path):
-        raise ValueError('outline tertunda tidak ditemukan (mungkin sudah '
-                         'dipakai / kedaluwarsa — pesan ulang)')
     try:
-        with open(path, encoding='utf-8') as f:
-            data = json.load(f)
-        if isinstance(data, dict) and 'outline' in data and isinstance(data['outline'], dict):
-            # Format baru (tier ikut tersimpan): outline + tier.
-            outline = outline_dari_json(data['outline'])
-            tier = data.get('tier')
-        else:
-            # Format lama (hanya outline): tier tak dikenal.
-            outline = outline_dari_json(data)
-            tier = None
+        return baca_outline_pending(token)
     finally:
-        try:
-            os.remove(path)
-        except OSError:
-            pass
-    return outline, tier
+        hapus_outline_pending(token)

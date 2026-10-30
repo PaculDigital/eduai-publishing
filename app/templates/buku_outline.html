@@ -40,6 +40,13 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
 .tombol.batal{background:#fff;color:var(--teks);border:1.5px solid var(--garis)}
 .gratis{font-size:13px;color:var(--hijau-gelap);background:var(--hijau-muda);
         border-radius:10px;padding:12px 14px;line-height:1.7}
+input[type="text"],textarea{font-family:inherit}
+.edit-judul{width:100%;font-size:15px;font-weight:700;border:1.5px solid var(--garis);border-radius:8px;padding:8px 10px;margin-bottom:8px}
+.edit-sub{width:100%;font-size:13.5px;border:1.5px solid var(--garis);border-radius:8px;padding:7px 10px}
+.edit-poin{width:100%;font-size:12px;color:var(--teks-abu);border:1.5px solid var(--garis);border-radius:8px;padding:7px 10px;margin-top:4px;min-height:52px;resize:vertical}
+.edit-nomor{font-weight:700;color:var(--hijau-gelap)}
+.edit-note{font-size:12.5px;color:var(--teks-abu);line-height:1.7}
+.edit-ok{background:var(--hijau-muda);border:1.5px solid #CFE9D8;border-radius:10px;padding:12px 14px;line-height:1.7;font-size:13px}
 </style>
 </head>
 <body>
@@ -71,7 +78,7 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
     <h2 style="color:var(--merah)">Kerangka belum bisa diproduksi</h2>
     <p style="font-size:13.5px;color:var(--teks-abu);line-height:1.7">Alasan cek awal (token tidak dipotong):</p>
     <ul class="sub-daftar">{% for m in cek.masalah %}<li>{{ m }}</li>{% endfor %}</ul>
-    <p style="font-size:13.5px;line-height:1.7;margin-top:10px">Tekan Ubah di bawah untuk membangun ulang kerangka (gratis).</p>
+    <p style="font-size:13.5px;line-height:1.7;margin-top:10px">Perbaiki lewat form edit di bawah, atau tekan Ubah untuk membangun ulang kerangka (gratis).</p>
     {% else %}
     <h2>Risiko produksi: {{ risiko_level }}</h2>
     {% if risiko_alasan %}<ul class="sub-daftar">{% for a in risiko_alasan %}<li>{{ a }}</li>{% endfor %}</ul>{% else %}<p style="font-size:13.5px;color:var(--teks-abu);line-height:1.7">Kerangka bersih, tidak ada peringatan.</p>{% endif %}
@@ -79,21 +86,39 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
   </div>
   {% endif %}
 
-  {% for n, bab in babs %}
-  <div class="kartu">
-    <div class="bab-judul">BAB {{ n }} — {{ bab.title }}</div>
-    <ul class="sub-daftar">
-      {% for sub in bab.subs %}
-      <li><span class="sub-nomor">{{ sub[0] }}</span> {{ sub[1] }}
-        {% if sub[2] %}<span class="sub-kunci">{{ sub[2] }}</span>{% endif %}</li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% endfor %}
+  {% if edit_pesan %}
+  <div class="kartu edit-ok">{{ edit_pesan }}</div>
+  {% endif %}
+
+  <form method="post" action="/buku/outline/simpan">
+    <input type="hidden" name="outline_token" value="{{ token }}">
+    <input type="hidden" name="judul" value="{{ judul }}">
+    <input type="hidden" name="penulis" value="{{ penulis }}">
+    <input type="hidden" name="penelaah" value="{{ penelaah }}">
+    <input type="hidden" name="jumlah_bab" value="{{ jumlah_bab }}">
+    <input type="hidden" name="tier" value="{{ tier }}">
+    {% for n, bab in babs %}
+    <div class="kartu">
+      <div class="bab-judul">BAB {{ n }}</div>
+      <input class="edit-judul" type="text" name="bab_{{ n }}_judul" maxlength="300" value="{{ bab.title }}">
+      <ul class="sub-daftar">
+        {% for sub in bab.subs %}
+        <li><span class="edit-nomor">{{ sub[0] }}</span>
+          <input class="edit-sub" type="text" name="sub_{{ n }}_{{ loop.index }}_judul" maxlength="300" value="{{ sub[1] }}">
+          <textarea class="edit-poin" name="sub_{{ n }}_{{ loop.index }}_poin" maxlength="2000">{{ sub[2] or '' }}</textarea></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+    <div class="aksi">
+      <button class="tombol utama" type="submit">Simpan perubahan</button>
+    </div>
+    <p class="edit-note">Edit judul bab, judul sub, dan poin sub, lalu simpan. Jumlah bab dan jumlah sub tidak bisa diubah (dikunci paket). Sesudah disimpan, kerangka dicek ulang dan kotak risiko di atas ikut berubah.</p>
+  </form>
 
   <div class="kartu gratis">
     Kerangka ini <b>gratis</b> — tokenmu baru dipotong saat kamu menekan
-    Setuju. Kalau kerangka belum pas, tekan Ubah: kamu kembali ke form dan
+    Setuju. Kalau kerangka belum pas, edit form di atas dan simpan, atau tekan Ubah: kamu kembali ke form dan
     kerangka dibangun ulang (gratis juga).
   </div>
 

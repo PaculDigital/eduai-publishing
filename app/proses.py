@@ -162,7 +162,8 @@ def ubah_tahap(kode: str, tahap: str, *, bagian_ke: int | None = None,
 
 def tandai_selesai(kode: str, *, hasil: str, hasil_json: str = '',
                    model_ai: str = '', token_in: int = 0,
-                   token_out: int = 0, token_revisi: int = 0) -> None:
+                   token_out: int = 0, token_revisi: int = 0,
+                   jenis_notifikasi: str = 'revisi_selesai') -> None:
     """Tandai proses SELESAI beserta hasilnya.
 
     Hasil disimpan di sini dulu (bukan langsung ditulis ke .docx) — lihat
@@ -188,8 +189,13 @@ def tandai_selesai(kode: str, *, hasil: str, hasil_json: str = '',
         #  🔔 Pemicu notifikasi (ACC Bos 17Sep26) — SESI SENDIRI.
         #  ⚠️ Jangan pakai `db` yang sama: `catat()` bisa rollback saat gagal,
         #  dan itu akan membatalkan status 'selesai' yang baru disimpan.
-        _simpan_notifikasi(p.user_id, 'revisi_selesai',
-                           bagian=_bagian_dari(p), file_id=p.file_id)
+        if jenis_notifikasi == 'buku_selesai':
+            _simpan_notifikasi(p.user_id, 'buku_selesai',
+                               bagian=_bagian_dari(p), file_id=p.file_id,
+                               judul_buku=hasil, kode=kode)
+        else:
+            _simpan_notifikasi(p.user_id, 'revisi_selesai',
+                               bagian=_bagian_dari(p), file_id=p.file_id)
     except Exception as e:                                        # noqa: BLE001
         log.warning('[proses] tandai_selesai gagal: %s', e)
     finally:
@@ -314,6 +320,19 @@ def _bagian_dari(p) -> str:
     return ''
 
 
+def _jumlah_bab_dari_komentar(komentar_json):
+    """Total bab dari komentar_json buku (None bila bukan buku)."""
+    try:
+        import json as _json
+        data = _json.loads(komentar_json or '{}')
+        if isinstance(data, dict):
+            v = int(data.get('jumlah_bab') or 0)
+            return v if v > 0 else None
+    except Exception:
+        pass
+    return None
+
+
 def ringkas(p: ProsesAI) -> dict:
     """Bentuk ringkas untuk dikirim ke halaman (JSON).
 
@@ -358,6 +377,10 @@ def ringkas(p: ProsesAI) -> dict:
         'status': p.status,
         'tahap': p.tahap,
         'bagian_ke': p.bagian_ke,
+        #  30 Okt 2026: total bab buku (dari komentar_json yang dititipkan
+        #  buku_susun) — untuk counter "Bab X dari N" di halaman proses.
+        #  Revisi: komentar_json bukan dict -> None (halaman tetap jalan).
+        'jumlah_bab': _jumlah_bab_dari_komentar(p.komentar_json),
         'jumlah_bagian': p.jumlah_bagian,
         'panjang': p.panjang,
         'jenis_dokumen': p.jenis_dokumen,

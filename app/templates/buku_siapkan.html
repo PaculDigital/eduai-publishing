@@ -85,6 +85,12 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
   h1{font-size:19px}
   .contoh{width:100px;height:100px;font-size:34px}
 }
+.paket-grid{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 8px}
+.paket-kartu{flex:1;min-width:170px;background:#fff;border:1.5px solid var(--garis);border-radius:12px;padding:12px 14px;cursor:pointer}
+.paket-kartu:has(input:checked){border-color:var(--hijau);background:var(--hijau-muda)}
+.paket-kartu input{margin-right:6px;accent-color:var(--hijau)}
+.paket-nama{display:block;font-weight:700;font-size:14.5px;margin-bottom:3px}
+.paket-isi{display:block;font-size:12.5px;color:var(--teks-abu);line-height:1.6}
 </style>
 </head>
 <body>
@@ -146,10 +152,19 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
                placeholder="Nama pakar penelaah (opsional — ditulis di Tentang Penulis)"
                value="{{ penelaah or '' }}">
       </label>
-      <fieldset class="baris-pilih"><legend>Paket buku (tier):</legend>
-      <label><input type="radio" name="tier" value="hemat" {% if tier == 'hemat' %}checked{% endif %}> Hemat: 5 bab, ilustrasi adegan maks 2 (bab 1-2), perkiraan 100-150 halaman.</label>
-      <label><input type="radio" name="tier" value="normal" {% if tier in ('', 'normal') %}checked{% endif %}> Normal: 8 bab, 1 ilustrasi tiap bab, perkiraan 150-200 halaman.</label>
-      <label><input type="radio" name="tier" value="full" {% if tier == 'full' %}checked{% endif %}> Full: 12 bab, 1 ilustrasi tiap bab, perkiraan 180-300 halaman.</label>
+      <fieldset class="baris-pilih paket-pilihan"><legend>Paket Pilihan:</legend>
+      <div class="paket-grid">
+      <label class="paket-kartu"><input type="radio" name="tier" value="hemat" {% if tier == 'hemat' %}checked{% endif %}>
+        <span class="paket-nama">Hemat</span>
+        <span class="paket-isi">5 bab · maks 2 ilustrasi · ±100-150 hlm</span></label>
+      <label class="paket-kartu"><input type="radio" name="tier" value="normal" {% if tier in ('', 'normal') %}checked{% endif %}>
+        <span class="paket-nama">Normal</span>
+        <span class="paket-isi">8 bab · 1 ilustrasi/bab · ±150-200 hlm</span></label>
+      <label class="paket-kartu"><input type="radio" name="tier" value="full" {% if tier == 'full' %}checked{% endif %}>
+        <span class="paket-nama">Full</span>
+        <span class="paket-isi">12 bab · 1 ilustrasi/bab · ±180-300 hlm</span></label>
+      </div>
+      <p class="ket-judul">Halaman = perkiraan. Mutu dan gerbang sama di semua paket.</p>
     </fieldset>
       <p class="ket-judul">Sesudah ini kamu melihat kerangkanya dulu (GRATIS) dan
          menyetujuinya sebelum produksi jalan — token baru dipotong sesudah

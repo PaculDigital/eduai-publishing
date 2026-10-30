@@ -452,6 +452,98 @@ def buku_outline(
     })
 
 
+@_router_kolaborasi.post('/buku/outline/simpan')
+async def buku_outline_simpan(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """Simpan hasil edit kerangka Gate 1 (GRATIS, sebelum Setuju).
+
+    Edit HANYA judul bab, judul sub, dan key_points. Jumlah bab dan
+    jumlah sub TIDAK bisa diubah lewat form (form hanya menampilkan
+    yang sudah ada) — dan tetap divalidasi di sini, jadi kiriman
+    karangan yang mengubah jumlah tetap ditolak.
+
+    Alur token: baca pending lama TANPA menghapus -> validasi ->
+    simpan pending BARU (token baru) -> hapus pending lama -> tampilkan
+    ulang. Gagal validasi = pending lama UTUH, edit user ditampilkan
+    lagi bersama alasannya, tombol Setuju tersembunyi (cek tidak lolos).
+    """
+    u = _wajib_login_kolab(request, db)
+    form = await request.form()
+    token_lama = (form.get('outline_token') or '').strip()
+    judul = (form.get('judul') or '').strip()
+    penulis = (form.get('penulis') or '').strip()
+    penelaah = (form.get('penelaah') or '').strip()
+    try:
+        jml_form = int(form.get('jumlah_bab') or 0)
+    except ValueError:
+        jml_form = 0
+    from . import referensi_pesanan as _RP
+    try:
+        outline_lama, tier_pending = _RP.baca_outline_pending(token_lama)
+    except ValueError as e:
+        return RedirectResponse('/buku?galat=' + quote(str(e)), status_code=303)
+    # Bangun outline baru dari field form, mengikuti jumlah bab/sub lama.
+    outline_baru = {}
+    for n in sorted(k for k in outline_lama if isinstance(k, int)):
+        subs_baru = []
+        for i in range(1, 6):
+            subs_baru.append((
+                f'{n}.{i}',
+                (form.get(f'sub_{n}_{i}_judul') or '').strip(),
+                (form.get(f'sub_{n}_{i}_poin') or '').strip(),
+            ))
+        outline_baru[n] = {
+            'title': (form.get(f'bab_{n}_judul') or '').strip(),
+            'subs': subs_baru,
+        }
+    tier_nama = tier_pending or (form.get('tier') or '').strip() or None
+    try:
+        from tier_buku import jumlah_bab as _bab_tier
+        jumlah_harus = _bab_tier(tier_nama) if tier_nama else jml_form
+    except Exception:
+        jumlah_harus = jml_form
+    # Validasi: bentuk (OB) + struktur (cek awal) — sama seperti Gate 1.
+    masalah = []
+    try:
+        import outline_buku as _OB
+        masalah.extend(_OB.periksa(outline_baru) or [])
+    except Exception:
+        pass
+    from . import cek_awal as _CA_simpan
+    cek_awal_baru = _CA_simpan.periksa_outline(outline_baru, jumlah_harus)
+    masalah.extend(cek_awal_baru['masalah'])
+    risiko_level, risiko_alasan = _CA_simpan.skor_risiko(outline_baru, jumlah_harus)
+    cek_tampil = {'lolos': not masalah, 'masalah': masalah}
+    kartu = _buku.cari('buku-referensi')
+    kembali = '/buku/siapkan?' + urlencode({
+        'jenis': 'buku-referensi', 'gaya': 'referensi', 'judul': judul,
+        'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': len(outline_baru),
+        'tier': tier_nama or ''})
+    babs = sorted(outline_baru.items(), key=lambda x: x[0])
+    if masalah:
+        # Gagal: pending lama UTUH, edit ditampilkan lagi, Setuju sembunyi.
+        return templates.TemplateResponse('buku_outline.html', {
+            'request': request, 'user': u, 'kartu': kartu,
+            'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
+            'jumlah_bab': len(outline_baru), 'tier': tier_nama or '', 'token': token_lama,
+            'kembali': kembali, 'babs': babs, 'cek': cek_tampil,
+            'risiko_level': risiko_level, 'risiko_alasan': risiko_alasan,
+            'edit_pesan': 'Perubahan belum tersimpan. Perbaiki alasan di atas, lalu simpan lagi.',
+        })
+    token_baru = _RP.simpan_outline_pending(outline_baru, tier_nama)
+    _RP.hapus_outline_pending(token_lama)
+    return templates.TemplateResponse('buku_outline.html', {
+        'request': request, 'user': u, 'kartu': kartu,
+        'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
+        'jumlah_bab': len(outline_baru), 'tier': tier_nama or '', 'token': token_baru,
+        'kembali': kembali, 'babs': babs, 'cek': cek_tampil,
+        'risiko_level': risiko_level, 'risiko_alasan': risiko_alasan,
+        'edit_pesan': 'Kerangka diperbarui. Silakan periksa lagi sebelum menekan Setuju.',
+    })
+
+
 @_router_kolaborasi.post('/buku/susun')
 def buku_susun(
     request: Request,
@@ -631,7 +723,8 @@ def buku_susun(
                                  tier=tier_untuk_susun)
             _proses.tandai_selesai(
                 kode, hasil=judul, hasil_json=_json.dumps(hasil, default=str),
-                token_revisi=hasil.get('token') or 0)
+                token_revisi=hasil.get('token') or 0,
+                jenis_notifikasi='buku_selesai')
         finally:
             sdb.close()
 
@@ -667,11 +760,22 @@ def halaman_buku_proses(kode: str, request: Request,
     except Exception:                                            # noqa: BLE001
         judul = ''
 
+    #  Info WA bersyarat (30 Okt 2026): kalimat "diinfo WA" hanya jujur
+    #  bila nomor WA user tersimpan DAN switch revisi aktif di Setelan.
+    wa_aktif = False
+    try:
+        from . import wa as _wa_proses
+        _sw = _wa_proses.setelan(db, u.id)
+        wa_aktif = bool((_sw.get('wa') or '').strip()) and bool(_sw.get('revisi'))
+    except Exception:
+        wa_aktif = False
+
     return templates.TemplateResponse('buku_proses.html', {
         'request': request, 'user': u,
         'kode': p.kode, 'judul': judul,
         'tahap': p.tahap or 'Menyiapkan',
         'status': p.status,
+        'wa_aktif': wa_aktif,
     })
 
 
