@@ -70,6 +70,10 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
 .lgk .isi{color:var(--teks-abu);line-height:1.55}
 .lgk.selesai .isi{color:var(--teks)}
 .lgk.kini .isi{color:var(--teks);font-weight:600}
+.lgk.gagal .dot{background:var(--merah);border-color:var(--merah)}
+.lgk.gagal .dot::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+.lgk.gagal .isi{color:var(--teks)}
+.bar-isi.gagal{background:var(--merah)}
 @media(max-width:560px){
   main{padding:20px 15px 48px}
   h1{font-size:19px}
@@ -147,7 +151,7 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
       <div class="lgk" data-i="3"><span class="dot"></span>
         <span class="isi">Selesai</span></div>
     </div>
-    <ul class="bab-daftar" id="subbab-info">{% for nomor, teks in (subbab_per_bab or {}).items() %}{% set teks2 = (teks or '')|string %}{% if ': ' in teks2 %}{% set judul_bab = teks2.split(': ', 1)[1] %}{% elif teks2.startswith('BAB ' ~ (nomor|string) ~ ' ') %}{% set judul_bab = '' %}{% else %}{% set judul_bab = teks2 %}{% endif %}{% set st = 'selesai' if 'selesai' in teks2|lower else ('tulis' if 'mulai' in teks2|lower else 'tunggu') %}<li><span class="st st-{{ st }}">{% if st == 'selesai' %}Selesai{% elif st == 'tulis' %}Sedang Ditulis{% else %}Menunggu...{% endif %}</span> Bab {{ nomor }}{% if judul_bab %}: {{ judul_bab }}{% endif %}</li>{% endfor %}</ul>
+    <ul class="bab-daftar" id="subbab-info">{% for nomor, teks in (subbab_per_bab or {}).items() %}{% set teks2 = (teks or '')|string %}{% if teks2.startswith('Catatan') %}<li>Bab {{ nomor }}</li>{% else %}{% if ': ' in teks2 %}{% set judul_bab = teks2.split(': ', 1)[1] %}{% elif teks2.startswith('BAB ' ~ (nomor|string) ~ ' ') %}{% set judul_bab = '' %}{% else %}{% set judul_bab = teks2 %}{% endif %}{% set st = 'selesai' if 'selesai' in teks2|lower else ('tulis' if 'mulai' in teks2|lower else 'tunggu') %}<li><span class="st st-{{ st }}">{% if st == 'selesai' %}Selesai{% elif st == 'tulis' %}Sedang Ditulis{% else %}Menunggu...{% endif %}</span> Bab {{ nomor }}{% if judul_bab %}: {{ judul_bab }}{% endif %}</li>{% endif %}{% endfor %}</ul>
   </div>
 
   <div class="kartu" id="kartu-hasil" style="display:none">
@@ -189,6 +193,15 @@ function gambarLangkah(i, selesai) {
     if (k < i) n.classList.add('selesai');
     else if (k === i) n.classList.add('kini');
   });
+}
+
+function gambarGagal() {
+  elLangkah.querySelectorAll('.lgk').forEach(function (n) {
+    n.classList.remove('selesai', 'kini');
+    n.classList.add('gagal');
+  });
+  var bar = document.getElementById('bar-isi');
+  if (bar) { bar.classList.remove('hidup'); bar.classList.add('gagal'); }
 }
 
 //  Petakan teks tahap dari server → langkah ke berapa (0..3).
@@ -267,6 +280,12 @@ async function pantau() {
       else { Object.keys(ag.subbab_per_bab).sort(function (a, b) { return a - b; }).forEach(function (k) { daftarK.push(k); }); }
       daftarK.forEach(function (k) {
         var t = ag.subbab_per_bab[k] || ag.subbab_per_bab[String(k)] || '';
+        if (t.indexOf('Catatan') === 0) {
+          var li0 = document.createElement('li');
+          li0.appendChild(document.createTextNode('Bab ' + k));
+          elSubbab.appendChild(li0);
+          return;
+        }
         var judul = '';
         if (t.indexOf(': ') >= 0) judul = t.slice(t.indexOf(': ') + 2);
         else if (t.indexOf('BAB ' + k + ' ') === 0) judul = '';
@@ -301,6 +320,7 @@ async function pantau() {
       tampilkanSabar(false);
       var elAkhir = document.getElementById('teks-akhir');
       if (elAkhir) elAkhir.style.display = '';
+      gambarGagal();
       return;
     }
     //  Status apa pun selain jalan/menunggu (termasuk terminal yang
