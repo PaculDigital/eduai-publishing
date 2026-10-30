@@ -85,6 +85,13 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
   h1{font-size:19px}
   .contoh{width:100px;height:100px;font-size:34px}
 }
+.paket-grid{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 8px}
+.paket-kartu{flex:1;min-width:170px;background:#fff;border:1.5px solid var(--garis);border-radius:12px;padding:12px 14px;cursor:pointer}
+.paket-kartu:has(input:checked){border-color:var(--hijau);background:var(--hijau-muda)}
+.paket-kartu input{margin-right:6px;accent-color:var(--hijau)}
+.paket-nama{display:block;font-weight:700;font-size:14.5px;margin-bottom:3px}
+.paket-isi{display:block;font-size:12.5px;color:var(--teks-abu);line-height:1.6}
+.btn-alt{border:1px solid #198E3B;background:#fff;color:#198E3B;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}.btn-alt:disabled{opacity:.5;cursor:default}
 </style>
 </head>
 <body>
@@ -123,7 +130,7 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
     <h2>Judul buku</h2>
     <form method="post" action="{% if kartu.kode == 'buku-referensi' %}/buku/outline{% else %}/buku/susun{% endif %}" id="form-susun">
       <input type="hidden" name="jenis" value="{{ kartu.kode }}">
-      <input type="hidden" name="bidang" value="{{ bidang }}">
+      {% if kartu.kode != 'buku-referensi' %}<input type="hidden" name="bidang" value="{{ bidang }}">{% endif %}
       <input type="hidden" name="untuk" value="{{ untuk }}">
       <label class="baris-pilih">
         <input class="kolom-judul" type="text" name="judul" required
@@ -133,6 +140,13 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
       </label>
       <p class="ket-judul">Judul ini yang menentukan isi seluruh bab. Pilih yang
          benar-benar kamu mau tulis — bukan contoh.</p>
+      {% if kartu.kode == 'buku-referensi' %}
+      <p class="ket-judul">Judul referensi yang baik itu baku, menyebut bidang ilmu, dan menyebut topik. Contoh: "Manajemen Strategi UMKM: Adopsi Teknologi dan Kinerja Bisnis".</p>
+      {% else %}
+      <p class="ket-judul">Judul yang baik menyebut topik dan menarik dibaca. Tulis dengan kata-katamu sendiri, nanti bisa diganti.</p>
+      {% endif %}
+      <button class="btn-alt" type="button" id="btn-judul-alt">&#10022; Judul alternatif</button>
+      <div id="judul-alt-hasil" class="ket-judul" hidden></div>
       {% if kartu.kode == 'buku-referensi' %}
       <label class="baris-pilih">
         <input class="kolom-judul" type="text" name="penulis" maxlength="120"
@@ -146,10 +160,27 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
                placeholder="Nama pakar penelaah (opsional — ditulis di Tentang Penulis)"
                value="{{ penelaah or '' }}">
       </label>
-      <fieldset class="baris-pilih"><legend>Paket buku (tier):</legend>
-      <label><input type="radio" name="tier" value="hemat" {% if tier == 'hemat' %}checked{% endif %}> Hemat: 5 bab, ilustrasi adegan maks 2 (bab 1-2), perkiraan 100-150 halaman.</label>
-      <label><input type="radio" name="tier" value="normal" {% if tier in ('', 'normal') %}checked{% endif %}> Normal: 8 bab, 1 ilustrasi tiap bab, perkiraan 150-200 halaman.</label>
-      <label><input type="radio" name="tier" value="full" {% if tier == 'full' %}checked{% endif %}> Full: 12 bab, 1 ilustrasi tiap bab, perkiraan 180-300 halaman.</label>
+      <label class="baris-pilih"><span class="ket-judul">Bidang ilmu (opsional)</span>
+        <select class="kolom-judul" name="bidang">
+          <option value="">Pilih bidang (opsional)</option>
+          {% for b in daftar_bidang %}
+          <option value="{{ b.kode }}" {% if bidang == b.kode %}selected{% endif %}>{{ b.nama }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <fieldset class="baris-pilih paket-pilihan"><legend>Paket Pilihan:</legend>
+      <div class="paket-grid">
+      <label class="paket-kartu"><input type="radio" name="tier" value="hemat" {% if tier == 'hemat' %}checked{% endif %}>
+        <span class="paket-nama">Hemat</span>
+        <span class="paket-isi">5 bab · maks 2 ilustrasi · ±100-150 hlm</span></label>
+      <label class="paket-kartu"><input type="radio" name="tier" value="normal" {% if tier in ('', 'normal') %}checked{% endif %}>
+        <span class="paket-nama">Normal</span>
+        <span class="paket-isi">8 bab · 1 ilustrasi/bab · ±150-200 hlm</span></label>
+      <label class="paket-kartu"><input type="radio" name="tier" value="full" {% if tier == 'full' %}checked{% endif %}>
+        <span class="paket-nama">Full</span>
+        <span class="paket-isi">12 bab · 1 ilustrasi/bab · ±180-300 hlm</span></label>
+      </div>
+      <p class="ket-judul">Halaman = perkiraan. Mutu dan gerbang sama di semua paket.</p>
     </fieldset>
       <p class="ket-judul">Sesudah ini kamu melihat kerangkanya dulu (GRATIS) dan
          menyetujuinya sebelum produksi jalan — token baru dipotong sesudah
@@ -159,7 +190,7 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
   </div>
 
   <div class="kartu">
-    <h2>Wajah buku yang akan dipakai</h2>
+    <h2>Gaya buku yang dipakai</h2>
     <div class="gaya">
       <div class="contoh" style="background:{{ paket.palet.krem }};
            border-color:{{ paket.palet.tinta }}">{{ ikon('presentation', 46) }}</div>
@@ -170,6 +201,11 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
         <span class="cip abu">Sapaan "{{ (paket.tone.split('.')[0])[:34] }}…"</span>
       </div>
     </div>
+      {% if kartu.kode == 'buku-referensi' %}
+      <p class="ket-judul">Gaya referensi: bahasa baku dan akademik, tiap bab 5 sub tetap (definisi, perkembangan, perbandingan kritis, posisi penulis, implikasi), tabel perbandingan wajib, ilustrasi realistis. Cocok untuk dosen, peneliti, dan mahasiswa pascasarjana.</p>
+      {% else %}
+      <p class="ket-judul">Gaya {{ kartu.nama }}: {{ paket.tone_visual }}. Gaya ini sudah termasuk dalam pilihan jenis bukumu, tidak perlu diisi.</p>
+      {% endif %}
   </div>
 
   <div class="belum">
@@ -186,6 +222,60 @@ footer{max-width:820px;margin:0 auto;padding:0 22px 40px;font-size:12px;
     </button>
     <a class="tombol batal" href="/buku">{{ ikon('arrow-left', 14) }} Ubah pilihan</a>
   </div>
+<script>
+(function(){
+  var btn = document.getElementById('btn-judul-alt');
+  var box = document.getElementById('judul-alt-hasil');
+  var input = document.querySelector('#form-susun input[name="judul"]');
+  if (!btn || !box || !input) return;
+  var diminta = '';
+  function tampil(pesan){ box.hidden = false; box.textContent = pesan; }
+  input.addEventListener('input', function(){
+    if (input.value.trim() !== diminta){ btn.disabled = false; btn.textContent = '\u2726 Judul alternatif'; }
+  });
+  btn.addEventListener('click', async function(){
+    var judul = input.value.trim();
+    if (judul.length < 10){ tampil('Judul minimal 10 huruf dulu, baru Wulan carikan alternatif.'); return; }
+    if (judul === diminta){ return; }
+    btn.disabled = true; btn.textContent = 'Memuat...';
+    var jenisEl = document.querySelector('#form-susun input[name="jenis"]');
+    var bidangEl = document.querySelector('#form-susun [name="bidang"]');
+    try {
+      var res = await fetch('/buku/judul-alternatif', {method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({judul: judul, jenis: jenisEl ? jenisEl.value : '',
+          bidang: bidangEl ? bidangEl.value : ''})});
+      var data = await res.json();
+      if (!data.ok){ tampil(data.galat || 'Gagal memuat alternatif, coba lagi.');
+        btn.disabled = false; btn.textContent = '\u2726 Judul alternatif'; return; }
+      diminta = judul;
+      box.hidden = false; box.innerHTML = '';
+      var j = document.createElement('p');
+      j.textContent = 'Alternatif judul (opsional, klik Pakai untuk memakai):';
+      box.appendChild(j);
+      data.alternatif.forEach(function(alt){
+        var row = document.createElement('div');
+        var teks = document.createElement('span'); teks.textContent = alt + ' ';
+        var pakai = document.createElement('button'); pakai.type = 'button';
+        pakai.className = 'btn-alt'; pakai.textContent = 'Pakai';
+        pakai.addEventListener('click', function(){
+          input.value = alt; box.hidden = true;
+          btn.disabled = false; btn.textContent = '\u2726 Judul alternatif'; });
+        row.appendChild(teks); row.appendChild(pakai); box.appendChild(row);
+      });
+      if (data.dari_cache){
+        var c = document.createElement('p');
+        c.textContent = 'Hasil tersimpan (tanpa panggil baru).';
+        box.appendChild(c);
+      }
+      btn.textContent = '\u2726 Judul alternatif';
+    } catch (e) {
+      tampil('Gagal memuat alternatif, coba lagi.');
+      btn.disabled = false; btn.textContent = '\u2726 Judul alternatif';
+    }
+  });
+})();
+</script>
 </main>
 <footer>
   Gaya buku menentukan ilustrasi, infografis, dan cara menulis — dipilih sekali

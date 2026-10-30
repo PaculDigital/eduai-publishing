@@ -97,6 +97,23 @@ def _revisi_belum_berhasil(alasan: str = '', file_id=None) -> dict:
     }
 
 
+def _buku_selesai(judul_buku: str = '', **_kw) -> dict:
+    """Buku selesai disusun — lonceng + WA (keputusan Bos 30 Okt 2026).
+
+    Beda dari revisi_selesai: jenis ini KHUSUS buku, supaya WA buku
+    tidak ikut terkirim untuk semua revisi yang memakai revisi_selesai.
+    Judul buku dari hasil pekerjaan (tandai_selesai: hasil=judul).
+    """
+    sebut = f'Buku "{(judul_buku or "").strip()}"' if (judul_buku or '').strip() else 'Bukumu'
+    return {
+        'judul': 'Buku kamu sudah jadi',
+        'isi': (f'{sebut} sudah selesai disusun EduAi. '
+                'Yuk lihat dan unduh di Naskah Saya, kapan pun kamu siap.'),
+        'tombol': 'Lihat buku',
+        'nada': 'kabar',
+    }
+
+
 def _kuota_hampir_habis(sisa: int = 0, file_id=None) -> dict:
     """Sisa kuota menipis.
 
@@ -307,6 +324,7 @@ def _hasil_ai_siap(jumlah: int = 1, file_id=None) -> dict:
 _DAFTAR = {
     'revisi_selesai': _revisi_selesai,
     'revisi_belum_berhasil': _revisi_belum_berhasil,
+    'buku_selesai': _buku_selesai,
     'kuota_hampir_habis': _kuota_hampir_habis,
     'addon_hampir_habis': _addon_hampir_habis,
     'pembayaran_masuk': _pembayaran_masuk,
@@ -379,7 +397,7 @@ def catat(db, user_id: int, nama_jenis: str, jeda_jam: int | None = None,
 
         t = pesan(nama_jenis, **data)
         #  Kunci anti-spam: jenis + konteks (file_id kalau ada).
-        kunci = f'{nama_jenis}:{data.get("file_id") or data.get("sisa") or ""}'
+        kunci = f'{nama_jenis}:{data.get("file_id") or data.get("sisa") or data.get("kode") or ""}'
 
         #  Sudah pernah dikirim dalam JEDA_SPAM_JAM terakhir?
         batas = datetime.utcnow() - timedelta(
@@ -413,12 +431,12 @@ def catat(db, user_id: int, nama_jenis: str, jeda_jam: int | None = None,
         #  Hanya jenis yang Bos izinkan (pembelian lembut + undangan);
         #  revisi/kejadian harian TIDAK dikirim (switch per user di app.wa).
         if nama_jenis in ('pembayaran_masuk', 'pembayaran_menunggu',
-                          'pembayaran_belum_masuk', 'pembimbing_diundang'):
+                          'pembayaran_belum_masuk', 'pembimbing_diundang', 'buku_selesai'):
             try:
                 from . import wa as _wa_mod
                 _wa_mod.kirim_user(
                     db, user_id, ('pembelian' if nama_jenis.startswith(
-                        'pembayaran') else 'undangan'),
+                        'pembayaran') else 'undangan' if nama_jenis == 'pembimbing_diundang' else 'revisi'),
                     f"EduAi\n\n{t['judul']}\n\n{t['isi']}")
             except Exception as e_wa:                             # noqa: BLE001
                 logging.getLogger(__name__).warning(

@@ -1313,6 +1313,26 @@ class DataLapanganBab4(Base):
     diperbarui: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
 
+class JudulAlternatifLog(Base):
+    """Jejak panggilan judul alternatif (tombol di siapkan, 30 Okt 2026).
+
+    Satu baris = SATU panggilan LLM baru. Cache: permintaan yang sama
+    (user, judul, jenis, bidang) mengembalikan baris lama tanpa panggil
+    baru. Batas: maks 3 panggilan baru per user per hari (dihitung dari
+    baris yang dibuat hari ini). Tabel BARU, dibuat create_all().
+    """
+
+    __tablename__ = 'judul_alternatif_log'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True, nullable=False)
+    judul: Mapped[str] = mapped_column(String(300), nullable=False)
+    jenis: Mapped[str] = mapped_column(String(30), default='', index=True)
+    bidang: Mapped[str] = mapped_column(String(30), default='')
+    alternatif: Mapped[str] = mapped_column(Text, nullable=False, default='[]')
+    dibuat: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
 def init_db() -> None:
     Base.metadata.create_all(engine)
     _migrasi_kolom()
