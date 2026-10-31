@@ -12,6 +12,9 @@ Tiga cacat job 227 yang diperbaiki di mesin, bukan di naskah:
      tiap bab dituntut 8 dari 8: baris yang hilang disisipkan satu
      kalimat sitasi dari data panen itu saja, bila tidak bisa
      disisipkan buku gagal bersih, bukan dirakit cacat.
+     Gas Bos 31 Okt 2026 malam: baris hilang yang judulnya di luar
+     tema bab TIDAK disisipkan sama sekali, buku gagal bersih
+     (refund) daripada dirakit dengan sitasi di luar tema.
 
 Urutan wajib di pemanggil: hapus luar, lalu sisip cakupan, lalu
 tulis ulang ganda, lalu cek ulang, baru rakit. Sisipan bisa
@@ -36,6 +39,14 @@ except ImportError:
     except ImportError:
         import sitasi_anti_gagal as SG
         import gerbang_subbab as GB
+
+try:
+    from . import prioritas_sumber as PS
+except ImportError:
+    try:
+        from app import prioritas_sumber as PS
+    except ImportError:
+        import prioritas_sumber as PS
 
 try:
     import mutu_isi_buku as MI
@@ -234,11 +245,43 @@ def _pilih_subbab(judul, subs):
     return terbaik
 
 
-def sisip_cakupan_per_bab(teks, nomor_bab, rows, subs=None):
+def _cocok_tema_ketat(judul_artikel, judul_bab):
+    """Saringan KETAT khusus sisipan cakupan (Gas Bos 31 Okt 2026 malam).
+
+    Lebih ketat dari PS.cocok_tema (preferensi urutan di panen):
+    judul bab tanpa kata tema -> False; frasa inti -> True; pola
+    SME + platform (kata utuh) -> True; selain itu perlu >= 2 kata
+    tema berbeda yang muncul sebagai kata utuh di judul artikel.
+    Satu kata generik yang sama TIDAK cukup, contoh: 'determinants'
+    di judul statistik kanker untuk bab determinan perilaku konsumen
+    lolos saringan longgar, tapi bukan bukti tema. Sisipan adalah
+    jalan terakhir, jadi buktinya harus lebih kuat; bila ragu, bab
+    gagal bersih daripada buku dirakit dengan sitasi di luar tema.
+    """
+    teks = (judul_artikel or '').strip().lower()
+    if not teks or not (judul_bab or '').strip():
+        return False
+    for frasa in PS._FRASA_INTI:
+        if frasa in teks:
+            return True
+    tema = PS.kata_tema(judul_bab)
+    if not tema:
+        return False
+    kata = set(re.split(r'[^a-z]+', teks))
+    if (any(k in kata for k in PS._KATA_SME)
+            and any(k in kata for k in PS._KATA_PLATFORM)):
+        return True
+    cocok = {k for k in tema if k in kata}
+    return len(cocok) >= 2
+
+
+def sisip_cakupan_per_bab(teks, nomor_bab, rows, subs=None,
+                          judul_bab=None):
     """Sisipkan kalimat sitasi untuk tiap baris snapshot yang hilang.
 
     Return (teks_baru, sisipan) dengan sisipan list {kunci, tahun,
-    subbab, kalimat}. Bila baris hilang tanpa judul, raise
+    subbab, kalimat}. Bila baris hilang tanpa judul ATAU judulnya di
+    luar tema bab (saringan ketat _cocok_tema_ketat), raise
     GagalSitasiBersih dengan galat yang menyebut bab, cakupan, dan
     baris hilang, supaya pemanggil gagal bersih dan token kembali,
     bukan merakit buku cacat. Bila kalimat sisipan pertama tidak
@@ -260,6 +303,16 @@ def sisip_cakupan_per_bab(teks, nomor_bab, rows, subs=None):
             raise SG.GagalSitasiBersih(
                 nomor_bab=nomor_bab,
                 masalah=['baris snapshot %s %s tanpa judul, tidak bisa disisipkan'
+                         % (kunci, tahun)],
+                cakupan=cak, detail_text=detail)
+        if not _cocok_tema_ketat(judul, judul_bab):
+            cak = SG.hitung_cakupan_kunci(teks_baru, rows)
+            detail = (SG.detail_galat_sitasi(nomor_bab, cak)
+                      + ', baris hilang di luar tema, tidak boleh disisipkan: %s %s'
+                      % (kunci, tahun))
+            raise SG.GagalSitasiBersih(
+                nomor_bab=nomor_bab,
+                masalah=['baris snapshot %s %s di luar tema bab, tidak boleh disisipkan'
                          % (kunci, tahun)],
                 cakupan=cak, detail_text=detail)
         nomor_sub = _pilih_subbab(judul, subs)
@@ -492,12 +545,15 @@ def tulis_ulang_ganda(teks_per_bab, panggil_llm, rows_per_bab=None):
 # ---------------------------------------------------------------------------
 
 def perbaiki_buku(teks_per_bab, rows_per_bab, subs_per_bab=None,
-                  panggil_llm=None):
+                  panggil_llm=None, judul_per_bab=None):
     """Jalankan 3 langkah dalam urutan wajib, return (teks, laporan).
 
     Urutan: hapus luar, lalu sisip cakupan, lalu tulis ulang ganda.
-    Gagal bersih dari sisip cakupan (baris tanpa judul) diteruskan
-    apa adanya, supaya pemanggil memicu refund, bukan merakit cacat.
+    Gagal bersih dari sisip cakupan (baris tanpa judul ATAU di luar
+    tema) diteruskan apa adanya, supaya pemanggil memicu refund,
+    bukan merakit cacat. judul_per_bab: {nomor_bab: judul} dari
+    outline yang disetujui; tanpa judul, tema tidak dapat diperiksa
+    sehingga sisipan apa pun gagal bersih.
     """
     teks1, lap_hapus = hapus_luar_per_bab(teks_per_bab, rows_per_bab)
     teks2 = dict(teks1)
@@ -505,7 +561,9 @@ def perbaiki_buku(teks_per_bab, rows_per_bab, subs_per_bab=None,
     for n in sorted(teks2):
         rows = (rows_per_bab or {}).get(n) or []
         subs = (subs_per_bab or {}).get(n) if subs_per_bab else None
-        teks2[n], sisipan = sisip_cakupan_per_bab(teks2[n], n, rows, subs)
+        _judul = (judul_per_bab or {}).get(n) if judul_per_bab else None
+        teks2[n], sisipan = sisip_cakupan_per_bab(
+            teks2[n], n, rows, subs, judul_bab=_judul)
         lap_sisip[n] = sisipan
     teks3, lap_ganda = tulis_ulang_ganda(teks2, panggil_llm, rows_per_bab)
     laporan = {'hapus_luar': lap_hapus, 'sisip_cakupan': lap_sisip,
