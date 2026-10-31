@@ -847,6 +847,14 @@ def halaman_buku_proses(kode: str, request: Request,
     #  G3 (30 Okt 2026): halaman membaca agregator, bukan slot mentah.
     agregat = _proses.agregat_progres(p)
     _ap, _at, _aj = _proses.info_antrean(p.kode)
+    #  Artikel pendukung (31 Okt 2026, display-only): baca snapshot beku
+    #  yang sudah ada, fail-soft ke dict kosong supaya halaman tidak
+    #  pernah error bila pra-panen belum selesai atau snapshot kosong.
+    artikel_per_bab = {}
+    try:
+        artikel_per_bab = _proses.artikel_proses(db, p.kode, agregat['bab_total'])
+    except Exception:                                                # noqa: BLE001
+        artikel_per_bab = {}
     return templates.TemplateResponse('buku_proses.html', {
         'request': request, 'user': u,
         'kode': p.kode, 'judul': judul,
@@ -863,6 +871,7 @@ def halaman_buku_proses(kode: str, request: Request,
         'antrean_pos': _ap,
         'antrean_total': _at,
         'subbab_per_bab': agregat['subbab_per_bab'],
+        'artikel_per_bab': artikel_per_bab,
     })
 
 
