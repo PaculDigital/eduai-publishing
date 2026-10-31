@@ -2117,7 +2117,170 @@ def _en_keywords(bab_title):
     return hasil
 
 
-def _refs_dari_harvest(bab_title, potong=True):
+PROMPT_INTENT_BAB = """Kamu ahli metodologi penelitian. Tentukan MAKSUD pencarian literatur untuk satu bab buku, dari konteks buku, bukan dari kata per kata judul bab.
+
+JUDUL BUKU: {judul_buku}
+BIDANG: {bidang}
+JUDUL BAB: {judul_bab}
+
+ATURAN:
+- Domain ditentukan dari JUDUL BUKU dan BIDANG dulu. Judul bab yang generik (mis. sintesis, tata kelola, agenda riset) WAJIB dijangkarkan ke domain buku itu, bukan diterjemahkan harfiah.
+- Abaikan kata umum (analisis, faktor-faktor, mempengaruhi, pengaruh, studi, hubungan, dampak).
+- Ambil VARIABEL inti + OBJEK/POPULASI + KONTEKS, maksimal 4 konsep, urut dari paling penting.
+- Tiap konsep: 2-4 sinonim INGGRIS + sinonim INDONESIA.
+- 'bukan': 2-6 FRASA (minimal 2 kata) yang menyebut makna yang harus DIKECUALIKAN, mis. bila bab tentang tata kelola etis, frasa 'tata kelola perusahaan' adalah frasa bukan. Satu kata tunggal tidak dihitung.
+- Kalau judul bab tidak punya variabel yang jelas, tetap coba yang terbaik dari konteks buku.
+
+Balas HANYA JSON: {{"konsep":[{{"nama":"..","en":[".."],"id":[".."]}}],"bukan":[".."]}}"""
+
+
+_INTENT_CACHE = {}
+
+
+def _urai_intent(teks, _pus):
+    """Balasan AI intent -> (daftar konsep, daftar frasa bukan).
+
+    Konsep memakai validasi yang sama dengan _urai_konsep_ai pustaka
+    (maks 4, en wajib ada). Frasa bukan hanya yang multi-kata, supaya
+    satu kata umum tidak membunuh artikel yang sah.
+    """
+    if not teks:
+        return [], []
+    try:
+        m = re.search(r'\{.*\}', teks, re.S)
+        d = json.loads(m.group(0)) if m else {}
+    except Exception:
+        return [], []
+    try:
+        konsep = _pus._urai_konsep_ai(teks) if _pus is not None else []
+    except Exception:
+        konsep = []
+    bukan = []
+    for s in (d.get('bukan') or []):
+        if not isinstance(s, str):
+            continue
+        f = s.strip()
+        if ' ' in f and f not in bukan:
+            bukan.append(f)
+    return konsep, bukan[:6]
+
+
+def _impor_pustaka():
+    """Impor pustaka dengan pola yang sama seperti _refs_dari_harvest."""
+    try:
+        from app import pustaka as _pus
+        return _pus
+    except Exception:
+        pass
+    try:
+        import importlib.util as _ilu
+        _spec = _ilu.spec_from_file_location(
+            'pustaka_harvest',
+            os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         'app', 'pustaka.py'))
+        _pus = _ilu.module_from_spec(_spec)
+        _spec.loader.exec_module(_pus)
+        return _pus
+    except Exception:
+        return None
+
+
+def intent_bab(bab_title, judul_buku=None, bidang=None, _pus=None):
+    """Intent satu bab: (kw_dict atau None, daftar frasa bukan).
+
+    Gas Bos 1 Nov 2026 (agen intent + gerbang tema panen):
+    kamus dulu (gratis, tanpa LLM), TAPI hanya dipercaya bila memberi
+    minimal 2 konsep: bukti live Bab 5 job 231, kamus memetakan kata
+    'tata kelola' menjadi satu konsep 'governance' saja, sehingga
+    saringan nyambung meloloskan artikel governance apa pun. Satu
+    konsep generik = belum cukup bukti, jatuh ke AI. AI hanya bila
+    kamus gagal atau tipis DAN konteks buku tersedia (judul buku atau
+    bidang). AI dipanggil lewat
+    call_llm, yaitu SATU PINTU combo EduAi, sama seperti _en_keywords.
+    Hasil sukses di-cache per (bidang, judul buku, judul bab); gagal
+    tidak di-cache, supaya percobaan berikutnya bisa mencoba lagi.
+    Gagal apa pun -> (None, []) fail-soft; pemanggil mode ketat
+    memperlakukannya sebagai pool kosong (gagal bersih, bukan sampah).
+    """
+    bab = (bab_title or '').strip()
+    kunci = ((bidang or '').strip().lower(),
+             (judul_buku or '').strip().lower(),
+             bab.lower())
+    if kunci in _INTENT_CACHE:
+        return _INTENT_CACHE[kunci]
+    if _pus is None:
+        _pus = _impor_pustaka()
+    if _pus is None or not bab:
+        return (None, [])
+    try:
+        kw = _pus.kata_kunci(bab)
+    except Exception:
+        kw = {}
+    if len(kw.get('konsep') or []) >= 2:
+        hasil = (kw, [])
+        _INTENT_CACHE[kunci] = hasil
+        return hasil
+    if not judul_buku and not bidang:
+        return (None, [])
+    try:
+        jawab = call_llm(
+            PROMPT_INTENT_BAB.format(
+                judul_buku=judul_buku or '',
+                bidang=bidang or '',
+                judul_bab=bab),
+            max_tokens=500, timeout=60)
+        konsep, bukan = _urai_intent(jawab or '', _pus)
+        if not konsep:
+            return (None, [])
+        kw2 = _pus.kata_kunci_konsep(konsep, bab, 'ai')
+        hasil = (kw2, bukan)
+    except Exception:
+        return (None, [])
+    _INTENT_CACHE[kunci] = hasil
+    return hasil
+
+
+def lolos_intent(artikel, kw, bukan=None, _pus=None):
+    """True bila artikel lolos gerbang intent.
+
+    Syarat: menyentuh SEMUA konsep (rumus PICO _nyambung pustaka,
+    judul + abstrak bila ada) DAN tidak memuat frasa bukan. Tanpa
+    kw (tidak ada intent) gerbang tidak berlaku, legacy dibiarkan.
+    """
+    if kw is None or not kw.get('konsep'):
+        return True
+    if _pus is None:
+        _pus = _impor_pustaka()
+    if _pus is None:
+        return True
+    try:
+        if not _pus._nyambung(artikel, kw):
+            return False
+    except Exception:
+        return False
+    teks = ((artikel.get('title') or '') + ' '
+            + (artikel.get('abstract') or '')[:600]).lower()
+    for frasa in (bukan or []):
+        f = (frasa or '').strip().lower()
+        if ' ' in f and f in teks:
+            return False
+    return True
+
+
+def saring_pasangan_intent(pasangan, kw, bukan=None, _pus=None):
+    """Saring list pasangan (row, ref) pra-panen dengan gerbang intent.
+
+    Dipakai fase 1 panen_semua untuk pool cache beku: ref adalah dict
+    adaptasi (judul tanpa abstrak), jadi gerbang berjalan judul saja.
+    Pasangan yang gagal dibuang, bukan dipertahankan sebagai pengisi.
+    """
+    if kw is None or not kw.get('konsep'):
+        return list(pasangan)
+    return [(r, f) for (r, f) in pasangan
+            if lolos_intent(f, kw, bukan, _pus)]
+
+
+def _refs_dari_harvest(bab_title, potong=True, konteks=None):
     """Referensi satu bab dari mesin Harvest app (pustaka).
 
     28 Okt 2026 (teguran Boss: Garuda kok tidak ada): mesin Harvest app
@@ -2136,9 +2299,28 @@ def _refs_dari_harvest(bab_title, potong=True):
     panggilan; bab dikerjakan per utas sehingga kunci berbeda tidak
     balapan). Gagal total -> None (pemanggil jatuh ke jalur biasa).
     potong=False: kembalikan pool penuh tanpa potong 8 dan tanpa cache, untuk fase pemilihan artikel-berbeda di panen_semua (paket sempurna).
+    Gas Bos 1 Nov 2026 (agen intent + gerbang tema panen):
+    konteks={'judul_buku':..., 'bidang':...} mengaktifkan mode ketat.
+    Intent diputuskan sekali per bab (kamus dulu, AI lewat combo EduAi
+    bila kamus gagal), leg 1 memakai kw intent lewat dengan_konsep,
+    dan SEMUA leg disaring gerbang intent (semua konsep + tanpa frasa
+    bukan) sebelum adaptasi. Mode ketat tidak pernah mengisi dari
+    artikel gagal: pool kosong -> [] (pemanggil strict tidak jatuh ke
+    jalur biasa), sehingga gerbang minimum 8 di panen_semua gagal
+    bersih dengan refund. Tanpa konteks, perilaku lama dipertahankan.
     """
-    if potong and bab_title in _HARVEST_CACHE:
-        return _HARVEST_CACHE[bab_title]
+    konteks = konteks or None
+    strict = konteks is not None
+    judul_buku_k = (konteks or {}).get('judul_buku')
+    bidang_k = (konteks or {}).get('bidang')
+    if strict:
+        _kunci_cache = ((bidang_k or '').strip().lower(),
+                        (judul_buku_k or '').strip().lower(),
+                        (bab_title or '').strip().lower())
+    else:
+        _kunci_cache = bab_title
+    if potong and _kunci_cache in _HARVEST_CACHE:
+        return _HARVEST_CACHE[_kunci_cache]
     refs = None
     try:
         try:
@@ -2156,29 +2338,48 @@ def _refs_dari_harvest(bab_title, potong=True):
     if _pus is None:
         # Pustaka tidak bisa diimpor -> pemanggil jatuh ke jalur biasa.
         if potong:
-            _HARVEST_CACHE[bab_title] = None
+            _HARVEST_CACHE[_kunci_cache] = None
         return None
     try:
-        adapted = []
+        # Gerbang intent (Gas Bos 1 Nov 2026): intent diputuskan SEKALI
+        # per bab, lalu semua leg disaring olehnya. Kamus dulu, AI bila
+        # kamus gagal dan konteks ada. Mode ketat (konteks diisi) tidak
+        # pernah mengembalikan sampah: intent gagal -> pool kosong.
+        intent_kw, intent_bukan = intent_bab(
+            bab_title, judul_buku_k, bidang_k, _pus)
+        if strict and intent_kw is None:
+            # Intent gagal dalam mode ketat: pool pasti dibuang
+            # gerbang, jadi jangan buang panggilan API sama sekali.
+            if potong:
+                _HARVEST_CACHE[_kunci_cache] = []
+            return []
+        mentah = []
         try:
-            # Gas Bos 31 Okt 2026 malam: hapus Scite dari buku.
-            # Panen buku tidak memakai data Scite sama sekali
-            # (dibuang di adaptasi), jadi jangan bayar panggilan
-            # tallies + premium per DOI. UI cari referensi dan
-            # kerangka tidak berubah (tetap default False).
-            try:
-                hasil = _pus.cari_semua(bab_title,
-                                        tanpa_scite=True) or {}
-            except TypeError:
-                hasil = _pus.cari_semua(bab_title) or {}
-            adapted = _adaptasi_harvest(hasil.get('artikel'))
+            if intent_kw is not None:
+                # Gas Bos 31 Okt 2026 malam: hapus Scite dari buku.
+                # dengan_konsep memakai kw intent (kamus atau AI), jadi
+                # saringan nyambung + filter tahun + audit DOI jalan
+                # seperti leg 1 dulu, tanpa panggilan Scite.
+                hasil = _pus.cari_semua_dengan_konsep(
+                    intent_kw, bab_title,
+                    sumber_kk=intent_kw.get('sumber', ''),
+                    tanpa_scite=True) or {}
+                mentah.extend(hasil.get('artikel') or [])
+            else:
+                # Legacy (tanpa konteks, kamus gagal): jalur lama.
+                try:
+                    hasil = _pus.cari_semua(bab_title,
+                                            tanpa_scite=True) or {}
+                except TypeError:
+                    hasil = _pus.cari_semua(bab_title) or {}
+                mentah.extend(hasil.get('artikel') or [])
         except Exception:
-            adapted = []
-        if not adapted:
+            mentah = []
+        if not _adaptasi_harvest(mentah):
             try:
-                adapted = _adaptasi_harvest(_pus.cari_garuda([bab_title]))
+                mentah.extend(_pus.cari_garuda([bab_title]) or [])
             except Exception:
-                adapted = []
+                pass
         # Leg 3 — TIRU APP (cek sebenarnya 28 Okt, perintah Boss):
         # verifikasi_sitasi.search_real_references TIDAK dipakai lagi di
         # jalur referensi, karena mutunya di bawah pustaka:
@@ -2218,15 +2419,30 @@ def _refs_dari_harvest(bab_title, potong=True):
             # Dedup HARUS memperbarui himpunan saat menambah: judul yang
             # sama bisa muncul di 2-3 sumber API sekaligus (Scopus +
             # OpenAlex + CrossRef). Himpunan beku (bug tangkapan uji)
-            # meloloskan duplikat antar-sumber.
-            ada = {a['title'].lower()[:80] for a in adapted}
-            for a in _adaptasi_harvest(api_hasil):
-                kunci = a['title'].lower()[:80]
-                if kunci not in ada:
+            # meloloskan duplikat antar-sumber. Kunci DOI dulu, judul
+            # bila tanpa DOI, supaya artikel yang sama tidak lolos
+            # lewat perbedaan huruf judul antar-sumber.
+            ada = set()
+            for a in mentah:
+                ada.add((a.get('doi') or '').strip().lower()
+                        or (a.get('title') or '').lower()[:80])
+            for a in (api_hasil or []):
+                kunci = ((a.get('doi') or '').strip().lower()
+                         or (a.get('title') or '').lower()[:80])
+                if kunci and kunci not in ada:
                     ada.add(kunci)
-                    adapted.append(a)
+                    mentah.append(a)
         except Exception:
             pass
+        # Gerbang intent atas SEMUA leg (mentah masih membawa abstrak,
+        # jadi nyambung memakai judul + abstrak; pool cache yang sudah
+        # adaptasi disaring lagi di fase 1 panen_semua, judul saja).
+        if intent_kw is not None:
+            mentah = [r for r in mentah
+                      if lolos_intent(r, intent_kw, intent_bukan, _pus)]
+        elif strict:
+            mentah = []
+        adapted = _adaptasi_harvest(mentah)
         # Keputusan Bos 31 Okt 2026 19:36, seimbang 2-2-2-2,
         # menggantikan prioritas Scopus penuh 19:03: dari kandidat
         # yang SUDAH lolos saring relevansi dan filter tahun, sesudah
@@ -2274,15 +2490,15 @@ def _refs_dari_harvest(bab_title, potong=True):
                     if len(_terpilih) >= 8:
                         break
                 adapted = _terpilih
-            refs = adapted[:8] or None
+            refs = adapted[:8] if adapted else ([] if strict else None)
         else:
-            refs = adapted or None
+            refs = adapted if adapted else ([] if strict else None)
     except Exception as e:
         print(f"       [HARVEST] gagal ({type(e).__name__}) — "
               f"jatuh ke verifikasi biasa")
         refs = None
     if potong:
-        _HARVEST_CACHE[bab_title] = refs
+        _HARVEST_CACHE[_kunci_cache] = refs
     return refs
 
 

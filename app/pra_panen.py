@@ -228,7 +228,7 @@ def _pastikan_jalur_modul():
             sys.path.insert(0, p)
 
 
-def panen_satu_bab(judul_bab, potong=True):
+def panen_satu_bab(judul_bab, potong=True, konteks=None):
     """Panen SATU bab dari API, tanpa DB, tanpa tulis. Fail-soft.
 
     Leg 1: _refs_dari_harvest yang sudah ada (4 sumber Scopus,
@@ -245,9 +245,14 @@ def panen_satu_bab(judul_bab, potong=True):
     _pastikan_jalur_modul()
     try:
         import buku_umum_pipeline as _P
-        hasil = _P._refs_dari_harvest(judul_bab, potong=potong)
+        hasil = _P._refs_dari_harvest(judul_bab, potong=potong,
+                                      konteks=konteks)
     except Exception:
         hasil = None
+    if konteks is not None:
+        # Mode ketat: [] adalah hasil sah (pool kosong sesudah gerbang),
+        # JANGAN jatuh ke jalur biasa yang tidak bergerbang.
+        return list(hasil or [])
     if hasil:
         return list(hasil)
     try:
@@ -268,13 +273,14 @@ def panen_satu_bab(judul_bab, potong=True):
     return keluar
 
 
-def _panen_dan_parse(judul_bab, potong=True):
+def _panen_dan_parse(judul_bab, potong=True, konteks=None):
     """Panen plus parse untuk satu bab. Murni (tanpa DB), aman
     dipanggil dari utas worker. Gagal apa pun: [] (gerbang nanti
     gagal jujur dengan jumlah 0, bukan crash).
     """
     try:
-        mentah = panen_satu_bab(judul_bab, potong=potong)
+        mentah = panen_satu_bab(judul_bab, potong=potong,
+                                konteks=konteks)
     except Exception:
         return []
     hasil = []
@@ -458,7 +464,7 @@ def ambil_snapshot(db, job_kode, bab):
     return hasil
 
 
-def panen_semua(db, job_kode, bidang, outline, lapor=None):
+def panen_semua(db, job_kode, bidang, outline, lapor=None, judul_buku=None):
     """Fase pra-panen: panen semua bab, simpan, bekukan, gerbang.
 
     Dipanggil dari on_mulai di susun() (sesudah token dipotong,
@@ -469,7 +475,10 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None):
     jumlah bab yang sudah selesai dipanen, bukan persen.
 
     Return dict bab ke list dict referensi (urut snapshot), untuk
-    penulisan. Raise GagalPraPanen bila ada bab di bawah minimum 8
+    penulisan. Gas Bos 1 Nov 2026: judul_buku diteruskan sebagai konteks
+    intent; pool cache beku ikut gerbang intent di fase 1, dan bila
+    lolos kurang dari 8 cache dianggap miss (panen segar).
+    Raise GagalPraPanen bila ada bab di bawah minimum 8
     (snapshot sudah ditulis dan di-commit sebelum raise, sebagai
     audit, dan pemanggil mengembalikan token lewat jalur refund).
     """
@@ -535,15 +544,37 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None):
                 # tulis snapshot ditunda ke fase 2, supaya bab ini
                 # ikut aturan artikel-berbeda dalam urutan bab.
                 # Cache_topik sendiri tidak ditulis ulang.
-                pool_per_bab[bab] = (judul_bab, list(zip(rows, refs)),
-                                     True)
+                # Gerbang intent (Gas Bos 1 Nov 2026): pool cache beku
+                # ikut disaring (judul saja, abstrak tidak tersimpan).
+                # Bila intent tidak ada atau lolos kurang dari 8,
+                # cache dianggap miss -> panen segar, bukan diisi
+                # artikel gagal.
+                _pasangan_cache = list(zip(rows, refs))
+                try:
+                    import buku_umum_pipeline as _P_cache
+                    _kw_i, _bukan_i = _P_cache.intent_bab(
+                        judul_bab, judul_buku, bidang)
+                    if _kw_i is None:
+                        _pasangan_cache = None
+                    else:
+                        _pasangan_cache = _P_cache.saring_pasangan_intent(
+                            _pasangan_cache, _kw_i, _bukan_i)
+                except Exception:
+                    _pasangan_cache = None
+                if (not _pasangan_cache
+                        or len(_pasangan_cache) < MIN_REFERENSI_PER_BAB):
+                    perlu_panen.append((bab, judul_bab))
+                    continue
+                pool_per_bab[bab] = (judul_bab, _pasangan_cache, True)
                 continue
         perlu_panen.append((bab, judul_bab))
     if perlu_panen:
         with ThreadPoolExecutor(max_workers=PARALEL_MAKS) as ex:
             futs = {}
             for bab, judul_bab in perlu_panen:
-                futs[ex.submit(_panen_dan_parse, judul_bab, False)] = (bab, judul_bab)
+                futs[ex.submit(_panen_dan_parse, judul_bab, False,
+                             {'judul_buku': judul_buku,
+                              'bidang': bidang})] = (bab, judul_bab)
             for fut in as_completed(futs):
                 bab, judul_bab = futs[fut]
                 try:
