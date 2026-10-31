@@ -75,7 +75,7 @@ SITASI_KURUNG = re.compile(r"\(([^()]{1,90}?),\s*(\d{4}[a-z]?)\)")
 # tahun, tanpa koma di antaranya, supaya tidak ganda dengan bentuk
 # kurung di atas.
 SITASI_NARATIF = re.compile(
-    r"\b([A-Z][A-Za-z\xc0-\xff\-]+(?:\s+(?:&|dan)\s+[A-Z][A-Za-z\xc0-\xff\-]+)?)"
+    r"\b([A-Z][A-Za-z\xc0-\xff\-]+(?:\s+(?:&|dan)\s+[A-Z][A-Za-z\xc0-\xff\-]+)?(?:\s+et al\.?)?)"
     r"\s*\((\d{4}[a-z]?)\)"
 )
 _TAHUN_REF = re.compile(r"\((\d{4})[a-z]?\)")
@@ -783,6 +783,159 @@ def periksa_dan_perbaiki_bab(nomor_bab, teks, refs, panggil_llm=None,
                 "cek_awal": cek_awal, "cek_ulang": cek_awal, "pesan": ""}
     repair = repair_bab(teks, refs, panggil_llm=panggil_llm)
     cek_ulang = cek_hulu_bab(nomor_bab, repair["teks_baru"], refs)
+    if cek_ulang["lolos"]:
+        return {"lolos": True, "nomor_bab": nomor_bab,
+                "teks_baru": repair["teks_baru"], "teks_asli": teks,
+                "diperbaiki": repair["diperbaiki"],
+                "ambigu": repair["ambigu"],
+                "tanpa_kandidat": repair["tanpa_kandidat"],
+                "cek_awal": cek_awal, "cek_ulang": cek_ulang, "pesan": ""}
+    if gagal_keras:
+        raise GagalSitasiBersih(
+            nomor_bab=nomor_bab, masalah=cek_ulang["masalah"],
+            inisial_tersisa=cek_ulang["inisial"],
+            cakupan=cek_ulang["cakupan"])
+    return {"lolos": False, "nomor_bab": nomor_bab,
+            "teks_baru": repair["teks_baru"], "teks_asli": teks,
+            "diperbaiki": repair["diperbaiki"],
+            "ambigu": repair["ambigu"],
+            "tanpa_kandidat": repair["tanpa_kandidat"],
+            "cek_awal": cek_awal, "cek_ulang": cek_ulang,
+            "pesan": PESAN_GAGAL_BERSIH}
+
+
+def _lipat_token(tok):
+    """Lipat diakritik plus huruf kecil untuk satu token nama.
+
+    Contoh: Dabic dengan aksen menjadi dabic. Sama dengan
+    normalisasi_teks di pra_panen (didupikasi di sini supaya modul
+    ini tetap mandiri, tanpa impor pra_panen).
+    """
+    import unicodedata
+    if not tok:
+        return ""
+    bentuk = unicodedata.normalize("NFKD", str(tok))
+    tanpa_aksen = "".join(
+        c for c in bentuk if not unicodedata.combining(c))
+    return tanpa_aksen.strip().strip(".,").lower()
+
+
+def hitung_cakupan_kunci(teks, snapshot_rows):
+    """Persen baris snapshot yang dikutip di badan, dari KUNCI DB.
+
+    snapshot_rows: list dict {kunci, alias, tahun} dari
+    pra_panen.ambil_snapshot (kunci dan alias sudah ternormalisasi).
+    Satu baris cocok bila ada sitasi badan dengan (surname_key atau
+    alias, tahun yang sama). Beda dengan hitung_cakupan lama yang
+    mem-parse ulang string format APA (sumber salah hitung job 223:
+    Marina lawan Dabic, Zhiqiang lawan Lu).
+
+    Return {total, cocok_jumlah, persen, cocok, hilang}, bentuk sama
+    dengan hitung_cakupan, supaya pemanggil bisa bertukar jalur.
+    """
+    teks = teks or ""
+    badan = set()
+    for sit in ekstrak_sitasi_badan(teks):
+        tahun = str(sit.get("tahun") or "")
+        for sur in (sit.get("surnames") or []):
+            badan.add((_lipat_token(sur), tahun))
+    total = len(snapshot_rows or [])
+    cocok = []
+    hilang = []
+    for row in (snapshot_rows or []):
+        kunci = _lipat_token(row.get("kunci") or "")
+        tahun = str(row.get("tahun") or "")
+        alias = [_lipat_token(a) for a in (row.get("alias") or [])]
+        kena = (kunci, tahun) in badan if kunci else False
+        if not kena:
+            for a in alias:
+                if a and (a, tahun) in badan:
+                    kena = True
+                    break
+        if kena:
+            cocok.append(kunci)
+        else:
+            hilang.append(kunci)
+    persen = (len(cocok) / total) if total else 0.0
+    return {"total": total, "cocok_jumlah": len(cocok),
+            "persen": persen, "cocok": cocok, "hilang": hilang}
+
+
+def cek_hulu_bab_snapshot(nomor_bab, teks, snapshot_rows):
+    """Cek hulu per bab dari snapshot (bukan dari string refs).
+
+    Lolos hanya bila dua syarat terpenuhi sekaligus: tidak ada sitasi
+    inisial saja, dan cakupan kunci minimal 50 persen. Bentuk return
+    dan wording masalah sama dengan cek_hulu_bab, supaya log bisa
+    dibandingkan dengan jalur lama.
+    """
+    teks = teks or ""
+    rows = list(snapshot_rows or [])
+    kemunculan = pindai_inisial(teks)
+    ringkas = ringkas_inisial(kemunculan)
+    cakupan = hitung_cakupan_kunci(teks, rows)
+    masalah = []
+    if kemunculan:
+        contoh = ", ".join(
+            "%s (%dx)" % (r["raw"], r["jumlah"]) for r in ringkas[:5])
+        masalah.append(
+            "BAB %s: %d sitasi inisial saja, contoh %s"
+            % (nomor_bab, len(kemunculan), contoh))
+    if not rows:
+        masalah.append("BAB %s: tidak ada referensi bab" % nomor_bab)
+    elif cakupan["persen"] < AMBANG_CAKUPAN:
+        masalah.append(
+            "BAB %s: cakupan surname hanya %.0f persen "
+            "(%d dari %d, ambang 50 persen)"
+            % (nomor_bab, cakupan["persen"] * 100,
+               cakupan["cocok_jumlah"], cakupan["total"]))
+    return {"lolos": not masalah, "nomor_bab": nomor_bab,
+            "jumlah_inisial": len(kemunculan), "inisial": ringkas,
+            "contoh_inisial": [r["raw"] for r in ringkas],
+            "cakupan": cakupan, "masalah": masalah}
+
+
+def periksa_dan_perbaiki_bab_snapshot(nomor_bab, teks, snapshot_rows,
+                                      gagal_keras=True):
+    """Orkestrasi snapshot per bab: cek kunci, repair, verifikasi ulang.
+
+    Bentuk return dan perilaku gagal sama dengan
+    periksa_dan_perbaiki_bab (GagalSitasiBersih bila gagal keras),
+    hanya sumber kebenarannya snapshot, bukan string refs_babN.json.
+    Repair memakai string format APA yang dibangun dari ref_dict
+    snapshot (untuk kandidat surname dan inisial), deterministik,
+    panggil_llm=None. Pemanggil yang babnya tidak punya snapshot
+    WAJIB memakai periksa_dan_perbaiki_bab lama (fallback JSON).
+    """
+    rows = list(snapshot_rows or [])
+    cek_awal = cek_hulu_bab_snapshot(nomor_bab, teks, rows)
+    if cek_awal["lolos"]:
+        return {"lolos": True, "nomor_bab": nomor_bab,
+                "teks_baru": teks, "teks_asli": teks,
+                "diperbaiki": [], "ambigu": [], "tanpa_kandidat": [],
+                "cek_awal": cek_awal, "cek_ulang": cek_awal, "pesan": ""}
+    try:
+        from verifikasi_sitasi import format_apa as _format_apa
+    except Exception:
+        _format_apa = None
+    refs_string = []
+    for row in rows:
+        ref_dict = row.get("ref_dict") or {}
+        teks_ref = None
+        if _format_apa is not None and ref_dict:
+            try:
+                teks_ref = _format_apa(ref_dict)
+            except Exception:
+                teks_ref = None
+        if not teks_ref:
+            teks_ref = "%s (%s)." % (
+                row.get("surname_tampil") or row.get("kunci") or "",
+                row.get("tahun") or "")
+        if teks_ref.strip():
+            refs_string.append(teks_ref)
+    repair = repair_bab(teks, refs_string, panggil_llm=None)
+    cek_ulang = cek_hulu_bab_snapshot(
+        nomor_bab, repair["teks_baru"], rows)
     if cek_ulang["lolos"]:
         return {"lolos": True, "nomor_bab": nomor_bab,
                 "teks_baru": repair["teks_baru"], "teks_asli": teks,

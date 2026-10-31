@@ -238,9 +238,15 @@ def build_citation_prompt(refs):
     return "\n".join(lines)
 
 
-def verify_text_citations(text, allowed_refs):
+def verify_text_citations(text, allowed_refs, mode="hapus"):
     """Verifikasi: semua sitasi in-text harus ada di allowed_refs.
-    
+
+    mode hapus (default): clean_text adalah teks dengan sitasi tak
+    terverifikasi dihapus (perilaku lama, dipakai semua pemanggil lama).
+    mode lapor: clean_text adalah teks APA ADANYA (tidak diubah),
+    pemanggil yang memutuskan (lapor, tulis ulang, atau hapus sebagai
+    jalan terakhir). Dipakai jalur snapshot pra-panen.
+
     Returns:
         dict: {verified, unverified, clean_text}
     """
@@ -306,21 +312,26 @@ def verify_text_citations(text, allowed_refs):
         else:
             unverified.append(f"({cite_clean})")
     
-    # Remove unverified citations from text
-    clean_text = text
-    for cite in unverified:
-        clean_text = clean_text.replace(cite, "")
+    # Remove unverified citations from text (mode hapus saja).
+    # Mode lapor: teks dikembalikan apa adanya, tanpa penghapusan.
+    if mode == "lapor":
+        clean_text = text
+    else:
+        clean_text = text
+        for cite in unverified:
+            clean_text = clean_text.replace(cite, "")
     #  🚨 BUG TERUKUR 20 Okt 2026 — AKAR "1 baris = 6.302 karakter":
     #  `\s{2,}` juga cocok dengan `\n\n` (baris kosong pemisah paragraf),
     #  sehingga SELURUH paragraf DIGABUNG jadi satu baris. Akibatnya
     #  perbaikan pemecah paragraf di `post_process` DIBATALKAN di sini,
     #  dan buku keluar sebagai satu blok raksasa.
     #  OBAT: rapikan spasi HANYA di dalam baris — baris baru TIDAK disentuh.
-    clean_text = re.sub(r'[ \t]{2,}', ' ', clean_text)     # spasi/tab dobel
-    clean_text = re.sub(r'[ \t]+\n', '\n', clean_text)     # spasi sisa di ujung baris
-    clean_text = re.sub(r'\n[ \t]+', '\n', clean_text)     # spasi sisa di awal baris
-    clean_text = re.sub(r' \.([ \t]|$|\n)', r'.\1', clean_text)  # spasi sebelum titik
-    clean_text = re.sub(r'\n{3,}', '\n\n', clean_text)     # baris kosong berlebih
+    if mode != "lapor":
+        clean_text = re.sub(r'[ \t]{2,}', ' ', clean_text)     # spasi/tab dobel
+        clean_text = re.sub(r'[ \t]+\n', '\n', clean_text)     # spasi sisa di ujung baris
+        clean_text = re.sub(r'\n[ \t]+', '\n', clean_text)     # spasi sisa di awal baris
+        clean_text = re.sub(r' \.([ \t]|$|\n)', r'.\1', clean_text)  # spasi sebelum titik
+        clean_text = re.sub(r'\n{3,}', '\n\n', clean_text)     # baris kosong berlebih
 
     return {
         "verified": verified,

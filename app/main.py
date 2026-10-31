@@ -778,7 +778,7 @@ def buku_susun(
                                  outline_siaps=outline_siaps,
                                  penulis=(penulis or None),
                                  penelaah=(penelaah or None),
-                                 tier=tier_untuk_susun)
+                                 tier=tier_untuk_susun, kode=kode)
             _fid_buku = hasil.get('file_id') if isinstance(hasil, dict) else None
             _proses.tandai_selesai(
                 kode, hasil=judul, hasil_json=_json.dumps(hasil, default=str),

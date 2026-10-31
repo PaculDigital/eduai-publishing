@@ -531,8 +531,17 @@ def gabung_slot_bab(komentar_json, bab, *, selesai=False, terakhir='') -> str:
 
 
 def _gabung_slot_dari_teks(p, tahap) -> None:
-    """Perbarui slot per bab dari teks tahap, di sesi ubah_tahap."""
+    """Perbarui slot per bab dari teks tahap, di sesi ubah_tahap.
+
+    Tahap pra-panen (Menyiapkan referensi, Bab X dari N) BUKAN
+    progres bab: diabaikan di sini, supaya daftar bab tidak tercemar
+    teks pra-panen (pola yang sama dengan eksklusi diagnosa Catatan
+    di gabung_slot_bab). Daftar bab tetap Menunggu selama pra-panen,
+    judul muncul saat menulis mulai.
+    """
     teks = tahap or ''
+    if teks.startswith('Menyiapkan referensi'):
+        return
     m = _POLA_BAB.search(teks)
     if not m:
         return

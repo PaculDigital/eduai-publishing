@@ -1316,7 +1316,7 @@ def add_indeks(doc, glosarium, teks_per_halaman=None):
     tulis_indeks_subjek(doc, subjek)
     tulis_indeks_nama(doc, nama)
 
-def add_daftar_pustaka(doc, references):
+def add_daftar_pustaka(doc, references, peta_sumber=None):
     add_para(doc, "DAFTAR PUSTAKA", size=Pt(16), bold=True, align='center',
              space_before=12, space_after=12, page_break_before=True, keep_next=True)
     for ref in references:
@@ -1324,7 +1324,13 @@ def add_daftar_pustaka(doc, references):
         pf = p.paragraph_format
         pf.left_indent = Cm(1.0)
         pf.first_line_indent = Cm(-1.0)
-        r = p.add_run(ref)
+        _sumber = []
+        if peta_sumber:
+            for _s in (peta_sumber.get(ref, []) or []):
+                if _s and _s not in _sumber:
+                    _sumber.append(_s)
+        _teks = ref + (" [Sumber: %s]" % ", ".join(_sumber) if _sumber else "")
+        r = p.add_run(_teks)
         set_font(r, size=Pt(11))
 
 def add_bio(doc):
@@ -1474,7 +1480,7 @@ def isi_halaman_docx(path_docx, pages):
 def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
           penulis='', institusi='', tahun=None, subjudul='',
           nama_berkas=None, judul_kartu=None, penelaah='',
-          tier=None, pages=None):
+          tier=None, pages=None, peta_sumber=None):
     """Rakit SEMUA bab jadi SATU .docx. Return dict hasil (bukan cuma print).
 
     Dipakai rute `/buku/susun` supaya user dapat 1 dokumen utuh — bukan
@@ -1660,7 +1666,7 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
                 except Exception:
                     pass
         if all_refs:
-            add_daftar_pustaka(doc, sorted(all_refs))
+            add_daftar_pustaka(doc, sorted(all_refs), peta_sumber)
 
         add_bio(doc)
         # 29 Okt 2026 (temuan uji 219): metadata penulis/judul HANYA diset

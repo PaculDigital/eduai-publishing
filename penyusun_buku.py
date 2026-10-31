@@ -162,7 +162,8 @@ def apakah_bisa():
 
 
 def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
-               batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None, on_bab_selesai=None):
+               batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None, on_bab_selesai=None,
+               refs_holder=None, dari_snapshot=False):
     """Susun buku dari outline yang SUDAH dibuat. Return dict hasil.
 
     Satu buku diproduksi dalam satu waktu (antrean FIFO global — lihat
@@ -177,6 +178,10 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
                 kata ditulis). Pemanggil memotong kuota di sini — jadi
                 buku yang masih mengantre BELUM dipotong.
     tier      : paket Hemat/Normal/Full (None = perilaku lama); diteruskan ke visuals.
+    refs_holder: dict yang diisi on_mulai dengan refs snapshot
+                 (dipakai bila dari_snapshot True, dibaca sesudah on_mulai).
+    dari_snapshot: True bila penulisan memakai snapshot pra-panen
+                 beku (bukan panen on demand), False bila jalur lama.
 
     TIDAK memotong kuota sendiri. Pemotongan kuota = tugas pemanggil
     lewat `on_mulai`, supaya modul ini bisa diuji tanpa menyentuh saldo
@@ -188,7 +193,9 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
         _antrian_tunggu_giliran(token, lapor=lapor)
         return _susun_buku_dalam(judul, outline, jenis, keluar_dir,
                                  batas_bab, lapor, ulang, on_mulai, tier=tier,
-                                 on_bab_selesai=on_bab_selesai)
+                                 on_bab_selesai=on_bab_selesai,
+                                 refs_holder=refs_holder,
+                                 dari_snapshot=dari_snapshot)
     finally:
         _antrian_selesai(token)
         #  Pulihkan tambalan prompt — SEKALIGUS untuk semua jalan keluar
@@ -206,7 +213,8 @@ def susun_buku(judul, outline, jenis="umum", keluar_dir=None,
 
 
 def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
-                      batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None, on_bab_selesai=None):
+                      batas_bab=None, lapor=None, ulang=0, on_mulai=None, tier=None, on_bab_selesai=None,
+                      refs_holder=None, dari_snapshot=False):
     """Isi susun_buku (lihat docstring-nya). Dipanggil HANYA dari wrapper
     antrean di atas — jangan dipanggil langsung, supaya antrean tidak
     bisa dilewati diam-diam."""
@@ -233,6 +241,18 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
     #  di wrapper TIDAK PERNAH sampai ke sini (belum dipotong).
     if on_mulai is not None:
         on_mulai()
+
+    # Pra-panen (31 Okt 2026): bila dari_snapshot, refs bab WAJIB
+    # sudah diisi on_mulai ke refs_holder (pemotong plus panen).
+    # Kosong = gagal cepat, tanpa fallback, supaya buku tidak
+    # ditulis dengan referensi campur aduk.
+    refs_per_bab = None
+    if dari_snapshot:
+        if isinstance(refs_holder, dict) and refs_holder.get("refs"):
+            refs_per_bab = refs_holder["refs"]
+        else:
+            raise ValueError(
+                "Snapshot referensi hilang, gagal cepat tanpa fallback")
 
     if keluar_dir is None:
         raise ValueError("keluar_dir wajib — hasil harus jadi BERKAS, "
@@ -306,8 +326,18 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
         try:
             if lapor:
                 lapor(f"BAB {n} mulai: {outline[n]['title']}")
-            teks, summ, wc, cit = P.generate_bab(
-                n, outline[n], ringkasan_awal, jenis=jenis, tier=tier)
+            # Snapshot hanya bila dari_snapshot True. Bila False,
+            # panggil dengan argumen lama persis, supaya mock dan
+            # pemanggil lama yang signature-nya lama tidak gagal
+            # TypeError karena kwargs baru (gerbang perbaikan bab).
+            if dari_snapshot:
+                teks, summ, wc, cit = P.generate_bab(
+                    n, outline[n], ringkasan_awal, jenis=jenis, tier=tier,
+                    refs_bab=(refs_per_bab.get(n) if isinstance(refs_per_bab, dict) else None),
+                    dari_snapshot=True)
+            else:
+                teks, summ, wc, cit = P.generate_bab(
+                    n, outline[n], ringkasan_awal, jenis=jenis, tier=tier)
         finally:
             P.lepas_folder()
         #  ⚠️ PENJAGA: bab kosong TIDAK boleh dicatat "done".
