@@ -2054,6 +2054,49 @@ def _refs_dari_harvest(bab_title):
                     adapted.append(a)
         except Exception:
             pass
+        # Keputusan Bos 31 Okt 2026 19:36, seimbang 2-2-2-2,
+        # menggantikan prioritas Scopus penuh 19:03: dari kandidat
+        # yang SUDAH lolos saring relevansi dan filter tahun, sesudah
+        # dedup, ambil kuota 2 per sumber (Scopus, OpenAlex, CrossRef,
+        # Garuda), total 8, urutan kelompok Scopus dulu, isi kekurangan
+        # dari sumber lain menurut prioritas yang sama, stabil di
+        # dalam sumber. Kueri, kata kunci, dedup, batas 8, saring, dan
+        # filter tahun tidak diubah, tidak ada artikel yang dikarang.
+        # Impor helper di sini, dengan fallback aturan yang sama,
+        # supaya jalur file tunggal tetap jalan bila paket app tidak
+        # bisa diimpor.
+        try:
+            from app.prioritas_sumber import pilih_seimbang as _pilih_seimbang
+            adapted = _pilih_seimbang(adapted)
+        except Exception:
+            _peta_seimbang = {'scopus': 0, 'openalex': 1,
+                              'crossref': 2, 'garuda': 3}
+
+            def _angka_seimbang(item):
+                kunci = str((item or {}).get('source')
+                            or (item or {}).get('sumber')
+                            or '').strip().lower()
+                for nama, angka in _peta_seimbang.items():
+                    if nama in kunci:
+                        return angka
+                return 4
+
+            _kelompok = {0: [], 1: [], 2: [], 3: [], 4: []}
+            for _item in adapted:
+                _kelompok[_angka_seimbang(_item)].append(_item)
+            _terpilih = []
+            for _angka in (0, 1, 2, 3):
+                _terpilih.extend(_kelompok[_angka][:2])
+                if len(_terpilih) >= 8:
+                    break
+            for _angka in (0, 1, 2, 3, 4):
+                for _item in _kelompok[_angka][2:]:
+                    if len(_terpilih) >= 8:
+                        break
+                    _terpilih.append(_item)
+                if len(_terpilih) >= 8:
+                    break
+            adapted = _terpilih
         refs = adapted[:8] or None
     except Exception as e:
         print(f"       [HARVEST] gagal ({type(e).__name__}) — "

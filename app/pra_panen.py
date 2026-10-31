@@ -53,6 +53,14 @@ try:
 except ImportError:  # dipakai sebagai modul atas, bukan paket app
     from models import Artikel, CacheTopik, SnapshotJob
 
+try:
+    from .prioritas_sumber import pilih_seimbang as _pilih_seimbang
+except ImportError:  # jalur cache tetap jalan urutan lama bila gagal
+    try:
+        from prioritas_sumber import pilih_seimbang as _pilih_seimbang
+    except ImportError:
+        _pilih_seimbang = None
+
 MIN_REFERENSI_PER_BAB = 8
 CACHE_SEGAR_HARI = 365  # 12 bulan
 PARALEL_MAKS = 4
@@ -513,6 +521,26 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None):
                     "source": art.sumber or "",
                 })
             if rows:
+                # Keputusan Bos 31 Okt 2026 19:36, seimbang 2-2-2-2:
+                # baris cache diurutkan ulang dengan aturan seimbang
+                # yang sama sebelum snapshot ditulis, supaya judul
+                # berulang tidak lolos dari seimbang. Pasangan baris
+                # dan ref diurutkan bersama, jadi ref yang dikembalikan
+                # ke penulisan mengikuti urutan snapshot baru, bukan
+                # urutan cache lama. Cache_topik sendiri tidak ditulis
+                # ulang, hanya snapshot job baru yang seimbang. Bila
+                # helper tidak tersedia, urutan lama dipertahankan
+                # (fail-soft, gerbang minimum 8 tetap berlaku).
+                if _pilih_seimbang is not None:
+                    try:
+                        _pasangan = _pilih_seimbang(
+                            list(zip(rows, refs)),
+                            kunci=lambda _p: _p[0].get('sumber') or '')
+                        if _pasangan:
+                            rows = [_p[0] for _p in _pasangan]
+                            refs = [_p[1] for _p in _pasangan]
+                    except Exception:
+                        pass
                 tulis_snapshot(db, job_kode, bab, rows)
                 db.commit()
                 refs_per_bab[bab] = refs
