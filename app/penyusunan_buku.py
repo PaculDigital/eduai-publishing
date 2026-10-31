@@ -734,6 +734,14 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                         'sisip_cakupan': _lap_pm['sisip_cakupan'],
                         'ganda': _lap_pm['ganda'],
                     }
+                    # Paket sempurna item 3: ukur kedalaman sitasi
+                    # dari teks final. Laporan saja di hasil_json,
+                    # TIDAK memblokir perakitan bila dangkal/refrain.
+                    try:
+                        hasil['kedalaman'] = _SG_pm.ukur_kedalaman(
+                            _teks_pm_baru, _rows_pm)
+                    except Exception as _e_ked:
+                        hasil['kedalaman'] = {'gagal': repr(_e_ked)[:200]}
                     # Cek ulang: kalimat ganda tidak boleh tersisa, dan
                     # cakupan harus 8 dari 8. Bila masih cacat, gagal
                     # bersih, bukan rakit dengan cacat.
@@ -1045,6 +1053,16 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     _CA_gate.gerbang_dengan_perbaikan(_gerbang_ref, _perbaiki_ref, lapor=lapor)
                 if kartu_jenis == 'book-chapter':
                     _sc.chapter(hasil['docx'])
+                # Paket sempurna item 5: verifikasi render final.
+                # Laporan saja di hasil_json, TIDAK menggagalkan buku
+                # bila nomor di luar rentang atau render gagal.
+                try:
+                    from . import verifikasi_render as _VR
+                    _hal_ver = _sc.teks_halaman(hasil['docx'])
+                    hasil['verifikasi_render'] = _VR.verifikasi(
+                        hasil['docx'], _hal_ver)
+                except Exception as _e_ver:
+                    hasil['verifikasi_render'] = {'gagal': repr(_e_ver)[:200]}
                 # Sukses: salinan pra-nomor tidak lagi diperlukan — hapus
                 # supaya tidak menumpuk di disk (temuan review agen).
                 # Gagal di atas (raise) membiarkannya tetap ada untuk

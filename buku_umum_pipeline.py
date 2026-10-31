@@ -573,6 +573,13 @@ ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
   'Penulis berpendirian'. Tanpa frasa itu = bab gagal.
 - Satu unit argumen (satu perbandingan atau satu posisi) TIDAK BOLEH
   terpotong: tulis utuh dalam sub-bab ini.
+- KEDALAMAN SITASI (WAJIB): Setiap referensi dalam daftar WAJIB
+  dibahas substansial minimal satu kali di bab ini: jelaskan
+  temuan, metode, atau argumennya dalam minimal satu kalimat
+  utuh, bukan hanya disebut dalam kurung. Referensi yang sama
+  TIDAK BOLEH diulang di sub-bab lain dengan klaim yang sama
+  persis; bila disebut lagi, harus dengan sudut atau bukti
+  yang berbeda.
 - Akhiri sub-bab dengan blok [ISTILAH BARU] — WAJIB di setiap sub-bab,
   bukan opsional. Satu baris per istilah yang DIDEFINISIKAN di sub-bab
   ini (bukan istilah yang hanya disebut): 'Istilah: definisi operasional
@@ -589,6 +596,22 @@ ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
   berakhir di baris kosong, tanpa penutup.
   Tanpa blok ini = sub-bab tidak lengkap.
 """
+        # Paket sempurna item 4: nada referensi. Sub-bab Implikasi
+        # boleh menyapa pembaca; Definisi/Perkembangan/Perbandingan/
+        # Posisi ditulis formal orang ketiga, tanpa sapaan perintah.
+        if 'implikasi' in (sub_title or '').lower():
+            aturan_referensi += (
+                '\nNADA REFERENSI: Sub-bab Implikasi boleh menyapa '
+                'pembaca secara langsung bila itu memperjelas tindakan '
+                'yang disarankan.\n')
+        else:
+            aturan_referensi += (
+                '\nNADA REFERENSI (WAJIB): Sub-bab ini ditulis dalam '
+                'nada ilmiah formal orang ketiga. DILARANG sapaan '
+                'perintah kepada pembaca seperti \'Anda perlu\', '
+                '\'Anda dapat\', \'Anda harus\', dan bentuk perintah '
+                'langsung lainnya. Jelaskan, bandingkan, dan simpulkan '
+                'tanpa memerintah pembaca.\n')
         aturan_ringkasan = (
             'Tulis section "Ringkasan Bab" FORMAL dalam poin-poin substansi '
             '(bukan paragraf mengalir)')
@@ -2094,7 +2117,7 @@ def _en_keywords(bab_title):
     return hasil
 
 
-def _refs_dari_harvest(bab_title):
+def _refs_dari_harvest(bab_title, potong=True):
     """Referensi satu bab dari mesin Harvest app (pustaka).
 
     28 Okt 2026 (teguran Boss: Garuda kok tidak ada): mesin Harvest app
@@ -2112,8 +2135,9 @@ def _refs_dari_harvest(bab_title):
     Cache per judul bab: sub-sub satu bab berbagi refs yang sama (hemat
     panggilan; bab dikerjakan per utas sehingga kunci berbeda tidak
     balapan). Gagal total -> None (pemanggil jatuh ke jalur biasa).
+    potong=False: kembalikan pool penuh tanpa potong 8 dan tanpa cache, untuk fase pemilihan artikel-berbeda di panen_semua (paket sempurna).
     """
-    if bab_title in _HARVEST_CACHE:
+    if potong and bab_title in _HARVEST_CACHE:
         return _HARVEST_CACHE[bab_title]
     refs = None
     try:
@@ -2131,7 +2155,8 @@ def _refs_dari_harvest(bab_title):
         _pus = None
     if _pus is None:
         # Pustaka tidak bisa diimpor -> pemanggil jatuh ke jalur biasa.
-        _HARVEST_CACHE[bab_title] = None
+        if potong:
+            _HARVEST_CACHE[bab_title] = None
         return None
     try:
         adapted = []
@@ -2204,44 +2229,51 @@ def _refs_dari_harvest(bab_title):
         # Impor helper di sini, dengan fallback aturan yang sama,
         # supaya jalur file tunggal tetap jalan bila paket app tidak
         # bisa diimpor.
-        try:
-            from app.prioritas_sumber import pilih_seimbang as _pilih_seimbang
-            adapted = _pilih_seimbang(adapted)
-        except Exception:
-            _peta_seimbang = {'scopus': 0, 'openalex': 1,
-                              'crossref': 2, 'garuda': 3}
+        if potong:
+            try:
+                from app.prioritas_sumber import pilih_seimbang as _pilih_seimbang, cocok_tema as _cocok_tema
+                adapted = _pilih_seimbang(
+                    adapted,
+                    cocok=lambda a: _cocok_tema(a.get('title') or '',
+                                                bab_title))
+            except Exception:
+                _peta_seimbang = {'scopus': 0, 'openalex': 1,
+                                  'crossref': 2, 'garuda': 3}
 
-            def _angka_seimbang(item):
-                kunci = str((item or {}).get('source')
-                            or (item or {}).get('sumber')
-                            or '').strip().lower()
-                for nama, angka in _peta_seimbang.items():
-                    if nama in kunci:
-                        return angka
-                return 4
+                def _angka_seimbang(item):
+                    kunci = str((item or {}).get('source')
+                                or (item or {}).get('sumber')
+                                or '').strip().lower()
+                    for nama, angka in _peta_seimbang.items():
+                        if nama in kunci:
+                            return angka
+                    return 4
 
-            _kelompok = {0: [], 1: [], 2: [], 3: [], 4: []}
-            for _item in adapted:
-                _kelompok[_angka_seimbang(_item)].append(_item)
-            _terpilih = []
-            for _angka in (0, 1, 2, 3):
-                _terpilih.extend(_kelompok[_angka][:2])
-                if len(_terpilih) >= 8:
-                    break
-            for _angka in (0, 1, 2, 3, 4):
-                for _item in _kelompok[_angka][2:]:
+                _kelompok = {0: [], 1: [], 2: [], 3: [], 4: []}
+                for _item in adapted:
+                    _kelompok[_angka_seimbang(_item)].append(_item)
+                _terpilih = []
+                for _angka in (0, 1, 2, 3):
+                    _terpilih.extend(_kelompok[_angka][:2])
                     if len(_terpilih) >= 8:
                         break
-                    _terpilih.append(_item)
-                if len(_terpilih) >= 8:
-                    break
-            adapted = _terpilih
-        refs = adapted[:8] or None
+                for _angka in (0, 1, 2, 3, 4):
+                    for _item in _kelompok[_angka][2:]:
+                        if len(_terpilih) >= 8:
+                            break
+                        _terpilih.append(_item)
+                    if len(_terpilih) >= 8:
+                        break
+                adapted = _terpilih
+            refs = adapted[:8] or None
+        else:
+            refs = adapted or None
     except Exception as e:
         print(f"       [HARVEST] gagal ({type(e).__name__}) — "
               f"jatuh ke verifikasi biasa")
         refs = None
-    _HARVEST_CACHE[bab_title] = refs
+    if potong:
+        _HARVEST_CACHE[bab_title] = refs
     return refs
 
 

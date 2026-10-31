@@ -1207,3 +1207,104 @@ PERINGATAN PROPAGASI, WAJIB DIBACA KOORDINATOR:
     gabung_pustaka raise, biarkan naik ke except susun() supaya
     tidak diam-diam jadi pustaka kosong.
 """
+
+
+_KATA_HENTI_KEDALAMAN = {
+    'yang', 'dan', 'atau', 'dengan', 'dari', 'untuk', 'dalam', 'pada',
+    'di', 'ke', 'oleh', 'sebagai', 'antara', 'serta', 'tentang',
+    'ini', 'itu', 'juga', 'sangat', 'lebih', 'secara', 'adalah',
+    'the', 'and', 'for', 'with', 'from', 'that', 'this', 'are',
+}
+
+
+def _kalimat_teks(teks):
+    """Pecah teks jadi kalimat (pisah di . ! ? diikuti spasi)."""
+    import re as _re
+    bersih = (teks or '').replace('\n', ' ')
+    return [k.strip() for k in _re.split(r'(?<=[.!?])\s+', bersih)
+            if k.strip()]
+
+
+def ukur_kedalaman(teks_per_bab, rows_per_bab):
+    """Ukur kedalaman sitasi per bab dari teks FINAL (sesudah perbaikan
+    mesin). Laporan saja, TIDAK memblokir apa pun.
+
+    teks_per_bab: {bab: teks}; rows_per_bab: {bab: [{kunci, alias,
+    tahun}]} format yang sama dengan hitung_cakupan_kunci.
+    Per artikel per bab: jumlah kalimat yang mengutipnya dan panjang
+    kalimat pengutip terpanjang (kata). Dangkal bila hanya dikutip
+    dalam 1 kalimat DAN kalimat itu < 40 kata, atau tidak dikutip
+    sama sekali. Refrain: artikel yang dikutip di >= 3 bab dengan
+    kemiripan kalimat antar-bab >= 0.50 (Jaccard kata isi) dilaporkan
+    sebagai kemungkinan pengulangan klaim yang sama.
+    """
+    import re as _re
+    per_bab = {}
+    kalimat_per_artikel = {}
+    for bab in sorted(rows_per_bab, key=lambda b: str(b)):
+        rows = rows_per_bab.get(bab) or []
+        teks = (teks_per_bab.get(bab)
+                or teks_per_bab.get(str(bab)) or '')
+        per_row = {}
+        for row in rows:
+            label = '%s-%s' % (row.get('kunci') or '',
+                               row.get('tahun') or '')
+            per_row[label] = {'kalimat': 0, 'terpanjang_kata': 0}
+        for kalimat in _kalimat_teks(teks):
+            cites = ekstrak_sitasi_badan(kalimat)
+            if not cites:
+                continue
+            kata = len(kalimat.split())
+            cocok_label = set()
+            for sit in cites:
+                tahun = str(sit.get('tahun') or '')
+                for sur in (sit.get('surnames') or []):
+                    sl = _lipat_token(sur)
+                    for row in rows:
+                        rt = str(row.get('tahun') or '')
+                        if rt != tahun:
+                            continue
+                        if sl == _lipat_token(row.get('kunci') or '') \
+                                or sl in [_lipat_token(a)
+                                          for a in (row.get('alias')
+                                                    or [])]:
+                            cocok_label.add(
+                                '%s-%s' % (row.get('kunci') or '', rt))
+            if not cocok_label:
+                continue
+            kata_isi = {w for w in _re.findall(r'[a-z0-9]+',
+                                               kalimat.lower())
+                        if len(w) >= 4
+                        and w not in _KATA_HENTI_KEDALAMAN}
+            for label in cocok_label:
+                d = per_row[label]
+                d['kalimat'] += 1
+                d['terpanjang_kata'] = max(d['terpanjang_kata'], kata)
+                kalimat_per_artikel.setdefault(label, []).append(
+                    (bab, kata_isi))
+        for label, d in per_row.items():
+            d['dangkal'] = bool(d['kalimat'] == 0 or (
+                d['kalimat'] == 1 and d['terpanjang_kata'] < 40))
+        per_bab[str(bab)] = per_row
+    refrain = []
+    for label, lst in kalimat_per_artikel.items():
+        babs = sorted(set(str(b) for b, _ in lst))
+        if len(babs) < 3:
+            continue
+        maks = 0.0
+        for i in range(len(lst)):
+            for j in range(i + 1, len(lst)):
+                if lst[i][0] == lst[j][0]:
+                    continue
+                a, b = lst[i][1], lst[j][1]
+                if not a or not b:
+                    continue
+                maks = max(maks, len(a & b) / len(a | b))
+        if maks >= 0.50:
+            refrain.append({'artikel': label, 'bab': babs,
+                            'kemiripan_maks': round(maks, 2)})
+    dangkal_total = sum(1 for pb in per_bab.values()
+                        for d in pb.values() if d['dangkal'])
+    return {'per_bab': per_bab, 'refrain': refrain,
+            'ringkas': {'dangkal_total': dangkal_total,
+                        'refrain_total': len(refrain)}}
