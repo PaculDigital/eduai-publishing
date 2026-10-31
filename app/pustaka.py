@@ -134,6 +134,85 @@ _KATA_HENTI = {
 }
 
 
+def _token_bersih_scopus(tok):
+    return (tok or "").strip().strip(".,;:!?\"'()[]{}")
+
+
+def _adalah_inisial_scopus(tok):
+    bersih = _token_bersih_scopus(tok).replace(".", "")
+    if not bersih:
+        return False
+    if len(bersih) == 1:
+        return True
+    return len(bersih) <= 4 and bersih.isupper() and bersih.isalpha()
+
+
+def nama_belakang_scopus(creator):
+    """Nama belakang KHUSUS Scopus, satu kalimat: bagian sebelum koma
+    pertama bila ada koma, kalau tidak ada koma token pertama yang
+    bukan inisial sesudah buang inisial di akhir, atau string kosong
+    bila tidak ada token seperti itu. Hanya untuk sumber Scopus,
+    jangan dipakai untuk OpenAlex, CrossRef, atau Garuda, karena
+    format nama mereka beda (nama lengkap, bukan Nama + Inisial).
+    """
+    if creator is None:
+        return ""
+    teks = str(creator).strip()
+    if not teks:
+        return ""
+    if "," in teks:
+        bagian = teks.split(",", 1)[0].strip()
+        potong = bagian.split()
+        if not potong:
+            return ""
+        token = _token_bersih_scopus(potong[0])
+        if not token:
+            return ""
+        if _adalah_inisial_scopus(token):
+            return ""
+        if not any(ch.isalpha() for ch in token):
+            return ""
+        if token.isdigit():
+            return ""
+        return token
+    token_list = [_token_bersih_scopus(t) for t in teks.split()
+                  if _token_bersih_scopus(t)]
+    while token_list and _adalah_inisial_scopus(token_list[-1]):
+        token_list.pop()
+    for token in token_list:
+        if _adalah_inisial_scopus(token):
+            continue
+        if not any(ch.isalpha() for ch in token):
+            continue
+        if token.isdigit():
+            continue
+        return token
+    return ""
+
+
+def saring_scopus(daftar):
+    """Buang hanya baris Scopus yang nama belakangnya tidak bisa
+    ditentukan. Baris sumber lain dipertahankan apa adanya, walau
+    string penulisnya sama persis dengan baris Scopus yang dibuang,
+    karena saring ini khusus Scopus. Urutan dipertahankan, tidak ada
+    dedup baru, tidak ada artikel yang dikarang.
+    """
+    keluar = []
+    for r in (daftar or []):
+        if not isinstance(r, dict):
+            continue
+        if r.get("source") != "Scopus":
+            keluar.append(r)
+            continue
+        penulis = r.get("authors") or ""
+        if isinstance(penulis, list):
+            penulis = penulis[0] if penulis else ""
+        if not nama_belakang_scopus(penulis):
+            continue
+        keluar.append(r)
+    return keluar
+
+
 def cari_scopus(kw_en: list[str], maks: int = MAKS_PER_SUMBER,
                 query_siap: str = '') -> list[dict]:
     """Cari di Scopus. Gagal → [] (failover, JANGAN hentikan pencarian).
@@ -186,7 +265,11 @@ def cari_scopus(kw_en: list[str], maks: int = MAKS_PER_SUMBER,
                 'issn': (it.get('prism:issn') or '').split(',')[0].strip(),
                 'garuda_id': None,
             })
-        log.info('[pustaka] Scopus: %s hasil', len(keluar))
+        awal = len(keluar)
+        keluar = saring_scopus(keluar)
+        log.info('[pustaka] Scopus: %s hasil, %s dibuang '
+                 '(nama belakang tidak bisa ditentukan)',
+                 len(keluar), awal - len(keluar))
         return keluar
     except Exception as e:                                    # noqa: BLE001
         log.warning('[pustaka] Scopus error: %s', e)
