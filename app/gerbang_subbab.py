@@ -306,6 +306,43 @@ def hapus_sitasi_luar(teks, rows):
     return bersih, luar_urut
 
 
+def hapus_sitasi_inisial(teks):
+    """Hapus sitasi inisial saja dari teks, deterministik.
+
+    Jaring pengaman gerbang subbab (job 228, Bab 3 subbab 3.1):
+    sesudah tulis ulang sekali masih ada inisial yang tidak bisa
+    diperbaiki pasti karena ambigu, dan subbab itu masih punya
+    sitasi snapshot sah, maka sitasi inisial itu dihapus saja,
+    daripada seluruh buku gagal. Return (teks_bersih,
+    inisial_dihapus) dengan inisial_dihapus list string sitasi
+    mentah yang dihapus, urut kemunculan pertama di teks awal.
+    Hanya string sitasi itu sendiri yang dihapus, kalimat dan
+    klaim tetap ada, sama seperti hapus_sitasi_luar. Fungsi ini
+    TIDAK memutuskan lolos atau gagal, pemanggil yang mengecek
+    ulang dengan periksa_subbab sesudah penghapusan.
+    """
+    teks = teks or ""
+    kemunculan = _SG.pindai_inisial(teks)
+    inisial_raw = []
+    for item in kemunculan:
+        raw = item.get("raw") or ""
+        if raw and raw not in inisial_raw:
+            inisial_raw.append(raw)
+    bersih = teks
+    for raw in inisial_raw:
+        bersih = bersih.replace(raw, "")
+    baris_bersih = []
+    for baris in bersih.split("\n"):
+        baris = re.sub(r"[ \t]{2,}", " ", baris)
+        baris = re.sub(r" \.([ \t]|$)", r".\1", baris)
+        baris = re.sub(r" ,([ \t]|$)", r",\1", baris)
+        baris_bersih.append(baris.strip(" \t"))
+    bersih = "\n".join(baris_bersih)
+    bersih = re.sub(r"\n{3,}", "\n\n", bersih)
+    inisial_urut = sorted(inisial_raw, key=lambda r: teks.find(r))
+    return bersih, inisial_urut
+
+
 def periksa_subbab(teks, rows, bab=None, subbab=None):
     """Periksa satu subbab terhadap snapshot bab itu.
 
