@@ -75,6 +75,152 @@ def urutkan_prioritas_sumber(daftar):
                   key=lambda item: prioritas_sumber(sumber_dari_item(item)))
 
 
+_KATA_HENTI_TEMA = {
+    'dan', 'atau', 'dengan', 'dari', 'untuk', 'dalam', 'yang', 'ini',
+    'ke', 'oleh', 'sebagai', 'antara', 'serta', 'tentang', 'pada',
+    'di', 'the', 'of', 'on', 'and', 'for', 'in', 'to', 'a', 'an',
+}
+
+# Kata yang ada di hampir semua judul bab buku ini: bukan pembeda tema,
+# jadi tidak dipakai sebagai kata tema (dipakai tetap di saringan inti
+# pustaka, bukan di sini).
+_KATA_GENERIK_BUKU = {
+    'umkm', 'usaha', 'mikro', 'kecil', 'menengah', 'sme', 'msme',
+    'digital', 'transformasi', 'transformation', 'ekonomi', 'economy',
+    'bisnis', 'business', 'skala', 'scale', 'lintas', 'dimensi',
+    'dimension', 'dimensions',
+}
+
+# Frasa inti buku: artikel yang memuat salah satunya dianggap cocok
+# untuk bab mana pun (literatur inti transformasi digital), tanpa
+# memandang kata tema bab.
+_FRASA_INTI = (
+    'digital transformation', 'transformasi digital',
+    'technology adoption', 'adopsi teknologi', 'digital adoption',
+    'adopsi digital', 'digital economy', 'ekonomi digital',
+    'digital maturity', 'digitalization', 'digitalisasi',
+)
+
+# Sinonim Inggris untuk kata tema Indonesia yang umum di judul bab.
+_SINONIM_TEMA = {
+    'strategi': {'strategy', 'strategic'},
+    'adopsi': {'adoption', 'adopt', 'adopting'},
+    'kinerja': {'performance'},
+    'dampak': {'impact', 'effect', 'effects', 'influence'},
+    'sintesis': {'synthesis', 'synthesizing'},
+    'integrasi': {'integration', 'integrated'},
+    'ekosistem': {'ecosystem'},
+    'kerangka': {'framework'},
+    'konseptual': {'conceptual'},
+    'lanskap': {'landscape'},
+    'batasan': {'limitation', 'limitations', 'boundary', 'boundaries'},
+    'teknologi': {'technology', 'technological'},
+    'informasi': {'information'},
+    'komunikasi': {'communication'},
+    'agenda': {'agenda'},
+    'riset': {'research'},
+    'mendatang': {'future'},
+    'global': {'global'},
+    'lokal': {'local'},
+    'berkembang': {'developing'},
+    'empiris': {'empirical'},
+    'keuangan': {'financial', 'finance'},
+    'metrik': {'metric', 'metrics'},
+    'nilai': {'value'},
+    'kematangan': {'maturity'},
+    'keselarasan': {'alignment'},
+    'determinan': {'determinant', 'determinants'},
+    'institusional': {'institutional'},
+    'individu': {'individual'},
+    'pemilik': {'owner', 'owners'},
+    'tekanan': {'pressure', 'pressures'},
+    'model': {'model'},
+    'penerimaan': {'acceptance'},
+    'keunggulan': {'advantage', 'competitive'},
+    'kompetitif': {'competitive'},
+    'operasional': {'operational', 'operations'},
+    'keberlanjutan': {'sustainability', 'sustainable'},
+    'kebijakan': {'policy', 'policies'},
+    'fasilitasi': {'facilitation'},
+    'pemerintah': {'government'},
+    'konvergensi': {'convergence'},
+    'manajemen': {'management'},
+    'sistem': {'system', 'systems'},
+    'pembangunan': {'development'},
+    'metodologis': {'methodological'},
+    'implikasi': {'implication', 'implications'},
+    'penelitian': {'research', 'study', 'studies'},
+    'kajian': {'study', 'studies', 'review'},
+    'teori': {'theory', 'theoretical'},
+    'pendekatan': {'approach', 'approaches'},
+    'perbandingan': {'comparison', 'comparative'},
+    'kritis': {'critical'},
+    'kontribusi': {'contribution'},
+    'teoretis': {'theoretical'},
+    'praktis': {'practical'},
+    'lingkup': {'scope'},
+    'ruang': {'scope'},
+}
+
+# Pola platform: artikel UMKM + platform digital (mis. e-commerce)
+# tetap cocok meski tanpa kata tema bab, karena itu bukti penerapan.
+_KATA_SME = ('umkm', 'sme', 'msme', 'usaha kecil', 'small medium')
+_KATA_PLATFORM = ('e-commerce', 'ecommerce', 'platform', 'online',
+                  'payment', 'pembayaran', 'system', 'sistem')
+
+
+def kata_tema(judul_bab):
+    """Kata tema dari judul bab: token isi minus kata henti dan kata
+    generik buku, plus sinonim Inggrisnya. Kosong bila judul hanya
+    berisi kata generik (saat itu saringan tema tidak dipakai)."""
+    import re as _re
+    teks = (judul_bab or '').lower()
+    # Frasa multi-kata dulu: 'ruang lingkup' -> 'scope', 'masa depan'
+    # -> 'future', 'negara berkembang' -> 'developing'.
+    tema = set()
+    if 'ruang lingkup' in teks:
+        tema.add('scope')
+    if 'masa depan' in teks:
+        tema.add('future')
+    if 'negara berkembang' in teks:
+        tema.add('developing')
+    for tok in _re.split(r'[^a-z]+', teks):
+        if len(tok) < 4:
+            continue
+        if tok in _KATA_HENTI_TEMA or tok in _KATA_GENERIK_BUKU:
+            continue
+        tema.add(tok)
+        tema.update(_SINONIM_TEMA.get(tok, ()))
+    return tema
+
+
+def cocok_tema(judul_artikel, judul_bab):
+    """True bila artikel cocok dengan tema bab ATAU literatur inti.
+
+    Cocok bila judul artikel memuat frasa inti, kata tema bab (atau
+    sinonimnya), atau pola SME + platform. Judul bab tanpa kata tema
+    (hanya kata generik) selalu cocok (fail-soft, saringan tidak
+    dipakai). Dipakai sebagai PREFERENSI urutan di pilih_seimbang,
+    bukan penghapus: artikel tidak cocok hanya turun urutan dan tetap
+    dipakai mengisi bila kandidat cocok tidak cukup mencapai total.
+    """
+    teks = (judul_artikel or '').lower()
+    if not teks.strip():
+        return False
+    for frasa in _FRASA_INTI:
+        if frasa in teks:
+            return True
+    tema = kata_tema(judul_bab)
+    if not tema:
+        return True
+    if any(k in teks for k in tema):
+        return True
+    if any(k in teks for k in _KATA_SME) \
+            and any(k in teks for k in _KATA_PLATFORM):
+        return True
+    return False
+
+
 def _identitas_default(item):
     """Identitas satu artikel untuk aturan artikel-berbeda-antar-bab.
 
@@ -153,7 +299,7 @@ def _pilih_dari_kelompok(kelompok, kuota, total, sudah, ambil_id):
 
 def pilih_seimbang(daftar, kuota=KUOTA_SEIMBANG_PER_SUMBER,
                    total=TOTAL_SEIMBANG, kunci=None, terpakai=None,
-                   identitas=None):
+                   identitas=None, cocok=None):
     """Pilih artikel seimbang dari daftar kandidat, stabil.
 
     daftar: list atau tuple item, dalam urutan asli. Bukan list atau
@@ -172,6 +318,12 @@ def pilih_seimbang(daftar, kuota=KUOTA_SEIMBANG_PER_SUMBER,
     belum terpakai tidak cukup mencapai total, supaya gerbang
     minimum 8 tidak berubah dan tidak ada artikel yang dikarang.
     Tanpa terpakai, perilaku sama persis seperti sebelumnya.
+    cocok: fungsi opsional item -> bool (cocok tema bab). Bila diisi,
+    di dalam tiap kelompok sumber, artikel yang cocok diurutkan dulu
+    (stabil), jadi kuota per sumber diambil dari artikel yang cocok
+    dulu dan artikel tidak cocok hanya mengisi kekurangan. Ini
+    PREFERENSI urutan, bukan penghapus: artikel tidak cocok tetap
+    dipakai bila kandidat cocok tidak cukup.
     identitas: fungsi opsional item -> identitas; tanpa itu dipakai
     _identitas_default (artikel_id untuk pasangan, DOI, lalu
     judul + tahun).
@@ -203,6 +355,18 @@ def pilih_seimbang(daftar, kuota=KUOTA_SEIMBANG_PER_SUMBER,
             except Exception:
                 nama = ''
             kelompok[prioritas_sumber(nama)].append(item)
+        if cocok is not None:
+            for angka in kelompok:
+                grp = kelompok[angka]
+                ya = []
+                tidak = []
+                for item in grp:
+                    try:
+                        ok = bool(cocok(item))
+                    except Exception:
+                        ok = True
+                    (ya if ok else tidak).append(item)
+                kelompok[angka] = ya + tidak
         return kelompok
 
     if not terpakai_set:

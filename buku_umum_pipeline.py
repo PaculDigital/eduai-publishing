@@ -2208,8 +2208,11 @@ def _refs_dari_harvest(bab_title, potong=True):
         # bisa diimpor.
         if potong:
             try:
-                from app.prioritas_sumber import pilih_seimbang as _pilih_seimbang
-                adapted = _pilih_seimbang(adapted)
+                from app.prioritas_sumber import pilih_seimbang as _pilih_seimbang, cocok_tema as _cocok_tema
+                adapted = _pilih_seimbang(
+                    adapted,
+                    cocok=lambda a: _cocok_tema(a.get('title') or '',
+                                                bab_title))
             except Exception:
                 _peta_seimbang = {'scopus': 0, 'openalex': 1,
                                   'crossref': 2, 'garuda': 3}

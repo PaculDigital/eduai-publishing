@@ -55,11 +55,14 @@ except ImportError:  # dipakai sebagai modul atas, bukan paket app
 
 try:
     from .prioritas_sumber import pilih_seimbang as _pilih_seimbang
+    from .prioritas_sumber import cocok_tema as _cocok_tema
 except ImportError:  # jalur cache tetap jalan urutan lama bila gagal
     try:
         from prioritas_sumber import pilih_seimbang as _pilih_seimbang
+        from prioritas_sumber import cocok_tema as _cocok_tema
     except ImportError:
         _pilih_seimbang = None
+        _cocok_tema = None
 
 MIN_REFERENSI_PER_BAB = 8
 CACHE_SEGAR_HARI = 365  # 12 bulan
@@ -588,9 +591,12 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None):
     # sudah terpilih untuk bab sebelumnya dihindari dulu oleh
     # pilih_seimbang (terpakai); kekurangan hanya diisi dari artikel
     # terpakai bila pool belum terpakai tidak cukup, supaya gerbang
-    # minimum 8 dan refund tidak berubah. Bab cache ikut fase ini
-    # dengan pool beku 8-nya, jadi ia tetap bisa menghindari artikel
-    # bab sebelumnya sejauh pool-nya memungkinkan, tanpa mengarang.
+    # minimum 8 dan refund tidak berubah. Di dalam tiap kelompok
+    # sumber, artikel yang cocok dengan tema bab (cocok_tema) dipilih
+    # dulu; artikel tidak cocok hanya mengisi kekurangan (preferensi,
+    # bukan penghapus). Bab cache ikut fase ini dengan pool beku
+    # 8-nya, jadi ia tetap bisa menghindari artikel bab sebelumnya
+    # sejauh pool-nya memungkinkan, tanpa mengarang.
     terpakai = set()
     for bab in babs:
         if bab not in pool_per_bab:
@@ -601,10 +607,15 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None):
         dipilih = pasangan
         if _pilih_seimbang is not None:
             try:
+                _cocok = None
+                if _cocok_tema is not None:
+                    _cocok = (lambda _p, _jb=judul_bab:
+                              _cocok_tema(_p[1].get('title') or '', _jb))
                 _hasil = _pilih_seimbang(
                     pasangan,
                     kunci=lambda _p: _p[0].get('sumber') or '',
-                    terpakai=terpakai)
+                    terpakai=terpakai,
+                    cocok=_cocok)
                 if _hasil:
                     dipilih = _hasil
             except Exception:
