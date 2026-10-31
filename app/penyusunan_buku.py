@@ -646,6 +646,174 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     if lapor:
                         lapor('Sitasi bab %s diperbaiki' % _n)
 
+        # ── PERBAIKAN MESIN BUKU (Gas Bos 31 Okt 2026 17:05) ───────────
+        #  Bukan perbaikan naskah: mesin sendiri yang memperbaiki 3 cacat
+        #  job 227 sebelum rakit, dalam urutan wajib: hapus sitasi luar
+        #  panen, lalu sisip cakupan sampai 8 dari 8, lalu tulis ulang
+        #  kalimat ganda, lalu cek ulang, baru rakit. Hanya buku
+        #  referensi dengan snapshot lengkap; bila snapshot tidak ada
+        #  (job lama), langkah ini dilewati dan jalur lama dipakai,
+        #  supaya job lama tidak rusak. Gagal bersih di sini raise di
+        #  dalam try susun(), sehingga except di bawah mengembalikan
+        #  token lewat jalur refund yang sudah ada.
+        _refs_kanonik = None
+        if kartu_jenis == 'buku-referensi':
+            try:
+                from . import pra_panen as _PP_pm
+                from . import perbaiki_mesin_buku as _PM
+                from . import sitasi_anti_gagal as _SG_pm
+                _rows_pm = {}
+                _rows_lengkap = True
+                for _n_pm in sorted(n for n in outline if isinstance(n, int)):
+                    try:
+                        _rows_pm[_n_pm] = _PP_pm.ambil_snapshot(
+                            db, _job_kode, _n_pm)
+                    except Exception:
+                        _rows_pm[_n_pm] = []
+                    if not _rows_pm[_n_pm]:
+                        _rows_lengkap = False
+                if not _rows_lengkap:
+                    if lapor:
+                        lapor('Perbaikan mesin dilewati: snapshot tidak lengkap')
+                else:
+                    _teks_pm = {}
+                    _path_pm = {}
+                    for _n_pm in sorted(_rows_pm):
+                        _p_pm = _path_bab(
+                            _n_pm, hasil['bab'].get(_n_pm)
+                            or hasil['bab'].get(str(_n_pm)) or {})
+                        if _p_pm:
+                            _path_pm[_n_pm] = _p_pm
+                            with open(_p_pm, encoding='utf-8') as _f_pm:
+                                _teks_pm[_n_pm] = _f_pm.read()
+                    _panggil_pm = None
+                    try:
+                        import buku_umum_pipeline as _P_pm
+                        _panggil_pm = lambda _prompt: _P_pm.call_llm(
+                            _prompt, max_tokens=800)
+                    except Exception:
+                        _panggil_pm = None
+                    _subs_pm = {}
+                    for _n_pm in sorted(_rows_pm):
+                        _subs_pm[_n_pm] = (outline.get(_n_pm) or {}).get('subs')
+                    _teks_pm_baru, _lap_pm = _PM.perbaiki_buku(
+                        _teks_pm, _rows_pm, _subs_pm, _panggil_pm)
+                    # Tulis kembali teks yang berubah, hitung ulang kata
+                    # dan sitasi dengan selisih formal, supaya angka di
+                    # hasil tetap cocok dengan berkas bab sesudah perbaikan.
+                    for _n_pm in sorted(_teks_pm_baru):
+                        if _teks_pm_baru[_n_pm] != _teks_pm.get(_n_pm, ''):
+                            with open(_path_pm[_n_pm], 'w',
+                                      encoding='utf-8') as _f_pm:
+                                _f_pm.write(_teks_pm_baru[_n_pm])
+                        _bab_hasil = (hasil['bab'].get(_n_pm)
+                                      or hasil['bab'].get(str(_n_pm)) or {})
+                        if _bab_hasil:
+                            _bab_hasil['kata'] = len(
+                                _teks_pm_baru[_n_pm].split())
+                            _delta_sit = (
+                                len(_SG_pm.ekstrak_sitasi_badan(
+                                    _teks_pm_baru[_n_pm]))
+                                - len(_SG_pm.ekstrak_sitasi_badan(
+                                    _teks_pm.get(_n_pm, ''))))
+                            _bab_hasil['sitasi'] = max(
+                                0, int(_bab_hasil.get('sitasi', 0)) + _delta_sit)
+                        _hapus_n = (_lap_pm['hapus_luar']
+                                    .get(_n_pm, {}).get('kemunculan', 0))
+                        _sisip_n = len(_lap_pm['sisip_cakupan'].get(_n_pm, []))
+                        _ganda_n = len([
+                            g for g in _lap_pm['ganda']['ditulis_ulang']
+                            if g.get('bab') == _n_pm])
+                        if lapor:
+                            lapor('Perbaikan mesin Bab %s: sitasi luar '
+                                  'dihapus %s, sisipan cakupan %s, kalimat '
+                                  'ganda ditulis ulang %s'
+                                  % (_n_pm, _hapus_n, _sisip_n, _ganda_n))
+                    hasil['perbaikan_mesin'] = {
+                        'hapus_luar': {
+                            str(k): v.get('dihapus', [])
+                            for k, v in _lap_pm['hapus_luar'].items()},
+                        'sisip_cakupan': _lap_pm['sisip_cakupan'],
+                        'ganda': _lap_pm['ganda'],
+                    }
+                    # Cek ulang: kalimat ganda tidak boleh tersisa, dan
+                    # cakupan harus 8 dari 8. Bila masih cacat, gagal
+                    # bersih, bukan rakit dengan cacat.
+                    if _lap_pm['ganda']['tidak_teratasi']:
+                        raise ValueError(
+                            'Kalimat ganda masih tersisa sesudah perbaikan '
+                            'mesin: %s' % (
+                                _lap_pm['ganda']['tidak_teratasi'][:2],))
+                    for _n_pm in sorted(_rows_pm):
+                        _cak_pm = _SG_pm.hitung_cakupan_kunci(
+                            _teks_pm_baru[_n_pm], _rows_pm[_n_pm])
+                        if _cak_pm['cocok_jumlah'] < _cak_pm['total']:
+                            raise _SG_pm.GagalSitasiBersih(
+                                nomor_bab=_n_pm,
+                                masalah=['cakupan masih %s dari %s sesudah '
+                                         'perbaikan mesin'
+                                         % (_cak_pm['cocok_jumlah'],
+                                            _cak_pm['total'])],
+                                cakupan=_cak_pm,
+                                detail_text=_SG_pm.detail_galat_sitasi(
+                                    _n_pm, _cak_pm))
+                    try:
+                        import mutu_isi_buku as _MI_pm
+                        _periksa_pm = _MI_pm.periksa_buku(
+                            _teks_pm_baru, outline)
+                        if any('DISALIN' in str(m)
+                               for m in _periksa_pm.get('masalah') or []):
+                            raise ValueError(
+                                'Kalimat ganda masih tersisa sesudah '
+                                'perbaikan mesin: %s'
+                                % (_periksa_pm['masalah'][:2],))
+                        hasil['mutu_masalah'] = _periksa_pm.get('masalah', [])
+                        hasil['mutu_curiga'] = _periksa_pm.get('curiga', [])
+                        hasil['mutu_lolos'] = _periksa_pm.get('lolos', True)
+                    except ValueError:
+                        raise
+                    except Exception:
+                        pass
+                    hasil['total_kata'] = sum(
+                        len(t.split()) for t in _teks_pm_baru.values())
+                    # Gerbang sitasi final diulang atas teks sesudah
+                    # perbaikan, supaya tidak ada inisial atau cakupan
+                    # yang lolos diam-diam dari langkah baru ini.
+                    for _n_pm in sorted(_rows_pm):
+                        _hasil_gate = _gate_sitasi_detailed(
+                            _n_pm, _teks_pm_baru[_n_pm],
+                            _rows_pm[_n_pm], [])
+                        if _hasil_gate['teks_baru'] != _teks_pm_baru[_n_pm]:
+                            with open(_path_pm[_n_pm], 'w',
+                                      encoding='utf-8') as _f_pm:
+                                _f_pm.write(_hasil_gate['teks_baru'])
+                            _teks_pm_baru[_n_pm] = _hasil_gate['teks_baru']
+                    _refs_kanonik, _lap_pus = _PM.pustaka_kanonik(
+                        _teks_pm_baru, _rows_pm)
+                    if _lap_pus.get('tanpa_judul'):
+                        raise _SG_pm.GagalSitasiBersih(
+                            masalah=['pustaka tanpa judul di database: %s'
+                                     % (_lap_pus['tanpa_judul'][:5],)],
+                            detail_text=(
+                                'Maaf, buku belum berhasil dibuat. Token '
+                                'sudah kembali ke saldo. (pustaka tanpa '
+                                'judul: %s)'
+                                % (', '.join(_lap_pus['tanpa_judul'][:5]),)))
+            except Exception as _e_pm:
+                # Hanya modul baru yang hilang yang dilewati dengan
+                # jalur lama (image lama tanpa modul ini). Gagal bersih
+                # (ValueError / GagalSitasiBersih) dan gagal tak terduga
+                # lainnya diteruskan, supaya token kembali lewat
+                # except susun(), bukan merakit buku dengan cacat yang
+                # disembunyikan oleh jalan pintas.
+                if isinstance(_e_pm, ImportError):
+                    if lapor:
+                        lapor('Perbaikan mesin dilewati: %s: %s'
+                              % (type(_e_pm).__name__, _e_pm))
+                    _refs_kanonik = None
+                else:
+                    raise
+
         # ── RAKIT SATU .docx (ACC Bos 19 Okt 2026, opsi B) ────────────────
         #  Tanpa ini hasilnya cuma berkas bab terpisah — tidak bisa dibuka di
         #  OnlyOffice. Mesin assembly SUDAH ADA; ini PEMASANGAN, bukan mesin
@@ -687,7 +855,15 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                 if _p_bab2:
                     with open(_p_bab2, encoding='utf-8') as _f2:
                         _teks_per_bab[_n] = _f2.read()
-            refs_rakit = _SG.gabung_pustaka(_teks_per_bab, refs_rakit or [])
+            if _refs_kanonik is not None:
+                # Perbaikan mesin 31 Okt 17:05: pustaka kanonik dari
+                # snapshot job itu, satu artikel satu entri lengkap,
+                # tanpa placeholder. Jalur lama gabung_pustaka hanya
+                # dipakai bila perbaikan mesin dilewati (snapshot
+                # tidak lengkap atau modul tidak ada).
+                refs_rakit = list(_refs_kanonik)
+            else:
+                refs_rakit = _SG.gabung_pustaka(_teks_per_bab, refs_rakit or [])
         _peta_sumber = None
         if kartu_jenis == 'buku-referensi':
             _peta_sumber = _peta_sumber_pustaka(db, _job_kode, outline)
