@@ -573,6 +573,13 @@ ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
   'Penulis berpendirian'. Tanpa frasa itu = bab gagal.
 - Satu unit argumen (satu perbandingan atau satu posisi) TIDAK BOLEH
   terpotong: tulis utuh dalam sub-bab ini.
+- KEDALAMAN SITASI (WAJIB): Setiap referensi dalam daftar WAJIB
+  dibahas substansial minimal satu kali di bab ini: jelaskan
+  temuan, metode, atau argumennya dalam minimal satu kalimat
+  utuh, bukan hanya disebut dalam kurung. Referensi yang sama
+  TIDAK BOLEH diulang di sub-bab lain dengan klaim yang sama
+  persis; bila disebut lagi, harus dengan sudut atau bukti
+  yang berbeda.
 - Akhiri sub-bab dengan blok [ISTILAH BARU] — WAJIB di setiap sub-bab,
   bukan opsional. Satu baris per istilah yang DIDEFINISIKAN di sub-bab
   ini (bukan istilah yang hanya disebut): 'Istilah: definisi operasional

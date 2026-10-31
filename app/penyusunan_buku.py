@@ -734,6 +734,14 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                         'sisip_cakupan': _lap_pm['sisip_cakupan'],
                         'ganda': _lap_pm['ganda'],
                     }
+                    # Paket sempurna item 3: ukur kedalaman sitasi
+                    # dari teks final. Laporan saja di hasil_json,
+                    # TIDAK memblokir perakitan bila dangkal/refrain.
+                    try:
+                        hasil['kedalaman'] = _SG_pm.ukur_kedalaman(
+                            _teks_pm_baru, _rows_pm)
+                    except Exception as _e_ked:
+                        hasil['kedalaman'] = {'gagal': repr(_e_ked)[:200]}
                     # Cek ulang: kalimat ganda tidak boleh tersisa, dan
                     # cakupan harus 8 dari 8. Bila masih cacat, gagal
                     # bersih, bukan rakit dengan cacat.
