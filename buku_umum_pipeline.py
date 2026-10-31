@@ -596,6 +596,22 @@ ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
   berakhir di baris kosong, tanpa penutup.
   Tanpa blok ini = sub-bab tidak lengkap.
 """
+        # Paket sempurna item 4: nada referensi. Sub-bab Implikasi
+        # boleh menyapa pembaca; Definisi/Perkembangan/Perbandingan/
+        # Posisi ditulis formal orang ketiga, tanpa sapaan perintah.
+        if 'implikasi' in (sub_title or '').lower():
+            aturan_referensi += (
+                '\nNADA REFERENSI: Sub-bab Implikasi boleh menyapa '
+                'pembaca secara langsung bila itu memperjelas tindakan '
+                'yang disarankan.\n')
+        else:
+            aturan_referensi += (
+                '\nNADA REFERENSI (WAJIB): Sub-bab ini ditulis dalam '
+                'nada ilmiah formal orang ketiga. DILARANG sapaan '
+                'perintah kepada pembaca seperti \'Anda perlu\', '
+                '\'Anda dapat\', \'Anda harus\', dan bentuk perintah '
+                'langsung lainnya. Jelaskan, bandingkan, dan simpulkan '
+                'tanpa memerintah pembaca.\n')
         aturan_ringkasan = (
             'Tulis section "Ringkasan Bab" FORMAL dalam poin-poin substansi '
             '(bukan paragraf mengalir)')

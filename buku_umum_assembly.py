@@ -549,24 +549,100 @@ def add_isbn_page(doc):
     doc.add_page_break()
 
 
-def add_kata_pengantar(doc, judul, penulis, institusi):
+def _tesis_bab_akhir(teks_bab_akhir):
+    """Ambil isi sub-bab N.4 Posisi/Sintesis dari bab sintesis terakhir.
+
+    Dipakai Kata Pengantar spesifik (paket sempurna item 4): pengantar
+    ditulis dari tesis nyata buku ini, bukan templat generik. Return ''
+    bila tidak ditemukan (pemanggil pakai templat lama, fail-soft).
+    Judul sub-bab boleh berawalan '###' (penanda sub_heading) atau
+    polos; penanda tabel/diagram dibuang dari kutipan tesis.
+    """
+    import re as _re
+    baris = (teks_bab_akhir or '').split('\n')
+    mulai = None
+    akhir = None
+    for i, b in enumerate(baris):
+        s = _re.sub(r'^#+\s*', '', b.strip())
+        if mulai is None:
+            if _re.match(r'^\d+\.4\b', s) and (
+                    'posisi' in s.lower() or 'sintesis' in s.lower()):
+                mulai = i
+            continue
+        if _re.match(r'^\d+\.5\b', s) \
+                or s.lower().startswith('ringkasan bab'):
+            akhir = i
+            break
+    if mulai is None:
+        return ''
+    isi = '\n'.join(baris[mulai + 1:akhir]).strip()
+    isi = _re.sub(r'\[TABEL[^\]]*\]', '', isi)
+    isi = _re.sub(r'\[DIAGRAM[^\]]*\]', '', isi)
+    return isi.strip()[:2500]
+
+
+def add_kata_pengantar(doc, judul, penulis, institusi,
+                           bab_akhir_teks=None, struktur_bab=None):
     """Kata Pengantar — MENGIKUTI JUDUL BUKU, bukan buku contoh.
 
     🚨 JEBAKAN TERUKUR 19 Okt 2026: versi lama menulis pengantar mati tentang
        "ekonomi digital". Buku berjudul "Petualangan di Laut" keluar dengan
        pengantar ekonomi digital ⇒ gerbang assembly menangkapnya (1 GAGAL).
+
+    Paket sempurna item 4 (Gas Bos 31 Okt 2026 malam): bila teks bab
+    akhir dan struktur bab diberikan, pengantar ditulis LLM dari tesis
+    nyata sub-bab N.4 bab terakhir (spesifik, bukan templat). Gagal
+    apa pun (tesis tidak ditemukan, LLM gagal, hasil terlalu pendek)
+    -> templat lama, supaya perakitan tidak pernah gagal karena
+    pengantar.
     """
     add_para(doc, "KATA PENGANTAR", size=Pt(16), bold=True, align='center', space_before=12, space_after=12, keep_next=True)
 
     judul_bersih = (judul or 'buku ini').strip() or 'buku ini'
-    pengantar = f"""Buku ini disusun untuk memberi pembaca pemahaman yang utuh tentang {judul_bersih}. Banyak pembaca mengenal topiknya sekilas, tetapi belum sempat memahaminya secara berurutan, dari dasar, ke penerapan, sampai ke hal yang sering ditanyakan.
+    pengantar = None
+    if bab_akhir_teks and struktur_bab:
+        try:
+            _tesis = _tesis_bab_akhir(bab_akhir_teks)
+            if len(_tesis) >= 200:
+                from buku_umum_pipeline import call_llm as _panggil
+                _struktur = '; '.join(struktur_bab)
+                _prompt = (
+                    'Tulis Kata Pengantar untuk buku referensi berjudul '
+                    f'"{judul_bersih}".\n'
+                    f'Struktur bab buku ini: {_struktur}.\n'
+                    f'Tesis utama penulis dari bab sintesis terakhir: '
+                    f'"{_tesis}".\n'
+                    'Aturan: tepat 3 paragraf. Nada ilmiah formal atas '
+                    'nama penulis. Paragraf pertama: pertanyaan utama '
+                    'yang dijawab buku ini dan mengapa penting. Paragraf '
+                    'kedua: posisi/tesis utama penulis (dari kutipan '
+                    'tesis di atas, jangan menambah tesis baru) dan '
+                    'bagaimana bab-bab mendukungnya. Paragraf ketiga: '
+                    'pembaca yang dituju dan manfaat konkret buku ini. '
+                    'DILARANG: kalimat templat generik seperti "setiap '
+                    'bab disusun mengalir", "dari dasar ke penerapan", '
+                    '"tanpa merasa sedang membaca pelajaran yang berat". '
+                    'Jangan menulis judul bab secara generik; setiap '
+                    'paragraf harus merujuk isi nyata buku ini. '
+                    'Keluaran hanya teks pengantar, tanpa judul, tanpa '
+                    'salam pembuka atau penutup.')
+                _hasil = _panggil(_prompt, max_tokens=1500, timeout=120)
+                _hasil = (_hasil or '').strip()
+                if len(_hasil) >= 400 and '\n' in _hasil:
+                    pengantar = _hasil
+        except Exception:
+            pengantar = None
+    if pengantar is None:
+        pengantar = f"""Buku ini disusun untuk memberi pembaca pemahaman yang utuh tentang {judul_bersih}. Banyak pembaca mengenal topiknya sekilas, tetapi belum sempat memahaminya secara berurutan, dari dasar, ke penerapan, sampai ke hal yang sering ditanyakan.
 
 Karena itu, setiap bab disusun mengalir dan saling menyambung. Penjelasan dimulai dari hal yang paling dekat dengan pengalaman pembaca, lalu bertahap menuju gagasan yang lebih dalam. Setiap istilah penting dijelaskan saat pertama kali muncul, sehingga pembaca tidak perlu berhenti untuk membuka kamus.
 
 Buku ini ditujukan bagi siapa pun yang ingin memahami {judul_bersih} tanpa merasa sedang membaca pelajaran yang berat. Semoga buku ini bermanfaat dan menemani pembaca memahami topiknya dengan lebih percaya diri. Selamat membaca."""
 
-    for para in pengantar.split('\n\n'):
-        add_para(doc, para.strip(), align='justify', space_after=10)
+    for para in pengantar.split('\n'):
+        para = para.strip()
+        if para:
+            add_para(doc, para, align='justify', space_after=10)
 
     add_para(doc, "", space_after=20)
     add_para(doc, f"{penulis}", align='right', space_after=6)
@@ -1585,8 +1661,18 @@ def rakit(judul, keluar_dir, outline, glosarium=None, references=None,
             doc.add_page_break()
 
         add_isbn_page(doc)
+        _bab_akhir_teks = None
+        try:
+            _n_akhir = max(ada)
+            with open(ada[_n_akhir], encoding='utf-8') as _f_akhir:
+                _bab_akhir_teks = _f_akhir.read()
+        except Exception:
+            _bab_akhir_teks = None
         add_kata_pengantar(doc, BUKU['judul'], BUKU['penulis'],
-                           BUKU['institusi'])
+                           BUKU['institusi'],
+                           bab_akhir_teks=_bab_akhir_teks,
+                           struktur_bab=[outline[n]['title']
+                                         for n in sorted(ada)])
         #  Daftar isi HANYA bab yang benar-benar dirakit — supaya nomor bab
         #  di daftar isi tidak menunjuk bab yang tidak ada.
         add_daftar_isi(doc, {n: outline[n] for n in sorted(ada)})
