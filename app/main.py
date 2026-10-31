@@ -372,6 +372,7 @@ def buku_outline(
     penelaah: str = Form(''),
     jumlah_bab: str = Form(''),
     tier: str = Form(''),
+    bidang: str = Form(''),
     db: Session = Depends(get_db),
 ):
     """Gate 1 buku referensi: bangun kerangka GRATIS, tampilkan untuk disetujui.
@@ -423,9 +424,17 @@ def buku_outline(
         pass  # tanpa OB, validasi menyusul di susun()
     from . import referensi_pesanan as _RP
     token = _RP.simpan_outline_pending(outline, tier=tier_nama)
+    # Gas 31 Okt 2026 12:03, butir 5: bidang dibawa dari siapkan ke
+    # kerangka, supaya Setuju nanti membawanya ke susun dan panen
+    # menerima bidang tidak kosong. Isi outline TIDAK diubah di
+    # sini (susun_outline tetap dipanggil dengan bidang kosong,
+    # seperti dulu), hanya nilai bidang yang diteruskan lewat
+    # konteks template dan URL kembali, supaya Gate 1 tidak berubah.
+    bidang = (bidang or '').strip()
     kembali = '/buku/siapkan?' + urlencode({
         'jenis': jenis, 'gaya': 'referensi', 'judul': judul,
-        'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml, 'tier': tier_nama})
+        'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml, 'tier': tier_nama,
+        'bidang': bidang})
     #  ⚠️ `susun_outline()` menyisipkan kunci META bertipe teks
     #  ('_judul', '_bidang', '_jenis', '_sumber') ke dalam dict yang kuncinya
     #  angka bab. `sorted()` atas campuran str+int melempar
@@ -447,7 +456,7 @@ def buku_outline(
         'request': request, 'user': u, 'kartu': kartu,
         'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
         'jumlah_bab': jml, 'tier': tier_nama, 'token': token, 'kembali': kembali,
-        'babs': babs, 'cek': _cek_outline,
+        'babs': babs, 'cek': _cek_outline, 'bidang': bidang,
         'risiko_level': _risiko_level, 'risiko_alasan': _risiko_alasan,
         **_kartu_status_server(),
     })
@@ -492,6 +501,9 @@ async def buku_outline_simpan(
     judul = (form.get('judul') or '').strip()
     penulis = (form.get('penulis') or '').strip()
     penelaah = (form.get('penelaah') or '').strip()
+    # Gas 31 Okt 2026 12:03, butir 5: bidang diteruskan lewat edit
+    # kerangka, supaya tidak hilang sesudah simpan perubahan.
+    bidang_simpan = (form.get('bidang') or '').strip()
     try:
         jml_form = int(form.get('jumlah_bab') or 0)
     except ValueError:
@@ -537,7 +549,7 @@ async def buku_outline_simpan(
     kembali = '/buku/siapkan?' + urlencode({
         'jenis': 'buku-referensi', 'gaya': 'referensi', 'judul': judul,
         'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': len(outline_baru),
-        'tier': tier_nama or ''})
+        'tier': tier_nama or '', 'bidang': bidang_simpan})
     babs = sorted(outline_baru.items(), key=lambda x: x[0])
     if masalah:
         # Gagal: pending lama UTUH, edit ditampilkan lagi, Setuju sembunyi.
@@ -547,6 +559,7 @@ async def buku_outline_simpan(
             'jumlah_bab': len(outline_baru), 'tier': tier_nama or '', 'token': token_lama,
             'kembali': kembali, 'babs': babs, 'cek': cek_tampil,
             'risiko_level': risiko_level, 'risiko_alasan': risiko_alasan,
+            'bidang': bidang_simpan,
             **_kartu_status_server(),
             'edit_pesan': 'Perubahan belum tersimpan. Perbaiki alasan di atas, lalu simpan lagi.',
         })
@@ -558,6 +571,7 @@ async def buku_outline_simpan(
         'jumlah_bab': len(outline_baru), 'tier': tier_nama or '', 'token': token_baru,
         'kembali': kembali, 'babs': babs, 'cek': cek_tampil,
         'risiko_level': risiko_level, 'risiko_alasan': risiko_alasan,
+        'bidang': bidang_simpan,
         **_kartu_status_server(),
         'edit_pesan': 'Kerangka diperbarui. Silakan periksa lagi sebelum menekan Setuju.',
     })

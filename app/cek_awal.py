@@ -15,6 +15,12 @@ Isi:
   3. periksa_bab_awal(n, teks, folder_bab, outline_bab): cek BARU per bab
      (tabel R3, posisi R4, surname R2). Cek kata/sitasi/bentuk sudah di
      Lapisan 1 (mutu_isi_buku) dan TIDAK diulang di sini.
+     Gas 31 Okt 2026 12:03, butir 4: bila snapshot_rows dioper,
+     R2 dihitung per baris snapshot (kunci atau alias, tahun sama),
+     sama dengan gerbang final, bukan per kata surname yang
+     membengkak jadi 15 untuk 8 referensi. Tanpa snapshot_rows,
+     metode kata lama dipertahankan untuk pemanggil lama dan uji
+     lama yang memakai refs_babN.json.
   4. gerbang_dengan_perbaikan(gate_fn, repair_fn, lapor): gerbang gagal
      pada hal deterministik -> perbaikan sekali -> gerbang ulang -> baru
      gagal. Tanpa ini, buku yang sebenarnya bisa diselamatkan ikut
@@ -167,13 +173,19 @@ def _refs_dari_json(data):
     return []
 
 
-def periksa_bab_awal(n, teks, folder_bab, outline_bab=None):
+def periksa_bab_awal(n, teks, folder_bab, outline_bab=None,
+                     snapshot_rows=None):
     """Cek BARU per bab (di luar Lapisan 1). Return {'masalah', 'curiga'}.
 
     Semua string diawali 'BAB {n}: ' supaya bab_bermasalah() Lapisan 1
     membacanya dan putaran perbaikan ikut memperbaiki bab ini.
     Tidak pernah raise: berkas tak terbaca = curiga, bukan crash.
     outline_bab diterima untuk perluasan; cakupan sub sudah di Lapisan 1.
+    snapshot_rows (None bila tidak ada): list dict {kunci, alias,
+    tahun} dari DB. Bila dioper dan tidak kosong, R2 memakai metrik
+    baris snapshot gerbang final. Bila dioper kosong eksplisit,
+    diperlakukan tidak ada referensi (curiga), bukan lolos diam.
+    Bila None, metode kata lama dari refs_babN.json dipakai.
     """
     masalah, curiga = [], []
     teks = teks or ''
@@ -210,30 +222,85 @@ def periksa_bab_awal(n, teks, folder_bab, outline_bab=None):
             f'BAB {n}: kalimat posisi penulis terlalu pendek '
             f'({len(kalimat_posisi.split())} kata)')
     # R2: surname referensi bab ini cocok dengan sitasi di badan bab ini.
-    refs_path = os.path.join(visual, f'refs_bab{n}.json')
-    try:
-        refs = _refs_dari_json(_baca_json(refs_path))
-    except Exception:
-        refs = None
-    if refs is None:
-        curiga.append(f'BAB {n}: berkas referensi bab tidak terbaca')
-    elif not refs:
-        curiga.append(f'BAB {n}: tidak ada referensi (indeks nama kosong)')
-    else:
-        kandidat = _RI.kumpulkan_nama(refs)
-        cocok = 0
-        for cand in kandidat:
-            if re.search(r'\b' + re.escape(cand) + r'\b', teks,
-                         re.IGNORECASE):
-                cocok += 1
-        if kandidat and cocok == 0:
-            masalah.append(
-                f'BAB {n}: 0 dari {len(kandidat)} surname referensi cocok '
-                f'dengan sitasi di badan (prediksi R2 kosong)')
-        elif kandidat and cocok < len(kandidat):
+    # Jalur snapshot (Gas 31 Okt 2026 12:03, butir 4): hitung per
+    # baris snapshot, bukan per kata surname, supaya tidak ada lagi
+    # 7 dari 15 yang membingungkan untuk 8 referensi. Impor di dalam
+    # fungsi dengan fallback ke metode lama bila impor gagal, supaya
+    # cek ini tidak pernah crash hanya karena satu modul hilang.
+    if snapshot_rows is not None:
+        if not snapshot_rows:
             curiga.append(
-                f'BAB {n}: hanya {cocok} dari {len(kandidat)} surname '
-                f'cocok dengan sitasi di badan')
+                f'BAB {n}: tidak ada baris snapshot referensi '
+                f'(indeks nama kosong)')
+        else:
+            cakupan = None
+            try:
+                from . import sitasi_anti_gagal as _SG
+                cakupan = _SG.hitung_cakupan_kunci(teks, snapshot_rows)
+            except Exception:
+                cakupan = None
+            if cakupan is not None:
+                total = cakupan["total"]
+                cocok = cakupan["cocok_jumlah"]
+                if cocok == 0:
+                    masalah.append(
+                        f'BAB {n}: 0 dari {total} baris snapshot cocok '
+                        f'dengan sitasi di badan (prediksi R2 kosong)')
+                elif cocok < total:
+                    curiga.append(
+                        f'BAB {n}: hanya {cocok} dari {total} baris '
+                        f'snapshot cocok dengan sitasi di badan')
+            else:
+                # Fallback ke metode kata lama bila gerbang final
+                # tidak bisa diimpor, dengan refs dari JSON bila ada.
+                refs_path = os.path.join(visual, f'refs_bab{n}.json')
+                try:
+                    refs = _refs_dari_json(_baca_json(refs_path))
+                except Exception:
+                    refs = None
+                if refs:
+                    kandidat = _RI.kumpulkan_nama(refs)
+                    cocok = 0
+                    for cand in kandidat:
+                        if re.search(r'\b' + re.escape(cand) + r'\b',
+                                     teks, re.IGNORECASE):
+                            cocok += 1
+                    if kandidat and cocok == 0:
+                        masalah.append(
+                            f'BAB {n}: 0 dari {len(kandidat)} surname '
+                            f'referensi cocok dengan sitasi di badan '
+                            f'(prediksi R2 kosong)')
+                    elif kandidat and cocok < len(kandidat):
+                        curiga.append(
+                            f'BAB {n}: hanya {cocok} dari '
+                            f'{len(kandidat)} surname cocok dengan '
+                            f'sitasi di badan')
+    else:
+        refs_path = os.path.join(visual, f'refs_bab{n}.json')
+        try:
+            refs = _refs_dari_json(_baca_json(refs_path))
+        except Exception:
+            refs = None
+        if refs is None:
+            curiga.append(f'BAB {n}: berkas referensi bab tidak terbaca')
+        elif not refs:
+            curiga.append(
+                f'BAB {n}: tidak ada referensi (indeks nama kosong)')
+        else:
+            kandidat = _RI.kumpulkan_nama(refs)
+            cocok = 0
+            for cand in kandidat:
+                if re.search(r'\b' + re.escape(cand) + r'\b', teks,
+                             re.IGNORECASE):
+                    cocok += 1
+            if kandidat and cocok == 0:
+                masalah.append(
+                    f'BAB {n}: 0 dari {len(kandidat)} surname referensi '
+                    f'cocok dengan sitasi di badan (prediksi R2 kosong)')
+            elif kandidat and cocok < len(kandidat):
+                curiga.append(
+                    f'BAB {n}: hanya {cocok} dari {len(kandidat)} surname '
+                    f'cocok dengan sitasi di badan')
     return {'masalah': masalah, 'curiga': curiga}
 
 

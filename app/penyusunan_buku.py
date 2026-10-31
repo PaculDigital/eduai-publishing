@@ -411,21 +411,51 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
             from . import pra_panen as _PP
             _refs_holder['refs'] = _PP.panen_semua(
                 db, _job_kode, bidang, outline, lapor=lapor)
+            # Gas 31 Okt 2026 12:03, butir 1: baris snapshot per bab
+            # dibaca dari DB sesudah panen dan dibekukan di holder,
+            # supaya penulis membaca daftar yang sama dengan gerbang
+            # final, bukan daftar yang berubah selama menulis.
+            # Gagal baca di sini tidak menggagalkan panen, pipeline
+            # menurunkan baris dari refs bila holder kosong.
+            try:
+                _snapshot_rows = {}
+                for _n_snap in (n for n in outline
+                                if isinstance(n, int)):
+                    _snapshot_rows[_n_snap] = _PP.ambil_snapshot(
+                        db, _job_kode, _n_snap)
+                _refs_holder['snapshot_rows'] = _snapshot_rows
+            except Exception:
+                _refs_holder['snapshot_rows'] = {}
 
         if lapor:
             lapor(f"Menulis {len([k for k in outline if isinstance(k, int)])} bab…")
         #  Cek awal point 3 (30 Okt 2026): tiap bab dicek saat hasilnya
         #  terkumpul (hanya cek BARU R3/R4/surname; cek kata/sitasi/
-        #  bentuk sudah di Lapisan 1). Hasilnya dipakai Lapisan 3c
-        #  (repair) + dilapor langsung; gagal cek TIDAK menggagalkan
-        #  buku di sini, gerbang final yang memutuskan.
+        #  bentuk sudah di Lapisan 1). Hasilnya dipakai perbaikan
+        #  bedah struktural + dilapor langsung; gagal cek TIDAK
+        #  menggagalkan buku di sini, gerbang final yang memutuskan.
         def _cek_bab(n, teks, folder_bab):
             try:
                 from . import cek_awal as _CA_bab
                 #  Penjaga None A1: teks None diperlakukan sebagai teks
                 #  kosong oleh cek, bukan crash .split() di jalur cek.
+                #  Gas 31 Okt 2026 12:03, butir 4: buku-referensi
+                #  mengoper baris snapshot bab itu, supaya metrik
+                #  cek per bab sama dengan gerbang final (per baris
+                #  snapshot, bukan per kata surname). Gagal baca
+                #  snapshot jatuh ke None, metode kata lama dipakai,
+                #  cek tidak pernah crash karena snapshot.
+                _snapshot_rows_cek = None
+                if _is_referensi:
+                    try:
+                        from . import pra_panen as _PP_cek
+                        _snapshot_rows_cek = _PP_cek.ambil_snapshot(
+                            db, _job_kode, n)
+                    except Exception:
+                        _snapshot_rows_cek = None
                 hasil_cek = _CA_bab.periksa_bab_awal(
-                    n, teks or '', folder_bab, outline.get(n))
+                    n, teks or '', folder_bab, outline.get(n),
+                    snapshot_rows=_snapshot_rows_cek)
                 if lapor:
                     for _m in hasil_cek['masalah']:
                         lapor(f'Cek awal {_m}')
@@ -535,6 +565,34 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
         if kartu_jenis == 'buku-referensi':
             import json as _json_sg
             from . import sitasi_anti_gagal as _SG
+
+            def _gate_sitasi_detailed(n, teks_bab, rows_snap, refs_bab):
+                # Gas 31 Okt 2026 12:03, butir 3: gerbang di bawah
+                # sudah mencetak [GERBANG-SITASI] ke log sebelum
+                # raise, jadi di sini tidak ada print lagi. Yang
+                # dibungkus di sini adalah galat DB: GagalSitasi
+                # default hanya memuat pesan umum, pembungkus ini
+                # membangun galat detail (nomor bab, cakupan
+                # pembilang dan penyebut, sitasi snapshot, pesan
+                # manusia plus Token sudah kembali), supaya
+                # proses.tandai_gagal menyimpan rincian itu di DB
+                # dan pekerja proses mencatatnya di log.
+                try:
+                    if rows_snap:
+                        return _SG.periksa_dan_perbaiki_bab_snapshot(
+                            n, teks_bab, rows_snap, gagal_keras=True)
+                    return _SG.periksa_dan_perbaiki_bab(
+                        n, teks_bab, refs_bab, panggil_llm=None,
+                        gagal_keras=True)
+                except _SG.GagalSitasiBersih as _e_sg:
+                    _detail = _SG.detail_galat_sitasi(
+                        n, _e_sg.cakupan)
+                    raise _SG.GagalSitasiBersih(
+                        nomor_bab=n, masalah=_e_sg.masalah,
+                        inisial_tersisa=_e_sg.inisial_tersisa,
+                        cakupan=_e_sg.cakupan,
+                        detail_text=_detail) from _e_sg
+
             for _n in sorted(n for n in outline if isinstance(n, int)):
                 _p_bab = _path_bab(
                     _n, hasil['bab'].get(_n) or hasil['bab'].get(str(_n)) or {})
@@ -553,8 +611,8 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                 except Exception:
                     _rows_snap = []
                 if _rows_snap:
-                    _hasil_sg = _SG.periksa_dan_perbaiki_bab_snapshot(
-                        _n, _teks_bab, _rows_snap, gagal_keras=True)
+                    _hasil_sg = _gate_sitasi_detailed(
+                        _n, _teks_bab, _rows_snap, [])
                     if _hasil_sg['teks_baru'] != _teks_bab:
                         with open(_p_bab, 'w', encoding='utf-8') as _f:
                             _f.write(_hasil_sg['teks_baru'])
@@ -579,9 +637,8 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     if _coba:
                         _refs_bab = _coba
                         break
-                _hasil_sg = _SG.periksa_dan_perbaiki_bab(
-                    _n, _teks_bab, _refs_bab, panggil_llm=None,
-                    gagal_keras=True)
+                _hasil_sg = _gate_sitasi_detailed(
+                    _n, _teks_bab, [], _refs_bab)
                 if _hasil_sg['teks_baru'] != _teks_bab:
                     with open(_p_bab, 'w', encoding='utf-8') as _f:
                         _f.write(_hasil_sg['teks_baru'])

@@ -49,10 +49,136 @@ try:
     _BATAS_BAB = min(8, max(1, int(os.environ.get('EDUAI_BAB_PARALEL', '4') or 4)))
 except (TypeError, ValueError):
     _BATAS_BAB = 4
-#  Perbaikan-otomatis bab bermasalah (Lapis 3c-2, ACC Bos 19 Okt 2026).
-#  MAKSIMAL 1 putaran per bab: cukup untuk memperbaiki isi berulang, tapi
-#  TIDAK boleh berputar sampai token user habis.
-_PERBAIKAN_MAKS = 1
+#  Perbaikan bedah struktural (Gas Bos 31 Okt 2026 12:03, butir 2).
+#  Lapis 3c-2 lama (tulis ulang penuh satu bab, ACC Bos 19 Okt 2026)
+#  DIHAPUS di Gas ini: bukti job 224, 5 dari 5 tulis ulang dibuang,
+#  40 sampai 50 menit terbuang, isi bab tidak berubah. Penggantinya
+#  adalah sisipan kecil SEKALI per celah struktural (tabel R3 atau
+#  posisi R4), dicek deterministik, gagal cek berarti sisipan
+#  dibuang dan bab lama dipertahankan, tanpa putaran kedua.
+#  MAKSIMAL 1 sisipan per jenis celah per bab.
+_BEDAH_MAKS = 1
+
+#  Frasa posisi penulis, SAMA dengan app/cek_awal._FRASA_POSISI.
+#  Diduplikasi di modul root ini supaya modul ini tidak bergantung
+#  pada paket app, yang bisa tidak ada di sys.path saat gerbang
+#  uji berjalan. Bila cek_awal mengubah daftarnya, daftar ini wajib
+#  disamakan lagi.
+_FRASA_POSISI = (
+    'posisi penulis',
+    'sintesis penulis',
+    'penulis berpendapat',
+    'penulis menilai',
+    'penulis menyimpulkan',
+    'penulis menegaskan',
+    'menurut penulis',
+    'pandangan penulis',
+)
+
+
+def _cek_sisipan_tabel(sisipan):
+    """Cek deterministik sisipan tabel komparasi.
+
+    Format tabel bab yang sudah ada: [TABEL N.1: Judul - Kolom
+    A, Kolom B | Baris1: ... | Baris2: ... | Baris3: ...].
+    Lolos bila memuat penanda [TABEL, pemisah pipa, dan minimal
+    3 kemunculan Baris. Tanpa ketiganya, sisipan dibuang.
+    """
+    if not isinstance(sisipan, str) or not sisipan.strip():
+        return False
+    return ('[TABEL' in sisipan and '|' in sisipan
+            and sisipan.count('Baris') >= 3)
+
+
+def _cek_sisipan_posisi(sisipan):
+    """Cek deterministik sisipan kalimat posisi penulis.
+
+    Lolos bila memuat satu frasa posisi dari daftar cek_awal dan
+    minimal 10 kata, sama dengan syarat R4 gerbang final. Tanpa
+    keduanya, sisipan dibuang.
+    """
+    if not isinstance(sisipan, str) or not sisipan.strip():
+        return False
+    rendah = sisipan.lower()
+    if not any(frasa in rendah for frasa in _FRASA_POSISI):
+        return False
+    return len(sisipan.split()) >= 10
+
+
+def _sisip_ke_subbab(teks, nomor_bab, nomor_sub, sisipan):
+    """Sisipkan teks kecil ke dalam subbab N.S yang tepat.
+
+    Cari judul ### N.S, sisipkan sebelum judul ### berikutnya,
+    bila tidak ada judul berikutnya, tempel di akhir bab. Bila
+    judul subbab tidak ditemukan sama sekali, tempel di akhir
+    bab, supaya sisipan tidak hilang diam-diam.
+    """
+    teks = teks or ''
+    sisipan = (sisipan or '').strip()
+    if not sisipan:
+        return teks
+    pola_judul = re.compile(
+        r'^###\s*' + str(nomor_bab) + r'\.' + str(nomor_sub) + r'\b',
+        re.MULTILINE)
+    cocok = pola_judul.search(teks)
+    if not cocok:
+        return teks.rstrip() + '\n\n' + sisipan + '\n'
+    pola_berikut = re.compile(r'^###\s+', re.MULTILINE)
+    berikut = pola_berikut.search(teks, cocok.end())
+    if berikut:
+        return teks[:berikut.start()].rstrip() + '\n\n' + sisipan + '\n\n' + teks[berikut.start():]
+    return teks.rstrip() + '\n\n' + sisipan + '\n'
+
+
+def _celah_struktural(masalah, curiga):
+    """Celah struktural dari hasil cek per bab.
+
+    Return {'tabel': bool, 'posisi': bool}. Tabel bila masalah
+    memuat tidak ada tabel (R3). Posisi bila masalah memuat tidak
+    ada kalimat posisi, atau curiga memuat kalimat posisi terlalu
+    pendek (R4). Masalah lain (duplikasi, sitasi, kata) BUKAN
+    celah struktural dan tidak memicu bedah, supaya bedah tidak
+    mencoba memperbaiki hal yang bukan tugasnya.
+    """
+    masalah = list(masalah or [])
+    curiga = list(curiga or [])
+    tabel = any('tidak ada tabel' in str(m) for m in masalah)
+    posisi = (any('tidak ada kalimat posisi' in str(m) for m in masalah)
+              or any('kalimat posisi penulis terlalu pendek' in str(c)
+                     for c in curiga))
+    return {'tabel': tabel, 'posisi': posisi}
+
+
+def _sisipan_aman_sitasi(sisipan, rows):
+    """True bila sisipan boleh dipakai, dari sisi sitasi.
+
+    Aman bila sisipan tidak memuat sitasi formal sama sekali,
+    atau setiap sitasi formalnya cocok dengan satu baris snapshot
+    (kunci atau alias, tahun sama), memakai ekstraktor gerbang
+    final. Bila rows None, sitasi formal apa pun dianggap tidak
+    aman (fail-closed), karena tidak bisa diverifikasi. Bila
+    ekstraktor tidak bisa diimpor, fallback ke pola tahun: ada
+    tahun berarti tidak aman, tanpa tahun berarti aman.
+    """
+    if not isinstance(sisipan, str) or not sisipan.strip():
+        return False
+    try:
+        from app.sitasi_anti_gagal import ekstrak_sitasi_badan as _ekstrak
+        from app.gerbang_subbab import _cocok_snapshot as _cocok
+        formal = _ekstrak(sisipan)
+        if not formal:
+            return True
+        if rows is None:
+            return False
+        for sit in formal:
+            if not _cocok(sit.get("surnames") or [],
+                          sit.get("tahun") or "", rows):
+                return False
+        return True
+    except Exception:
+        if re.search(r"\b(19|20)\d{2}[a-z]?\b", sisipan):
+            return False
+        return True
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -331,10 +457,27 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
             # pemanggil lama yang signature-nya lama tidak gagal
             # TypeError karena kwargs baru (gerbang perbaikan bab).
             if dari_snapshot:
-                teks, summ, wc, cit = P.generate_bab(
-                    n, outline[n], ringkasan_awal, jenis=jenis, tier=tier,
-                    refs_bab=(refs_per_bab.get(n) if isinstance(refs_per_bab, dict) else None),
-                    dari_snapshot=True)
+                # Gas 31 Okt 2026 12:03, butir 1: baris snapshot
+                # bab ini dioper ke pipeline, supaya gerbang per
+                # subbab memakai baris DB yang sama dengan gerbang
+                # final, bukan turunan refs yang bisa berbeda arah
+                # kunci dan alias. Fallback TypeError untuk mock
+                # lama yang signature-nya belum mengenal
+                # snapshot_rows, pipeline menurunkan baris dari
+                # refs bila kwarg tidak sampai.
+                _rows_bab = None
+                if isinstance(refs_holder, dict):
+                    _rows_bab = (refs_holder.get("snapshot_rows") or {}).get(n)
+                try:
+                    teks, summ, wc, cit = P.generate_bab(
+                        n, outline[n], ringkasan_awal, jenis=jenis, tier=tier,
+                        refs_bab=(refs_per_bab.get(n) if isinstance(refs_per_bab, dict) else None),
+                        dari_snapshot=True, snapshot_rows=_rows_bab)
+                except TypeError:
+                    teks, summ, wc, cit = P.generate_bab(
+                        n, outline[n], ringkasan_awal, jenis=jenis, tier=tier,
+                        refs_bab=(refs_per_bab.get(n) if isinstance(refs_per_bab, dict) else None),
+                        dari_snapshot=True)
             else:
                 teks, summ, wc, cit = P.generate_bab(
                     n, outline[n], ringkasan_awal, jenis=jenis, tier=tier)
@@ -360,6 +503,7 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
                 "berkas": berkas}
 
     gagal = {}
+    _galat_gerbang = None  # GagalSubbab pertama, diteruskan apa adanya
     cek_bab = {}  # point 3: hasil cek awal per bab (R3/R4/surname)
     try:
         pekerjaan = []
@@ -410,6 +554,19 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
                 try:
                     r = f.result()
                 except Exception as e:                     # noqa: BLE001
+                    # Gas 31 Okt 2026 12:03, butir 1 dan 3: gagal
+                    # gerbang subbab TIDAK boleh dibungkus menjadi
+                    # RuntimeError umum yang di-retry A1. Simpan
+                    # apa adanya, laporkan, bab lain tetap ditunggu
+                    # sampai selesai, lalu raise di bawah sebelum
+                    # cek gagal umum, supaya susun() melihat
+                    # ValueError dan langsung refund tanpa retry.
+                    if type(e).__name__ == "GagalSubbab":
+                        if _galat_gerbang is None:
+                            _galat_gerbang = e
+                        if lapor:
+                            lapor(f"BAB {n} GAGAL gerbang subbab: {e}")
+                        continue
                     gagal[n] = f"{type(e).__name__}: {e}"
                     if lapor:
                         lapor(f"BAB {n} GAGAL — {gagal[n]}")
@@ -457,12 +614,19 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
                         if lapor:
                             lapor(f"Cek awal BAB {n} dilewati: {_e_cek}")
     finally:
-        #  Pemulihan tambalan prompt TIDAK di sini lagi: putaran PERBAIKAN
-        #  (Lapis 3c-2, di bawah) masih butuh wrapper outline. Pemulihan
-        #  dilakukan wrapper antrean di `finally`-nya (mencakup SEMUA
-        #  jalan keluar) — supaya bab perbaikan tidak jatuh ke outline
-        #  Ekonomi Digital sementara.
+        #  Pemulihan tambalan prompt TIDAK di sini lagi: bedah
+        #  struktural (di bawah) masih butuh wrapper outline.
+        #  Pemulihan dilakukan wrapper antrean di `finally`-nya
+        #  (mencakup SEMUA jalan keluar), supaya bab bedah tidak
+        #  jatuh ke outline Ekonomi Digital sementara.
         pass
+
+    if _galat_gerbang is not None:
+        # Gagal gerbang subbab diteruskan apa adanya (ValueError),
+        # supaya susun() tidak me-retry dan langsung refund dengan
+        # galat detail bab dan subbab. Bab lain yang sudah jadi
+        # tetap tersimpan di disk sebagai audit, token kembali.
+        raise _galat_gerbang
 
     if gagal:
         #  JANGAN pura-pura selesai. Bab yang gagal dilaporkan apa adanya.
@@ -501,111 +665,162 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
             if lapor:
                 lapor(f'Catatan: {c}')
 
-        # ── LAPIS 3c-2: PERBAIKI SEKALI bab BERMASALAH (ACC Bos 19 Okt) ────
-        #  Dulu `mutu_lolos=False` hanya DILAPORKAN. Sekarang bab yang bermasalah
-        #  dikerjakan ULANG SEKALI dengan arahan konkret soal apa yang salah,
-        #  lalu diperiksa lagi.
-        #  Pagar:
-        #   • MAKSIMAL 1 putaran per bab (`_PERBAIKAN_MAKS`) — tidak boleh
-        #     berputar sampai token habis.
-        #   • Hanya bab yang disebut MASALAH; bab yang lolos TIDAK disentuh.
-        #   • Kalau hasil perbaikan TIDAK lebih baik, PAKAI VERSI LAMA dan
-        #     laporkan jujur — jangan menukar yang lebih baik dengan yang buruk.
-        #   • Kuota TIDAK dipotong lagi (perbaikan = tanggung jawab mesin).
-        if not periksa['lolos']:
-            #  ⚠️ `periksa['masalah']` = LIST TEKS ("BAB 2: ..."), bukan dict.
-            #  `bab_bermasalah()` yang membaca nomornya.
-            bab_rusak = [n for n in MI.bab_bermasalah(periksa) if n in isi_bab]
-            if lapor:
-                lapor(f"🔧 Memperbaiki {len(bab_rusak)} bab bermasalah "
-                      f"(maksimal {_PERBAIKAN_MAKS} putaran): {bab_rusak}")
-            for n in bab_rusak:
-                #  Jangkar sama bentuknya dengan loop utama (judul bab +
-                #  sub-bab dari outline) — JANGAN mengarang string lain,
-                #  nanti bab perbaikan tidak tahu strukturnya.
-                subs_n = (outline[n].get("subs") or [])
-                poin_n = '; '.join(f'{x[1]}' for x in subs_n[:5])
-                jangkar_n = (f"Ini buku berbab-bab. Bab ini: "
-                             f"{outline[n]['title']}. Sub-bab yang dibahas: "
-                             f"{poin_n}.")
-                for putaran in range(1, _PERBAIKAN_MAKS + 1):
-                    arahan = MI.arahan_perbaikan(periksa, n)
-                    lama = isi_bab[n]
-                    try:
-                        with ThreadPoolExecutor(max_workers=1) as ex:
-                            f = ex.submit(_kerjakan_satu_bab, n, {},
-                                          jangkar_n + "\n\n" + arahan)
-                            r = f.result()
-                    except Exception as e:               # noqa: BLE001
-                        if lapor:
-                            lapor(f"   BAB {n} perbaikan gagal: "
-                                  f"{type(e).__name__}: {e}")
-                        break
-                    f_baru = os.path.join(keluar_dir, f"bab{n}", f"bab{n}.txt")
-                    if not os.path.exists(f_baru):
-                        break
-                    baru = open(f_baru, encoding='utf-8').read()
-                    uji = MI.periksa_buku({**isi_bab, n: baru}, outline)
-
-                    #  Cek awal point 3: nilai ulang cek per bab pada teks
-                    #  perbaikan (R3/R4/surname), supaya skor perbaikan
-                    #  tidak buta terhadap cek baru.
-                    _cek_baru = {'masalah': [], 'curiga': []}
-                    if on_bab_selesai is not None:
+        # -- BEDAH STRUKTURAL SEKALI (Gas Bos 31 Okt 2026 12:03, butir 2) --
+        #  Pengganti Lapis 3c-2 yang dihapus: tidak ada lagi tulis
+        #  ulang penuh satu bab. Hanya celah struktural (tabel R3
+        #  hilang atau kalimat posisi R4 hilang atau terlalu pendek)
+        #  yang diperbaiki, dengan SATU sisipan kecil per celah,
+        #  dicek deterministik. Sisipan gagal cek, LLM tidak menjawab,
+        #  atau sitasi sisipan tidak cocok snapshot, maka sisipan
+        #  dibuang saja dan bab lama dipertahankan, tanpa putaran
+        #  kedua dan tanpa tulis ulang penuh. Bila tidak ada celah,
+        #  tidak ada perbaikan sama sekali. Hanya buku-referensi.
+        #  Batas: tabel disisipkan ke subbab N.3, posisi ke N.4.
+        #  Proksi R3 di cek_awal membaca berkas visual, bukan teks
+        #  bab, jadi sesudah tabel masuk ke teks bab, masalah R3
+        #  dihapus eksplisit di sini dengan catatan bahwa tabel
+        #  kini ada di teks bab dan akan dirakit ke DOCX. Proksi
+        #  R4 membaca teks bab, jadi posisi baru akan lolos bila
+        #  cek diulang, tetapi masalahnya tetap dihapus eksplisit
+        #  di sini supaya laporan akhir konsisten.
+        #  Baris snapshot per bab untuk cek sitasi sisipan: dari
+        #  holder bila ada (otoritatif dari DB), bila tidak ada
+        #  diturunkan dari refs, bila keduanya tidak ada maka
+        #  sitasi formal apa pun di sisipan dianggap tidak aman
+        #  dan sisipan dibuang (fail-closed).
+        if jenis == "referensi":
+            _rows_bedah_per_bab = {}
+            if isinstance(refs_holder, dict) and refs_holder.get("snapshot_rows"):
+                _rows_bedah_per_bab = refs_holder.get("snapshot_rows") or {}
+            elif dari_snapshot and isinstance(refs_per_bab, dict):
+                try:
+                    from app.gerbang_subbab import rows_dari_refs_dicts as _rows_dari
+                    for _nb in refs_per_bab:
+                        _rows_bedah_per_bab[_nb] = _rows_dari(
+                            refs_per_bab.get(_nb) or [])
+                except Exception:
+                    _rows_bedah_per_bab = {}
+            for _n_bedah in sorted(isi_bab):
+                _celah = _celah_struktural(
+                    (cek_bab.get(_n_bedah) or {}).get("masalah") or [],
+                    (cek_bab.get(_n_bedah) or {}).get("curiga") or [])
+                if not (_celah["tabel"] or _celah["posisi"]):
+                    continue
+                _teks_lama = isi_bab[_n_bedah]
+                if not isinstance(_teks_lama, str):
+                    # Penjaga None job 221: teks bab bukan string
+                    # diperlakukan sebagai celah yang tidak bisa
+                    # dibedah, bukan crash AttributeError.
+                    if lapor:
+                        lapor(f"Bedah struktural BAB {_n_bedah} dilewati: "
+                              f"teks bab bukan string")
+                    continue
+                _teks_bedah = _teks_lama
+                _diterima = []
+                _dibuang = []
+                for _jenis_celah, _nomor_sub in (
+                        ("tabel", 3), ("posisi", 4)):
+                    if not _celah[_jenis_celah]:
+                        continue
+                    _sisipan = None
+                    _alasan_buang = None
+                    for _percobaan_bedah in range(1, _BEDAH_MAKS + 1):
                         try:
-                            _cek_baru = on_bab_selesai(
-                                n, baru, os.path.join(keluar_dir, f"bab{n}")) or _cek_baru
-                        except Exception as _e_cek2:  # noqa: BLE001
-                            if lapor:
-                                lapor(f"Cek awal BAB {n} (perbaikan) dilewati: {_e_cek2}")
-                    #  ⚠️ `masalah` = LIST TEKS. Hitung yang MENYEBUT bab ini
-                    #     (bukan `m['bab']` — tidak ada kuncinya).
-                    pola_n = re.compile(r'BAB\s+' + str(n) + r'\b')
-                    skor_baru = len([m for m in uji['masalah']
-                                     if pola_n.search(str(m))])
-                    skor_lama = len([m for m in periksa['masalah']
-                                     if pola_n.search(str(m))])
-                    skor_baru = skor_baru + len(_cek_baru.get('masalah') or [])
-                    if skor_baru < skor_lama:
-                        isi_bab[n] = baru
-                        periksa = uji
+                            _judul_bedah = (outline[_n_bedah].get("title") or "")
+                            if _jenis_celah == "tabel":
+                                _prompt_bedah = (
+                                    f"Buat SATU blok tabel komparasi untuk "
+                                    f"Bab {_n_bedah} buku ini, judul bab: "
+                                    f"{_judul_bedah}. Format persis: "
+                                    f"[TABEL {_n_bedah}.1: Judul Tabel - Kolom A, "
+                                    f"Kolom B, Kolom C | Baris1: ..., ..., ... | "
+                                    f"Baris2: ..., ..., ... | Baris3: ..., ..., ...]. "
+                                    f"Isi dengan perbandingan teori yang SUDAH "
+                                    f"dibahas di bab ini, jangan menambah sitasi "
+                                    f"baru, jangan menambah klaim baru, hanya "
+                                    f"rangkum perbandingan yang ada. Keluarkan "
+                                    f"HANYA blok tabel, tanpa kalimat lain.")
+                            else:
+                                _prompt_bedah = (
+                                    f"Buat SATU kalimat posisi penulis untuk "
+                                    f"Bab {_n_bedah} buku ini, judul bab: "
+                                    f"{_judul_bedah}, minimal 10 kata, diawali "
+                                    f"dengan frasa 'Penulis berpendapat' atau "
+                                    f"'Menurut penulis', yang merangkum posisi "
+                                    f"penulis atas perbandingan di bab ini, "
+                                    f"tanpa sitasi baru, tanpa klaim baru. "
+                                    f"Keluarkan HANYA kalimat itu.")
+                            _sisipan = P.call_llm(_prompt_bedah, max_tokens=800)
+                        except Exception as _e_bedah:
+                            _sisipan = None
+                            _alasan_buang = (
+                                f"LLM gagal: {type(_e_bedah).__name__}")
+                        break
+                    if _sisipan is None or not str(_sisipan).strip():
+                        _alasan_buang = _alasan_buang or "LLM tidak menjawab"
+                    elif _jenis_celah == "tabel" and not _cek_sisipan_tabel(_sisipan):
+                        _alasan_buang = "gagal cek tabel"
+                    elif _jenis_celah == "posisi" and not _cek_sisipan_posisi(_sisipan):
+                        _alasan_buang = "gagal cek posisi"
+                    elif not _sisipan_aman_sitasi(
+                            _sisipan,
+                            _rows_bedah_per_bab.get(_n_bedah)):
+                        _alasan_buang = "sitasi tidak cocok snapshot"
+                    if _alasan_buang:
+                        _dibuang.append((_jenis_celah, _alasan_buang))
+                        continue
+                    _teks_bedah = _sisip_ke_subbab(
+                        _teks_bedah, _n_bedah, _nomor_sub, _sisipan)
+                    _diterima.append(_jenis_celah)
+                if _diterima:
+                    _berkas_bedah = os.path.join(
+                        keluar_dir, f"bab{_n_bedah}", f"bab{_n_bedah}.txt")
+                    with open(_berkas_bedah, "w", encoding="utf-8") as _fh:
+                        _fh.write(_teks_bedah)
+                    isi_bab[_n_bedah] = _teks_bedah
+                    if _n_bedah in hasil_bab:
+                        hasil_bab[_n_bedah]["kata"] = len(_teks_bedah.split())
+                    if "tabel" in _diterima:
+                        periksa["masalah"] = [
+                            m for m in periksa["masalah"]
+                            if not (str(m).startswith(f"BAB {_n_bedah}:")
+                                    and "tidak ada tabel" in str(m))]
+                        if _n_bedah in cek_bab:
+                            cek_bab[_n_bedah]["masalah"] = [
+                                m for m in cek_bab[_n_bedah]["masalah"]
+                                if "tidak ada tabel" not in str(m)]
+                    if "posisi" in _diterima:
+                        periksa["masalah"] = [
+                            m for m in periksa["masalah"]
+                            if not (str(m).startswith(f"BAB {_n_bedah}:")
+                                    and "tidak ada kalimat posisi" in str(m))]
+                        periksa["curiga"] = [
+                            c for c in periksa["curiga"]
+                            if not (str(c).startswith(f"BAB {_n_bedah}:")
+                                    and "kalimat posisi penulis terlalu pendek" in str(c))]
+                        if _n_bedah in cek_bab:
+                            cek_bab[_n_bedah]["masalah"] = [
+                                m for m in cek_bab[_n_bedah]["masalah"]
+                                if "tidak ada kalimat posisi" not in str(m)]
+                            cek_bab[_n_bedah]["curiga"] = [
+                                c for c in cek_bab[_n_bedah]["curiga"]
+                                if "kalimat posisi penulis terlalu pendek" not in str(c)]
+                    periksa["lolos"] = not periksa["masalah"]
+                    if lapor:
+                        lapor(f"Bedah struktural BAB {_n_bedah}: sisipan "
+                              f"{' dan '.join(_diterima)} diterima")
+                for _jenis_buang, _alasan_buang in _dibuang:
+                    if lapor:
+                        lapor(f"Bedah struktural BAB {_n_bedah}: sisipan "
+                              f"{_jenis_buang} dibuang, {_alasan_buang}")
 
-                        #  Periksa diganti uji (MI saja), gabungkan lagi
-                        #  cek per bab terbaru supaya sinyal R3/R4/surname
-                        #  tidak hilang sesudah perbaikan diterima.
-                        cek_bab[n] = {
-                            'masalah': list(_cek_baru.get('masalah') or []),
-                            'curiga': list(_cek_baru.get('curiga') or []),
-                        }
-                        for _n2 in sorted(cek_bab):
-                            for _m2 in cek_bab[_n2].get('masalah') or []:
-                                if _m2 not in periksa['masalah']:
-                                    periksa['masalah'].append(_m2)
-                            for _c2 in cek_bab[_n2].get('curiga') or []:
-                                if _c2 not in periksa['curiga']:
-                                    periksa['curiga'].append(_c2)
-                        periksa['lolos'] = not periksa['masalah']
-                        hasil_bab[n] = {"kata": r["kata"], "sitasi": r["sitasi"],
-                                        "file": f"bab{n}.txt",
-                                        "diperbaiki": True}
-                        if lapor:
-                            lapor(f"   ✅ BAB {n} diperbaiki: "
-                                  f"{skor_lama} → {skor_baru} masalah")
-                    else:
-                        #  Perbaikan TIDAK lebih baik → kembalikan versi lama.
-                        with open(f_baru, "w", encoding='utf-8') as fh:
-                            fh.write(lama)
-                        if lapor:
-                            lapor(f"   ⚠️ BAB {n} perbaikan TIDAK lebih baik "
-                                  f"({skor_lama} → {skor_baru}) — versi LAMA "
-                                  f"dipertahankan")
-                    break
-
-    #  Total kata dihitung ULANG dari isi final (bisa berubah karena perbaikan).
+    #  Total kata dihitung ULANG dari isi final (bisa berubah karena bedah).
+    #  Penjaga None job 221: nilai bukan string dilewati, bukan crash.
     if isi_bab:
-        total_kata = sum(len(t.split()) for t in isi_bab.values())
+        total_kata = sum(len(t.split()) for t in isi_bab.values()
+                         if isinstance(t, str))
         for n, t in isi_bab.items():
-            if n in hasil_bab:
+            if n in hasil_bab and isinstance(t, str):
                 hasil_bab[n]["kata"] = len(t.split())
 
     return {
