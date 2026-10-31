@@ -75,8 +75,85 @@ def urutkan_prioritas_sumber(daftar):
                   key=lambda item: prioritas_sumber(sumber_dari_item(item)))
 
 
+def _identitas_default(item):
+    """Identitas satu artikel untuk aturan artikel-berbeda-antar-bab.
+
+    Pasangan (baris_snapshot, ref) di jalur cache: artikel_id baris.
+    Dict artikel biasa: DOI bila ada, kalau tidak judul + tahun.
+    Selain itu: DOI/title dari atribut, kalau tidak ada pakai id()
+    objek (tidak pernah dianggap sama dengan artikel lain).
+    """
+    if isinstance(item, (list, tuple)) and len(item) == 2 \
+            and isinstance(item[0], dict):
+        aid = item[0].get('artikel_id')
+        if aid is not None:
+            return ('id', aid)
+        item = item[1]
+    if isinstance(item, dict):
+        doi = (item.get('doi') or '').strip().lower()
+        if doi:
+            return ('doi', doi)
+        judul = (item.get('title') or item.get('judul') or '').strip().lower()
+        tahun = str(item.get('year') or item.get('tahun') or '')
+        if judul:
+            return ('judul', judul, tahun)
+        return ('obj', id(item))
+    doi = str(getattr(item, 'doi', '') or '').strip().lower()
+    if doi:
+        return ('doi', doi)
+    judul = str(getattr(item, 'title', '') or getattr(item, 'judul', '')
+                or '').strip().lower()
+    tahun = str(getattr(item, 'year', '') or getattr(item, 'tahun', '') or '')
+    if judul:
+        return ('judul', judul, tahun)
+    return ('obj', id(item))
+
+
+def _pilih_dari_kelompok(kelompok, kuota, total, sudah, ambil_id):
+    """Jalankan aturan kuota + isi kekurangan di atas satu kelompok.
+
+    sudah: hasil sejauh ini (dipakai sebagai awal, supaya pengisian
+    dari daftar kedua tidak mengulang kuota dari awal). Item yang
+    identitasnya sudah ada di hasil dilewati, jadi hasil tidak pernah
+    memuat artikel yang sama dua kali.
+    """
+    terpilih = list(sudah)
+    sudah_id = set()
+    for item in terpilih:
+        try:
+            sudah_id.add(ambil_id(item))
+        except Exception:
+            pass
+    for angka in (0, 1, 2, 3):
+        for item in kelompok[angka][:kuota]:
+            if len(terpilih) >= total:
+                return terpilih[:total]
+            try:
+                iid = ambil_id(item)
+            except Exception:
+                iid = ('obj', id(item))
+            if iid in sudah_id:
+                continue
+            sudah_id.add(iid)
+            terpilih.append(item)
+    for angka in (0, 1, 2, 3, 4):
+        for item in kelompok[angka][kuota:]:
+            if len(terpilih) >= total:
+                return terpilih[:total]
+            try:
+                iid = ambil_id(item)
+            except Exception:
+                iid = ('obj', id(item))
+            if iid in sudah_id:
+                continue
+            sudah_id.add(iid)
+            terpilih.append(item)
+    return terpilih
+
+
 def pilih_seimbang(daftar, kuota=KUOTA_SEIMBANG_PER_SUMBER,
-                   total=TOTAL_SEIMBANG, kunci=None):
+                   total=TOTAL_SEIMBANG, kunci=None, terpakai=None,
+                   identitas=None):
     """Pilih artikel seimbang dari daftar kandidat, stabil.
 
     daftar: list atau tuple item, dalam urutan asli. Bukan list atau
@@ -86,6 +163,18 @@ def pilih_seimbang(daftar, kuota=KUOTA_SEIMBANG_PER_SUMBER,
     (baris_snapshot, ref) di jalur cache hit, di mana sumber ada
     di elemen pertama pasangan. Tanpa kunci, sumber diambil dengan
     sumber_dari_item.
+
+    terpakai: himpunan identitas artikel yang SUDAH terpilih untuk
+    bab-bab sebelumnya dalam job yang sama (paket sempurna, Gas Bos
+    31 Okt 2026 malam: artikel berbeda per bab). Bila diisi, kandidat
+    yang belum terpakai dipilih dulu dengan aturan kuota yang sama,
+    dan kekurangan HANYA diisi dari artikel terpakai bila kandidat
+    belum terpakai tidak cukup mencapai total, supaya gerbang
+    minimum 8 tidak berubah dan tidak ada artikel yang dikarang.
+    Tanpa terpakai, perilaku sama persis seperti sebelumnya.
+    identitas: fungsi opsional item -> identitas; tanpa itu dipakai
+    _identitas_default (artikel_id untuk pasangan, DOI, lalu
+    judul + tahun).
 
     Langkah: kelompokkan menurut prioritas (Scopus, OpenAlex,
     CrossRef, Garuda, lain), pertahankan urutan asli di dalam tiap
@@ -103,22 +192,36 @@ def pilih_seimbang(daftar, kuota=KUOTA_SEIMBANG_PER_SUMBER,
     if kuota is None or kuota < 0:
         kuota = 0
     ambil_sumber = kunci if kunci is not None else sumber_dari_item
-    kelompok = {0: [], 1: [], 2: [], 3: [], 4: []}
+    ambil_id = identitas if identitas is not None else _identitas_default
+    terpakai_set = set(terpakai) if terpakai else set()
+
+    def _kelompokkan(items):
+        kelompok = {0: [], 1: [], 2: [], 3: [], 4: []}
+        for item in items:
+            try:
+                nama = ambil_sumber(item)
+            except Exception:
+                nama = ''
+            kelompok[prioritas_sumber(nama)].append(item)
+        return kelompok
+
+    if not terpakai_set:
+        return _pilih_dari_kelompok(_kelompokkan(daftar), kuota, total,
+                                    [], ambil_id)
+    belum = []
+    sudah_pakai = []
     for item in daftar:
         try:
-            nama = ambil_sumber(item)
+            iid = ambil_id(item)
         except Exception:
-            nama = ''
-        kelompok[prioritas_sumber(nama)].append(item)
-    terpilih = []
-    for angka in (0, 1, 2, 3):
-        terpilih.extend(kelompok[angka][:kuota])
-        if len(terpilih) >= total:
-            return terpilih[:total]
-    for angka in (0, 1, 2, 3, 4):
-        sisa = kelompok[angka][kuota:]
-        for item in sisa:
-            if len(terpilih) >= total:
-                return terpilih[:total]
-            terpilih.append(item)
+            iid = ('obj', id(item))
+        if iid in terpakai_set:
+            sudah_pakai.append(item)
+        else:
+            belum.append(item)
+    terpilih = _pilih_dari_kelompok(_kelompokkan(belum), kuota, total,
+                                    [], ambil_id)
+    if len(terpilih) < total and sudah_pakai:
+        terpilih = _pilih_dari_kelompok(_kelompokkan(sudah_pakai), kuota,
+                                        total, terpilih, ambil_id)
     return terpilih

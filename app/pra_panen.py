@@ -225,7 +225,7 @@ def _pastikan_jalur_modul():
             sys.path.insert(0, p)
 
 
-def panen_satu_bab(judul_bab):
+def panen_satu_bab(judul_bab, potong=True):
     """Panen SATU bab dari API, tanpa DB, tanpa tulis. Fail-soft.
 
     Leg 1: _refs_dari_harvest yang sudah ada (4 sumber Scopus,
@@ -242,7 +242,7 @@ def panen_satu_bab(judul_bab):
     _pastikan_jalur_modul()
     try:
         import buku_umum_pipeline as _P
-        hasil = _P._refs_dari_harvest(judul_bab)
+        hasil = _P._refs_dari_harvest(judul_bab, potong=potong)
     except Exception:
         hasil = None
     if hasil:
@@ -265,13 +265,13 @@ def panen_satu_bab(judul_bab):
     return keluar
 
 
-def _panen_dan_parse(judul_bab):
+def _panen_dan_parse(judul_bab, potong=True):
     """Panen plus parse untuk satu bab. Murni (tanpa DB), aman
     dipanggil dari utas worker. Gagal apa pun: [] (gerbang nanti
     gagal jujur dengan jumlah 0, bukan crash).
     """
     try:
-        mentah = panen_satu_bab(judul_bab)
+        mentah = panen_satu_bab(judul_bab, potong=potong)
     except Exception:
         return []
     hasil = []
@@ -487,6 +487,13 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None):
                 pass
 
     _lapor("Menyiapkan referensi (Bab 0 dari %s)" % total)
+    # Paket sempurna, Gas Bos 31 Okt 2026 malam, dua fase: fase 1
+    # kumpulkan pool kandidat per bab (cache beku + panen segar
+    # paralel), fase 2 pilih 8 per bab BERURUTAN dengan artikel
+    # terpakai bab sebelumnya dihindari dulu. Pool tidak ditulis
+    # jadi snapshot sebelum fase 2, supaya bab segar bisa menghindari
+    # artikel bab cache dan bab segar sebelumnya.
+    pool_per_bab = {}
     perlu_panen = []
     for bab in babs:
         judul_bab = ((outline.get(bab) or {}).get("title") or "")
@@ -521,40 +528,19 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None):
                     "source": art.sumber or "",
                 })
             if rows:
-                # Keputusan Bos 31 Okt 2026 19:36, seimbang 2-2-2-2:
-                # baris cache diurutkan ulang dengan aturan seimbang
-                # yang sama sebelum snapshot ditulis, supaya judul
-                # berulang tidak lolos dari seimbang. Pasangan baris
-                # dan ref diurutkan bersama, jadi ref yang dikembalikan
-                # ke penulisan mengikuti urutan snapshot baru, bukan
-                # urutan cache lama. Cache_topik sendiri tidak ditulis
-                # ulang, hanya snapshot job baru yang seimbang. Bila
-                # helper tidak tersedia, urutan lama dipertahankan
-                # (fail-soft, gerbang minimum 8 tetap berlaku).
-                if _pilih_seimbang is not None:
-                    try:
-                        _pasangan = _pilih_seimbang(
-                            list(zip(rows, refs)),
-                            kunci=lambda _p: _p[0].get('sumber') or '')
-                        if _pasangan:
-                            rows = [_p[0] for _p in _pasangan]
-                            refs = [_p[1] for _p in _pasangan]
-                    except Exception:
-                        pass
-                tulis_snapshot(db, job_kode, bab, rows)
-                db.commit()
-                refs_per_bab[bab] = refs
-                hitung[bab] = len(rows)
-                selesai += 1
-                _lapor("Menyiapkan referensi (Bab %s dari %s)"
-                       % (selesai, total))
+                # Fase 1 saja: pool cache disimpan, pemilihan dan
+                # tulis snapshot ditunda ke fase 2, supaya bab ini
+                # ikut aturan artikel-berbeda dalam urutan bab.
+                # Cache_topik sendiri tidak ditulis ulang.
+                pool_per_bab[bab] = (judul_bab, list(zip(rows, refs)),
+                                     True)
                 continue
         perlu_panen.append((bab, judul_bab))
     if perlu_panen:
         with ThreadPoolExecutor(max_workers=PARALEL_MAKS) as ex:
             futs = {}
             for bab, judul_bab in perlu_panen:
-                futs[ex.submit(_panen_dan_parse, judul_bab)] = (bab, judul_bab)
+                futs[ex.submit(_panen_dan_parse, judul_bab, False)] = (bab, judul_bab)
             for fut in as_completed(futs):
                 bab, judul_bab = futs[fut]
                 try:
@@ -594,17 +580,50 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None):
                         "type": "article",
                         "source": p["sumber"],
                     })
-                if rows:
-                    simpan_cache(db, bidang_norm,
-                                 normalisasi_teks(judul_bab),
-                                 [r["artikel_id"] for r in rows])
-                tulis_snapshot(db, job_kode, bab, rows)
-                db.commit()
-                refs_per_bab[bab] = refs
-                hitung[bab] = len(rows)
-                selesai += 1
-                _lapor("Menyiapkan referensi (Bab %s dari %s)"
-                       % (selesai, total))
+                # Fase 1 saja: pool segar disimpan, pemilihan,
+                # simpan cache, dan tulis snapshot ditunda ke fase 2.
+                pool_per_bab[bab] = (judul_bab, list(zip(rows, refs)),
+                                     False)
+    # Fase 2: pilih 8 per bab berurutan Bab 1 ke N. Artikel yang
+    # sudah terpilih untuk bab sebelumnya dihindari dulu oleh
+    # pilih_seimbang (terpakai); kekurangan hanya diisi dari artikel
+    # terpakai bila pool belum terpakai tidak cukup, supaya gerbang
+    # minimum 8 dan refund tidak berubah. Bab cache ikut fase ini
+    # dengan pool beku 8-nya, jadi ia tetap bisa menghindari artikel
+    # bab sebelumnya sejauh pool-nya memungkinkan, tanpa mengarang.
+    terpakai = set()
+    for bab in babs:
+        if bab not in pool_per_bab:
+            continue
+        judul_bab, pasangan, dari_cache = pool_per_bab[bab]
+        if not pasangan:
+            continue
+        dipilih = pasangan
+        if _pilih_seimbang is not None:
+            try:
+                _hasil = _pilih_seimbang(
+                    pasangan,
+                    kunci=lambda _p: _p[0].get('sumber') or '',
+                    terpakai=terpakai)
+                if _hasil:
+                    dipilih = _hasil
+            except Exception:
+                pass
+        rows = [_p[0] for _p in dipilih]
+        refs = [_p[1] for _p in dipilih]
+        for _r in rows:
+            terpakai.add(('id', _r.get('artikel_id')))
+        if not dari_cache and rows:
+            simpan_cache(db, bidang_norm,
+                         normalisasi_teks(judul_bab),
+                         [r["artikel_id"] for r in rows])
+        tulis_snapshot(db, job_kode, bab, rows)
+        db.commit()
+        refs_per_bab[bab] = refs
+        hitung[bab] = len(rows)
+        selesai += 1
+        _lapor("Menyiapkan referensi (Bab %s dari %s)"
+               % (selesai, total))
     gagal = []
     for bab in babs:
         judul_bab = ((outline.get(bab) or {}).get("title") or "")

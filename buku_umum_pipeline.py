@@ -2094,7 +2094,7 @@ def _en_keywords(bab_title):
     return hasil
 
 
-def _refs_dari_harvest(bab_title):
+def _refs_dari_harvest(bab_title, potong=True):
     """Referensi satu bab dari mesin Harvest app (pustaka).
 
     28 Okt 2026 (teguran Boss: Garuda kok tidak ada): mesin Harvest app
@@ -2112,8 +2112,9 @@ def _refs_dari_harvest(bab_title):
     Cache per judul bab: sub-sub satu bab berbagi refs yang sama (hemat
     panggilan; bab dikerjakan per utas sehingga kunci berbeda tidak
     balapan). Gagal total -> None (pemanggil jatuh ke jalur biasa).
+    potong=False: kembalikan pool penuh tanpa potong 8 dan tanpa cache, untuk fase pemilihan artikel-berbeda di panen_semua (paket sempurna).
     """
-    if bab_title in _HARVEST_CACHE:
+    if potong and bab_title in _HARVEST_CACHE:
         return _HARVEST_CACHE[bab_title]
     refs = None
     try:
@@ -2131,7 +2132,8 @@ def _refs_dari_harvest(bab_title):
         _pus = None
     if _pus is None:
         # Pustaka tidak bisa diimpor -> pemanggil jatuh ke jalur biasa.
-        _HARVEST_CACHE[bab_title] = None
+        if potong:
+            _HARVEST_CACHE[bab_title] = None
         return None
     try:
         adapted = []
@@ -2204,44 +2206,48 @@ def _refs_dari_harvest(bab_title):
         # Impor helper di sini, dengan fallback aturan yang sama,
         # supaya jalur file tunggal tetap jalan bila paket app tidak
         # bisa diimpor.
-        try:
-            from app.prioritas_sumber import pilih_seimbang as _pilih_seimbang
-            adapted = _pilih_seimbang(adapted)
-        except Exception:
-            _peta_seimbang = {'scopus': 0, 'openalex': 1,
-                              'crossref': 2, 'garuda': 3}
+        if potong:
+            try:
+                from app.prioritas_sumber import pilih_seimbang as _pilih_seimbang
+                adapted = _pilih_seimbang(adapted)
+            except Exception:
+                _peta_seimbang = {'scopus': 0, 'openalex': 1,
+                                  'crossref': 2, 'garuda': 3}
 
-            def _angka_seimbang(item):
-                kunci = str((item or {}).get('source')
-                            or (item or {}).get('sumber')
-                            or '').strip().lower()
-                for nama, angka in _peta_seimbang.items():
-                    if nama in kunci:
-                        return angka
-                return 4
+                def _angka_seimbang(item):
+                    kunci = str((item or {}).get('source')
+                                or (item or {}).get('sumber')
+                                or '').strip().lower()
+                    for nama, angka in _peta_seimbang.items():
+                        if nama in kunci:
+                            return angka
+                    return 4
 
-            _kelompok = {0: [], 1: [], 2: [], 3: [], 4: []}
-            for _item in adapted:
-                _kelompok[_angka_seimbang(_item)].append(_item)
-            _terpilih = []
-            for _angka in (0, 1, 2, 3):
-                _terpilih.extend(_kelompok[_angka][:2])
-                if len(_terpilih) >= 8:
-                    break
-            for _angka in (0, 1, 2, 3, 4):
-                for _item in _kelompok[_angka][2:]:
+                _kelompok = {0: [], 1: [], 2: [], 3: [], 4: []}
+                for _item in adapted:
+                    _kelompok[_angka_seimbang(_item)].append(_item)
+                _terpilih = []
+                for _angka in (0, 1, 2, 3):
+                    _terpilih.extend(_kelompok[_angka][:2])
                     if len(_terpilih) >= 8:
                         break
-                    _terpilih.append(_item)
-                if len(_terpilih) >= 8:
-                    break
-            adapted = _terpilih
-        refs = adapted[:8] or None
+                for _angka in (0, 1, 2, 3, 4):
+                    for _item in _kelompok[_angka][2:]:
+                        if len(_terpilih) >= 8:
+                            break
+                        _terpilih.append(_item)
+                    if len(_terpilih) >= 8:
+                        break
+                adapted = _terpilih
+            refs = adapted[:8] or None
+        else:
+            refs = adapted or None
     except Exception as e:
         print(f"       [HARVEST] gagal ({type(e).__name__}) — "
               f"jatuh ke verifikasi biasa")
         refs = None
-    _HARVEST_CACHE[bab_title] = refs
+    if potong:
+        _HARVEST_CACHE[bab_title] = refs
     return refs
 
 
