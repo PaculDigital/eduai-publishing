@@ -725,10 +725,8 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                             g for g in _lap_pm['ganda']['ditulis_ulang']
                             if g.get('bab') == _n_pm])
                         if lapor:
-                            lapor('Perbaikan mesin Bab %s: sitasi luar '
-                                  'dihapus %s, sisipan cakupan %s, kalimat '
-                                  'ganda ditulis ulang %s'
-                                  % (_n_pm, _hapus_n, _sisip_n, _ganda_n))
+                            lapor('Bab %s: sudah dirapikan dan diperiksa '
+                                  'mutunya' % _n_pm)
                     hasil['perbaikan_mesin'] = {
                         'hapus_luar': {
                             str(k): v.get('dihapus', [])
