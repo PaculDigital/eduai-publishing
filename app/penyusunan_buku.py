@@ -410,7 +410,8 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
             _potong_saat_mulai()
             from . import pra_panen as _PP
             _refs_holder['refs'] = _PP.panen_semua(
-                db, _job_kode, bidang, outline, lapor=lapor)
+                db, _job_kode, bidang, outline, lapor=lapor,
+                judul_buku=judul)
             # Gas 31 Okt 2026 12:03, butir 1: baris snapshot per bab
             # dibaca dari DB sesudah panen dan dibekukan di holder,
             # supaya penulis membaca daftar yang sama dengan gerbang
