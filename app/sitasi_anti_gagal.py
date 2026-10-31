@@ -117,6 +117,43 @@ class GagalSitasiBersih(Exception):
         self.cakupan = dict(cakupan or {})
 
 
+def _format_inisial_sisa(ringkas):
+    """Format ringkas inisial jadi string jumlah dan contoh.
+
+    Contoh: 3, contoh E. M. (2003), M. (1990), F. D. (2003).
+    Contoh dibatasi 5 butir pertama, jumlah penuh tetap dihitung.
+    """
+    ringkas = list(ringkas or [])
+    total = 0
+    for item in ringkas:
+        try:
+            total += int(item.get("jumlah", 0) or 0)
+        except Exception:
+            total += 1
+    if not ringkas:
+        return "0"
+    contoh = ", ".join(str(item.get("raw", "")) for item in ringkas[:5])
+    return "%s, contoh %s" % (total, contoh)
+
+
+def hapus_inisial_sisa(teks):
+    """Hapus semua sitasi inisial saja dari teks, secara deterministik.
+
+    Tidak menebak nama pengganti, hanya menghapus kemunculan
+    inisial itu sendiri. Return (teks_baru, dihapus_ringkas),
+    dihapus_ringkas adalah ringkas_inisial sebelum penghapusan.
+    """
+    teks = teks or ""
+    kemunculan = pindai_inisial(teks)
+    dihapus = ringkas_inisial(kemunculan)
+    teks_baru = teks
+    for item in sorted(kemunculan, key=lambda x: x["posisi"], reverse=True):
+        pos = item["posisi"]
+        panjang = len(item["raw"])
+        teks_baru = teks_baru[:pos] + teks_baru[pos + panjang:]
+    return teks_baru, dihapus
+
+
 def detail_galat_sitasi(nomor_bab, cakupan, snapshot_ditemukan=None,
                         nomor_subbab=None, luar_dihapus=None,
                         inisial_sisa=None):
@@ -141,7 +178,10 @@ def detail_galat_sitasi(nomor_bab, cakupan, snapshot_ditemukan=None,
     if luar_dihapus is not None:
         bagian.append("sitasi luar dihapus %s" % luar_dihapus)
     if inisial_sisa is not None:
-        bagian.append("inisial sisa %s" % inisial_sisa)
+        if isinstance(inisial_sisa, (list, tuple)):
+            bagian.append("inisial sisa %s" % _format_inisial_sisa(inisial_sisa))
+        else:
+            bagian.append("inisial sisa %s" % inisial_sisa)
     return ", ".join(bagian)
 
 
@@ -840,6 +880,30 @@ def periksa_dan_perbaiki_bab(nomor_bab, teks, refs, panggil_llm=None,
                 "ambigu": repair["ambigu"],
                 "tanpa_kandidat": repair["tanpa_kandidat"],
                 "cek_awal": cek_awal, "cek_ulang": cek_ulang, "pesan": ""}
+    # Perbaikan sederhana gerbang final, 31 Okt 2026: bila cek ulang
+    # hanya gagal karena inisial saja tersisa, padahal cakupan
+    # lolos dan masih ada sitasi snapshot, hapus inisial itu
+    # secara deterministik (tanpa menebak nama), lalu cek ulang.
+    # Lolos bila cakupan tetap di atas atau sama dengan 50 persen
+    # dan masih ada sitasi snapshot. Gagal hanya bila cakupan
+    # jatuh di bawah 50 persen atau tidak ada sitasi snapshot.
+    if cek_ulang["jumlah_inisial"] > 0:
+        _cak = cek_ulang["cakupan"] or {}
+        if (_cak.get("persen", 0) >= AMBANG_CAKUPAN
+                and _cak.get("sitasi_snapshot", 0) > 0):
+            _teks_hapus, _dihapus = hapus_inisial_sisa(repair["teks_baru"])
+            _cek_hapus = cek_hulu_bab(nomor_bab, _teks_hapus, refs)
+            if _cek_hapus["lolos"]:
+                print("       [GERBANG-SITASI] Bab %s: inisial dihapus %s"
+                      % (nomor_bab, _format_inisial_sisa(_dihapus)))
+                return {"lolos": True, "nomor_bab": nomor_bab,
+                        "teks_baru": _teks_hapus, "teks_asli": teks,
+                        "diperbaiki": repair["diperbaiki"],
+                        "ambigu": repair["ambigu"],
+                        "tanpa_kandidat": repair["tanpa_kandidat"],
+                        "inisial_dihapus": _dihapus,
+                        "cek_awal": cek_awal, "cek_ulang": _cek_hapus,
+                        "pesan": ""}
     if gagal_keras:
         # Gas 31 Okt 2026 12:03, butir 3: gerbang wajib menulis
         # baris yang sama ke log stdout, bukan hanya ke slot DB,
@@ -848,7 +912,9 @@ def periksa_dan_perbaiki_bab(nomor_bab, teks, refs, panggil_llm=None,
         # pesan tepat itu tetap lolos, detail lengkap ada di
         # log dan di galat DB lewat pembungkus susun().
         print("       [GERBANG-SITASI] %s. %s"
-              % (detail_galat_sitasi(nomor_bab, cek_ulang["cakupan"]),
+              % (detail_galat_sitasi(
+                    nomor_bab, cek_ulang["cakupan"],
+                    inisial_sisa=cek_ulang["inisial"]),
                  PESAN_GAGAL_BERSIH))
         raise GagalSitasiBersih(
             nomor_bab=nomor_bab, masalah=cek_ulang["masalah"],
@@ -1025,11 +1091,33 @@ def periksa_dan_perbaiki_bab_snapshot(nomor_bab, teks, snapshot_rows,
                 "ambigu": repair["ambigu"],
                 "tanpa_kandidat": repair["tanpa_kandidat"],
                 "cek_awal": cek_awal, "cek_ulang": cek_ulang, "pesan": ""}
+    # Sama seperti jalur lama: hapus inisial tak terperbaiki bila
+    # cakupan lolos dan masih ada sitasi snapshot, lalu cek ulang.
+    if cek_ulang["jumlah_inisial"] > 0:
+        _cak = cek_ulang["cakupan"] or {}
+        if (_cak.get("persen", 0) >= AMBANG_CAKUPAN
+                and _cak.get("sitasi_snapshot", 0) > 0):
+            _teks_hapus, _dihapus = hapus_inisial_sisa(repair["teks_baru"])
+            _cek_hapus = cek_hulu_bab_snapshot(
+                nomor_bab, _teks_hapus, rows)
+            if _cek_hapus["lolos"]:
+                print("       [GERBANG-SITASI] Bab %s: inisial dihapus %s"
+                      % (nomor_bab, _format_inisial_sisa(_dihapus)))
+                return {"lolos": True, "nomor_bab": nomor_bab,
+                        "teks_baru": _teks_hapus, "teks_asli": teks,
+                        "diperbaiki": repair["diperbaiki"],
+                        "ambigu": repair["ambigu"],
+                        "tanpa_kandidat": repair["tanpa_kandidat"],
+                        "inisial_dihapus": _dihapus,
+                        "cek_awal": cek_awal, "cek_ulang": _cek_hapus,
+                        "pesan": ""}
     if gagal_keras:
         # Gas 31 Okt 2026 12:03, butir 3: sama seperti jalur lama,
         # tulis baris detail ke log stdout sebelum raise.
         print("       [GERBANG-SITASI] %s. %s"
-              % (detail_galat_sitasi(nomor_bab, cek_ulang["cakupan"]),
+              % (detail_galat_sitasi(
+                    nomor_bab, cek_ulang["cakupan"],
+                    inisial_sisa=cek_ulang["inisial"]),
                  PESAN_GAGAL_BERSIH))
         raise GagalSitasiBersih(
             nomor_bab=nomor_bab, masalah=cek_ulang["masalah"],

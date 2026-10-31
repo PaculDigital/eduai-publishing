@@ -586,7 +586,8 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                         gagal_keras=True)
                 except _SG.GagalSitasiBersih as _e_sg:
                     _detail = _SG.detail_galat_sitasi(
-                        n, _e_sg.cakupan)
+                        n, _e_sg.cakupan,
+                        inisial_sisa=_e_sg.inisial_tersisa)
                     raise _SG.GagalSitasiBersih(
                         nomor_bab=n, masalah=_e_sg.masalah,
                         inisial_tersisa=_e_sg.inisial_tersisa,
