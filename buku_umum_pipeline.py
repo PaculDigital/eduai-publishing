@@ -2161,7 +2161,16 @@ def _refs_dari_harvest(bab_title, potong=True):
     try:
         adapted = []
         try:
-            hasil = _pus.cari_semua(bab_title) or {}
+            # Gas Bos 31 Okt 2026 malam: hapus Scite dari buku.
+            # Panen buku tidak memakai data Scite sama sekali
+            # (dibuang di adaptasi), jadi jangan bayar panggilan
+            # tallies + premium per DOI. UI cari referensi dan
+            # kerangka tidak berubah (tetap default False).
+            try:
+                hasil = _pus.cari_semua(bab_title,
+                                        tanpa_scite=True) or {}
+            except TypeError:
+                hasil = _pus.cari_semua(bab_title) or {}
             adapted = _adaptasi_harvest(hasil.get('artikel'))
         except Exception:
             adapted = []

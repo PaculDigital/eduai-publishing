@@ -1605,10 +1605,15 @@ def _kunci_dedup(r: dict) -> str:
 
 
 def cari_semua(tema: str, uji_tahun: bool = True,
-               pakai_ai: bool = False) -> dict:
+               pakai_ai: bool = False, tanpa_scite: bool = False) -> dict:
     """Cari referensi dari SEMUA sumber untuk satu tema/judul penelitian.
 
     Args:
+      tanpa_scite: Gas Bos 31 Okt 2026 malam (hapus Scite dari buku) —
+        kalau True, blok tallies DAN blok kutipan premium Scite dilewati
+        sepenuhnya (r['scite'] dan r['kutipan'] tetap None). Dipakai
+        jalur panen buku yang tidak pernah membaca data Scite; layar
+        cari referensi dan kerangka tetap memakai default False.
       pakai_ai: ⭐ 13Okt26 — kalau True, KAMUS tidak mengenali judul ⇒ minta
         AI memetakan kata kunci (1 panggilan). Kalau AI juga gagal,
         hasilnya KOSONG + `sumber_kata_kunci=''` (jujur, JANGAN kata mentah).
@@ -1634,11 +1639,13 @@ def cari_semua(tema: str, uji_tahun: bool = True,
         kw = kata_kunci_ai(tema)
         sumber_kk = 'ai' if kw.get('konsep') else ''
     return cari_semua_dengan_konsep(kw, tema, uji_tahun=uji_tahun,
-                                    sumber_kk=sumber_kk)
+                                    sumber_kk=sumber_kk,
+                                    tanpa_scite=tanpa_scite)
 
 
 def cari_semua_dengan_konsep(kw: dict, tema: str, uji_tahun: bool = True,
-                             sumber_kk: str = '') -> dict:
+                             sumber_kk: str = '',
+                             tanpa_scite: bool = False) -> dict:
     """Jalankan 4 MESIN NYATA memakai kata kunci yang SUDAH jadi.
 
     Dipisah (13Okt26) supaya RUTE async bisa memetakan kata kunci lewat
@@ -1734,7 +1741,7 @@ def cari_semua_dengan_konsep(kw: dict, tema: str, uji_tahun: bool = True,
         r['scite'] = None
     _dois = [((r.get('doi') or '').strip()) for r in daftar]
     _dois = [d for d in _dois if d]
-    if _dois:
+    if _dois and not tanpa_scite:
         from concurrent.futures import ThreadPoolExecutor
         with ThreadPoolExecutor(max_workers=min(8, len(_dois))) as _tp:
             _peta_s = dict(zip(_dois, _tp.map(scite_tallies, _dois)))
@@ -1764,7 +1771,7 @@ def cari_semua_dengan_konsep(kw: dict, tema: str, uji_tahun: bool = True,
                  if r.get('scite') and (r.get('doi') or '').strip()]
     _kandidat.sort(key=lambda r: -(r.get('scite') or {}).get('dibantah') or 0)
     _kandidat = _kandidat[:KUTIPAN_MAKS]
-    if _kandidat:
+    if _kandidat and not tanpa_scite:
         #  ⭐ 13Okt26 — HEMAT KUOTA 90% (TERUKUR, putusan Bos).
         #  SEBELUM: ThreadPoolExecutor memanggil `scite_kutipan` PER DOI
         #  ⇒ 3 kandidat = 3 panggilan = 3 KUOTA Scite, padahal Scite
