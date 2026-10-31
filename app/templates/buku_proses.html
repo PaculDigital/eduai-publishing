@@ -100,6 +100,14 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
 .st-tulis{color:#92400e;background:#fef3c7}
 .st-tunggu{color:var(--teks-abu);background:#eef0f2}
 .st-selesai{color:var(--hijau-gelap);background:var(--hijau-muda)}
+.artikel-blok{margin-top:14px}
+.artikel-item{padding:8px 0;border-bottom:1px dashed var(--garis);font-size:13.5px;line-height:1.6}
+.artikel-item:last-child{border-bottom:none}
+.artikel-judul{font-weight:600}
+.artikel-meta{color:var(--teks-abu);font-size:12.5px}
+.badge-sumber{display:inline-block;font-weight:700;font-size:11.5px;padding:2px 8px;border-radius:20px;background:var(--hijau-muda);color:var(--hijau-gelap);margin-left:6px;white-space:nowrap}
+.artikel-more summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--hijau-gelap);padding:8px 0}
+.artikel-kosong{font-size:13.5px;color:var(--teks-abu);line-height:1.7}
 </style>
 </head>
 <body>
@@ -152,6 +160,38 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
         <span class="isi">Selesai</span></div>
     </div>
     <ul class="bab-daftar" id="subbab-info">{% for nomor, teks in (subbab_per_bab or {}).items() %}{% set teks2 = (teks or '')|string %}{% if teks2.startswith('Catatan') %}<li>Bab {{ nomor }}</li>{% else %}{% if ': ' in teks2 %}{% set judul_bab = teks2.split(': ', 1)[1] %}{% elif teks2.startswith('BAB ' ~ (nomor|string) ~ ' ') %}{% set judul_bab = '' %}{% else %}{% set judul_bab = teks2 %}{% endif %}{% set st = 'selesai' if 'selesai' in teks2|lower else ('tulis' if 'mulai' in teks2|lower else 'tunggu') %}<li><span class="st st-{{ st }}">{% if st == 'selesai' %}Selesai{% elif st == 'tulis' %}Sedang Ditulis{% else %}Menunggu...{% endif %}</span> Bab {{ nomor }}{% if judul_bab %}: {{ judul_bab }}{% endif %}</li>{% endif %}{% endfor %}</ul>
+  </div>
+
+  <div class="kartu" id="kartu-artikel">
+    <h2>Artikel Pendukung</h2>
+    {% if artikel_per_bab %}
+      {% for nomor in artikel_per_bab.keys()|sort %}
+        {% set daftar = artikel_per_bab[nomor] %}
+        {% set tampil = daftar[:3] %}
+        {% set sisa = daftar[3:] %}
+        <div class="artikel-blok">
+          <h3 style="font-size:14px;margin-bottom:6px">Bab {{ nomor }} ({{ daftar|length }} artikel)</h3>
+          {% for a in tampil %}
+          <div class="artikel-item">
+            <div class="artikel-judul">{{ a.judul }}</div>
+            <div class="artikel-meta">{% if a.penulis %}{{ a.penulis }}{% endif %}{% if a.tahun %}{% if a.penulis %}, {% endif %}{{ a.tahun }}{% endif %}{% if a.sumber %}<span class="badge-sumber">{{ a.sumber }}</span>{% endif %}</div>
+          </div>
+          {% endfor %}
+          {% if sisa %}
+          <details class="artikel-more"><summary>and more... ({{ sisa|length }} lagi)</summary>
+            {% for a in sisa %}
+            <div class="artikel-item">
+              <div class="artikel-judul">{{ a.judul }}</div>
+              <div class="artikel-meta">{% if a.penulis %}{{ a.penulis }}{% endif %}{% if a.tahun %}{% if a.penulis %}, {% endif %}{{ a.tahun }}{% endif %}{% if a.sumber %}<span class="badge-sumber">{{ a.sumber }}</span>{% endif %}</div>
+            </div>
+            {% endfor %}
+          </details>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="artikel-kosong">Referensi sedang disiapkan. Artikel pendukung akan tampil di sini sesudah referensi selesai disiapkan.</p>
+    {% endif %}
   </div>
 
   <div class="kartu" id="kartu-hasil" style="display:none">

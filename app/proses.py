@@ -378,6 +378,95 @@ def galat_tampil(galat):
     return teks[m.end():] if m else teks
 
 
+# ── Artikel pendukung di halaman proses (31 Okt 2026, display-only) ──
+# Gas Bos: tiap bab tampil minimal, 3 artikel dulu, sisanya di balik
+# "and more...". Data dibaca dari snapshot beku yang sudah ada
+# (pra_panen.ambil_snapshot), tidak ada panen baru, tidak ada tulis DB,
+# tidak ada ubah alur. Kartu artikel di template TIDAK ditulis ulang
+# oleh JS polling (JS hanya menulis daftar bab), jadi data tampil pada
+# muat awal halaman; bila halaman dibuka sebelum pra-panen selesai,
+# placeholder netral tampil dan muat ulang sesudah pra-panen
+# menampilkan artikelnya.
+ARTIKEL_TAMPIL_MAKS = 3
+
+
+def bagi_artikel_tampil(daftar):
+    """Bagi daftar artikel jadi (tampil, sisa).
+
+    tampil = ARTIKEL_TAMPIL_MAKS pertama, sisa = sisanya. Bukan list
+    (mis. None) menjadi ([], []) supaya template tidak error.
+    """
+    if not isinstance(daftar, (list, tuple)):
+        return [], []
+    daftar = list(daftar)
+    return daftar[:ARTIKEL_TAMPIL_MAKS], daftar[ARTIKEL_TAMPIL_MAKS:]
+
+
+def _artikel_tampil_dari_snapshot(baris):
+    """Satu baris snapshot menjadi dict tampil {judul, penulis, tahun, sumber}.
+
+    Penulis = surname_tampil bila ada, kalau tidak penulis pertama dari
+    ref_dict. Sumber dipakai apa adanya dari DB, tidak dipetakan dan
+    tidak ditambah, supaya badge yang tidak ada di snapshot tidak
+    pernah tampil (mis. Garuda tidak tampil bila bab itu 0 Garuda).
+    Baris tanpa judul dilewati pemanggil, bukan ditampilkan kosong.
+    """
+    ref = baris.get('ref_dict') or {} if isinstance(baris, dict) else {}
+    authors = ref.get('authors') or []
+    penulis = (baris.get('surname_tampil') or '').strip() if isinstance(baris, dict) else ''
+    if not penulis and authors:
+        penulis = str(authors[0]).strip()
+    judul = (ref.get('title') or '').strip()
+    tahun = ref.get('year')
+    if tahun in (None, ''):
+        tahun = baris.get('tahun') or ''
+    tahun = str(tahun).strip() if tahun is not None else ''
+    sumber = (baris.get('sumber') or ref.get('source') or '').strip() if isinstance(baris, dict) else ''
+    return {'judul': judul, 'penulis': penulis, 'tahun': tahun, 'sumber': sumber}
+
+
+def artikel_proses(db, kode, bab_total, ambil=None):
+    """Artikel pendukung per bab untuk halaman proses, dari snapshot.
+
+    Return dict {nomor_bab: [ {judul, penulis, tahun, sumber}, ... ]}
+    urut snapshot. Fail-soft: kesalahan apa pun di satu bab hanya
+    melewatkan bab itu, kesalahan loader menghasilkan {} , fungsi ini
+    tidak pernah raise ke halaman. Bab tanpa artikel tidak masuk dict,
+    supaya template menampilkan placeholder netral, bukan kartu kosong.
+    Parameter ambil hanya untuk uji (loader palsu); produksi memakai
+    pra_panen.ambil_snapshot.
+    """
+    if not kode or not bab_total:
+        return {}
+    try:
+        total = int(bab_total)
+    except (TypeError, ValueError):                                # noqa: BLE001
+        return {}
+    if total <= 0:
+        return {}
+    if ambil is None:
+        try:
+            from .pra_panen import ambil_snapshot as ambil
+        except Exception:                                                # noqa: BLE001
+            return {}
+    hasil = {}
+    for bab in range(1, total + 1):
+        try:
+            baris_list = ambil(db, kode, bab) or []
+        except Exception:                                                # noqa: BLE001
+            continue
+        items = []
+        for baris in baris_list:
+            if not isinstance(baris, dict):
+                continue
+            item = _artikel_tampil_dari_snapshot(baris)
+            if item['judul']:
+                items.append(item)
+        if items:
+            hasil[bab] = items
+    return hasil
+
+
 def ringkas(p: ProsesAI) -> dict:
     """Bentuk ringkas untuk dikirim ke halaman (JSON).
 
