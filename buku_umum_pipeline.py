@@ -2054,6 +2054,30 @@ def _refs_dari_harvest(bab_title):
                     adapted.append(a)
         except Exception:
             pass
+        # Gas Bos 31 Okt 2026 19:03, prioritas Scopus dulu: urutkan
+        # kandidat yang SUDAH lolos saring relevansi dan filter tahun
+        # dengan prioritas sumber (Scopus, OpenAlex, CrossRef, Garuda,
+        # lain), stabil, BARU potong 8 pertama. Kueri, kata kunci,
+        # dedup, batas 8, dan cache tidak diubah. Bila Scopus kurang
+        # dari 8, sisanya diisi sumber lain menurut prioritas yang
+        # sama, bukan dipaksa 8 Scopus. Impor helper di sini, dengan
+        # fallback pemetaan yang sama, supaya jalur file tunggal
+        # tetap jalan bila paket app tidak bisa diimpor.
+        try:
+            from app.prioritas_sumber import urutkan_prioritas_sumber as _urut_scopus
+            adapted = _urut_scopus(adapted)
+        except Exception:
+            _peta_scopus = {'scopus': 0, 'openalex': 1,
+                            'crossref': 2, 'garuda': 3}
+
+            def _angka_scopus(item):
+                kunci = str((item or {}).get('source') or '').strip().lower()
+                for nama, angka in _peta_scopus.items():
+                    if nama in kunci:
+                        return angka
+                return 4
+
+            adapted = sorted(adapted, key=_angka_scopus)
         refs = adapted[:8] or None
     except Exception as e:
         print(f"       [HARVEST] gagal ({type(e).__name__}) — "

@@ -61,6 +61,7 @@ from typing import Any, Optional
 from sqlalchemy import select
 
 from .models import ProsesAI, SessionLocal
+from .prioritas_sumber import urutkan_prioritas_sumber
 
 log = logging.getLogger('eduai.proses')
 
@@ -395,10 +396,16 @@ def bagi_artikel_tampil(daftar):
 
     tampil = ARTIKEL_TAMPIL_MAKS pertama, sisa = sisanya. Bukan list
     (mis. None) menjadi ([], []) supaya template tidak error.
+    Gas Bos 31 Okt 2026 19:03: sebelum dibagi, daftar diurutkan
+    dengan prioritas sumber (Scopus dulu), stabil, supaya Scopus
+    tidak tersembunyi di balik and more. Item bukan dict
+    dipertahankan urutan aslinya.
     """
     if not isinstance(daftar, (list, tuple)):
         return [], []
     daftar = list(daftar)
+    if daftar and all(isinstance(item, dict) for item in daftar):
+        daftar = urutkan_prioritas_sumber(daftar)
     return daftar[:ARTIKEL_TAMPIL_MAKS], daftar[ARTIKEL_TAMPIL_MAKS:]
 
 
@@ -429,7 +436,10 @@ def artikel_proses(db, kode, bab_total, ambil=None):
     """Artikel pendukung per bab untuk halaman proses, dari snapshot.
 
     Return dict {nomor_bab: [ {judul, penulis, tahun, sumber}, ... ]}
-    urut snapshot. Fail-soft: kesalahan apa pun di satu bab hanya
+    urut prioritas sumber (Scopus dulu, Gas Bos 31 Okt 2026 19:03),
+    bukan urut snapshot mentah, supaya template yang mengambil
+    daftar[:3] menampilkan Scopus dulu. Fail-soft: kesalahan apa
+    pun di satu bab hanya
     melewatkan bab itu, kesalahan loader menghasilkan {} , fungsi ini
     tidak pernah raise ke halaman. Bab tanpa artikel tidak masuk dict,
     supaya template menampilkan placeholder netral, bukan kartu kosong.
@@ -463,7 +473,7 @@ def artikel_proses(db, kode, bab_total, ambil=None):
             if item['judul']:
                 items.append(item)
         if items:
-            hasil[bab] = items
+            hasil[bab] = urutkan_prioritas_sumber(items)
     return hasil
 
 

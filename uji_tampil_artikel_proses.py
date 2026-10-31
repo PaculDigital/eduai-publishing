@@ -90,11 +90,18 @@ def _():
 
 @kasus('artikel-proses-bab1-8-item-urut')
 def _():
+    # Gas Bos 31 Okt 2026 19:03: urutan kini prioritas sumber, bukan
+    # urut snapshot mentah. Loader palsu: Scopus 1,4,7, OpenAlex 2,5,8,
+    # CrossRef 3,6, jadi urutan baru 1,4,7,2,5,8,3,6.
     data = artikel_proses(None, 'KODEUJI', 5, ambil=_ambil_palsu)
     assert len(data[1]) == 8, data
     assert data[1][0] == {'judul': 'Judul Artikel 1', 'penulis': 'Penulis1',
                           'tahun': '2021', 'sumber': 'Scopus'}, data[1][0]
-    assert data[1][7]['judul'] == 'Judul Artikel 8'
+    assert [a['judul'] for a in data[1]] == [
+        'Judul Artikel 1', 'Judul Artikel 4', 'Judul Artikel 7',
+        'Judul Artikel 2', 'Judul Artikel 5', 'Judul Artikel 8',
+        'Judul Artikel 3', 'Judul Artikel 6'], data[1]
+    assert data[1][7]['judul'] == 'Judul Artikel 6'
 
 
 @kasus('artikel-proses-tanpa-garuda-palsu')
