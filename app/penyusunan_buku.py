@@ -694,10 +694,13 @@ def susun(db, u, judul, bidang, untuk, jenis, jumlah_bab=None, lapor=None,
                     except Exception:
                         _panggil_pm = None
                     _subs_pm = {}
+                    _judul_pm = {}
                     for _n_pm in sorted(_rows_pm):
                         _subs_pm[_n_pm] = (outline.get(_n_pm) or {}).get('subs')
+                        _judul_pm[_n_pm] = (outline.get(_n_pm) or {}).get('title')
                     _teks_pm_baru, _lap_pm = _PM.perbaiki_buku(
-                        _teks_pm, _rows_pm, _subs_pm, _panggil_pm)
+                        _teks_pm, _rows_pm, _subs_pm, _panggil_pm,
+                        judul_per_bab=_judul_pm)
                     # Tulis kembali teks yang berubah, hitung ulang kata
                     # dan sitasi dengan selisih formal, supaya angka di
                     # hasil tetap cocok dengan berkas bab sesudah perbaikan.
