@@ -86,19 +86,63 @@ _PEMISAH_PENULIS = re.compile(r"\s+&\s+|\s+dan\s+|\s+and\s+|;")
 class GagalSitasiBersih(Exception):
     """Sinyal gagal bersih sesudah repair habis.
 
-    str(exception) selalu PESAN_GAGAL_BERSIH, supaya pemanggil di
-    penyusunan_buku.susun bisa mengandalkan jalur except yang sudah
-    ada untuk refund, tanpa menampilkan error mentah ke user.
-    Rincian teknis tetap tersedia sebagai atribut, bukan di pesan.
+    Default, str(exception) selalu PESAN_GAGAL_BERSIH, supaya
+    pemanggil di penyusunan_buku.susun bisa mengandalkan jalur
+    except yang sudah ada untuk refund, tanpa menampilkan error
+    mentah ke user, dan supaya uji lama yang menegaskan pesan
+    tepat itu tetap lolos. Rincian teknis tetap tersedia sebagai
+    atribut, bukan di pesan.
+
+    Gas 31 Okt 2026 12:03, butir 3: pemanggil produksi boleh
+    mengoper detail_text, maka str menjadi PESAN_GAGAL_BERSIH
+    ditambah detail (nomor bab, cakupan, sitasi snapshot), supaya
+    galat DB dan log memuat bab mana yang gagal, bukan hanya
+    pesan umum. detail_text hanya dipakai pemanggil produksi,
+    bukan jalur uji default.
     """
 
     def __init__(self, nomor_bab=None, masalah=None, inisial_tersisa=None,
-                 cakupan=None):
-        super().__init__(PESAN_GAGAL_BERSIH)
+                 cakupan=None, nomor_subbab=None,
+                 snapshot_ditemukan=None, detail_text=None):
+        if detail_text:
+            super().__init__(PESAN_GAGAL_BERSIH + " " + detail_text)
+        else:
+            super().__init__(PESAN_GAGAL_BERSIH)
         self.nomor_bab = nomor_bab
+        self.nomor_subbab = nomor_subbab
+        self.snapshot_ditemukan = snapshot_ditemukan
+        self.detail_text = detail_text
         self.masalah = list(masalah or [])
         self.inisial_tersisa = list(inisial_tersisa or [])
         self.cakupan = dict(cakupan or {})
+
+
+def detail_galat_sitasi(nomor_bab, cakupan, snapshot_ditemukan=None,
+                        nomor_subbab=None, luar_dihapus=None,
+                        inisial_sisa=None):
+    """String detail untuk galat DB dan log gerbang sitasi.
+
+    Contoh: Bab 2, cakupan 0 dari 8, sitasi snapshot 0.
+    Bila subbab dioper, ditambah di depan cakupan. Bila luar
+    dihapus atau inisial sisa dioper, ditambah di akhir. String
+    ini tidak pernah memuat nama kelas exception, supaya tampilan
+    bersih tetap bersih.
+    """
+    cakupan = dict(cakupan or {})
+    total = cakupan.get("total", 0)
+    cocok = cakupan.get("cocok_jumlah", 0)
+    if snapshot_ditemukan is None:
+        snapshot_ditemukan = cakupan.get("sitasi_snapshot", 0)
+    bagian = ["Bab %s" % nomor_bab]
+    if nomor_subbab is not None:
+        bagian.append("subbab %s" % nomor_subbab)
+    bagian.append("cakupan %s dari %s" % (cocok, total))
+    bagian.append("sitasi snapshot %s" % snapshot_ditemukan)
+    if luar_dihapus is not None:
+        bagian.append("sitasi luar dihapus %s" % luar_dihapus)
+    if inisial_sisa is not None:
+        bagian.append("inisial sisa %s" % inisial_sisa)
+    return ", ".join(bagian)
 
 
 def _norm(kata):
@@ -378,8 +422,13 @@ def hitung_cakupan(teks, refs):
     bila refs kosong, supaya pemanggil fail-closed, bukan lolos diam.
     """
     surnames_ref = _surname_dari_refs(refs)
+    surnames_ref_lipat = {s.lower() for s in surnames_ref}
     badan = set()
+    sitasi_snapshot = 0
     for sit in ekstrak_sitasi_badan(teks):
+        if any(s.lower() in surnames_ref_lipat
+               for s in sit["surnames"]):
+            sitasi_snapshot += 1
         for sur in sit["surnames"]:
             badan.add(sur.lower())
     cocok = [s for s in surnames_ref if s.lower() in badan]
@@ -387,7 +436,8 @@ def hitung_cakupan(teks, refs):
     total = len(surnames_ref)
     persen = (len(cocok) / total) if total else 0.0
     return {"total": total, "cocok_jumlah": len(cocok),
-            "persen": persen, "cocok": cocok, "hilang": hilang}
+            "persen": persen, "cocok": cocok, "hilang": hilang,
+            "sitasi_snapshot": sitasi_snapshot}
 
 
 def cek_hulu_bab(nomor_bab, teks, refs):
@@ -791,6 +841,15 @@ def periksa_dan_perbaiki_bab(nomor_bab, teks, refs, panggil_llm=None,
                 "tanpa_kandidat": repair["tanpa_kandidat"],
                 "cek_awal": cek_awal, "cek_ulang": cek_ulang, "pesan": ""}
     if gagal_keras:
+        # Gas 31 Okt 2026 12:03, butir 3: gerbang wajib menulis
+        # baris yang sama ke log stdout, bukan hanya ke slot DB,
+        # supaya job gagal bisa didiagnosis dari log saja. Pesan
+        # raise tetap default, supaya uji lama yang menegaskan
+        # pesan tepat itu tetap lolos, detail lengkap ada di
+        # log dan di galat DB lewat pembungkus susun().
+        print("       [GERBANG-SITASI] %s. %s"
+              % (detail_galat_sitasi(nomor_bab, cek_ulang["cakupan"]),
+                 PESAN_GAGAL_BERSIH))
         raise GagalSitasiBersih(
             nomor_bab=nomor_bab, masalah=cek_ulang["masalah"],
             inisial_tersisa=cek_ulang["inisial"],
@@ -835,10 +894,32 @@ def hitung_cakupan_kunci(teks, snapshot_rows):
     """
     teks = teks or ""
     badan = set()
+    sitasi_snapshot = 0
     for sit in ekstrak_sitasi_badan(teks):
         tahun = str(sit.get("tahun") or "")
         for sur in (sit.get("surnames") or []):
             badan.add((_lipat_token(sur), tahun))
+        # Hitung per kemunculan sitasi formal, bukan per baris.
+        # Satu sitasi dihitung snapshot bila satu pun surnamenya
+        # cocok dengan kunci atau alias satu baris untuk tahun
+        # yang sama, sama dengan definisi luar di gerbang subbab.
+        cocok_sitasi = False
+        for sur in (sit.get("surnames") or []):
+            sur_lipat = _lipat_token(sur)
+            for row in (snapshot_rows or []):
+                if str(row.get("tahun") or "") != tahun:
+                    continue
+                if sur_lipat == _lipat_token(row.get("kunci") or ""):
+                    cocok_sitasi = True
+                    break
+                if sur_lipat in [_lipat_token(a)
+                                 for a in (row.get("alias") or [])]:
+                    cocok_sitasi = True
+                    break
+            if cocok_sitasi:
+                break
+        if cocok_sitasi:
+            sitasi_snapshot += 1
     total = len(snapshot_rows or [])
     cocok = []
     hilang = []
@@ -858,7 +939,8 @@ def hitung_cakupan_kunci(teks, snapshot_rows):
             hilang.append(kunci)
     persen = (len(cocok) / total) if total else 0.0
     return {"total": total, "cocok_jumlah": len(cocok),
-            "persen": persen, "cocok": cocok, "hilang": hilang}
+            "persen": persen, "cocok": cocok, "hilang": hilang,
+            "sitasi_snapshot": sitasi_snapshot}
 
 
 def cek_hulu_bab_snapshot(nomor_bab, teks, snapshot_rows):
@@ -944,6 +1026,11 @@ def periksa_dan_perbaiki_bab_snapshot(nomor_bab, teks, snapshot_rows,
                 "tanpa_kandidat": repair["tanpa_kandidat"],
                 "cek_awal": cek_awal, "cek_ulang": cek_ulang, "pesan": ""}
     if gagal_keras:
+        # Gas 31 Okt 2026 12:03, butir 3: sama seperti jalur lama,
+        # tulis baris detail ke log stdout sebelum raise.
+        print("       [GERBANG-SITASI] %s. %s"
+              % (detail_galat_sitasi(nomor_bab, cek_ulang["cakupan"]),
+                 PESAN_GAGAL_BERSIH))
         raise GagalSitasiBersih(
             nomor_bab=nomor_bab, masalah=cek_ulang["masalah"],
             inisial_tersisa=cek_ulang["inisial"],

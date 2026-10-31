@@ -138,6 +138,7 @@ input[type="text"],textarea{font-family:inherit}
     <input type="hidden" name="penelaah" value="{{ penelaah }}">
     <input type="hidden" name="jumlah_bab" value="{{ jumlah_bab }}">
     <input type="hidden" name="tier" value="{{ tier }}">
+    <input type="hidden" name="bidang" value="{{ bidang }}">
     {% for n, bab in babs %}
     <div class="kartu">
       <div class="bab-judul">BAB {{ n }}</div>
@@ -172,6 +173,7 @@ input[type="text"],textarea{font-family:inherit}
       <input type="hidden" name="penelaah" value="{{ penelaah }}">
       <input type="hidden" name="jumlah_bab" value="{{ jumlah_bab }}">
       <input type="hidden" name="outline_token" value="{{ token }}">
+      <input type="hidden" name="bidang" value="{{ bidang }}">
       <button class="tombol utama" type="submit">
         {{ ikon('file-pen', 14) }} Setuju, lanjut produksi
       </button>

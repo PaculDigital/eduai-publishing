@@ -703,7 +703,12 @@ def editor_prompt(sub_title, draft, kritik, saran, jenis="umum", refs=None, dari
     # pernah menerima daftar, padahal aturan 6a merujuk ke daftar itu).
     # Aturan 6a diubah dari HAPUS diam-diam menjadi LAPOR plus tulis
     # ulang, dan penanda [SITASI-DILUAR] dihapus pemanggil supaya
-    # tidak bocor ke buku.
+    # tidak bocor ke buku. Gas 31 Okt 2026 12:03, butir 4: satu aturan
+    # saja, HANYA dari daftar snapshot. Bila sitasi luar tidak bisa
+    # ditulis ulang ke sitasi dari daftar, mesin akan menghapus
+    # sitasi luar itu deterministik, jangan pertahankan sitasi luar
+    # di teks final. Ini menyamakan perintah editor dengan jalan
+    # terakhir pipeline (verify hapus), bukan bentrok dengannya.
     daftar_editor = ""
     if dari_snapshot and refs and jenis == "referensi":
         daftar_editor = (
@@ -719,7 +724,10 @@ def editor_prompt(sub_title, draft, kritik, saran, jenis="umum", refs=None, dari
             "di luar daftar, JANGAN hapus diam-diam. Laporkan di akhir "
             "jawaban sebagai [SITASI-DILUAR: (Nama, Tahun), ...] dan "
             "tulis ulang kalimat itu memakai sitasi dari daftar yang "
-            "mendukung pernyataan tersebut.")
+            "mendukung pernyataan tersebut. Bila tidak bisa ditulis "
+            "ulang ke sitasi dari daftar, mesin akan menghapus sitasi "
+            "luar itu deterministik, jangan pertahankan sitasi luar "
+            "di teks final.")
     else:
         aturan_anti_halusinasi = (
             "6a. ANTI-HALLUSINASI SITASI, WAJIB: HANYA gunakan sitasi "
@@ -2105,9 +2113,79 @@ Output: teks lengkap hasil perbaikan saja.""",
     return post_process(perbaikan, jenis=jenis)
 
 
-def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, refs=None, jenis="umum", dari_snapshot=False):
-    """Generate 1 sub-bab via 4-agen council."""
+def _saring_unverified_alias(unverified, rows):
+    """Buang dari daftar unverified yang sebenarnya sah lewat alias.
+
+    verify_text_citations lama hanya mengenal surname pertama dari
+    format_in_text, tanpa alias snapshot. Sitasi seperti (Dabic,
+    2019) untuk baris marina-2019 alias dabic adalah sah menurut
+    gerbang final (kunci atau alias, tahun sama), tetapi unverified
+    menurut verify lama. Saringan ini memakai ekstraktor gerbang
+    final, supaya sitasi sah lewat alias tidak ikut ditulis ulang
+    atau dihapus. Bila rows tidak ada atau impor gerbang gagal,
+    daftar dikembalikan apa adanya (fail-closed ke perilaku lama).
+    """
+    if not rows:
+        return list(unverified or [])
+    try:
+        from app.gerbang_subbab import _cocok_snapshot as _cocok
+    except Exception:
+        return list(unverified or [])
+    hasil = []
+    for item in (unverified or []):
+        m = re.search(r"\(([^,()]+),\s*(\d{4})", item or "")
+        if not m:
+            hasil.append(item)
+            continue
+        surnames = [s.strip() for s in
+                    re.split(r"\s+&\s+|\s+et al\.?", m.group(1))
+                    if s.strip()]
+        if _cocok(surnames, m.group(2), rows):
+            continue
+        hasil.append(item)
+    return hasil
+
+
+def _hapus_sitasi_tertentu(teks, daftar_raw):
+    """Hapus hanya string sitasi yang disebut, deterministik.
+
+    Dipakai jalur snapshot sebagai pengganti verify mode hapus,
+    supaya sitasi sah lewat alias yang sudah disaring tidak ikut
+    terhapus. Pembersihan spasi hanya di dalam baris, paragraf
+    tidak digabung.
+    """
+    bersih = teks or ""
+    for raw in (daftar_raw or []):
+        if raw:
+            bersih = bersih.replace(raw, "")
+    baris_bersih = []
+    for baris in bersih.split("\n"):
+        baris = re.sub(r"[ \t]{2,}", " ", baris)
+        baris = re.sub(r" \.([ \t]|$)", r".\1", baris)
+        baris = re.sub(r" ,([ \t]|$)", r",\1", baris)
+        baris_bersih.append(baris.strip(" \t"))
+    bersih = "\n".join(baris_bersih)
+    bersih = re.sub(r"\n{3,}", "\n\n", bersih)
+    return bersih
+
+
+def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, refs=None, jenis="umum", dari_snapshot=False, snapshot_rows=None, _gerbang_percobaan=0, _umpan_gerbang=None):
+    """Generate 1 sub-bab via 4-agen council.
+
+    Gas 31 Okt 2026 12:03, butir 1: jalur snapshot referensi
+    memakai gerbang per subbab sesudah MIN_SITASI dan sebelum
+    ringkasan, supaya ringkasan diambil dari teks yang sudah
+    lolos gerbang. snapshot_rows dari DB adalah otoritatif, bila
+    tidak dioper maka baris diturunkan dari refs. Bila gerbang
+    gagal pada percobaan pertama, subbab ditulis ulang SEKALI
+    dengan umpan gerbang yang ditempel ke key_points untuk
+    arsitek saja, lalu dicek ulang. Bila masih gagal, raise
+    GagalSubbab (ValueError, tidak di-retry A1, langsung refund).
+    Intro dan penutup bab tidak digerbang, hanya subbab N.1-N.5.
+    """
     print(f"  [{sub_num}] {sub_title}")
+    if _umpan_gerbang:
+        key_points = (key_points or "") + "\n\n" + _umpan_gerbang
 
     # Snapshot: refs WAJIB dari snapshot beku (pra-panen). Hilang =
     # gagal cepat, tanpa panen ulang, tanpa fallback diam-diam.
@@ -2174,7 +2252,22 @@ def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling
             final, _penanda = _strip_penanda_sitasi_diluar(final)
             if _penanda:
                 print(f"       [VERIF-SNAP] editor melapor {_penanda[:3]}")
+            # Gas 31 Okt 2026 12:03, butir 4: verify lama adalah
+            # pra-saring, bukan gerbang. Sitasi sah lewat alias
+            # disaring dari unverified, supaya tidak ditulis ulang
+            # atau dihapus. Penghapusan memakai daftar tersaring
+            # saja, bukan verify mode hapus yang menghapus semua
+            # unverified termasuk yang sah lewat alias.
+            _rows_verif = snapshot_rows
+            if _rows_verif is None:
+                try:
+                    from app.gerbang_subbab import rows_dari_refs_dicts as _rows_dari_refs
+                    _rows_verif = _rows_dari_refs(refs)
+                except Exception:
+                    _rows_verif = None
             verif = verify_text_citations(final, refs, mode="lapor")
+            verif["unverified"] = _saring_unverified_alias(
+                verif["unverified"], _rows_verif)
             if verif["unverified"]:
                 print(f"       [VERIF-SNAP] {len(verif['unverified'])} sitasi di luar daftar, tulis ulang sekali")
                 perbaikan_snap = _perbaiki_sitasi_diluar(
@@ -2182,15 +2275,16 @@ def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling
                 if perbaikan_snap is not None:
                     perbaikan_snap, _penanda2 = _strip_penanda_sitasi_diluar(perbaikan_snap)
                     verif2 = verify_text_citations(perbaikan_snap, refs, mode="lapor")
+                    verif2["unverified"] = _saring_unverified_alias(
+                        verif2["unverified"], _rows_verif)
                     if not verif2["unverified"]:
                         final = perbaikan_snap
                     else:
-                        bersih = verify_text_citations(perbaikan_snap, refs, mode="hapus")
-                        final = bersih["clean_text"]
+                        final = _hapus_sitasi_tertentu(
+                            perbaikan_snap, verif2["unverified"])
                         print(f"       [VERIF-SNAP] hapus {len(verif2['unverified'])} sisa sesudah tulis ulang: {verif2['unverified'][:3]}")
                 else:
-                    bersih = verify_text_citations(final, refs, mode="hapus")
-                    final = bersih["clean_text"]
+                    final = _hapus_sitasi_tertentu(final, verif["unverified"])
                     print(f"       [VERIF-SNAP] tulis ulang gagal, hapus {len(verif['unverified'])} sitasi di luar daftar")
             # Simpan referensi snapshot SEKALI (tulis penuh, bukan menumpuk).
             refs_path = os.path.join(visual_ini(), f"refs_bab{bab_num}.json")
@@ -2254,12 +2348,23 @@ Output: teks lengkap hasil perbaikan saja.""",
             if refs:
                 if dari_snapshot:
                     verif2 = verify_text_citations(perbaikan, refs, mode="lapor")
+                    # Saring alias sah, hapus hanya daftar tersaring,
+                    # sama seperti blok verif utama di atas.
+                    _rows_min = snapshot_rows
+                    if _rows_min is None:
+                        try:
+                            from app.gerbang_subbab import rows_dari_refs_dicts as _rows_dari_refs2
+                            _rows_min = _rows_dari_refs2(refs)
+                        except Exception:
+                            _rows_min = None
+                    verif2["unverified"] = _saring_unverified_alias(
+                        verif2["unverified"], _rows_min)
                     if verif2["unverified"]:
                         # Jalan terakhir (tanpa tulis ulang kedua):
                         # hapus sisa, dicatat, supaya sitasi palsu
                         # tidak terkirim.
-                        bersih2 = verify_text_citations(perbaikan, refs, mode="hapus")
-                        perbaikan = bersih2["clean_text"]
+                        perbaikan = _hapus_sitasi_tertentu(
+                            perbaikan, verif2["unverified"])
                         print(f"       [VERIF-SNAP] hapus {len(verif2['unverified'])} sitasi di luar daftar sesudah perbaikan MIN_SITASI")
                 else:
                     verif2 = verify_text_citations(perbaikan, refs)
@@ -2279,7 +2384,65 @@ Output: teks lengkap hasil perbaikan saja.""",
     if cit < MIN_SITASI:
         print(f"       [SITASI] ⚠️ AKHIR: hanya {cit} sitasi "
               f"(minimum {MIN_SITASI}) — TIDAK dipalsukan", flush=True)
-    
+
+    # ── GERBANG PER SUBBAB (Gas Bos 31 Okt 2026 12:03, butir 1) ──
+    #  Hanya jalur snapshot referensi. Sesudah post_process, sesudah
+    #  verif snapshot dan perbaikan MIN_SITASI, sebelum ringkasan,
+    #  supaya ringkasan diambil dari teks yang sudah lolos gerbang.
+    #  Syarat lolos: minimal 1 sitasi snapshot formal, tidak ada
+    #  sitasi luar tersisa sesudah penghapusan deterministik, tidak
+    #  ada sitasi inisial saja tersisa sesudah perbaikan deterministik.
+    #  Kuota 2 sampai 3 tetap arahan prompt, bukan syarat keras di sini.
+    if dari_snapshot and jenis == "referensi":
+        try:
+            from app.gerbang_subbab import (
+                periksa_subbab as _periksa_subbab,
+                rows_dari_refs_dicts as _rows_dari_refs_gate,
+                GagalSubbab as _GagalSubbab)
+        except Exception as _e_gate:
+            raise ValueError(
+                "Gerbang subbab tidak bisa dimuat, gagal cepat: %s"
+                % _e_gate)
+        _rows_gate = snapshot_rows
+        if _rows_gate is None:
+            _rows_gate = _rows_dari_refs_gate(refs) if refs else None
+        if not _rows_gate:
+            raise ValueError(
+                "Snapshot referensi bab %s hilang untuk gerbang subbab, "
+                "gagal cepat tanpa fallback" % bab_num)
+        _hasil_gate = _periksa_subbab(
+            final, _rows_gate, bab=bab_num, subbab=sub_num)
+        if _hasil_gate["lolos"]:
+            if _hasil_gate["luar_dihapus"] or _hasil_gate["diperbaiki"]:
+                print(f"       [GERBANG-SUBBAB] bab {bab_num} subbab "
+                      f"{sub_num}: sitasi luar dihapus "
+                      f"{len(_hasil_gate['luar_dihapus'])}, inisial "
+                      f"diperbaiki {len(_hasil_gate['diperbaiki'])}")
+            final = _hasil_gate["teks_bersih"]
+        elif _gerbang_percobaan == 0:
+            _umpan = (
+                "Perhatian gerbang sitasi, subbab sebelumnya gagal: "
+                + "; ".join(_hasil_gate["masalah"])
+                + ". Tulis ulang subbab ini dengan sitasi HANYA dari "
+                "daftar snapshot di atas, minimal 1 sitasi formal "
+                "(Nama Belakang, Tahun) yang ada di daftar, tanpa "
+                "sitasi luar daftar, tanpa sitasi inisial saja.")
+            return generate_sub_bab(
+                bab_num, bab_title, sub_num, sub_title, key_points,
+                rolling_summary, refs=refs, jenis=jenis,
+                dari_snapshot=dari_snapshot, snapshot_rows=snapshot_rows,
+                _gerbang_percobaan=1, _umpan_gerbang=_umpan)
+        else:
+            print(f"       [GERBANG-SUBBAB] BAB {bab_num} subbab "
+                  f"{sub_num} gagal: cakupan "
+                  f"{_hasil_gate['cakupan_cocok']} dari "
+                  f"{_hasil_gate['cakupan_total']}, sitasi snapshot "
+                  f"{_hasil_gate['snapshot_count']}, luar dihapus "
+                  f"{len(_hasil_gate['luar_dihapus'])}, inisial sisa "
+                  f"{len(_hasil_gate['inisial_sisa'])}")
+            raise _GagalSubbab(
+                bab=bab_num, subbab=sub_num, hasil=_hasil_gate)
+
     # Rolling summary
     print(f"       Summary...", end="", flush=True)
     t8 = time.time()
@@ -2316,7 +2479,7 @@ def generate_closing(bab_num, bab_title, rolling_summary, jenis="umum"):
     closing = post_process(closing, jenis=jenis)
     return closing
 
-def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None, refs_bab=None, dari_snapshot=False):
+def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None, refs_bab=None, dari_snapshot=False, snapshot_rows=None):
     """Generate 1 bab lengkap: intro + sub-bab + penutup."""
     bab_title = bab_data["title"]
     subs = bab_data["subs"]
@@ -2347,7 +2510,8 @@ def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None, refs_
         if dari_snapshot:
             final, summary, wc, cit = generate_sub_bab(
                 bab_num, bab_title, sub_num, sub_title, key_points, rolling,
-                refs=refs_bab, jenis=jenis, dari_snapshot=True
+                refs=refs_bab, jenis=jenis, dari_snapshot=True,
+                snapshot_rows=snapshot_rows
             )
         else:
             final, summary, wc, cit = generate_sub_bab(
