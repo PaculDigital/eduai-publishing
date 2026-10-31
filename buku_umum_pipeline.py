@@ -424,6 +424,125 @@ Bab 3: Ekosistem Pembayaran Digital dan Masa Depan
 
 # === PROMPTS ===
 
+def _adalah_token_inisial(token):
+    """True bila token adalah inisial, bukan nama belakang.
+
+    Contoh inisial: M, D, N.P.S., A.K.S.U., Y.P. Token nama
+    belakang seperti Masina, Saenz-Royo, atau Macharia bukan
+    inisial, walau hurufnya besar semua di satu token pendek.
+    """
+    bersih = (token or "").strip().strip(",").replace(".", "")
+    if not bersih:
+        return False
+    if len(bersih) == 1:
+        return bersih.isalpha()
+    return len(bersih) <= 4 and bersih.isupper() and bersih.isalpha()
+
+
+def _nama_belakang_dari_penulis(nama):
+    """Nama belakang lengkap dari satu string penulis, tanpa inisial.
+
+    Alasan ada fungsi ini (job 228, Bab 3): format_in_text lama
+    mengambil token terakhir sebagai nama belakang, sehingga
+    penulis "Masina N.P.S." menjadi sitasi (N.P.S., 2026) di
+    prompt, padahal nama belakangnya Masina. Fungsi ini membuang
+    token inisial di akhir dulu, baru mengambil token terakhir
+    yang tersisa. Bentuk "Nama, Inisial" memakai bagian sebelum
+    koma. Bentuk nama lengkap memakai token terakhir yang bukan
+    inisial, misalnya Chege Samwel Macharia menjadi Macharia.
+    """
+    if not nama:
+        return ""
+    nama = str(nama).strip()
+    if "," in nama:
+        return nama.split(",")[0].strip()
+    tokens = [t.strip(",") for t in nama.split() if t.strip(",")]
+    while len(tokens) > 1 and _adalah_token_inisial(tokens[-1]):
+        tokens.pop()
+    if not tokens:
+        return ""
+    return tokens[-1].strip(",.")
+
+
+def _baris_referensi_untuk_penulis(ref):
+    """Satu baris referensi untuk LLM penulis, tanpa inisial.
+
+    Bentuk: Nama Belakang (Tahun). Judul. Hanya nama belakang
+    penulis pertama, tanpa inisial nama depan, tanpa singkatan
+    nama. Ini HANYA representasi untuk LLM, bukan format pustaka
+    DOCX dan bukan daftar checker atau gerbang, yang tetap memakai
+    format_apa dan kunci snapshot seperti sebelumnya.
+    """
+    if isinstance(ref, str):
+        return ref
+    authors = ref.get("authors") or []
+    surnames = [_nama_belakang_dari_penulis(a) for a in authors]
+    surnames = [s for s in surnames if s]
+    pertama = surnames[0] if surnames else "Anonim"
+    tahun = ref.get("year") or ""
+    judul = (ref.get("title") or "").strip()
+    if judul:
+        return "%s (%s). %s." % (pertama, tahun, judul)
+    return "%s (%s)." % (pertama, tahun)
+
+
+def _sitasi_untuk_penulis(ref):
+    """Sitasi in-text untuk LLM penulis, hanya nama belakang."""
+    if isinstance(ref, str):
+        return ""
+    authors = ref.get("authors") or []
+    surnames = [_nama_belakang_dari_penulis(a) for a in authors]
+    surnames = [s for s in surnames if s]
+    tahun = ref.get("year") or ""
+    if not surnames:
+        return "(Anonim, %s)" % tahun
+    if len(surnames) == 1:
+        return "(%s, %s)" % (surnames[0], tahun)
+    if len(surnames) == 2:
+        return "(%s & %s, %s)" % (surnames[0], surnames[1], tahun)
+    return "(%s et al., %s)" % (surnames[0], tahun)
+
+
+def _boleh_jaring_pengaman_inisial(hasil_gate):
+    """True bila jaring pengaman inisial boleh dipakai, dan hanya itu.
+
+    Syarat, semua harus terpenuhi: ada inisial sisa, minimal 1
+    sitasi snapshot sah, tidak ada sitasi luar tersisa, dan semua
+    masalah yang dilaporkan adalah masalah inisial. Bila satu
+    syarat saja tidak terpenuhi, pemanggil harus tetap gagal,
+    bukan menghapus inisial untuk menutupi masalah lain.
+    """
+    hasil = hasil_gate or {}
+    if not hasil.get("inisial_sisa"):
+        return False
+    if hasil.get("snapshot_count", 0) < 1:
+        return False
+    if hasil.get("luar_sisa"):
+        return False
+    masalah = hasil.get("masalah") or []
+    return all("inisial" in (m or "").lower() for m in masalah)
+
+
+def _daftar_referensi_untuk_penulis(refs):
+    """Daftar referensi untuk LLM penulis, tanpa inisial sama sekali."""
+    baris = []
+    for i, ref in enumerate(refs or [], 1):
+        baris.append("%s. %s" % (i, _baris_referensi_untuk_penulis(ref)))
+        sitasi = _sitasi_untuk_penulis(ref)
+        if sitasi:
+            baris.append("   Sitasi: %s" % sitasi)
+    return baris
+
+
+_ATURAN_NAMA_BELAKANG_PENULIS = (
+    "ATURAN SITASI NAMA BELAKANG LENGKAP: Kutip HANYA dengan nama "
+    "belakang lengkap dari daftar di atas, tanpa inisial nama depan. "
+    "Contoh bentuk saja, bukan referensi tambahan: benar Masina et "
+    "al. (2026), salah M. et al. (2026), salah N.P.S. (2026). "
+    "Sitasi inisial saja sama dengan gagal."
+)
+
+
 def architect_prompt(bab_num, bab_title, sub_num, sub_title, key_points, rolling_summary, is_intro=False, is_closing=False, refs=None, jenis="umum", outline=None, dari_snapshot=False):
     """Prompt penulis. `jenis` menentukan TONE (Bos 18 Okt 2026).
 
@@ -482,9 +601,16 @@ ATURAN BUKU REFERENSI (WAJIB, mengalahkan aturan umum bila bertentangan):
     refs_section = ""
     if refs:
         refs_lines = ["\nREFERENSI TERVERIFIKASI (WAJIB gunakan, HANYA dari list ini):"]
-        for i, ref in enumerate(refs, 1):
-            refs_lines.append(f"{i}. {format_apa(ref)}")
-            refs_lines.append(f"   Sitasi: {format_in_text(ref)}")
+        if dari_snapshot:
+            # Jalur snapshot: daftar untuk LLM memakai nama belakang
+            # saja, tanpa inisial, supaya penulis tidak meniru inisial
+            # menjadi sitasi inisial saja (job 228, Bab 3).
+            refs_lines.extend(_daftar_referensi_untuk_penulis(refs))
+            refs_lines.append(_ATURAN_NAMA_BELAKANG_PENULIS)
+        else:
+            for i, ref in enumerate(refs, 1):
+                refs_lines.append(f"{i}. {format_apa(ref)}")
+                refs_lines.append(f"   Sitasi: {format_in_text(ref)}")
         refs_lines.append("DILARANG mengarang sitasi baru.")
         refs_lines.append("PERATURAN SITASI KETAT — PELANGGARAN = GAGAL TOTAL:")
         refs_lines.append("  - HANYA gunakan sitasi yang ADA di daftar referensi di atas")
@@ -596,8 +722,16 @@ def skeptic_prompt(sub_title, draft, refs=None, jenis='umum', dari_snapshot=Fals
     if jenis == 'referensi':
         daftar = ''
         if refs:
-            daftar = '\nDAFTAR REFERENSI (satu-satunya sumber sitasi yang sah):\n' + '\n'.join(
-                f'- {format_in_text(r)}' for r in refs)
+            if dari_snapshot:
+                # Daftar untuk verifikator memakai nama belakang saja,
+                # supaya (N.P.S., 2026) tidak dianggap sitasi yang sah.
+                daftar = ('\nDAFTAR REFERENSI (satu-satunya sumber '
+                          'sitasi yang sah):\n' + '\n'.join(
+                              '- %s' % _baris_referensi_untuk_penulis(r)
+                              for r in refs))
+            else:
+                daftar = '\nDAFTAR REFERENSI (satu-satunya sumber sitasi yang sah):\n' + '\n'.join(
+                    f'- {format_in_text(r)}' for r in refs)
         cakupan = ""
         if dari_snapshot:
             cakupan = ("Juga hitung cakupan: berapa referensi dari daftar "
@@ -711,9 +845,14 @@ def editor_prompt(sub_title, draft, kritik, saran, jenis="umum", refs=None, dari
     # terakhir pipeline (verify hapus), bukan bentrok dengannya.
     daftar_editor = ""
     if dari_snapshot and refs and jenis == "referensi":
+        # Daftar untuk editor memakai nama belakang saja, tanpa
+        # inisial, supaya editor tidak mengira (N.P.S., 2026)
+        # adalah sitasi yang sah, lalu mempertahankannya.
         daftar_editor = (
             "\nDAFTAR REFERENSI (satu-satunya sumber sitasi yang sah):\n"
-            + "\n".join(f"- {format_in_text(r)}" for r in refs) + "\n")
+            + "\n".join("- %s" % _baris_referensi_untuk_penulis(r)
+                         for r in refs)
+            + "\n" + _ATURAN_NAMA_BELAKANG_PENULIS + "\n")
     if dari_snapshot and jenis == "referensi":
         aturan_anti_halusinasi = (
             "6a. ANTI-HALLUSINASI SITASI, WAJIB: HANYA gunakan sitasi "
@@ -2086,7 +2225,10 @@ def _perbaiki_sitasi_diluar(final, refs, unverified, jenis="referensi"):
     terlalu pendek (pemanggil memakai teks lama, lalu hapus sisa
     sebagai jalan terakhir).
     """
-    daftar = "\n".join(f"- {format_apa(r)}" for r in refs)
+    # Daftar untuk LLM perbaikan memakai nama belakang saja, tanpa
+    # inisial, supaya perbaikan tidak menulis sitasi inisial baru.
+    daftar = "\n".join("- %s" % _baris_referensi_untuk_penulis(r)
+                         for r in refs)
     luar = ", ".join(unverified)
     perbaikan = call_llm(
         f"""Teks di bawah memuat sitasi di luar daftar referensi yang sah:
@@ -2094,6 +2236,8 @@ def _perbaiki_sitasi_diluar(final, refs, unverified, jenis="referensi"):
 
 DAFTAR REFERENSI (HANYA ini yang boleh dikutip):
 {daftar}
+
+{_ATURAN_NAMA_BELAKANG_PENULIS}
 
 TEKS:
 {final[:6000]}
@@ -2321,7 +2465,12 @@ def generate_sub_bab(bab_num, bab_title, sub_num, sub_title, key_points, rolling
     cit = count_citations(final)
     kalau = refs or []
     if cit < MIN_SITASI and kalau:
-        daftar = "\n".join(f"- {format_apa(r)}" for r in kalau[:8])
+        if dari_snapshot:
+            daftar = "\n".join(
+                "- %s" % _baris_referensi_untuk_penulis(r)
+                for r in kalau[:8])
+        else:
+            daftar = "\n".join(f"- {format_apa(r)}" for r in kalau[:8])
         print(f"       [SITASI] hanya {cit} — minta perbaikan", flush=True)
         perbaikan = call_llm(
             f"""Teks di bawah hanya punya {cit} sitasi, padahal WAJIB minimal
@@ -2433,15 +2582,64 @@ Output: teks lengkap hasil perbaikan saja.""",
                 dari_snapshot=dari_snapshot, snapshot_rows=snapshot_rows,
                 _gerbang_percobaan=1, _umpan_gerbang=_umpan)
         else:
-            print(f"       [GERBANG-SUBBAB] BAB {bab_num} subbab "
-                  f"{sub_num} gagal: cakupan "
-                  f"{_hasil_gate['cakupan_cocok']} dari "
-                  f"{_hasil_gate['cakupan_total']}, sitasi snapshot "
-                  f"{_hasil_gate['snapshot_count']}, luar dihapus "
-                  f"{len(_hasil_gate['luar_dihapus'])}, inisial sisa "
-                  f"{len(_hasil_gate['inisial_sisa'])}")
-            raise _GagalSubbab(
-                bab=bab_num, subbab=sub_num, hasil=_hasil_gate)
+            # JARING PENGAMAN GERBANG SUBBAB (job 228, Bab 3 subbab
+            # 3.1): bila cek ulang sesudah tulis ulang sekali gagal
+            # HANYA karena inisial sisa, dan subbab masih punya
+            # minimal 1 sitasi snapshot sah, dan tidak ada sitasi
+            # luar tersisa, maka hapus sitasi inisial itu secara
+            # deterministik, lalu cek ulang sekali lagi. Syarat
+            # minimal 1 sitasi snapshot dan luar 0 TIDAK dilonggarkan.
+            # Bila sesudah hapus snapshot menjadi 0, atau luar masih
+            # ada, atau inisial masih tersisa, tetap gagal seperti
+            # sebelumnya. Cakupan 7 dari 8 bukan syarat lolos subbab,
+            # jadi tidak dipakai di sini sebagai syarat tambahan.
+            _hanya_inisial = _boleh_jaring_pengaman_inisial(
+                _hasil_gate)
+            if _hanya_inisial:
+                try:
+                    from app.gerbang_subbab import (
+                        hapus_sitasi_inisial as _hapus_inisial)
+                    _teks_hapus, _inisial_dihapus = _hapus_inisial(
+                        _hasil_gate.get("teks_bersih") or final)
+                    _hasil_cek_ulang = _periksa_subbab(
+                        _teks_hapus, _rows_gate,
+                        bab=bab_num, subbab=sub_num)
+                except Exception:
+                    _hasil_cek_ulang = None
+                    _inisial_dihapus = []
+                if (_hasil_cek_ulang is not None
+                        and _hasil_cek_ulang.get("lolos")):
+                    print(f"       [GERBANG-SUBBAB] bab {bab_num} "
+                          f"subbab {sub_num}: inisial dihapus "
+                          f"{len(_inisial_dihapus)} sebagai jaring "
+                          f"pengaman, subbab lolos")
+                    final = _hasil_cek_ulang["teks_bersih"]
+                else:
+                    _hasil_akhir = (_hasil_cek_ulang
+                                    if _hasil_cek_ulang is not None
+                                    else _hasil_gate)
+                    print(f"       [GERBANG-SUBBAB] BAB {bab_num} "
+                          f"subbab {sub_num} gagal sesudah jaring "
+                          f"pengaman: cakupan "
+                          f"{_hasil_akhir['cakupan_cocok']} dari "
+                          f"{_hasil_akhir['cakupan_total']}, sitasi "
+                          f"snapshot "
+                          f"{_hasil_akhir['snapshot_count']}, "
+                          f"inisial sisa "
+                          f"{len(_hasil_akhir['inisial_sisa'])}")
+                    raise _GagalSubbab(
+                        bab=bab_num, subbab=sub_num,
+                        hasil=_hasil_akhir)
+            else:
+                print(f"       [GERBANG-SUBBAB] BAB {bab_num} subbab "
+                      f"{sub_num} gagal: cakupan "
+                      f"{_hasil_gate['cakupan_cocok']} dari "
+                      f"{_hasil_gate['cakupan_total']}, sitasi snapshot "
+                      f"{_hasil_gate['snapshot_count']}, luar dihapus "
+                      f"{len(_hasil_gate['luar_dihapus'])}, inisial sisa "
+                      f"{len(_hasil_gate['inisial_sisa'])}")
+                raise _GagalSubbab(
+                    bab=bab_num, subbab=sub_num, hasil=_hasil_gate)
 
     # Rolling summary
     print(f"       Summary...", end="", flush=True)
