@@ -65,6 +65,10 @@ except ImportError:  # jalur cache tetap jalan urutan lama bila gagal
         _cocok_tema = None
 
 MIN_REFERENSI_PER_BAB = 8
+# Ambang fleksibel (Gas Bos 1 Nov 2026): tier tetap mengejar 8,
+# tapi bab lolos bila punya minimal 4 artikel SPESIFIK (pool
+# sudah disaring di _refs; pengisi santai yang umum dibuang).
+MIN_SPESIFIK_PER_BAB = 4
 CACHE_SEGAR_HARI = 365  # 12 bulan
 PARALEL_MAKS = 4
 TIMEOUT_PER_SUMBER_DETIK = 30  # sudah dipakai pustaka.py, lihat atas
@@ -89,7 +93,7 @@ class GagalPraPanen(ValueError):
         for bab, judul_bab, jumlah in self.gagal:
             bagian.append(
                 "Bab %s (%s) hanya menemukan %s referensi (minimal %s)"
-                % (bab, judul_bab or "", jumlah, MIN_REFERENSI_PER_BAB))
+                % (bab, judul_bab or "", jumlah, MIN_SPESIFIK_PER_BAB))
         pesan = (
             "Maaf, buku belum berhasil dibuat. "
             + "; ".join(bagian)
@@ -478,7 +482,7 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None, judul_buku=None):
     penulisan. Gas Bos 1 Nov 2026: judul_buku diteruskan sebagai konteks
     intent; pool cache beku ikut gerbang intent di fase 1, dan bila
     lolos kurang dari 8 cache dianggap miss (panen segar).
-    Raise GagalPraPanen bila ada bab di bawah minimum 8
+    Raise GagalPraPanen bila ada bab di bawah minimum 4 spesifik
     (snapshot sudah ditulis dan di-commit sebelum raise, sebagai
     audit, dan pemanggil mengembalikan token lewat jalur refund).
     """
@@ -622,7 +626,7 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None, judul_buku=None):
     # sudah terpilih untuk bab sebelumnya dihindari dulu oleh
     # pilih_seimbang (terpakai); kekurangan hanya diisi dari artikel
     # terpakai bila pool belum terpakai tidak cukup, supaya gerbang
-    # minimum 8 dan refund tidak berubah. Di dalam tiap kelompok
+    # minimum 4 spesifik dan refund tidak berubah. Di dalam tiap kelompok
     # sumber, artikel yang cocok dengan tema bab (cocok_tema) dipilih
     # dulu; artikel tidak cocok hanya mengisi kekurangan (preferensi,
     # bukan penghapus). Bab cache ikut fase ini dengan pool beku
@@ -670,7 +674,7 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None, judul_buku=None):
     for bab in babs:
         judul_bab = ((outline.get(bab) or {}).get("title") or "")
         jumlah = hitung.get(bab, 0)
-        if jumlah < MIN_REFERENSI_PER_BAB:
+        if jumlah < MIN_SPESIFIK_PER_BAB:
             gagal.append((bab, judul_bab, jumlah))
     if gagal:
         raise GagalPraPanen(gagal)

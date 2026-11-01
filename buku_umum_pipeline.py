@@ -2185,6 +2185,82 @@ def _impor_pustaka():
         return None
 
 
+def _perluas_sinonim(konsep_list):
+    """Perluas sinonim tiap konsep (Gas Bos 1 Nov 2026, perluasan
+    sinonim Bab 4). Dipakai HANYA di cabang AI intent_bab, bukan
+    kamus (kamus sudah kurasi, bab yang sudah lolos tidak diusik).
+
+    Dua perluasan mekanis, tanpa nama konsep Bab 4 yang di-hardcode,
+    jadi berlaku untuk semua maksud AI:
+    1. Varian tanda hubung: 'socio-emotional' -> 'socio emotional'
+       dan 'socioemotional'; 'social emotional' -> 'social-emotional'.
+       Frasa AI sering kalah oleh varian penulisan di judul/abstrak.
+    2. Keluarga kata (hanya daftar en, supaya kata kunci Garuda
+       dari daftar id tidak tercemar bahasa Inggris): 'privacy' ->
+       children's privacy, child privacy, dan kawan-kawan;
+       'emotional'/'socio'/'affective' -> varian socioemotional dan
+       social-emotional learning; 'ethic' -> digital ethics dan
+       kawan-kawan; 'data protection' -> varian anak.
+    Asli dipertahankan di depan, varian ditambah di belakang,
+    dedup tanpa peduli kapital. Daftar asli tidak diubah.
+    """
+    keluarga = [
+        ('privacy', ["children's privacy", 'child privacy',
+                     'online privacy for children',
+                     'children data protection']),
+        ('data protection', ['data protection for children']),
+        ('emotional', ['socioemotional', 'socio-emotional',
+                       'social-emotional', 'social emotional',
+                       'socioemotional development',
+                       'socio-emotional learning',
+                       'social-emotional learning',
+                       'social emotional learning']),
+        ('socio', ['socioemotional', 'socio-emotional',
+                   'social-emotional', 'social emotional',
+                   'socioemotional development',
+                   'socio-emotional learning',
+                   'social-emotional learning',
+                   'social emotional learning']),
+        ('affective', ['socioemotional', 'socio-emotional',
+                       'social-emotional', 'social emotional',
+                       'socioemotional development',
+                       'socio-emotional learning',
+                       'social-emotional learning',
+                       'social emotional learning']),
+        ('ethic', ['digital ethics',
+                   'ethics in early childhood education',
+                   'ethics of educational technology']),
+    ]
+    keluar = []
+    for k in (konsep_list or []):
+        nk = dict(k)
+        for kunci in ('en', 'id'):
+            asal = [x.strip() for x in (k.get(kunci) or [])
+                    if x and x.strip()]
+            tambah = []
+            for frasa in asal:
+                rendah = frasa.lower()
+                if '-' in frasa:
+                    tambah.append(frasa.replace('-', ' '))
+                    tambah.append(frasa.replace('-', ''))
+                elif ' ' in frasa:
+                    tambah.append(frasa.replace(' ', '-'))
+                if kunci == 'en':
+                    for picu, sin in keluarga:
+                        if picu in rendah:
+                            tambah.extend(sin)
+            gabung = []
+            lihat = set()
+            for x in asal + tambah:
+                xl = (x or '').strip()
+                if xl and xl.lower() not in lihat:
+                    lihat.add(xl.lower())
+                    gabung.append(xl)
+            nk[kunci] = gabung
+        keluar.append(nk)
+    return keluar
+
+
 def intent_bab(bab_title, judul_buku=None, bidang=None, _pus=None):
     """Intent satu bab: (kw_dict atau None, daftar frasa bukan).
 
@@ -2232,6 +2308,9 @@ def intent_bab(bab_title, judul_buku=None, bidang=None, _pus=None):
         konsep, bukan = _urai_intent(jawab or '', _pus)
         if not konsep:
             return (None, [])
+        # Perluasan sinonim (Gas Bos 1 Nov 2026): sebelum kw
+        # dibangun, supaya rumus query DAN gerbang ikut meluas.
+        konsep = _perluas_sinonim(konsep)
         kw2 = _pus.kata_kunci_konsep(konsep, bab, 'ai')
         hasil = (kw2, bukan)
     except Exception:
@@ -2278,6 +2357,124 @@ def saring_pasangan_intent(pasangan, kw, bukan=None, _pus=None):
         return list(pasangan)
     return [(r, f) for (r, f) in pasangan
             if lolos_intent(f, kw, bukan, _pus)]
+
+
+def sentuh_konsep(artikel, k):
+    """True bila satu konsep tersentuh di judul + abstrak (<=600)."""
+    teks = ((artikel.get('title') or '') + ' '
+            + (artikel.get('abstract') or '')[:600]).lower()
+    sinonim = [(x or '').lower()
+               for x in (k.get('en') or []) + (k.get('id') or [])]
+    return any(s and s in teks for s in sinonim)
+
+
+def lolos_pasangan(artikel, bab_konsep, buku_konsep):
+    """True bila artikel menyentuh KEDUA anggota pasangan (bab + buku).
+
+    Berbeda dari _nyambung yang meloloskan 1 konsep dengan >= 2 sinonim
+    di judul: gerbang pasangan menuntut kedua anggota tersentuh, supaya
+    pengisi tier pasangan tetap spesifik, bukan PAUD umum.
+    """
+    try:
+        return (sentuh_konsep(artikel, bab_konsep)
+                and sentuh_konsep(artikel, buku_konsep))
+    except Exception:
+        return False
+
+
+def lolos_spesifik(artikel, intent_kw, intent_bukan, buku_kw, _pus=None,
+                       bab_title=None, buku_bukan=None):
+    """True bila artikel SPESIFIK untuk bab (Gas Bos 1 Nov 2026).
+
+    Spesifik = lolos maksud penuh bab, ATAU menyentuh >= 1 konsep bab
+    + konsep buku pertama (gerbang pasangan). Artikel santai yang
+    hanya nyambung tema buku (tanpa konsep bab) TIDAK spesifik dan
+    tidak dihitung ke ambang, supaya buku tidak lolos bermodal
+    artikel umum. Tanpa maksud bab, tidak ada yang terverifikasi
+    spesifik -> False (gagal jujur, bukan lolos diam-diam).
+    Pengecualian (keputusan Bos 1 Nov 2026): bab yang judulnya
+    memuat 'sintesis'/'sintesa' BOLEH menghitung artikel tema
+    buku (lolos maksud buku), karena sumber alami bab sintesis
+    memang artikel tema buku. Bab lain tidak kena pengecualian.
+    """
+    try:
+        bab_list = (intent_kw or {}).get('konsep') or []
+        if not bab_list:
+            return False
+        if lolos_intent(artikel, intent_kw, intent_bukan, _pus):
+            return True
+        buku_list = (buku_kw or {}).get('konsep') or []
+        if not buku_list:
+            return False
+        jangkar = buku_list[0]
+        for k_bab in bab_list[:3]:
+            if lolos_pasangan(artikel, k_bab, jangkar):
+                return True
+    except Exception:
+        pass
+    # Pengecualian bab sintesis (keputusan Bos 1 Nov 2026).
+    try:
+        judul_norm = (bab_title or '').strip().lower()
+        if 'sintesis' in judul_norm or 'sintesa' in judul_norm:
+            buku_list2 = (buku_kw or {}).get('konsep') or []
+            if buku_list2 and lolos_intent(artikel, buku_kw,
+                                           buku_bukan, _pus):
+                return True
+    except Exception:
+        pass
+    return False
+
+
+def _kumpul_pasangan(_pus, bab_title, intent_kw, buku_kw,
+                       longgar=False):
+    """Pool tier pasangan: tiap konsep bab (maks 3) dipasangkan dengan
+    konsep buku pertama, dicari lewat dengan_konsep, disaring gerbang
+    pasangan, dedup DOI dulu. Fail-soft: gagal apa pun -> [].
+
+    Mode longgar (Gas Bos 1 Nov 2026): tiap konsep bab dicari SENDIRI
+    secara luas (tanpa AND dengan tema buku di query), hasilnya tetap
+    disaring gerbang pasangan yang sama. Alasan: query AND pasangan
+    di Scopus mengembalikan 0 untuk pasangan niche Bab 4, dan
+    _nyambung di dalam dengan_konsep ikut menyaring ketat; query
+    satu konsep membuka recall, gerbang menjaga presisi.
+    """
+    keluar = []
+    try:
+        bab_list = (intent_kw or {}).get('konsep') or []
+        buku_list = (buku_kw or {}).get('konsep') or []
+        if not bab_list or not buku_list:
+            return []
+        buku_pertama = buku_list[0]
+        ada = set()
+        for k_bab in bab_list[:3]:
+            try:
+                if longgar:
+                    kw_pair = _pus.kata_kunci_konsep(
+                        [k_bab], bab_title, 'longgar')
+                else:
+                    kw_pair = _pus.kata_kunci_konsep(
+                        [k_bab, buku_pertama], bab_title, 'pasangan')
+            except Exception:
+                continue
+            try:
+                hasil = _pus.cari_semua_dengan_konsep(
+                    kw_pair, bab_title,
+                    sumber_kk=kw_pair.get('sumber', ''),
+                    tanpa_scite=True) or {}
+                mentah = hasil.get('artikel') or []
+            except Exception:
+                continue
+            for a in mentah:
+                if not lolos_pasangan(a, k_bab, buku_pertama):
+                    continue
+                kunci = ((a.get('doi') or '').strip().lower()
+                         or (a.get('title') or '').lower()[:80])
+                if kunci and kunci not in ada:
+                    ada.add(kunci)
+                    keluar.append(a)
+    except Exception:
+        return []
+    return keluar
 
 
 def _refs_dari_harvest(bab_title, potong=True, konteks=None):
@@ -2442,6 +2639,56 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                       if lolos_intent(r, intent_kw, intent_bukan, _pus)]
         elif strict:
             mentah = []
+        # Tier pasangan (Gas Bos 1 Nov 2026): pool ketat < 8 ->
+        # tiap konsep bab dipasangkan dengan konsep buku pertama,
+        # dicari dan disaring per pasangan. Pengisi tetap spesifik
+        # (kedua anggota tersentuh), bukan PAUD umum. Bila tetap
+        # < 8, tier santai di bawah yang jalan.
+        if (strict and judul_buku_k and intent_kw is not None
+                and len(mentah) < 8):
+            try:
+                buku_kw, _buku_bukan = intent_bab(
+                    judul_buku_k, judul_buku_k, bidang_k, _pus)
+            except Exception:
+                buku_kw = None
+            if buku_kw is not None:
+                pasangan = _kumpul_pasangan(
+                    _pus, bab_title, intent_kw, buku_kw)
+                ada = set()
+                for a in mentah:
+                    ada.add((a.get('doi') or '').strip().lower()
+                              or (a.get('title') or '').lower()[:80])
+                for a in pasangan:
+                    kunci = ((a.get('doi') or '').strip().lower()
+                               or (a.get('title') or '').lower()[:80])
+                    if kunci and kunci not in ada:
+                        ada.add(kunci)
+                        mentah.append(a)
+        # Tier longgar (Gas Bos 1 Nov 2026): pool masih < 8 ->
+        # tiap konsep bab dicari SENDIRI secara luas (tanpa AND
+        # dengan tema buku di query), hasilnya tetap disaring
+        # gerbang pasangan (bab + buku). Bila tetap < 8, tier
+        # santai di bawah yang jalan.
+        if (strict and judul_buku_k and intent_kw is not None
+                and len(mentah) < 8):
+            try:
+                buku_kw2, _buku_bukan2 = intent_bab(
+                    judul_buku_k, judul_buku_k, bidang_k, _pus)
+            except Exception:
+                buku_kw2 = None
+            if buku_kw2 is not None:
+                longgar_list = _kumpul_pasangan(
+                    _pus, bab_title, intent_kw, buku_kw2, longgar=True)
+                ada = set()
+                for a in mentah:
+                    ada.add((a.get('doi') or '').strip().lower()
+                              or (a.get('title') or '').lower()[:80])
+                for a in longgar_list:
+                    kunci = ((a.get('doi') or '').strip().lower()
+                               or (a.get('title') or '').lower()[:80])
+                    if kunci and kunci not in ada:
+                        ada.add(kunci)
+                        mentah.append(a)
         # Pelonggaran berjenjang (Gas Bos 1 Nov 2026): pool ketat
         # < 8 -> cari ulang dengan maksud tingkat buku (judul buku +
         # bidang), tetap disaring gerbangnya sendiri. Tidak pernah
@@ -2524,6 +2771,24 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                     if kunci and kunci not in ada:
                         ada.add(kunci)
                         mentah.append(a)
+        # Ambang fleksibel (Gas Bos 1 Nov 2026): sesudah semua tier,
+        # buang pengisi yang tidak spesifik, supaya yang dihitung ke
+        # ambang hanya artikel spesifik. Tier tetap mengejar 8;
+        # yang lolos minimal 4 spesifik (gerbang akhir di pra_panen).
+        # Jalur lama tanpa konteks tidak berubah (strict False).
+        # Tanpa maksud bab, tidak ada yang terverifikasi spesifik,
+        # jadi pool dikosongkan (gagal jujur, bukan lolos diam-diam).
+        if strict:
+            try:
+                buku_kw_f, _bukan_f = intent_bab(
+                    judul_buku_k, judul_buku_k, bidang_k, _pus)
+            except Exception:
+                buku_kw_f = None
+            mentah = [a for a in mentah
+                      if lolos_spesifik(a, intent_kw, intent_bukan,
+                                        buku_kw_f, _pus,
+                                        bab_title=bab_title,
+                                        buku_bukan=_bukan_f)]
         adapted = _adaptasi_harvest(mentah)
         # Keputusan Bos 31 Okt 2026 19:36, seimbang 2-2-2-2,
         # menggantikan prioritas Scopus penuh 19:03: dari kandidat
