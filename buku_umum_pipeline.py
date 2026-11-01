@@ -2382,7 +2382,8 @@ def lolos_pasangan(artikel, bab_konsep, buku_konsep):
         return False
 
 
-def lolos_spesifik(artikel, intent_kw, intent_bukan, buku_kw, _pus=None):
+def lolos_spesifik(artikel, intent_kw, intent_bukan, buku_kw, _pus=None,
+                       bab_title=None, buku_bukan=None):
     """True bila artikel SPESIFIK untuk bab (Gas Bos 1 Nov 2026).
 
     Spesifik = lolos maksud penuh bab, ATAU menyentuh >= 1 konsep bab
@@ -2391,6 +2392,10 @@ def lolos_spesifik(artikel, intent_kw, intent_bukan, buku_kw, _pus=None):
     tidak dihitung ke ambang, supaya buku tidak lolos bermodal
     artikel umum. Tanpa maksud bab, tidak ada yang terverifikasi
     spesifik -> False (gagal jujur, bukan lolos diam-diam).
+    Pengecualian (keputusan Bos 1 Nov 2026): bab yang judulnya
+    memuat 'sintesis'/'sintesa' BOLEH menghitung artikel tema
+    buku (lolos maksud buku), karena sumber alami bab sintesis
+    memang artikel tema buku. Bab lain tidak kena pengecualian.
     """
     try:
         bab_list = (intent_kw or {}).get('konsep') or []
@@ -2406,7 +2411,17 @@ def lolos_spesifik(artikel, intent_kw, intent_bukan, buku_kw, _pus=None):
             if lolos_pasangan(artikel, k_bab, jangkar):
                 return True
     except Exception:
-        return False
+        pass
+    # Pengecualian bab sintesis (keputusan Bos 1 Nov 2026).
+    try:
+        judul_norm = (bab_title or '').strip().lower()
+        if 'sintesis' in judul_norm or 'sintesa' in judul_norm:
+            buku_list2 = (buku_kw or {}).get('konsep') or []
+            if buku_list2 and lolos_intent(artikel, buku_kw,
+                                           buku_bukan, _pus):
+                return True
+    except Exception:
+        pass
     return False
 
 
@@ -2771,7 +2786,9 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                 buku_kw_f = None
             mentah = [a for a in mentah
                       if lolos_spesifik(a, intent_kw, intent_bukan,
-                                        buku_kw_f, _pus)]
+                                        buku_kw_f, _pus,
+                                        bab_title=bab_title,
+                                        buku_bukan=_bukan_f)]
         adapted = _adaptasi_harvest(mentah)
         # Keputusan Bos 31 Okt 2026 19:36, seimbang 2-2-2-2,
         # menggantikan prioritas Scopus penuh 19:03: dari kandidat
