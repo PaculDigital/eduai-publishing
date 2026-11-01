@@ -671,11 +671,32 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None, judul_buku=None):
         _lapor("Menyiapkan referensi (Bab %s dari %s)"
                % (selesai, total))
     gagal = []
+    kurangi = []
     for bab in babs:
         judul_bab = ((outline.get(bab) or {}).get("title") or "")
         jumlah = hitung.get(bab, 0)
         if jumlah < MIN_SPESIFIK_PER_BAB:
             gagal.append((bab, judul_bab, jumlah))
-    if gagal:
+            if jumlah > 0:
+                kurangi.append((bab, judul_bab, jumlah))
+    #  🔴 ATURAN JUJUR (keputusan Bos 01Nov26, urutan 3):
+    #  Bab yang dapat SEDIKIT (1..MIN-1) artikel SAH **tidak** menggagalkan
+    #  seluruh buku — target bab itu diturunkan apa adanya, dan buku ditandai
+    #  "referensi terbatas". Yang TETAP menggagalkan: bab yang 0 artikel
+    #  (artinya tema bab memang tidak ada di sumber, bukan saringan terlalu
+    #  ketat) ATAU seluruh bab kosong.
+    #  Yang DILARANG KERAS: mendaur ulang artikel dari bab lain supaya angka
+    #  cukup — itu bikin bab berisi bahan yang bukan babnya.
+    if gagal and not kurangi:
         raise GagalPraPanen(gagal)
+    if kurangi:
+        sisa = [g for g in gagal if g[0] not in {k[0] for k in kurangi}]
+        if sisa:
+            raise GagalPraPanen(sisa)
+        #  pra_panen tidak punya `log` (tidak pakai logging) — pakai print
+        #  supaya jejaknya tetap muncul di `docker logs`.
+        print('[pra_panen] referensi TERBATAS pada bab %s — target diturunkan '
+              'jujur, TIDAK didaur dari bab lain'
+              % ', '.join('%s: %d' % (b, n) for b, _j, n in kurangi),
+              flush=True)
     return refs_per_bab

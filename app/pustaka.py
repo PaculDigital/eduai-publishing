@@ -292,8 +292,9 @@ def _abstrak_openalex(inv: dict | None) -> str:
 
 
 def cari_openalex(kw_en: list[str], kw_id: list[str] | None = None,
-                  maks: int = MAKS_PER_SUMBER, frasa: str = '') -> list[dict]:
-    """OpenAlex: 2 query (EN global + ID language:id) — dari jurnalkit."""
+                  maks: int = MAKS_PER_SUMBER, frasa: str = '',
+                  konsep: list[dict] | None = None) -> list[dict]:
+    """OpenAlex: jalur `filter` (baru) + jalur `search` (lama, cadangan)."""
     try:
         hdr = {'User-Agent': f'OpenAlexBot/1.0 (mailto:{EMAIL_POLITE})'}
         kumpul, lihat = [], set()
@@ -313,24 +314,61 @@ def cari_openalex(kw_en: list[str], kw_id: list[str] | None = None,
         dasar = (f'from_publication_date:{TAHUN_AWAL}-01-01,'
                  f'to_publication_date:{TAHUN_AKHIR}-12-31')
         #  ⚠️ api_key = QUERY PARAM (bukan header). Filter OR antar nilai = 400.
-        #  🔴 pakai frasa KONSEP INTI (dari PICO) — bukan gabungan kata bebas
-        _frasa_en = frasa or ' '.join(
-            [k for k in kw_en if len(k) > 2][:1]) or \
-            ' '.join([k for k in (kw_id or []) if len(k) > 3][:1])
-        p1 = {'filter': dasar, 'search': _frasa_en,
-              'sort': 'cited_by_count:desc', 'per_page': min(maks, 7)}
-        if _kunci('openalex', 'EDUAI_OPENALEX_KEY'):
-            p1['api_key'] = _kunci('openalex', 'EDUAI_OPENALEX_KEY')
-        _tarik(p1)
-        if kw_id:
-            p2 = {'filter': dasar + ',language:id', 'search': ' '.join(
-                [k for k in kw_id if len(k) > 3][:4]),
-                'sort': 'cited_by_count:desc', 'per_page': min(maks, 10)}
+        #
+        #  🔴 01Nov26 — AKAR "tema spesifik = 0 / tema umum = sampah":
+        #     jalur lama `search=<frasa>` + `cited_by_count:desc` mengembalikan
+        #     artikel raksasa yang cuma KEBETULAN memuat kata itu
+        #     ("Cancer statistics 2019", "IDF Diabetes Atlas") — 7/7 sampah.
+        #     Jalur BENAR: `filter=title.search:…,title_and_abstract.search:…`
+        #     + urut `relevance_score`. Terbukti 5 tema (PAUD/UMKM/gizi/
+        #     hukum/sipil), 15/15 judul tepat.
+        filt = ''
+        if konsep:
+            filt = rumus_openalex_filter(konsep)
+        if filt:
+            kunci_oa = _kunci('openalex', 'EDUAI_OPENALEX_KEY')
+            sudah = 0
+            for hal in (1, 2):
+                p = {'filter': dasar + ',' + filt, 'per_page': 25,
+                     'page': hal, 'sort': 'relevance_score:desc'}
+                if kunci_oa:
+                    p['api_key'] = kunci_oa
+                _tarik(p)
+                if len(kumpul) <= sudah:
+                    break                       # halaman kosong → berhenti
+                sudah = len(kumpul)
+                if len(kumpul) >= maks:
+                    break
+            if kw_id:                           # jaring Indonesia
+                p2 = {'filter': dasar + ',language:id',
+                      'search': ' '.join(
+                          [k for k in kw_id if len(k) > 3][:4]),
+                      'sort': 'relevance_score:desc',
+                      'per_page': min(maks, 10)}
+                if kunci_oa:
+                    p2['api_key'] = kunci_oa
+                _tarik(p2)
+        else:
+            _frasa_en = frasa or ' '.join(
+                [k for k in kw_en if len(k) > 2][:1]) or \
+                ' '.join([k for k in (kw_id or []) if len(k) > 3][:1])
+            p1 = {'filter': dasar, 'search': _frasa_en,
+                  'sort': 'cited_by_count:desc', 'per_page': min(maks, 7)}
             if _kunci('openalex', 'EDUAI_OPENALEX_KEY'):
-                p2['api_key'] = _kunci('openalex', 'EDUAI_OPENALEX_KEY')
-            _tarik(p2)
+                p1['api_key'] = _kunci('openalex', 'EDUAI_OPENALEX_KEY')
+            _tarik(p1)
+            if kw_id:
+                p2 = {'filter': dasar + ',language:id', 'search': ' '.join(
+                    [k for k in kw_id if len(k) > 3][:4]),
+                    'sort': 'cited_by_count:desc', 'per_page': min(maks, 10)}
+                if _kunci('openalex', 'EDUAI_OPENALEX_KEY'):
+                    p2['api_key'] = _kunci('openalex', 'EDUAI_OPENALEX_KEY')
+                _tarik(p2)
 
-        kumpul.sort(key=lambda x: x.get('cited_by_count') or 0, reverse=True)
+        #  Jalur filter sudah terurut RELEVANSI — jangan diacak ulang sitasi.
+        if not filt:
+            kumpul.sort(key=lambda x: x.get('cited_by_count') or 0,
+                        reverse=True)
         keluar = []
         for it in kumpul[:maks]:
             try:
@@ -403,6 +441,100 @@ def cari_openalex(kw_en: list[str], kw_id: list[str] | None = None,
         return keluar
     except Exception as e:                                    # noqa: BLE001
         log.warning('[pustaka] OpenAlex error: %s', e)
+        return []
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  SUMBER 5 — DOAJ  (ditambah 01Nov26, keputusan Bos)
+#
+#  KENAPA: tema sempit (mis. "etika data anak", "hak anak atas pendidikan")
+#  0 artikel di Scopus/OpenAlex/Garuda/CrossRef — bukan karena saringan,
+#  tapi karena 4 sumber itu memang tidak menyimpannya. DOAJ mengindeks
+#  jurnal akses-terbuka (banyak penerbit kecil & non-barat) sehingga
+#  menutup lubang itu.
+#
+#  TERUKUR 01Nov26 (uji 4 tema, tanpa API key):
+#    PAUD+digital   25 hasil 0,4 dtk — semuanya tepat
+#    UMKM digital   25 hasil 0,4 dtk — tepat
+#    gizi hamil     25 hasil 0,4 dtk — tepat
+#  DOAJ mendukung BOOLEAN di dalam field (`bibjson.title:"..." AND ...`)
+#  ⇒ ini satu-satunya sumber selain OpenAlex yang bisa memaksa DUA konsep
+#  sekaligus di JUDUL.
+# ══════════════════════════════════════════════════════════════════════════
+DOAJ_URL = 'https://doaj.org/api/search/articles/'
+
+
+def _doaj_kueri(konsep: list[dict]) -> str:
+    """Rumus DOAJ: konsep-1 DAN konsep-2 di judul, OR antar sinonim.
+
+    ⚠️ Frasa WAJIB dalam tanda kutip — tanpa kutip DOAJ memecah per kata
+       dan presisi jatuh (sama seperti OpenAlex `search`).
+    """
+    def _klausa(k, n=3):
+        sin = [x.strip() for x in (k.get('en') or []) if len(x.strip()) > 2]
+        sin = sorted(dict.fromkeys(sin), key=len, reverse=True)[:n]
+        if not sin:
+            return ''
+        return '(' + ' OR '.join('"%s"' % s for s in sin) + ')'
+
+    if not konsep:
+        return ''
+    k1 = _klausa(konsep[0])
+    if not k1:
+        return ''
+    k2 = _klausa(konsep[1]) if len(konsep) > 1 else ''
+    return ('bibjson.title:%s AND bibjson.title:%s' % (k1, k2)
+            if k2 else 'bibjson.title:%s' % k1)
+
+
+def cari_doaj(konsep: list[dict], maks: int = MAKS_PER_SUMBER) -> list[dict]:
+    """Cari di DOAJ (akses terbuka). Gagal → [] (failover, jangan hentikan)."""
+    q = _doaj_kueri(konsep)
+    if not q:
+        return []
+    try:
+        import urllib.parse
+        u = DOAJ_URL + urllib.parse.quote(q, safe='')
+        r = httpx.get(u, params={'pageSize': min(max(maks, 25), 100)},
+                      headers={'User-Agent': 'eduai/1.0',
+                               'Accept': 'application/json'},
+                      timeout=30)
+        if r.status_code != 200:
+            log.warning('[pustaka] DOAJ HTTP %s', r.status_code)
+            return []
+        keluar = []
+        for it in (r.json().get('results') or []):
+            b = it.get('bibjson') or {}
+            judul = (b.get('title') or '').strip()
+            if not judul:
+                continue
+            doi = ''
+            for i in (b.get('identifier') or []):
+                if i.get('type') == 'doi' and i.get('id'):
+                    doi = 'https://doi.org/' + i['id']
+                    break
+            th = b.get('year')
+            penulis = ', '.join(
+                (a.get('name') or '').strip()
+                for a in (b.get('author') or [])[:6] if a.get('name'))
+            jurnal = (b.get('journal') or {}).get('title', '')
+            keluar.append({
+                'title': judul,
+                'doi': doi,
+                'year': int(str(th)) if str(th or '').isdigit() else 0,
+                'authors': penulis,
+                'pdf_url': '', 'url': '',
+                'is_oa': True,                     # DOAJ = akses terbuka
+                'cited_by_count': 0,
+                'source': 'DOAJ',
+                'abstract': (b.get('abstract') or '').strip(),
+                'language': (b.get('journal') or {}).get('language') or ['en'],
+                'journal': jurnal, 'garuda_id': None,
+            })
+        log.info('[pustaka] DOAJ: %s hasil', len(keluar))
+        return keluar[:maks]
+    except Exception as e:                                    # noqa: BLE001
+        log.warning('[pustaka] DOAJ error: %s', e)
         return []
 
 
@@ -591,25 +723,72 @@ def audit_doi(doi: str) -> bool:
 
 
 def cari_crossref(kw_en: list[str], maks: int = 10,
-                  frasa: str = '') -> list[dict]:
-    """Cari artikel langsung di CrossRef (sumber tambahan + DOI terverifikasi)."""
+                  frasa: str = '',
+                  konsep: list[dict] | None = None) -> list[dict]:
+    """Cari artikel langsung di CrossRef (sumber tambahan + DOI terverifikasi).
+
+    🔴 01Nov26 — AKAR "CrossRef hasilnya nyasar":
+      jalur lama `query.bibliographic=<2 frasa>` + `sort=is-referenced-by-count`
+      = pencarian KABUR di seluruh metadata, lalu diurutkan artikel paling
+      banyak dikutip ⇒ yang menang selalu artikel raksasa yang cuma kebetulan
+      memuat salah satu kata (terukur: semua hasil soal AI/ChatGPT, bukan PAUD).
+
+    OBAT (dua pagar):
+      ① `query.title` — CrossRef hanya mencocokkan JUDUL, bukan abstrak.
+      ② Tiap hasil WAJIB memuat frasa konsep-1 di judulnya (kata kunci
+         lengkap, bukan potongan) — kalau tidak, dibuang sebelum masuk pool.
+         Ini penyaring deterministik: tidak bisa berhalusinasi, 0 biaya.
+    """
     try:
-        #  🔴 2 FRASA KONSEP teratas (dari PICO) — bukan timbunan kata
-        par = {'query.bibliographic': frasa or ' '.join(
-            [k for k in kw_en if len(k) > 2][:2]),
-               'rows': maks,
+        #  🔴 01Nov26 (uji 3 varian): `query.title` dengan SATU frasa saja
+        #     mengembalikan judul generik berulang ("Early Childhood
+        #     Education" ×30, tanpa kata digital) ⇒ harus DUA konsep sekaligus
+        #     dalam satu kueri + `rows` diperbesar. Terukur: 31/60 tepat
+        #     (varian 1 frasa: 0/30).
+        inti = ''
+        if konsep:
+            k1 = [x.strip() for x in (konsep[0].get('en') or [])
+                  if x.strip() and len(x.split()) >= 2]
+            if k1:
+                inti = max(k1, key=len)
+        #  Aspek kedua (kalau ada) — ikut diwajibkan di judul
+        aspek = []
+        aspek_frasa = ''
+        if konsep and len(konsep) > 1:
+            k2 = [x.strip() for x in (konsep[1].get('en') or [])
+                  if x.strip() and len(x.split()) >= 2]
+            if k2:
+                aspek_frasa = min(k2, key=len)
+                aspek = [w for w in re.findall(
+                    r'[a-z]+', aspek_frasa.lower()) if len(w) > 3]
+        kueri = ' '.join(x for x in (inti, aspek_frasa) if x) or frasa or \
+            ' '.join([k for k in kw_en if len(k) > 2][:2])
+        par = {'query.title': kueri,
+               'rows': max(maks * 3, 60),
                'filter': f'from-pub-date:{TAHUN_AWAL}-01-01,'
                          f'until-pub-date:{TAHUN_AKHIR}-12-31',
-               'sort': 'is-referenced-by-count', 'order': 'desc'}
+               'sort': 'relevance', 'order': 'desc'}
         r = httpx.get(CROSSREF_URL, params=par, timeout=30,
                          headers={'Accept': 'application/json'})
         if r.status_code != 200:
             return []
         keluar = []
+        _lihat_judul: set[str] = set()
         for it in (r.json().get('message', {}).get('items') or []):
             judul = (it.get('title') or [''])[0]
             if not judul:
                 continue
+            #  ② PAGAR JUDUL: wajib memuat inti konsep + aspek kedua
+            jl = judul.lower()
+            kata = [w for w in re.findall(r'[a-z]+', inti.lower())
+                    if len(w) > 3] if inti else []
+            if kata and not all(w in jl for w in kata):
+                continue
+            if aspek and not any(w in jl for w in aspek):
+                continue
+            if judul.strip().lower() in _lihat_judul:
+                continue                        # ③ buang duplikat judul
+            _lihat_judul.add(judul.strip().lower())
             keluar.append({
                 'title': judul.strip(),
                 'doi': 'https://doi.org/' + (it.get('DOI') or ''),
@@ -1448,13 +1627,59 @@ def _scite_mcp(nama_alat: str, argumen: dict, token: str) -> dict | None:
         return None
 
 
-def rumus_openalex(konsep: list[dict], maks_konsep: int = 3) -> str:
-    """OpenAlex: pakai SEARCH hanya untuk konsep PERTAMA (yang paling inti),
-    lalu saring konsep lain di `_nyambung` — karena OpenAlex `search` tidak
-    mendukung sintaks boolean AND yang andal.
+def _frasa_kuat(konsep: list[dict], indeks: int) -> list[str]:
+    """Sinonim EN satu konsep, yang TERPENDEK (paling umum) lebih dulu.
 
-    ⚠️ Pelajaran: `search` OpenAlex mencocokkan tiap kata → kalau semua
-       konsep dimasukkan, presisi jatuh. Satu frasa inti = paling aman.
+    Alasan: OpenAlex `title.search` tanpa kutip mencocokkan per kata, jadi
+    "early childhood education" = dokumen yang memuat ketiga kata — sinonim
+    pendek ("preschool", "ECEC") memperluas jangkauan tanpa menurunkan
+    presisi (dibuktikan 01Nov26: count 3.095, 15/15 judul tepat).
+    """
+    if indeks >= len(konsep):
+        return []
+    sin = [x.strip() for x in (konsep[indeks].get('en') or []) if x.strip()]
+    return sorted(dict.fromkeys(sin), key=len)
+
+
+def rumus_openalex_filter(konsep: list[dict],
+                          maks_sinonim: int = 4) -> str:
+    """🔴 RUMUS BENAR OpenAlex (01Nov26) — `filter`, BUKAN `search`.
+
+    AKAR kegagalan lama: `search=<frasa>` mencocokkan tiap kata pada SELURUH
+    metadata lalu diurutkan `cited_by_count:desc` ⇒ hasil teratas selalu
+    artikel raksasa yang kebetulan memuat kata itu ("Cancer statistics 2019",
+    "Dementia prevention", "IDF Diabetes Atlas") — 7 dari 7 sampah.
+
+    Yang TERBUKTI benar (uji 5 tema berbeda, 01Nov26):
+      • konsep 1 (topik)   → `title.search:`  (OR antar sinonim, TANPA kutip)
+      • konsep 2 (aspek)   → `title_and_abstract.search:` (OR antar sinonim)
+      • urut `relevance_score:desc` — JANGAN `cited_by_count`
+
+    Contoh hasil: "Digital technology in early childhood education",
+    "Augmented reality as a form of digital technology in ECE",
+    "Digital competence of early childhood education teachers".
+
+    Konsep ke-3 dan seterusnya TIDAK masuk filter (OpenAlex menolak/menyan -
+    dainya tidak andal); sisa konsep disaring di `_nyambung` seperti biasa.
+    """
+    if not konsep:
+        return ''
+    satu = _frasa_kuat(konsep, 0)[:maks_sinonim]
+    if not satu:
+        return ''
+    bagian = ['title.search:' + ' OR '.join(satu)]
+    dua = _frasa_kuat(konsep, 1)[:maks_sinonim]
+    if dua:
+        bagian.append('title_and_abstract.search:' + ' OR '.join(dua))
+    return ','.join(bagian)
+
+
+def rumus_openalex(konsep: list[dict], maks_konsep: int = 3) -> str:
+    """Jaga-tampilan LAMA: kembalikan `search` satu frasa inti.
+
+    ⚠️ DIPERTAHANKAN hanya supaya pemanggil lama tidak pecah. Untuk panen
+    buku pakai `rumus_openalex_filter()` — `search` + urut sitasi TERBUKTI
+    menghasilkan artikel sampah (lihat docstring fungsi itu).
     """
     for k in konsep:
         en = [x for x in (k.get('en') or []) if x.strip()]
@@ -1672,10 +1897,14 @@ def cari_semua_dengan_konsep(kw: dict, tema: str, uji_tahun: bool = True,
     for nama, hasil in (
         ('Scopus', cari_scopus(kw['en'], query_siap=kw.get('q_scopus', ''))),
         ('OpenAlex', cari_openalex(kw['en'], kw['id'],
-                                   frasa=kw.get('q_openalex', ''))),
+                                   frasa=kw.get('q_openalex', ''),
+                                   konsep=kw.get('konsep'))),
         ('Garuda', cari_garuda(_garuda_kw)),
         ('CrossRef', cari_crossref(kw['en'],
-                                   frasa=kw.get('q_crossref', ''))),
+                                   frasa=kw.get('q_crossref', ''),
+                                   konsep=kw.get('konsep'))),
+        #  ⭐ Sumber ke-5 (01Nov26): DOAJ — penutup lubang tema sempit.
+        ('DOAJ', cari_doaj(kw.get('konsep') or [])),
     ):
         jumlah[nama] = len(hasil)
         semua.extend(hasil)
