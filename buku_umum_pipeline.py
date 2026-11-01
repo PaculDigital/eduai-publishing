@@ -2347,13 +2347,11 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
         # pernah mengembalikan sampah: intent gagal -> pool kosong.
         intent_kw, intent_bukan = intent_bab(
             bab_title, judul_buku_k, bidang_k, _pus)
-        if strict and intent_kw is None:
-            # Intent gagal dalam mode ketat: pool pasti dibuang
-            # gerbang, jadi jangan buang panggilan API sama sekali.
-            if potong:
-                _HARVEST_CACHE[_kunci_cache] = []
-            return []
         mentah = []
+        # Mode ketat + maksud bab gagal: leg ketat dilewati (hemat
+        # panggilan API seperti dulu); pelonggaran tingkat buku di
+        # bawah yang jalan. Bukan kembali ke jalur lama tanpa saring.
+        _ketat_kosong = bool(strict and intent_kw is None)
         try:
             if intent_kw is not None:
                 # Gas Bos 31 Okt 2026 malam: hapus Scite dari buku.
@@ -2365,8 +2363,10 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                     sumber_kk=intent_kw.get('sumber', ''),
                     tanpa_scite=True) or {}
                 mentah.extend(hasil.get('artikel') or [])
-            else:
+            elif not strict:
                 # Legacy (tanpa konteks, kamus gagal): jalur lama.
+                # Mode ketat + maksud gagal tidak lewat sini (pool
+                # ketat tetap kosong, pelonggaran di bawah yang jalan).
                 try:
                     hasil = _pus.cari_semua(bab_title,
                                             tanpa_scite=True) or {}
@@ -2375,7 +2375,7 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                 mentah.extend(hasil.get('artikel') or [])
         except Exception:
             mentah = []
-        if not _adaptasi_harvest(mentah):
+        if not _ketat_kosong and not _adaptasi_harvest(mentah):
             try:
                 mentah.extend(_pus.cari_garuda([bab_title]) or [])
             except Exception:
@@ -2396,7 +2396,7 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
         # Bahasa (aturan Boss 28 Okt): EN untuk internasional, ID untuk
         # OpenAlex-ID. Tiap sumber fail-soft sendiri (gagal -> []).
         try:
-            en_list = [k.strip() for k in
+            en_list = [] if _ketat_kosong else [k.strip() for k in
                        (_en_keywords(bab_title) or '').split(',')
                        if k.strip()]
             id_list = [w for w in re.split(r'[^A-Za-z]+', bab_title or '')
@@ -2411,7 +2411,7 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                     api_hasil.extend(_pus.cari_crossref(en_list))
                 except Exception:
                     pass
-            if en_list or id_list:
+            if not _ketat_kosong and (en_list or id_list):
                 try:
                     api_hasil.extend(_pus.cari_openalex(en_list, id_list))
                 except Exception:
@@ -2442,6 +2442,88 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                       if lolos_intent(r, intent_kw, intent_bukan, _pus)]
         elif strict:
             mentah = []
+        # Pelonggaran berjenjang (Gas Bos 1 Nov 2026): pool ketat
+        # < 8 -> cari ulang dengan maksud tingkat buku (judul buku +
+        # bidang), tetap disaring gerbangnya sendiri. Tidak pernah
+        # tanpa saring. Bila tetap < 8, pool parsial dikembalikan dan
+        # panen_semua yang menggagalkan bersih seperti dulu (pesan +
+        # refund tidak berubah).
+        if strict and judul_buku_k and len(mentah) < 8:
+            try:
+                santai_kw, santai_bukan = intent_bab(
+                    judul_buku_k, judul_buku_k, bidang_k, _pus)
+            except Exception:
+                santai_kw, santai_bukan = None, []
+            _nama_konsep = lambda kw: sorted(
+                (k.get('konsep') or k.get('nama') or '')
+                for k in ((kw or {}).get('konsep') or []))
+            if (santai_kw is not None
+                    and _nama_konsep(santai_kw) != _nama_konsep(intent_kw)):
+                santai = []
+                try:
+                    hasil = _pus.cari_semua_dengan_konsep(
+                        santai_kw, judul_buku_k,
+                        sumber_kk=santai_kw.get('sumber', ''),
+                        tanpa_scite=True) or {}
+                    santai.extend(hasil.get('artikel') or [])
+                except Exception:
+                    pass
+                if not _adaptasi_harvest(santai):
+                    try:
+                        santai.extend(
+                            _pus.cari_garuda([judul_buku_k]) or [])
+                    except Exception:
+                        pass
+                try:
+                    en_list = [k.strip() for k in
+                               (_en_keywords(judul_buku_k) or '').split(',')
+                               if k.strip()]
+                    id_list = [w for w in re.split(
+                        r'[^A-Za-z]+', judul_buku_k or '')
+                        if len(w) > 3][:4]
+                    api_hasil = []
+                    if en_list:
+                        try:
+                            api_hasil.extend(_pus.cari_scopus(en_list))
+                        except Exception:
+                            pass
+                        try:
+                            api_hasil.extend(_pus.cari_crossref(en_list))
+                        except Exception:
+                            pass
+                    if en_list or id_list:
+                        try:
+                            api_hasil.extend(
+                                _pus.cari_openalex(en_list, id_list))
+                        except Exception:
+                            pass
+                    ada = set()
+                    for a in mentah:
+                        ada.add((a.get('doi') or '').strip().lower()
+                                  or (a.get('title') or '').lower()[:80])
+                    for a in santai:
+                        ada.add((a.get('doi') or '').strip().lower()
+                                  or (a.get('title') or '').lower()[:80])
+                    for a in (api_hasil or []):
+                        kunci = ((a.get('doi') or '').strip().lower()
+                                   or (a.get('title') or '').lower()[:80])
+                        if kunci and kunci not in ada:
+                            ada.add(kunci)
+                            santai.append(a)
+                except Exception:
+                    pass
+                santai = [r for r in santai
+                          if lolos_intent(r, santai_kw, santai_bukan, _pus)]
+                ada = set()
+                for a in mentah:
+                    ada.add((a.get('doi') or '').strip().lower()
+                              or (a.get('title') or '').lower()[:80])
+                for a in santai:
+                    kunci = ((a.get('doi') or '').strip().lower()
+                               or (a.get('title') or '').lower()[:80])
+                    if kunci and kunci not in ada:
+                        ada.add(kunci)
+                        mentah.append(a)
         adapted = _adaptasi_harvest(mentah)
         # Keputusan Bos 31 Okt 2026 19:36, seimbang 2-2-2-2,
         # menggantikan prioritas Scopus penuh 19:03: dari kandidat
