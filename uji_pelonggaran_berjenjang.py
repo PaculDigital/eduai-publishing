@@ -167,12 +167,16 @@ def _doi(refs):
 def kasus_1_ketat_tipis_santai_mengisi():
     _reset()
     refs = P._refs_dari_harvest('BAB-UJI-1', potong=True, konteks=KONTEKS)
-    assert len(refs) == 8, ('kasus 1: harus 8, dapat %d: %s'
+    # Ambang fleksibel (Gas Bos 1 Nov 2026): santai umum R2 dibuang
+    # filter spesifik, jadi 7 bukan 8 (R2 nyambung buku saja, tanpa
+    # konsep bab; R1/R3/R4 spesifik karena menyentuh konsep bab).
+    assert len(refs) == 7, ('kasus 1: harus 7 spesifik, dapat %d: %s'
                             % (len(refs), _judul(refs)))
     assert JUNK['title'] not in _judul(refs), 'kasus 1: sampah lolos'
-    assert len(set(_doi(refs))) == 8, 'kasus 1: duplikat lolos'
+    assert len(set(_doi(refs))) == 7, 'kasus 1: duplikat lolos'
     assert BUKU in PANGGIL['dengan_konsep'], 'kasus 1: leg santai tidak jalan'
-    print('kasus 1 OK: ketat 4 + santai 5 -> 8, sampah dan duplikat dibuang')
+    print('kasus 1 OK: ketat 4 + santai 5 -> 7 spesifik, sampah, umum, '
+          'dan duplikat dibuang')
 
 
 def kasus_2_ketat_penuh_santai_tidak_jalan():
@@ -202,15 +206,18 @@ def kasus_3_dua_duanya_kosong_gagal_bersih():
 
 
 def kasus_4_maksud_gagal_santai_tetap_jalan():
+    # Ambang fleksibel (Gas Bos 1 Nov 2026): tier santai tetap jalan,
+    # tapi poolnya dibuang filter spesifik karena tanpa maksud bab
+    # tidak ada yang terverifikasi spesifik -> pool 0, gagal jujur.
     _reset()
     refs = P._refs_dari_harvest('BAB-GAGAL', potong=True, konteks=KONTEKS)
-    assert len(refs) == 5, ('kasus 4: harus 5 santai, dapat %d: %s'
-                            % (len(refs), _judul(refs)))
+    assert len(refs) == 0, ('kasus 4: harus 0 sesudah filter spesifik, '
+                            'dapat %d: %s' % (len(refs), _judul(refs)))
     assert JUNK['title'] not in _judul(refs), 'kasus 4: sampah lolos'
     assert 'BAB-GAGAL' not in PANGGIL['dengan_konsep'], \
         'kasus 4: leg ketat jalan padahal maksud gagal'
     assert [BUKU] not in PANGGIL['garuda'], 'kasus 4: garuda ketat jalan'
-    print('kasus 4 OK: maksud gagal -> leg ketat dilewati, santai 5 lolos')
+    print('kasus 4 OK: maksud gagal -> santai jalan tapi dibuang filter spesifik, pool 0')
 
 
 def kasus_5_santai_sama_dengan_ketat_tidak_diulang():

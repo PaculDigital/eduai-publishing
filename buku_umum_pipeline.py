@@ -2303,6 +2303,34 @@ def lolos_pasangan(artikel, bab_konsep, buku_konsep):
         return False
 
 
+def lolos_spesifik(artikel, intent_kw, intent_bukan, buku_kw, _pus=None):
+    """True bila artikel SPESIFIK untuk bab (Gas Bos 1 Nov 2026).
+
+    Spesifik = lolos maksud penuh bab, ATAU menyentuh >= 1 konsep bab
+    + konsep buku pertama (gerbang pasangan). Artikel santai yang
+    hanya nyambung tema buku (tanpa konsep bab) TIDAK spesifik dan
+    tidak dihitung ke ambang, supaya buku tidak lolos bermodal
+    artikel umum. Tanpa maksud bab, tidak ada yang terverifikasi
+    spesifik -> False (gagal jujur, bukan lolos diam-diam).
+    """
+    try:
+        bab_list = (intent_kw or {}).get('konsep') or []
+        if not bab_list:
+            return False
+        if lolos_intent(artikel, intent_kw, intent_bukan, _pus):
+            return True
+        buku_list = (buku_kw or {}).get('konsep') or []
+        if not buku_list:
+            return False
+        jangkar = buku_list[0]
+        for k_bab in bab_list[:3]:
+            if lolos_pasangan(artikel, k_bab, jangkar):
+                return True
+    except Exception:
+        return False
+    return False
+
+
 def _kumpul_pasangan(_pus, bab_title, intent_kw, buku_kw,
                        longgar=False):
     """Pool tier pasangan: tiap konsep bab (maks 3) dipasangkan dengan
@@ -2649,6 +2677,22 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                     if kunci and kunci not in ada:
                         ada.add(kunci)
                         mentah.append(a)
+        # Ambang fleksibel (Gas Bos 1 Nov 2026): sesudah semua tier,
+        # buang pengisi yang tidak spesifik, supaya yang dihitung ke
+        # ambang hanya artikel spesifik. Tier tetap mengejar 8;
+        # yang lolos minimal 4 spesifik (gerbang akhir di pra_panen).
+        # Jalur lama tanpa konteks tidak berubah (strict False).
+        # Tanpa maksud bab, tidak ada yang terverifikasi spesifik,
+        # jadi pool dikosongkan (gagal jujur, bukan lolos diam-diam).
+        if strict:
+            try:
+                buku_kw_f, _bukan_f = intent_bab(
+                    judul_buku_k, judul_buku_k, bidang_k, _pus)
+            except Exception:
+                buku_kw_f = None
+            mentah = [a for a in mentah
+                      if lolos_spesifik(a, intent_kw, intent_bukan,
+                                        buku_kw_f, _pus)]
         adapted = _adaptasi_harvest(mentah)
         # Keputusan Bos 31 Okt 2026 19:36, seimbang 2-2-2-2,
         # menggantikan prioritas Scopus penuh 19:03: dari kandidat

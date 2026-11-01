@@ -181,11 +181,13 @@ def kasus_3_longgar_tidak_membocorkan_umum():
     CURRENT['loose'] = [G1]
     CURRENT['relaxed'] = [R1, R2]
     refs = P._refs_dari_harvest('BAB-UJI-3', potong=True, konteks=KONTEKS)
-    assert len(refs) == 4, ('kasus 3: harus 4, dapat %d' % len(refs))
+    assert len(refs) == 2, ('kasus 3: harus 2 ketat saja, dapat %d'
+                            % len(refs))
     assert PANGGIL['longgar'] == 3, 'kasus 3: longgar tidak dicoba'
     assert any(t == BUKU for _, t in PANGGIL['dengan_konsep']), \
         'kasus 3: santai tidak jalan sesudah longgar kosong'
-    print('kasus 3 OK: longgar hanya umum -> dibuang, santai 2 mengisi')
+    print('kasus 3 OK: longgar umum dibuang, santai umum juga dibuang, '
+          'tinggal 2 ketat')
 
 
 def kasus_4_ketat_penuh_tidak_ada_tier_lanjut():
@@ -237,10 +239,12 @@ def kasus_6_maksud_gagal_longgar_dilewati():
     CURRENT['loose'] = [L2, L3]
     CURRENT['relaxed'] = [R1, R2]
     refs = P._refs_dari_harvest('BAB-GAGAL', potong=True, konteks=KONTEKS)
-    assert len(refs) == 2, ('kasus 6: harus 2 santai, dapat %d' % len(refs))
+    assert len(refs) == 0, ('kasus 6: harus 0 sesudah filter spesifik, '
+                            'dapat %d' % len(refs))
     assert PANGGIL['longgar'] == 0, \
         'kasus 6: longgar dibangun padahal maksud gagal'
-    print('kasus 6 OK: maksud gagal -> longgar dilewati, santai 2 lolos')
+    print('kasus 6 OK: maksud gagal -> longgar dilewati, santai jalan '
+          'tapi dibuang filter spesifik, pool 0')
 
 
 kasus_1_pasangan_kosong_longgar_mengisi()

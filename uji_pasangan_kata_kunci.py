@@ -191,12 +191,14 @@ def kasus_3_pasangan_kosong_santai_mengisi():
     CURRENT['pair'] = []
     CURRENT['relaxed'] = [R1, R2]
     refs = P._refs_dari_harvest('BAB-UJI-3', potong=True, konteks=KONTEKS)
-    assert len(refs) == 4, ('kasus 3: harus 4, dapat %d' % len(refs))
+    assert len(refs) == 2, ('kasus 3: harus 2 ketat saja, dapat %d'
+                            % len(refs))
     assert PANGGIL['pasangan_dibangun'] == 3, \
         'kasus 3: pasangan tidak dicoba'
     assert any(t == BUKU for _, t in PANGGIL['dengan_konsep']), \
         'kasus 3: tier santai tidak jalan sesudah pasangan kosong'
-    print('kasus 3 OK: ketat 2 + pasangan 0 + santai 2 -> 4')
+    print('kasus 3 OK: ketat 2 + pasangan 0 + santai umum 2 -> 2 '
+          'spesifik saja')
 
 
 def kasus_4_gerbang_pasangan_menuntut_kedua_anggota():
@@ -226,10 +228,12 @@ def kasus_6_maksud_gagal_pasangan_dilewati():
     CURRENT['pair'] = [P1, P2, P3]
     CURRENT['relaxed'] = [R1, R2]
     refs = P._refs_dari_harvest('BAB-GAGAL', potong=True, konteks=KONTEKS)
-    assert len(refs) == 2, ('kasus 6: harus 2 santai, dapat %d' % len(refs))
+    assert len(refs) == 0, ('kasus 6: harus 0 sesudah filter spesifik, '
+                            'dapat %d' % len(refs))
     assert PANGGIL['pasangan_dibangun'] == 0, \
         'kasus 6: pasangan dibangun padahal maksud gagal'
-    print('kasus 6 OK: maksud gagal -> pasangan dilewati, santai 2 lolos')
+    print('kasus 6 OK: maksud gagal -> pasangan dilewati, santai jalan '
+          'tapi dibuang filter spesifik, pool 0')
 
 
 kasus_1_ketat_tipis_pasangan_mengisi()
