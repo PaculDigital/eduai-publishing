@@ -2185,6 +2185,82 @@ def _impor_pustaka():
         return None
 
 
+def _perluas_sinonim(konsep_list):
+    """Perluas sinonim tiap konsep (Gas Bos 1 Nov 2026, perluasan
+    sinonim Bab 4). Dipakai HANYA di cabang AI intent_bab, bukan
+    kamus (kamus sudah kurasi, bab yang sudah lolos tidak diusik).
+
+    Dua perluasan mekanis, tanpa nama konsep Bab 4 yang di-hardcode,
+    jadi berlaku untuk semua maksud AI:
+    1. Varian tanda hubung: 'socio-emotional' -> 'socio emotional'
+       dan 'socioemotional'; 'social emotional' -> 'social-emotional'.
+       Frasa AI sering kalah oleh varian penulisan di judul/abstrak.
+    2. Keluarga kata (hanya daftar en, supaya kata kunci Garuda
+       dari daftar id tidak tercemar bahasa Inggris): 'privacy' ->
+       children's privacy, child privacy, dan kawan-kawan;
+       'emotional'/'socio'/'affective' -> varian socioemotional dan
+       social-emotional learning; 'ethic' -> digital ethics dan
+       kawan-kawan; 'data protection' -> varian anak.
+    Asli dipertahankan di depan, varian ditambah di belakang,
+    dedup tanpa peduli kapital. Daftar asli tidak diubah.
+    """
+    keluarga = [
+        ('privacy', ["children's privacy", 'child privacy',
+                     'online privacy for children',
+                     'children data protection']),
+        ('data protection', ['data protection for children']),
+        ('emotional', ['socioemotional', 'socio-emotional',
+                       'social-emotional', 'social emotional',
+                       'socioemotional development',
+                       'socio-emotional learning',
+                       'social-emotional learning',
+                       'social emotional learning']),
+        ('socio', ['socioemotional', 'socio-emotional',
+                   'social-emotional', 'social emotional',
+                   'socioemotional development',
+                   'socio-emotional learning',
+                   'social-emotional learning',
+                   'social emotional learning']),
+        ('affective', ['socioemotional', 'socio-emotional',
+                       'social-emotional', 'social emotional',
+                       'socioemotional development',
+                       'socio-emotional learning',
+                       'social-emotional learning',
+                       'social emotional learning']),
+        ('ethic', ['digital ethics',
+                   'ethics in early childhood education',
+                   'ethics of educational technology']),
+    ]
+    keluar = []
+    for k in (konsep_list or []):
+        nk = dict(k)
+        for kunci in ('en', 'id'):
+            asal = [x.strip() for x in (k.get(kunci) or [])
+                    if x and x.strip()]
+            tambah = []
+            for frasa in asal:
+                rendah = frasa.lower()
+                if '-' in frasa:
+                    tambah.append(frasa.replace('-', ' '))
+                    tambah.append(frasa.replace('-', ''))
+                elif ' ' in frasa:
+                    tambah.append(frasa.replace(' ', '-'))
+                if kunci == 'en':
+                    for picu, sin in keluarga:
+                        if picu in rendah:
+                            tambah.extend(sin)
+            gabung = []
+            lihat = set()
+            for x in asal + tambah:
+                xl = (x or '').strip()
+                if xl and xl.lower() not in lihat:
+                    lihat.add(xl.lower())
+                    gabung.append(xl)
+            nk[kunci] = gabung
+        keluar.append(nk)
+    return keluar
+
+
 def intent_bab(bab_title, judul_buku=None, bidang=None, _pus=None):
     """Intent satu bab: (kw_dict atau None, daftar frasa bukan).
 
@@ -2232,6 +2308,9 @@ def intent_bab(bab_title, judul_buku=None, bidang=None, _pus=None):
         konsep, bukan = _urai_intent(jawab or '', _pus)
         if not konsep:
             return (None, [])
+        # Perluasan sinonim (Gas Bos 1 Nov 2026): sebelum kw
+        # dibangun, supaya rumus query DAN gerbang ikut meluas.
+        konsep = _perluas_sinonim(konsep)
         kw2 = _pus.kata_kunci_konsep(konsep, bab, 'ai')
         hasil = (kw2, bukan)
     except Exception:
