@@ -104,7 +104,8 @@ def _fake_intent(bab_title, judul_buku=None, bidang=None, _pus=None):
 
 
 def _fake_kata_kunci_konsep(k, tema, sumber=''):
-    PANGGIL['pasangan_dibangun'] += 1
+    if sumber == 'pasangan':
+        PANGGIL['pasangan_dibangun'] += 1
     en, id_ = [], []
     for x in k:
         en += [w for w in x.get('en', []) if w not in en]

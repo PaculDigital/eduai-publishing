@@ -2303,10 +2303,18 @@ def lolos_pasangan(artikel, bab_konsep, buku_konsep):
         return False
 
 
-def _kumpul_pasangan(_pus, bab_title, intent_kw, buku_kw):
+def _kumpul_pasangan(_pus, bab_title, intent_kw, buku_kw,
+                       longgar=False):
     """Pool tier pasangan: tiap konsep bab (maks 3) dipasangkan dengan
     konsep buku pertama, dicari lewat dengan_konsep, disaring gerbang
     pasangan, dedup DOI dulu. Fail-soft: gagal apa pun -> [].
+
+    Mode longgar (Gas Bos 1 Nov 2026): tiap konsep bab dicari SENDIRI
+    secara luas (tanpa AND dengan tema buku di query), hasilnya tetap
+    disaring gerbang pasangan yang sama. Alasan: query AND pasangan
+    di Scopus mengembalikan 0 untuk pasangan niche Bab 4, dan
+    _nyambung di dalam dengan_konsep ikut menyaring ketat; query
+    satu konsep membuka recall, gerbang menjaga presisi.
     """
     keluar = []
     try:
@@ -2318,8 +2326,12 @@ def _kumpul_pasangan(_pus, bab_title, intent_kw, buku_kw):
         ada = set()
         for k_bab in bab_list[:3]:
             try:
-                kw_pair = _pus.kata_kunci_konsep(
-                    [k_bab, buku_pertama], bab_title, 'pasangan')
+                if longgar:
+                    kw_pair = _pus.kata_kunci_konsep(
+                        [k_bab], bab_title, 'longgar')
+                else:
+                    kw_pair = _pus.kata_kunci_konsep(
+                        [k_bab, buku_pertama], bab_title, 'pasangan')
             except Exception:
                 continue
             try:
@@ -2525,6 +2537,31 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                     ada.add((a.get('doi') or '').strip().lower()
                               or (a.get('title') or '').lower()[:80])
                 for a in pasangan:
+                    kunci = ((a.get('doi') or '').strip().lower()
+                               or (a.get('title') or '').lower()[:80])
+                    if kunci and kunci not in ada:
+                        ada.add(kunci)
+                        mentah.append(a)
+        # Tier longgar (Gas Bos 1 Nov 2026): pool masih < 8 ->
+        # tiap konsep bab dicari SENDIRI secara luas (tanpa AND
+        # dengan tema buku di query), hasilnya tetap disaring
+        # gerbang pasangan (bab + buku). Bila tetap < 8, tier
+        # santai di bawah yang jalan.
+        if (strict and judul_buku_k and intent_kw is not None
+                and len(mentah) < 8):
+            try:
+                buku_kw2, _buku_bukan2 = intent_bab(
+                    judul_buku_k, judul_buku_k, bidang_k, _pus)
+            except Exception:
+                buku_kw2 = None
+            if buku_kw2 is not None:
+                longgar_list = _kumpul_pasangan(
+                    _pus, bab_title, intent_kw, buku_kw2, longgar=True)
+                ada = set()
+                for a in mentah:
+                    ada.add((a.get('doi') or '').strip().lower()
+                              or (a.get('title') or '').lower()[:80])
+                for a in longgar_list:
                     kunci = ((a.get('doi') or '').strip().lower()
                                or (a.get('title') or '').lower()[:80])
                     if kunci and kunci not in ada:
