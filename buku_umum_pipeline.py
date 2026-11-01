@@ -2280,6 +2280,69 @@ def saring_pasangan_intent(pasangan, kw, bukan=None, _pus=None):
             if lolos_intent(f, kw, bukan, _pus)]
 
 
+def sentuh_konsep(artikel, k):
+    """True bila satu konsep tersentuh di judul + abstrak (<=600)."""
+    teks = ((artikel.get('title') or '') + ' '
+            + (artikel.get('abstract') or '')[:600]).lower()
+    sinonim = [(x or '').lower()
+               for x in (k.get('en') or []) + (k.get('id') or [])]
+    return any(s and s in teks for s in sinonim)
+
+
+def lolos_pasangan(artikel, bab_konsep, buku_konsep):
+    """True bila artikel menyentuh KEDUA anggota pasangan (bab + buku).
+
+    Berbeda dari _nyambung yang meloloskan 1 konsep dengan >= 2 sinonim
+    di judul: gerbang pasangan menuntut kedua anggota tersentuh, supaya
+    pengisi tier pasangan tetap spesifik, bukan PAUD umum.
+    """
+    try:
+        return (sentuh_konsep(artikel, bab_konsep)
+                and sentuh_konsep(artikel, buku_konsep))
+    except Exception:
+        return False
+
+
+def _kumpul_pasangan(_pus, bab_title, intent_kw, buku_kw):
+    """Pool tier pasangan: tiap konsep bab (maks 3) dipasangkan dengan
+    konsep buku pertama, dicari lewat dengan_konsep, disaring gerbang
+    pasangan, dedup DOI dulu. Fail-soft: gagal apa pun -> [].
+    """
+    keluar = []
+    try:
+        bab_list = (intent_kw or {}).get('konsep') or []
+        buku_list = (buku_kw or {}).get('konsep') or []
+        if not bab_list or not buku_list:
+            return []
+        buku_pertama = buku_list[0]
+        ada = set()
+        for k_bab in bab_list[:3]:
+            try:
+                kw_pair = _pus.kata_kunci_konsep(
+                    [k_bab, buku_pertama], bab_title, 'pasangan')
+            except Exception:
+                continue
+            try:
+                hasil = _pus.cari_semua_dengan_konsep(
+                    kw_pair, bab_title,
+                    sumber_kk=kw_pair.get('sumber', ''),
+                    tanpa_scite=True) or {}
+                mentah = hasil.get('artikel') or []
+            except Exception:
+                continue
+            for a in mentah:
+                if not lolos_pasangan(a, k_bab, buku_pertama):
+                    continue
+                kunci = ((a.get('doi') or '').strip().lower()
+                         or (a.get('title') or '').lower()[:80])
+                if kunci and kunci not in ada:
+                    ada.add(kunci)
+                    keluar.append(a)
+    except Exception:
+        return []
+    return keluar
+
+
 def _refs_dari_harvest(bab_title, potong=True, konteks=None):
     """Referensi satu bab dari mesin Harvest app (pustaka).
 
@@ -2442,6 +2505,31 @@ def _refs_dari_harvest(bab_title, potong=True, konteks=None):
                       if lolos_intent(r, intent_kw, intent_bukan, _pus)]
         elif strict:
             mentah = []
+        # Tier pasangan (Gas Bos 1 Nov 2026): pool ketat < 8 ->
+        # tiap konsep bab dipasangkan dengan konsep buku pertama,
+        # dicari dan disaring per pasangan. Pengisi tetap spesifik
+        # (kedua anggota tersentuh), bukan PAUD umum. Bila tetap
+        # < 8, tier santai di bawah yang jalan.
+        if (strict and judul_buku_k and intent_kw is not None
+                and len(mentah) < 8):
+            try:
+                buku_kw, _buku_bukan = intent_bab(
+                    judul_buku_k, judul_buku_k, bidang_k, _pus)
+            except Exception:
+                buku_kw = None
+            if buku_kw is not None:
+                pasangan = _kumpul_pasangan(
+                    _pus, bab_title, intent_kw, buku_kw)
+                ada = set()
+                for a in mentah:
+                    ada.add((a.get('doi') or '').strip().lower()
+                              or (a.get('title') or '').lower()[:80])
+                for a in pasangan:
+                    kunci = ((a.get('doi') or '').strip().lower()
+                               or (a.get('title') or '').lower()[:80])
+                    if kunci and kunci not in ada:
+                        ada.add(kunci)
+                        mentah.append(a)
         # Pelonggaran berjenjang (Gas Bos 1 Nov 2026): pool ketat
         # < 8 -> cari ulang dengan maksud tingkat buku (judul buku +
         # bidang), tetap disaring gerbangnya sendiri. Tidak pernah
