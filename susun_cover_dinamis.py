@@ -118,8 +118,18 @@ LABEL_JENIS = {
 
 
 def cari_font(nama):
-    for p in glob.glob('/usr/share/fonts/**/' + nama, recursive=True):
-        return p
+    # Urutan: font sistem (apt fonts-dejavu-core di image), lalu font
+    # yang ikut COPY app (app/static/font), sebagai pengaman bila image
+    # berubah. Jangan mengandalkan satu lokasi saja, itu pelajaran dari
+    # container lama yang font DejaVu-nya hilang.
+    dasar = [
+        '/usr/share/fonts',
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app', 'static', 'font'),
+        '/app/app/static/font',
+    ]
+    for d in dasar:
+        for p in glob.glob(os.path.join(d, '**', nama), recursive=True):
+            return p
     raise FileNotFoundError(nama)
 
 

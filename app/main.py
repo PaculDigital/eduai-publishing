@@ -906,6 +906,19 @@ def halaman_buku_selesai(
     ukuran_kb = (os.path.getsize(docx) // 1024) if ada else 0
     fid_sah = _proses.fid_selesai(db, u.id, data['hasil'],
                                   getattr(p, 'file_id', None), docx)
+    hasil_cover = data['hasil'] or {}
+    cover_preview_url = []
+    for _p in (hasil_cover.get('cover_preview') or []):
+        if _p and os.path.exists(_p):
+            cover_preview_url.append(
+                '/buku/cover/gambar?kode=' + quote(kode) + '&nama=' +
+                quote(os.path.basename(_p)))
+    cover_depan_url = ''
+    if hasil_cover.get('cover_depan') and os.path.exists(hasil_cover['cover_depan']):
+        cover_depan_url = '/buku/cover/gambar?kode=' + quote(kode) + '&nama=' + quote('cover_depan.png')
+    cover_belakang_url = ''
+    if hasil_cover.get('cover_belakang') and os.path.exists(hasil_cover['cover_belakang']):
+        cover_belakang_url = '/buku/cover/gambar?kode=' + quote(kode) + '&nama=' + quote('cover_belakang.png')
     return templates.TemplateResponse('buku_selesai.html', {
         'request': request, 'user': u,
         'judul': judul, 'bab': bab, 'kata': kata, 'folder': folder,
@@ -915,7 +928,229 @@ def halaman_buku_selesai(
         'docx_alasan': data['docx_alasan'] if not ada else '',
         'fid': fid_sah,
         'file_alasan': data['file_alasan'] if ada and not fid_sah else '',
+        'kode': kode,
+        'cover_status': hasil_cover.get('cover_status') or 'belum_dibuat',
+        'cover_preview_url': cover_preview_url,
+        'cover_pilihan': hasil_cover.get('cover_pilihan') or '',
+        'cover_depan_url': cover_depan_url,
+        'cover_belakang_url': cover_belakang_url,
+        'cover_gagal': hasil_cover.get('cover_gagal') or '',
     })
+
+
+def _cover_job_selesai(db, request, kode):
+    """Ambil job buku selesai milik user, atau None bila tidak sah.
+
+    Dipakai semua rute cover, supaya cek login, kepemilikan, dan
+    status selesai tidak ditulis ulang per rute dengan versi yang
+    berbeda. Gagal cover di sini hanya mengembalikan None, buku
+    tetap tidak berubah.
+    """
+    u = _wajib_login_kolab(request, db)
+    if not kode:
+        return None, None, None
+    from . import proses as _proses
+    p = _proses.ambil(db, kode, u.id)
+    if p is None or p.status != 'selesai':
+        return None, None, None
+    data = _proses.data_selesai_dari_hasil(p)
+    return u, p, data
+
+
+def _cover_simpan_hasil(db, p, hasil_baru):
+    """Simpan hasil_json baru dengan merge, tanpa mengubah status job.
+
+    Hanya dipakai rute cover. Tidak memanggil tandai_selesai, karena
+    fungsi itu untuk akhir job, bukan untuk update cover sesudah
+    selesai. Kunci lama dipertahankan oleh app.cover.perbarui_hasil_cover
+    sebelum fungsi ini dipanggil, jadi di sini hanya menulis dict itu.
+    """
+    p.hasil_json = json.dumps(hasil_baru, ensure_ascii=False, default=str)
+    db.commit()
+
+
+def _cover_data_job(p, data):
+    """Jenis, tema, judul, penulis dari komentar dan hasil job."""
+    try:
+        komentar = json.loads(getattr(p, 'komentar_json', '') or '{}') or {}
+    except Exception:
+        komentar = {}
+    hasil = data['hasil'] or {}
+    kunci = komentar.get('kunci_jenis') or 'umum'
+    if kunci not in ('referensi', 'ajar', 'monograf', 'panduan', 'umum', 'chapter'):
+        kunci = 'umum'
+    return {
+        'jenis': kunci,
+        'tema': komentar.get('bidang') or '',
+        'judul': hasil.get('judul') or komentar.get('judul') or data['judul'],
+        'penulis': komentar.get('penulis') or '',
+        'folder': hasil.get('folder') or data['folder'] or '',
+    }
+
+
+@_router_kolaborasi.get('/buku/cover/gambar', response_class=HTMLResponse)
+def cover_gambar(request: Request, kode: str = '', nama: str = '',
+                 db: Session = Depends(get_db)):
+    """Sajikan 1 berkas cover job itu, sesudah cek kepemilikan.
+
+    Nama hanya boleh basename yang ada di daftar preview, final, atau
+    belakang job itu, dan berkas harus ada di folder hasil job itu.
+    Nama lain ditolak 404, tanpa membuka path di luar folder job.
+    """
+    u, p, data = _cover_job_selesai(db, request, kode)
+    if p is None:
+        raise HTTPException(status_code=404, detail='Pekerjaan tidak ditemukan')
+    hasil = data['hasil'] or {}
+    diizinkan = set()
+    for _p in (hasil.get('cover_preview') or []):
+        diizinkan.add(os.path.basename(_p))
+    for _k in ('cover_depan', 'cover_belakang'):
+        if hasil.get(_k):
+            diizinkan.add(os.path.basename(hasil[_k]))
+    nama_bersih = os.path.basename(nama or '')
+    if nama_bersih not in diizinkan:
+        raise HTTPException(status_code=404, detail='Berkas cover tidak ditemukan')
+    folder = hasil.get('folder') or data['folder'] or ''
+    jalur = os.path.join(folder, nama_bersih)
+    if not folder or not os.path.exists(jalur):
+        raise HTTPException(status_code=404, detail='Berkas cover tidak ditemukan')
+    from fastapi.responses import FileResponse
+    return FileResponse(jalur, media_type='image/png')
+
+
+@_router_kolaborasi.post('/buku/cover/buat')
+def cover_buat(request: Request, kode: str = Form(''),
+               db: Session = Depends(get_db)):
+    """Buat bahan wide dan 3 preview, sesudah buku selesai.
+
+    Langkah terpisah dari susun(), gagal di sini tidak menggagalkan
+    buku dan tidak memicu refund. Bila bahan sudah ada, pakai bahan
+    itu, jangan generate ulang. Bila bahan belum ada, generate 1
+    gambar wide dari brief outline, tanpa judul di dalam gambar.
+    Tombol Gambar Lain disembunyikan sesuai keputusan Bos, jadi rute
+    ini tidak boleh dipanggil berulang untuk generate baru tanpa
+    batas, bila preview sudah siap, langsung kembali ke halaman
+    selesai.
+    """
+    u, p, data = _cover_job_selesai(db, request, kode)
+    if p is None:
+        return RedirectResponse('/buku?galat=' + quote('Pekerjaan tidak ditemukan'),
+                                status_code=303)
+    from . import cover as _cover
+    info = _cover_data_job(p, data)
+    folder = info['folder']
+    hasil = data['hasil'] or {}
+    if not folder or not os.path.isdir(folder):
+        return RedirectResponse('/buku/selesai?kode=' + quote(kode) + '&galat=' + quote('Folder hasil tidak ditemukan'),
+                                status_code=303)
+    if (hasil.get('cover_preview') and
+            all(os.path.exists(_p) for _p in hasil['cover_preview'])):
+        return RedirectResponse('/buku/selesai?kode=' + quote(kode), status_code=303)
+    try:
+        bahan = os.path.join(folder, _cover.NAMA_BAHAN)
+        if not os.path.exists(bahan):
+            brief = (
+                f"Cover buku {info['tema'] or info['judul']}, "
+                f"gaya realistis candid, satu adegan jelas sesuai tema, "
+                f"warna cerah profesional, tanpa teks, tanpa huruf, "
+                f"tanpa angka, tanpa logo di dalam gambar"
+            )
+            bahan_baru = _cover.buat_bahan_wide(folder, brief)
+            if not bahan_baru:
+                raise ValueError('Generate bahan cover gagal')
+            bahan = bahan_baru
+        kunci = _cover.buat_preview(
+            folder, info['jenis'], info['tema'], info['judul'],
+            info['penulis'], 'PT Bayana Hasana Duna', bahan,
+            sinopsis='', foto_path=None, bio='')
+        hasil_baru = _cover.perbarui_hasil_cover(hasil, kunci)
+        _cover_simpan_hasil(db, p, hasil_baru)
+    except Exception as e:
+        kunci_gagal = _cover.perbarui_hasil_cover(hasil, {
+            'cover_status': 'gagal', 'cover_gagal': f"{type(e).__name__}: {e}"[:200]})
+        try:
+            _cover_simpan_hasil(db, p, kunci_gagal)
+        except Exception:
+            pass
+    return RedirectResponse('/buku/selesai?kode=' + quote(kode), status_code=303)
+
+
+@_router_kolaborasi.post('/buku/cover/pilih')
+def cover_pilih(request: Request, kode: str = Form(''),
+                pilihan: str = Form(''), db: Session = Depends(get_db)):
+    """Pilih 1 preview jadi final, idempotent, DOCX tidak diubah."""
+    u, p, data = _cover_job_selesai(db, request, kode)
+    if p is None:
+        return RedirectResponse('/buku?galat=' + quote('Pekerjaan tidak ditemukan'),
+                                status_code=303)
+    from . import cover as _cover
+    info = _cover_data_job(p, data)
+    hasil = data['hasil'] or {}
+    try:
+        pilihan_bersih = (pilihan or '').strip()
+        if pilihan_bersih.isdigit():
+            previews = hasil.get('cover_preview') or []
+            idx = int(pilihan_bersih)
+            if 0 <= idx < len(previews):
+                nama_file = os.path.basename(previews[idx])
+                # preview-1-klasik.png -> klasik, preview-3-foto_penuh_atas.png -> foto_penuh_atas
+                bagian = nama_file[:-4].split('-', 2)
+                pilihan_bersih = bagian[2] if len(bagian) == 3 else ''
+        hasil_baru = _cover.pilih_preview(info['folder'], hasil, pilihan_bersih)
+        _cover_simpan_hasil(db, p, hasil_baru)
+    except Exception:
+        pass
+    return RedirectResponse('/buku/selesai?kode=' + quote(kode), status_code=303)
+
+
+@_router_kolaborasi.post('/buku/cover/lengkapi')
+def cover_lengkapi(request: Request, kode: str = Form(''),
+                   bio: str = Form(''), foto: UploadFile = File(None),
+                   db: Session = Depends(get_db)):
+    """Unggah foto dan bio penulis, buat ulang belakang saja.
+
+    Foto dibatasi JPG atau PNG dan maksimal 5 MB. Bila foto tidak
+    diunggah, foto lama dipakai. Bila bio kosong, bio lama dipakai.
+    Buku dan sampul depan tidak dibuat ulang di rute ini.
+    """
+    u, p, data = _cover_job_selesai(db, request, kode)
+    if p is None:
+        return RedirectResponse('/buku?galat=' + quote('Pekerjaan tidak ditemukan'),
+                                status_code=303)
+    from . import cover as _cover
+    info = _cover_data_job(p, data)
+    hasil = data['hasil'] or {}
+    folder = info['folder']
+    if not folder or not os.path.isdir(folder):
+        return RedirectResponse('/buku/selesai?kode=' + quote(kode), status_code=303)
+    foto_tmp = None
+    try:
+        if foto is not None and getattr(foto, 'filename', ''):
+            nama_bawah = (foto.filename or '').lower()
+            if not (nama_bawah.endswith('.jpg') or nama_bawah.endswith('.jpeg')
+                    or nama_bawah.endswith('.png')):
+                return RedirectResponse('/buku/selesai?kode=' + quote(kode), status_code=303)
+            isi = foto.file.read()
+            if len(isi) > 5 * 1024 * 1024:
+                return RedirectResponse('/buku/selesai?kode=' + quote(kode), status_code=303)
+            foto_tmp = os.path.join(folder, 'foto_penulis_tmp.png')
+            with open(foto_tmp, 'wb') as f:
+                f.write(isi)
+        bio_baru = None if (bio or '').strip() == '' else (bio or '').strip()
+        if len(bio_baru or '') > 2000:
+            bio_baru = (bio_baru or '')[:2000]
+        hasil_baru = _cover.lengkapi_belakang(
+            folder, hasil, foto_path=foto_tmp, bio=bio_baru)
+        _cover_simpan_hasil(db, p, hasil_baru)
+    except Exception:
+        pass
+    finally:
+        try:
+            if foto_tmp and os.path.exists(foto_tmp):
+                os.remove(foto_tmp)
+        except Exception:
+            pass
+    return RedirectResponse('/buku/selesai?kode=' + quote(kode), status_code=303)
 
 
 @_router_kolaborasi.get('/buku/siapkan', response_class=HTMLResponse)

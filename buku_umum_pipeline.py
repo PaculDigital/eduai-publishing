@@ -1984,6 +1984,38 @@ def generate_sampul_api(brief, simpan=None, seed=1000, timeout=280):
     return simpan
 
 
+def generate_gambar_cover_wide(brief, simpan, seed=1000, timeout=280):
+    """Generate BAHAN cover wide (3:2), 1 generasi, TANPA teks AI.
+
+    Keputusan Bos 2 Nov 2026 17:17 WIB: bahan cover wide, bukan portrait.
+    Alasan: varian Foto Penuh Atas dan pita Klasik memotong bahan
+    portrait terlalu banyak. Biaya tetap 1 generasi, sama seperti
+    portrait, hanya rasio yang berubah: Bumi aspect 3:2, InferHub
+    ukuran 1536x1024, OpenRouter mengikuti modelnya lalu dipotong
+    modul cover. Pemanggil WAJIB memberi `simpan` yang jelas, misalnya
+    cover_bahan.png di folder hasil job, JANGAN cover.png, supaya
+    rakitan DOCX tidak tertimpa gambar mentah tanpa judul. Return path
+    atau None. Gagal di sini tidak boleh menggagalkan buku, pemanggil
+    yang mencatat status cover_gagal.
+    """
+    if not brief or not simpan:
+        return None
+    folder = os.path.dirname(simpan)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    raw, model, galat = _gambar_satu(brief, ukuran="1536x1024", seed=seed,
+                                     timeout=timeout, aspect_ratio="3:2")
+    if not raw:
+        for g in galat:
+            print(f"       ⚠️ {g}")
+        print("       ❌ Semua jalur gambar gagal — tidak ada bahan cover.")
+        return None
+    with open(simpan, 'wb') as f:
+        f.write(raw)
+    print(f"       ✅ Bahan cover wide: {simpan} ({round(len(raw)/1024)} KB) · {model}")
+    return simpan
+
+
 def generate_ilustrasi_api(bab_num, bab_title, ringkasan_bab="", bab_text="",
                            varian=3, gaya=None):
     """Generate ilustrasi (2 tahap + kurasi): brief dari isi bab → gambar.
