@@ -232,7 +232,7 @@ def _pastikan_jalur_modul():
             sys.path.insert(0, p)
 
 
-def panen_satu_bab(judul_bab, potong=True, konteks=None):
+def panen_satu_bab(judul_bab, potong=True, konteks=None, subs=None):
     """Panen SATU bab dari API, tanpa DB, tanpa tulis. Fail-soft.
 
     Leg 1: _refs_dari_harvest yang sudah ada (4 sumber Scopus,
@@ -242,10 +242,31 @@ def panen_satu_bab(judul_bab, potong=True, konteks=None):
     hanya bila source kosong, bukan diam-diam. Gagal total: [].
     Kata kunci EN memakai LLM lewat helper yang sudah ada (seperti
     panen hari ini). Parse ke artikel tetap deterministik, tanpa LLM.
+
+    Gas Bos 1 Nov 2026 malam: bila subs diberikan dan berisi ≥ 2
+    sub-topik berbeda, panen per sub-bab secara paralel lalu gabung.
+    Ini memecahkan masalah bab multi-topik yang menghasilkan pool
+    campur aduk (misal 'Ekologi Keluarga, Kebijakan Publik, dan Etika
+    Data Anak' → 40 artikel campuran). Per sub-bab topiknya tunggal,
+    hasil lebih fokus dan presisi lebih tinggi tanpa perlu JeV.
     """
     judul_bab = (judul_bab or "").strip()
     if not judul_bab:
         return []
+
+    # Panen per sub-bab bila ada ≥ 2 sub-topik berbeda
+    _subs_valid = []
+    if subs:
+        for s in subs:
+            try:
+                _nomor, _judul_sub, _kp = s[0], s[1], s[2]
+                if isinstance(_judul_sub, str) and _judul_sub.strip():
+                    _subs_valid.append(_judul_sub.strip())
+            except (IndexError, TypeError, ValueError):
+                continue
+    if len(_subs_valid) >= 2:
+        return _panen_per_subbab(_subs_valid, judul_bab, potong, konteks)
+
     _pastikan_jalur_modul()
     try:
         import buku_umum_pipeline as _P
@@ -277,14 +298,71 @@ def panen_satu_bab(judul_bab, potong=True, konteks=None):
     return keluar
 
 
-def _panen_dan_parse(judul_bab, potong=True, konteks=None):
+def _panen_per_subbab(sub_juduls, judul_bab_induk, potong, konteks):
+    """Panen per sub-bab secara paralel, gabung, dedup.
+
+    Setiap sub-bab dipanen sebagai kueri terpisah dengan konteks buku
+    yang sama. Hasil digabung dan didedup berdasarkan DOI atau
+    judul+tahun+surname. Tidak memotong — pemotongan dilakukan di
+    fase 2 panen_semua setelah semua bab selesai.
+    """
+    _pastikan_jalur_modul()
+    try:
+        import buku_umum_pipeline as _P
+    except Exception:
+        return []
+
+    def _panen_satu_sub(judul_sub):
+        try:
+            h = _P._refs_dari_harvest(judul_sub, potong=False,
+                                       konteks=konteks)
+            return list(h or [])
+        except Exception:
+            return []
+
+    semua = []
+    with ThreadPoolExecutor(max_workers=min(len(sub_juduls), PARALEL_MAKS)) as ex:
+        futs = {ex.submit(_panen_satu_sub, sj): sj for sj in sub_juduls}
+        for fut in as_completed(futs):
+            try:
+                hasil = fut.result() or []
+                semua.extend(hasil)
+            except Exception:
+                pass
+
+    # Dedup
+    lihat = set()
+    unik = []
+    for r in semua:
+        if isinstance(r, dict):
+            doi = r.get("doi") or ""
+            if doi:
+                k = "doi:" + doi.strip().lower()
+            else:
+                j = (r.get("title") or r.get("judul") or "").strip().lower()
+                th = str(r.get("year") or r.get("tahun") or "")
+                k = "judul:%s|%s" % (j, th)
+            if k in lihat:
+                continue
+            lihat.add(k)
+            unik.append(r)
+
+    print("[pra_panen] sub-bab panen: %d sub → %d artikel unik (induk: %s)"
+          % (len(sub_juduls), len(unik), judul_bab_induk[:50]), flush=True)
+    return unik
+
+
+def _panen_dan_parse(judul_bab, potong=True, konteks=None, subs=None):
     """Panen plus parse untuk satu bab. Murni (tanpa DB), aman
     dipanggil dari utas worker. Gagal apa pun: [] (gerbang nanti
     gagal jujur dengan jumlah 0, bukan crash).
+
+    Gas Bos 1 Nov 2026 malam: subs diteruskan ke panen_satu_bab
+    supaya bab multi-topik dipanen per sub-bab.
     """
     try:
         mentah = panen_satu_bab(judul_bab, potong=potong,
-                                konteks=konteks)
+                                konteks=konteks, subs=subs)
     except Exception:
         return []
     hasil = []
@@ -576,9 +654,13 @@ def panen_semua(db, job_kode, bidang, outline, lapor=None, judul_buku=None):
         with ThreadPoolExecutor(max_workers=PARALEL_MAKS) as ex:
             futs = {}
             for bab, judul_bab in perlu_panen:
+                # Gas Bos 1 Nov 2026 malam: teruskan subs dari outline
+                # supaya bab multi-topik dipanen per sub-bab.
+                _subs_bab = (outline.get(bab) or {}).get("subs")
                 futs[ex.submit(_panen_dan_parse, judul_bab, False,
                              {'judul_buku': judul_buku,
-                              'bidang': bidang})] = (bab, judul_bab)
+                              'bidang': bidang},
+                             subs=_subs_bab)] = (bab, judul_bab)
             for fut in as_completed(futs):
                 bab, judul_bab = futs[fut]
                 try:
