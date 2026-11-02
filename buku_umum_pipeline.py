@@ -233,20 +233,51 @@ except Exception:
 #  di InferHub (45 penjual) · 6,9–9,2 s · $0,00043/gambar (~Rp 7).
 GAMBAR_BASE = "https://api.inferhub.dev/v1"
 
-# ── MESIN GAMBAR: 3 JALUR TERKUNCI (diuji nyata 28 Okt 2026) ─────────────
-# Urutan = murah dulu, mahal terakhir. TIDAK boleh menambah kandidat tanpa uji.
+# ── MESIN GAMBAR: 4 JALUR TERKUNCI (Gas Bos 2 Nov 2026) ───────────────
+# Urutan = keputusan Bos 2 Nov 2026: Bumi Digital JALUR KE-3, OpenRouter
+# TERAKHIR. Di dalam Bumi, urutkan termurah dulu (harga live 2 Nov 2026,
+# endpoint publik /api/v1/models/pricing?type=image, TANPA kunci):
+#   Bumi promo GPT Image 2.5 0,1 kredit (medium 1K) → Bumi low 0,2 kredit.
+#   Seedream Flash 0,4 kredit BELUM dimasukkan (butuh param model tambahan
+#   yang belum teruji live); OpenRouter tetap jaring terakhir di bawahnya.
+#   Harga PROMO bisa hilang sewaktu-waktu,
+#   jadi rantai Bumi TIDAK boleh hanya berisi promo.
 #   ① gpt-image-2-codex        InferHub    $0,0031  55–180 s   (polos = hidup)
 #   ② cx/gpt-image-2-codex     InferHub    $0,0031  ~59 s
-#   ③ gemini-3.1-flash-lite-image OpenRouter $0,034  3,85 s   (jaring terakhir)
+#   ③ Bumi Digital (3 model, termurah dulu, ASINKRON + polling)
+#   ④ gemini-3.1-flash-lite-image OpenRouter $0,034  3,85 s   (jaring terakhir)
 # Terbukti MATI (jangan dimasukkan lagi): cb/gemini-2.5-flash-image (22
 # tawaran harga tapi "route config not found"), 23 nama lain "unknown model",
 # SELURUH keluarga FLUX tidak ada di InferHub maupun OpenRouter.
+# CATATAN BUMI: Bumi BUKAN jalur teks. Teks tetap combo EduAi di 9router.
+# Bumi HANYA untuk gambar produksi (ilustrasi bab + sampul), dan HANYA
+# dipakai kalau InferHub gagal. Kunci Bumi TIDAK ditulis di sini dan TIDAK
+# dibaca di tingkat atas (supaya modul tetap bisa diimpor tanpa kunci Bumi):
+# dibaca malas di cabang Bumi lewat _baca_env("BUMI_API_KEY"); kalau kunci
+# kosong, jalur Bumi dilewati begitu saja ke OpenRouter, bukan crash.
 GAMBAR_MODEL = "gpt-image-2-codex"
 GAMBAR_RANTAI = [
     ("inferhub",   "gpt-image-2-codex"),
     ("inferhub",   "cx/gpt-image-2-codex"),
+    ("bumi",       "is2i-gpt-image-2-5-sunburst"),
+    ("bumi",       "OpenAI/gpt-image-2.5-flare-promo"),
+    ("bumi",       "OpenAI/gpt-image-2.5-flare"),
     ("openrouter", "google/gemini-3.1-flash-lite-image"),
 ]
+# Parameter Bumi per model (dari input_schema live 2 Nov 2026). Promo pakai
+# aspect_ratio + quality medium + resolution "1k" (huruf kecil). Flare
+# non-promo pakai size + quality low + resolution "1K" (huruf besar) +
+# output_format png, supaya dapat harga low 0,2 kredit, bukan high 1,1.
+BUMI_BASE = "https://bumi.digital"
+BUMI_PARAM = {
+    "is2i-gpt-image-2-5-sunburst": {"quality": "medium", "resolution": "1k"},
+    "OpenAI/gpt-image-2.5-flare-promo": {"quality": "medium", "resolution": "1k"},
+    "OpenAI/gpt-image-2.5-flare": {"quality": "low", "resolution": "1K",
+                                  "output_format": "png"},
+}
+BUMI_POLL_INTERVAL = 10       # detik antar cek status Bumi
+BUMI_POLL_DEADLINE = 600      # detik maks menunggu satu model Bumi (promo
+                              # saja estimasinya 360 detik di pricing)
 GAMBAR_TIMEOUT = 280           # per percobaan; model lambat jangan dipotong
 GAMBAR_MATI = set()            # model yg gagal di proses ini → tidak dicoba lagi
 
@@ -1648,11 +1679,14 @@ def _sub_bab_tengah(bab_text):
     return "\n\n".join(s[:900] for s in pilih)
 
 
-def _gambar_satu(prompt, ukuran="1024x1024", seed=1000, timeout=None):
+def _gambar_satu(prompt, ukuran="1024x1024", seed=1000, timeout=None,
+                 aspect_ratio="1:1"):
     """Coba SATU jalur gambar sesuai GAMBAR_RANTAI. Return (raw_bytes, model, galat).
 
-    Pintu TUNGGAL ke semua penyedia gambar — InferHub maupun OpenRouter.
+    Pintu TUNGGAL ke semua penyedia gambar — InferHub, Bumi, OpenRouter.
     Tidak ada pemanggil lain yang boleh menembak API gambar langsung.
+    aspect_ratio HANYA dipakai Bumi (ilustrasi "1:1", sampul "2:3");
+    InferHub/OpenRouter tetap memakai `ukuran` seperti dulu.
     """
     timeout = timeout or GAMBAR_TIMEOUT
     raw, model, galat = None, None, []
@@ -1694,8 +1728,110 @@ def _gambar_satu(prompt, ukuran="1024x1024", seed=1000, timeout=None):
                 GAMBAR_MATI.add(nama_model)
                 continue
 
-        # ── ② OpenRouter: POST /chat/completions modalities=image ───────
-        else:
+        # ── ② Bumi: POST /api/v1/image/generate, lalu POLLING ────────
+        # Bumi asinkron (dokumen: generation_id dulu, hasil belakangan).
+        # JANGAN menunggu di satu POST; poll GET /generation/{id} sampai
+        # completed/failed atau deadline. Kalau kunci kosong, lewati ke
+        # model berikutnya (akhirnya OpenRouter), bukan crash.
+        elif penyedia == "bumi":
+            try:
+                kunci_bumi = _baca_env("BUMI_API_KEY")
+            except RuntimeError:
+                kunci_bumi = ""
+            if not kunci_bumi:
+                galat.append(f"{nama_model}: BUMI_API_KEY kosong")
+                continue
+            param_bumi = dict(BUMI_PARAM.get(nama_model, {}))
+            if nama_model == "OpenAI/gpt-image-2.5-flare":
+                param_bumi["size"] = aspect_ratio
+            else:
+                param_bumi["aspect_ratio"] = aspect_ratio
+            try:
+                resp = requests.post(
+                    f"{BUMI_BASE}/api/v1/image/generate",
+                    headers={"Content-Type": "application/json",
+                             "Authorization": f"Bearer {kunci_bumi}"},
+                    json={"model_id": nama_model,
+                          "parameters": {"prompt": prompt, **param_bumi}},
+                    timeout=timeout)
+                data = resp.json() if hasattr(resp, "json") else {}
+                if not isinstance(data, dict):
+                    data = {}
+                isi = data.get("data") if isinstance(data.get("data"), dict) else data
+                gen_id = isi.get("generation_id") or isi.get("id") or ""
+                url_langsung = (isi.get("resultUrl") or isi.get("result_url")
+                                or isi.get("output_url") or "")
+                if not url_langsung and isinstance(isi.get("resultUrls"), list) \
+                        and isi.get("resultUrls"):
+                    url_langsung = isi["resultUrls"][0]
+                if url_langsung:
+                    import base64 as _b64
+                    if url_langsung.startswith("data:"):
+                        raw = _b64.b64decode(url_langsung.split(",", 1)[1])
+                    else:
+                        raw = requests.get(url_langsung, timeout=90).content
+                    if raw:
+                        model = nama_model
+                    else:
+                        galat.append(f"{nama_model}: url langsung kosong")
+                        GAMBAR_MATI.add(nama_model)
+                        continue
+                elif not gen_id:
+                    galat.append(f"{nama_model}: tanpa generation_id {str(data)[:80]}")
+                    GAMBAR_MATI.add(nama_model)
+                    continue
+                else:
+                    batas = time.time() + max(timeout or GAMBAR_TIMEOUT,
+                                              BUMI_POLL_DEADLINE)
+                    gagal_poll = None
+                    while time.time() < batas:
+                        cek = requests.get(
+                            f"{BUMI_BASE}/api/v1/generation/{gen_id}",
+                            headers={"Authorization": f"Bearer {kunci_bumi}"},
+                            timeout=90)
+                        info = cek.json() if hasattr(cek, "json") else {}
+                        if not isinstance(info, dict):
+                            info = {}
+                        isi2 = info.get("data") if isinstance(info.get("data"), dict) else info
+                        status = str(isi2.get("status") or "").lower()
+                        if status == "completed":
+                            url_hasil = (isi2.get("resultUrl")
+                                         or isi2.get("result_url")
+                                         or isi2.get("output_url") or "")
+                            if not url_hasil and isinstance(isi2.get("resultUrls"), list) \
+                                    and isi2.get("resultUrls"):
+                                url_hasil = isi2["resultUrls"][0]
+                            if not url_hasil:
+                                gagal_poll = "completed tanpa resultUrl"
+                            else:
+                                import base64 as _b64
+                                if url_hasil.startswith("data:"):
+                                    raw = _b64.b64decode(url_hasil.split(",", 1)[1])
+                                else:
+                                    raw = requests.get(url_hasil, timeout=90).content
+                                if raw:
+                                    model = nama_model
+                                else:
+                                    gagal_poll = "resultUrl kosong"
+                            break
+                        if status == "failed":
+                            gagal_poll = str(isi2.get("error") or "failed")[:70]
+                            break
+                        time.sleep(BUMI_POLL_INTERVAL)
+                    else:
+                        gagal_poll = "polling Bumi habis deadline"
+                    if not raw:
+                        galat.append(f"{nama_model}: {gagal_poll or 'gagal poll'}")
+                        GAMBAR_MATI.add(nama_model)
+                        continue
+            except Exception as e:                                  # noqa: BLE001
+                galat.append(f"{nama_model}: {type(e).__name__} {str(e)[:70]}")
+                GAMBAR_MATI.add(nama_model)
+                continue
+
+        # ── ③ OpenRouter: POST /chat/completions modalities=image ───────
+        # Jaring TERAKHIR (keputusan Bos 2 Nov 2026: Bumi jalur ke-3).
+        elif penyedia == "openrouter":
             kunci_or = ""
             for nama_kunci in ("EDUAI_GAMBAR_FALLBACK_KEY", "JEV_OPENROUTER_KEY"):
                 try:
@@ -1780,6 +1916,38 @@ def _gambar_inferhub(prompt, simpan=None, ukuran="1024x1024", seed=1000,
     with open(simpan, 'wb') as f:
         f.write(raw)
     print(f"       ✅ Gambar: {simpan} ({round(len(raw)/1024)} KB) · {model}")
+    return simpan
+
+
+def generate_sampul_api(brief, simpan=None, seed=1000, timeout=280):
+    """Generate sampul (portrait, TANPA teks AI) lewat rantai gambar.
+
+    BUKAN dipanggil otomatis oleh rakitan buku. Pemanggil yang memutuskan
+    sampul dibuat di akhir (keputusan Bos 30 Okt 2026) memanggil helper ini
+    dengan brief visual TANPA judul/penulis di dalamnya, karena teks yang
+    digambar AI sering rusak. Judul/penulis dipasang di tahap desain,
+    bukan di gambar AI. Kalau `simpan` kosong, simpan ke cover.png di
+    folder visual utas ini (assembly sudah memakai cover.png bila ada).
+    Return path atau None. Rantai yang dipakai SAMA dengan ilustrasi:
+    InferHub 1, InferHub 2, Bumi 3, OpenRouter terakhir.
+    """
+    if not brief:
+        return None
+    if not simpan:
+        os.makedirs(VISUAL_DIR, exist_ok=True)
+        simpan = os.path.join(visual_ini(), "cover.png")
+    folder = os.path.dirname(simpan) or VISUAL_DIR
+    os.makedirs(folder, exist_ok=True)
+    raw, model, galat = _gambar_satu(brief, ukuran="1024x1024", seed=seed,
+                                     timeout=timeout, aspect_ratio="2:3")
+    if not raw:
+        for g in galat:
+            print(f"       ⚠️ {g}")
+        print("       ❌ Semua jalur gambar gagal — tidak ada sampul dibuat.")
+        return None
+    with open(simpan, 'wb') as f:
+        f.write(raw)
+    print(f"       ✅ Sampul: {simpan} ({round(len(raw)/1024)} KB) · {model}")
     return simpan
 
 
