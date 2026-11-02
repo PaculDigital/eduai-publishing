@@ -3324,7 +3324,7 @@ def generate_closing(bab_num, bab_title, rolling_summary, jenis="umum"):
     closing = post_process(closing, jenis=jenis)
     return closing
 
-def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None, refs_bab=None, dari_snapshot=False, snapshot_rows=None):
+def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None, refs_bab=None, dari_snapshot=False, snapshot_rows=None, on_subbab=None):
     """Generate 1 bab lengkap: intro + sub-bab + penutup."""
     bab_title = bab_data["title"]
     subs = bab_data["subs"]
@@ -3348,7 +3348,14 @@ def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None, refs_
     #  ringkasan bab TANPA memanggil AI lagi (ACC Bos 19 Okt 2026).
     ringkasan_subs = []
 
-    for sub_num, sub_title, key_points in subs:
+    _total_subs = len(subs)
+    for _idx_sub, (sub_num, sub_title, key_points) in enumerate(subs, 1):
+        # P1: lapor progres per subbab (Gas Bos 2Nov26)
+        if on_subbab:
+            try:
+                on_subbab(bab_num, _idx_sub, _total_subs, sub_title, 'mulai')
+            except Exception:
+                pass
         # Panggilan kondisional: jalur lama memakai argumen lama persis
         # (pembungkus gerbang RINGKASAN menolak kwarg dari_snapshot);
         # jalur snapshot memakai refs + dari_snapshot.
@@ -3367,6 +3374,12 @@ def generate_bab(bab_num, bab_data, prev_summary, jenis="umum", tier=None, refs_
         rolling = summary  # next sub gets this summary
         if summary:
             ringkasan_subs.append((sub_num, sub_title, summary.strip()))
+        # P1: lapor selesai subbab
+        if on_subbab:
+            try:
+                on_subbab(bab_num, _idx_sub, _total_subs, sub_title, 'selesai')
+            except Exception:
+                pass
 
     # Penutup
     closing = generate_closing(bab_num, bab_title, rolling, jenis=jenis)

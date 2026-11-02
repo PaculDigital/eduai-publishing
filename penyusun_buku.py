@@ -456,6 +456,13 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
             # panggil dengan argumen lama persis, supaya mock dan
             # pemanggil lama yang signature-nya lama tidak gagal
             # TypeError karena kwargs baru (gerbang perbaikan bab).
+            # P1: wrapper on_subbab → lapor (Gas Bos 2Nov26)
+            def _on_subbab(_bn, _si, _st, _sn, _fase):
+                if lapor:
+                    if _fase == 'mulai':
+                        lapor(f'BAB {_bn} subbab {_si}/{_st}: {_sn}')
+                    else:
+                        lapor(f'BAB {_bn} subbab {_si}/{_st} selesai')
             if dari_snapshot:
                 # Gas 31 Okt 2026 12:03, butir 1: baris snapshot
                 # bab ini dioper ke pipeline, supaya gerbang per
@@ -472,15 +479,15 @@ def _susun_buku_dalam(judul, outline, jenis="umum", keluar_dir=None,
                     teks, summ, wc, cit = P.generate_bab(
                         n, outline[n], ringkasan_awal, jenis=jenis, tier=tier,
                         refs_bab=(refs_per_bab.get(n) if isinstance(refs_per_bab, dict) else None),
-                        dari_snapshot=True, snapshot_rows=_rows_bab)
+                        dari_snapshot=True, snapshot_rows=_rows_bab, on_subbab=_on_subbab)
                 except TypeError:
                     teks, summ, wc, cit = P.generate_bab(
                         n, outline[n], ringkasan_awal, jenis=jenis, tier=tier,
                         refs_bab=(refs_per_bab.get(n) if isinstance(refs_per_bab, dict) else None),
-                        dari_snapshot=True)
+                        dari_snapshot=True, on_subbab=_on_subbab)
             else:
                 teks, summ, wc, cit = P.generate_bab(
-                    n, outline[n], ringkasan_awal, jenis=jenis, tier=tier)
+                    n, outline[n], ringkasan_awal, jenis=jenis, tier=tier, on_subbab=_on_subbab)
         finally:
             P.lepas_folder()
         #  ⚠️ PENJAGA: bab kosong TIDAK boleh dicatat "done".

@@ -100,6 +100,9 @@ h1{font-size:22px;font-weight:700;display:flex;align-items:center;gap:9px;margin
 .st-tulis{color:#92400e;background:#fef3c7}
 .st-tunggu{color:var(--teks-abu);background:#eef0f2}
 .st-selesai{color:var(--hijau-gelap);background:var(--hijau-muda)}
+.st-sub-tulis{color:#1e40af;background:#dbeafe}
+.st-sub-selesai{color:#065f46;background:#d1fae5}
+.eta-info{font-size:12px;color:var(--teks-abu);margin-top:6px;font-style:italic;list-style:none}
 .artikel-blok{margin-top:14px}
 .artikel-item{padding:8px 0;border-bottom:1px dashed var(--garis);font-size:13.5px;line-height:1.6}
 .artikel-item:last-child{border-bottom:none}
@@ -318,6 +321,10 @@ async function pantau() {
       var daftarK = [];
       if (TOTAL_BAB > 0) { for (var k = 1; k <= TOTAL_BAB; k++) daftarK.push(k); }
       else { Object.keys(ag.subbab_per_bab).sort(function (a, b) { return a - b; }).forEach(function (k) { daftarK.push(k); }); }
+      // P1: hitung ETA dari subbab selesai (Gas Bos 2Nov26)
+      var totalSubSelesai = 0, totalSubSemua = 0;
+      var waktuMulaiStr = j.dibuat || null;
+      var waktuMulai = waktuMulaiStr ? new Date(waktuMulaiStr).getTime() / 1000 : null;
       daftarK.forEach(function (k) {
         var t = ag.subbab_per_bab[k] || ag.subbab_per_bab[String(k)] || '';
         if (t.indexOf('Catatan') === 0) {
@@ -326,19 +333,56 @@ async function pantau() {
           elSubbab.appendChild(li0);
           return;
         }
-        var judul = '';
-        if (t.indexOf(': ') >= 0) judul = t.slice(t.indexOf(': ') + 2);
-        else if (t.indexOf('BAB ' + k + ' ') === 0) judul = '';
-        else judul = t;
-        var st = 'tunggu', label = 'Menunggu...';
-        if (/selesai/i.test(t)) { st = 'selesai'; label = 'Selesai'; }
+        // Parse progres subbab: "BAB N subbab S/T: judul" atau "BAB N subbab S/T selesai"
+        var m = t.match(/subbab\s+(\d+)\/(\d+)/i);
+        if (m) {
+          var sIdx = parseInt(m[1]), sTot = parseInt(m[2]);
+          totalSubSemua = Math.max(totalSubSemua, sTot);
+          if (/selesai/i.test(t)) totalSubSelesai++;
+        }
+        var judul = '', st = 'tunggu', label = 'Menunggu...';
+        if (/subbab\s+\d+\/\d+\s+selesai/i.test(t)) {
+          st = 'sub-selesai'; label = t.replace(/.*subbab\s+(\d+\/\d+)\s+selesai.*/i, 'Subbab $1 selesai');
+        } else if (/subbab\s+\d+\/\d+/i.test(t)) {
+          st = 'sub-tulis'; label = t.replace(/.*subbab\s+(\d+\/\d+):\s*(.*)/i, 'Subbab $1 — $2');
+        } else if (/selesai/i.test(t)) { st = 'selesai'; label = 'Selesai'; }
         else if (/mulai/i.test(t)) { st = 'tulis'; label = 'Sedang Ditulis'; }
+        if (st === 'sub-tulis' || st === 'sub-selesai') {
+          // Ambil judul bab dari teks sebelum "subbab"
+          var preSub = t.split(/subbab/i)[0].replace(/^BAB\s+\d+\s*/, '').trim();
+          judul = preSub;
+        } else {
+          if (t.indexOf(': ') >= 0) judul = t.slice(t.indexOf(': ') + 2);
+          else if (t.indexOf('BAB ' + k + ' ') === 0) judul = '';
+          else judul = t;
+        }
         var li = document.createElement('li');
         var sp = document.createElement('span'); sp.className = 'st st-' + st; sp.textContent = label;
         li.appendChild(sp);
         li.appendChild(document.createTextNode(' Bab ' + k + (judul ? ': ' + judul : '')));
         elSubbab.appendChild(li);
       });
+      // P1: ETA — rata-rata detik per subbab × sisa
+      if (totalSubSelesai > 0 && waktuMulai && totalSubSemua > 0) {
+        var detikLalu = Math.floor((Date.now() / 1000) - waktuMulai);
+        var rataPerSub = detikLalu / totalSubSelesai;
+        // Total subbab semua bab = totalSubSemua * jumlah bab yang sudah mulai
+        var babMulai = daftarK.filter(function(k) {
+          var t2 = ag.subbab_per_bab[k] || ag.subbab_per_bab[String(k)] || '';
+          return /subbab/i.test(t2);
+        }).length || 1;
+        var totalSubAll = totalSubSemua * babMulai;
+        var sisa = totalSubAll - totalSubSelesai;
+        if (sisa > 0) {
+          var etaDetik = Math.round(rataPerSub * sisa);
+          var etaM = Math.floor(etaDetik / 60), etaS = etaDetik % 60;
+          var etaTeks = '~' + etaM + ':' + (etaS < 10 ? '0' : '') + etaS + ' lagi';
+          var liEta = document.createElement('li');
+          liEta.className = 'eta-info';
+          liEta.textContent = '⏱ Perkiraan: ' + etaTeks;
+          elSubbab.appendChild(liEta);
+        }
+      }
     }
     aturServer(j);
     aturBar(ix, babAg, TOTAL_BAB);
