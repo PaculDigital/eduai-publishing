@@ -330,13 +330,11 @@ fieldset.baris-pilih legend{font-size:12.5px;font-weight:700;color:var(--teks);
     if (!form.checkValidity()){ return; }
     sudahDikirim = true;
     btn.disabled = true;
-    // Freeze semua input & tombol lain supaya user tidak bisa ubah form.
-    // JANGAN disable hidden input — hidden yang disabled tidak ikut
-    // dikirim di POST, sehingga field seperti 'jenis' hilang di server.
-    var semuaInput = form.querySelectorAll('input:not([type="hidden"]), select, textarea, button');
-    for (var i = 0; i < semuaInput.length; i++) {
-      semuaInput[i].disabled = true;
-    }
+    // JANGAN disable input, select, atau textarea apa pun di sini: kontrol
+    // yang disabled tidak ikut dikirim di POST dan lolos validasi, sehingga
+    // judul (dan dulu jenis) hilang di server dan user dilempar ke kartu
+    // dengan pesan yang menyesatkan. Cegah kirim ganda cukup dengan
+    // sudahDikirim dan tombol yang dinonaktifkan di atas.
     var keKerangka = form.getAttribute('action') &&
       form.getAttribute('action').indexOf('/buku/outline') !== -1;
     var label = keKerangka ? 'Proses Kerangka' : 'Proses Susun';
