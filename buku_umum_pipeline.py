@@ -278,6 +278,37 @@ BUMI_PARAM = {
 BUMI_POLL_INTERVAL = 10       # detik antar cek status Bumi
 BUMI_POLL_DEADLINE = 600      # detik maks menunggu satu model Bumi (promo
                               # saja estimasinya 360 detik di pricing)
+BUMI_UNDUH_ULANG = 3          # percobaan unduh hasil Bumi per URL
+BUMI_UNDUH_JEDA = 5           # detik antar percobaan unduh
+
+
+def _unduh_bumi(url, timeout=90):
+    """Unduh hasil Bumi dengan ulang, bukan sekali jalan.
+
+    Bukti live 2 Nov 2026: unduh urllib polos gagal 403, lalu gagal
+    IncompleteRead tepat di 81920 byte, padahal generate di server Bumi
+    sudah selesai. Unduh ulang lewat curl dengan User-Agent peramban
+    berhasil penuh tanpa biaya baru. Helper ini meniru pelajaran itu di
+    dalam pipeline: header User-Agent peramban, sampai 3 percobaan,
+    jeda 5 detik antar percobaan, dan kembalikan bytes kosong bila semua
+    percobaan gagal, supaya pemanggil bisa mencatat generation_id dan
+    lanjut ke model berikutnya, bukan crash atau buang generate.
+    """
+    for percobaan in range(1, BUMI_UNDUH_ULANG + 1):
+        try:
+            resp = requests.get(
+                url,
+                headers={"User-Agent": "Mozilla/5.0",
+                         "Accept": "image/*"},
+                timeout=timeout)
+            raw = resp.content
+            if raw:
+                return raw
+        except Exception:                                  # noqa: BLE001
+            pass
+        if percobaan < BUMI_UNDUH_ULANG:
+            time.sleep(BUMI_UNDUH_JEDA)
+    return b""
 GAMBAR_TIMEOUT = 280           # per percobaan; model lambat jangan dipotong
 GAMBAR_MATI = set()            # model yg gagal di proses ini → tidak dicoba lagi
 
@@ -1769,11 +1800,12 @@ def _gambar_satu(prompt, ukuran="1024x1024", seed=1000, timeout=None,
                     if url_langsung.startswith("data:"):
                         raw = _b64.b64decode(url_langsung.split(",", 1)[1])
                     else:
-                        raw = requests.get(url_langsung, timeout=90).content
+                        raw = _unduh_bumi(url_langsung)
                     if raw:
                         model = nama_model
                     else:
-                        galat.append(f"{nama_model}: url langsung kosong")
+                        galat.append(f"{nama_model}: url langsung kosong "
+                                     f"(generation_id {gen_id})")
                         GAMBAR_MATI.add(nama_model)
                         continue
                 elif not gen_id:
@@ -1808,11 +1840,12 @@ def _gambar_satu(prompt, ukuran="1024x1024", seed=1000, timeout=None,
                                 if url_hasil.startswith("data:"):
                                     raw = _b64.b64decode(url_hasil.split(",", 1)[1])
                                 else:
-                                    raw = requests.get(url_hasil, timeout=90).content
+                                    raw = _unduh_bumi(url_hasil)
                                 if raw:
                                     model = nama_model
                                 else:
-                                    gagal_poll = "resultUrl kosong"
+                                    gagal_poll = ("resultUrl kosong "
+                                                  f"(generation_id {gen_id})")
                             break
                         if status == "failed":
                             gagal_poll = str(isi2.get("error") or "failed")[:70]

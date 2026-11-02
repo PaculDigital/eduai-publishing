@@ -8,6 +8,8 @@ Kasus:
   3. Bumi gagal (status failed) -> OpenRouter sukses, jadi jaring terakhir.
   4. BUMI_API_KEY kosong -> Bumi dilewati -> OpenRouter sukses.
   5. Sampul: aspect_ratio "2:3" diteruskan ke parameter Bumi.
+  6. Unduh Bumi putus di percobaan pertama -> diunduh ulang dan sukses,
+     generation_id tidak dibuang (pelajaran live 2 Nov 2026).
 Jalankan: EDUAI_ROUTER_KEY=dummy INFERHUB_KEY=dummy python3 uji_fallback_bumi.py
 """
 import base64
@@ -43,6 +45,7 @@ class MockRequests:
         self.get_urls = []
         self.bumi_params = []
         self._poll_n = 0
+        self._unduh_n = 0
 
     def post(self, url, headers=None, json=None, timeout=None, **kw):
         self.post_urls.append(url)
@@ -71,6 +74,10 @@ class MockRequests:
             return Resp({"generation_id": "gen-1", "status": "completed",
                          "resultUrl": "https://contoh.test/hasil.png"})
         if url == "https://contoh.test/hasil.png":
+            if self.mode == "unduh_putus":
+                self._unduh_n += 1
+                if self._unduh_n == 1:
+                    raise Exception("IncompleteRead simulasi")
             return Resp(content=PNG_PALSU)
         raise AssertionError("GET tak terduga: " + url)
 
@@ -135,6 +142,12 @@ def main():
         raw == PNG_PALSU
         and model == "google/gemini-3.1-flash-lite-image"
         and not any("bumi.digital" in u for u in mock.post_urls))
+
+    raw, model, galat, mock = jalankan("unduh_putus", "kunci-uji")
+    cek("Unduh Bumi putus -> diulang dan sukses, bukan buang generate",
+        raw == PNG_PALSU
+        and model == "is2i-gpt-image-2-5-sunburst"
+        and mock._unduh_n == 2)
 
     with tempfile.TemporaryDirectory() as tmp:
         P.GAMBAR_MATI.clear()
