@@ -2155,13 +2155,18 @@ function kbArsipLipat() {
 <style>
 .pn-tirai{position:fixed;inset:0;background:rgba(18,36,26,.52);display:flex;
   align-items:center;justify-content:center;z-index:940;padding:16px}
+/* 🐛 FIX 2Nov26: [hidden] WAJIB menang atas display:flex. Tanpa ini,
+   popup Profil Naskah bisa tampil meski atribut hidden sudah dipasang —
+   terutama di mobile browser yang menerapkan UA stylesheet berbeda. */
+.pn-tirai[hidden]{display:none!important}
 .pn-kartu{background:#fff;border-radius:16px;width:min(560px,100%);
   max-height:88vh;overflow:auto;box-shadow:0 18px 50px rgba(0,0,0,.28)}
 .pn-kepala{display:flex;justify-content:space-between;align-items:center;
   padding:15px 18px;border-bottom:1px solid #EDF3EF}
 .pn-kepala b{font-size:15px}
-.pn-x{border:none;background:#F2F6F3;border-radius:8px;width:30px;height:30px;
-  font-size:16px;cursor:pointer;color:#5B6B7C}
+.pn-x{border:none;background:#F2F6F3;border-radius:8px;width:36px;height:36px;
+  font-size:20px;cursor:pointer;color:#5B6B7C;display:flex;align-items:center;
+  justify-content:center;line-height:1;-webkit-tap-highlight-color:transparent}
 .pn-badan{padding:15px 18px 6px}
 .pn-tabel{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}
 .pn-tabel td{padding:7px 4px;border-bottom:1px solid #F0F5F1;vertical-align:top}
@@ -2205,9 +2210,9 @@ function kbArsipLipat() {
     </div>
     <div class="pn-badan">
       <table class="pn-tabel">
-        <tr><td>Jenjang &amp; bidang</td><td id="pn-jenjang">…</td></tr>
-        <tr><td>Identitas</td><td id="pn-identitas">…</td></tr>
-        <tr><td>Asal naskah</td><td id="pn-asal">…</td></tr>
+        <tr><td>Jenjang &amp; bidang</td><td id="pn-jenjang">Memuat…</td></tr>
+        <tr><td>Identitas</td><td id="pn-identitas">Memuat…</td></tr>
+        <tr><td>Asal naskah</td><td id="pn-asal">Memuat…</td></tr>
       </table>
 
       <div class="pn-kartu2">
@@ -2254,13 +2259,19 @@ function pnPesan(teks, gagal){
   e.style.display = 'block';
 }
 
-function pnTutup(){ document.getElementById('pn-tirai').hidden = true; }
+function pnTutup(){ document.getElementById('pn-tirai').hidden = true; document.body.style.overflow=''; }
+
+// 🐛 FIX 2Nov26: Escape key menutup popup Profil Naskah (sama seperti popup topup).
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape' && !document.getElementById('pn-tirai').hidden) pnTutup();
+});
 
 async function bukaProfilNaskah(fid){
   PN_FID = fid;
   var tirai = document.getElementById('pn-tirai');
   tirai.hidden = false;
-  document.getElementById('pn-nama').textContent = '…';
+  document.body.style.overflow = 'hidden';
+  document.getElementById('pn-nama').textContent = 'Memuat…';
   document.getElementById('pn-pesan').style.display = 'none';
   document.getElementById('pn-blok').style.display = 'none';
   pnMuat();
