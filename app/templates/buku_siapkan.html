@@ -325,15 +325,29 @@ fieldset.baris-pilih legend{font-size:12.5px;font-weight:700;color:var(--teks);
     if (!form.checkValidity()){ return; }
     sudahDikirim = true;
     btn.disabled = true;
+    // Freeze semua input & tombol lain supaya user tidak bisa ubah form
+    var semuaInput = form.querySelectorAll('input, select, textarea, button');
+    for (var i = 0; i < semuaInput.length; i++) {
+      semuaInput[i].disabled = true;
+    }
     var keKerangka = form.getAttribute('action') &&
       form.getAttribute('action').indexOf('/buku/outline') !== -1;
-    var teks = keKerangka ? 'Wait.. Proses Kerangka' : 'Wait.. Proses Susun';
-    btn.innerHTML = '';
-    var putar = document.createElement('span');
-    putar.className = 'tunggu-putar';
-    putar.setAttribute('aria-hidden', 'true');
-    btn.appendChild(putar);
-    btn.appendChild(document.createTextNode(teks));
+    var label = keKerangka ? 'Proses Kerangka' : 'Proses Susun';
+    var detik = 0;
+    function updateBtn(){
+      detik++;
+      var m = Math.floor(detik / 60);
+      var s = detik % 60;
+      var waktu = m > 0 ? m + ':' + (s < 10 ? '0' : '') + s : s + 'd';
+      btn.innerHTML = '';
+      var putar = document.createElement('span');
+      putar.className = 'tunggu-putar';
+      putar.setAttribute('aria-hidden', 'true');
+      btn.appendChild(putar);
+      btn.appendChild(document.createTextNode(' ' + label + ' · ' + waktu));
+    }
+    updateBtn();
+    setInterval(updateBtn, 1000);
   });
 })();
 </script>
