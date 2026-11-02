@@ -79,19 +79,18 @@ done
 echo "  ✅ Source lengkap ($(find app -name '*.py' | wc -l) file .py, $(find app/templates -type f | wc -l) template)"
 echo "  ✅ Aset wajib ada"
 
-# ── P5a: KUNCI DEPLOY SAAT JOB JALAN (Gas Bos 2Nov26) ────────────────
-# Jangan deploy saat ada buku yang sedang disusun — bisa merusak job aktif.
-if [ -f eduai.db ]; then
-  JOB_AKTIF=$(sqlite3 eduai.db "SELECT COUNT(*) FROM jobs WHERE status IN ('menulis','panen','merakit','menunggu') AND deleted_at IS NULL;" 2>/dev/null || echo 0)
-  if [ "$JOB_AKTIF" -gt 0 ] 2>/dev/null; then
-    echo
-    echo "⛔ DEPLOY DITOLAK — $JOB_AKTIF job sedang berjalan!"
-    echo "   Tunggu sampai semua job selesai atau batalkan dulu."
-    echo "   Cek: sqlite3 eduai.db \"SELECT kode, judul, status FROM jobs WHERE status NOT IN ('selesai','gagal','dibatalkan');\""
-    exit 1
-  fi
-  echo "  ✅ Tidak ada job aktif — aman deploy"
+# ── P5a: KUNCI DEPLOY SAAT JOB JALAN (diperbaiki, lihat dokumen paket aman) ──
+# DB produksi hanya bisa dibaca lewat container eduai-app (bind-mount).
+# Baca read-only, jangan pernah tulis lewat cek ini.
+JOB_CEK=$(docker exec eduai-app python3 -c "import sqlite3; c=sqlite3.connect('file:/app/data/eduai.db?mode=ro', uri=True); print(c.execute(\"SELECT COUNT(*) FROM proses_ai WHERE status IN ('jalan','menunggu')\").fetchone()[0])" 2>/dev/null || echo "TAK-DIKETAHUI")
+if [ "$JOB_CEK" != "0" ]; then
+  echo
+  echo "⛔ DEPLOY DITOLAK — job berjalan atau status DB tak dapat dipastikan (hasil cek: $JOB_CEK)."
+  docker exec eduai-app python3 -c "import sqlite3; c=sqlite3.connect('file:/app/data/eduai.db?mode=ro', uri=True); [print(r) for r in c.execute(\"SELECT kode, tahap FROM proses_ai WHERE status IN ('jalan','menunggu')\")]" 2>/dev/null || true
+  echo "   Tunggu sampai semua job selesai atau batalkan dulu, lalu jalankan lagi."
+  exit 1
 fi
+echo "  ✅ Tidak ada job jalan — aman deploy"
 
 if [ $DRY -eq 1 ]; then
   echo
