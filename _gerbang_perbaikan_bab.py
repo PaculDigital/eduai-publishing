@@ -164,7 +164,7 @@ def main():
         tmp = tempfile.mkdtemp(prefix='uji_perbaikan_')
         panggilan = {'generate': [], 'llm': []}
 
-        def gen(n, info, ringkasan, jenis=None, tier=None):
+        def gen(n, info, ringkasan, jenis=None, tier=None, **_kw):
             panggilan['generate'].append(n)
             if mode == 'sehat':
                 teks = isi_unik(n)
