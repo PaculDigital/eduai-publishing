@@ -325,8 +325,10 @@ fieldset.baris-pilih legend{font-size:12.5px;font-weight:700;color:var(--teks);
     if (!form.checkValidity()){ return; }
     sudahDikirim = true;
     btn.disabled = true;
-    // Freeze semua input & tombol lain supaya user tidak bisa ubah form
-    var semuaInput = form.querySelectorAll('input, select, textarea, button');
+    // Freeze semua input & tombol lain supaya user tidak bisa ubah form.
+    // JANGAN disable hidden input — hidden yang disabled tidak ikut
+    // dikirim di POST, sehingga field seperti 'jenis' hilang di server.
+    var semuaInput = form.querySelectorAll('input:not([type="hidden"]), select, textarea, button');
     for (var i = 0; i < semuaInput.length; i++) {
       semuaInput[i].disabled = true;
     }
