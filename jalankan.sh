@@ -79,6 +79,20 @@ done
 echo "  ✅ Source lengkap ($(find app -name '*.py' | wc -l) file .py, $(find app/templates -type f | wc -l) template)"
 echo "  ✅ Aset wajib ada"
 
+# ── P5a: KUNCI DEPLOY SAAT JOB JALAN (Gas Bos 2Nov26) ────────────────
+# Jangan deploy saat ada buku yang sedang disusun — bisa merusak job aktif.
+if [ -f eduai.db ]; then
+  JOB_AKTIF=$(sqlite3 eduai.db "SELECT COUNT(*) FROM jobs WHERE status IN ('menulis','panen','merakit','menunggu') AND deleted_at IS NULL;" 2>/dev/null || echo 0)
+  if [ "$JOB_AKTIF" -gt 0 ] 2>/dev/null; then
+    echo
+    echo "⛔ DEPLOY DITOLAK — $JOB_AKTIF job sedang berjalan!"
+    echo "   Tunggu sampai semua job selesai atau batalkan dulu."
+    echo "   Cek: sqlite3 eduai.db \"SELECT kode, judul, status FROM jobs WHERE status NOT IN ('selesai','gagal','dibatalkan');\""
+    exit 1
+  fi
+  echo "  ✅ Tidak ada job aktif — aman deploy"
+fi
+
 if [ $DRY -eq 1 ]; then
   echo
   echo "  DRY-RUN selesai — source sehat, siap deploy."
