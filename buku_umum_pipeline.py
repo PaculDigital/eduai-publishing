@@ -278,6 +278,37 @@ BUMI_PARAM = {
 BUMI_POLL_INTERVAL = 10       # detik antar cek status Bumi
 BUMI_POLL_DEADLINE = 600      # detik maks menunggu satu model Bumi (promo
                               # saja estimasinya 360 detik di pricing)
+BUMI_UNDUH_ULANG = 3          # percobaan unduh hasil Bumi per URL
+BUMI_UNDUH_JEDA = 5           # detik antar percobaan unduh
+
+
+def _unduh_bumi(url, timeout=90):
+    """Unduh hasil Bumi dengan ulang, bukan sekali jalan.
+
+    Bukti live 2 Nov 2026: unduh urllib polos gagal 403, lalu gagal
+    IncompleteRead tepat di 81920 byte, padahal generate di server Bumi
+    sudah selesai. Unduh ulang lewat curl dengan User-Agent peramban
+    berhasil penuh tanpa biaya baru. Helper ini meniru pelajaran itu di
+    dalam pipeline: header User-Agent peramban, sampai 3 percobaan,
+    jeda 5 detik antar percobaan, dan kembalikan bytes kosong bila semua
+    percobaan gagal, supaya pemanggil bisa mencatat generation_id dan
+    lanjut ke model berikutnya, bukan crash atau buang generate.
+    """
+    for percobaan in range(1, BUMI_UNDUH_ULANG + 1):
+        try:
+            resp = requests.get(
+                url,
+                headers={"User-Agent": "Mozilla/5.0",
+                         "Accept": "image/*"},
+                timeout=timeout)
+            raw = resp.content
+            if raw:
+                return raw
+        except Exception:                                  # noqa: BLE001
+            pass
+        if percobaan < BUMI_UNDUH_ULANG:
+            time.sleep(BUMI_UNDUH_JEDA)
+    return b""
 GAMBAR_TIMEOUT = 280           # per percobaan; model lambat jangan dipotong
 GAMBAR_MATI = set()            # model yg gagal di proses ini → tidak dicoba lagi
 
@@ -1769,11 +1800,12 @@ def _gambar_satu(prompt, ukuran="1024x1024", seed=1000, timeout=None,
                     if url_langsung.startswith("data:"):
                         raw = _b64.b64decode(url_langsung.split(",", 1)[1])
                     else:
-                        raw = requests.get(url_langsung, timeout=90).content
+                        raw = _unduh_bumi(url_langsung)
                     if raw:
                         model = nama_model
                     else:
-                        galat.append(f"{nama_model}: url langsung kosong")
+                        galat.append(f"{nama_model}: url langsung kosong "
+                                     f"(generation_id {gen_id})")
                         GAMBAR_MATI.add(nama_model)
                         continue
                 elif not gen_id:
@@ -1808,11 +1840,12 @@ def _gambar_satu(prompt, ukuran="1024x1024", seed=1000, timeout=None,
                                 if url_hasil.startswith("data:"):
                                     raw = _b64.b64decode(url_hasil.split(",", 1)[1])
                                 else:
-                                    raw = requests.get(url_hasil, timeout=90).content
+                                    raw = _unduh_bumi(url_hasil)
                                 if raw:
                                     model = nama_model
                                 else:
-                                    gagal_poll = "resultUrl kosong"
+                                    gagal_poll = ("resultUrl kosong "
+                                                  f"(generation_id {gen_id})")
                             break
                         if status == "failed":
                             gagal_poll = str(isi2.get("error") or "failed")[:70]
@@ -1948,6 +1981,38 @@ def generate_sampul_api(brief, simpan=None, seed=1000, timeout=280):
     with open(simpan, 'wb') as f:
         f.write(raw)
     print(f"       ✅ Sampul: {simpan} ({round(len(raw)/1024)} KB) · {model}")
+    return simpan
+
+
+def generate_gambar_cover_wide(brief, simpan, seed=1000, timeout=280):
+    """Generate BAHAN cover wide (3:2), 1 generasi, TANPA teks AI.
+
+    Keputusan Bos 2 Nov 2026 17:17 WIB: bahan cover wide, bukan portrait.
+    Alasan: varian Foto Penuh Atas dan pita Klasik memotong bahan
+    portrait terlalu banyak. Biaya tetap 1 generasi, sama seperti
+    portrait, hanya rasio yang berubah: Bumi aspect 3:2, InferHub
+    ukuran 1536x1024, OpenRouter mengikuti modelnya lalu dipotong
+    modul cover. Pemanggil WAJIB memberi `simpan` yang jelas, misalnya
+    cover_bahan.png di folder hasil job, JANGAN cover.png, supaya
+    rakitan DOCX tidak tertimpa gambar mentah tanpa judul. Return path
+    atau None. Gagal di sini tidak boleh menggagalkan buku, pemanggil
+    yang mencatat status cover_gagal.
+    """
+    if not brief or not simpan:
+        return None
+    folder = os.path.dirname(simpan)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    raw, model, galat = _gambar_satu(brief, ukuran="1536x1024", seed=seed,
+                                     timeout=timeout, aspect_ratio="3:2")
+    if not raw:
+        for g in galat:
+            print(f"       ⚠️ {g}")
+        print("       ❌ Semua jalur gambar gagal — tidak ada bahan cover.")
+        return None
+    with open(simpan, 'wb') as f:
+        f.write(raw)
+    print(f"       ✅ Bahan cover wide: {simpan} ({round(len(raw)/1024)} KB) · {model}")
     return simpan
 
 

@@ -84,6 +84,12 @@ COPY tata_paragraf.py ./tata_paragraf.py
 COPY buku_umum_assembly.py ./buku_umum_assembly.py
 COPY indeks_referensi.py ./indeks_referensi.py
 
+# ── MODUL COVER DINAMIS (2 Nov 2026, Gas Bos) ─────────────────────────
+# WAJIB: tanpa baris ini, `import susun_cover_dinamis` gagal di image
+# padahal di host tampak jalan, karena modul ini di root repo, bukan di
+# folder app. Pola gagal yang sama pernah terjadi untuk jev_buku_umum.
+COPY susun_cover_dinamis.py ./susun_cover_dinamis.py
+
 # ── SCRIPT UJI MIRIP (16 Okt 2026) ────────────────────────────────────
 # `similarity_precheck.py` = script uji mirip milik Bos (sudah diperbaiki
 # bug stabilonya: 11 sumber = 11 stabilo, kotak nomor di atas, sebaran
