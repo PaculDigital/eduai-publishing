@@ -142,6 +142,11 @@ fieldset.baris-pilih legend{font-size:12.5px;font-weight:700;color:var(--teks);
   <h1>{{ ikon('check-check', 22) }} Buku Siap Disusun</h1>
   <p class="sub">Pilihanmu sudah dikunci. Semua bab, ilustrasi, dan infografis
      akan mengikuti gaya ini — tidak dicampur.</p>
+  {% if galat %}
+  <div style="background:#fdf2f2;border:1.5px solid #e5a0a0;border-radius:14px;padding:14px 16px;margin:0 0 14px">
+    <p style="font-size:13.5px;line-height:1.7;margin:0;color:#991b1b">{{ galat }}</p>
+  </div>
+  {% endif %}
 
   <div class="kartu">
     <h2>Pilihanmu</h2>

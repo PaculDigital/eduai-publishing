@@ -293,6 +293,7 @@ async def submit_jurnal_cek_status(db: Session = Depends(get_db),
 #     ③ template `plagiarisme.html`  ④ token `kuota.potong_banyak()` (SUDAH ADA)
 @_router_kolaborasi.get('/buku', response_class=HTMLResponse)
 async def halaman_buku(request: Request,
+                       galat: str = '',
                        db: Session = Depends(get_db)):
     """Publish Buku — 5 kartu jenis buku (putusan Bos 17 Okt 2026).
 
@@ -307,6 +308,7 @@ async def halaman_buku(request: Request,
         # Pilihan bidang + untuk siapa — HANYA kartu Buku Umum (18 Okt 2026)
         'bidang_umum': _buku.BIDANG_UMUM,
         'untuk_siapa': _buku.UNTUK_SIAPA,
+        'galat': galat,
     })
 
 
@@ -406,20 +408,30 @@ def buku_outline(
     tier_nama = _normal_tier(tier)
     if (tier or '').strip():
         jml = _bab_dari_tier(tier)
+    # Gagal susun kerangka JANGAN buang user ke kartu: kembali ke form
+    # dengan isian utuh + pesan galat yang tampil (sebelumnya redirect
+    # ke /buku yang tidak menampilkan galat, jadi tombol Lihat kerangka
+    # terasa seperti tombol Ubah pilihan).
+    _ke_form = '/buku/siapkan?' + urlencode({
+        'jenis': jenis, 'gaya': 'referensi', 'judul': judul,
+        'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml,
+        'tier': tier_nama, 'bidang': (bidang or '').strip(),
+        'galat': 'Kerangka gagal disusun, coba lagi'})
     try:
         from . import referensi_outline as _RO
         outline = _RO.susun_outline(judul, '', jml, tier=tier)
-    except Exception:
-        return RedirectResponse(
-            '/buku?galat=' + quote('Kerangka gagal disusun, coba lagi'),
-            status_code=303)
+    except Exception as e:
+        print(f'[outline] gagal susun judul={judul!r} tier={tier!r}: {e!r}',
+              flush=True)
+        return RedirectResponse(_ke_form, status_code=303)
     # Validasi bentuk sebelum ditampilkan (kerangka rusak jangan tampil).
     try:
         import outline_buku as _OB
-        if _OB.periksa(outline):
-            return RedirectResponse(
-                '/buku?galat=' + quote('Kerangka gagal disusun, coba lagi'),
-                status_code=303)
+        _masalah = _OB.periksa(outline)
+        if _masalah:
+            print(f'[outline] kerangka tidak lolos periksa judul={judul!r}: '
+                  f'{_masalah!r}', flush=True)
+            return RedirectResponse(_ke_form, status_code=303)
     except Exception:
         pass  # tanpa OB, validasi menyusul di susun()
     from . import referensi_pesanan as _RP
@@ -1165,6 +1177,7 @@ def halaman_buku_siapkan(
     penelaah: str = '',
     jumlah_bab: str = '',
     tier: str = '',
+    galat: str = '',
     db: Session = Depends(get_db),
 ):
     """Halaman konfirmasi: pilihan sudah dikunci, tampilkan wajah bukunya.
@@ -1193,6 +1206,7 @@ def halaman_buku_siapkan(
         'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
         'jumlah_bab': jumlah_bab,
         'tier': tier,
+        'galat': galat,
     })
 
 
