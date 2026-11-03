@@ -377,7 +377,15 @@ def buku_outline(
     bidang: str = Form(''),
     db: Session = Depends(get_db),
 ):
-    """Gate 1 buku referensi: bangun kerangka GRATIS, tampilkan untuk disetujui.
+    """Gate 1 buku referensi, versi proses server (Gas Bos 3 Nov 2026).
+
+    Dulu generasi jalan di dalam request, jadi back atau navigasi =
+    hasil hilang. Sekarang POST hanya membuat pekerjaan + utas, lalu
+    redirect ke halaman menunggu GET. Pekerjaan jalan di server sampai
+    selesai, walau user back, pindah halaman, atau tutup tab; kembali ke
+    alamat pekerjaan menampilkan status yang sama. TIDAK ADA pembatalan
+    manual (putusan Bos 3 Nov 2026): pekerjaan hanya berakhir lewat
+    selesai, gagal server, atau timeout 10 menit (di bawah, malas).
 
     Token TIDAK dipotong di sini — potong di /buku/susun, sesudah user
     menekan Setuju. Kerangka disimpan di server (berkas + token acak);
@@ -388,15 +396,7 @@ def buku_outline(
     if jenis != 'buku-referensi':
         return RedirectResponse('/buku', status_code=303)
     kartu = _buku.cari(jenis)
-    if not kartu or not kartu.get('siap'):
-        return RedirectResponse(
-            '/buku?galat=' + quote('Jenis ini belum bisa dijalankan'),
-            status_code=303)
     judul = (judul or '').strip()
-    if len(judul) < 5:
-        return RedirectResponse(
-            '/buku?galat=' + quote('Judul buku minimal 5 huruf'),
-            status_code=303)
     try:
         jml = int(jumlah_bab or 8)
     except ValueError:
@@ -408,70 +408,34 @@ def buku_outline(
     tier_nama = _normal_tier(tier)
     if (tier or '').strip():
         jml = _bab_dari_tier(tier)
-    # Gagal susun kerangka JANGAN buang user ke kartu: kembali ke form
-    # dengan isian utuh + pesan galat yang tampil (sebelumnya redirect
-    # ke /buku yang tidak menampilkan galat, jadi tombol Lihat kerangka
-    # terasa seperti tombol Ubah pilihan).
-    _ke_form = '/buku/siapkan?' + urlencode({
-        'jenis': jenis, 'gaya': 'referensi', 'judul': judul,
-        'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml,
-        'tier': tier_nama, 'bidang': (bidang or '').strip(),
-        'galat': 'Kerangka gagal disusun, coba lagi'})
-    try:
-        from . import referensi_outline as _RO
-        outline = _RO.susun_outline(judul, '', jml, tier=tier)
-    except Exception as e:
-        print(f'[outline] gagal susun judul={judul!r} tier={tier!r}: {e!r}',
-              flush=True)
-        return RedirectResponse(_ke_form, status_code=303)
-    # Validasi bentuk sebelum ditampilkan (kerangka rusak jangan tampil).
-    try:
-        import outline_buku as _OB
-        _masalah = _OB.periksa(outline)
-        if _masalah:
-            print(f'[outline] kerangka tidak lolos periksa judul={judul!r}: '
-                  f'{_masalah!r}', flush=True)
-            return RedirectResponse(_ke_form, status_code=303)
-    except Exception:
-        pass  # tanpa OB, validasi menyusul di susun()
-    from . import referensi_pesanan as _RP
-    token = _RP.simpan_outline_pending(outline, tier=tier_nama)
-    # Gas 31 Okt 2026 12:03, butir 5: bidang dibawa dari siapkan ke
-    # kerangka, supaya Setuju nanti membawanya ke susun dan panen
-    # menerima bidang tidak kosong. Isi outline TIDAK diubah di
-    # sini (susun_outline tetap dipanggil dengan bidang kosong,
-    # seperti dulu), hanya nilai bidang yang diteruskan lewat
-    # konteks template dan URL kembali, supaya Gate 1 tidak berubah.
     bidang = (bidang or '').strip()
-    kembali = '/buku/siapkan?' + urlencode({
-        'jenis': jenis, 'gaya': 'referensi', 'judul': judul,
-        'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml, 'tier': tier_nama,
-        'bidang': bidang})
-    #  ⚠️ `susun_outline()` menyisipkan kunci META bertipe teks
-    #  ('_judul', '_bidang', '_jenis', '_sumber') ke dalam dict yang kuncinya
-    #  angka bab. `sorted()` atas campuran str+int melempar
-    #  `TypeError: '<' not supported between instances of 'str' and 'int'`
-    #  (HTTP 500 di /buku/outline, 28 Okt 2026). Template hanya butuh bab
-    #  bernomor — saring dulu, jangan mengubah bentuk data dari
-    #  `susun_outline()` (pembaca lain: penyusunan_buku.py:277 sudah pakai
-    #  `isinstance(n, int)`).
-    babs = sorted(((n, b) for n, b in outline.items()
-                   if isinstance(n, int)),
-                  key=lambda x: x[0])
-    #  Cek awal point 1+2 (30 Okt 2026): tampilkan hasil cek + risiko di
-    #  halaman persetujuan (gratis, sebelum token dipotong). Template
-    #  menyembunyikan tombol Setuju bila cek keras tidak lolos.
-    from . import cek_awal as _CA_outline
-    _cek_outline = _CA_outline.periksa_outline(outline, jml)
-    _risiko_level, _risiko_alasan = _CA_outline.skor_risiko(outline, jml)
-    return templates.TemplateResponse('buku_outline.html', {
-        'request': request, 'user': u, 'kartu': kartu,
-        'judul': judul, 'penulis': penulis, 'penelaah': penelaah,
-        'jumlah_bab': jml, 'tier': tier_nama, 'token': token, 'kembali': kembali,
-        'babs': babs, 'cek': _cek_outline, 'bidang': bidang,
-        'risiko_level': _risiko_level, 'risiko_alasan': _risiko_alasan,
-        **_kartu_status_server(),
-    })
+    _dasar = {'jenis': jenis, 'gaya': 'referensi', 'judul': judul,
+              'penulis': penulis, 'penelaah': penelaah, 'jumlah_bab': jml,
+              'tier': tier_nama, 'bidang': bidang}
+    if not kartu or not kartu.get('siap'):
+        return RedirectResponse(
+            '/buku/siapkan?' + urlencode(
+                {**_dasar, 'galat': 'Jenis ini belum bisa dijalankan'}),
+            status_code=303)
+    if len(judul) < 5:
+        return RedirectResponse(
+            '/buku/siapkan?' + urlencode(
+                {**_dasar, 'galat': 'Judul buku minimal 5 huruf'}),
+            status_code=303)
+    from . import outline_job as _OJ
+    # Dedup: pekerjaan jalan yang sama (judul+tier) tidak dibuat ganda —
+    # klik ganda, back lalu kirim ulang, dan tab ganda bermuara ke satu
+    # pekerjaan yang sama. Hanya jalan yang dihitung; selesai/gagal
+    # tidak menghalangi submit baru.
+    jalan = _OJ.cari_jalan(u.id, judul, tier_nama)
+    if jalan is not None:
+        return RedirectResponse(
+            '/buku/outline/proses?token=' + jalan['token'], status_code=303)
+    rec = _OJ.buat_job(u.id, judul, tier_nama, tier, bidang, penulis,
+                       penelaah, jml)
+    _OJ.mulai_utas(rec['token'])
+    return RedirectResponse(
+        '/buku/outline/proses?token=' + rec['token'], status_code=303)
 
 
 def _kartu_status_server():
@@ -488,6 +452,105 @@ def _kartu_status_server():
         siap = False
     return {'server_status': 'ready' if siap else 'sibuk',
             'antrean_jalan': sedang, 'antrean_tunggu': total_tunggu}
+
+
+def _ke_form_dari_job(job, galat):
+    """URL siapkan dengan isian dari pekerjaan + pesan galat."""
+    return '/buku/siapkan?' + urlencode({
+        'jenis': 'buku-referensi', 'gaya': 'referensi',
+        'judul': job.get('judul', ''), 'penulis': job.get('penulis', ''),
+        'penelaah': job.get('penelaah', ''),
+        'jumlah_bab': job.get('jumlah_bab', ''),
+        'tier': job.get('tier', ''), 'bidang': job.get('bidang', ''),
+        'galat': galat})
+
+
+@_router_kolaborasi.get('/buku/outline/proses', response_class=HTMLResponse)
+def halaman_outline_proses(request: Request, token: str = '',
+                           db: Session = Depends(get_db)):
+    """Halaman menunggu/persetujuan kerangka server-side (GET, aman back).
+
+    Jalan -> halaman menunggu (polling tiap 4 detik). Selesai -> halaman
+    persetujuan yang sama seperti dulu (edit, Setuju, Ubah). Gagal ->
+    kembali ke form dengan pesan. Token tidak dikenal / bukan milik user
+    -> kartu dengan pesan (tidak membocorkan keberadaan pekerjaan orang).
+    """
+    u = _wajib_login_kolab(request, db)
+    from . import outline_job as _OJ
+    job = _OJ.muat_job((token or '').strip())
+    if job is None or job.get('user_id') != u.id:
+        return RedirectResponse(
+            '/buku?galat=' + quote('Kerangka tidak ditemukan, silakan susun ulang'),
+            status_code=303)
+    _OJ.terapkan_timeout(job)
+    job = _OJ.muat_job(job['token'])
+    if job['status'] == 'jalan':
+        return templates.TemplateResponse('buku_outline_proses.html', {
+            'request': request, 'user': u, 'job': job,
+        })
+    if job['status'] == 'gagal':
+        return RedirectResponse(
+            _ke_form_dari_job(
+                job, job.get('galat') or 'Kerangka gagal disusun, coba lagi'),
+            status_code=303)
+    # Selesai: tampilkan persetujuan dari outline tersimpan. Konteksnya
+    # sama dengan handler lama (bab bernomor, cek awal, risiko, status
+    # server); hanya sumber outline yang pindah dari hasil POST ke berkas
+    # pekerjaan. Outline cacat (kunci non-digit warisan) dicoba lagi
+    # sesudah saring bab bernomor, baru gagal bila tetap cacat.
+    from . import referensi_pesanan as _RP
+    from . import cek_awal as _CA
+    try:
+        outline = _RP.outline_dari_json(job['outline'])
+    except Exception:
+        try:
+            outline = _RP.outline_dari_json(
+                {k: v for k, v in (job['outline'] or {}).items()
+                 if isinstance(k, str) and k.isdigit()})
+        except Exception:
+            return RedirectResponse(
+                _ke_form_dari_job(job, 'Kerangka gagal disusun, coba lagi'),
+                status_code=303)
+    jml = job['jumlah_bab']
+    kartu = _buku.cari('buku-referensi')
+    kembali = '/buku/siapkan?' + urlencode({
+        'jenis': 'buku-referensi', 'gaya': 'referensi',
+        'judul': job['judul'], 'penulis': job['penulis'],
+        'penelaah': job['penelaah'], 'jumlah_bab': jml,
+        'tier': job['tier'], 'bidang': job['bidang']})
+    babs = sorted(((n, b) for n, b in outline.items()
+                   if isinstance(n, int)), key=lambda x: x[0])
+    cek = _CA.periksa_outline(outline, jml)
+    risiko_level, risiko_alasan = _CA.skor_risiko(outline, jml)
+    return templates.TemplateResponse('buku_outline.html', {
+        'request': request, 'user': u, 'kartu': kartu,
+        'judul': job['judul'], 'penulis': job['penulis'],
+        'penelaah': job['penelaah'], 'jumlah_bab': jml,
+        'tier': job['tier'], 'token': job['pending_token'],
+        'kembali': kembali, 'babs': babs, 'cek': cek,
+        'bidang': job['bidang'], 'risiko_level': risiko_level,
+        'risiko_alasan': risiko_alasan,
+        **_kartu_status_server(),
+    })
+
+
+@_router_kolaborasi.get('/api/ai/v1/outline/{token}/status')
+def status_outline(token: str, request: Request,
+                   db: Session = Depends(get_db)):
+    """Status JSON pekerjaan kerangka untuk polling halaman menunggu."""
+    try:
+        u = _wajib_login_kolab(request, db)
+    except HTTPException:
+        return JSONResponse({'ok': False, 'pesan': 'Harus login dulu.'},
+                            status_code=401)
+    from . import outline_job as _OJ
+    job = _OJ.muat_job((token or '').strip())
+    if job is None or job.get('user_id') != u.id:
+        return JSONResponse({'ok': False, 'pesan': 'tidak ditemukan'},
+                            status_code=404)
+    _OJ.terapkan_timeout(job)
+    job = _OJ.muat_job(job['token'])
+    return {'ok': True, 'status': job['status']}
 
 
 @_router_kolaborasi.post('/buku/outline/simpan')
