@@ -1,4 +1,4 @@
-"""Gerbang 3-naskah — pemeriksaan otomatis sebelum pilot produksi Jev 1.13.
+"""Gerbang 3-naskah — pemeriksaan otomatis sebelum pilot produksi Jev 1.14.
 
 ATURAN GERBANG (ditulis di sini, bukan dikarang diam-diam):
   G1  BAB HILANG: FAIL bila ada judul BAB baseline yang tidak ada di
@@ -12,43 +12,45 @@ ATURAN GERBANG (ditulis di sini, bukan dikarang diam-diam):
   G2  SUBBAB BERUBAH: FAIL bila median subbab peta baru menyimpang lebih
       dari AMBANG per naskah dari median baseline. Ambang per naskah
       (tersimpan di gerbang_baseline.json, field 'ambang_g2') dihitung
-      dari sebaran antar-sesi yang terukur, BUKAN satu angka global:
+      dari sebaran antar-run yang terukur, BUKAN satu angka global:
         ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2
-      dengan subbab_run = semua run kode v7 yang tersimpan (v7 3 run +
-      ab114-1.13 + deploy + gerbang 2 run; sesi kode lama v5/v6 tidak
-      masuk karena kodenya beda). Nilai saat ini: 81=2 (7 run, semua
-      131), 112=6 (5 run, 75-82, median 78), 115=8 (6 run, 67-78,
-      median 72.5). "+2" adalah margin eksplisit untuk sesi yang belum
+      dengan subbab_run = semua run 1.14 yang tersimpan. Nilai saat ini
+      (baseline 1.14, 10 Nov 2026): 81=3 (4 run, 129-131, median 130),
+      112=3 (2 run, 79-81, median 80), 115=3 (2 run, 75-76, median
+      75.5). "+2" adalah margin eksplisit untuk sesi yang belum
       teramati (n kecil, rentang sejati lebih lebar) — lebih kecil dari
       regresi terkecil yang gerbang wajib tangkap (+10 subbab, kasus
       uji mandiri 5). Konsekuensi jujur: gerbang TIDAK bisa membedakan
-      regresi kecil (+-5) dari drift model biasa; ia hanya menangkap
-      regresi besar. Ambang lama (global 5 dari median satu sore v7)
-      DITARIK 10 Nov 2026 karena terbukti terlalu ketat: dua sesi malam
-      yang sepakat (deploy 21:22 dan gerbang 22:30) gagal G2 padahal
-      diff kode v7->HEAD pada jalur klasifikasi kosong (drift model,
-      bukan regresi). Median diambil dari 2 run (bila 2 run) atau 1 run.
-  BATAS DETEKSI (terukur 10 Nov 2026, jangan disembunyikan): karena
-  median gabungan duduk DI ANTARA gugus drift (115: sesi sore 69,
-  sesi malam 75-78), regresi yang menggeser sesi KE ARAH median
-  gabungan bisa lolos. Terjamin tertangkap: 81 +-10 dari sesi mana pun;
-  112 +10 dari sesi mana pun, -10 hanya dari sesi rendah; 115 +-10
-  hanya bila dari sesi tengah/tinggi -- +10 dari sesi rendah (69->79,
-  selisih 6.5 < ambang 8) dan -10 dari sesi tengah/tinggi LOLOS.
-  Jaminan deteksi penuh: 81 ~+-3, 112 ~+-11, 115 ~+-12. Mengetatkan
-  ambang 115 ke <=6 supaya +10-dari-rendah tertangkap akan membuat
-  sesi gerbang yang sah (selisih 5.5) berada 0.5 dari batas gagal --
-  mengulang kegagalan G2 yang baru diperbaiki. Jadi ambang TIDAK
-  diketatkan; batas ini dicatat di sini dan di laporan.
+      regresi kecil (+-3) dari drift model biasa; ia hanya menangkap
+      regresi besar. PERHATIAN n kecil: 112/115 baru punya 2 run, jadi
+      rentang terukur adalah batas bawah dan ambang 3 ketat — lebar
+      drift 1.13 (112=7, 115=11) menunjukkan sesi 1.14 berikutnya bisa
+      duduk di batas. Bila G2 gagal mepet, ulangi satu sesi segar
+      sebelum menvonis regresi. Baseline 1.13 tersimpan di
+      ground_truth/gerbang_baseline_113.json dan TIDAK berlaku lagi
+      untuk menilai run 1.14. Median diambil dari 2 run (bila 2 run)
+      atau 1 run (cara gerbang: sorted[len//2], upper-middle).
+  BATAS DETEKSI (1.14, 10 Nov 2026, jangan disembunyikan): ambang G2=3
+  di semua naskah. Regresi yang menggeser median sesi >3 dari median
+  baseline tertangkap (termasuk +-10 dari baseline di semua naskah);
+  regresi <=3 TIDAK bisa dibedakan dari drift model. Risiko sebaliknya
+  yang lebih nyata di 1.14: ambang 3 ketat karena 112/115 baru punya
+  2 run — lebar drift 1.13 (112=7, 115=11) menunjukkan sesi 1.14
+  berikutnya bisa duduk di batas ambang padahal bukan regresi. Jadi
+  G2 yang gagal mepet (selisih 4-5) harus diulang satu sesi segar
+  sebelum divonis regresi, dan satu sesi 1.14 tambahan (2 run x 3
+  naskah) akan melebarkan rentang terukur dan menaikkan ambang bila
+  drift memang selebar 1.13.
   G1  CATATAN PENGUKURAN (10 Nov 2026): daftar 'bab' pelari live
       (jalankan_gerbang.py) adalah GABUNGAN label Jev + judul gabung
-      kode, sedangkan daftar 'bab' v7 hanya label Jev. Karena itu
+      kode, sedangkan daftar 'bab' baseline hanya label Jev. Karena itu
       baseline BAB tetap gabungan label Jev v7 (112/115: II-V; 81: I-V
-      dari gabung kode yang terbukti selaras) dan TIDAK ditambah BAB I /
-      BAB VI dari daftar gabung gerbang — judul BAB VI yang sama persis
-      di dua naskah berbeda menunjukkan ia berasal dari jalur gabung,
-      bukan pengukuran Jev. Soal BAB VI sudah masuk paket sengketa
-      (ground_truth_115.tsv baris 69) menunggu label manusia.
+      dari gabung kode yang terbukti selaras) — diwarisi baseline 1.13,
+      struktur naskah tidak berubah dengan model — dan TIDAK ditambah
+      BAB I / BAB VI dari daftar gabung gerbang — judul BAB VI yang sama
+      persis di dua naskah berbeda menunjukkan ia berasal dari jalur
+      gabung, bukan pengukuran Jev. Soal BAB VI sudah masuk paket
+      sengketa (ground_truth_115.tsv baris 69) menunggu label manusia.
   G3  JUDUL BAB SAMPAH: FAIL bila ada judul BAB di peta baru yang:
       - panjangnya > 80 karakter, ATAU
       - mengandung '. ' (tanda kalimat di tengah judul), ATAU
@@ -66,8 +68,8 @@ CARA PAKAI:
       Boleh 1 run per naskah (aturan G1 jadi: hilang di run itu = FAIL).
   python3 gerbang_3_naskah.py --mode live --ya-saya-tahu-biaya
       Jalankan pemetaan live 2 run x 3 naskah di container (lewat
-      jalankan_gerbang.py), lalu nilai. BIAYA: ~166 panggilan Jev
-      (2 x (40 + 36 + 7), dari angka live v7) dan ~2 menit wall.
+      jalankan_gerbang.py), lalu nilai. BIAYA: ~170 panggilan Jev
+      (2 x (41 + 37 + 7), dari angka live 1.14) dan ~2 menit wall.
       Tanpa flag --ya-saya-tahu-biaya, hanya mencetak biaya + perintah.
 
 Keluar: exit 0 bila gerbang LOLOS, exit 1 bila GAGAL (pesan pelanggaran
@@ -85,8 +87,8 @@ BASELINE_PATH = ROOT / 'ground_truth' / 'gerbang_baseline.json'
 AMBANG_SUBBAB_SELISIH = 5  # fallback bila baseline belum punya ambang_g2
 PANJANG_JUDUL_SAMPAH = 80
 
-# Biaya live (dari angka live v7, 10 Nov 2026) — ditulis, bukan dikarang.
-BIAYA_LIVE_PER_RUN = {'112': 40, '115': 36, '81': 7}
+# Biaya live (dari angka live 1.14, 10 Nov 2026) — ditulis, bukan dikarang.
+BIAYA_LIVE_PER_RUN = {'112': 41, '115': 37, '81': 7}
 RUN_LIVE_PER_NASKAH = 2
 
 
@@ -200,36 +202,55 @@ def muat_peta_v7():
     return out
 
 
+def muat_peta_114():
+    """Peta tersimpan 1.14 (hasil_baseline114.json) sebagai peta 'baik'.
+
+    2 run per naskah; 'bab' = daftar gabung pelari live (Jev + gabung
+    kode), sama seperti yang dikeluarkan jalankan_gerbang.py. Dipakai
+    uji mandiri sejak baseline pindah ke 1.14 (10 Nov 2026): peta v7
+    (1.13) tidak lagi lolos G2 melawan baseline 1.14 (112 selisih 4,
+    115 selisih 6.5 dari median baru), jadi peta 'baik' harus dari
+    model yang sama dengan baseline.
+    """
+    d = json.load(open(ROOT / 'hasil_baseline114.json', encoding='utf-8'))
+    out = {}
+    for fid in ('81', '112', '115'):
+        out[fid] = [{'bab': list(r.get('bab') or []),
+                     'subbab_jml': r.get('subbab_jml')}
+                    for r in d['run'][fid]]
+    return out
+
+
 def uji_mandiri():
     """Uji offline: 6 kasus. Semua harus berperilaku sesuai harapan."""
     baseline = muat_baseline()
-    v7 = muat_peta_v7()
+    p114 = muat_peta_114()
     kasus = []
 
     def tambah(nama, maps, harap_lolos):
         ok, hasil = nilai_gerbang(maps, baseline)
         kasus.append((nama, harap_lolos, ok, hasil))
 
-    # 1. peta v7 asli (2 run pertama tiap naskah) -> harus LOLOS
-    tambah('v7 asli (2 run)', {k: v[:2] for k, v in v7.items()}, True)
-    # 2. peta v7 asli (3 run) -> harus LOLOS
-    tambah('v7 asli (3 run)', v7, True)
+    # 1. peta 1.14 asli (2 run) -> harus LOLOS
+    tambah('1.14 asli (2 run)', {k: v[:2] for k, v in p114.items()}, True)
+    # 2. peta 1.14 asli (1 run saja) -> harus LOLOS (jalur 1 run)
+    tambah('1.14 asli (1 run)', {k: v[:1] for k, v in p114.items()}, True)
     # 3. BAB dibuang di KEDUA run fid=112 -> harus GAGAL (G1)
-    m = json.loads(json.dumps(v7))
+    m = json.loads(json.dumps(p114))
     for r in m['112'][:2]:
         r['bab'] = [b for b in r['bab'] if 'BAB III' not in b]
     tambah('BAB III hilang di 2 run (112)', m, False)
     # 4. BAB dibuang di SATU run saja -> harus LOLOS (derau) + peringatan
-    m = json.loads(json.dumps(v7))
+    m = json.loads(json.dumps(p114))
     m['112'][0]['bab'] = [b for b in m['112'][0]['bab'] if 'BAB III' not in b]
     tambah('BAB III hilang di 1 run saja (derau)', m, True)
     # 5. subbab +10 di fid=81 -> harus GAGAL (G2)
-    m = json.loads(json.dumps(v7))
+    m = json.loads(json.dumps(p114))
     for r in m['81']:
         r['subbab_jml'] = r['subbab_jml'] + 10
     tambah('subbab +10 (81)', m, False)
     # 6. judul BAB sampah di fid=115 -> harus GAGAL (G3)
-    m = json.loads(json.dumps(v7))
+    m = json.loads(json.dumps(p114))
     m['115'][0]['bab'] = list(m['115'][0]['bab']) + [
         'bagian ini menjelaskan tentang jenis, waktu, dan tempat desain.']
     tambah('judul BAB sampah (115)', m, False)

@@ -1,8 +1,14 @@
 """Runner live gerbang 3-naskah (2 run x 3 naskah), jalan DI CONTAINER.
 
 Jalankan di container eduai-app:  python3 /tmp/jev-gerbang/jalankan_gerbang.py
-- Memuat peta3_jev.py + app.* + profil/ dari /tmp/jev-gerbang (namespace
-  package: yang tidak ada di scratch diambil dari /app/app yang deploy).
+- Memuat peta3_jev.py + app.* dari /tmp/jev-gerbang (kode BRANCH 1.14),
+  BUKAN /app (kode deploy 1.13). Dijaga dengan assert __file__.
+- URUTAN IMPOR PENTING: app.jev DULU sebelum app.hakim_peta, karena
+  hakim_peta.py:57 menyisipkan '/app' di posisi 0 sys.path dan `app`
+  adalah namespace package yang jalurnya dinamis — bila hakim dimuat
+  dulu, `import app.jev` sesudahnya akan mengambil /app/app/jev.py
+  (deploy 1.13), bukan scratch 1.14. TIDAK ada fallback '/app' di
+  sys.path (sejak 10 Nov 2026): semua kode harus dari scratch.
 - 2 run petakan(fid) per naskah: 81, 112, 115. Cache peta DIMATIKAN supaya
   run 2 benar-benar bertanya lagi ke Jev.
 - DB hanya dibaca (sidik files + proses_ai sebelum/sesudah).
@@ -21,7 +27,6 @@ import sys
 os.environ['EDUAI_JEV_CACHE_MAX'] = '0'
 
 sys.path.insert(0, '/tmp/jev-gerbang')
-sys.path.insert(1, '/app')
 
 import importlib.util
 import json
@@ -35,17 +40,26 @@ spec = importlib.util.spec_from_loader('peta3_gerbang', loader=None)
 P = importlib.util.module_from_spec(spec)
 exec(compile(_src, '/tmp/jev-gerbang/peta3_jev.py', 'exec'), P.__dict__)
 
+# URUTAN IMPOR PENTING: app.jev DULU sebelum app.hakim_peta (lihat
+# docstring). Tanpa ini, jev diam-diam diambil dari /app (deploy 1.13).
+import app.jev as _J
 import app.konversi as K
 import app.satpam as S
 import app.hakim_peta as H
 
+print('jev dari:', _J.__file__)
 print('konversi dari:', K.__file__)
 print('satpam dari:', S.__file__)
 print('hakim dari:', H.__file__)
 print('RULE_VERSION:', P.RULE_VERSION)
+print('MODEL_DEFAULT:', _J.MODEL_DEFAULT)
 assert 'v7' in P.RULE_VERSION, 'BUKAN kode v7!'
+assert _J.__file__.startswith('/tmp/jev-gerbang/'), 'jev BUKAN dari scratch!'
 assert K.__file__.startswith('/tmp/jev-gerbang/'), 'konversi BUKAN dari scratch!'
 assert S.__file__.startswith('/tmp/jev-gerbang/'), 'satpam BUKAN dari scratch!'
+assert H.__file__.startswith('/tmp/jev-gerbang/'), 'hakim BUKAN dari scratch!'
+assert _J.MODEL_DEFAULT == 'SATPAM/typesafe/jev-1.14', \
+    'MODEL_DEFAULT BUKAN 1.14: %r' % _J.MODEL_DEFAULT
 
 from app import ai as _ai
 from sqlalchemy import text as _text
@@ -61,7 +75,6 @@ def sidik():
         s.close()
 
 
-import app.jev as _J
 hitung = {'choice': 0, 'noul': 0, 'lain': 0}
 _orig_jev_tanya = _J.tanya
 
