@@ -1266,6 +1266,13 @@ def _petakan_dari_hasil(d, putaran=None):
     tanya_ulang_jml = 0
     tanya_ulang_gelombang = 0
     tanya_ulang_goyang_pb_jml = 0
+    # ── v7.2: UKUR MANFAAT tanya-ulang batas goyang — catat tiap kandidat
+    #    PB yang label menangnya BERBALIK sesudah suara ekstra ([i, sebelum,
+    #    sesudah]). Kriteria pertahankan (diputuskan sebelum uji live v7):
+    #    berguna bila ada balik DAN separuhnya bertahan sampai label akhir
+    #    (tidak dibatalkan koreksi deterministik); balik 0 di semua naskah
+    #    x 3 run = tidak terbukti => hapus cabang PB-nya.
+    tanya_ulang_goyang_pb_balik = []
     if putaran == 1 and _tanya_ulang_aktif():
         sudah_ditanya = set()
         pb_ekstra_sudah = set()  # kandidat yang sudah ditanya-ulang karena goyang PB
@@ -1328,6 +1335,8 @@ def _petakan_dari_hasil(d, putaran=None):
             waktu.append(time.time() - t0)
             if not jw:
                 gagal += 1
+            # ── v7.2: potret label menang kandidat PB SEBELUM suara ekstra.
+            lab_sebelum_pb = {i: label.get(i) for i in pb_idx}
             for n, i in enumerate(ragu_idx):
                 jw_i = jw.get('c%d' % n) or {}
                 v = jw_i.get('choice')
@@ -1338,6 +1347,11 @@ def _petakan_dari_hasil(d, putaran=None):
                 conf[i].append(float(c) if isinstance(c, (int, float)) else None)
             _tidur_adaptif(t0)
             label, goyang, p_label = _hitung_label()
+            # ── v7.2: balik label sesudah suara ekstra PB.
+            for _i in pb_idx:
+                if lab_sebelum_pb.get(_i) != label.get(_i):
+                    tanya_ulang_goyang_pb_balik.append(
+                        [_i, lab_sebelum_pb.get(_i), label.get(_i)])
 
     # ── ATURAN 2 (vonis Bos 09 Okt) — KOREKSI LABEL, BUKAN SARINGAN BUANG.
     #    Judul sub-bab hampir selalu PENDEK. Kalau Jev bilang 'subbab' tapi
@@ -1479,6 +1493,8 @@ def _petakan_dari_hasil(d, putaran=None):
             'pisah_subbab_ekor_jml': d.get('pisah_subbab_ekor_jml', 0),
             'koreksi_batas_paragraf': koreksi_batas,
             'tanya_ulang_goyang_pb_jml': tanya_ulang_goyang_pb_jml,
+            'tanya_ulang_goyang_pb_balik': tanya_ulang_goyang_pb_balik,
+            'tanya_ulang_goyang_pb_balik_jml': len(tanya_ulang_goyang_pb_balik),
             'bab_kode': bab_kode, 'bab_ganda': bab_ganda,
             'bab_demosi': bab_demosi,
             'jev_mati': jev_mati, 'stitch_pakai': d.get('stitch_pakai', False),

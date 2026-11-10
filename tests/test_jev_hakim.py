@@ -702,6 +702,11 @@ def main():
     cek('v6.3: tanya-ulang batas goyang memakai gelombang ke-2',
         r_pb.get('tanya_ulang_gelombang', 0) >= 2,
         str(r_pb.get('tanya_ulang_gelombang')))
+    #    (d) v7.2: balik label sesudah suara ekstra PB tercatat.
+    cek('v7.2: balik label tanya-ulang batas goyang tercatat',
+        r_pb.get('tanya_ulang_goyang_pb_balik_jml') == 1
+        and r_pb.get('tanya_ulang_goyang_pb_balik') == [[2, 'biasa', 'paragraf']],
+        str(r_pb.get('tanya_ulang_goyang_pb_balik')))
 
     # ── 10. v6.4: DETEKSI BAB DETERMINISTIK ─────────────────────────────
     #    (a) penanda BAB dipaksa 'bab' oleh kode (fake melabel 'paragraf').
