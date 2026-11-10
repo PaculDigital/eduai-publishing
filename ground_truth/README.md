@@ -8,17 +8,18 @@ paket ini, tidak ada tulis ke database.
 
 | Berkas | Isi |
 |---|---|
-| `ground_truth_81.tsv` | 21 baris sengketa fid=81 (Asih) |
-| `ground_truth_112.tsv` | 10 baris sengketa fid=112 (Wulandari kualitatif) |
-| `ground_truth_115.tsv` | 9 baris sengketa fid=115 (Wulandari PDF resmi) |
-| `ground_truth_WULAN-1.tsv` | 3 baris sengketa WULAN-1 |
+| `ground_truth_81.tsv` | 27 baris sengketa fid=81 (Asih): 21 lama + 6 sengketa paragraf baru |
+| `ground_truth_112.tsv` | 209 baris sengketa fid=112 (Wulandari kualitatif): 10 lama + 199 baru |
+| `ground_truth_115.tsv` | 142 baris sengketa fid=115 (Wulandari PDF resmi): 9 lama + 133 baru |
+| `ground_truth_WULAN-1.tsv` | 19 baris sengketa WULAN-1: 3 lama + 16 baru |
 | `buat_paket_ground_truth.py` | Skrip pembangun paket ini (bisa diulang, tanpa Jev) |
-| `buat_sengketa_paragraf.py` | Skrip pelengkap untuk sengketa paragraf (butuh 2 run live, belum jalan) |
+| `buat_sengketa_paragraf.py` | Skrip pelengkap sengketa paragraf (SUDAH jalan live 10 Nov 2026) |
+| `ground_truth_sengketa_paragraf.tsv` | 363 baris sengketa paragraf mentah (sumber gabungan, sebelum digabung) |
 | `gerbang_baseline.json` | Baseline gerbang 3-naskah (dari hasil live v7) |
 | `ringkasan_paket.json` | Ringkasan jumlah baris per naskah |
 | `README.md` | Berkas ini |
 
-Total: **43 baris sengketa** yang bisa Boss putuskan sendiri.
+Total: **397 baris sengketa** (43 lama sudah berlabel + 354 baris sengketa paragraf baru yang labelnya masih kosong untuk Boss isi).
 
 ## Cara mengisi (untuk Boss)
 
@@ -46,20 +47,28 @@ Total: **43 baris sengketa** yang bisa Boss putuskan sendiri.
 | `judul_bab_sampah` | Jev melabel satu kalimat utuh sebagai judul BAB |
 | `hakim_curiga` | Hakim menandai baris ini mencurigakan (mis. awal sitasi) |
 | `hakim_ragu` | Hakim ragu (nilai Jev 0,5–0,7), perlu manusia |
+| `sengketa_paragraf` | Label baris ini beda antara run 1 dan run 2 live (10 Nov 2026) |
 
-## Yang JUJUR belum ada di paket ini
+## Sengketa paragraf (dilengkapi 10 Nov 2026, Gas Boss, 180 panggilan Jev)
 
-**Sengketa batas paragraf antar-run v7 tidak ada di sini.** Penyebabnya:
-label per baris dari 12 run v7 tidak pernah disimpan — yang tersimpan hanya
-hitungan agregat (mis. paragraf fid=81: 166, 173, 173). Jadi Wulan tahu
-paragraf bergoyang, tapi tidak tahu baris mana yang bergoyang.
+`buat_sengketa_paragraf.py` dijalankan live (2 run x 4 naskah) dan menemukan
+**363 baris sengketa**: fid=81: 11, fid=112: 201, fid=115: 134, WULAN-1: 17.
+Dari 363 itu, 354 masuk sebagai baris baru (label kosong) dan 9 digabung ke
+baris lama yang sudah ada (bukti barunya ditempel di kolom `bukti_run`).
 
-Untuk melengkapinya, pakai `buat_sengketa_paragraf.py`: skrip itu menjalankan
-2 run live baru per naskah DENGAN menyimpan label tiap baris, lalu
-membandingkan kedua run dan mengeluarkan baris yang beda label. Biayanya
-sekitar **180 panggilan Jev** (2 run x 4 naskah, dari angka live v7:
-112 ~40, 115 ~36, 81 ~7, WULAN-1 ~7 per run). Skrip ini BELUM dijalankan —
-perlu Gas Boss dulu karena biayanya live.
+**Jujur soal isinya — namanya "sengketa paragraf" tapi isinya lebih luas:**
+hanya ~76 baris yang benar-benar soal batas paragraf (paragraf vs biasa 57,
+paragraf vs subbab 19). Sisanya: kandidat yang ada di satu run tapi hilang di
+run lain (None vs biasa 154, None vs subbab 6), subbab vs biasa 110, dan 4
+baris soal label BAB (paragraf vs bab 3, bab vs biasa 1). Jadi goyangnya
+bukan cuma batas paragraf — himpunan kandidat dan label subbab ikut goyang
+antar run. Itu temuan penting, bukan sekadar jumlah baris.
+
+**Volume:** 354 label kosong itu banyak (fid=112 sendiri 199). Boss tidak
+harus mengisi semuanya sekaligus — isi dulu yang paling berdampak (baris
+yang melibatkan label `paragraf` dan `bab`), sisanya bisa diisi bertahap
+atau diambil sampelnya. Baris yang kosong labelnya dianggap belum
+diputuskan, bukan salah.
 
 ## Seberapa bisa dipercaya nomor baris di paket ini
 
