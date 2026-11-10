@@ -1,4 +1,4 @@
-"""Gerbang 3-naskah — pemeriksaan otomatis sebelum pilot produksi Jev 1.13.
+"""Gerbang 3-naskah — pemeriksaan otomatis sebelum pilot produksi Jev 1.14.
 
 ATURAN GERBANG (ditulis di sini, bukan dikarang diam-diam):
   G1  BAB HILANG: FAIL bila ada judul BAB baseline yang tidak ada di
@@ -9,11 +9,48 @@ ATURAN GERBANG (ditulis di sini, bukan dikarang diam-diam):
       bukan regresi (dicatat sebagai peringatan). FAIL bila BAB itu hilang
       di >= 2 run (gerbang jalan 2 run; bila 1 run saja, hilang di run itu
       = FAIL).
-  G2  SUBBAB BERUBAH: FAIL bila jumlah subbab peta baru menyimpang lebih
-      dari AMBANG_SUBBAB_SELISIH = 5 dari median baseline. Ambang 5 dipilih
-      karena rentang antar-run v7 paling besar adalah 5 (fid=112: 75-80;
-      fid=115: 67-70; fid=81: 131-131). Diambil dari median 2 run (bila
-      2 run) atau 1 run.
+  G2  SUBBAB BERUBAH: FAIL bila median subbab peta baru menyimpang lebih
+      dari AMBANG per naskah dari median baseline. Ambang per naskah
+      (tersimpan di gerbang_baseline.json, field 'ambang_g2') dihitung
+      dari sebaran antar-run yang terukur, BUKAN satu angka global:
+        ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2
+      dengan subbab_run = semua run 1.14 yang tersimpan. Nilai saat ini
+      (baseline 1.14, 10 Nov 2026): 81=3 (4 run, 129-131, median 130),
+      112=3 (2 run, 79-81, median 80), 115=3 (2 run, 75-76, median
+      75.5). "+2" adalah margin eksplisit untuk sesi yang belum
+      teramati (n kecil, rentang sejati lebih lebar) — lebih kecil dari
+      regresi terkecil yang gerbang wajib tangkap (+10 subbab, kasus
+      uji mandiri 5). Konsekuensi jujur: gerbang TIDAK bisa membedakan
+      regresi kecil (+-3) dari drift model biasa; ia hanya menangkap
+      regresi besar. PERHATIAN n kecil: 112/115 baru punya 2 run, jadi
+      rentang terukur adalah batas bawah dan ambang 3 ketat — lebar
+      drift 1.13 (112=7, 115=11) menunjukkan sesi 1.14 berikutnya bisa
+      duduk di batas. Bila G2 gagal mepet, ulangi satu sesi segar
+      sebelum menvonis regresi. Baseline 1.13 tersimpan di
+      ground_truth/gerbang_baseline_113.json dan TIDAK berlaku lagi
+      untuk menilai run 1.14. Median diambil dari 2 run (bila 2 run)
+      atau 1 run (cara gerbang: sorted[len//2], upper-middle).
+  BATAS DETEKSI (1.14, 10 Nov 2026, jangan disembunyikan): ambang G2=3
+  di semua naskah. Regresi yang menggeser median sesi >3 dari median
+  baseline tertangkap (termasuk +-10 dari baseline di semua naskah);
+  regresi <=3 TIDAK bisa dibedakan dari drift model. Risiko sebaliknya
+  yang lebih nyata di 1.14: ambang 3 ketat karena 112/115 baru punya
+  2 run — lebar drift 1.13 (112=7, 115=11) menunjukkan sesi 1.14
+  berikutnya bisa duduk di batas ambang padahal bukan regresi. Jadi
+  G2 yang gagal mepet (selisih 4-5) harus diulang satu sesi segar
+  sebelum divonis regresi, dan satu sesi 1.14 tambahan (2 run x 3
+  naskah) akan melebarkan rentang terukur dan menaikkan ambang bila
+  drift memang selebar 1.13.
+  G1  CATATAN PENGUKURAN (10 Nov 2026): daftar 'bab' pelari live
+      (jalankan_gerbang.py) adalah GABUNGAN label Jev + judul gabung
+      kode, sedangkan daftar 'bab' baseline hanya label Jev. Karena itu
+      baseline BAB tetap gabungan label Jev v7 (112/115: II-V; 81: I-V
+      dari gabung kode yang terbukti selaras) — diwarisi baseline 1.13,
+      struktur naskah tidak berubah dengan model — dan TIDAK ditambah
+      BAB I / BAB VI dari daftar gabung gerbang — judul BAB VI yang sama
+      persis di dua naskah berbeda menunjukkan ia berasal dari jalur
+      gabung, bukan pengukuran Jev. Soal BAB VI sudah masuk paket
+      sengketa (ground_truth_115.tsv baris 69) menunggu label manusia.
   G3  JUDUL BAB SAMPAH: FAIL bila ada judul BAB di peta baru yang:
       - panjangnya > 80 karakter, ATAU
       - mengandung '. ' (tanda kalimat di tengah judul), ATAU
@@ -31,8 +68,8 @@ CARA PAKAI:
       Boleh 1 run per naskah (aturan G1 jadi: hilang di run itu = FAIL).
   python3 gerbang_3_naskah.py --mode live --ya-saya-tahu-biaya
       Jalankan pemetaan live 2 run x 3 naskah di container (lewat
-      jalankan_gerbang.py), lalu nilai. BIAYA: ~166 panggilan Jev
-      (2 x (40 + 36 + 7), dari angka live v7) dan ~2 menit wall.
+      jalankan_gerbang.py), lalu nilai. BIAYA: ~170 panggilan Jev
+      (2 x (41 + 37 + 7), dari angka live 1.14) dan ~2 menit wall.
       Tanpa flag --ya-saya-tahu-biaya, hanya mencetak biaya + perintah.
 
 Keluar: exit 0 bila gerbang LOLOS, exit 1 bila GAGAL (pesan pelanggaran
@@ -47,11 +84,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 BASELINE_PATH = ROOT / 'ground_truth' / 'gerbang_baseline.json'
 
-AMBANG_SUBBAB_SELISIH = 5
+AMBANG_SUBBAB_SELISIH = 5  # fallback bila baseline belum punya ambang_g2
 PANJANG_JUDUL_SAMPAH = 80
 
-# Biaya live (dari angka live v7, 10 Nov 2026) — ditulis, bukan dikarang.
-BIAYA_LIVE_PER_RUN = {'112': 40, '115': 36, '81': 7}
+# Biaya live (dari angka live 1.14, 10 Nov 2026) — ditulis, bukan dikarang.
+BIAYA_LIVE_PER_RUN = {'112': 41, '115': 37, '81': 7}
 RUN_LIVE_PER_NASKAH = 2
 
 
@@ -111,15 +148,17 @@ def nilai_naskah(runs, baseline_naskah, fid):
         return False, gagal, peringatan
     for p in sorted(hilang_hitung):
         peringatan.append('derau (bukan gagal): %s' % p)
-    # G2: subbab vs median baseline
+    # G2: subbab vs median baseline, ambang per naskah dari baseline
     subbab = [r.get('subbab_jml') for r in runs if r.get('subbab_jml') is not None]
     if subbab:
         med = sorted(subbab)[len(subbab) // 2]
-        if abs(med - baseline_naskah['subbab_median']) > AMBANG_SUBBAB_SELISIH:
-            return False, ['G2 subbab berubah: median run %d vs baseline %d '
-                           '(selisih > %d)'
+        ambang = baseline_naskah.get('ambang_g2', AMBANG_SUBBAB_SELISIH)
+        if abs(med - baseline_naskah['subbab_median']) > ambang:
+            return False, ['G2 subbab berubah: median run %s vs baseline %s '
+                           '(selisih %s > ambang fid=%s %s)'
                            % (med, baseline_naskah['subbab_median'],
-                              AMBANG_SUBBAB_SELISIH)], peringatan
+                              abs(med - baseline_naskah['subbab_median']),
+                              fid, ambang)], peringatan
     return True, [], peringatan
 
 
@@ -163,36 +202,55 @@ def muat_peta_v7():
     return out
 
 
+def muat_peta_114():
+    """Peta tersimpan 1.14 (hasil_baseline114.json) sebagai peta 'baik'.
+
+    2 run per naskah; 'bab' = daftar gabung pelari live (Jev + gabung
+    kode), sama seperti yang dikeluarkan jalankan_gerbang.py. Dipakai
+    uji mandiri sejak baseline pindah ke 1.14 (10 Nov 2026): peta v7
+    (1.13) tidak lagi lolos G2 melawan baseline 1.14 (112 selisih 4,
+    115 selisih 6.5 dari median baru), jadi peta 'baik' harus dari
+    model yang sama dengan baseline.
+    """
+    d = json.load(open(ROOT / 'hasil_baseline114.json', encoding='utf-8'))
+    out = {}
+    for fid in ('81', '112', '115'):
+        out[fid] = [{'bab': list(r.get('bab') or []),
+                     'subbab_jml': r.get('subbab_jml')}
+                    for r in d['run'][fid]]
+    return out
+
+
 def uji_mandiri():
     """Uji offline: 6 kasus. Semua harus berperilaku sesuai harapan."""
     baseline = muat_baseline()
-    v7 = muat_peta_v7()
+    p114 = muat_peta_114()
     kasus = []
 
     def tambah(nama, maps, harap_lolos):
         ok, hasil = nilai_gerbang(maps, baseline)
         kasus.append((nama, harap_lolos, ok, hasil))
 
-    # 1. peta v7 asli (2 run pertama tiap naskah) -> harus LOLOS
-    tambah('v7 asli (2 run)', {k: v[:2] for k, v in v7.items()}, True)
-    # 2. peta v7 asli (3 run) -> harus LOLOS
-    tambah('v7 asli (3 run)', v7, True)
+    # 1. peta 1.14 asli (2 run) -> harus LOLOS
+    tambah('1.14 asli (2 run)', {k: v[:2] for k, v in p114.items()}, True)
+    # 2. peta 1.14 asli (1 run saja) -> harus LOLOS (jalur 1 run)
+    tambah('1.14 asli (1 run)', {k: v[:1] for k, v in p114.items()}, True)
     # 3. BAB dibuang di KEDUA run fid=112 -> harus GAGAL (G1)
-    m = json.loads(json.dumps(v7))
+    m = json.loads(json.dumps(p114))
     for r in m['112'][:2]:
         r['bab'] = [b for b in r['bab'] if 'BAB III' not in b]
     tambah('BAB III hilang di 2 run (112)', m, False)
     # 4. BAB dibuang di SATU run saja -> harus LOLOS (derau) + peringatan
-    m = json.loads(json.dumps(v7))
+    m = json.loads(json.dumps(p114))
     m['112'][0]['bab'] = [b for b in m['112'][0]['bab'] if 'BAB III' not in b]
     tambah('BAB III hilang di 1 run saja (derau)', m, True)
     # 5. subbab +10 di fid=81 -> harus GAGAL (G2)
-    m = json.loads(json.dumps(v7))
+    m = json.loads(json.dumps(p114))
     for r in m['81']:
         r['subbab_jml'] = r['subbab_jml'] + 10
     tambah('subbab +10 (81)', m, False)
     # 6. judul BAB sampah di fid=115 -> harus GAGAL (G3)
-    m = json.loads(json.dumps(v7))
+    m = json.loads(json.dumps(p114))
     m['115'][0]['bab'] = list(m['115'][0]['bab']) + [
         'bagian ini menjelaskan tentang jenis, waktu, dan tempat desain.']
     tambah('judul BAB sampah (115)', m, False)
@@ -230,6 +288,11 @@ def jalankan_live():
             tar.add(ROOT / nama, arcname=nama)
         tar.add(ROOT / 'app', arcname='app')
         tar.add(ROOT / 'profil', arcname='profil')
+        # 10 Nov 2026: app/ai.py:363 membaca prompts/revisi_produksi.txt
+        # lewat Path(__file__).parent.parent/'prompts' — dari scratch itu
+        # /tmp/jev-gerbang/prompts. Tanpa ini run gagal di start (0 Jev
+        # terbuang), sama seperti uji v7 yang butuh tambahan prompts/.
+        tar.add(ROOT / 'prompts', arcname='prompts')
     open('/tmp/jev-gerbang.tar', 'wb').write(buf.getvalue())
     cmds = (
         'docker exec eduai-app mkdir -p /tmp/jev-gerbang && '
@@ -260,7 +323,11 @@ def jalankan_live():
         print('GAGAL jalan live:', r.stderr[-500:])
         return 1
     try:
-        maps = json.loads(r.stdout[r.stdout.rindex('{"81"'):])
+        # 10 Nov 2026: pelari mencetak 'SELESAI' sesudah baris GERBANG_MAPS,
+        # jadi json.loads() pada sisa stdout gagal 'Extra data'. Pakai
+        # raw_decode supaya hanya objek JSON pertama yang dibaca.
+        teks = r.stdout[r.stdout.rindex('{"81"'):]
+        maps, _ = json.JSONDecoder().raw_decode(teks)
     except Exception as e:
         print('GAGAL baca JSON live:', e)
         return 1

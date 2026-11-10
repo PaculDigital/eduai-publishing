@@ -1,0 +1,435 @@
+{
+  "v5-run2": {
+    "81": [
+      {
+        "subbab": 131,
+        "paragraf": 169,
+        "goyang": 39,
+        "panggilan": 6,
+        "wall": 5.05,
+        "bab": []
+      }
+    ],
+    "112": [
+      {
+        "subbab": 78,
+        "paragraf": 26,
+        "goyang": 55,
+        "panggilan": 40,
+        "wall": 23.48,
+        "bab": [
+          "5. BAB V PENUTUP, pada bab ini penulis akan menjelaskan mengenai"
+        ]
+      }
+    ],
+    "115": [
+      {
+        "subbab": 75,
+        "paragraf": 24,
+        "goyang": 65,
+        "panggilan": 35,
+        "wall": 21.6,
+        "bab": [
+          "3. BAB III METODOLOGI PENELITIAN, bagian ini menjelaskan tentang",
+          "4. BAB IV HASIL DAN PEMBAHASAN, bagian ini penulis akan",
+          "5. BAB V PENUTUP, pada bab ini penulis akan menjelaskan mengenai"
+        ]
+      }
+    ]
+  },
+  "v6-run1": {
+    "81": [
+      {
+        "subbab": 131,
+        "paragraf": 146,
+        "goyang": 41,
+        "panggilan": 7,
+        "wall": 5.89,
+        "bab": []
+      }
+    ],
+    "112": [
+      {
+        "subbab": 79,
+        "paragraf": 24,
+        "goyang": 74,
+        "panggilan": 41,
+        "wall": 24.14,
+        "bab": [
+          "2. BAB II TINJAUAN PUSTAKA bagian ini menjelaskan tentang landasan",
+          "5. BAB V PENUTUP pada bab ini penulis akan menjelaskan mengenai kesimpulan penelitian dan saran."
+        ]
+      }
+    ],
+    "115": [
+      {
+        "subbab": 63,
+        "paragraf": 20,
+        "goyang": 66,
+        "panggilan": 36,
+        "wall": 21.85,
+        "bab": [
+          "3. BAB III METODOLOGI PENELITIAN bagian ini menjelaskan tentang",
+          "4. BAB IV HASIL DAN PEMBAHASAN bagian ini penulis akan",
+          "5. BAB V PENUTUP pada bab ini penulis akan menjelaskan mengenai kesimpulan penelitian dan saran."
+        ]
+      }
+    ],
+    "WULAN-1": [
+      {
+        "subbab": 46,
+        "paragraf": 69,
+        "goyang": 38,
+        "panggilan": 7,
+        "wall": 4.81,
+        "bab": [
+          "1. BAB I PENDAHULUAN",
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN"
+        ]
+      }
+    ]
+  },
+  "v6-run2": {
+    "81": [
+      {
+        "subbab": 130,
+        "paragraf": 171,
+        "goyang": 33,
+        "panggilan": 7,
+        "wall": 6.18,
+        "bab": []
+      }
+    ],
+    "112": [
+      {
+        "subbab": 82,
+        "paragraf": 19,
+        "goyang": 63,
+        "panggilan": 41,
+        "wall": 30.33,
+        "bab": [
+          "2. BAB II TINJAUAN PUSTAKA",
+          "4. BAB IV HASIL DAN PEMBAHASAN",
+          "5. BAB V PENUTUP"
+        ]
+      }
+    ],
+    "115": [
+      {
+        "subbab": 65,
+        "paragraf": 29,
+        "goyang": 60,
+        "panggilan": 36,
+        "wall": 22.77,
+        "bab": [
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN",
+          "5. BAB V PENUTUP"
+        ]
+      }
+    ],
+    "WULAN-1": [
+      {
+        "subbab": 46,
+        "paragraf": 86,
+        "goyang": 46,
+        "panggilan": 7,
+        "wall": 4.93,
+        "bab": [
+          "1. BAB I PENDAHULUAN",
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN"
+        ]
+      }
+    ]
+  },
+  "v7": {
+    "81": [
+      {
+        "subbab": 131,
+        "paragraf": 173,
+        "goyang": 37,
+        "panggilan": 7,
+        "wall": 5.91,
+        "bab": []
+      },
+      {
+        "subbab": 131,
+        "paragraf": 173,
+        "goyang": 38,
+        "panggilan": 7,
+        "wall": 5.92,
+        "bab": []
+      },
+      {
+        "subbab": 131,
+        "paragraf": 166,
+        "goyang": 45,
+        "panggilan": 7,
+        "wall": 5.98,
+        "bab": []
+      }
+    ],
+    "112": [
+      {
+        "subbab": 80,
+        "paragraf": 22,
+        "goyang": 64,
+        "panggilan": 40,
+        "wall": 25.48,
+        "bab": [
+          "2. BAB II TINJAUAN PUSTAKA",
+          "4. BAB IV HASIL DAN PEMBAHASAN",
+          "5. BAB V PENUTUP"
+        ]
+      },
+      {
+        "subbab": 76,
+        "paragraf": 20,
+        "goyang": 55,
+        "panggilan": 40,
+        "wall": 28.17,
+        "bab": [
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN",
+          "5. BAB V PENUTUP"
+        ]
+      },
+      {
+        "subbab": 75,
+        "paragraf": 23,
+        "goyang": 57,
+        "panggilan": 41,
+        "wall": 25.25,
+        "bab": [
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN",
+          "5. BAB V PENUTUP"
+        ]
+      }
+    ],
+    "115": [
+      {
+        "subbab": 67,
+        "paragraf": 26,
+        "goyang": 65,
+        "panggilan": 36,
+        "wall": 22.46,
+        "bab": [
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN",
+          "5. BAB V PENUTUP"
+        ]
+      },
+      {
+        "subbab": 69,
+        "paragraf": 24,
+        "goyang": 63,
+        "panggilan": 36,
+        "wall": 22.27,
+        "bab": [
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN",
+          "5. BAB V PENUTUP"
+        ]
+      },
+      {
+        "subbab": 70,
+        "paragraf": 23,
+        "goyang": 68,
+        "panggilan": 36,
+        "wall": 22.76,
+        "bab": [
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN",
+          "5. BAB V PENUTUP"
+        ]
+      }
+    ],
+    "WULAN-1": [
+      {
+        "subbab": 58,
+        "paragraf": 98,
+        "goyang": 44,
+        "panggilan": 7,
+        "wall": 4.86,
+        "bab": [
+          "1. BAB I PENDAHULUAN",
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN"
+        ]
+      },
+      {
+        "subbab": 55,
+        "paragraf": 100,
+        "goyang": 48,
+        "panggilan": 7,
+        "wall": 4.88,
+        "bab": [
+          "1. BAB I PENDAHULUAN",
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "bagian ini menjelaskan tentang jenis, waktu, dan tempat desain, jenis data, subyek dan obyek penelitian selanjutnya menjelaskan metode pengumpulan data, meliputi tahap pengelolaan data kualitatif pada penelitian, dan menjelaskan metode.",
+          "4. BAB IV HASIL DAN PEMBAHASAN"
+        ]
+      },
+      {
+        "subbab": 57,
+        "paragraf": 99,
+        "goyang": 41,
+        "panggilan": 7,
+        "wall": 5.1,
+        "bab": [
+          "1. BAB I PENDAHULUAN",
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN"
+        ]
+      }
+    ]
+  },
+  "ab114-1.13": {
+    "81": [
+      {
+        "subbab": 131,
+        "paragraf": 173,
+        "goyang": 30,
+        "panggilan": 7,
+        "wall": 6.41,
+        "bab": []
+      }
+    ]
+  },
+  "deploy": {
+    "81": [
+      {
+        "subbab": 131,
+        "paragraf": 170,
+        "goyang": 36,
+        "panggilan": 7,
+        "wall": 6.44,
+        "bab": []
+      }
+    ],
+    "115": [
+      {
+        "subbab": 75,
+        "paragraf": 20,
+        "goyang": 60,
+        "panggilan": 36,
+        "wall": 23.22,
+        "bab": [
+          "2. BAB II TINJAUAN PUSTAKA",
+          "3. BAB III METODOLOGI PENELITIAN",
+          "4. BAB IV HASIL DAN PEMBAHASAN",
+          "5. BAB V PENUTUP"
+        ]
+      }
+    ]
+  },
+  "gerbang": {
+    "81": [
+      {
+        "subbab": 131,
+        "paragraf": 165,
+        "goyang": null,
+        "panggilan": 7,
+        "wall": 6.12,
+        "bab": [
+          "BAB I PENDAHULUAN",
+          "BAB II TINJAUAN PUSTAKA",
+          "BAB III METODE PENELITIAN",
+          "BAB IV HASIL DAN PEMBAHASAN",
+          "BAB V PENUTUP"
+        ]
+      },
+      {
+        "subbab": 131,
+        "paragraf": 176,
+        "goyang": null,
+        "panggilan": 7,
+        "wall": 6.36,
+        "bab": [
+          "BAB I PENDAHULUAN",
+          "BAB II TINJAUAN PUSTAKA",
+          "BAB III METODE PENELITIAN",
+          "BAB IV HASIL DAN PEMBAHASAN",
+          "BAB V PENUTUP"
+        ]
+      }
+    ],
+    "112": [
+      {
+        "subbab": 78,
+        "paragraf": 32,
+        "goyang": null,
+        "panggilan": 40,
+        "wall": 26.09,
+        "bab": [
+          "BAB I PENDAHULUAN",
+          "BAB II TINJAUAN PUSTAKA",
+          "BAB III METODOLOGI PENELITIAN",
+          "BAB IV HASIL DAN PEMBAHASAN",
+          "BAB V PENUTUP",
+          "BAB VI HASIL PENELITIAN DAN PEMBAHASAN"
+        ]
+      },
+      {
+        "subbab": 82,
+        "paragraf": 22,
+        "goyang": null,
+        "panggilan": 41,
+        "wall": 24.23,
+        "bab": [
+          "BAB I PENDAHULUAN",
+          "BAB II TINJAUAN PUSTAKA",
+          "BAB III METODOLOGI PENELITIAN",
+          "BAB IV HASIL DAN PEMBAHASAN",
+          "BAB V PENUTUP",
+          "BAB VI HASIL PENELITIAN DAN PEMBAHASAN"
+        ]
+      }
+    ],
+    "115": [
+      {
+        "subbab": 75,
+        "paragraf": 23,
+        "goyang": null,
+        "panggilan": 36,
+        "wall": 22.53,
+        "bab": [
+          "BAB I PENDAHULUAN",
+          "BAB II TINJAUAN PUSTAKA",
+          "BAB III METODOLOGI PENELITIAN",
+          "BAB IV HASIL DAN PEMBAHASAN",
+          "BAB V PENUTUP",
+          "BAB VI HASIL PENELITIAN DAN PEMBAHASAN"
+        ]
+      },
+      {
+        "subbab": 78,
+        "paragraf": 18,
+        "goyang": null,
+        "panggilan": 36,
+        "wall": 24.96,
+        "bab": [
+          "BAB I PENDAHULUAN",
+          "BAB II TINJAUAN PUSTAKA",
+          "BAB III METODOLOGI PENELITIAN",
+          "BAB IV HASIL DAN PEMBAHASAN",
+          "BAB V PENUTUP",
+          "BAB VI HASIL PENELITIAN DAN PEMBAHASAN"
+        ]
+      }
+    ]
+  }
+}

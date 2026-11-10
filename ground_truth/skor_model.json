@@ -1,0 +1,21 @@
+{
+ "beda_model": {
+  "n": 21,
+  "m113": 8,
+  "m114": 13,
+  "seri": 0
+ },
+ "beda_model_tanpa_sedang": {
+  "n": 15,
+  "m113": 3,
+  "m114": 12,
+  "seri": 0
+ },
+ "sengketa_run1_run2": {
+  "n": 354,
+  "run1_benar": 172,
+  "run2_benar": 125,
+  "keduanya": 0,
+  "tidak_ada": 57
+ }
+}

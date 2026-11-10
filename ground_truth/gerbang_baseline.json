@@ -1,5 +1,9 @@
 {
+  "model": "1.14",
+  "tanggal": "2026-11-10",
+  "catatan": "Baseline gerbang model 1.14 (MODEL_DEFAULT SATPAM/typesafe/jev-1.14, RULE_VERSION jev-peta-v7). Baseline 1.13 tersimpan di gerbang_baseline_113.json. PERHATIAN: 112/115 baru punya 2 run, jadi rentang antar-run adalah batas bawah dan ambang G2=3 ketat — sesi 1.14 berikutnya bisa duduk di batas karena drift model (lebar drift 1.13: 112=7, 115=11). Bila G2 gagal mepet, ulangi satu sesi segar sebelum menvonis regresi.",
   "81": {
+    "model": "1.14",
     "bab": [
       "BAB I PENDAHULUAN",
       "BAB II TINJAUAN PUSTAKA",
@@ -8,19 +12,71 @@
       "BAB V PENUTUP"
     ],
     "subbab_per_run": [
+      130,
       131,
-      131,
+      129,
+      130
+    ],
+    "subbab_median": 130.0,
+    "paragraf_per_run": [
+      199,
+      197,
+      194,
+      193
+    ],
+    "paragraf_median": 195.5,
+    "ambang_g2": 3,
+    "rentang_subbab_run": [
+      129,
       131
     ],
-    "subbab_median": 131,
-    "paragraf_per_run": [
-      166,
-      173,
-      173
+    "median_sesi": [
+      131,
+      129,
+      130
     ],
-    "sumber": "hasil_v7_live.json (3 run per naskah, 10 Nov 2026)"
+    "rentang_median_sesi": [
+      129,
+      131
+    ],
+    "sumber": "run 1.14: baseline114-run1=130, baseline114-run2=131, verifikasi114=129, ab114-1.14=130",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
   },
   "112": {
+    "model": "1.14",
+    "bab": [
+      "BAB II TINJAUAN PUSTAKA",
+      "BAB III METODOLOGI PENELITIAN",
+      "BAB IV HASIL DAN PEMBAHASAN",
+      "BAB V PENUTUP"
+    ],
+    "subbab_per_run": [
+      81,
+      79
+    ],
+    "subbab_median": 80.0,
+    "paragraf_per_run": [
+      89,
+      94
+    ],
+    "paragraf_median": 91.5,
+    "ambang_g2": 3,
+    "rentang_subbab_run": [
+      79,
+      81
+    ],
+    "median_sesi": [
+      81
+    ],
+    "rentang_median_sesi": [
+      81,
+      81
+    ],
+    "sumber": "run 1.14: baseline114-run1=81, baseline114-run2=79",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
+  },
+  "115": {
+    "model": "1.14",
     "bab": [
       "BAB II TINJAUAN PUSTAKA",
       "BAB III METODOLOGI PENELITIAN",
@@ -29,35 +85,58 @@
     ],
     "subbab_per_run": [
       75,
+      76
+    ],
+    "subbab_median": 75.5,
+    "paragraf_per_run": [
+      61,
+      56
+    ],
+    "paragraf_median": 58.5,
+    "ambang_g2": 3,
+    "rentang_subbab_run": [
+      75,
+      76
+    ],
+    "median_sesi": [
+      76
+    ],
+    "rentang_median_sesi": [
       76,
-      80
+      76
     ],
-    "subbab_median": 76,
-    "paragraf_per_run": [
-      20,
-      22,
-      23
-    ],
-    "sumber": "hasil_v7_live.json (3 run per naskah, 10 Nov 2026)"
+    "sumber": "run 1.14: baseline114-run1=75, baseline114-run2=76",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
   },
-  "115": {
-    "bab": [
-      "BAB II TINJAUAN PUSTAKA",
-      "BAB III METODOLOGI PENELITIAN",
-      "BAB IV HASIL DAN PEMBAHASAN",
-      "BAB V PENUTUP"
-    ],
+  "WULAN-1": {
+    "bab": [],
     "subbab_per_run": [
-      67,
-      69,
-      70
+      58,
+      55,
+      57
     ],
-    "subbab_median": 69,
+    "subbab_median": 57,
     "paragraf_per_run": [
-      23,
-      24,
-      26
+      98,
+      100,
+      99
     ],
-    "sumber": "hasil_v7_live.json (3 run per naskah, 10 Nov 2026)"
+    "paragraf_median": 99,
+    "ambang_g2": 4,
+    "rentang_subbab_run": [
+      55,
+      58
+    ],
+    "median_sesi": [
+      57
+    ],
+    "rentang_median_sesi": [
+      57,
+      57
+    ],
+    "sumber": "sesi kode v7 (b41392a + v8 tanpa ubah klasifikasi): v7(3 run)",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2",
+    "catatan": "referensi 1.13 saja — belum ada run 1.14 untuk WULAN-1; gerbang tidak memeriksanya.",
+    "model": "1.13"
   }
 }

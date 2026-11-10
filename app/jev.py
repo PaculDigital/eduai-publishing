@@ -72,13 +72,14 @@ JEMBATAN_HEALTH = 'http://172.17.0.1:8130/health'
 #     berpindah sendiri saat rilis baru ⇒ ambang jadi tidak sah tanpa ada yang
 #     mengubahnya. Resmi: "pin that version's ID instead of the alias."
 #
-#  📌 1.14 SUDAH DIUJI 21 Okt 2026 — TIDAK DINAIKKAN (SOT §16).
-#     34 pertanyaan · 3 naskah Indonesia ⇒ 34/34 jawaban IDENTIK dengan 1.13,
-#     Δ noul rata 0,001–0,018; 1.14 malah lebih goyah di naskah sulit
-#     (5/9 vs 3/9 berubah); biaya & token identik.
-#     Kapan naik: ada naskah asing nyata · butuh tipe `box` · 1.13 mendekati
-#     pensiun (≈13 Des 2026). Nama yang HIDUP di jembatan: 'typesafe/jev-1.14'.
-MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
+#  📌 DINAIKKAN ke 1.14 — Gas Bos 10 Nov 2026 (vonis label kebenaran dasar).
+#     Vonis lama 21 Okt 2026 (TIDAK DINAIKKAN, SOT §16) DICABUT: vonis itu
+#     memakai jarak ke baseline Okt 157, yang terbukti bukan wasit adil
+#     (baseline dari pipeline lama). Wasit yang benar = 397 label kebenaran
+#     dasar: pada 21 baris sengketa fid=81, 1.14 benar 13/21 vs 1.13 8/21
+#     (tanpa 6 baris keyakinan sedang: 12/15 vs 3/15). 1.13 pensiun
+#     ≈13 Des 2026. Nama yang HIDUP di jembatan: 'typesafe/jev-1.14'.
+MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
 
 #  Tanda jalur MENYESATKAN — kalau muncul, tolak (jangan diam-diam jalan).
 _TANDA_SESAT = (':20128', '9router:', '/v1/chat/completions')  # dicek bersama host

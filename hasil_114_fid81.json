@@ -1,0 +1,54 @@
+{
+  "model_diminta": "SATPAM/typesafe/jev-1.14",
+  "bukti_layan": {
+    "model_dilayani": "jev-1.14.0",
+    "satpam_penyedia": "resmi",
+    "satpam_jejak": [
+      {
+        "penyedia": "resmi",
+        "model": "jev-1.14.0",
+        "hasil": "DIPAKAI"
+      }
+    ],
+    "provider": "TypeSafe"
+  },
+  "rule_version": "jev-peta-v7",
+  "wall": 7.44,
+  "panggilan": {
+    "choice": 7,
+    "noul": 0,
+    "lain": 0
+  },
+  "panggilan_total": 7,
+  "kand_jml": 486,
+  "gelombang": 5,
+  "tanya_ulang": 71,
+  "gabung": 10,
+  "buang": 720,
+  "gagal": 0,
+  "jev_mati": false,
+  "label": {
+    "subbab": 129,
+    "paragraf": 194,
+    "biasa": 163
+  },
+  "goyang": 20,
+  "hakim": {
+    "jumlah_sepakat": 129,
+    "jumlah_ragu": 0,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+  },
+  "hakim_panggilan_jev": 0,
+  "hakim_wall": 0.1,
+  "sidik_sebelum": [
+    28,
+    108,
+    235
+  ],
+  "sidik_sesudah": [
+    28,
+    108,
+    235
+  ]
+}

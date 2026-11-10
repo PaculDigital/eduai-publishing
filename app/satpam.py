@@ -37,7 +37,7 @@ AKTIF = (os.getenv('EDUAI_SATPAM_AKTIF') or '1').strip() not in ('0', 'false', '
 #     BASE/MODEL/KUNCI/BATAS_DETIK DIHAPUS. Fungsi itu mati (0 pemanggil) dan
 #     env EDUAI_SATPAM_MODEL MENIPU: menyetelnya tidak mengganti model peta
 #     (semua jalur bermuara ke `jev.tanya()` tanpa argumen model). Satu-satunya
-#     saklar model yang hidup = `app/jev.py::MODEL_DEFAULT` (bawaan 1.13).
+#     saklar model yang hidup = `app/jev.py::MODEL_DEFAULT` (bawaan 1.14).
 AMBANG_LOLOS = float(os.getenv('EDUAI_SATPAM_AMBANG') or '0.80')
 AMBANG_TANYA = 0.50
 
