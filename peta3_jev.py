@@ -971,8 +971,10 @@ def _petakan_dari_hasil(d, putaran=None):
     #    per gelombang, paling banyak 3 (env EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG).
     tanya_ulang_jml = 0
     tanya_ulang_gelombang = 0
+    tanya_ulang_goyang_pb_jml = 0
     if putaran == 1 and _tanya_ulang_aktif():
         sudah_ditanya = set()
+        pb_ekstra_sudah = set()  # kandidat yang sudah ditanya-ulang karena goyang PB
         for _gel in range(_maks_gelombang_tanya_ulang()):
             ragu_idx = [i for i, _t in kand
                         if i not in sudah_ditanya
@@ -981,6 +983,36 @@ def _petakan_dari_hasil(d, putaran=None):
             ragu_idx.sort(key=lambda i: (p_label.get(i) is not None,
                                          p_label.get(i) or 0))
             ragu_idx = ragu_idx[:BATAS_TANYA]
+            # ── v6: batas paragraf GOYANG — suara Jev terbelah
+            #    paragraf/biasa. Satu suara tidak bisa terbelah (putaran=1),
+            #    jadi yang kena di sini adalah kandidat yang SESUDAH
+            #    tanya-ulang gelombang sebelumnya terbelah — ditanya SEKALI
+            #    lagi (paling goyang dulu = selisih confidence terkecil).
+            #    Mereka SUDAH ada di `sudah_ditanya` (begitulah mereka dapat
+            #    2 suara) — penjaganya `pb_ekstra_sudah`, bukan itu.
+            pb_idx = []
+            if len(ragu_idx) < BATAS_TANYA:
+                for gi, votes in goyang:
+                    if gi in ragu_idx or gi in pb_ekstra_sudah:
+                        continue
+                    vs = {v for v in votes if v}
+                    if vs != {'paragraf', 'biasa'}:
+                        continue
+                    pasangan = [(v, c) for v, c in zip(semua[gi], conf[gi])
+                                if v]
+                    maks = {}
+                    for v, c in pasangan:
+                        s = float(c) if isinstance(c, (int, float)) else 0.0
+                        maks[v] = max(maks.get(v, 0.0), s)
+                    gap = abs(maks.get('paragraf', 0.0)
+                              - maks.get('biasa', 0.0))
+                    pb_idx.append((gap, gi))
+                pb_idx.sort()
+                pb_idx = [gi for _, gi in pb_idx[:BATAS_TANYA - len(ragu_idx)]]
+            if pb_idx:
+                pb_ekstra_sudah.update(pb_idx)
+                tanya_ulang_goyang_pb_jml += len(pb_idx)
+            ragu_idx = ragu_idx + pb_idx
             if not ragu_idx:
                 break
             tanya_ulang_gelombang += 1
@@ -1070,6 +1102,35 @@ def _petakan_dari_hasil(d, putaran=None):
         asal[i] = 'kode'
         boleh[i] = True
 
+    # ── v6: KOREKSI BATAS PARAGRAF (deterministik, tanpa Jev) ─────────────
+    #    Paragraf baru tidak bisa mulai di tengah kalimat: bila baris isi
+    #    sebelumnya TIDAK diakhiri tanda akhir kalimat (. ! ? …), kandidat
+    #    'paragraf' ini adalah lanjutan, bukan awal paragraf baru ⇒ 'biasa'.
+    #    Judul sebelumnya (bab/subbab/gabung/kode) dikecualikan — paragraf
+    #    pertama sesudah judul memang baru. Butir daftar bernomor dan baris
+    #    mirip judul huruf besar dikecualikan (batasnya ambigu, jangan tebak).
+    #    Blok sistematika tak disentuh (konsisten dengan Aturan 5).
+    koreksi_batas = []
+    for i, _t in kand:
+        if label.get(i) != 'paragraf' or i in sistematika:
+            continue
+        j = i - 1
+        while j >= 0 and (not baris[j].strip() or j in d['buang']):
+            j -= 1
+        if j < 0:
+            continue
+        if j in d['gabung'] or j in kode_label \
+                or label.get(j) in ('bab', 'subbab'):
+            continue
+        sebelum = baris[j].strip()
+        if re.match(r'^\d+[.)]\s+\S', sebelum):
+            continue
+        if sebelum and sebelum == sebelum.upper() and len(sebelum) <= 60:
+            continue
+        if not re.search(r'[.!?…]["\')\]]*\s*$', sebelum):
+            label[i] = 'biasa'
+            koreksi_batas.append(i)
+
     # ── JEV MATI TOTAL: semua gelombang gagal ⇒ pemanggil WAJIB fallback
     #    (dulu: semua label 'biasa' tanpa jejak ⇒ hakim/pemutus jalur tak
     #    bisa bedakan "peta memang tanpa judul" vs "Jev gagal").
@@ -1095,6 +1156,8 @@ def _petakan_dari_hasil(d, putaran=None):
             'huruf_berspasi_sebelum': d.get('huruf_berspasi_sebelum', 0),
             'huruf_berspasi_sesudah': d.get('huruf_berspasi_sesudah', 0),
             'pisah_bab_ekor_jml': d.get('pisah_bab_ekor_jml', 0),
+            'koreksi_batas_paragraf': koreksi_batas,
+            'tanya_ulang_goyang_pb_jml': tanya_ulang_goyang_pb_jml,
             'jev_mati': jev_mati, 'stitch_pakai': d.get('stitch_pakai', False),
             'versi_aturan': RULE_VERSION}
 

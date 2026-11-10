@@ -52,6 +52,18 @@ class FakeSatpam:
                     if sum(1 for b, _ in self.panggilan if tengah in b) <= 1:
                         conf = 0.3
                 label = 'bab' if tengah.startswith('BAB') else 'paragraf'
+                # ── v6.3: penanda GOYANG-PB — suara terbelah paragraf/biasa
+                #    antar gelombang (panggilan 1: paragraf 0,3 → tanya-ulang
+                #    karena p rendah; panggilan 2: biasa 0,9 → goyang PB;
+                #    panggilan 3: paragraf 0,9 → tanya-ulang batas goyang).
+                if 'GOYANG-PB' in tengah:
+                    n = sum(1 for b, _ in self.panggilan if tengah in b)
+                    if n <= 1:
+                        label, conf = 'paragraf', 0.3
+                    elif n == 2:
+                        label, conf = 'biasa', 0.9
+                    else:
+                        label, conf = 'paragraf', 0.9
                 jawab[nama] = {'choice': label, 'confidence': conf}
         return jawab
 
@@ -633,6 +645,53 @@ def main():
         'BAB III METODOLOGI PENELITIAN\n' in hasil_lintas
         and 'membahas pemasaran digital di Indonesia.' in hasil_lintas,
         hasil_lintas[:120])
+
+    # ── 9. v6.3: STABILKAN BATAS PARAGRAF ────────────────────────────────
+    #    (a) koreksi deterministik: 'paragraf' sesudah baris isi yang tidak
+    #    berakhir tanda akhir kalimat = lanjutan -> 'biasa'.
+    teks_batas = (
+        'BAB I\nPENDAHULUAN\n'
+        'Kalimat pertama yang berlanjut ke baris berikutnya dan masih panjang sekali\n'
+        'ke baris berikutnya yang jadi kandidat.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_batas = P.petakan_dari_teks(teks_batas)
+    lab_batas = {i: v for i, v in r_batas['label'].items()}
+    cek('v6.3: lanjutan kalimat (baris sebelum tanpa titik) jadi biasa',
+        lab_batas.get(3) == 'biasa', str(lab_batas))
+    cek('v6.3: paragraf sesudah kalimat selesai tetap paragraf',
+        lab_batas.get(4) == 'paragraf', str(lab_batas))
+    cek('v6.3: paragraf pertama sesudah judul tetap paragraf',
+        lab_batas.get(2) == 'paragraf', str(lab_batas))
+    cek('v6.3: koreksi batas tercatat',
+        r_batas.get('koreksi_batas_paragraf') == [3],
+        str(r_batas.get('koreksi_batas_paragraf')))
+    #    (b) judul sebelumnya mengecualikan koreksi.
+    teks_judul = (
+        'BAB I\nPENDAHULUAN\n'
+        '1.1 Latar Belakang\n'
+        'Isi paragraf pertama sesudah judul subbab ini.\n'
+        'Isi paragraf kedua yang panjang dan tidak terbelah sama sekali.\n'
+    )
+    r_judul = P.petakan_dari_teks(teks_judul)
+    cek('v6.3: paragraf sesudah subbab kode tidak didemosi',
+        r_judul['label'].get(3) == 'paragraf'
+        and r_judul.get('koreksi_batas_paragraf') == [],
+        str({k: v for k, v in r_judul['label'].items() if v != 'biasa'}))
+    #    (c) tanya-ulang batas goyang: suara terbelah paragraf/biasa
+    #    sesudah gelombang 1 ditanya sekali lagi di gelombang 2.
+    teks_pb = (
+        'BAB I\nPENDAHULUAN\n'
+        'Baris GOYANG-PB yang membuka paragraf baru.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_pb = P.petakan_dari_teks(teks_pb)
+    cek('v6.3: batas goyang paragraf/biasa ditanya ulang sekali lagi',
+        r_pb.get('tanya_ulang_goyang_pb_jml') == 1,
+        str(r_pb.get('tanya_ulang_goyang_pb_jml')))
+    cek('v6.3: tanya-ulang batas goyang memakai gelombang ke-2',
+        r_pb.get('tanya_ulang_gelombang', 0) >= 2,
+        str(r_pb.get('tanya_ulang_gelombang')))
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
