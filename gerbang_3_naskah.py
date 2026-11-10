@@ -28,6 +28,18 @@ ATURAN GERBANG (ditulis di sini, bukan dikarang diam-diam):
       yang sepakat (deploy 21:22 dan gerbang 22:30) gagal G2 padahal
       diff kode v7->HEAD pada jalur klasifikasi kosong (drift model,
       bukan regresi). Median diambil dari 2 run (bila 2 run) atau 1 run.
+  BATAS DETEKSI (terukur 10 Nov 2026, jangan disembunyikan): karena
+  median gabungan duduk DI ANTARA gugus drift (115: sesi sore 69,
+  sesi malam 75-78), regresi yang menggeser sesi KE ARAH median
+  gabungan bisa lolos. Terjamin tertangkap: 81 +-10 dari sesi mana pun;
+  112 +10 dari sesi mana pun, -10 hanya dari sesi rendah; 115 +-10
+  hanya bila dari sesi tengah/tinggi -- +10 dari sesi rendah (69->79,
+  selisih 6.5 < ambang 8) dan -10 dari sesi tengah/tinggi LOLOS.
+  Jaminan deteksi penuh: 81 ~+-3, 112 ~+-11, 115 ~+-12. Mengetatkan
+  ambang 115 ke <=6 supaya +10-dari-rendah tertangkap akan membuat
+  sesi gerbang yang sah (selisih 5.5) berada 0.5 dari batas gagal --
+  mengulang kegagalan G2 yang baru diperbaiki. Jadi ambang TIDAK
+  diketatkan; batas ini dicatat di sini dan di laporan.
   G1  CATATAN PENGUKURAN (10 Nov 2026): daftar 'bab' pelari live
       (jalankan_gerbang.py) adalah GABUNGAN label Jev + judul gabung
       kode, sedangkan daftar 'bab' v7 hanya label Jev. Karena itu
