@@ -5,8 +5,8 @@
       "beda_model_113_114": 21,
       "sengketa_paragraf": 6
     },
-    "label_terisi": 21,
-    "label_kosong": 6
+    "label_terisi": 27,
+    "label_kosong": 0
   },
   "112": {
     "total": 209,
@@ -16,8 +16,8 @@
       "hakim_ragu": 3,
       "sengketa_paragraf": 199
     },
-    "label_terisi": 10,
-    "label_kosong": 199
+    "label_terisi": 209,
+    "label_kosong": 0
   },
   "115": {
     "total": 142,
@@ -27,8 +27,8 @@
       "hakim_ragu": 4,
       "sengketa_paragraf": 133
     },
-    "label_terisi": 9,
-    "label_kosong": 133
+    "label_terisi": 142,
+    "label_kosong": 0
   },
   "WULAN-1": {
     "total": 19,
@@ -38,8 +38,20 @@
       "hakim_curiga": 1,
       "sengketa_paragraf": 16
     },
-    "label_terisi": 3,
-    "label_kosong": 16
+    "label_terisi": 19,
+    "label_kosong": 0
   },
-  "total_paket": 397
+  "total_paket": 397,
+  "label_total": {
+    "terisi": 397,
+    "kosong": 0,
+    "ragu": 0,
+    "per_label": {
+      "bab": 6,
+      "subbab": 41,
+      "paragraf": 97,
+      "biasa": 253
+    },
+    "keyakinan_sedang": 20
+  }
 }
