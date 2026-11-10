@@ -433,7 +433,7 @@ main{flex:1;position:relative;min-height:0;background:#fff}
       <button type="button" class="tombol-nav" id="simpan" title="Simpan sekarang">
         <span>{{ ikon('check', 16) }}</span><span class="teks-lengkap">Simpan</span>
       </button>
-      <a href="/naskah" class="tombol-nav utama">Selesai</a>
+      <a href="/naskah" class="tombol-nav utama" id="tombol-selesai">Selesai</a>
     </div>
   </div>
 </header>
@@ -2187,6 +2187,36 @@ window.__AI_FILE_ID__ = {{ berkas.id }};
   // Penutupan sesi hanya lewat:
   //   (a) tombol "Simpan & Tutup" / "Selesai" (disengaja user), atau
   //   (b) pembersihan otomatis sesi BASI setelah SESI_IDLE_MENIT.
+
+  // ---- tombol Selesai: tutup sesi editor dulu, baru pindah halaman ----
+  // 10Nov26: DULU tombol ini hanya tautan ke /naskah, sesi tidak pernah
+  // ditutup lewat sini, jadi "Editor aktif" tetap 1/3 sampai sesi
+  // dianggap basi. Sekarang klik Selesai memanggil /api/sesi/tutup
+  // (server forcesave dulu). Kalau forcesave gagal, tetap di editor
+  // supaya user bisa simpan manual, tidak ada editan yang hilang diam-diam.
+  var tombolSelesai = document.getElementById('tombol-selesai');
+  if (tombolSelesai) {
+    tombolSelesai.addEventListener('click', function (e) {
+      e.preventDefault();
+      tombolSelesai.textContent = 'Menyimpan...';
+      fetch('/api/sesi/tutup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({file_id: SESI_FID})
+      }).then(function (r) {
+        return r.json().then(function (d) { return {status: r.status, d: d}; });
+      }).then(function (hasil) {
+        if (hasil.d && hasil.d.ok) { window.location.href = '/naskah'; }
+        else {
+          tombolSelesai.textContent = 'Selesai';
+          pesan((hasil.d && hasil.d.pesan) || 'Tidak bisa menutup dokumen.', 'gagal');
+        }
+      }).catch(function () {
+        tombolSelesai.textContent = 'Selesai';
+        pesan('Gagal menghubungi server.', 'gagal');
+      });
+    });
+  }
 
   // ---- di HP: cegah editor terpotong saat papan ketik muncul ----
   window.addEventListener('resize', function () {
