@@ -265,7 +265,11 @@ def jalankan_live():
         print('GAGAL jalan live:', r.stderr[-500:])
         return 1
     try:
-        maps = json.loads(r.stdout[r.stdout.rindex('{"81"'):])
+        # 10 Nov 2026: pelari mencetak 'SELESAI' sesudah baris GERBANG_MAPS,
+        # jadi json.loads() pada sisa stdout gagal 'Extra data'. Pakai
+        # raw_decode supaya hanya objek JSON pertama yang dibaca.
+        teks = r.stdout[r.stdout.rindex('{"81"'):]
+        maps, _ = json.JSONDecoder().raw_decode(teks)
     except Exception as e:
         print('GAGAL baca JSON live:', e)
         return 1
