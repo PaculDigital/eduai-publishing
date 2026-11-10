@@ -316,53 +316,19 @@ async def cari(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
                         'jatah': izin['r']}
             raise
 
-    #  ── Cari lewat SATU mesin resmi ──
-    #  10Nov26: kata kunci yang TIDAK ada di kamus (mis. "pemasaran")
-    #  dulu langsung 0 hasil karena sumber tidak pernah dipanggil.
-    #  Sekarang, kalau kamus tidak mengenali, petakan dulu lewat AI
-    #  (pola yang sama seperti /cari-ai, 1 panggilan, AI hanya menyusun
-    #  kata kunci, artikel tetap dari mesin nyata + audit DOI).
-    #  Kalau AI juga tidak bisa memetakan, jawab jujur di bawah dan
-    #  token dikembalikan seperti pencarian 0 hasil biasa.
+    #  ── Cari lewat SATU mesin resmi, kamus saja ──
+    #  10Nov26 (putusan Boss 11:01): JANGAN pakai AI otomatis di sini,
+    #  karena AI layanan berbayar token. Kalau kamus tidak mengenali
+    #  kata kunci, mesin mengembalikan `belum_dipetakan` dan jawaban di
+    #  bawah menawarkan pencarian AI berbayar. AI baru jalan bila user
+    #  menekan tombol tawarannya di layar.
     prof = _profil_atau_buat(db, fb.id, u.id)
-    _kw_awal = None
     try:
-        from . import pustaka as _pustaka_cari
-        _kw_awal = _pustaka_cari.kata_kunci(kk)
-    except Exception:                                         # noqa: BLE001
-        _kw_awal = None
-    if _kw_awal is not None and not _kw_awal.get('konsep'):
-        _kw_ai: dict = {'konsep': []}
-        try:
-            from . import pustaka as _pustaka_ai
-            _kw_ai = await _pustaka_ai.kata_kunci_ai_async(kk)
-        except Exception as e:                                # noqa: BLE001
-            log.warning('[jurnal] petakan kata kunci gagal: %s', e)
-            _kw_ai = {'konsep': []}
-        if not _kw_ai.get('konsep'):
-            if token_terpotong:
-                from . import kuota as _kuota_ai
-                _kuota_ai.kembalikan_banyak(db, u, token_terpotong)
-            db.commit()
-            return {'ok': False, 'kode': 'tidak_dipetakan',
-                    'pesan': ('EduAi belum bisa memetakan kata kunci ini. '
-                              'Coba tulis kata kuncinya lebih spesifik, '
-                              'misalnya sebut variabelnya langsung.'),
-                    'token_dikembalikan': token_terpotong,
-                    'jatah': _jatah.ringkas(db, u.id)}
-        try:
-            hasil = _jurnal.cari_untuk_bab_konsep(_kw_ai, kk, bab, maks=20)
-        except Exception as e:                                # noqa: BLE001
-            log.warning('[jurnal] pencarian gagal: %s', e)
-            hasil = {'ok': False, 'pesan': 'Pencarian gagal, coba lagi ya.',
-                     'artikel': []}
-    else:
-        try:
-            hasil = _jurnal.cari_untuk_bab('', bab, kk, maks=20)
-        except Exception as e:                                # noqa: BLE001
-            log.warning('[jurnal] pencarian gagal: %s', e)
-            hasil = {'ok': False, 'pesan': 'Pencarian gagal, coba lagi ya.',
-                     'artikel': []}
+        hasil = _jurnal.cari_untuk_bab('', bab, kk, maks=20)
+    except Exception as e:                                    # noqa: BLE001
+        log.warning('[jurnal] pencarian gagal: %s', e)
+        hasil = {'ok': False, 'pesan': 'Pencarian gagal, coba lagi ya.',
+                 'artikel': []}
 
     #  ── Gagal / 0 hasil → token DIKEMBALIKAN (pagar anti-rugi) ──
     dapat = hasil.get('artikel') or []
@@ -371,6 +337,14 @@ async def cari(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
             from . import kuota as _kuota2
             _kuota2.kembalikan_banyak(db, u, token_terpotong)
         db.commit()
+        if hasil.get('belum_dipetakan'):
+            return {'ok': False, 'kode': 'tidak_dipetakan',
+                    'tawarkan_ai': True,
+                    'pesan': ('Kata kunci ini belum dikenali EduAi, jadi '
+                              'belum ada hasil. Mau coba dengan AI? '
+                              'Biaya 1 Token Revisi.'),
+                    'token_dikembalikan': token_terpotong,
+                    'jatah': _jatah.ringkas(db, u.id)}
         return {'ok': False, 'kode': 'tidak_ada_hasil',
                 'pesan': ('Belum ada artikel yang cocok untuk kata kunci itu. '
                           'Coba kata kunci lain ya — tokenmu tidak jadi dipakai.'),
@@ -395,17 +369,21 @@ async def cari(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  3. CARI AUTO AI — GRATIS sampai kerangka (putusan Bos 06Okt26)
+#  3. CARI AUTO AI, GRATIS dari tombol biasa (putusan Bos 06Okt26),
+#     BERBAYAR 1 Token Revisi hanya lewat tawaran (putusan Bos 10Nov26)
 # ══════════════════════════════════════════════════════════════════════
 @router.post('/cari-ai')
 async def cari_ai(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
-                  paksa: bool = False,
+                  paksa: bool = False, pakai_token: bool = False,
                   u: User = Depends(wajib_login_api),
                   db: Session = Depends(get_db)) -> dict[str, Any]:
-    """Pencarian OTOMATIS oleh AI — GRATIS (tidak memakai jatah manual).
+    """Pencarian OTOMATIS oleh AI, jalan saat tombol ditekan.
 
-    Jalan saat tombol ditekan (bukan otomatis). Hasil disimpan per bab
-    dengan penanda `asal='ai'` supaya bisa dibedakan dari artikel manual.
+    Tombol "Carikan artikel" biasa tetap GRATIS (tidak memakai jatah
+    manual). Hanya pencarian lewat TAWARAN di layar sesudah pencarian
+    manual 0 hasil (`pakai_token=1`) yang memotong 1 Token Revisi,
+    sekali, sebelum AI jalan. Token DIKEMBALIKAN bila AI tidak bisa
+    memetakan kata kunci atau tidak ada hasil.
 
     ⭐ 13Okt26 (putusan Bos 2A): `pakai_ai=True` ⇒ kalau KAMUS tidak
     mengenali kata kunci, AI memetakan dulu (1 panggilan). Kalau AI pun
@@ -416,6 +394,30 @@ async def cari_ai(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
     if not kk:
         raise HTTPException(400, detail={'ok': False,
                                         'pesan': 'Isi kata kuncinya dulu ya.'})
+
+    #  ── 10Nov26: potong 1 Token Revisi HANYA bila lewat tawaran ──
+    berbayar = bool(pakai_token)
+    token_ai = 0
+    if berbayar:
+        from . import kuota as _kuota_ai
+        try:
+            potong = _kuota_ai.potong_banyak(db, u, _jatah.HARGA_TOKEN,
+                                             jenis_addon='ai')
+            token_ai = int(potong.get('dipotong') or 0)
+        except HTTPException as e:
+            #  402 dari dompet → teruskan pesan hangat + tawaran AddOn
+            if getattr(e, 'status_code', None) == 402:
+                return {'ok': False, 'kode': 'saldo_kurang',
+                        'tawarkan': 'ADDON',
+                        'pesan': _jatah.pesan_tidak_cukup_saldo(),
+                        'jatah': _jatah.ringkas(db, u.id)}
+            raise
+
+    def _kembali_ai():
+        if token_ai:
+            from . import kuota as _kuota_kembali
+            _kuota_kembali.kembalikan_banyak(db, u, token_ai)
+
     prof = _profil_atau_buat(db, fb.id, u.id)
     from . import pustaka as _pustaka
     #  ⚠️ 13Okt26 — WAJIB petakan kata kunci lewat `await` (event loop
@@ -431,15 +433,21 @@ async def cari_ai(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
             log.warning('[jurnal] petakan kata kunci AI gagal: %s', e)
             sumber_kk = ''
     if not kw.get('konsep'):
+        _kembali_ai()
+        db.commit()
         return {'ok': False, 'kode': 'tidak_dipetakan',
+                'token_dikembalikan': token_ai,
                 'pesan': ('EduAi belum bisa memetakan kata kunci ini. '
                           'Coba tulis kata kuncinya lebih spesifik — '
                           'misalnya sebut variabelnya langsung '
-                          '(contoh: "kualitas layanan" "loyalitas").')}
+                          '(contoh: "kualitas layanan" "loyalitas").')
+                         + (' Tokenmu dikembalikan ya.' if token_ai else '')}
     try:
         hasil = _jurnal.cari_untuk_bab_konsep(kw, kk, bab, maks=20)
     except Exception as e:                                    # noqa: BLE001
         log.warning('[jurnal] pencarian AI gagal: %s', e)
+        _kembali_ai()
+        db.commit()
         raise HTTPException(503, detail={
             'ok': False,
             'pesan': 'Pencarian sedang sibuk, coba lagi sebentar ya.'})
@@ -450,18 +458,25 @@ async def cari_ai(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
         #     sebabnya. Kasus "belum dipetakan" (kata kunci tak dikenali
         #     kamus & AI tak bisa memetakan) DIBEDAKAN — itu bukan salah
         #     user, dan mesin TIDAK boleh mengarang artikel.
+        _kembali_ai()
+        db.commit()
         if hasil.get('belum_dipetakan'):
             return {'ok': False, 'kode': 'tidak_dipetakan',
+                    'token_dikembalikan': token_ai,
                     'pesan': ('EduAi belum bisa memetakan kata kunci ini. '
                               'Coba tulis kata kuncinya lebih spesifik — '
                               'misalnya sebut variabelnya langsung '
-                              '(contoh: "kualitas layanan" "loyalitas").')}
+                              '(contoh: "kualitas layanan" "loyalitas").')
+                             + (' Tokenmu dikembalikan ya.' if token_ai else '')}
         return {'ok': False, 'kode': 'tidak_ada_hasil',
+                'token_dikembalikan': token_ai,
                 'pesan': ('Kata kunci ini belum menemukan artikel di '
                           'database internasional. Coba ubah kata kuncinya, '
                           'atau pakai kata kunci Indonesia untuk jurnal '
-                          'dalam negeri (Garuda). Pencarian ini gratis, '
-                          'tidak mengurangi jatahmu.')}
+                          'dalam negeri (Garuda).')
+                         + (' Tokenmu dikembalikan ya.' if token_ai
+                            else ' Pencarian ini gratis, '
+                                 'tidak mengurangi jatahmu.')}
 
     data = _jurnal.tambah(_jurnal.baca(prof), bab, dapat, asal='ai')
     _jurnal.tulis(prof, data)
@@ -471,7 +486,8 @@ async def cari_ai(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
         'artikel': _jurnal.daftar(data, bab),
         'baru': len(dapat), 'info': hasil.get('info'),
         'sumber_kata_kunci': hasil.get('sumber_kata_kunci', ''),
-        'gratis': True,
+        'gratis': not berbayar,
+        'token_dipotong': token_ai,
         'sisa_slot_manual': _jurnal.sisa_slot_manual(data, bab),
         'jatah': _jatah.ringkas(db, u.id),
     }

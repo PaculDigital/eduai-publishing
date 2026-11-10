@@ -340,6 +340,9 @@ function IKON(nama, uk){
 }
 const BAB_LABEL = {'BAB I':'BAB I','BAB II':'BAB II','BAB III':'BAB III'};
 const MAX_ART = 8;
+//  10Nov26 (putusan Boss 11:01): kata kunci tawaran AI berbayar,
+//  diisi saat pencarian manual mengembalikan `tidak_dipetakan`.
+let KK_TAWARAN = '';
 //  daftar naskah dikirim SERVER (tidak menambah endpoint baru)
 let NASKAH = {{ (daftar_naskah or [])|tojson }};
 
@@ -545,15 +548,21 @@ async function gambarKesempatan(){
   }catch(_){ /* diamkan — bukan hal fatal */ }
 }
 
-async function cariAI(){
+async function cariAI(berbayar){
   const fid = $('naskah-ai').value, bab = $('bab-ai').value, kk = $('kk-ai').value.trim();
   if(!fid){ pesan('Belum ada naskah ya.', 'tidak'); return; }
   if(!kk){ pesan('Isi kata kuncinya dulu ya.', 'tidak'); return; }
   const b = $('btn-ai'); b.disabled = true; b.innerHTML = IKON('sparkles',16) + ' Mencari…';
   pesan('EduAi sedang mencarikan artikel untukmu…', 'ya');
-  const j = await api('cari-ai?file_id='+fid+'&bab='+encodeURIComponent(bab)+'&kata_kunci='+encodeURIComponent(kk), {method:'POST'});
+  //  10Nov26 (putusan Boss 11:01): pencarian AI lewat TAWARAN
+  //  (berbayar) memotong 1 Token Revisi. Tombol biasa tetap gratis.
+  let jalur = 'cari-ai?file_id='+fid+'&bab='+encodeURIComponent(bab)
+    +'&kata_kunci='+encodeURIComponent(kk);
+  if(berbayar){ jalur += '&pakai_token=1'; }
+  const j = await api(jalur, {method:'POST'});
   b.disabled = false; b.innerHTML = IKON('sparkles',16) + ' Carikan artikel';
-  pesan(j.pesan || ('Dapat ' + (j.baru||0) + ' artikel.'), j.ok?'ya':'tidak');
+  pesan(j.pesan || ('Dapat ' + (j.baru||0) + ' artikel'
+        + (j.token_dipotong ? ' (1 Token Revisi)' : '') + '.'), j.ok?'ya':'tidak');
   if(j.ok){ $('kk-man').value = kk; gambarDaftar(j); gambarJatah(j.jatah); }
 }
 
@@ -613,9 +622,32 @@ async function cariManual(){
   pesan('Sedang mencari…', 'ya');
   const j = await api('cari?file_id='+fid+'&bab='+encodeURIComponent(bab)+'&kata_kunci='+encodeURIComponent(kk), {method:'POST'});
   b.disabled = false; b.innerHTML = IKON('search',16) + ' Cari sendiri';
+  //  10Nov26 (putusan Boss 11:01): kata kunci tidak dikenali kamus →
+  //  tawarkan AI berbayar, JANGAN jalan otomatis. Token TIDAK terpotong
+  //  sebelum tombol tawaran ditekan.
+  if(j.kode === 'tidak_dipetakan'){
+    KK_TAWARAN = kk;
+    pesan((j.pesan || 'Belum ada hasil untuk kata kunci ini.')
+      + '<br><button class="tombol" style="margin-top:10px" onclick="cobaDenganAI()">'
+      + IKON('sparkles',15) + ' Coba dengan AI (1 Token Revisi)</button>', 'tidak');
+    return;
+  }
   pesan(j.pesan || ('Dapat ' + (j.baru||0) + ' artikel' +
         (j.jenis === 'gratis' ? ' (tanpa Token)' : ' (1 Token Revisi)')), j.ok?'ya':'tidak');
   if(j.ok){ gambarDaftar(j); gambarJatah(j.jatah); }
+}
+
+/*  10Nov26 (putusan Boss 11:01), tombol tawaran AI berbayar.
+    Baru di sini AI jalan dan token terpotong (1 Token Revisi, sekali).
+    Kata kunci, naskah, dan bab disalin dari kotak "Pencarian kamu". */
+async function cobaDenganAI(){
+  const kk = (KK_TAWARAN || $('kk-man').value || '').trim();
+  if(!kk){ pesan('Isi kata kuncinya dulu ya.', 'tidak'); return; }
+  $('kk-ai').value = kk;
+  if($('naskah-man').value){ $('naskah-ai').value = $('naskah-man').value; }
+  if($('bab-man').value){ $('bab-ai').value = $('bab-man').value; }
+  KK_TAWARAN = '';
+  cariAI(true);
 }
 
 async function tambahManual(){
