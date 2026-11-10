@@ -51,7 +51,12 @@ AMBANG_TANYA = 0.50
 #     · **nama pertanyaan BEBAS** apa saja (tidak dikirim ke model)
 #     · **TIPE hanya 3**: `noul` · `choice` · `score`
 #     · **`criteria` WAJIB PER-TIPE — ini akar 503 semu 07 Okt 2026:**
-#         noul   → ⛔ **TIDAK BOLEH ada `criteria`** (bentuk apa pun ⇒ 400)
+#         noul   → **OPSIONAL, WAJIB OBJEK** {'true': …, 'false': …} kalau ada
+#                 (dokumen RESMI TypeSafe: Noul menerima `criteria` sebagai
+#                 "optional clarification of what yes and no mean" — yang
+#                 SALAH 07 Okt 2026 adalah BENTUKNYA (string), bukan fieldnya;
+#                 lihat `app/jev.py::periksa_skema`, terukur 09 Okt 2026:
+#                 noul + criteria OBJEK = OK, noul + criteria STRING = 502)
 #         choice → **OBJEK**  {'opsi': 'deskripsi opsi'}
 #         score  → **ARRAY**  ['tingkat 0', 'tingkat 1', …]   (2–10 tingkat)
 #
@@ -335,11 +340,16 @@ def _json_awal(teks: str) -> Any:
 def _periksa_skema(pertanyaan: dict[str, Any]) -> list[str]:
     """PAGAR SKEMA JEV — cegah `criteria` salah bentuk masuk (07 Okt 2026).
 
-    ATURAN (terukur ke `/systemone` langsung, sumber: skill `typesafe-jev`):
-        noul   → ⛔ TIDAK BOLEH ada `criteria`
+    ATURAN (dokumen RESMI TypeSafe + terukur ke `/systemone`):
+        noul   → `criteria` OPSIONAL; kalau ada WAJIB OBJEK {'true': …, 'false': …}
+                 (string/list ⇒ 400/502 — itulah akar 503 semu 07 Okt 2026:
+                 contoh gagalnya memakai `criteria` STRING, bukan objek)
         choice → `criteria` WAJIB, bentuk OBJEK {'opsi': 'deskripsi'}
         score  → `criteria` WAJIB, bentuk ARRAY ['tkt0', 'tkt1', …] (2–10)
     Tipe lain → DILARANG. Nama & jumlah pertanyaan BEBAS.
+    Selaras dengan `app/jev.py::periksa_skema` (jalur tol yang dipakai
+    produksi) — dulu pagar ini LEBIH KETAT dari dokumen resmi dan dari
+    `jev.py`, sehingga menolak pertanyaan noul + criteria OBJEK yang sah.
 
     Balik: daftar keluhan (kosong = sah). Pemanggil WAJIB gagal-cepat
     (raise) supaya 503 semu tidak pernah terjadi lagi.
@@ -355,10 +365,17 @@ def _periksa_skema(pertanyaan: dict[str, Any]) -> list[str]:
         punya_criteria = 'criteria' in q
         if tipe == 'noul':
             if punya_criteria:
-                keluhan.append(
-                    f'{nama}: type noul TIDAK BOLEH punya `criteria` '
-                    f'(dapat {type(q["criteria"]).__name__}) — inilah penyebab '
-                    f'HTTP 503 semu. Hapus field `criteria`.')
+                c = q['criteria']
+                if not isinstance(c, dict):
+                    keluhan.append(
+                        f'{nama}: noul `criteria` WAJIB OBJEK '
+                        f'{{"true": …, "false": …}} (dapat '
+                        f'{type(c).__name__}) — bentuk inilah penyebab '
+                        f'HTTP 503 semu. Ubah jadi objek atau hapus fieldnya.')
+                elif not ({'true', 'false'} & set(c.keys())):
+                    keluhan.append(
+                        f'{nama}: noul `criteria` WAJIB memuat kunci '
+                        f'`true` dan/atau `false`.')
         elif tipe == 'choice':
             if not punya_criteria:
                 keluhan.append(f'{nama}: type choice WAJIB punya `criteria` '

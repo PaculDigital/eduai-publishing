@@ -76,9 +76,15 @@ LABEL_JUDUL = ('bab', 'subbab')
 MAKS_TANYA = 24          # kandidat per panggilan (batas aman teruji 156; ini hemat)
 MAKS_TANYA_TOTAL = 48    # batas pertanyaan sempit per peta — selebihnya 'belum'
 
-#  Titik tengah netral skala noul 0..1 (BUKAN ambang yang disetel per naskah).
-#  Di bawah 0,5 = Jev sendiri tidak yakin ⇒ 'ragu'. Di atasnya ⇒ 'sepakat'.
-AMBANG_RAGU = 0.5
+#  Ambang 'ragu' skala noul 0..1 (dokumen RESMI TypeSafe, halaman Noul):
+#  "A good starting point is 0.7 for yes and 0.3 for no. ... Values
+#  between 0.3 and 0.7 can go to a person rather than either code path."
+#  Dulu 0,5 (titik tengah netral) — akibatnya noul 0,5–0,7 yang menurut
+#  dokumen resmi masih pita tengah (layak diperiksa manusia) sudah
+#  dibaca 'sepakat'. Sekarang < 0,7 ⇒ 'ragu' (masuk antrean manusia),
+#  ≥ 0,7 ⇒ 'sepakat'. Hakim tetap LOG SAJA, tidak memblokir — perubahan
+#  ini hanya menambah bendera ragu, bukan vonis baru.
+AMBANG_RAGU = 0.7
 
 #  ── daftar TERTUTUP header output SPSS (salinan daftar di peta3_jev.py —
 #     ubah keduanya bila daftar berubah; hanya exact-match, huruf kecil).

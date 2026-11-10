@@ -132,9 +132,24 @@ def _tidur_adaptif(t0, dasar=None):
 BATAS_TANYA = 120
 BATAS_KAR = 18000
 AMBANG_CAPTION = 70
+# ── KRITERIA (dokumen RESMI TypeSafe, halaman Choice) ──────────────────
+#    "Start with a one-line description per option. When two options are
+#    similar and the model keeps confusing them, describe each one with
+#    an object instead of a string. Give it fields for what the option
+#    covers, what belongs to a neighboring option instead, and a few
+#    example inputs."
+#    `bab` vs `subbab` TERUKUR tertukar (goyang: Asih 23, fid=115 puluhan)
+#    ⇒ keduanya bentuk OBJEK `what`/`not_for`. `paragraf`/`biasa` tetap
+#    satu baris (tidak tertukar). Nama field bebas (bukan bagian API).
 KRITERIA = {
-    'bab': 'Awal BAB (mis. BAB I, BAB II)',
-    'subbab': 'Awal SUB-BAB (mis. 1.1, 2.1.3, atau judul bagian)',
+    'bab': {'what': 'Awal BAB baru — judul tingkat tertinggi naskah '
+                    '(mis. BAB I, BAB II, BAB III)',
+            'not_for': 'Bukan sub-bab bernomor (1.1, 2.1.3), bukan awal '
+                       'paragraf, bukan lanjutan kalimat'},
+    'subbab': {'what': 'Awal SUB-BAB — judul bagian di dalam bab '
+                       '(mis. 1.1, 2.1.3, atau judul bagian tanpa nomor)',
+               'not_for': 'Bukan BAB (BAB I, BAB II), bukan awal paragraf '
+                          'biasa, bukan lanjutan kalimat'},
     'paragraf': 'Awal PARAGRAF BARU (kalimat pertama paragraf)',
     'biasa': 'Lanjutan/biasa (bukan awal apa pun)',
 }
@@ -495,11 +510,22 @@ def _stitch_baris(teks, tanya_fn=None):
             perlu = sorted({a for a, _ in sub} | {b for _, b in sub})
             state = '\n'.join('L%04d| %s' % (n, (blok[n].get('text') or '')[:200])
                               for n in perlu)
-            tanya = {('L%04d' % b): {'instructions':
-                     ('Does line L%04d pick up mid-sentence, continuing a '
-                      'sentence left unfinished at the end of line L%04d?'
-                      % (b, a)), 'type': 'noul'}
-                     for a, b in sub}
+            # ── KUTIP KEDUA BARIS (dokumen RESMI TypeSafe, cookbook
+            #    'Structure recovery' Pass 1): "quotes both lines, so the
+            #    model judges the exact text in question rather than
+            #    finding it by id". Pasangan lintas-kosong SEDIKIT per
+            #    naskah, jadi kutipan [:200] tidak mengancam context rot.
+            tanya = {}
+            for a, b in sub:
+                _ta = (blok[a].get('text') or '').strip()[:200]
+                _tb = (blok[b].get('text') or '').strip()[:200]
+                tanya['L%04d' % b] = {
+                    'instructions':
+                        ('Does line L%04d pick up mid-sentence, continuing a '
+                         'sentence left unfinished at the end of line L%04d? '
+                         'Line L%04d: "%s". Line L%04d: "%s".'
+                         % (b, a, a, _ta, b, _tb)),
+                    'type': 'noul'}
             try:
                 jawab = tanya_fn(state, tanya) or {}
             except Exception:

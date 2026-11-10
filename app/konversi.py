@@ -943,6 +943,25 @@ def _kandidat_sambung(baris: list) -> list:
     return kand
 
 
+def _tanya_sambung(n: int, sebelum: str, sesudah: str) -> dict:
+    """Satu pertanyaan Noul stitch — KUTIP KEDUA BARIS.
+
+    Dokumen RESMI TypeSafe, cookbook 'Structure recovery' (Pass 1):
+    pertanyaan stitch "quotes both lines, so the model judges the exact
+    text in question rather than finding it by id among 28 lines".
+    Dulu instruksi hanya menyebut ID baris — model harus mencari teksnya
+    di state (sampai 240 baris per panggilan). Sekarang teksnya dikutip
+    langsung di instruksi. AMAN dari context rot: kandidat stitch selalu
+    ≤60 kar per baris (`_KANDIDAT_MAKS_KAR`), jadi kutipan menambah
+    ≤120 kar per pertanyaan.
+    """
+    return {'instructions':
+            (f'Does line L{n:04d} pick up mid-sentence, continuing a '
+             f'sentence left unfinished at the end of line L{n - 1:04d}? '
+             f'Line L{n - 1:04d}: "{sebelum}". Line L{n:04d}: "{sesudah}".'),
+            'type': 'noul'}
+
+
 def _pecah_blok(teks: str) -> list:
     """PASS 1 — Jev MENYAMBUNG baris terbelah → daftar blok.
 
@@ -997,10 +1016,7 @@ def _pecah_blok(teks: str) -> list:
         #  itu SATU-SATUNYA tetangga yang perlu; sisanya tak dikirim.
         perlu = sorted({n - 1 for n in sub} | set(sub))
         state = '\n'.join(f'L{n:04d}| {baris[n][:200]}' for n in perlu)
-        tanya = {f'L{n:04d}': {'instructions':
-                 (f'Does line L{n:04d} pick up mid-sentence, '
-                  f'continuing a sentence left unfinished at the end of '
-                  f'line L{n - 1:04d}?'), 'type': 'noul'}
+        tanya = {f'L{n:04d}': _tanya_sambung(n, baris[n - 1], baris[n])
                  for n in sub}
         if not tanya:
             continue

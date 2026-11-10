@@ -148,6 +148,16 @@ def _muat_peta3():
     return m
 
 
+def _muat_asli(nama, jalur):
+    """Muat modul ASLI (satpam/konversi) dengan nama berbeda — modulnya
+    hanya impor stdlib di tingkat atas, jadi aman dimuat meski `app.*`
+    di-stub untuk peta3_jev."""
+    spec = importlib.util.spec_from_file_location(nama, str(jalur))
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
 def main():
     P = _muat_peta3()
     import app.hakim_peta as H
@@ -466,6 +476,58 @@ def main():
     P._tidur_adaptif(t0, dasar=0.05)
     cek('jeda adaptif: panggilan cepat -> tidur sisa jarak',
         0.03 < time.time() - mulai < 0.3)
+
+    # ── 6. SELARAS DOKUMEN RESMI TYPESAFE (v5.4) ─────────────────────────
+    #    Sumber: https://docs.typesafe.ai/primitives (+ /choice, /noul,
+    #    /confidence, /cookbooks/autoformat) — dibaca 10 Nov 2026.
+    S = _muat_asli('app.satpam_asli', ROOT / 'app' / 'satpam.py')
+    cek('dokumen: noul TANPA criteria sah',
+        S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x'}}) == [])
+    cek('dokumen: noul + criteria OBJEK {true,false} sah (dulu ditolak)',
+        S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x',
+                                'criteria': {'true': 'ya, sambung',
+                                             'false': 'tidak, putus'}}}) == [])
+    cek('dokumen: noul + criteria STRING tetap ditolak (akar 503 semu 07 Okt)',
+        len(S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x',
+                                   'criteria': 'Ya bila sambung'}})) == 1)
+    cek('dokumen: noul + criteria LIST ditolak',
+        len(S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x',
+                                   'criteria': ['ya', 'tidak']}})) == 1)
+    cek('dokumen: noul + criteria OBJEK tanpa true/false ditolak',
+        len(S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x',
+                                   'criteria': {'ya': 'sambung'}}})) == 1)
+    cek('dokumen: choice TANPA criteria tetap ditolak',
+        len(S._periksa_skema({'q': {'type': 'choice',
+                                   'instructions': 'x'}})) == 1)
+    cek('dokumen: choice + criteria OBJEK sah',
+        S._periksa_skema({'q': {'type': 'choice', 'instructions': 'x',
+                                'criteria': {'a': 'opsi A'}}}) == [])
+
+    K = _muat_asli('app.konversi_asli', ROOT / 'app' / 'konversi.py')
+    _tq = K._tanya_sambung(5, 'Latar belakang penelitian ini',
+                          'membahas pemasaran digital.')
+    cek('dokumen: pertanyaan stitch mengutip KEDUA baris (bukan hanya ID)',
+        _tq['type'] == 'noul'
+        and 'Latar belakang penelitian ini' in _tq['instructions']
+        and 'membahas pemasaran digital.' in _tq['instructions'])
+    H._TANYA_FN = lambda bahan, tanya: {k: {'noul': 0.6} for k in tanya}
+    lap = H.periksa_peta(kalimat)
+    cek('dokumen: Hakim noul 0,6 (pita tengah 0,3-0,7) -> ragu, bukan sepakat',
+        lap['jumlah_ragu'] == 1 and lap['bagian'][1]['status'] == 'ragu')
+    H._TANYA_FN = lambda bahan, tanya: {k: {'noul': 0.9} for k in tanya}
+    lap = H.periksa_peta(kalimat)
+    cek('dokumen: Hakim noul 0,9 (>= 0,7) tetap sepakat',
+        lap['jumlah_sepakat'] == 2)
+    H._TANYA_FN = None
+    cek('dokumen: criteria bab/subbab bentuk OBJEK what/not_for',
+        isinstance(P.KRITERIA.get('bab'), dict)
+        and set(P.KRITERIA['bab']) >= {'what', 'not_for'}
+        and isinstance(P.KRITERIA.get('subbab'), dict)
+        and set(P.KRITERIA['subbab']) >= {'what', 'not_for'})
+    cek('dokumen: criteria tetap 4 opsi, paragraf/biasa satu baris',
+        set(P.KRITERIA) == {'bab', 'subbab', 'paragraf', 'biasa'}
+        and isinstance(P.KRITERIA['paragraf'], str)
+        and isinstance(P.KRITERIA['biasa'], str))
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
