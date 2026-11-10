@@ -464,6 +464,22 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
 .fd-lapis{position:fixed;inset:0;background:rgba(28,27,34,.42);display:none;
   align-items:center;justify-content:center;z-index:50;padding:18px}
 .fd-lapis.tampil{display:flex}
+
+/* --- dialog yakin di dalam halaman (ganti confirm bawaan) --- */
+#yk-tirai{position:fixed;inset:0;background:rgba(20,18,26,.55);display:none;
+  place-items:center;z-index:200;padding:22px}
+#yk-tirai.tampil{display:grid}
+#yk-tirai .dialog{background:#fff;border-radius:18px;padding:28px 26px;max-width:420px;width:100%;
+  text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+#yk-tirai .dialog h3{font-size:18px;font-weight:800;margin-bottom:9px}
+#yk-tirai .dialog p{font-size:14px;color:var(--teks-abu);line-height:1.65;margin-bottom:20px;white-space:pre-line}
+#yk-tirai .dialog .tombol{display:flex;gap:10px}
+#yk-tirai .dialog button{flex:1;padding:12px;border-radius:70px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:inherit;border:none;transition:.2s}
+#yk-tirai .dialog .batal{background:#F2F2F4;color:var(--teks)}
+#yk-tirai .dialog .batal:hover{background:#E7E7EA}
+#yk-tirai .dialog .ya{background:#E5484D;color:#fff}
+#yk-tirai .dialog .ya:hover{background:#C93A3F}
 .fd-kartu{background:#fff;border-radius:16px;padding:20px;width:100%;
   max-width:380px;box-shadow:0 18px 50px rgba(0,0,0,.22)}
 .fd-kartu h3{font-size:16px;margin:0 0 15px}
@@ -885,7 +901,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
       <div class="fd-aksi">
         <button type="button" class="fd-mini2" onclick="fdBukaUbah({{ fd.id }}, '{{ fd.nama|e }}', '{{ fd.warna }}', '{{ fd.ikon }}')">Ubah</button>
         <form method="post" action="/folder/hapus" style="display:inline"
-              onsubmit="return confirm('Hapus folder {{ fd.nama|e }}? Dokumen di dalamnya TIDAK terhapus — akan dipindah ke Tanpa folder.')">
+              data-nama="{{ fd.nama|e }}" onsubmit="return mintaHapusFolder(this)">
           <input type="hidden" name="folder_id" value="{{ fd.id }}">
           <button type="submit" class="fd-mini2 fd-hapus">Hapus folder</button>
         </form>
@@ -911,7 +927,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
         <span class="fd-berkas-ukuran">{{ '%.1f'|format(f.ukuran / 1024 / 1024) }} MB</span>
         {% if folder %}
         <select class="fd-pilih" onchange="fdPindah({{ f.id }}, this.value)">
-          <option value="">Pindahkan ke…</option>
+          <option value="__pilih__" selected>Pindahkan ke…</option>
           {% for fd in folder %}
           <option value="{{ fd.id }}">{{ fd.nama }}</option>
           {% endfor %}
@@ -950,6 +966,15 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
         {% endif %}
         <a href="/unduh/{{ f.id }}">{{ ikon('download', 15) }} Unduh</a>
         <button onclick="bukaProfilNaskah({{ f.id }})">{{ ikon('book-open', 15) }} Profil</button>
+        {% if folder %}
+        <select class="fd-pilih" title="Pindahkan ke folder" onchange="fdPindah({{ f.id }}, this.value)">
+          <option value="__pilih__" selected>Pindahkan ke…</option>
+          {% for fd in folder %}
+          <option value="{{ fd.id }}">{{ fd.nama }}</option>
+          {% endfor %}
+          <option value="__luar__">Tanpa folder</option>
+        </select>
+        {% endif %}
         <button class="hapus" onclick="hapusBerkas({{ f.id }}, '{{ f.nama|e }}')">{{ ikon('trash-2', 15) }} Hapus</button>
       </div>
     </div>
@@ -965,6 +990,19 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
 </div>
 
 <div id="notif"></div>
+
+{# ── DIALOG YAKIN di dalam halaman (ganti confirm bawaan, 10Nov26) ──
+   Dipakai hapus berkas, hapus folder, dan tutup semua sesi. #}
+<div id="yk-tirai">
+  <div class="dialog">
+    <h3 id="yk-judul">Yakin?</h3>
+    <p id="yk-teks"></p>
+    <div class="tombol">
+      <button class="batal" type="button" id="yk-batal">Batal</button>
+      <button class="ya" type="button" id="yk-ya">Ya, lanjutkan</button>
+    </div>
+  </div>
+</div>
 
 {# ── MODAL BUAT / UBAH FOLDER (ACC Bos 15Sep26) ── #}
 <div class="fd-lapis" id="fd-lapis">
@@ -1054,8 +1092,50 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') { fdTutup(); }
 });
 
+/* ── DIALOG YAKIN di dalam halaman (10Nov26) ──────────────────────────
+   KENAPA: confirm() bawaan tidak muncul di browser otomatis / WebView
+   tertentu, jadi klik Hapus, Hapus folder, dan Tutup Semua diam saja
+   tanpa pesan dan tanpa jalan. Dialog ini bagian dari halaman, jadi
+   selalu tampil. Polanya sama dengan dialog hapus permanen di sampah.html.
+   Mengembalikan Promise<boolean>: true kalau user menekan Ya. */
+var _ykSelesai = null;
+function tanyaYakin(judul, teks, teksYa) {
+  document.getElementById('yk-judul').textContent = judul;
+  document.getElementById('yk-teks').textContent = teks;
+  document.getElementById('yk-ya').textContent = teksYa || 'Ya, lanjutkan';
+  document.getElementById('yk-tirai').classList.add('tampil');
+  return new Promise(function (selesai) { _ykSelesai = selesai; });
+}
+function tutupYakin(hasil) {
+  document.getElementById('yk-tirai').classList.remove('tampil');
+  if (_ykSelesai) { var f = _ykSelesai; _ykSelesai = null; f(hasil); }
+}
+document.getElementById('yk-ya').onclick = function () { tutupYakin(true); };
+document.getElementById('yk-batal').onclick = function () { tutupYakin(false); };
+document.getElementById('yk-tirai').onclick = function (e) {
+  if (e.target === this) { tutupYakin(false); }
+};
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && _ykSelesai) { tutupYakin(false); }
+});
+
+/* Hapus folder lewat dialog di dalam halaman (bukan confirm bawaan).
+   Dipanggil dari onsubmit form; form.submit() asli tidak memicu
+   onsubmit lagi, jadi tidak berputar. */
+function mintaHapusFolder(form) {
+  var nama = form.getAttribute('data-nama') || 'folder ini';
+  tanyaYakin('Hapus folder?',
+    'Hapus folder "' + nama + '"? Dokumen di dalamnya TIDAK terhapus, akan dipindah ke Tanpa folder.',
+    'Ya, hapus folder').then(function (ok) {
+    if (ok) { form.submit(); }
+  });
+  return false;
+}
+
 /* Pindahkan dokumen ke folder (atau keluarkan kalau folderId kosong). */
 function fdPindah(fileId, folderId) {
+  if (folderId === '__pilih__') { return; }
+  if (folderId === '__luar__') { folderId = null; }
   fetch('/folder/pindah', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1239,9 +1319,12 @@ function tampilAjakUpgrade(sebab) {
 async function hapusBerkas(id, nama) {
   // KONFIRMASI (ACC Bos 14Sep26): cegah salah klik. Dokumen masuk Tong
   // Sampah dulu — masih bisa dipulihkan {{ sampah_hari }} hari.
-  const ok = confirm('Pindahkan "' + nama + '" ke Tong Sampah?\\n\\n'
-    + 'Dokumen TIDAK langsung hilang. Masih bisa dipulihkan selama '
-    + '{{ sampah_hari }} hari di Tong Sampah.');
+  // 10Nov26: dialog di dalam halaman, bukan confirm() bawaan yang
+  // tidak muncul di browser otomatis / WebView tertentu.
+  const ok = await tanyaYakin('Pindahkan ke Tong Sampah?',
+    'Pindahkan "' + nama + '" ke Tong Sampah?\n\nDokumen TIDAK langsung hilang. Masih bisa dipulihkan selama '
+    + '{{ sampah_hari }} hari di Tong Sampah.',
+    'Ya, pindahkan');
   if (!ok) return;
   try {
     const r = await fetch('/hapus/' + id, { method: 'POST' });
@@ -1256,7 +1339,11 @@ async function hapusBerkas(id, nama) {
 // ── Tutup SEMUA sesi editor dari halaman daftar (permintaan Bos 12Sep26) ──
 // Server akan forcesave tiap dokumen dulu supaya hasil edit tidak hilang.
 async function tutupSemuaSesi(tombol) {
-  if (!confirm('Simpan & tutup semua dokumen yang sedang terbuka di editor?')) return;
+  // 10Nov26: dialog di dalam halaman, bukan confirm() bawaan.
+  const ok = await tanyaYakin('Tutup semua dokumen?',
+    'Simpan dan tutup semua dokumen yang sedang terbuka di editor?',
+    'Ya, simpan dan tutup');
+  if (!ok) return;
   tombol.disabled = true;
   const teksAsli = tombol.textContent;
   tombol.textContent = 'Menyimpan...';
