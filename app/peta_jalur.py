@@ -33,6 +33,11 @@ def putuskan_jalur(peta_surveyor: dict[str, Any] | None) -> tuple[str, str]:
     if not isinstance(peta_surveyor, dict):
         return 'fallback', f'bentuk tidak sah: {type(peta_surveyor).__name__}'
 
+    #  ── JEV MATI TOTAL (10 Nov 2026): semua gelombang gagal ⇒ JANGAN
+    #     pakai peta 'biasa' semua — itu degradasi senyap, bukan peta.
+    if peta_surveyor.get('jev_mati'):
+        return 'fallback', 'surveyor gagal total (Jev mati)'
+
     label = peta_surveyor.get('label')
     if not isinstance(label, dict) or not label:
         return 'fallback', 'peta tanpa label'

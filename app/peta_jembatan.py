@@ -30,7 +30,9 @@ PAGAR (WAJIB, jangan dilanggar):
         kunci: section_id · section_title · kategori · char_count · isi_teks.
     P4  `nomor` sub-bab dinormalkan SAMA gaya lama (`title_for`/`get_category_for`).
 
-STATUS: BARU 09 Okt 2026 — belum dipasang ke pemakai mana pun (uji dulu).
+STATUS: TERPASANG 14 Okt 2026 — dipakai `app/ai.py::peta_mulai` (jalur JEV)
+        dan `app/versi.py::_deteksi_bagian` (pintu layar).
+        (Catatan usang "belum dipasang" diperbaiki 10 Nov 2026.)
 ═══════════════════════════════════════════════════════════════════════════
 """
 from __future__ import annotations

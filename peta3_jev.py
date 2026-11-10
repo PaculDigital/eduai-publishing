@@ -10,11 +10,108 @@ OBAT (bukan menyempitkan Jev): bagi kandidat jadi GELOMBANG ≤ BATAS_AMAN tanya
 
 GELOMBANG: BATAS_TANYA = 120 · BATAS_KAR = 18.000 (di bawah batas aman 156/20.622).
 """
-import sys, json, time, re, os
+import sys, json, time, re, os, hashlib, logging
+from collections import OrderedDict
 sys.path.insert(0, '/app')
 from app.ai import SessionLocal, _teks_dari_berkas, UPLOAD_DIR
 from app.models import FileBerkas
 from app import satpam, state
+
+log = logging.getLogger(__name__)
+
+# ── VERSI ATURAN (10 Nov 2026, v3-stitch) ────────────────────────────────
+#    Kunci cache peta: ubah string ini SETIAP KALI aturan di berkas ini
+#    berubah (stitch, ambang, Aturan 2/4/5/6, D1) ⇒ cache lama kedaluwarsa
+#    otomatis, tidak pernah ada peta basi dari aturan lama.
+RULE_VERSION = 'jev-peta-v3-stitch'
+
+# ── SAKLAR (env, tanpa ubah kode) ────────────────────────────────────────
+#    EDUAI_JEV_STITCH=0      ⇒ matikan pass-1 stitch (susun cara lama)
+#    EDUAI_JEV_TANYA_ULANG=0 ⇒ matikan tanya-ulang bertarget (goyang/p)
+#    EDUAI_JEV_CACHE_MAX=N   ⇒ jumlah peta yang disimpan di cache (bawaan 8)
+#    EDUAI_JEV_JEDA_DASAR=X  ⇒ jarak ANTAR AWAL panggilan gelombang (detik,
+#                               bawaan 0,7 — lihat _tidur_adaptif)
+def _env_int(nama, bawaan):
+    try:
+        return int(os.getenv(nama) or bawaan)
+    except ValueError:
+        return bawaan
+
+
+def _env_float(nama, bawaan):
+    try:
+        return float(os.getenv(nama) or bawaan)
+    except ValueError:
+        return bawaan
+
+
+def _stitch_aktif():
+    return (os.getenv('EDUAI_JEV_STITCH') or '1') != '0'
+
+
+def _tanya_ulang_aktif():
+    return (os.getenv('EDUAI_JEV_TANYA_ULANG') or '1') != '0'
+
+
+def _jeda_dasar():
+    return _env_float('EDUAI_JEV_JEDA_DASAR', 0.7)
+
+
+# ── CACHE PETA (10 Nov 2026) ─────────────────────────────────────────────
+#    Naskah yang sama dipetakan berkali-kali (peta_awal, deteksi bagian di
+#    layar, konversi) — dulu tiap kali panggil Jev dari nol. Sekarang hasil
+#    disimpan per sidik (hash teks + versi aturan + putaran), di memori proses
+#    saja (container restart = cache hilang, aman). Batas 8 entri (LRU).
+_CACHE_PETA: OrderedDict = OrderedDict()
+
+
+def _cache_maks():
+    return max(0, _env_int('EDUAI_JEV_CACHE_MAX', 8))
+
+
+def _kunci_cache(teks, putaran):
+    sidik = hashlib.sha256((teks or '').encode('utf-8')).hexdigest()
+    return (sidik, RULE_VERSION, putaran)
+
+
+def _cache_ambil(kunci):
+    if _cache_maks() <= 0:
+        return None
+    hasil = _CACHE_PETA.get(kunci)
+    if hasil is None:
+        return None
+    _CACHE_PETA.move_to_end(kunci)
+    return dict(hasil)          # salinan dangkal — pemanggil tak boleh ubah asli
+
+
+def _cache_simpan(kunci, hasil):
+    maks = _cache_maks()
+    if maks <= 0 or hasil is None:
+        return
+    _CACHE_PETA[kunci] = hasil
+    _CACHE_PETA.move_to_end(kunci)
+    while len(_CACHE_PETA) > maks:
+        _CACHE_PETA.popitem(last=False)
+
+
+def _tidur_adaptif(t0, dasar=None):
+    """Jeda ADAPTIF antar gelombang (10 Nov 2026, ganti sleep 0,7 tetap).
+
+    Dulu: tiap gelombang tidur 0,7 detik DITAMBAH waktu panggil (40 gelombang
+    × (0,6 panggil + 0,7 tidur) ≈ 52 detik, 28 detik di antaranya diam).
+    Sekarang: jarak ANTAR AWAL panggilan dijaga ≥ `dasar` detik — kalau
+    panggilannya sendiri sudah ≥ dasar (server lambat), TIDAK tidur sama
+    sekali. Panggilan cepat (0,6 dtk) ⇒ tidur 0,1 dtk; total 40 gelombang
+    ≈ 28 detik. Jeda ini BUKAN tebak: `dasar` bawaan 0,7 = nilai lama yang
+    sudah terbukti aman terhadap 503, hanya tidak lagi ditumpuk di atas
+    waktu panggil. Uji live tetap perlu mengukur latensi nyata.
+    """
+    if dasar is None:
+        dasar = _jeda_dasar()
+    sisa = dasar - (time.time() - t0)
+    if sisa > 0:
+        time.sleep(sisa)
+
 
 BATAS_TANYA = 120
 BATAS_KAR = 18000
@@ -162,6 +259,194 @@ def dibuang(s):
     return False
 
 
+# ── POLA NOMOR BERTINGKAT (10 Nov 2026) ────────────────────────────────
+#    Baris bernomor bertingkat ("1.1 Latar Belakang", "2.3.1 Metode") DIBACA
+#    KODE SAJA, tidak dikirim ke Jev: nomornya sendiri sudah menandai
+#    kedudukan di kerangka. Syarat KETAT (jangan longgarkan tanpa ukur):
+#    angka bertingkat + teks diawali huruf BESAR + ≤120 kar + tidak diakhiri
+#    '?' (butir bertanya) atau '.' (kalimat). Yang TIDAK memenuhi syarat
+#    tetap jadi kandidat Jev (mis. "1.1 latar belakang" huruf kecil,
+#    "2. Wawancara" nomor tunggal — kode tak bisa bedakan dari butir daftar).
+_POLA_NOMOR_BERTINGKAT = re.compile(r'^(\d+(?:\.\d+)+)\s+(\S.*)$')
+
+
+def _ambang(nama, bawaan):
+    """Ambang aturan dari profil kampus (config), fallback ke bawaan.
+
+    Angka aturan (mis. judul >300 kar) BUKAN hardcode — dibaca dari
+    `profil/kampus.json` bila ada. Gagal baca ⇒ bawaan (jangan gagalkan).
+    """
+    try:
+        from app import profil_kampus as _pk
+        return int(_pk.aturan().get(nama) or bawaan)
+    except Exception:
+        return bawaan
+
+
+def _huruf_awal_kecil(s):
+    """True bila HURUF pertama judul huruf kecil (awalan nomor dikupas dulu:
+    '1.1 latar belakang' = huruf kecil, '1.1 Latar' bukan). Tanpa kupasan
+    ini, judul bernomor yang huruf kecil lolos dari Aturan 5 (angka '1'
+    bukan huruf kecil — bug terukur 10 Nov 2026)."""
+    t = re.sub(r'^\d+(?:\.\d+)*\s*', '', (s or '').strip())
+    return bool(t) and t[:1].islower()
+
+
+def _nomor_bertindak_judul(s):
+    """True bila baris bernomor bertingkat ini PASTI judul sub-bab (kode)."""
+    m = _POLA_NOMOR_BERTINGKAT.match(s.strip())
+    if not m:
+        return False
+    teks = m.group(2)
+    if len(s.strip()) > _ambang('subbab_kode_maks_kar', 120):
+        return False
+    if teks.endswith('?') or teks.endswith('.'):
+        return False
+    return teks[:1].isupper()
+
+
+# ── PASS-1 STITCH (10 Nov 2026 — dipasang ke repo, dulu hanya di server) ──
+#    REKONSILIASI (bukti dari kode, 10 Nov 2026):
+#      · 10 Okt 2026 Bos memasang stitch di `peta3_jev.py` dan Wulan
+#        memverifikasi LULUS di server (kandidat 8.555 → 1.524) — TAPI
+#        versi itu TIDAK PERNAH masuk git main: `git log -S stitch` kosong,
+#        `peta3_jev.py` di main 0412330 TIDAK memuat `_stitch_baris` sama
+#        sekali, dan salinan workspace pun identik (md5 sama). Deploy 10 Nov
+#        membangun image dari main ⇒ stitch di server ikut HILANG.
+#      ⇒ Audit 10 Nov ("stitch hilang") BENAR untuk kode produksi di repo;
+#        catatan 10 Okt BENAR untuk salinan server saat itu. Di sinilah
+#        stitch dipasang KEMBALI, kali ini di repo, dengan 3 pagar + obat
+#        baris-kosong fid=104 yang dulu masih terbuka.
+#    CARA: pakai alat produksi yang sudah ada (`app/konversi._pecah_blok`,
+#    JANGAN bikin baru) + satu pass tambahan untuk pasangan lintas
+#    baris-kosong (Jev TERBUKTI BISA menilai, uji 10 Okt: 12.527/12.527
+#    terjawab, 7 dari 8 zona abu memang harus disambung).
+def _perbaiki_gabung_bab(blok):
+    """Pisah kembali blok yang menelan judul BAB ("BAB I PENDAHULUAN").
+
+    Stitch TIDAK BOLEH melewati garis BAB: gabung judul BAB sudah ada
+    jalurnya sendiri (`susun()` → `gabung`). Kalau satu blok berisi
+    "BAB I" + judulnya, pecah jadi dua blok (deterministik, tanpa Jev).
+    """
+    keluar = []
+    for b in blok:
+        m = re.match(r'^(BAB\s+[IVX0-9]+)\s+(\S.*)$', (b.get('text') or '').strip(), re.I)
+        if m and b.get('lines'):
+            garis = list(b.get('lines') or [])
+            keluar.append({'text': m.group(1), 'lines': garis[:1], 'kosong': False})
+            keluar.append({'text': m.group(2), 'lines': garis[1:] or garis[:1],
+                           'kosong': False})
+        else:
+            keluar.append(b)
+    return keluar
+
+
+def _stitch_baris(teks, tanya_fn=None):
+    """PASS-1: sambung baris terbelah jadi blok. Kembalikan TEKS (bukan blok).
+
+    3 PAGAR (jangan dilepas — pagar ③ terbukti bekerja di fid=104):
+      ① Jev mati / `_pecah_blok` galat / kosong ⇒ pakai teks APA ADANYA.
+      ② blok < 4 ATAU ≥ jumlah baris ⇒ pakai teks APA ADANYA (tak berguna).
+      ③ karakter (non-spasi) hilang >2% ⇒ pakai teks APA ADANYA (ada isi hilang).
+    Obat fid=104: pasangan lintas baris-kosong DITANYAKAN ke Jev (dulu
+    dilewati `_kandidat_sambung`), dan digabung bila Jev bilang sambung.
+    """
+    baris_asal = (teks or '').split('\n')
+    if len(baris_asal) < 4:
+        return teks
+    try:
+        from app import konversi as _K
+        blok = _K._pecah_blok(teks)
+    except Exception as e:                                    # pagar ①
+        log.warning('[peta3] stitch dilewati (konversi galat: %s)', e)
+        return teks
+    if not blok:                                              # pagar ①
+        return teks
+    blok = _perbaiki_gabung_bab(blok)
+    if len(blok) < 4:                                             # pagar ② (sebagian)
+        return teks
+    # ── pagar ③: isi hilang? (ukur karakter non-spasi — normalisasi spasi
+    #    oleh _pecah_blok bukan kehilangan isi)
+    def _isi(t):
+        return re.sub(r'\s', '', t or '')
+    asal, baru = _isi(teks), _isi('\n'.join(b.get('text') or '' for b in blok))
+    if asal and (len(asal) - len(baru)) / len(asal) > 0.02:
+        return teks
+
+    # ── obat fid=104: pasangan lintas baris-kosong ──────────────────────
+    #    Pola: [blok isi][1+ blok kosong][blok isi]. Tanyakan ke Jev apakah
+    #    blok sesudah kosong menyambung kalimat blok sebelumnya. Jangan
+    #    pernah gabung melewati garis BAB.
+    if tanya_fn is None:
+        tanya_fn = satpam.tanya_bebas_mutu
+    pasangan = []          # (idx_blok_sebelum, idx_blok_sesudah)
+    for a in range(len(blok)):
+        if blok[a].get('kosong') or not (blok[a].get('text') or '').strip():
+            continue
+        b = a + 1
+        while b < len(blok) and (blok[b].get('kosong') or not (blok[b].get('text') or '').strip()):
+            b += 1
+        if b < len(blok) and b > a + 1:
+            sebelum = (blok[a].get('text') or '').strip()
+            sesudah = (blok[b].get('text') or '').strip()
+            if POLA_BAB.match(sebelum) or POLA_BAB.match(sesudah):
+                continue
+            pasangan.append((a, b))
+    sambung = {}
+    if pasangan:
+        for mulai in range(0, len(pasangan), 120):
+            sub = pasangan[mulai:mulai + 120]
+            perlu = sorted({a for a, _ in sub} | {b for _, b in sub})
+            state = '\n'.join('L%04d| %s' % (n, (blok[n].get('text') or '')[:200])
+                              for n in perlu)
+            tanya = {('L%04d' % b): {'instructions':
+                     ('Does line L%04d pick up mid-sentence, continuing a '
+                      'sentence left unfinished at the end of line L%04d?'
+                      % (b, a)), 'type': 'noul'}
+                     for a, b in sub}
+            try:
+                jawab = tanya_fn(state, tanya) or {}
+            except Exception:
+                jawab = {}
+            if jawab:
+                sambung.update(jawab)
+        try:
+            ambang_gantung = _K._SAMBUNG_GANTUNG
+            ambang_akhir = _K._SAMBUNG_AKHIR
+        except Exception:
+            ambang_gantung, ambang_akhir = 0.2, 0.5
+        gabung_idx = set()
+        for a, b in pasangan:
+            jaw = (sambung.get('L%04d' % b) or {}).get('noul')
+            if jaw is None:
+                continue
+            sebelum = (blok[a].get('text') or '').strip()
+            ambang = (ambang_akhir if re.search(r'[.!?:;\u2026]["\')\]]*$', sebelum)
+                      else ambang_gantung)
+            try:
+                if float(jaw) >= ambang:
+                    gabung_idx.add((a, b))
+            except (TypeError, ValueError):
+                pass
+        if gabung_idx:
+            buang = set()
+            for a, b in sorted(gabung_idx):
+                blok[a]['text'] = ((blok[a].get('text') or '').strip() + ' '
+                                   + (blok[b].get('text') or '').strip()).strip()
+                blok[a]['lines'] = list(blok[a].get('lines') or []) + list(blok[b].get('lines') or [])
+                for k in range(a + 1, b + 1):
+                    buang.add(k)
+            blok = [x for n, x in enumerate(blok) if n not in buang]
+    # ── pagar ② (sisa): sesudah SEMUA pass, kalau tidak ada satu pun baris
+    #    yang tersambung (blok == baris) ⇒ stitch tak berguna ⇒ teks apa adanya.
+    #    (Dulu pagar ini dicek SEBELUM pass lintas-kosong, sehingga pass itu
+    #    tidak pernah jalan bila _pecah_blok tidak menyambung apa pun —
+    #    persis kasus fid=104. Diperbaiki 10 Nov 2026.)
+    if len(blok) >= len(baris_asal):
+        return teks
+    return '\n'.join(b.get('text') or '' for b in blok)
+
+
 def susun(fid, awal=None, akhir=None):
     db = SessionLocal()
     try:
@@ -173,13 +458,28 @@ def susun(fid, awal=None, akhir=None):
         db.close()
 
 
-def _susun_dari_bersih(bersih, awal=None, akhir=None, nama=''):
+def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None):
     """INTI `susun()` — bekerja dari TEKS yang sudah dibersihkan.
 
     Dipisahkan 14 Okt 2026 (Lapis 5) supaya `petakan_dari_teks()` bisa memakai
     logika yang SAMA PERSIS tanpa menyalin satu baris pun (satu sumber
     kebenaran). `susun(fid)` sekarang memanggil fungsi ini.
+
+    ── PASS-1 STITCH (10 Nov 2026) ─────────────────────────────────────
+    Teks disambung jadi BLOK dulu (`_stitch_baris`) sebelum dipecah baris —
+    jadi satu paragraf tidak lagi jadi 3-5 kandidat. Baris hasil stitch
+    adalah BLOK; indeks peta merujuk ke baris hasil stitch (konsisten di
+    seluruh keluaran susun/petakan, sama seperti verifikasi 10 Okt).
+    `pakai_stitch=False` (atau env EDUAI_JEV_STITCH=0) ⇒ cara lama.
     """
+    if pakai_stitch is None:
+        pakai_stitch = _stitch_aktif()
+    teks_asal = bersih            # sidik cache dihitung dari teks SEBELUM stitch
+    stitch_pakai = False
+    if pakai_stitch and bersih:
+        hasil_stitch = _stitch_baris(bersih)
+        stitch_pakai = hasil_stitch is not bersih and hasil_stitch != bersih
+        bersih = hasil_stitch
     baris = bersih.split('\n')
     if awal is None or awal < 0:
         awal = 0
@@ -191,7 +491,7 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama=''):
             return ('L%06d| ' % j) + ' '.join(baris[j].split())[:58]
         return '(tepi)'
 
-    kand, gabung, buang = [], {}, []
+    kand, gabung, buang, kode_label = [], {}, [], {}
     i = awal
     while i < akhir:
         s = baris[i].strip()
@@ -217,9 +517,19 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama=''):
             gabung[i] = (s, '')
             i += 1
             continue
+        # ── BARIS BERNOMOR DIBACA KODE (10 Nov 2026) ──────────────────
+        #    Nomor bertingkat yang memenuhi syarat KETAT ⇒ 'subbab' langsung,
+        #    TIDAK dikirim ke Jev (hemat + deterministik). Yang tidak memenuhi
+        #    syarat tetap jadi kandidat Jev.
+        if _nomor_bertindak_judul(s):
+            kode_label[i] = 'subbab'
+            i += 1
+            continue
         kand.append((i, s))
         i += 1
     return {'baris': baris, 'kand': kand, 'gabung': gabung, 'buang': buang,
+            'kode_label': kode_label, 'stitch_pakai': stitch_pakai,
+            'teks_asal': teks_asal,
             'awal': awal, 'akhir': akhir, 'nama': nama, 't': _t}
 
 
@@ -228,14 +538,39 @@ def petakan_dari_teks(teks, awal=None, akhir=None, putaran=None):
 
     Dipakai `app/peta3_jev.py::petakan_teks()` ← `versi._deteksi_bagian()`.
     ⚠️ Teks DIANGGAP SUDAH bersih (pemanggil sudah `buang_daftar_isi`).
+    Cache: teks sama + aturan sama ⇒ peta lama dipakai (Rp 0, tanpa Jev).
     """
+    if putaran is None:
+        try:
+            putaran = max(1, int(os.getenv('EDUAI_JEVI_PUTARAN') or '1'))
+        except ValueError:
+            putaran = 1
+    kunci = _kunci_cache(teks or '', putaran)
+    dari_cache = _cache_ambil(kunci)
+    if dari_cache is not None:
+        log.info('[peta3] peta dari cache (sidik %s…)', kunci[0][:8])
+        return dari_cache
     d = _susun_dari_bersih(teks or '', awal, akhir, '')
-    return _petakan_dari_hasil(d, putaran)
+    hasil = _petakan_dari_hasil(d, putaran)
+    _cache_simpan(kunci, hasil)
+    return hasil
 
 
 def petakan(fid, awal=None, akhir=None, putaran=None):
+    if putaran is None:
+        try:
+            putaran = max(1, int(os.getenv('EDUAI_JEVI_PUTARAN') or '1'))
+        except ValueError:
+            putaran = 1
     d = susun(fid, awal, akhir)
-    return _petakan_dari_hasil(d, putaran)
+    kunci = _kunci_cache(d.get('teks_asal') or '\n'.join(d['baris']), putaran)
+    dari_cache = _cache_ambil(kunci)
+    if dari_cache is not None:
+        log.info('[peta3] peta dari cache (fid=%s, sidik %s…)', fid, kunci[0][:8])
+        return dari_cache
+    hasil = _petakan_dari_hasil(d, putaran)
+    _cache_simpan(kunci, hasil)
+    return hasil
 
 
 def _petakan_dari_hasil(d, putaran=None):
@@ -307,33 +642,78 @@ def _petakan_dari_hasil(d, putaran=None):
                 c = jw_i.get('confidence')
                 if isinstance(c, (int, float)):
                     conf[i].append(float(c))
-            time.sleep(0.7)
+            _tidur_adaptif(t0)
 
-    label, goyang, p_label = {}, [], {}
-    for i, _t in kand:
-        vs = [x for x in semua[i] if x]
-        dari = {}
-        for v in vs:
-            dari[v] = dari.get(v, 0) + 1
-        utama = max(dari, key=dari.get) if dari else None
-        if len(dari) > 1:
-            goyang.append((i, semua[i]))
-            label[i] = 'biasa'
-        else:
-            label[i] = utama if utama in ('bab', 'subbab', 'paragraf') else 'biasa'
-        # ── S1: `p` per label = confidence Jev (rata semua putaran).
-        #    Sumber JELAS (S2): langsung dari Jev, bukan tebakan kode.
-        #    ⚠️ Ini BUKAN kesepakatan antar-putaran (itu terbukti SELALU 1,00).
-        cs = conf[i]
-        p_label[i] = round(sum(cs) / len(cs), 3) if cs else None
+    def _hitung_label():
+        """Label + goyang + p dari `semua`/`conf` saat ini (dipakai ulang
+        sesudah tanya-ulang bertarget)."""
+        lab, goy, p_lab = {}, [], {}
+        for i, _t in kand:
+            vs = [x for x in semua[i] if x]
+            dari = {}
+            for v in vs:
+                dari[v] = dari.get(v, 0) + 1
+            utama = max(dari, key=dari.get) if dari else None
+            if len(dari) > 1:
+                goy.append((i, semua[i]))
+                lab[i] = 'biasa'
+            else:
+                lab[i] = utama if utama in ('bab', 'subbab', 'paragraf') else 'biasa'
+            cs = conf[i]
+            p_lab[i] = round(sum(cs) / len(cs), 3) if cs else None
+        return lab, goy, p_lab
+
+    label, goyang, p_label = _hitung_label()
+
+    # ── TANYA-ULANG BERTARGET (10 Nov 2026, ganti putaran global) ────────
+    #    Putaran global 3× TERBUKTI tidak berguna (kesepakatan antar-putaran
+    #    selalu 1,00 ⇒ buang 114 dtk). Yang berguna: tanya ULANG hanya pada
+    #    kandidat yang goyang atau p rendah — maksimal 1 gelombang tambahan.
+    #    p < 0,5 = Jev sendiri tidak yakin (titik tengah netral 0..1, BUKAN
+    #    ambang yang disetel per naskah); p None = Jev tidak menjawab.
+    tanya_ulang_jml = 0
+    if putaran == 1 and _tanya_ulang_aktif():
+        ragu_idx = [i for i, _t in kand
+                    if p_label.get(i) is None or (p_label.get(i) or 0) < 0.5]
+        ragu_idx = ragu_idx[:120]
+        if ragu_idx:
+            tanya_ulang_jml = len(ragu_idx)
+            paket = {}
+            tanya = {}
+            for n, i in enumerate(ragu_idx):
+                nm = 'c%d' % n
+                paket[nm] = {'sebelum': _t(i - 1),
+                             'tengah': ('L%06d| ' % i) + baris[i].strip()[:70],
+                             'sesudah': _t(i + 1)}
+                tanya[nm] = {'type': 'choice',
+                             'instructions': 'Baris `%s.tengah` ada di dalam naskah akademik. '
+                                             'Baris tengah ini perannya apa?' % nm,
+                             'criteria': dict(KRITERIA)}
+            t0 = time.time()
+            jw = satpam.tanya_bebas_mutu(json.dumps(paket, ensure_ascii=False), tanya) or {}
+            waktu.append(time.time() - t0)
+            if not jw:
+                gagal += 1
+            for n, i in enumerate(ragu_idx):
+                jw_i = jw.get('c%d' % n) or {}
+                v = jw_i.get('choice')
+                if isinstance(v, dict):
+                    v = v.get('id') or v.get('label')
+                semua[i].append(v)
+                c = jw_i.get('confidence')
+                if isinstance(c, (int, float)):
+                    conf[i].append(float(c))
+            _tidur_adaptif(t0)
+            label, goyang, p_label = _hitung_label()
 
     # ── ATURAN 2 (vonis Bos 09 Okt) — KOREKSI LABEL, BUKAN SARINGAN BUANG.
     #    Judul sub-bab hampir selalu PENDEK. Kalau Jev bilang 'subbab' tapi
-    #    barisnya PANJANG (>300 kar), itu paragraf asli ⇒ label diubah.
+    #    barisnya PANJANG (>ambang profil kampus, bawaan 300 kar), itu paragraf
+    #    asli ⇒ label diubah.
     #    ⛔ JANGAN dibuang: paragraf asli sering >300 kar (bencana Uji 8).
     koreksi = []
     for i, _t in kand:
-        if label.get(i) == 'subbab' and len(baris[i].strip()) > 300:
+        if label.get(i) == 'subbab' and len(baris[i].strip()) > _ambang('judul_maks_kar', 300):
             label[i] = 'paragraf'
             koreksi.append(i)
 
@@ -362,12 +742,13 @@ def _petakan_dari_hasil(d, putaran=None):
         if i in sistematika:
             continue                      # blok sistematika jangan disentuh
         t = baris[i].strip()
-        if label.get(i) in ('bab', 'subbab') and t[:1].islower():
+        if label.get(i) in ('bab', 'subbab') and _huruf_awal_kecil(t):
             label[i] = 'biasa'
             koreksi_kecil.append(i)
 
     asal = {}
     boleh = {}
+    kode_label = d.get('kode_label') or {}
     for i, _t in kand:
         if i in sistematika:
             asal[i] = 'sistematika'
@@ -375,6 +756,17 @@ def _petakan_dari_hasil(d, putaran=None):
         else:
             asal[i] = 'jev'
             boleh[i] = True
+    # ── BARIS BERNOMOR (kode) masuk label + asal — TIDAK pernah ke Jev.
+    for i, lab in kode_label.items():
+        label[i] = lab
+        p_label[i] = None        # bukan confidence Jev — jangan dicampur
+        asal[i] = 'kode'
+        boleh[i] = True
+
+    # ── JEV MATI TOTAL: semua gelombang gagal ⇒ pemanggil WAJIB fallback
+    #    (dulu: semua label 'biasa' tanpa jejak ⇒ hakim/pemutus jalur tak
+    #    bisa bedakan "peta memang tanpa judul" vs "Jev gagal").
+    jev_mati = bool(gel) and gagal >= len(gel) * max(1, putaran)
 
     return {'baris': baris, 'kand': kand, 'label': label, 'goyang': goyang,
             'p': p_label,                      # S1: confidence Jev per label
@@ -383,7 +775,10 @@ def _petakan_dari_hasil(d, putaran=None):
             'sistematika': sorted(sistematika), 'asal': asal, 'boleh_dipakai_fitur': boleh,
             'gabung': d['gabung'], 'buang': d['buang'], 'waktu': waktu, 'gagal': gagal,
             'gelombang': len(gel), 'semua': semua, 'awal': d['awal'], 'akhir': d['akhir'],
-            'nama': d['nama'], 'kand_jml': len(kand)}
+            'nama': d['nama'], 'kand_jml': len(kand),
+            'kode_label': kode_label, 'tanya_ulang_jml': tanya_ulang_jml,
+            'jev_mati': jev_mati, 'stitch_pakai': d.get('stitch_pakai', False),
+            'versi_aturan': RULE_VERSION}
 
 
 def main():

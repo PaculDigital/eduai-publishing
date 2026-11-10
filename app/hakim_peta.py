@@ -1,40 +1,54 @@
-"""HAKIM T① — PERIKSA **PETA SURVEYOR** (bukan peta mesin lagi).
+"""HAKIM v2 — AUDIT STRUKTURAL DETERMINISTIK + JEV HANYA PERTANYAAN SEMPIT.
 
 ═══════════════════════════════════════════════════════════════════════════
-PUTUSAN BOS 09 Okt 2026:
-  · T① = hakim menilai **PETA SURVEYOR** (hasil `peta3_jev`), bukan peta mesin.
-  · SKEMA 2-SUMBER, **TANPA AMBANG `p`** (§7c rancangan):
-        curiga  ← kode deterministik (`pola_penulisan.judul_curiga`)  → lapor
-        ragu    ← **vonis HAKIM sendiri** (menilai barisnya LANGSUNG) → 1 putaran
-        sepakat ← sisanya
-        `p`     → HANYA info tampilan, ⛔ tidak pernah jadi input keputusan
-  · Pagar H1: **Hakim LAPOR, jangan BLOKIR** (tidak boleh menghentikan mesin).
+BENTUK BARU (putusan Bos 10 Okt 2026 — K5 DIHAPUS, jangan pasang kembali):
+  · KODE melakukan audit struktural deterministik (nomor loncat, subbab
+    yatim tanpa BAB induk, judul >300 karakter, judul berawalan huruf kecil,
+    fragmen tabel/SPSS) ⇒ mengeluarkan sepakat/curiga + alasan.
+  · Jev HANYA menjawab pertanyaan sempit yang kode tidak bisa putuskan
+    (satu pertanyaan generik TANPA criteria, tanpa ambang yang disetel
+    per naskah) ⇒ hasilnya hanya bisa jadi 'ragu' atau 'sepakat'.
+  · Manusia memeriksa yang 'curiga'. Hakim TIDAK PERNAH memblokir atau
+    mengubah label (pagar H1).
 
-═══════════════════════════════════════════════════════════════════════════
-RANCANGAN TUGAS (§2 rancangan) — yang dikerjakan modul ini:
-  T① peta SURVEYOR yang dinilai (bukan `deteksi_bab_besar`)
-  T② cek JUDUL vs LANJUTAN per kandidat — jendela 3 baris ber-ID, tipe `noul`:
-      "Apakah baris tengah ini benar AWAL <bab|sub-bab>?"
-      ⇒ di sini **vonis hakim** yang menentukan ragu (bukan `p`)
-  T⑤ keluarkan DAFTAR KECURIGAAN (bukan cuma lolos/tolak)
-  T③ TIDAK dipakai di sini (itu per-bab hitung, beda langkah)
-  T④ dipakai apa adanya (`jumlah_bab`/`semua_romawi_sah`/`berurutan`) — dari `satpam`
+KENAPA K5 MATI (jangan dihidupkan lagi):
+  K5 = kalimat criteria yang disetel PER KASUS. Terbukti tidak bisa
+  menyeberang naskah (12/12 set latih → ~10/16 set uji segar; '3. Tinjauan
+  Literatur' 0,63 di Asih tapi 0,12 di fid=115). Vonis Bos 14 Okt: "K5 itu
+  terlalu detail hanya cocok untuk 1 naskah saja, tidak bisa dipakai untuk
+  global. Karena app EduAi ini akan menerima ribuan naskah nantinya."
+  Teks criteria K5 SUDAH DIHAPUS dari berkas ini (riwayat ada di git).
 
-═══════════════════════════════════════════════════════════════════════════
+ATURAN VONIS (tanpa ambang yang disetel per naskah):
+  · 'curiga'  ← SATU saja aturan deterministik kena (alasan tercatat).
+  · 'ragu'    ← kode tidak menemukan apa pun, TAPI Jev (pertanyaan sempit)
+                menjawab noul < 0,5. 0,5 = titik tengah netral skala 0..1
+                (Jev sendiri tidak yakin), BUKAN ambang yang disetel.
+  · 'sepakat' ← kode bersih dan (tidak perlu tanya Jev, atau Jev ≥ 0,5).
+  · 'belum'   ← Jev mati / tidak ditanya karena di luar batas (jujur).
+  `p` surveyor HANYA info tampilan, tidak pernah jadi input keputusan.
+
 PAGAR (WAJIB, tidak boleh dilanggar):
-  P1  Hakim mati / galat ⇒ kembalikan laporan KOSONG, mesin TETAP jalan
-  P2  Jangan melempar galat keluar
-  P3  JANGAN memutuskan label — hakim hanya melaporkan status per bagian
-  P4  Jumlah bagian TIDAK berkurang
-  P5  `p` hanya dicatat sebagai `p_info`, TIDAK dipakai memfilter/memutuskan
-  P6  JANGAN menyentuh `app/satpam.py` (dipakai jalur biaya) — modul ini TERPISAH
+  P1  Hakim mati / galat ⇒ kembalikan laporan KOSONG, mesin TETAP jalan.
+  P2  Jangan melempar galat keluar.
+  P3  JANGAN memutuskan label — hakim hanya melaporkan status per bagian.
+  P4  Jumlah bagian TIDAK berkurang.
+  P5  `p` hanya dicatat sebagai `p_info`, TIDAK dipakai memfilter/memutuskan.
+  P6  JANGAN menyentuh `app/satpam.py` (dipakai jalur biaya) — modul ini TERPISAH.
+  P7  Kill-switch: env EDUAI_HAKIM_AKTIF=0 ⇒ hakim mati (laporan 'mati').
 
-Jalan: docker exec -w /app eduai-app python3 app/hakim_peta.py
+PEMASANGAN PRODUKSI (10 Nov 2026):
+  `app/ai.py::peta_mulai` memanggil `periksa_peta()` sesudah surveyor dan
+  menempel ringkasannya di balasan ('hakim') — log saja, tidak mengubah
+  label atau bentuk balasan lama. `app/versi.py::_deteksi_bagian` memanggil
+  yang sama untuk log. Matikan kapan saja: EDUAI_HAKIM_AKTIF=0.
 """
 from __future__ import annotations
 
 import json
 import logging
+import os
+import re
 import sys
 import urllib.request
 from pathlib import Path
@@ -60,71 +74,54 @@ LABEL_JUDUL = ('bab', 'subbab')
 
 #  Frekuensi panggilan: SATU panggilan untuk sekumpulan kandidat (hemat).
 MAKS_TANYA = 24          # kandidat per panggilan (batas aman teruji 156; ini hemat)
+MAKS_TANYA_TOTAL = 48    # batas pertanyaan sempit per peta — selebihnya 'belum'
 
-#  ⚠️ Bentuk WAJIB: `questions` = OBJEK `{nama: {...}}`, BUKAN list.
-#     (Terukur 09 Okt 2026: list ⇒ 9router balas 503 palsu
-#      "questions harus objek berisi minimal 1 pertanyaan".)
-#  ⚠️ TERUKUR 09 Okt 2026 (JALAN TOL): Jev melaporkan SATU angka per NAMA
-#     pertanyaan. Kalau semua kandidat ditumpuk jadi 1 pertanyaan ("judul_sah"),
-#     Jev menjawab SEKALI untuk seluruh blok ⇒ mustahil dipetakan per baris
-#     (itu sebabnya 131 kandidat selalu 'belum').
-#     ⇒ WAJIB 1 pertanyaan PER KANDIDAT, namanya = "L000123".
-#     Bentuk jawaban: {"L000004": {"type":"noul","noul":0.82}, ...}
-#  ── K5 — 🚫 DIMATIKAN 14 Okt 2026 (putusan Bos: SALAH ALAT UKUR) ──────────
-#  K5 = kalimat criteria yang DISETEL PER-KASUS. Terbukti TIDAK BISA menyeberang
-#  naskah ⇒ MUSTAHIL untuk app yang menerima RIBUAN naskah.
-#
-#  Vonis Bos (09 Okt, verbatim): "Hasil uji ini tidak bisa buat naskah general.
-#  Terlalu detail cocok untuk 1 naskah saja."
-#  Vonis Bos (14 Okt, verbatim): "K5 itu terlalu detail hanya cocok untuk 1
-#  naskah saja, tidak bisa dipakai untuk global. Karena app EduAi ini akan
-#  menerima ribuan naskah nantinya."
-#
-#  Bukti overfit (terukur): '3. Tinjauan Literatur' → 0,63 di Asih tapi 0,12 di
-#  fid=115 · 12/12 di set latih → ~10/16 di set uji segar · 4× 'Informan' gagal
-#  walau 3 definisi ditambah.
-#
-#  ⛔ SAKLAR: K5 AKTIF = False. JANGAN dinyalakan tanpa izin eksplisit Bos.
-#     Selaras rancangan hakim §7c: "ambang DIBUBARKAN — ini masalah SALAH ALAT
-#     UKUR, bukan masalah kalibrasi."
-#  Teks criteria DIPERTAHANKAN di bawah (jangan dibuang) untuk arkeologi/uji
-#  ulang kalau kelak ada arahan baru.
-#  Lihat: PENUTUP_UJI_K5_09OKT2026.md §4 · HASIL_PENYELIDIKAN_PETA_14OKT2026.md
-K5_AKTIF = False
+#  Titik tengah netral skala noul 0..1 (BUKAN ambang yang disetel per naskah).
+#  Di bawah 0,5 = Jev sendiri tidak yakin ⇒ 'ragu'. Di atasnya ⇒ 'sepakat'.
+AMBANG_RAGU = 0.5
 
-CRITERIA_K5 = {
-    'true': ('Baris adalah JUDUL BAGIAN dari kerangka naskah. Ciri: berisi nama '
-             'topik bahasan (bukan nama kegiatan/langkah), nomornya menandai '
-             'kedudukan bagian dalam kerangka tulisan seperti 2.1 atau BAB II '
-             'atau nomor polos tanpa titik yang sejajar dengan judul bab lain '
-             'di dokumen ini, dan baris berikutnya mulai dengan paragraf '
-             'penjelasan baru.'),
-    'false': ('Baris adalah SATU LANGKAH KEGIATAN atau SATU BUTIR dari sebuah '
-              'daftar cara kerja, atau bagian lain yang bukan kepala tulisan: '
-              'deret angka di dalam tabel, sel dan kolom, keterangan bernama '
-              'di atas tabel atau gambar, potongan kutipan wawancara, nama '
-              'sumber, atau sambungan kalimat sebelumnya yang belum selesai.'),
+#  ── daftar TERTUTUP header output SPSS (salinan daftar di peta3_jev.py —
+#     ubah keduanya bila daftar berubah; hanya exact-match, huruf kecil).
+_SPSS_HEADER = {
+    'reliability statistics', 'item-total statistics', 'item statistics',
+    'scale statistics', 'summary item statistics', 'descriptive statistics',
+    'correlations', 'model summary', 'anova', 'coefficients',
+    'variables entered/removed', 'case processing summary',
+    'total variance explained', 'component matrix', 'rotated component matrix',
 }
+
+_ROMAWI = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7,
+           'VIII': 8, 'IX': 9, 'X': 10, 'XI': 11, 'XII': 12}
+_POLA_BAB = re.compile(r'^BAB\s+([IVX0-9]+)\b', re.I)
+_POLA_NOMOR = re.compile(r'^(\d+(?:\.\d+)*)\.?\s')
+_POLA_SPSS_KATA = re.compile(
+    r'\b(Coefficients|Cronbach|Sum of Squares|Mean Square|Sig\.|Std\. Error|'
+    r'Reliability Statistics|Model Summary|ANOVA|Descriptive Statistics|'
+    r'Correlations)\b', re.I)
+
+#  Titik injeksi untuk uji offline (HANYA dipakai tes — produksi None).
+_TANYA_FN = None
+_JUDUL_CURIGA_FN = None
+
+
+def aktif() -> bool:
+    """Kill-switch hakim: env EDUAI_HAKIM_AKTIF=0 ⇒ mati. Bawaan hidup."""
+    return (os.getenv('EDUAI_HAKIM_AKTIF') or '1') != '0'
 
 
 def _q_per_kandidat(blok: list[dict]) -> dict:
-    """Bentuk pertanyaan: satu per kandidat (nama = L%06d).
+    """Pertanyaan SEMPIT, generik, TANPA criteria (K5 mati).
 
-    ⛔ K5 DIMATIKAN (14 Okt 2026) — `criteria` HANYA dipasang kalau K5_AKTIF.
-    Tanpa criteria: Jev menilai barisnya LANGSUNG (vonis hakim sendiri),
-    bukan mencocokkan kalimat criteria yang disetel per-naskah.
-    Selaras rancangan hakim §7c (ambang DIBUBARKAN — salah alat ukur).
+    Satu pertanyaan per kandidat (nama = L%06d). Jev menilai barisnya
+    LANGSUNG — tidak ada kalimat criteria yang disetel per naskah.
     """
     q = {}
     for k in blok:
-        tanya = {
+        q[f"L{k['i']:06d}"] = {
             'type': 'noul',
             'instructions': (f"Apakah baris TENGAH untuk {k['i']:06d} di atas "
                              'benar-benar KEPALA BAGIAN (judul) naskah?'),
         }
-        if K5_AKTIF:                       # ← False: criteria TIDAK dikirim
-            tanya['criteria'] = CRITERIA_K5
-        q[f"L{k['i']:06d}"] = tanya
     return q
 
 
@@ -168,16 +165,14 @@ def _bahan_kandidat(kand: list[dict], baris: list[str]) -> str:
 
 
 def _tanya_jev(bahan: str, pertanyaan: dict) -> dict | None:
-    """Pakai `satpam.tanya_bebas_mutu` — jalur BAHAN SIAP (sudah terbukti di konversi).
-
-    ⚠️ JEBAKAN TERUKUR 09 Okt 2026 (2× makan waktu):
-       `tanya_bebas(teks, peta, q)` MENYUSUN ULANG state dari arg ke-2 (`peta`).
-       Kalau peta `[]` ⇒ state jadi "PETA ... (0 bagian)" ⇒ bahan jendela
-       kita DIBUANG ⇒ Jev jawab salah/503 semu. ⇒ PAKAI `tanya_bebas_mutu`,
-       yang menerima bahan yang SUDAH disusun pemanggil.
-
-    P1/P2: TIDAK PERNAH melempar galat — gagal ⇒ None, pemanggil lanjut.
-    """
+    """Tanya Jev lewat jalan tol. TIDAK PERNAH melempar galat — gagal ⇒ None."""
+    if _TANYA_FN is not None:                    # injeksi uji offline
+        try:
+            return _TANYA_FN(bahan, pertanyaan)
+        except Exception as e:                     # P1/P2
+            log.warning('[hakim_peta] tanya injeksi gagal: %s: %s',
+                        type(e).__name__, e)
+            return None
     if not _AKTIF:
         return None
     try:
@@ -188,39 +183,136 @@ def _tanya_jev(bahan: str, pertanyaan: dict) -> dict | None:
         return None
 
 
-#  ── PEMETAAN PRODUKSI — ⚠️ AMBANG 0,60/0,30 = SETELAN 1-NASKAH (DIMATIKAN) ──
-#  🚫 DIRANCANG 09 Okt dari 18 kandidat SATU naskah; goyang ±4 kandidat/putaran.
-#  Vonis Bos 09 Okt: "Terlalu detail cocok untuk 1 naskah saja."
-#  Vonis Bos 14 Okt: TIDAK bisa untuk GLOBAL (app akan menerima RIBUAN naskah).
-#
-#  ⇒ Ambang ini DIPERTAHANKAN hanya sebagai catatan angka. JANGAN dipakai
-#    sebagai SAKLAR di produksi (rancangan hakim §7c: ambang DIBUBARKAN).
-#    Sesudah K5 mati, Jev menilai barisnya LANGSUNG — nilai `noul` tidak lagi
-#    dibandingkan ke ambang tetap.
-#  Lihat: HASIL_PENYELIDIKAN_PETA_14OKT2026.md · PENUTUP_UJI_K5_09OKT2026.md §3
-AMBANG_SEPAKAT = 0.60          # ⛔ catatan 1-naskah — bukan saklar produksi
-AMBANG_CURIGA = 0.30           # ⛔ catatan 1-naskah — bukan saklar produksi
+def _judul_curiga_kode(baris: list[str]) -> dict[int, list[str]]:
+    """Sinyal curiga dari `pola_penulisan.judul_curiga` (2 sinyal PASTI:
+    awal-sitasi, butir-bertanya). Kembalikan {i: [alasan]}."""
+    fn = _JUDUL_CURIGA_FN
+    if fn is None:
+        try:
+            from .pola_penulisan import judul_curiga as fn
+        except Exception as e:                         # P2
+            log.warning('[hakim_peta] judul_curiga gagal: %s', e)
+            return {}
+    try:
+        hasil = fn([(i, baris[i]) for i in range(len(baris))]) or []
+    except Exception as e:                             # P2
+        log.warning('[hakim_peta] judul_curiga gagal: %s', e)
+        return {}
+    keluar: dict[int, list[str]] = {}
+    for c in hasil:
+        try:
+            keluar.setdefault(int(c.get('i')), []).extend(c.get('alasan') or [])
+        except Exception:
+            continue
+    return keluar
 
 
-def _status_vonis(noul: float) -> str:
-    """Petakan skor noul ⇒ status hakim. Nilai awal; catat & review berkala."""
-    if noul >= AMBANG_SEPAKAT:
-        return 'sepakat'
-    if noul < AMBANG_CURIGA:
-        return 'curiga'
-    return 'ragu'               # 0,30-0,60 = zona kerja hakim (jaring aman)
+def _huruf_awal_kecil(s):
+    """True bila HURUF pertama judul huruf kecil (awalan nomor dikupas dulu:
+    '1.1 latar belakang' = huruf kecil. Salinan helper di peta3_jev.py —
+    hakim tidak boleh mengimpor skrip root)."""
+    t = re.sub(r'^\d+(?:\.\d+)*\s*', '', (s or '').strip())
+    return bool(t) and t[:1].islower()
+
+
+def _audit_struktural(peta_surveyor: dict, kand: list[dict]) -> dict[int, list[str]]:
+    """AUDIT STRUKTURAL DETERMINISTIK (kode saja, nol goyang).
+
+    Aturan (putusan Bos 10 Okt 2026):
+      · nomor-loncat      — urutan bernomor melompat (1.1 → 1.3, BAB II → BAB IV)
+      · subbab-yatim      — subbab tanpa BAB induk sebelumnya
+      · judul-panjang     — judul >300 karakter (ambang dari profil kampus)
+      · judul-huruf-kecil — judul diawali huruf kecil
+      · fragmen-tabel     — judul berisi pipa tabel / header SPSS
+      · bab-ganda         — nomor BAB yang sama muncul dua kali
+    Kembalikan {i: [alasan, ...]}. Kosong = kode tidak menemukan apa pun.
+    """
+    try:
+        from .profil_kampus import aturan as _aturan
+        maks_kar = int((_aturan() or {}).get('judul_maks_kar') or 300)
+    except Exception:
+        maks_kar = 300
+    baris = peta_surveyor.get('baris') or []
+    gabung = peta_surveyor.get('gabung') or {}
+    temuan: dict[int, list[str]] = {}
+
+    def _tambah(i, alasan):
+        temuan.setdefault(int(i), []).append(alasan)
+
+    # ── urutan nomor + BAB ganda + subbab yatim ──────────────────────────
+    ada_bab = bool(gabung)       # judul BAB dari `gabung` sudah cukup jadi induk
+    bab_angka_terakhir = None
+    bab_nomor: dict[str, int] = {}
+    nomor_induk: dict[str, int] = {}     # induk -> nomor anak terakhir
+    for k in kand:
+        i, teks = k['i'], k['teks']
+        m_bab = _POLA_BAB.match(teks)
+        if k['label'] == 'bab' or m_bab:
+            if m_bab:
+                nomor = m_bab.group(1).upper()
+                if nomor in bab_nomor:
+                    _tambah(i, 'bab-ganda')
+                bab_nomor[nomor] = i
+                if nomor in _ROMAWI:
+                    angka = _ROMAWI[nomor]
+                    if bab_angka_terakhir is not None and angka > bab_angka_terakhir + 1:
+                        _tambah(i, 'nomor-loncat')
+                    bab_angka_terakhir = angka
+            ada_bab = True
+            continue
+        # subbab bernomor: cek induk + loncatan
+        m = _POLA_NOMOR.match(teks)
+        if m:
+            nomor = m.group(1)
+            bagian = nomor.split('.')
+            if len(bagian) >= 2:
+                induk = '.'.join(bagian[:-1])
+                anak = int(bagian[-1])
+                if induk in nomor_induk and anak > nomor_induk[induk] + 1:
+                    _tambah(i, 'nomor-loncat')
+                nomor_induk[induk] = max(nomor_induk.get(induk, 0), anak)
+        if not ada_bab:
+            _tambah(i, 'subbab-yatim')
+
+    # ── bentuk judul (per kandidat) ──────────────────────────────────────
+    for k in kand:
+        i, teks = k['i'], k['teks']
+        if len(teks) > maks_kar:
+            _tambah(i, 'judul-panjang')
+        if _huruf_awal_kecil(teks):
+            _tambah(i, 'judul-huruf-kecil')
+        if '|' in teks or _POLA_SPSS_KATA.search(teks) \
+                or teks.strip().lower() in _SPSS_HEADER:
+            _tambah(i, 'fragmen-tabel')
+    # ── sinyal judul_curiga (2 sinyal PASTI) ─────────────────────────────
+    for i, alasan in _judul_curiga_kode(baris).items():
+        if any(k['i'] == i for k in kand):
+            for a in alasan:
+                _tambah(i, a)
+    return temuan
+
+
+def _butuh_tanya_jev(k: dict) -> bool:
+    """Kode tidak bisa putuskan? Hanya judul yang mirip kalimat: diakhiri
+    titik (kalimat selesai) atau panjang 120-300 kar. Yang lain cukup kode."""
+    teks = k.get('teks') or ''
+    return teks.endswith('.') or 120 < len(teks) <= 300
 
 
 def periksa_peta(peta_surveyor: dict) -> dict:
-    """T① — hakim menilai PETA SURVEYOR. SELALU mengembalikan dict (P1).
+    """Hakim v2 — audit peta surveyor. SELALU mengembalikan dict (P1).
 
-    Keluaran (T⑤):
-      {'ok', 'keputusan', 'bagian':[{i,label,judul,p_info,status}],
-       'jumlah_sepakat', 'jumlah_ragu', 'jumlah_curiga', 'alasan'}
+    Keluaran:
+      {'ok', 'keputusan', 'bagian':[{i,label,judul,p_info,status,alasan}],
+       'jumlah_sepakat', 'jumlah_ragu', 'jumlah_curiga', 'jumlah_belum',
+       'alasan'}
+    'keputusan' selalu 'lolos' — hakim LAPOR, jangan BLOKIR (pagar H1).
     """
     kosong = {'ok': False, 'keputusan': 'mati', 'bagian': [],
               'jumlah_sepakat': 0, 'jumlah_ragu': 0, 'jumlah_curiga': 0,
-              'alasan': 'tidak bisa diperiksa'}
+              'jumlah_belum': 0, 'alasan': 'tidak bisa diperiksa'}
+    if not aktif():
+        return {**kosong, 'alasan': 'hakim dimatikan (EDUAI_HAKIM_AKTIF=0)'}
     if not isinstance(peta_surveyor, dict):
         return kosong
 
@@ -229,8 +321,7 @@ def periksa_peta(peta_surveyor: dict) -> dict:
 
     #  🚨 PAGAR DEGRADASI SENYAP (terukur 09 Okt 2026):
     #     `peta3_jev.petakan()` TIDAK melaporkan kegagalan Jev — kalau Jev kena
-    #     503, SEMUA baris dilabeli 'biasa' (491 baris) dan `gagal=0`.
-    #     Akibatnya hakim melihat "0 kandidat judul" dan TIDAK TAHU itu gagal.
+    #     503, SEMUA baris dilabeli 'biasa' dan `gagal=0`.
     #     ⇒ Wajib DIBEDAKAN: "peta memang tanpa judul" vs "surveyor gagal".
     _label = peta_surveyor.get('label') or {}
     if not kand:
@@ -243,65 +334,53 @@ def periksa_peta(peta_surveyor: dict) -> dict:
                     'degradasi': True}
         return {**kosong, 'alasan': 'tidak ada kandidat judul'}
 
-    # ── SUMBER-1: curiga = kode deterministik (gratis, presisi 100% terbukti)
-    curiga_kode: set[int] = set()
-    try:
-        from .pola_penulisan import judul_curiga as _jc
-        for c in (_jc([(i, baris[i]) for i, _ in enumerate(baris)]) or []):
-            curiga_kode.add(int(c.get('i')))
-    except Exception as e:                             # P2
-        log.warning('[hakim_peta] judul_curiga gagal: %s', e)
+    # ── SUMBER-1: curiga = audit struktural deterministik (kode) ─────────
+    curiga_kode = _audit_struktural(peta_surveyor, kand)
 
-    # ── SUMBER-2: ragu = VONIS HAKIM (bukan `p`)
+    # ── SUMBER-2: ragu = vonis Jev atas pertanyaan SEMPIT ────────────────
+    #    Hanya untuk judul yang kode tidak bisa putuskan (mirip kalimat),
+    #    maksimal MAKS_TANYA_TOTAL pertanyaan per peta (hemat).
+    perlu = [k for k in kand if k['i'] not in curiga_kode and _butuh_tanya_jev(k)]
+    perlu = perlu[:MAKS_TANYA_TOTAL]
     vonis: dict[int, str] = {}
-    for mulai in range(0, len(kand), MAKS_TANYA):
-        blok = kand[mulai:mulai + MAKS_TANYA]
+    for mulai in range(0, len(perlu), MAKS_TANYA):
+        blok = perlu[mulai:mulai + MAKS_TANYA]
         bahan = _bahan_kandidat(blok, baris)
         jalan = _tanya_jev(bahan, _q_per_kandidat(blok))
         if jalan is None:
             continue                                   # P1: lewati, jangan hentikan
-        # Jev menjawab per kandidat — kunci urut baris
         for k in blok:
-            jaw = (jalan.get(f'L{k["i"]:06d}') or jalan.get(str(k['i']))
+            jaw = (jalan.get(f"L{k['i']:06d}") or jalan.get(str(k['i']))
                    or jalan.get(f'baris_{k["i"]}'))
             if isinstance(jaw, dict):
                 noul = jaw.get('noul')
                 if noul is not None:
-                    vonis[k['i']] = _status_vonis(float(noul))
-    #  DEMOSI 'curiga' DICATAT (permintaan Bos: audit manusia berkala) — supaya
-    #  kalau ambang 0,30 ternyata terlalu galak, ketahuan dari log, bukan dari
-    #  naskah user yang rusak. Nol karakter hilang (pagar H1: lapor, jangan blokir).
-    demosi = [{'i': k['i'], 'teks': k['teks'][:70]}
-              for k in kand if vonis.get(k['i']) == 'curiga']
-    if demosi:
-        try:
-            #  Bos 09 Okt: "jangan buat json, buat md saja". Log = BAGIAN di
-            #  laporan .md (ditulis-tambah), bukan berkas baru.
-            _lapor = Path('/app/DEMOSI_CURIGA.md')
-            _baris = [f'- `L{x["i"]:06d}` — {x["teks"]!r}'
-                      for x in demosi]
-            _lapor.write_text(
-                '# DEMOSI CURIGA — audit manusia berkala\n\n'
-                f'Ambang: < {AMBANG_CURIGA} ⇒ ditolak hakim. '
-                'Daftar ini untuk memeriksa apakah ambang terlalu galak.\n\n'
-                + '\n'.join(_baris) + '\n', encoding='utf-8')
-        except Exception as e:                             # jangan pernah gagalkan hakim
-            log.warning('[hakim_peta] catat demosi gagal: %s', e)
+                    try:
+                        vonis[k['i']] = ('ragu' if float(noul) < AMBANG_RAGU
+                                         else 'sepakat')
+                    except (TypeError, ValueError):
+                        pass
 
-    # ── RAKIT laporan (P4: jumlah bagian TIDAK berkurang)
+    # ── RAKIT laporan (P4: jumlah bagian TIDAK berkurang) ────────────────
     bagian = []
     for k in kand:
-        if k['i'] in curiga_kode:
+        alasan = list(curiga_kode.get(k['i']) or [])
+        if alasan:
             status = 'curiga'
         elif k['i'] in vonis:
-            status = vonis[k['i']]         # 'sepakat' | 'ragu' | 'curiga'
+            status = vonis[k['i']]         # 'sepakat' | 'ragu'
+            if status == 'ragu':
+                alasan = ['jev-ragu']
         else:
-            status = 'belum'                           # hakim mati/lewat ⇒ jujur
+            status = 'belum' if _butuh_tanya_jev(k) else 'sepakat'
         bagian.append({
             'i': k['i'], 'label': k['label'], 'judul': k['teks'][:60],
             'p_info': k['p_info'],                     # P5: info saja
-            'status': status,
+            'status': status, 'alasan': alasan,
         })
+        if status == 'curiga':
+            log.warning('[hakim_peta] curiga L%06d (%s): %s',
+                        k['i'], k['teks'][:60], ', '.join(alasan))
 
     n_sep = sum(1 for b in bagian if b['status'] == 'sepakat')
     n_rag = sum(1 for b in bagian if b['status'] == 'ragu')
@@ -309,7 +388,7 @@ def periksa_peta(peta_surveyor: dict) -> dict:
     n_bel = sum(1 for b in bagian if b['status'] == 'belum')
     return {
         'ok': True,
-        'keputusan': 'lolos',                          # P6: TIDAK memblokir
+        'keputusan': 'lolos',                          # H1: TIDAK memblokir
         'bagian': bagian,
         'jumlah_sepakat': n_sep,
         'jumlah_ragu': n_rag,
