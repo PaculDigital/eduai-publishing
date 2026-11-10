@@ -230,6 +230,11 @@ def jalankan_live():
             tar.add(ROOT / nama, arcname=nama)
         tar.add(ROOT / 'app', arcname='app')
         tar.add(ROOT / 'profil', arcname='profil')
+        # 10 Nov 2026: app/ai.py:363 membaca prompts/revisi_produksi.txt
+        # lewat Path(__file__).parent.parent/'prompts' — dari scratch itu
+        # /tmp/jev-gerbang/prompts. Tanpa ini run gagal di start (0 Jev
+        # terbuang), sama seperti uji v7 yang butuh tambahan prompts/.
+        tar.add(ROOT / 'prompts', arcname='prompts')
     open('/tmp/jev-gerbang.tar', 'wb').write(buf.getvalue())
     cmds = (
         'docker exec eduai-app mkdir -p /tmp/jev-gerbang && '
