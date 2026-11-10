@@ -19,14 +19,17 @@ from app import satpam, state
 
 log = logging.getLogger(__name__)
 
-# ── VERSI ATURAN (10 Nov 2026, v4-prefilter) ────────────────────────────
+# ── VERSI ATURAN (10 Nov 2026, v5) ─────────────────────────────────────
 #    Kunci cache peta: ubah string ini SETIAP KALI aturan di berkas ini
 #    berubah (stitch, ambang, Aturan 2/4/5/6, D1) ⇒ cache lama kedaluwarsa
 #    otomatis, tidak pernah ada peta basi dari aturan lama.
 #    v4: pre-filter kode di stitch (`sambung_kode`), tanya-ulang urut p +
 #    suara berbobot confidence, kupas nomor halaman pada BAB, waktu stitch
 #    tercatat (terukur live 10 Nov: fid=115 stitch 64 -> ~14 panggilan).
-RULE_VERSION = 'jev-peta-v4-prefilter'
+#    v5: tanya-ulang BERGELOMBANG (cap 120 per gelombang, maks 3 gelombang),
+#    pisah judul menempel satu baris, perbaiki spasi huruf pecah-per-huruf,
+#    profil kampus untuk istilah + penomoran, tanda bahasa non-standar.
+RULE_VERSION = 'jev-peta-v5'
 
 # ── SAKLAR (env, tanpa ubah kode) ────────────────────────────────────────
 #    EDUAI_JEV_STITCH=0      ⇒ matikan pass-1 stitch (susun cara lama)
@@ -58,6 +61,16 @@ def _tanya_ulang_aktif():
 
 def _jeda_dasar():
     return _env_float('EDUAI_JEV_JEDA_DASAR', 0.7)
+
+
+def _maks_gelombang_tanya_ulang():
+    """Maks gelombang tanya-ulang (v5): tiap gelombang ≤120 kandidat.
+
+    Bawaan 3 ⇒ paling banyak 360 kandidat ragu ditanya ulang (3 panggilan
+    Jev tambahan). 1 = perilaku v4 (satu gelombang, cap 120). Naikkan hanya
+    dengan bukti biaya: tiap gelombang = 1 panggilan Jev.
+    """
+    return max(1, _env_int('EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG', 3))
 
 
 # ── CACHE PETA (10 Nov 2026) ─────────────────────────────────────────────
@@ -704,24 +717,37 @@ def _petakan_dari_hasil(d, putaran=None):
 
     label, goyang, p_label = _hitung_label()
 
-    # ── TANYA-ULANG BERTARGET (10 Nov 2026, ganti putaran global) ────────
+    # ── TANYA-ULANG BERTARGET BERGELOMBANG (v5, ganti 1 gelombang v4) ───
     #    Putaran global 3× TERBUKTI tidak berguna (kesepakatan antar-putaran
     #    selalu 1,00 ⇒ buang 114 dtk). Yang berguna: tanya ULANG hanya pada
-    #    kandidat yang goyang atau p rendah — maksimal 1 gelombang tambahan.
+    #    kandidat yang goyang atau p rendah.
     #    p < 0,5 = Jev sendiri tidak yakin (titik tengah netral 0..1, BUKAN
     #    ambang yang disetel per naskah); p None = Jev tidak menjawab.
+    #    MASALAH v4: satu gelombang cap 120 — di fid=115 ragu > 120, jadi
+    #    kandidat paling ragu di akhir naskah tidak sempat ditanya.
+    #    OBAT v5: gelombang KECIL berulang (≤120 per gelombang, maks 3
+    #    gelombang bawaan). Tiap gelombang: hitung ulang ragu dari p
+    #    TERKINI, lewati yang sudah ditanya, ambil 120 paling tidak yakin.
+    #    Yang sudah membaik (p ≥ 0,5) sesudah gelombang sebelumnya TIDAK
+    #    ditanya lagi ⇒ panggilan tidak terbuang. Biaya: 1 panggilan Jev
+    #    per gelombang, paling banyak 3 (env EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG).
     tanya_ulang_jml = 0
+    tanya_ulang_gelombang = 0
     if putaran == 1 and _tanya_ulang_aktif():
-        ragu_idx = [i for i, _t in kand
-                    if p_label.get(i) is None or (p_label.get(i) or 0) < 0.5]
-        # ── URUT p NAIK (v4): yang paling tidak yakin ditanya dulu. Dulu
-        #    120 pertama menurut urutan baris, jadi kandidat paling ragu di
-        #    akhir naskah tidak sempat ditanya (terukur: cap mentok di 115/112).
-        ragu_idx.sort(key=lambda i: (p_label.get(i) is not None,
-                                     p_label.get(i) or 0))
-        ragu_idx = ragu_idx[:120]
-        if ragu_idx:
-            tanya_ulang_jml = len(ragu_idx)
+        sudah_ditanya = set()
+        for _gel in range(_maks_gelombang_tanya_ulang()):
+            ragu_idx = [i for i, _t in kand
+                        if i not in sudah_ditanya
+                        and (p_label.get(i) is None or (p_label.get(i) or 0) < 0.5)]
+            # ── URUT p NAIK: yang paling tidak yakin ditanya dulu.
+            ragu_idx.sort(key=lambda i: (p_label.get(i) is not None,
+                                         p_label.get(i) or 0))
+            ragu_idx = ragu_idx[:BATAS_TANYA]
+            if not ragu_idx:
+                break
+            tanya_ulang_gelombang += 1
+            tanya_ulang_jml += len(ragu_idx)
+            sudah_ditanya.update(ragu_idx)
             paket = {}
             tanya = {}
             for n, i in enumerate(ragu_idx):
@@ -825,6 +851,7 @@ def _petakan_dari_hasil(d, putaran=None):
             'gelombang': len(gel), 'semua': semua, 'awal': d['awal'], 'akhir': d['akhir'],
             'nama': d['nama'], 'kand_jml': len(kand),
             'kode_label': kode_label, 'tanya_ulang_jml': tanya_ulang_jml,
+            'tanya_ulang_gelombang': tanya_ulang_gelombang,
             'jev_mati': jev_mati, 'stitch_pakai': d.get('stitch_pakai', False),
             'versi_aturan': RULE_VERSION}
 

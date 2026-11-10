@@ -248,6 +248,34 @@ def main():
     P.RULE_VERSION = 'jev-peta-v3-stitch'
     P._CACHE_PETA.clear()
 
+    # ── 2b. TANYA-ULANG BERGELOMBANG (v5) ────────────────────────────────
+    #    130 kandidat ragu (> cap 120): v4 hanya menanya 120 pertama,
+    #    v5 menanya semua dalam 2 gelombang (120 + 10).
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.panggilan.clear()
+    FAKE_SATPAM.rendah = {'RAGU'}
+    banyak = '\n'.join(
+        'Paragraf isi RAGU nomor %03d tentang pemasaran digital dan kinerja bisnis usaha kecil di Indonesia.'
+        % n for n in range(130))
+    peta_b = P.petakan_dari_teks(banyak, putaran=1)
+    cek('tanya-ulang bergelombang: 130 ragu ditanya semua',
+        peta_b.get('tanya_ulang_jml') == 130, f"dapat {peta_b.get('tanya_ulang_jml')}")
+    cek('tanya-ulang bergelombang: 2 gelombang (120 + 10)',
+        peta_b.get('tanya_ulang_gelombang') == 2, f"dapat {peta_b.get('tanya_ulang_gelombang')}")
+    cek('tanya-ulang bergelombang: sesudah tanya ulang p membaik',
+        all((peta_b['p'].get(i) or 0) >= 0.5 for i in peta_b['label']))
+    # cap gelombang via env: maks 1 gelombang -> hanya 120 yang ditanya
+    os.environ['EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG'] = '1'
+    P._CACHE_PETA.clear()
+    FAKE_SATPAM.panggilan.clear()
+    peta_c = P.petakan_dari_teks(banyak, putaran=1)
+    cek('tanya-ulang bergelombang: env maks 1 gelombang -> 120 saja',
+        peta_c.get('tanya_ulang_jml') == 120
+        and peta_c.get('tanya_ulang_gelombang') == 1,
+        f"dapat {peta_c.get('tanya_ulang_jml')}/{peta_c.get('tanya_ulang_gelombang')}")
+    os.environ.pop('EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG', None)
+    FAKE_SATPAM.rendah = set()
+
     # ── 3. JEV MATI -> fallback ───────────────────────────────────────────
     #    (ganti satpam di modul P langsung — jangan muat ulang, _stub_app
     #    akan menimpa stub satpam bila dipanggil lagi)
