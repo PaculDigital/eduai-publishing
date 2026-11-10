@@ -12,7 +12,6 @@ GELOMBANG: BATAS_TANYA = 120 · BATAS_KAR = 18.000 (di bawah batas aman 156/20.6
 """
 import sys, json, time, re, os, hashlib, logging
 from collections import OrderedDict
-sys.path.insert(0, '/tmp/jev-v4')
 from app.ai import SessionLocal, _teks_dari_berkas, UPLOAD_DIR
 from app.models import FileBerkas
 from app import satpam, state
