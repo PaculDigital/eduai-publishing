@@ -58,16 +58,15 @@ sys.path.insert(0, '/app')
 
 log = logging.getLogger('hakim_peta')
 
-# ── setelan: MEMINJAM setelan satpam (KUNCI/BASE/MODEL) — jangan bikin setelan baru
+# ── setelan: MEMINJAM setelan satpam — jangan bikin setelan baru.
+#  v8 (10 Nov 2026): pinjaman BASE/KUNCI/MODEL/BATAS_DETIK DIHAPUS — tidak
+#  pernah dibaca (Hakim bertanya lewat `jev.tanya()`, model ikut
+#  `jev.MODEL_DEFAULT`). Yang dipinjam hanya AKTIF (kill-switch).
 try:
     from . import satpam as _satpam
     _AKTIF = bool(getattr(_satpam, 'AKTIF', False))
-    _BASE = getattr(_satpam, 'BASE', '')
-    _KUNCI = getattr(_satpam, 'KUNCI', '')
-    _MODEL = getattr(_satpam, 'MODEL', '')
-    _BATAS = float(getattr(_satpam, 'BATAS_DETIK', 90))
 except Exception:                                     # P2: telan
-    _AKTIF, _BASE, _KUNCI, _MODEL, _BATAS = False, '', '', '', 90.0
+    _AKTIF = False
 
 #  Label judul yang diperiksa hakim (paragraf/biasa BUKAN tugas hakim)
 LABEL_JUDUL = ('bab', 'subbab')
