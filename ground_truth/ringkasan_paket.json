@@ -1,0 +1,39 @@
+{
+  "81": {
+    "total": 21,
+    "per_jenis": {
+      "beda_model_113_114": 21
+    }
+  },
+  "112": {
+    "total": 10,
+    "per_jenis": {
+      "bab_hilang": 1,
+      "hakim_curiga": 6,
+      "hakim_ragu": 3
+    }
+  },
+  "115": {
+    "total": 9,
+    "per_jenis": {
+      "bab_hilang": 1,
+      "hakim_curiga": 4,
+      "hakim_ragu": 4
+    }
+  },
+  "WULAN-1": {
+    "total": 3,
+    "per_jenis": {
+      "judul_bab_sampah": 1,
+      "hakim_ragu": 1,
+      "hakim_curiga": 1
+    }
+  },
+  "_selaras_rekonstruksi": {
+    "81": "True",
+    "112": "sebagian (teks)",
+    "115": "sebagian (teks)",
+    "WULAN-1": "True"
+  },
+  "_catatan": "fid=81 dan WULAN-1: rekonstruksi tanpa Jev SELARAS persis dengan live (kand dan buang sama; stitch nyaris tanpa Jev), jadi nomor baris = nomor live. fid=112/115: stitch Jev tidak bisa direproduksi tanpa panggilan live (kand mock ~2x live) — teks dan konteks tiap baris sengketa tetap benar (dicari lewat pencarian teks), tapi nomor baris bisa geser; untuk baris Hakim dipakai nomor live Lxxxxxx dari log. Sengketa batas paragraf antar-run v7 TIDAK ada di paket ini karena label per baris v7 tidak pernah disimpan; lihat buat_sengketa_paragraf.py."
+}
