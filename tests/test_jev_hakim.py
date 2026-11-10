@@ -529,6 +529,42 @@ def main():
         and isinstance(P.KRITERIA['paragraf'], str)
         and isinstance(P.KRITERIA['biasa'], str))
 
+    # ── 7. v6.1: SEGMENTASI SESUDAH STITCH ───────────────────────────────
+    #    Teks pecah per huruf hidup satu huruf per BARIS — pra-stitch tidak
+    #    bisa cocok lintas baris; stitch menyambungnya jadi "D i n a m i k a".
+    teks_huruf = (
+        'BAB I\nPENDAHULUAN\n'
+        'D\ni\nn\na\nm\ni\nk\na\n\n'
+        'M\ne\nm\nb\na\nh\na\ns\n\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    FakeKonversi.mode = 'normal'
+    d_huruf = P._susun_dari_bersih(teks_huruf)
+    cek('v6.1: huruf per baris jadi kata utuh sesudah stitch ("Dinamika")',
+        any('Dinamika' in b for b in d_huruf['baris']))
+    cek('v6.1: kata kamus baru ikut diperbaiki ("Membahas")',
+        any('Membahas' in b for b in d_huruf['baris']))
+    cek('v6.1: baris berspasi sebelum perbaikan = 2',
+        d_huruf.get('huruf_berspasi_sebelum') == 2,
+        str(d_huruf.get('huruf_berspasi_sebelum')))
+    cek('v6.1: baris berspasi sesudah perbaikan = 0',
+        d_huruf.get('huruf_berspasi_sesudah') == 0,
+        str(d_huruf.get('huruf_berspasi_sesudah')))
+    cek('v6.1: jumlah rangkaian diperbaiki sesudah stitch = 2',
+        d_huruf.get('spasi_huruf_sesudah_stitch') == 2,
+        str(d_huruf.get('spasi_huruf_sesudah_stitch')))
+    teks_asing = (
+        'BAB I\nPENDAHULUAN\n'
+        'Q\nw\ne\nr\nt\ny\n\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    d_asing = P._susun_dari_bersih(teks_asing)
+    cek('v6.1: rangkaian tak dikenal dibiarkan berspasi (tidak dikarang)',
+        any('Q w e r t y' in b for b in d_asing['baris']))
+    cek('v6.1: rangkaian tak dikenal tidak dihitung diperbaiki',
+        d_asing.get('spasi_huruf_sesudah_stitch') == 0,
+        str(d_asing.get('spasi_huruf_sesudah_stitch')))
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))

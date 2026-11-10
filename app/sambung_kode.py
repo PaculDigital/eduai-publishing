@@ -244,6 +244,54 @@ KATA_UMUM = {
 }
 
 _HURUF_ROMAWI = set('ivxlcdm')
+
+# ── KATA TAMBAHAN v6 (10 Nov 2026) ───────────────────────────────────────
+#    Kata Indonesia umum yang belum ada di KATA_UMUM di atas — kata kerja
+#    akademik + penghubung + istilah kampus yang sering muncul di naskah.
+#    Dipakai segmentasi teks pecah per huruf SESUDAH stitch (v6.1).
+#    Hanya kata berdiri sendiri yang benar (bukan gabungan yang salah
+#    seperti 'tanggungjawab'/'matakuliah' — dua kata itu TIDAK ada di sini).
+KATA_UMUM_V6 = {
+    'membahas': 30, 'menjelaskan': 30, 'menyatakan': 30, 'merupakan': 30,
+    'mengenai': 30, 'berkaitan': 30, 'berikut': 30, 'selanjutnya': 30,
+    'kemudian': 30, 'meliputi': 30, 'mencakup': 30, 'terdiri': 30,
+    'meningkatkan': 30, 'memberikan': 30, 'memperoleh': 30, 'menyebabkan': 30,
+    'menghasilkan': 30, 'menganalisis': 30, 'mengidentifikasi': 30,
+    'menentukan': 30, 'memahami': 30, 'mengetahui': 30, 'melakukan': 30,
+    'menyusun': 30, 'menyajikan': 30, 'menguraikan': 30, 'mengumpulkan': 30,
+    'menerapkan': 30, 'memilih': 30, 'menilai': 30, 'mengukur': 30,
+    'membandingkan': 30, 'membedakan': 30, 'menghubungkan': 30,
+    'memengaruhi': 30, 'mempengaruhi': 30, 'dipengaruhi': 30, 'dimaksud': 30,
+    'disebut': 30, 'dinamakan': 30, 'termasuk': 30, 'melibatkan': 30,
+    'membutuhkan': 30, 'diperlukan': 30, 'diperoleh': 30, 'ditemukan': 30,
+    'diberikan': 30, 'dilaksanakan': 30, 'ditetapkan': 30, 'dijelaskan': 30,
+    'disebutkan': 30, 'menurut': 30, 'berpendapat': 30, 'mengemukakan': 30,
+    'menyebutkan': 30, 'mengatakan': 30, 'menambahkan': 30, 'mengurangi': 30,
+    'menambah': 30, 'berkurang': 30, 'bertambah': 30, 'sangat': 30,
+    'cukup': 30, 'kurang': 30, 'paling': 30, 'hampir': 30, 'sekitar': 30,
+    'antara': 30, 'hingga': 30, 'selama': 30, 'sementara': 30,
+    'sedangkan': 30, 'meskipun': 30, 'walaupun': 30, 'apabila': 30,
+    'jika': 30, 'sebab': 30, 'akibat': 30, 'kedudukan': 30, 'kewenangan': 30,
+    'menjawab': 30, 'pertanggungjawaban': 30, 'pendidik': 30, 'kampus': 30,
+    'fakultas': 30, 'semester': 30, 'perkuliahan': 30, 'bimbingan': 30,
+    'ujian': 30, 'wisuda': 30, 'alumni': 30, 'lulusan': 30, 'praktik': 30,
+    'magang': 30, 'pelatihan': 30, 'pemberdayaan': 30, 'keberhasilan': 30,
+    'kegagalan': 30, 'permasalahan': 30, 'persoalan': 30, 'tantangan': 30,
+    'peluang': 30, 'ancaman': 30, 'kekuatan': 30, 'kelemahan': 30,
+    'kesempatan': 30, 'kemungkinan': 30, 'kepastian': 30, 'kebenaran': 30,
+    'keadilan': 30, 'kejujuran': 30, 'kepercayaan': 30, 'kepedulian': 30,
+    'kesadaran': 30, 'pemahaman': 30, 'keterampilan': 30, 'kecakapan': 30,
+    'sikap': 30, 'kebiasaan': 30, 'norma': 30, 'etika': 30, 'moral': 30,
+    'hukum': 30, 'peraturan': 30, 'kebijakan': 30, 'kesepakatan': 30,
+    'perjanjian': 30, 'kerjasama': 30, 'kemitraan': 30, 'jejaring': 30,
+    'penduduk': 30, 'warga': 30, 'generasi': 30, 'anak': 30, 'remaja': 30,
+    'dewasa': 30, 'lansia': 30, 'perempuan': 30, 'kesehatan': 30,
+    'politik': 30, 'transportasi': 30, 'infrastruktur': 30,
+    'perekonomian': 30, 'perdagangan': 30, 'pertanian': 30, 'perikanan': 30,
+    'peternakan': 30, 'kehutanan': 30, 'pertambangan': 30, 'energi': 30,
+    'pariwisata': 30,
+}
+KATA_UMUM.update(KATA_UMUM_V6)
 _POLA_RUN_SPASI = re.compile(r'(?<![A-Za-z0-9])([A-Za-z](?: [A-Za-z]){2,})(?![A-Za-z0-9])')
 _POLA_TOKEN = re.compile(r'[A-Za-z]{3,}')
 _PANJANG_KATA_MAKS = 24

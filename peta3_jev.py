@@ -28,7 +28,11 @@ log = logging.getLogger(__name__)
 #    v5: tanya-ulang BERGELOMBANG (cap 120 per gelombang, maks 3 gelombang),
 #    pisah judul menempel satu baris, perbaiki spasi huruf pecah-per-huruf,
 #    profil kampus untuk istilah + penomoran, tanda bahasa non-standar.
-RULE_VERSION = 'jev-peta-v5'
+#    v6 (10 Nov 2026): segmentasi kata SESUDAH stitch (spasi diciptakan
+#    stitch), pisah "BAB + judul + koma + kalimat", koreksi batas paragraf
+#    deterministik + tanya-ulang batas goyang, deteksi BAB deterministik
+#    (kode, bukan Jev), profil kampus istilah + penomoran titik akhir.
+RULE_VERSION = 'jev-peta-v6'
 
 # ── SAKLAR (env, tanpa ubah kode) ────────────────────────────────────────
 #    EDUAI_JEV_STITCH=0      ⇒ matikan pass-1 stitch (susun cara lama)
@@ -403,6 +407,17 @@ def _pisah_judul_menempel_baris(baris):
     return keluar, jml
 
 
+# ── BARIS HURUF BERSPASI (v6) ────────────────────────────────────────────
+#    Pola yang sama dipakai pelapor live (jalankan_v*.py): ≥4 huruf tunggal
+#    berspasi berurutan ("D i n a m i k a"). Dipakai mengukur perbaikan
+#    sesudah stitch: sebelum vs sesudah.
+_POLA_HURUF = re.compile(r'(?:[A-Za-z]\s){4,}[A-Za-z]')
+
+
+def _hitung_baris_berspasi(baris):
+    return sum(1 for b in (baris or []) if _POLA_HURUF.search(b or ''))
+
+
 # ── PASS-1 STITCH (10 Nov 2026 — dipasang ke repo, dulu hanya di server) ──
 #    REKONSILIASI (bukti dari kode, 10 Nov 2026):
 #      · 10 Okt 2026 Bos memasang stitch di `peta3_jev.py` dan Wulan
@@ -612,12 +627,28 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     bersih = '\n'.join(_baris_split)
     stitch_pakai = False
     waktu_stitch = 0.0
+    spasi_huruf_sesudah_stitch = 0
+    huruf_berspasi_sebelum = 0
+    huruf_berspasi_sesudah = 0
     if pakai_stitch and bersih:
         _t0_stitch = time.time()
         hasil_stitch = _stitch_baris(bersih)
         waktu_stitch = time.time() - _t0_stitch
         stitch_pakai = hasil_stitch is not bersih and hasil_stitch != bersih
         bersih = hasil_stitch
+        # ── v6: perbaiki spasi huruf SESUDAH stitch (tugas 1). Teks pecah
+        #    per huruf hidup satu huruf per BARIS ("D\ni\nn...") — pola
+        #    pra-stitch tidak bisa cocok lintas baris; stitch-lah yang
+        #    menyambungnya jadi "D i n a m i k a" (spasi DICIPTAKAN stitch).
+        #    Jadi perbaikan sesudah stitch adalah yang bekerja; pra-stitch
+        #    tetap dipertahankan untuk rangkaian yang sudah sebaris.
+        huruf_berspasi_sebelum = _hitung_baris_berspasi(bersih.split('\n'))
+        try:
+            from app.sambung_kode import perbaiki_spasi_huruf as _psh2
+            bersih, spasi_huruf_sesudah_stitch = _psh2(bersih)
+        except Exception:
+            spasi_huruf_sesudah_stitch = 0
+        huruf_berspasi_sesudah = _hitung_baris_berspasi(bersih.split('\n'))
     baris = bersih.split('\n')
     # ── v5: pisah lagi SESUDAH stitch (blok bisa menyambung judul kembali).
     baris, pisah_sesudah = _pisah_judul_menempel_baris(baris)
@@ -690,7 +721,11 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     return {'baris': baris, 'kand': kand, 'gabung': gabung, 'buang': buang,
             'kode_label': kode_label, 'stitch_pakai': stitch_pakai,
             'waktu_stitch': waktu_stitch, 'pisah_judul_jml': pisah_judul_jml,
-            'spasi_huruf_jml': spasi_huruf_jml,
+            'spasi_huruf_jml': spasi_huruf_jml + spasi_huruf_sesudah_stitch,
+            'spasi_huruf_sebelum_stitch': spasi_huruf_jml,
+            'spasi_huruf_sesudah_stitch': spasi_huruf_sesudah_stitch,
+            'huruf_berspasi_sebelum': huruf_berspasi_sebelum,
+            'huruf_berspasi_sesudah': huruf_berspasi_sesudah,
             'teks_asal': teks_asal,
             'awal': awal, 'akhir': akhir, 'nama': nama, 't': _t}
 
@@ -975,6 +1010,10 @@ def _petakan_dari_hasil(d, putaran=None):
             'nama': d['nama'], 'kand_jml': len(kand),
             'kode_label': kode_label, 'tanya_ulang_jml': tanya_ulang_jml,
             'tanya_ulang_gelombang': tanya_ulang_gelombang,
+            'spasi_huruf_jml': d.get('spasi_huruf_jml', 0),
+            'spasi_huruf_sesudah_stitch': d.get('spasi_huruf_sesudah_stitch', 0),
+            'huruf_berspasi_sebelum': d.get('huruf_berspasi_sebelum', 0),
+            'huruf_berspasi_sesudah': d.get('huruf_berspasi_sesudah', 0),
             'jev_mati': jev_mati, 'stitch_pakai': d.get('stitch_pakai', False),
             'versi_aturan': RULE_VERSION}
 
