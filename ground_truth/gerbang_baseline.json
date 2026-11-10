@@ -1,5 +1,9 @@
 {
+  "model": "1.14",
+  "tanggal": "2026-11-10",
+  "catatan": "Baseline gerbang model 1.14 (MODEL_DEFAULT SATPAM/typesafe/jev-1.14, RULE_VERSION jev-peta-v7). Baseline 1.13 tersimpan di gerbang_baseline_113.json. PERHATIAN: 112/115 baru punya 2 run, jadi rentang antar-run adalah batas bawah dan ambang G2=3 ketat — sesi 1.14 berikutnya bisa duduk di batas karena drift model (lebar drift 1.13: 112=7, 115=11). Bila G2 gagal mepet, ulangi satu sesi segar sebelum menvonis regresi.",
   "81": {
+    "model": "1.14",
     "bab": [
       "BAB I PENDAHULUAN",
       "BAB II TINJAUAN PUSTAKA",
@@ -8,44 +12,38 @@
       "BAB V PENUTUP"
     ],
     "subbab_per_run": [
+      130,
       131,
-      131,
-      131,
-      131,
-      131,
-      131,
-      131
+      129,
+      130
     ],
-    "subbab_median": 131,
+    "subbab_median": 130.0,
     "paragraf_per_run": [
-      173,
-      173,
-      166,
-      173,
-      170,
-      165,
-      176
+      199,
+      197,
+      194,
+      193
     ],
-    "paragraf_median": 173,
-    "ambang_g2": 2,
+    "paragraf_median": 195.5,
+    "ambang_g2": 3,
     "rentang_subbab_run": [
-      131,
+      129,
       131
     ],
     "median_sesi": [
       131,
-      131,
-      131,
-      131
+      129,
+      130
     ],
     "rentang_median_sesi": [
-      131,
+      129,
       131
     ],
-    "sumber": "sesi kode v7 (b41392a + v8 tanpa ubah klasifikasi): v7(3 run), ab114-1.13(1 run), deploy(1 run), gerbang(2 run)",
+    "sumber": "run 1.14: baseline114-run1=130, baseline114-run2=131, verifikasi114=129, ab114-1.14=130",
     "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
   },
   "112": {
+    "model": "1.14",
     "bab": [
       "BAB II TINJAUAN PUSTAKA",
       "BAB III METODOLOGI PENELITIAN",
@@ -53,38 +51,32 @@
       "BAB V PENUTUP"
     ],
     "subbab_per_run": [
-      80,
-      76,
-      75,
-      78,
-      82
+      81,
+      79
     ],
-    "subbab_median": 78,
+    "subbab_median": 80.0,
     "paragraf_per_run": [
-      22,
-      20,
-      23,
-      32,
-      22
+      89,
+      94
     ],
-    "paragraf_median": 22,
-    "ambang_g2": 6,
+    "paragraf_median": 91.5,
+    "ambang_g2": 3,
     "rentang_subbab_run": [
-      75,
-      82
+      79,
+      81
     ],
     "median_sesi": [
-      76,
-      82
+      81
     ],
     "rentang_median_sesi": [
-      76,
-      82
+      81,
+      81
     ],
-    "sumber": "sesi kode v7 (b41392a + v8 tanpa ubah klasifikasi): v7(3 run), gerbang(2 run)",
+    "sumber": "run 1.14: baseline114-run1=81, baseline114-run2=79",
     "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
   },
   "115": {
+    "model": "1.14",
     "bab": [
       "BAB II TINJAUAN PUSTAKA",
       "BAB III METODOLOGI PENELITIAN",
@@ -92,38 +84,28 @@
       "BAB V PENUTUP"
     ],
     "subbab_per_run": [
-      67,
-      69,
-      70,
       75,
-      75,
-      78
+      76
     ],
-    "subbab_median": 72.5,
+    "subbab_median": 75.5,
     "paragraf_per_run": [
-      26,
-      24,
-      23,
-      20,
-      23,
-      18
+      61,
+      56
     ],
-    "paragraf_median": 23.0,
-    "ambang_g2": 8,
+    "paragraf_median": 58.5,
+    "ambang_g2": 3,
     "rentang_subbab_run": [
-      67,
-      78
+      75,
+      76
     ],
     "median_sesi": [
-      69,
-      75,
-      78
+      76
     ],
     "rentang_median_sesi": [
-      69,
-      78
+      76,
+      76
     ],
-    "sumber": "sesi kode v7 (b41392a + v8 tanpa ubah klasifikasi): v7(3 run), deploy(1 run), gerbang(2 run)",
+    "sumber": "run 1.14: baseline114-run1=75, baseline114-run2=76",
     "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
   },
   "WULAN-1": {
@@ -154,6 +136,7 @@
     ],
     "sumber": "sesi kode v7 (b41392a + v8 tanpa ubah klasifikasi): v7(3 run)",
     "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2",
-    "catatan": "referensi saja — gerbang hanya memeriksa fid 81/112/115; WULAN-1 hanya punya 1 sesi v7 (3 run), jadi ambangnya dari rentang run."
+    "catatan": "referensi 1.13 saja — belum ada run 1.14 untuk WULAN-1; gerbang tidak memeriksanya.",
+    "model": "1.13"
   }
 }
