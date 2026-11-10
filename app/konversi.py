@@ -950,8 +950,13 @@ def _pecah_blok(teks: str) -> list:
            baris kosong (`kosong`) — semuanya dibaca KODE, tak dikirim ke Jev.
            KODE juga MENYARING kandidat (`_kandidat_sambung`) — sesuai
            kelemahan #5: "saring di kode dulu; kirim hanya yang perlu".
+           Sejak v4 (10 Nov 2026) kode juga MEMUTUSKAN pasangan yang PASTI
+           (`app/sambung_kode.py`): yang pasti sambung / pasti tidak
+           sambung tidak ditanya ke Jev lagi — terukur di fid=115: 63 batch
+           jadi 13 batch, fid=81: 5 batch jadi 0, tanpa mengubah peta bab.
     JEV  : satu `noul` per pasangan kandidat baris — "does line Lxxx pick up
            mid-sentence?" Dikirim per jatah supaya tak kena context rot.
+           Hanya untuk pasangan yang kode TIDAK BISA putuskan.
     KODE : gabung baris tersambung jadi blok (ambang dari cookbook).
 
     Balik: [{'text':…, 'lines':[…], 'kosong':bool}] — [] bila Jev mati.
@@ -965,9 +970,27 @@ def _pecah_blok(teks: str) -> list:
     if len(baris) < 4:
         return []
 
+    #  KODE DULU (v4, 10 Nov 2026): putuskan pasangan yang PASTI oleh kode
+    #  (`sambung_kode`: True = pasti sambung, False = pasti tidak, None =
+    #  tanya Jev). Yang meragukan tetap ditanya (jalur lama, tidak berubah).
+    try:
+        from .sambung_kode import sambung_kode as _sk
+    except Exception:                                     # noqa: BLE001
+        _sk = None
+    sambung_kode_jawaban: dict = {}
+    tanya_kandidat: list = []
+    for _n in _kandidat_sambung(baris):
+        _d = _sk(baris[_n - 1], baris[_n]) if _sk else None
+        if _d is True:
+            sambung_kode_jawaban[f'L{_n:04d}'] = {'noul': 1.0}
+        elif _d is False:
+            sambung_kode_jawaban[f'L{_n:04d}'] = {'noul': 0.0}
+        else:
+            tanya_kandidat.append(_n)
+
     #  JEV pass 1 — sambung (HANYA baris kandidat + tetangga kirinya)
     sambung: dict = {}
-    kandidat = _kandidat_sambung(baris)
+    kandidat = tanya_kandidat
     for mulai in range(0, len(kandidat), _GAL_KAND):
         sub = kandidat[mulai:mulai + _GAL_KAND]
         #  Jev butuh baris SEBELUMNYA untuk menilai "menyambung ke atas?" —
@@ -994,7 +1017,10 @@ def _pecah_blok(teks: str) -> list:
         kosong = not b
         gabung = False
         if blok and not kosong:
-            noul = (sambung.get(f'L{n:04d}') or {}).get('noul')
+            #  Kode dulu (v4): jawaban kode mengalahkan — Jev hanya ditanya
+            #  untuk pasangan yang kode tidak bisa putuskan.
+            noul = (sambung_kode_jawaban.get(f'L{n:04d}')
+                    or sambung.get(f'L{n:04d}') or {}).get('noul')
             if noul is not None:
                 ambang = (_SAMBUNG_AKHIR if _akhir_kalimat(baris[n - 1])
                           else _SAMBUNG_GANTUNG)

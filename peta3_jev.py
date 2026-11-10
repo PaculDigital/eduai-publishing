@@ -12,18 +12,21 @@ GELOMBANG: BATAS_TANYA = 120 · BATAS_KAR = 18.000 (di bawah batas aman 156/20.6
 """
 import sys, json, time, re, os, hashlib, logging
 from collections import OrderedDict
-sys.path.insert(0, '/app')
+sys.path.insert(0, '/tmp/jev-v4')
 from app.ai import SessionLocal, _teks_dari_berkas, UPLOAD_DIR
 from app.models import FileBerkas
 from app import satpam, state
 
 log = logging.getLogger(__name__)
 
-# ── VERSI ATURAN (10 Nov 2026, v3-stitch) ────────────────────────────────
+# ── VERSI ATURAN (10 Nov 2026, v4-prefilter) ────────────────────────────
 #    Kunci cache peta: ubah string ini SETIAP KALI aturan di berkas ini
 #    berubah (stitch, ambang, Aturan 2/4/5/6, D1) ⇒ cache lama kedaluwarsa
 #    otomatis, tidak pernah ada peta basi dari aturan lama.
-RULE_VERSION = 'jev-peta-v3-stitch'
+#    v4: pre-filter kode di stitch (`sambung_kode`), tanya-ulang urut p +
+#    suara berbobot confidence, kupas nomor halaman pada BAB, waktu stitch
+#    tercatat (terukur live 10 Nov: fid=115 stitch 64 -> ~14 panggilan).
+RULE_VERSION = 'jev-peta-v4-prefilter'
 
 # ── SAKLAR (env, tanpa ubah kode) ────────────────────────────────────────
 #    EDUAI_JEV_STITCH=0      ⇒ matikan pass-1 stitch (susun cara lama)
@@ -131,7 +134,8 @@ POLA_BAB = re.compile(r'^BAB\s+([IVX0-9]+)\s*$', re.I)   # ivx = Romawi · 0-9 =
 #    "BAB I" polos sudah disedot ke `gabung` di susun() ⇒ tak pernah jadi kand.
 #    Penyebutan sistematika hanya cocok pola AWALAN ini. (Koreksi Bos 09 Okt.)
 #    Boleh didahului nomor daftar: "1. BAB I PENDAHULUAN, bagian ini…".
-_POLA_BAB_TEKS = re.compile(r'^(?:\d+[.)]\s*|[IVX]+[.)]\s*)?BAB\s+[IVX0-9]+\b', re.I)
+#    Boleh juga didahului nomor halaman: "13 BAB I" (terukur WULAN-1).
+_POLA_BAB_TEKS = re.compile(r'^(?:\d{1,3}\s+)?(?:\d+[.)]\s*|[IVX]+[.)]\s*)?BAB\s+[IVX0-9]+\b', re.I)
 #    Pengikut blok sistematika — DUA ragam terukur (09 Okt, naskah Wulandari fid=112):
 #      "Bab ini berisi…"   (Asih)  ·  "bagian ini berisikan…" (Wulandari)
 #    ⚠️ WAJIB terima keduanya: ganti salah satu saja = D1 gagal di kampus lain.
@@ -379,7 +383,13 @@ def _stitch_baris(teks, tanya_fn=None):
     #    pernah gabung melewati garis BAB.
     if tanya_fn is None:
         tanya_fn = satpam.tanya_bebas_mutu
-    pasangan = []          # (idx_blok_sebelum, idx_blok_sesudah)
+    # ── KODE DULU (v4): pasangan yang PASTI diputus kode, tidak ditanya Jev.
+    try:
+        from app.sambung_kode import sambung_kode as _sk
+    except Exception:                                     # noqa: BLE001
+        _sk = None
+    pasangan = []          # (idx_blok_sebelum, idx_blok_sesudah) -> tanya Jev
+    langsung = []          # pasangan yang PASTI sambung (kode, tanpa Jev)
     for a in range(len(blok)):
         if blok[a].get('kosong') or not (blok[a].get('text') or '').strip():
             continue
@@ -391,7 +401,13 @@ def _stitch_baris(teks, tanya_fn=None):
             sesudah = (blok[b].get('text') or '').strip()
             if POLA_BAB.match(sebelum) or POLA_BAB.match(sesudah):
                 continue
-            pasangan.append((a, b))
+            d = _sk(sebelum, sesudah) if _sk else None
+            if d is False:
+                continue               # pasti tidak sambung -> jangan tanya
+            if d is True:
+                langsung.append((a, b))
+            else:
+                pasangan.append((a, b))
     sambung = {}
     if pasangan:
         for mulai in range(0, len(pasangan), 120):
@@ -410,6 +426,7 @@ def _stitch_baris(teks, tanya_fn=None):
                 jawab = {}
             if jawab:
                 sambung.update(jawab)
+    if pasangan or langsung:
         try:
             ambang_gantung = _K._SAMBUNG_GANTUNG
             ambang_akhir = _K._SAMBUNG_AKHIR
@@ -428,6 +445,7 @@ def _stitch_baris(teks, tanya_fn=None):
                     gabung_idx.add((a, b))
             except (TypeError, ValueError):
                 pass
+        gabung_idx.update(langsung)     # pasangan PASTI sambung (kode, v4)
         if gabung_idx:
             buang = set()
             for a, b in sorted(gabung_idx):
@@ -476,8 +494,11 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
         pakai_stitch = _stitch_aktif()
     teks_asal = bersih            # sidik cache dihitung dari teks SEBELUM stitch
     stitch_pakai = False
+    waktu_stitch = 0.0
     if pakai_stitch and bersih:
+        _t0_stitch = time.time()
         hasil_stitch = _stitch_baris(bersih)
+        waktu_stitch = time.time() - _t0_stitch
         stitch_pakai = hasil_stitch is not bersih and hasil_stitch != bersih
         bersih = hasil_stitch
     baris = bersih.split('\n')
@@ -502,7 +523,11 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             buang.append(i)
             i += 1
             continue
-        m = POLA_BAB.match(s)
+        # ── NOMOR HALAMAN NEMPEL (WULAN-1, terukur live 10 Nov 2026) ─────
+        #    "13 BAB I" / "13 1.1 Latar Belakang" — kupas awalan 1-3 digit
+        #    HANYA untuk pencocokan pola; teks asli baris tidak diubah.
+        s_pola = re.sub(r'^\d{1,3}\s+', '', s)
+        m = POLA_BAB.match(s_pola)
         if m:
             j = i + 1
             while j < akhir and not baris[j].strip():
@@ -510,18 +535,18 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             if j < akhir:
                 s2 = baris[j].strip()
                 if s2 and s2 == s2.upper() and 4 < len(s2) < 70:
-                    gabung[i] = (s, s2)
+                    gabung[i] = (s_pola, s2)
                     i = j + 1
                     continue
             # BAB tanpa judul menyusul → tetap bab
-            gabung[i] = (s, '')
+            gabung[i] = (s_pola, '')
             i += 1
             continue
         # ── BARIS BERNOMOR DIBACA KODE (10 Nov 2026) ──────────────────
         #    Nomor bertingkat yang memenuhi syarat KETAT ⇒ 'subbab' langsung,
         #    TIDAK dikirim ke Jev (hemat + deterministik). Yang tidak memenuhi
         #    syarat tetap jadi kandidat Jev.
-        if _nomor_bertindak_judul(s):
+        if _nomor_bertindak_judul(s_pola):
             kode_label[i] = 'subbab'
             i += 1
             continue
@@ -529,6 +554,7 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
         i += 1
     return {'baris': baris, 'kand': kand, 'gabung': gabung, 'buang': buang,
             'kode_label': kode_label, 'stitch_pakai': stitch_pakai,
+            'waktu_stitch': waktu_stitch,
             'teks_asal': teks_asal,
             'awal': awal, 'akhir': akhir, 'nama': nama, 't': _t}
 
@@ -639,27 +665,40 @@ def _petakan_dari_hasil(d, putaran=None):
                 #    (p < ambang) ⇒ hemat biaya. `confidence` SUDAH dikirim Jev
                 #    di balasan yang sama ⇒ S1 = NOL panggilan tambahan.
                 #    ⚠️ Terukur: conf Jev 0,36–0,99 (rata 0,839) ⇒ BUKAN 1,00 selalu.
+                #    Sejak v4: None ikut disimpan supaya `conf[i]` sejajar
+                #    dengan `semua[i]` (pasangan suara-confidence).
                 c = jw_i.get('confidence')
-                if isinstance(c, (int, float)):
-                    conf[i].append(float(c))
+                conf[i].append(float(c) if isinstance(c, (int, float)) else None)
             _tidur_adaptif(t0)
 
     def _hitung_label():
         """Label + goyang + p dari `semua`/`conf` saat ini (dipakai ulang
-        sesudah tanya-ulang bertarget)."""
+        sesudah tanya-ulang bertarget).
+
+        ── SUARA BERBOBOT CONFIDENCE (v4, 10 Nov 2026) ──────────────────
+        Dulu: 2 suara berbeda -> label dipaksa 'biasa'. Terukur live fid=81:
+        tanya-ulang membalik label asli (PARAGRAF 157 -> 144) karena suara
+        kedua yang TIDAK YAKIN menimpa suara pertama. Sekarang suara yang
+        menang = yang confidence-nya paling tinggi; seri -> suara pertama.
+        Daftar `goyang` TETAP dicatat untuk diperiksa manusia.
+        """
         lab, goy, p_lab = {}, [], {}
         for i, _t in kand:
-            vs = [x for x in semua[i] if x]
-            dari = {}
-            for v in vs:
-                dari[v] = dari.get(v, 0) + 1
-            utama = max(dari, key=dari.get) if dari else None
-            if len(dari) > 1:
+            pasangan = [(v, c) for v, c in zip(semua[i], conf[i]) if v]
+            skor, urutan = {}, {}
+            for urut, (v, c) in enumerate(pasangan):
+                s = float(c) if isinstance(c, (int, float)) else 0.0
+                if v not in skor or s > skor[v]:
+                    skor[v] = s
+                if v not in urutan:
+                    urutan[v] = urut
+            utama = None
+            if skor:
+                utama = max(skor, key=lambda v: (skor[v], -urutan[v]))
+            if len(skor) > 1:
                 goy.append((i, semua[i]))
-                lab[i] = 'biasa'
-            else:
-                lab[i] = utama if utama in ('bab', 'subbab', 'paragraf') else 'biasa'
-            cs = conf[i]
+            lab[i] = utama if utama in ('bab', 'subbab', 'paragraf') else 'biasa'
+            cs = [c for c in conf[i] if isinstance(c, (int, float))]
             p_lab[i] = round(sum(cs) / len(cs), 3) if cs else None
         return lab, goy, p_lab
 
@@ -675,6 +714,11 @@ def _petakan_dari_hasil(d, putaran=None):
     if putaran == 1 and _tanya_ulang_aktif():
         ragu_idx = [i for i, _t in kand
                     if p_label.get(i) is None or (p_label.get(i) or 0) < 0.5]
+        # ── URUT p NAIK (v4): yang paling tidak yakin ditanya dulu. Dulu
+        #    120 pertama menurut urutan baris, jadi kandidat paling ragu di
+        #    akhir naskah tidak sempat ditanya (terukur: cap mentok di 115/112).
+        ragu_idx.sort(key=lambda i: (p_label.get(i) is not None,
+                                     p_label.get(i) or 0))
         ragu_idx = ragu_idx[:120]
         if ragu_idx:
             tanya_ulang_jml = len(ragu_idx)
@@ -701,8 +745,7 @@ def _petakan_dari_hasil(d, putaran=None):
                     v = v.get('id') or v.get('label')
                 semua[i].append(v)
                 c = jw_i.get('confidence')
-                if isinstance(c, (int, float)):
-                    conf[i].append(float(c))
+                conf[i].append(float(c) if isinstance(c, (int, float)) else None)
             _tidur_adaptif(t0)
             label, goyang, p_label = _hitung_label()
 
@@ -774,6 +817,11 @@ def _petakan_dari_hasil(d, putaran=None):
             'koreksi_kecil': koreksi_kecil,
             'sistematika': sorted(sistematika), 'asal': asal, 'boleh_dipakai_fitur': boleh,
             'gabung': d['gabung'], 'buang': d['buang'], 'waktu': waktu, 'gagal': gagal,
+            # ── v4: `waktu` HANYA gelombang klasifikasi. Terukur live
+            #    fid=115: waktu jumlah 9,52 dtk vs waktu Jev nyata 33,7 dtk
+            #    (sisanya stitch). Sekarang stitch tercatat terpisah.
+            'waktu_stitch': round(d.get('waktu_stitch', 0.0), 3),
+            'waktu_total': round(d.get('waktu_stitch', 0.0) + sum(waktu), 3),
             'gelombang': len(gel), 'semua': semua, 'awal': d['awal'], 'akhir': d['akhir'],
             'nama': d['nama'], 'kand_jml': len(kand),
             'kode_label': kode_label, 'tanya_ulang_jml': tanya_ulang_jml,
@@ -793,7 +841,9 @@ def main():
     print('PETA 3 TINGKAT — %s (fid=%d) %s-%s' % (jdl, fid, r['awal'], r['akhir']))
     print('   kandidat %d · gelombang %d · gabung %d · buang %d · gagal %d'
           % (r['kand_jml'], r['gelombang'], len(r['gabung']), len(r['buang']), r['gagal']))
-    print('   waktu: %s' % ' '.join('%.1f' % w for w in r['waktu']))
+    print('   waktu: %s · stitch %.1f dtk · total %.1f dtk'
+          % (' '.join('%.1f' % w for w in r['waktu']),
+             r.get('waktu_stitch', 0.0), r.get('waktu_total', 0.0)))
     print('   GOYANG: %d' % len(r['goyang']))
     for i, v in r['goyang'][:12]:
         print('      L%06d %s | %s' % (i, v, r['baris'][i].strip()[:40]))
