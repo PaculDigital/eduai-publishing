@@ -205,7 +205,9 @@ def _simpan(hasil, fid, run, r, pgl, extra, hk, hpgl, wall_h, wall):
 
 def _agregat(hasil):
     """Rata-rata + rentang per naskah dari 3 run."""
-    for fid, runs in hasil.items():
+    for fid, runs in list(hasil.items()):   # list(): _agregat menulis
+        # kunci '_agregat' ke dict yang sama — tanpa salinan, iterasi crash
+        # (RuntimeError, terbukti di run live v7 pertama).
         if fid == '_agregat':
             continue
         ag = {}
