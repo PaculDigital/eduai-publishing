@@ -12,18 +12,29 @@ GELOMBANG: BATAS_TANYA = 120 · BATAS_KAR = 18.000 (di bawah batas aman 156/20.6
 """
 import sys, json, time, re, os, hashlib, logging
 from collections import OrderedDict
-sys.path.insert(0, '/app')
 from app.ai import SessionLocal, _teks_dari_berkas, UPLOAD_DIR
 from app.models import FileBerkas
 from app import satpam, state
 
 log = logging.getLogger(__name__)
 
-# ── VERSI ATURAN (10 Nov 2026, v3-stitch) ────────────────────────────────
+# ── VERSI ATURAN (10 Nov 2026, v5) ─────────────────────────────────────
 #    Kunci cache peta: ubah string ini SETIAP KALI aturan di berkas ini
 #    berubah (stitch, ambang, Aturan 2/4/5/6, D1) ⇒ cache lama kedaluwarsa
 #    otomatis, tidak pernah ada peta basi dari aturan lama.
-RULE_VERSION = 'jev-peta-v3-stitch'
+#    v4: pre-filter kode di stitch (`sambung_kode`), tanya-ulang urut p +
+#    suara berbobot confidence, kupas nomor halaman pada BAB, waktu stitch
+#    tercatat (terukur live 10 Nov: fid=115 stitch 64 -> ~14 panggilan).
+#    v5: tanya-ulang BERGELOMBANG (cap 120 per gelombang, maks 3 gelombang),
+#    pisah judul menempel satu baris, perbaiki spasi huruf pecah-per-huruf,
+#    profil kampus untuk istilah + penomoran, tanda bahasa non-standar.
+#    v6 (10 Nov 2026): segmentasi kata SESUDAH stitch (spasi diciptakan
+#    stitch), pisah "BAB + judul + koma + kalimat", koreksi batas paragraf
+#    deterministik + tanya-ulang batas goyang, deteksi BAB deterministik
+#    (kode, bukan Jev), profil kampus istilah + penomoran titik akhir.
+#    v6.7: kupas nomor daftar di pagar judul BAB; batas paragraf hanya
+#    untuk lanjutan eksplisit. v6.8: gabung fragmen 1-2 huruf.
+RULE_VERSION = 'jev-peta-v7'
 
 # ── SAKLAR (env, tanpa ubah kode) ────────────────────────────────────────
 #    EDUAI_JEV_STITCH=0      ⇒ matikan pass-1 stitch (susun cara lama)
@@ -55,6 +66,16 @@ def _tanya_ulang_aktif():
 
 def _jeda_dasar():
     return _env_float('EDUAI_JEV_JEDA_DASAR', 0.7)
+
+
+def _maks_gelombang_tanya_ulang():
+    """Maks gelombang tanya-ulang (v5): tiap gelombang ≤120 kandidat.
+
+    Bawaan 3 ⇒ paling banyak 360 kandidat ragu ditanya ulang (3 panggilan
+    Jev tambahan). 1 = perilaku v4 (satu gelombang, cap 120). Naikkan hanya
+    dengan bukti biaya: tiap gelombang = 1 panggilan Jev.
+    """
+    return max(1, _env_int('EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG', 3))
 
 
 # ── CACHE PETA (10 Nov 2026) ─────────────────────────────────────────────
@@ -116,9 +137,24 @@ def _tidur_adaptif(t0, dasar=None):
 BATAS_TANYA = 120
 BATAS_KAR = 18000
 AMBANG_CAPTION = 70
+# ── KRITERIA (dokumen RESMI TypeSafe, halaman Choice) ──────────────────
+#    "Start with a one-line description per option. When two options are
+#    similar and the model keeps confusing them, describe each one with
+#    an object instead of a string. Give it fields for what the option
+#    covers, what belongs to a neighboring option instead, and a few
+#    example inputs."
+#    `bab` vs `subbab` TERUKUR tertukar (goyang: Asih 23, fid=115 puluhan)
+#    ⇒ keduanya bentuk OBJEK `what`/`not_for`. `paragraf`/`biasa` tetap
+#    satu baris (tidak tertukar). Nama field bebas (bukan bagian API).
 KRITERIA = {
-    'bab': 'Awal BAB (mis. BAB I, BAB II)',
-    'subbab': 'Awal SUB-BAB (mis. 1.1, 2.1.3, atau judul bagian)',
+    'bab': {'what': 'Awal BAB baru — judul tingkat tertinggi naskah '
+                    '(mis. BAB I, BAB II, BAB III)',
+            'not_for': 'Bukan sub-bab bernomor (1.1, 2.1.3), bukan awal '
+                       'paragraf, bukan lanjutan kalimat'},
+    'subbab': {'what': 'Awal SUB-BAB — judul bagian di dalam bab '
+                       '(mis. 1.1, 2.1.3, atau judul bagian tanpa nomor)',
+               'not_for': 'Bukan BAB (BAB I, BAB II), bukan awal paragraf '
+                          'biasa, bukan lanjutan kalimat'},
     'paragraf': 'Awal PARAGRAF BARU (kalimat pertama paragraf)',
     'biasa': 'Lanjutan/biasa (bukan awal apa pun)',
 }
@@ -126,12 +162,108 @@ POLA_CAPTION = re.compile(r'^(tabel|gambar|grafik|diagram|bagan|skema)\s*\.?\s*\
 POLA_SUMBER = re.compile(r'^(sumber|source)\s*[:.]', re.I)
 POLA_MARKER = re.compile(r'^\[\[.*\]\]$')
 POLA_BAB = re.compile(r'^BAB\s+([IVX0-9]+)\s*$', re.I)   # ivx = Romawi · 0-9 = varian "BAB 1" (usul Bos 09 Okt)
+# ── POLA BAB BERNOMOR (v6): seperti _POLA_BAB_TEKS tapi MENANGKAP nomornya
+#    (grup 1) — dipakai deteksi BAB deterministik (angka dinormalisasi,
+#    jadi "BAB 1" dan "BAB I" dikenali sebagai BAB yang sama).
+_POLA_BAB_NOMOR = re.compile(
+    r'^(?:\d{1,3}\s+)?(?:\d+[.)]\s*|[IVX]+[.)]\s*)?BAB\s+([IVX0-9]+)\b', re.I)
+_ROMAWI_BAB = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7,
+               'VIII': 8, 'IX': 9, 'X': 10, 'XI': 11, 'XII': 12, 'XIII': 13,
+               'XIV': 14, 'XV': 15}
+
+
+def _angka_bab(nomor):
+    """Normalisasi nomor BAB ("I", "1", "III") jadi angka; None bila aneh."""
+    t = (nomor or '').strip().upper()
+    if t.isdigit():
+        try:
+            n = int(t)
+            return n if 1 <= n <= 30 else None
+        except ValueError:
+            return None
+    return _ROMAWI_BAB.get(t)
+
+
+# ── KATA GANTUNG (v6.7): kata terakhir baris yang WAJIB diikuti lanjutan
+#    dalam kalimat yang sama. Salinan dari `app/sambung_kode.py` (di sana
+#    dipakai putusan sambung; di sini dipakai koreksi batas paragraf) —
+#    ubah keduanya bila daftar berubah.
+_KATA_GANTUNG = {
+    'dan', 'yang', 'di', 'ke', 'dari', 'untuk', 'dengan', 'atau', 'serta',
+    'dalam', 'pada', 'oleh', 'sebagai', 'adalah', 'bahwa', 'jika', 'karena',
+    'agar', 'supaya', 'yaitu', 'yakni', 'saat', 'ketika', 'sambil', 'tanpa',
+    'antara', 'melalui', 'terhadap', 'kepada', 'demi', 'guna', 'hingga',
+    'sampai', 'sejak', 'sebelum', 'sesudah', 'setelah', 'apabila',
+    'meskipun', 'walaupun', 'namun', 'tetapi', 'sedangkan', 'sementara',
+    'juga', 'pun', 'lah', 'kah', 'tah',
+}
+
+
+def _koreksi_bab_deterministik(baris, label, kand, sistematika, gabung,
+                               kode_label):
+    """Deteksi BAB oleh KODE (v6) — penanda BAB itu deterministik, jangan
+    serahkan ke Jev (sumber susunan BAB berbeda antar run di v5).
+
+    1. Paksa 'bab': kandidat yang diawali penanda BAB ("BAB I", "BAB 1",
+       "3. BAB III ...") dan bukan sistematika ⇒ 'bab', asal 'kode'.
+       Nomor dinormalisasi: "BAB 1" = "BAB I".
+    2. Ganda: nomor BAB yang sama muncul 2x (kepala berjalan / sisa daftar
+       isi) ⇒ kemunculan ke-2 dst jadi 'biasa' (yang pertama yang asli).
+    3. Demosi: label 'bab' dari Jev TANPA penanda BAB ⇒ bukan bab. Kecuali
+       (a) tepat sesudah penanda BAB polos yang judulnya kosong di gabung
+       ("BAB I" lalu "Pendahuluan" — itu judul BAB asli), dan (b) baris
+       huruf BESAR pendek tanpa titik akhir (judul yang penandanya hilang
+       saat ekstraksi). Yang didemosi jadi 'paragraf' bila berakhir tanda
+       akhir kalimat, sisanya 'biasa'.
+    Kembalikan (bab_kode, bab_ganda, bab_demosi) — daftar indeks baris.
+    """
+    bab_kode, bab_ganda, bab_demosi = [], [], []
+    lihat = {}
+    for i, _t in kand:
+        if i in sistematika:
+            continue
+        t = re.sub(r'^\d{1,3}\s+', '', baris[i].strip())
+        m = _POLA_BAB_NOMOR.match(t)
+        if not m:
+            continue
+        angka = _angka_bab(m.group(1))
+        if angka is None:
+            continue
+        if angka in lihat:
+            label[i] = 'biasa'
+            bab_ganda.append(i)
+        else:
+            lihat[angka] = i
+            if label.get(i) != 'bab':
+                label[i] = 'bab'
+            bab_kode.append(i)
+    for i, _t in kand:
+        if label.get(i) != 'bab' or i in sistematika:
+            continue
+        t = re.sub(r'^\d{1,3}\s+', '', baris[i].strip())
+        if _POLA_BAB_NOMOR.match(t):
+            continue
+        j = i - 1
+        while j >= 0 and not baris[j].strip():
+            j -= 1
+        if j >= 0 and j in gabung:
+            _penanda, _judul = gabung[j]
+            if POLA_BAB.match(_penanda.strip()) and not _judul:
+                continue
+        if t and t == t.upper() and len(t) <= 70 \
+                and not re.search(r'[.!?…]["\')\]]*\s*$', t):
+            continue
+        label[i] = ('paragraf' if re.search(r'[.!?…]["\')\]]*\s*$', t)
+                    else 'biasa')
+        bab_demosi.append(i)
+    return bab_kode, bab_ganda, bab_demosi
 # ── ATURAN D1: POLA AWALAN (bukan pola baris-penuh).
 #    ⚠️ POLA_BAB (baris-penuh) TIDAK PERNAH cocok pada KANDIDAT: semua baris
 #    "BAB I" polos sudah disedot ke `gabung` di susun() ⇒ tak pernah jadi kand.
 #    Penyebutan sistematika hanya cocok pola AWALAN ini. (Koreksi Bos 09 Okt.)
 #    Boleh didahului nomor daftar: "1. BAB I PENDAHULUAN, bagian ini…".
-_POLA_BAB_TEKS = re.compile(r'^(?:\d+[.)]\s*|[IVX]+[.)]\s*)?BAB\s+[IVX0-9]+\b', re.I)
+#    Boleh juga didahului nomor halaman: "13 BAB I" (terukur WULAN-1).
+_POLA_BAB_TEKS = re.compile(r'^(?:\d{1,3}\s+)?(?:\d+[.)]\s*|[IVX]+[.)]\s*)?BAB\s+[IVX0-9]+\b', re.I)
 #    Pengikut blok sistematika — DUA ragam terukur (09 Okt, naskah Wulandari fid=112):
 #      "Bab ini berisi…"   (Asih)  ·  "bagian ini berisikan…" (Wulandari)
 #    ⚠️ WAJIB terima keduanya: ganti salah satu saja = D1 gagal di kampus lain.
@@ -248,7 +380,9 @@ def dibuang(s):
     # ATURAN 3 (vonis Bos 09 Okt): judul KUESIONER PENELITIAN = isi LAMPIRAN,
     #   bukan struktur BAB I-V. Konsisten dengan kebijakan lampiran yang sudah
     #   jalan (LAMPIRAN 1-11, DAFTAR LAMPIRAN sudah dibuang).
-    if re.match(r'^\s*(KUESIONER|ANGKET)\b', s, re.I):
+    #   v6: sebutannya dari profil kampus (istilah.kuesioner), bukan hardcode
+    #   — kampus lain boleh memakai "angket" atau sebutan sendiri.
+    if _pola_kuesioner().match(s):
         return True
     if _PEMBUANG.match(s) or _TITIK_ISI.search(s) or POLA_MARKER.match(s):
         return True
@@ -267,7 +401,40 @@ def dibuang(s):
 #    '?' (butir bertanya) atau '.' (kalimat). Yang TIDAK memenuhi syarat
 #    tetap jadi kandidat Jev (mis. "1.1 latar belakang" huruf kecil,
 #    "2. Wawancara" nomor tunggal — kode tak bisa bedakan dari butir daftar).
-_POLA_NOMOR_BERTINGKAT = re.compile(r'^(\d+(?:\.\d+)+)\s+(\S.*)$')
+#    v6: titik sesudah ANGKA ("1.1. Latar Belakang") selalu diterima kode —
+#    itu format penomoran; titik di AKHIR judul ("...Belakang.") hanya
+#    diterima bila profil kampus `penomoran.judul_titik_akhir` = true.
+_POLA_NOMOR_BERTINGKAT = re.compile(r'^(\d+(?:\.\d+)+)\.?\s+(\S.*)$')
+_POLA_KUESIONER_CACHE = {'terms': None, 'pola': None}
+
+
+def _pola_kuesioner():
+    """Pola judul kuesioner/angket dari profil kampus (cache per istilah).
+
+    Gagal baca config ⇒ bawaan ('kuesioner', 'angket') — jangan gagalkan.
+    """
+    try:
+        from app import profil_kampus as _pk
+        terms = tuple((_pk.istilah() or {}).get('kuesioner')
+                      or ('kuesioner', 'angket'))
+    except Exception:
+        terms = ('kuesioner', 'angket')
+    if _POLA_KUESIONER_CACHE.get('terms') != terms:
+        _POLA_KUESIONER_CACHE.update({
+            'terms': terms,
+            'pola': re.compile(
+                r'^\s*(?:%s)\b' % '|'.join(re.escape(t) for t in terms),
+                re.I)})
+    return _POLA_KUESIONER_CACHE['pola']
+
+
+def _judul_titik_akhir_boleh():
+    """True bila profil kampus membolehkan titik di akhir judul bernomor."""
+    try:
+        from app import profil_kampus as _pk
+        return bool((_pk.penomoran() or {}).get('judul_titik_akhir'))
+    except Exception:
+        return False
 
 
 def _ambang(nama, bawaan):
@@ -288,7 +455,7 @@ def _huruf_awal_kecil(s):
     '1.1 latar belakang' = huruf kecil, '1.1 Latar' bukan). Tanpa kupasan
     ini, judul bernomor yang huruf kecil lolos dari Aturan 5 (angka '1'
     bukan huruf kecil — bug terukur 10 Nov 2026)."""
-    t = re.sub(r'^\d+(?:\.\d+)*\s*', '', (s or '').strip())
+    t = re.sub(r'^\d+(?:\.\d+)*\.?\s*', '', (s or '').strip())
     return bool(t) and t[:1].islower()
 
 
@@ -300,9 +467,287 @@ def _nomor_bertindak_judul(s):
     teks = m.group(2)
     if len(s.strip()) > _ambang('subbab_kode_maks_kar', 120):
         return False
-    if teks.endswith('?') or teks.endswith('.'):
+    if teks.endswith('?'):
+        return False
+    # v6: titik akhir judul hanya boleh bila profil kampus mengizinkan.
+    if teks.endswith('.') and not _judul_titik_akhir_boleh():
         return False
     return teks[:1].isupper()
+
+
+# ── PISAH JUDUL MENEMPEL SATU BARIS (v5) ───────────────────────────────
+#    Artefak ekstraksi: "58 BAB III METODOLOGI PENELITIAN 3.1 Jenis
+#    Penelitian 3.2 Metode Penelitian" — beberapa judul menempel dalam
+#    SATU baris. Terukur live WULAN-1 (10 Nov 2026): baris itu jadi
+#    `curiga` Hakim dan tidak satu pun judulnya dikenali.
+#    ATURAN: pisah HANYA bila segmen SEBELUM titik pisah MIRIP JUDUL
+#    (mulai BAB/bernomor, atau ≥70% huruf besar, ≤120 kar, tanpa titik
+#    akhir kalimat) DAN titik pisah memulai judul baru (BAB / nomor
+#    bertingkat + huruf besar). Kalimat biasa yang menyebut "BAB II" atau
+#    "2.1" di tengah TIDAK terpisah — segmen sebelumnya bukan judul.
+_POLA_AWAL_JUDUL_PISAH = re.compile(
+    r'(BAB\s+[IVX0-9]+\b|\d+(?:\.\d+)+\s+[A-Z\u00C0-\u00DE])')
+
+
+def _segmen_mirip_judul(seg):
+    """True bila segmen ini mirip judul (bukan kalimat biasa)."""
+    t = re.sub(r'^\d{1,3}\s+', '', (seg or '').strip())   # kupas nomor halaman
+    if not t or len(t) > 120:
+        return False
+    if t[-1] in '.!?':
+        return False
+    if re.match(r'^(BAB\s+[IVX0-9]+\b|\d+(?:\.\d+)+\s+\S)', t, re.I):
+        return True
+    huruf = [c for c in t if c.isalpha()]
+    if huruf and sum(1 for c in huruf if c.isupper()) / len(huruf) >= 0.7:
+        return True
+    return False
+
+
+def _pisah_judul_menempel(s):
+    """Pisah satu baris berisi >1 judul jadi beberapa baris (deterministik).
+
+    Kembalikan daftar baris (1 elemen = tidak ada yang dipisah).
+    """
+    t = s or ''
+    if len(t) < 12:
+        return [s]
+    titik = [m.start() for m in _POLA_AWAL_JUDUL_PISAH.finditer(t)
+             if m.start() > 0]
+    if not titik:
+        return [s]
+    batas = [0] + titik + [len(t)]
+    segmen = [t[batas[k]:batas[k + 1]].strip() for k in range(len(batas) - 1)]
+    # segmen pertama boleh HANYA nomor halaman ("58") — tempelkan ke judul
+    # berikut, jangan jadikan segmen sendiri (kalau tidak, validasi gagal
+    # dan judul tidak pernah terpisah).
+    if len(segmen) > 1 and re.match(r'^\d{1,3}$', segmen[0]):
+        segmen = [segmen[0] + ' ' + segmen[1]] + segmen[2:]
+    # semua segmen KECUALI terakhir harus mirip judul (segmen terakhir
+    # memulai pola judul oleh konstruksi regex — terima apa adanya).
+    if not all(_segmen_mirip_judul(g) for g in segmen[:-1]):
+        return [s]
+    keluar = [g for g in segmen if g]
+    return keluar if len(keluar) > 1 else [s]
+
+
+# ── PISAH "BAB + JUDUL + KOMA + KALIMAT" (v6) ───────────────────────────
+#    Pola NYATA di naskah (v5 TIDAK menangani — 0 baris cocok pola lama
+#    "58 BAB III ... 3.1 ...", tapi judul BAB fid=115/112 membawa ekor):
+#      "3. BAB III METODOLOGI PENELITIAN, bagian ini menjelaskan tentang"
+#      "5. BAB V PENUTUP, pada bab ini penulis akan menjelaskan mengenai"
+#    ATURAN: pisah HANYA bila ekor sesudah koma memulai KALIMAT (huruf
+#    kecil, atau frasa "bagian ini"/"Bab ini"/"pada bab ini"). Judul yang
+#    ekornya huruf BESAR ("BAB II TINJAUAN PUSTAKA, KERANGKA PEMIKIRAN...")
+#    TIDAK dipisah — itu masih judul. Judul tanpa koma tidak disentuh.
+#    Nomor daftar di depan ("3. ", "5. ") tetap menempel di baris judul
+#    supaya pola BAB deterministik (v6.4) tetap mengenalinya.
+_POLA_BAB_EKOR = re.compile(
+    r'^((?:\d{1,3}\s+)?(?:\d+[.)]\s*)?BAB\s+[IVX0-9]+\s+[^,]{2,80}),\s+(.+)$',
+    re.I)
+
+
+def _pisah_bab_ekor(s):
+    """Pisah satu baris "BAB + judul + koma + kalimat" jadi dua baris.
+
+    Kembalikan [judul, ekor] bila pola cocok, [s] bila tidak.
+    """
+    t = s or ''
+    m = _POLA_BAB_EKOR.match(t.strip())
+    if not m:
+        return [s]
+    judul, ekor = m.group(1).strip(), m.group(2).strip()
+    if not judul or not ekor or len(ekor) < 3:
+        return [s]
+    # judul harus mirip judul: tiap kata diawali huruf BESAR (judul CAPS
+    # maupun Title Case lolos; kalimat biasa tidak).
+    kata_judul = judul.split()
+    if not kata_judul:
+        return [s]
+    if not all(w[:1].isupper() or not w[:1].isalpha() for w in kata_judul):
+        return [s]
+    # ekor harus memulai kalimat: huruf kecil, atau frasa sistematika.
+    if not (ekor[:1].islower()
+            or re.match(r'(?:bagian|bab|pada)\s+(?:ini|bab)\b', ekor, re.I)):
+        return [s]
+    return [judul, ekor]
+
+
+def _pisah_bab_ekor_baris(baris):
+    """Terapkan `_pisah_bab_ekor` ke daftar baris. Kembalikan
+    (baris_baru, jumlah_pisahan)."""
+    keluar, jml = [], 0
+    for b in baris:
+        p = _pisah_bab_ekor(b)
+        jml += max(0, len(p) - 1)
+        keluar.extend(p)
+    return keluar, jml
+
+
+# ── PISAH EKOR KALIMAT PADA JUDUL SUBBAB BERNOMOR (v7) ─────────────────
+#    Cacat terbesar v6 (terukur live 10 Nov 2026): judul SUBBAB bernomor
+#    membawa ekor kalimat — "1.1 LATAR BELAKANG Indonesia merupakan
+#    salah satu negara den...", "1.3 Tujuan Penelitian 1. Untuk
+#    mengidentifikasi SWOT pada Us...", "1.5 Sistematika Penulisan Agar
+#    memberikan gambaran sekilas m...". Judul-judul itu DIBACA KODE
+#    (`_nomor_bertindak_judul`, tanpa Jev), jadi ekornya ikut jadi judul.
+#    ATURAN (deterministik, sebelum klasifikasi; ekor jadi baris sendiri):
+#      · penanda butir "1." sesudah judul -> pisah sebelum penanda;
+#      · koma + kalimat sesudahnya (>=2 kata huruf kecil di 4 kata pertama)
+#        -> pisah di koma (judul yang ekornya Title Case semua tidak kena);
+#      · kata huruf kecil BUKAN penghubung judul ("adalah", "merupakan")
+#        -> pisah sebelum kata itu;
+#      · kata awal kalimat ("Agar", "Dalam", "Pada", "Untuk", ...) +
+#        kalimat sesudahnya -> pisah sebelum kata itu;
+#      · kata Title Case sesudah deret CAPS + kalimat sesudahnya
+#        ("LATAR BELAKANG Indonesia merupakan ...") -> ekor mulai di kata
+#        Title Case itu, BUKAN di kata huruf kecilnya.
+#    Penghubung judul ("dan", "di", "ke", "dari", "yang", ...) boleh di
+#    tengah judul dan tidak memicu pisah. Judul tanpa ekor tidak disentuh.
+_KATA_PENGHUBUNG_JUDUL = frozenset({
+    'dan', 'atau', 'di', 'ke', 'dari', 'yang', 'per', 'antar', 'atas',
+    'bagi', 'tentang', 'hingga', 'serta', 'maupun', 'terhadap', 'antara',
+    'sampai', 'demi', 'kepada'})
+_KATA_AWAL_KALIMAT = frozenset({
+    'agar', 'dalam', 'pada', 'untuk', 'dengan', 'sebagai', 'karena',
+    'sehingga', 'oleh', 'namun', 'sedangkan', 'sementara', 'jika',
+    'apabila', 'ketika', 'setelah', 'sebelum', 'selama', 'melalui',
+    'berdasarkan', 'menurut', 'selain', 'ini', 'itu', 'hal', 'tersebut',
+    'bab', 'bagian'})
+_POLA_SUBBAB_EKOR = re.compile(
+    r'^((?:\d{1,3}\s+)?\d+(?:\.\d+)+\.?)\s+(.+)$')
+
+
+def _kalimat_ekor(kata):
+    """True bila daftar kata ini membaca seperti kalimat (bukan judul):
+    >=3 kata berhuruf dan >=2 kata huruf kecil di 4 kata pertama."""
+    kata = [w for w in (kata or []) if w and w[:1].isalpha()]
+    if len(kata) < 3:
+        return False
+    kecil = [w for w in kata[:4] if w[:1].islower()]
+    return len(kecil) >= 2
+
+
+def _judul_subbab(depan):
+    """True bila potongan ini mirip judul subbab (bukan kalimat)."""
+    d = (depan or '').strip()
+    if not d or len(d) > 120 or d[-1] in '.?!':
+        return False
+    kata = d.split()
+    if not kata:
+        return False
+    return all(w[:1].isupper()
+               or w.lower().strip('.,;:') in _KATA_PENGHUBUNG_JUDUL
+               or not w[:1].isalpha() for w in kata)
+
+
+def _pisah_subbab_ekor(s):
+    """Pisah satu baris "nomor + judul subbab + ekor kalimat" jadi dua baris.
+
+    Kembalikan [judul, ekor] bila pola cocok, [s] bila tidak.
+    """
+    t = (s or '').strip()
+    m = _POLA_SUBBAB_EKOR.match(t)
+    if not m:
+        return [s]
+    nomor, sisa = m.group(1), m.group(2).strip()
+    if not sisa or len(sisa) < 3:
+        return [s]
+    judul_awal = nomor + ' '
+
+    # ── 1. penanda butir sesudah judul: "... Penelitian 1. Untuk ..." ──
+    m_butir = re.search(r'\s(\d+[.)])\s+(?=[A-Z\u00C0-\u00DE])', sisa)
+    if m_butir:
+        depan = sisa[:m_butir.start()].strip()
+        ekor = sisa[m_butir.start() + 1:].strip()
+        if depan and _judul_subbab(depan) and _kalimat_ekor(ekor.split()):
+            return [judul_awal + depan, ekor]
+
+    # ── 2. koma + kalimat: "1.1 Latar Belakang, Indonesia merupakan ..." ──
+    for m_koma in re.finditer(r',\s+', sisa):
+        depan = sisa[:m_koma.start()].strip()
+        ekor = sisa[m_koma.end():].strip()
+        if depan and _judul_subbab(depan) and _kalimat_ekor(ekor.split()):
+            return [judul_awal + depan, ekor]
+
+    # ── 3. pindai kata: judul = deret kata judul; ekor mulai di kata yang
+    #    bukan kata judul (huruf kecil non-penghubung / kata awal kalimat).
+    kata = [(mm.start(), mm.group(0))
+            for mm in re.finditer(r'\S+', sisa)]
+    pisah = None
+    for idx, (pos, w) in enumerate(kata):
+        bersih = w.strip('.,;:()[]"\'')
+
+        if not bersih:
+            continue
+        if re.match(r'^\d+[.)]$', bersih):
+            pisah = idx
+            break
+        if bersih.isupper() and any(c.isalpha() for c in bersih):
+            continue                      # kata CAPS = kata judul
+        if bersih[:1].isupper():
+            if bersih.lower() in _KATA_AWAL_KALIMAT and _kalimat_ekor(
+                    [k[1] for k in kata[idx:]]):
+                pisah = idx
+                break
+            continue
+        if bersih.lower() in _KATA_PENGHUBUNG_JUDUL:
+            continue                      # penghubung judul, bukan ekor
+        pisah = idx
+        break
+    if pisah is None or pisah == 0:
+        return [s]
+    # ── ekor boleh mulai satu kata LEBIH AWAL: kata Title Case sesudah
+    #    deret CAPS ("LATAR BELAKANG Indonesia merupakan ...") adalah kata
+    #    pertama kalimat (nama diri), bukan kata judul.
+    if pisah > 1:
+        sebelum = kata[pisah - 1][1].strip('.,;:()[]"\'')
+
+        awal = kata[:pisah - 1]
+        if (sebelum[:1].isupper() and not sebelum.isupper()
+                and awal and all(
+                    k[1].strip('.,;:()[]"\'').isupper()
+                    for k in awal
+                    if k[1].strip('.,;:()[]"\'')[:1].isalpha())):
+            pisah -= 1
+    judul = judul_awal + ' '.join(k[1] for k in kata[:pisah]).strip()
+    ekor = ' '.join(k[1] for k in kata[pisah:]).strip()
+    if not judul.strip() or judul.strip() == nomor or len(ekor.split()) < 2:
+        return [s]
+    return [judul, ekor]
+
+
+def _pisah_subbab_ekor_baris(baris):
+    """Terapkan `_pisah_subbab_ekor` ke daftar baris. Kembalikan
+    (baris_baru, jumlah_pisahan)."""
+    keluar, jml = [], 0
+    for b in baris:
+        p = _pisah_subbab_ekor(b)
+        jml += max(0, len(p) - 1)
+        keluar.extend(p)
+    return keluar, jml
+
+
+def _pisah_judul_menempel_baris(baris):
+    """Terapkan `_pisah_judul_menempel` ke daftar baris. Kembalikan
+    (baris_baru, jumlah_pisahan)."""
+    keluar, jml = [], 0
+    for b in baris:
+        p = _pisah_judul_menempel(b)
+        jml += max(0, len(p) - 1)
+        keluar.extend(p)
+    return keluar, jml
+
+
+# ── BARIS HURUF BERSPASI (v6) ────────────────────────────────────────────
+#    Pola yang sama dipakai pelapor live (jalankan_v*.py): ≥4 huruf tunggal
+#    berspasi berurutan ("D i n a m i k a"). Dipakai mengukur perbaikan
+#    sesudah stitch: sebelum vs sesudah.
+_POLA_HURUF = re.compile(r'(?:[A-Za-z]\s){4,}[A-Za-z]')
+
+
+def _hitung_baris_berspasi(baris):
+    return sum(1 for b in (baris or []) if _POLA_HURUF.search(b or ''))
 
 
 # ── PASS-1 STITCH (10 Nov 2026 — dipasang ke repo, dulu hanya di server) ──
@@ -379,7 +824,25 @@ def _stitch_baris(teks, tanya_fn=None):
     #    pernah gabung melewati garis BAB.
     if tanya_fn is None:
         tanya_fn = satpam.tanya_bebas_mutu
-    pasangan = []          # (idx_blok_sebelum, idx_blok_sesudah)
+    # ── KODE DULU (v4): pasangan yang PASTI diputus kode, tidak ditanya Jev.
+    try:
+        from app.sambung_kode import sambung_kode as _sk
+    except Exception:                                     # noqa: BLE001
+        _sk = None
+    pasangan = []          # (idx_blok_sebelum, idx_blok_sesudah) -> tanya Jev
+    langsung = []          # pasangan yang PASTI sambung (kode, tanpa Jev)
+    def _didahului_bab(a):
+        """True bila blok sebelum `a` (lewati kosong) adalah penanda BAB
+        polos ("BAB III") — artinya blok `a` adalah JUDUL bab itu (hasil
+        `_perbaiki_gabung_bab` yang memecah "BAB III METODOLOGI..." jadi
+        dua blok). Judul bab tidak boleh disambung ke kalimat sesudahnya.
+        """
+        k = a - 1
+        while k >= 0 and (blok[k].get('kosong')
+                          or not (blok[k].get('text') or '').strip()):
+            k -= 1
+        return k >= 0 and bool(POLA_BAB.match(
+            (blok[k].get('text') or '').strip()))
     for a in range(len(blok)):
         if blok[a].get('kosong') or not (blok[a].get('text') or '').strip():
             continue
@@ -389,9 +852,23 @@ def _stitch_baris(teks, tanya_fn=None):
         if b < len(blok) and b > a + 1:
             sebelum = (blok[a].get('text') or '').strip()
             sesudah = (blok[b].get('text') or '').strip()
-            if POLA_BAB.match(sebelum) or POLA_BAB.match(sesudah):
+            # ── v6: jangan gabung melewati garis BAB — pola AWALAN (bukan
+            #    baris-penuh): "BAB III METODOLOGI PENELITIAN" juga garis
+            #    BAB. Dulu POLA_BAB baris-penuh tidak cocok pada judul
+            #    ber kata, sehingga judul + ekor kalimat bisa disambung.
+            #    Termasuk judul yang sudah dipecah `_perbaiki_gabung_bab`
+            #    (blok judul didahului penanda BAB polos).
+            if (_POLA_BAB_TEKS.match(sebelum)
+                    or _POLA_BAB_TEKS.match(sesudah)
+                    or _didahului_bab(a)):
                 continue
-            pasangan.append((a, b))
+            d = _sk(sebelum, sesudah) if _sk else None
+            if d is False:
+                continue               # pasti tidak sambung -> jangan tanya
+            if d is True:
+                langsung.append((a, b))
+            else:
+                pasangan.append((a, b))
     sambung = {}
     if pasangan:
         for mulai in range(0, len(pasangan), 120):
@@ -399,17 +876,29 @@ def _stitch_baris(teks, tanya_fn=None):
             perlu = sorted({a for a, _ in sub} | {b for _, b in sub})
             state = '\n'.join('L%04d| %s' % (n, (blok[n].get('text') or '')[:200])
                               for n in perlu)
-            tanya = {('L%04d' % b): {'instructions':
-                     ('Does line L%04d pick up mid-sentence, continuing a '
-                      'sentence left unfinished at the end of line L%04d?'
-                      % (b, a)), 'type': 'noul'}
-                     for a, b in sub}
+            # ── KUTIP KEDUA BARIS (dokumen RESMI TypeSafe, cookbook
+            #    'Structure recovery' Pass 1): "quotes both lines, so the
+            #    model judges the exact text in question rather than
+            #    finding it by id". Pasangan lintas-kosong SEDIKIT per
+            #    naskah, jadi kutipan [:200] tidak mengancam context rot.
+            tanya = {}
+            for a, b in sub:
+                _ta = (blok[a].get('text') or '').strip()[:200]
+                _tb = (blok[b].get('text') or '').strip()[:200]
+                tanya['L%04d' % b] = {
+                    'instructions':
+                        ('Does line L%04d pick up mid-sentence, continuing a '
+                         'sentence left unfinished at the end of line L%04d? '
+                         'Line L%04d: "%s". Line L%04d: "%s".'
+                         % (b, a, a, _ta, b, _tb)),
+                    'type': 'noul'}
             try:
                 jawab = tanya_fn(state, tanya) or {}
             except Exception:
                 jawab = {}
             if jawab:
                 sambung.update(jawab)
+    if pasangan or langsung:
         try:
             ambang_gantung = _K._SAMBUNG_GANTUNG
             ambang_akhir = _K._SAMBUNG_AKHIR
@@ -428,6 +917,7 @@ def _stitch_baris(teks, tanya_fn=None):
                     gabung_idx.add((a, b))
             except (TypeError, ValueError):
                 pass
+        gabung_idx.update(langsung)     # pasangan PASTI sambung (kode, v4)
         if gabung_idx:
             buang = set()
             for a, b in sorted(gabung_idx):
@@ -475,12 +965,65 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     if pakai_stitch is None:
         pakai_stitch = _stitch_aktif()
     teks_asal = bersih            # sidik cache dihitung dari teks SEBELUM stitch
+    # ── v5: perbaiki teks pecah per huruf ("D i n a m i k a") SEBELUM
+    #    stitch/pisah-judul — supaya kata utuh dikenali semua aturan.
+    #    Rangkaian yang tidak aman dibiarkan (lihat app/sambung_kode).
+    try:
+        from app.sambung_kode import perbaiki_spasi_huruf as _psh
+        bersih, spasi_huruf_jml = _psh(bersih)
+    except Exception:
+        spasi_huruf_jml = 0
+    # ── v5: pisah judul menempel SEBELUM stitch (supaya stitch tidak
+    #    menelan judul yang menempel satu baris).
+    _baris_split, pisah_sebelum = _pisah_judul_menempel_baris(bersih.split('\n'))
+    # ── v6: pisah "BAB + judul + koma + kalimat" SEBELUM stitch.
+    _baris_split, pisah_ekor_sebelum = _pisah_bab_ekor_baris(_baris_split)
+    # ── v7: pisah ekor kalimat pada judul SUBBAB bernomor SEBELUM stitch.
+    _baris_split, pisah_subbab_sebelum = _pisah_subbab_ekor_baris(_baris_split)
+    bersih = '\n'.join(_baris_split)
     stitch_pakai = False
+    waktu_stitch = 0.0
+    spasi_huruf_sesudah_stitch = 0
+    spasi_fragmen_jml = 0
+    huruf_berspasi_sebelum = 0
+    huruf_berspasi_sesudah = 0
     if pakai_stitch and bersih:
+        _t0_stitch = time.time()
         hasil_stitch = _stitch_baris(bersih)
+        waktu_stitch = time.time() - _t0_stitch
         stitch_pakai = hasil_stitch is not bersih and hasil_stitch != bersih
         bersih = hasil_stitch
+        # ── v6: perbaiki spasi huruf SESUDAH stitch (tugas 1). Teks pecah
+        #    per huruf hidup satu huruf per BARIS ("D\ni\nn...") — pola
+        #    pra-stitch tidak bisa cocok lintas baris; stitch-lah yang
+        #    menyambungnya jadi "D i n a m i k a" (spasi DICIPTAKAN stitch).
+        #    Jadi perbaikan sesudah stitch adalah yang bekerja; pra-stitch
+        #    tetap dipertahankan untuk rangkaian yang sudah sebaris.
+        huruf_berspasi_sebelum = _hitung_baris_berspasi(bersih.split('\n'))
+        try:
+            from app.sambung_kode import perbaiki_spasi_huruf as _psh2
+            bersih, spasi_huruf_sesudah_stitch = _psh2(bersih)
+        except Exception:
+            spasi_huruf_sesudah_stitch = 0
+        # ── v6.8: gabung fragmen 1-2 huruf ("d ij e l a s k a n") — pola
+        #    run huruf-tunggal tidak cocok pada potongan 2 huruf.
+        try:
+            from app.sambung_kode import perbaiki_fragmen_huruf as _pfh
+            bersih, spasi_fragmen_jml = _pfh(bersih)
+        except Exception:
+            spasi_fragmen_jml = 0
+        huruf_berspasi_sesudah = _hitung_baris_berspasi(bersih.split('\n'))
     baris = bersih.split('\n')
+    # ── v5: pisah lagi SESUDAH stitch (blok bisa menyambung judul kembali).
+    baris, pisah_sesudah = _pisah_judul_menempel_baris(baris)
+    # ── v6: pisah "BAB + judul + koma + kalimat" lagi SESUDAH stitch
+    #    (stitch bisa menyambung kembali judul + ekor yang sudah dipisah).
+    baris, pisah_ekor_sesudah = _pisah_bab_ekor_baris(baris)
+    # ── v7: pisah ekor subbab lagi SESUDAH stitch.
+    baris, pisah_subbab_sesudah = _pisah_subbab_ekor_baris(baris)
+    pisah_judul_jml = pisah_sebelum + pisah_sesudah
+    pisah_bab_ekor_jml = pisah_ekor_sebelum + pisah_ekor_sesudah
+    pisah_subbab_ekor_jml = pisah_subbab_sebelum + pisah_subbab_sesudah
     if awal is None or awal < 0:
         awal = 0
     if akhir is None or akhir > len(baris):
@@ -502,7 +1045,11 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             buang.append(i)
             i += 1
             continue
-        m = POLA_BAB.match(s)
+        # ── NOMOR HALAMAN NEMPEL (WULAN-1, terukur live 10 Nov 2026) ─────
+        #    "13 BAB I" / "13 1.1 Latar Belakang" — kupas awalan 1-3 digit
+        #    HANYA untuk pencocokan pola; teks asli baris tidak diubah.
+        s_pola = re.sub(r'^\d{1,3}\s+', '', s)
+        m = POLA_BAB.match(s_pola)
         if m:
             j = i + 1
             while j < akhir and not baris[j].strip():
@@ -510,18 +1057,33 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             if j < akhir:
                 s2 = baris[j].strip()
                 if s2 and s2 == s2.upper() and 4 < len(s2) < 70:
-                    gabung[i] = (s, s2)
+                    gabung[i] = (s_pola, s2)
                     i = j + 1
                     continue
             # BAB tanpa judul menyusul → tetap bab
-            gabung[i] = (s, '')
+            gabung[i] = (s_pola, '')
             i += 1
             continue
+        # ── BAB + JUDUL SATU BARIS (v5) ───────────────────────────────
+        #    "BAB III METODOLOGI PENELITIAN" — judul BAB tidak di baris
+        #    berikut, tapi menempel di baris yang sama. Kenali langsung
+        #    sebagai bab (deterministik, tanpa Jev). Syarat: judul mulai
+        #    huruf BESAR, tanpa titik akhir kalimat, <70 kar. Kalimat
+        #    biasa ("BAB III membahas metode penelitian ini.") TIDAK kena:
+        #    judulnya huruf kecil / berakhir titik.
+        m1 = re.match(r'^(BAB\s+[IVX0-9]+)\s+(\S.*)$', s_pola, re.I)
+        if m1:
+            _judul = m1.group(2).strip()
+            if _judul and _judul[0].isupper() and _judul[-1] not in '.?!' \
+                    and len(_judul) < 70:
+                gabung[i] = (m1.group(1), _judul)
+                i += 1
+                continue
         # ── BARIS BERNOMOR DIBACA KODE (10 Nov 2026) ──────────────────
         #    Nomor bertingkat yang memenuhi syarat KETAT ⇒ 'subbab' langsung,
         #    TIDAK dikirim ke Jev (hemat + deterministik). Yang tidak memenuhi
         #    syarat tetap jadi kandidat Jev.
-        if _nomor_bertindak_judul(s):
+        if _nomor_bertindak_judul(s_pola):
             kode_label[i] = 'subbab'
             i += 1
             continue
@@ -529,6 +1091,15 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
         i += 1
     return {'baris': baris, 'kand': kand, 'gabung': gabung, 'buang': buang,
             'kode_label': kode_label, 'stitch_pakai': stitch_pakai,
+            'waktu_stitch': waktu_stitch, 'pisah_judul_jml': pisah_judul_jml,
+            'pisah_bab_ekor_jml': pisah_bab_ekor_jml,
+            'pisah_subbab_ekor_jml': pisah_subbab_ekor_jml,
+            'spasi_huruf_jml': spasi_huruf_jml + spasi_huruf_sesudah_stitch,
+            'spasi_huruf_sebelum_stitch': spasi_huruf_jml,
+            'spasi_huruf_sesudah_stitch': spasi_huruf_sesudah_stitch,
+            'spasi_fragmen_jml': spasi_fragmen_jml,
+            'huruf_berspasi_sebelum': huruf_berspasi_sebelum,
+            'huruf_berspasi_sesudah': huruf_berspasi_sesudah,
             'teks_asal': teks_asal,
             'awal': awal, 'akhir': akhir, 'nama': nama, 't': _t}
 
@@ -639,45 +1210,115 @@ def _petakan_dari_hasil(d, putaran=None):
                 #    (p < ambang) ⇒ hemat biaya. `confidence` SUDAH dikirim Jev
                 #    di balasan yang sama ⇒ S1 = NOL panggilan tambahan.
                 #    ⚠️ Terukur: conf Jev 0,36–0,99 (rata 0,839) ⇒ BUKAN 1,00 selalu.
+                #    Sejak v4: None ikut disimpan supaya `conf[i]` sejajar
+                #    dengan `semua[i]` (pasangan suara-confidence).
                 c = jw_i.get('confidence')
-                if isinstance(c, (int, float)):
-                    conf[i].append(float(c))
+                conf[i].append(float(c) if isinstance(c, (int, float)) else None)
             _tidur_adaptif(t0)
 
     def _hitung_label():
         """Label + goyang + p dari `semua`/`conf` saat ini (dipakai ulang
-        sesudah tanya-ulang bertarget)."""
+        sesudah tanya-ulang bertarget).
+
+        ── SUARA BERBOBOT CONFIDENCE (v4, 10 Nov 2026) ──────────────────
+        Dulu: 2 suara berbeda -> label dipaksa 'biasa'. Terukur live fid=81:
+        tanya-ulang membalik label asli (PARAGRAF 157 -> 144) karena suara
+        kedua yang TIDAK YAKIN menimpa suara pertama. Sekarang suara yang
+        menang = yang confidence-nya paling tinggi; seri -> suara pertama.
+        Daftar `goyang` TETAP dicatat untuk diperiksa manusia.
+        """
         lab, goy, p_lab = {}, [], {}
         for i, _t in kand:
-            vs = [x for x in semua[i] if x]
-            dari = {}
-            for v in vs:
-                dari[v] = dari.get(v, 0) + 1
-            utama = max(dari, key=dari.get) if dari else None
-            if len(dari) > 1:
+            pasangan = [(v, c) for v, c in zip(semua[i], conf[i]) if v]
+            skor, urutan = {}, {}
+            for urut, (v, c) in enumerate(pasangan):
+                s = float(c) if isinstance(c, (int, float)) else 0.0
+                if v not in skor or s > skor[v]:
+                    skor[v] = s
+                if v not in urutan:
+                    urutan[v] = urut
+            utama = None
+            if skor:
+                utama = max(skor, key=lambda v: (skor[v], -urutan[v]))
+            if len(skor) > 1:
                 goy.append((i, semua[i]))
-                lab[i] = 'biasa'
-            else:
-                lab[i] = utama if utama in ('bab', 'subbab', 'paragraf') else 'biasa'
-            cs = conf[i]
+            lab[i] = utama if utama in ('bab', 'subbab', 'paragraf') else 'biasa'
+            cs = [c for c in conf[i] if isinstance(c, (int, float))]
             p_lab[i] = round(sum(cs) / len(cs), 3) if cs else None
         return lab, goy, p_lab
 
     label, goyang, p_label = _hitung_label()
 
-    # ── TANYA-ULANG BERTARGET (10 Nov 2026, ganti putaran global) ────────
+    # ── TANYA-ULANG BERTARGET BERGELOMBANG (v5, ganti 1 gelombang v4) ───
     #    Putaran global 3× TERBUKTI tidak berguna (kesepakatan antar-putaran
     #    selalu 1,00 ⇒ buang 114 dtk). Yang berguna: tanya ULANG hanya pada
-    #    kandidat yang goyang atau p rendah — maksimal 1 gelombang tambahan.
+    #    kandidat yang goyang atau p rendah.
     #    p < 0,5 = Jev sendiri tidak yakin (titik tengah netral 0..1, BUKAN
     #    ambang yang disetel per naskah); p None = Jev tidak menjawab.
+    #    MASALAH v4: satu gelombang cap 120 — di fid=115 ragu > 120, jadi
+    #    kandidat paling ragu di akhir naskah tidak sempat ditanya.
+    #    OBAT v5: gelombang KECIL berulang (≤120 per gelombang, maks 3
+    #    gelombang bawaan). Tiap gelombang: hitung ulang ragu dari p
+    #    TERKINI, lewati yang sudah ditanya, ambil 120 paling tidak yakin.
+    #    Yang sudah membaik (p ≥ 0,5) sesudah gelombang sebelumnya TIDAK
+    #    ditanya lagi ⇒ panggilan tidak terbuang. Biaya: 1 panggilan Jev
+    #    per gelombang, paling banyak 3 (env EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG).
     tanya_ulang_jml = 0
+    tanya_ulang_gelombang = 0
+    tanya_ulang_goyang_pb_jml = 0
+    # ── v7.2: UKUR MANFAAT tanya-ulang batas goyang — catat tiap kandidat
+    #    PB yang label menangnya BERBALIK sesudah suara ekstra ([i, sebelum,
+    #    sesudah]). Kriteria pertahankan (diputuskan sebelum uji live v7):
+    #    berguna bila ada balik DAN separuhnya bertahan sampai label akhir
+    #    (tidak dibatalkan koreksi deterministik); balik 0 di semua naskah
+    #    x 3 run = tidak terbukti => hapus cabang PB-nya.
+    tanya_ulang_goyang_pb_balik = []
     if putaran == 1 and _tanya_ulang_aktif():
-        ragu_idx = [i for i, _t in kand
-                    if p_label.get(i) is None or (p_label.get(i) or 0) < 0.5]
-        ragu_idx = ragu_idx[:120]
-        if ragu_idx:
-            tanya_ulang_jml = len(ragu_idx)
+        sudah_ditanya = set()
+        pb_ekstra_sudah = set()  # kandidat yang sudah ditanya-ulang karena goyang PB
+        for _gel in range(_maks_gelombang_tanya_ulang()):
+            ragu_idx = [i for i, _t in kand
+                        if i not in sudah_ditanya
+                        and (p_label.get(i) is None or (p_label.get(i) or 0) < 0.5)]
+            # ── URUT p NAIK: yang paling tidak yakin ditanya dulu.
+            ragu_idx.sort(key=lambda i: (p_label.get(i) is not None,
+                                         p_label.get(i) or 0))
+            ragu_idx = ragu_idx[:BATAS_TANYA]
+            # ── v6: batas paragraf GOYANG — suara Jev terbelah
+            #    paragraf/biasa. Satu suara tidak bisa terbelah (putaran=1),
+            #    jadi yang kena di sini adalah kandidat yang SESUDAH
+            #    tanya-ulang gelombang sebelumnya terbelah — ditanya SEKALI
+            #    lagi (paling goyang dulu = selisih confidence terkecil).
+            #    Mereka SUDAH ada di `sudah_ditanya` (begitulah mereka dapat
+            #    2 suara) — penjaganya `pb_ekstra_sudah`, bukan itu.
+            pb_idx = []
+            if len(ragu_idx) < BATAS_TANYA:
+                for gi, votes in goyang:
+                    if gi in ragu_idx or gi in pb_ekstra_sudah:
+                        continue
+                    vs = {v for v in votes if v}
+                    if vs != {'paragraf', 'biasa'}:
+                        continue
+                    pasangan = [(v, c) for v, c in zip(semua[gi], conf[gi])
+                                if v]
+                    maks = {}
+                    for v, c in pasangan:
+                        s = float(c) if isinstance(c, (int, float)) else 0.0
+                        maks[v] = max(maks.get(v, 0.0), s)
+                    gap = abs(maks.get('paragraf', 0.0)
+                              - maks.get('biasa', 0.0))
+                    pb_idx.append((gap, gi))
+                pb_idx.sort()
+                pb_idx = [gi for _, gi in pb_idx[:BATAS_TANYA - len(ragu_idx)]]
+            if pb_idx:
+                pb_ekstra_sudah.update(pb_idx)
+                tanya_ulang_goyang_pb_jml += len(pb_idx)
+            ragu_idx = ragu_idx + pb_idx
+            if not ragu_idx:
+                break
+            tanya_ulang_gelombang += 1
+            tanya_ulang_jml += len(ragu_idx)
+            sudah_ditanya.update(ragu_idx)
             paket = {}
             tanya = {}
             for n, i in enumerate(ragu_idx):
@@ -694,6 +1335,8 @@ def _petakan_dari_hasil(d, putaran=None):
             waktu.append(time.time() - t0)
             if not jw:
                 gagal += 1
+            # ── v7.2: potret label menang kandidat PB SEBELUM suara ekstra.
+            lab_sebelum_pb = {i: label.get(i) for i in pb_idx}
             for n, i in enumerate(ragu_idx):
                 jw_i = jw.get('c%d' % n) or {}
                 v = jw_i.get('choice')
@@ -701,10 +1344,14 @@ def _petakan_dari_hasil(d, putaran=None):
                     v = v.get('id') or v.get('label')
                 semua[i].append(v)
                 c = jw_i.get('confidence')
-                if isinstance(c, (int, float)):
-                    conf[i].append(float(c))
+                conf[i].append(float(c) if isinstance(c, (int, float)) else None)
             _tidur_adaptif(t0)
             label, goyang, p_label = _hitung_label()
+            # ── v7.2: balik label sesudah suara ekstra PB.
+            for _i in pb_idx:
+                if lab_sebelum_pb.get(_i) != label.get(_i):
+                    tanya_ulang_goyang_pb_balik.append(
+                        [_i, lab_sebelum_pb.get(_i), label.get(_i)])
 
     # ── ATURAN 2 (vonis Bos 09 Okt) — KOREKSI LABEL, BUKAN SARINGAN BUANG.
     #    Judul sub-bab hampir selalu PENDEK. Kalau Jev bilang 'subbab' tapi
@@ -763,6 +1410,60 @@ def _petakan_dari_hasil(d, putaran=None):
         asal[i] = 'kode'
         boleh[i] = True
 
+    # ── v6: KOREKSI BATAS PARAGRAF (deterministik, tanpa Jev) ─────────────
+    #    Paragraf baru tidak bisa mulai di tengah kalimat — TAPI "tengah
+    #    kalimat" harus dibuktikan sinyal EKSPLISIT, bukan sekadar "baris
+    #    sebelumnya tidak berakhir titik". Terukur live fid=81 (diag 10 Nov):
+    #    25 demosi, ~20 SALAH — baris sebelumnya berakhir ':' (pengantar
+    #    tabel: "...disajikan pada tabel berikut:"), fragmen SPSS
+    #    ("Item-Total Statistics", "a. Dependent Variable: ..."), atau
+    #    baris TERPOTONG ekstraksi ("...terhadap Keberl..."), yang semuanya
+    #    diikuti paragraf baru yang sah. Jadi demosi HANYA bila:
+    #      (a) kandidat diawali huruf KECIL (paragraf tak pernah mulai
+    #          huruf kecil — perluasan Aturan 5 ke paragraf), ATAU
+    #      (b) baris sebelumnya berakhir tanda lanjutan EKSPLISIT: koma,
+    #          titik-koma, kurung buka, strip, atau kata gantung
+    #          (dan/yang/di/ke/...) sebagai kata terakhir.
+    #    Titik-dua ':' TIDAK masuk — itu pengantar tabel/daftar, sesudahnya
+    #    paragraf baru. Judul sebelumnya, butir daftar, dan baris mirip
+    #    judul tetap dikecualikan; blok sistematika tak disentuh.
+    koreksi_batas = []
+    for i, _t in kand:
+        if label.get(i) != 'paragraf' or i in sistematika:
+            continue
+        t_ini = baris[i].strip()
+        j = i - 1
+        while j >= 0 and (not baris[j].strip() or j in d['buang']):
+            j -= 1
+        if j < 0:
+            continue
+        if j in d['gabung'] or j in kode_label \
+                or label.get(j) in ('bab', 'subbab'):
+            continue
+        sebelum = baris[j].strip()
+        if re.match(r'^\d+[.)]\s+\S', sebelum):
+            continue
+        if sebelum and sebelum == sebelum.upper() and len(sebelum) <= 60:
+            continue
+        lanjut_eksplisit = (
+            sebelum.endswith((',', ';', '(', '-', '\u2013', '\u2014'))
+            or (sebelum.split()
+                and re.sub(r'[^A-Za-z]+$', '',
+                           sebelum.split()[-1].lower()) in _KATA_GANTUNG))
+        if t_ini[:1].islower() or lanjut_eksplisit:
+            label[i] = 'biasa'
+            koreksi_batas.append(i)
+
+    # ── v6: DETEKSI BAB DETERMINISTIK (kode, bukan Jev) ──────────────────
+    #    Penanda BAB ("BAB I", "BAB 1") itu deterministik — putuskan di kode
+    #    supaya susunan BAB sama di tiap run (v5: 3 BAB tersusun berbeda
+    #    antar run). Yang dipaksa 'bab' asal-nya 'kode' (seperti baris
+    #    bernomor); ganda/demosi dicatat untuk laporan.
+    bab_kode, bab_ganda, bab_demosi = _koreksi_bab_deterministik(
+        baris, label, kand, sistematika, d['gabung'], kode_label)
+    for i in bab_kode:
+        asal[i] = 'kode'
+
     # ── JEV MATI TOTAL: semua gelombang gagal ⇒ pemanggil WAJIB fallback
     #    (dulu: semua label 'biasa' tanpa jejak ⇒ hakim/pemutus jalur tak
     #    bisa bedakan "peta memang tanpa judul" vs "Jev gagal").
@@ -774,9 +1475,28 @@ def _petakan_dari_hasil(d, putaran=None):
             'koreksi_kecil': koreksi_kecil,
             'sistematika': sorted(sistematika), 'asal': asal, 'boleh_dipakai_fitur': boleh,
             'gabung': d['gabung'], 'buang': d['buang'], 'waktu': waktu, 'gagal': gagal,
+            # ── v4: `waktu` HANYA gelombang klasifikasi. Terukur live
+            #    fid=115: waktu jumlah 9,52 dtk vs waktu Jev nyata 33,7 dtk
+            #    (sisanya stitch). Sekarang stitch tercatat terpisah.
+            'waktu_stitch': round(d.get('waktu_stitch', 0.0), 3),
+            'waktu_total': round(d.get('waktu_stitch', 0.0) + sum(waktu), 3),
             'gelombang': len(gel), 'semua': semua, 'awal': d['awal'], 'akhir': d['akhir'],
             'nama': d['nama'], 'kand_jml': len(kand),
             'kode_label': kode_label, 'tanya_ulang_jml': tanya_ulang_jml,
+            'tanya_ulang_gelombang': tanya_ulang_gelombang,
+            'spasi_huruf_jml': d.get('spasi_huruf_jml', 0),
+            'spasi_huruf_sesudah_stitch': d.get('spasi_huruf_sesudah_stitch', 0),
+            'spasi_fragmen_jml': d.get('spasi_fragmen_jml', 0),
+            'huruf_berspasi_sebelum': d.get('huruf_berspasi_sebelum', 0),
+            'huruf_berspasi_sesudah': d.get('huruf_berspasi_sesudah', 0),
+            'pisah_bab_ekor_jml': d.get('pisah_bab_ekor_jml', 0),
+            'pisah_subbab_ekor_jml': d.get('pisah_subbab_ekor_jml', 0),
+            'koreksi_batas_paragraf': koreksi_batas,
+            'tanya_ulang_goyang_pb_jml': tanya_ulang_goyang_pb_jml,
+            'tanya_ulang_goyang_pb_balik': tanya_ulang_goyang_pb_balik,
+            'tanya_ulang_goyang_pb_balik_jml': len(tanya_ulang_goyang_pb_balik),
+            'bab_kode': bab_kode, 'bab_ganda': bab_ganda,
+            'bab_demosi': bab_demosi,
             'jev_mati': jev_mati, 'stitch_pakai': d.get('stitch_pakai', False),
             'versi_aturan': RULE_VERSION}
 
@@ -793,7 +1513,9 @@ def main():
     print('PETA 3 TINGKAT — %s (fid=%d) %s-%s' % (jdl, fid, r['awal'], r['akhir']))
     print('   kandidat %d · gelombang %d · gabung %d · buang %d · gagal %d'
           % (r['kand_jml'], r['gelombang'], len(r['gabung']), len(r['buang']), r['gagal']))
-    print('   waktu: %s' % ' '.join('%.1f' % w for w in r['waktu']))
+    print('   waktu: %s · stitch %.1f dtk · total %.1f dtk'
+          % (' '.join('%.1f' % w for w in r['waktu']),
+             r.get('waktu_stitch', 0.0), r.get('waktu_total', 0.0)))
     print('   GOYANG: %d' % len(r['goyang']))
     for i, v in r['goyang'][:12]:
         print('      L%06d %s | %s' % (i, v, r['baris'][i].strip()[:40]))

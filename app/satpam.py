@@ -24,8 +24,6 @@ import json
 import logging
 import os
 import time
-import urllib.error
-import urllib.request
 from typing import Any
 
 log = logging.getLogger(__name__)
@@ -35,11 +33,11 @@ AKTIF = (os.getenv('EDUAI_SATPAM_AKTIF') or '1').strip() not in ('0', 'false', '
 #  🛣️ JALAN TOL JEV (perintah Bos 09 Okt 2026): SATU-SATUNYA jalur = `app/jev.py`.
 #     Jalur B (endpoint sarat-umum) SUDAH DIHAPUS TOTAL — tidak ada lagi di
 #     berkas ini, dan TIDAK BOLEH dikembalikan.
-BASE = 'jalan tol'          # tidak dipakai lagi; pemanggilan lewat `jev.tanya()`
-MODEL = (os.getenv('EDUAI_SATPAM_MODEL') or 'SATPAM/typesafe/jev-1.13').strip()
-# kunci: pakai kunci 9router yang SUDAH dipakai app (jangan buat kunci baru)
-KUNCI = (os.getenv('EDUAI_SATPAM_KEY') or os.getenv('EDUAI_ROUTER_KEY') or '').strip()
-BATAS_DETIK = float(os.getenv('EDUAI_SATPAM_TIMEOUT') or '60')
+#  v8 (10 Nov 2026): jalur langsung lama `_tanya_bebas_lama` + setelan
+#     BASE/MODEL/KUNCI/BATAS_DETIK DIHAPUS. Fungsi itu mati (0 pemanggil) dan
+#     env EDUAI_SATPAM_MODEL MENIPU: menyetelnya tidak mengganti model peta
+#     (semua jalur bermuara ke `jev.tanya()` tanpa argumen model). Satu-satunya
+#     saklar model yang hidup = `app/jev.py::MODEL_DEFAULT` (bawaan 1.13).
 AMBANG_LOLOS = float(os.getenv('EDUAI_SATPAM_AMBANG') or '0.80')
 AMBANG_TANYA = 0.50
 
@@ -51,7 +49,12 @@ AMBANG_TANYA = 0.50
 #     · **nama pertanyaan BEBAS** apa saja (tidak dikirim ke model)
 #     · **TIPE hanya 3**: `noul` · `choice` · `score`
 #     · **`criteria` WAJIB PER-TIPE — ini akar 503 semu 07 Okt 2026:**
-#         noul   → ⛔ **TIDAK BOLEH ada `criteria`** (bentuk apa pun ⇒ 400)
+#         noul   → **OPSIONAL, WAJIB OBJEK** {'true': …, 'false': …} kalau ada
+#                 (dokumen RESMI TypeSafe: Noul menerima `criteria` sebagai
+#                 "optional clarification of what yes and no mean" — yang
+#                 SALAH 07 Okt 2026 adalah BENTUKNYA (string), bukan fieldnya;
+#                 lihat `app/jev.py::periksa_skema`, terukur 09 Okt 2026:
+#                 noul + criteria OBJEK = OK, noul + criteria STRING = 502)
 #         choice → **OBJEK**  {'opsi': 'deskripsi opsi'}
 #         score  → **ARRAY**  ['tingkat 0', 'tingkat 1', …]   (2–10 tingkat)
 #
@@ -335,11 +338,16 @@ def _json_awal(teks: str) -> Any:
 def _periksa_skema(pertanyaan: dict[str, Any]) -> list[str]:
     """PAGAR SKEMA JEV — cegah `criteria` salah bentuk masuk (07 Okt 2026).
 
-    ATURAN (terukur ke `/systemone` langsung, sumber: skill `typesafe-jev`):
-        noul   → ⛔ TIDAK BOLEH ada `criteria`
+    ATURAN (dokumen RESMI TypeSafe + terukur ke `/systemone`):
+        noul   → `criteria` OPSIONAL; kalau ada WAJIB OBJEK {'true': …, 'false': …}
+                 (string/list ⇒ 400/502 — itulah akar 503 semu 07 Okt 2026:
+                 contoh gagalnya memakai `criteria` STRING, bukan objek)
         choice → `criteria` WAJIB, bentuk OBJEK {'opsi': 'deskripsi'}
         score  → `criteria` WAJIB, bentuk ARRAY ['tkt0', 'tkt1', …] (2–10)
     Tipe lain → DILARANG. Nama & jumlah pertanyaan BEBAS.
+    Selaras dengan `app/jev.py::periksa_skema` (jalur tol yang dipakai
+    produksi) — dulu pagar ini LEBIH KETAT dari dokumen resmi dan dari
+    `jev.py`, sehingga menolak pertanyaan noul + criteria OBJEK yang sah.
 
     Balik: daftar keluhan (kosong = sah). Pemanggil WAJIB gagal-cepat
     (raise) supaya 503 semu tidak pernah terjadi lagi.
@@ -355,10 +363,17 @@ def _periksa_skema(pertanyaan: dict[str, Any]) -> list[str]:
         punya_criteria = 'criteria' in q
         if tipe == 'noul':
             if punya_criteria:
-                keluhan.append(
-                    f'{nama}: type noul TIDAK BOLEH punya `criteria` '
-                    f'(dapat {type(q["criteria"]).__name__}) — inilah penyebab '
-                    f'HTTP 503 semu. Hapus field `criteria`.')
+                c = q['criteria']
+                if not isinstance(c, dict):
+                    keluhan.append(
+                        f'{nama}: noul `criteria` WAJIB OBJEK '
+                        f'{{"true": …, "false": …}} (dapat '
+                        f'{type(c).__name__}) — bentuk inilah penyebab '
+                        f'HTTP 503 semu. Ubah jadi objek atau hapus fieldnya.')
+                elif not ({'true', 'false'} & set(c.keys())):
+                    keluhan.append(
+                        f'{nama}: noul `criteria` WAJIB memuat kunci '
+                        f'`true` dan/atau `false`.')
         elif tipe == 'choice':
             if not punya_criteria:
                 keluhan.append(f'{nama}: type choice WAJIB punya `criteria` '
@@ -465,47 +480,6 @@ def tanya_bebas_mutu(bahan: str, pertanyaan: dict[str, Any]) -> dict[str, Any] |
         #  salah PROGRAMMER (bukan gangguan) ⇒ naikkan, jangan ditelan
         log.error('[satpam] tanya_bebas_mutu: %s', e)
         raise
-
-
-def _tanya_bebas_lama(bahan: str, pertanyaan: dict[str, Any]) -> dict[str, Any] | None:
-    """Tanya Jev dengan BAHAN SIAP (bukan naskah + peta). Dipakai mutu.
-
-    ⚠️ BEDA dengan `tanya_bebas()`: yang itu menyusun bahan lewat
-    `_susun_state()` (peta bab). Yang ini menerima bahan yang SUDAH disusun
-    pemanggil (mis. `konversi._bahan_mutu()`).
-
-    SELALU balik dict atau None. TIDAK PERNAH melempar galat.
-    """
-    if not AKTIF or not bahan or not pertanyaan:
-        return None
-    #  🛡️ PAGAR SKEMA (sama seperti `tanya_bebas`) — cegah 503 semu.
-    keluhan = _periksa_skema(pertanyaan)
-    if keluhan:
-        raise ValueError('Skema pertanyaan Jev salah — perbaiki dulu: '
-                         + ' | '.join(keluhan))
-
-    body = {
-        'model': MODEL,
-        'messages': [{'role': 'user',
-                      'content': json.dumps({'state': bahan,
-                                             'questions': pertanyaan})}],
-    }
-    req = urllib.request.Request(
-        BASE, data=json.dumps(body).encode(),
-        headers={'Authorization': f'Bearer {KUNCI}',
-                 'Content-Type': 'application/json'})
-    try:
-        with urllib.request.urlopen(req, timeout=BATAS_DETIK) as r:
-            mentah = r.read().decode()
-    except Exception as e:                                    # P1 + P2: telan galat
-        log.warning('[satpam] tanya_bebas_mutu gagal: %s: %s', type(e).__name__, e)
-        return None
-
-    jawab = _urai_balasan(mentah)
-    if jawab is None:
-        log.warning('[satpam] tanya_bebas_mutu: balasan tak terbaca (%d byte)',
-                    len(mentah))
-    return jawab
 
 
 # ────────────────────────── BLOK PROMPT ──────────────────────────

@@ -943,6 +943,25 @@ def _kandidat_sambung(baris: list) -> list:
     return kand
 
 
+def _tanya_sambung(n: int, sebelum: str, sesudah: str) -> dict:
+    """Satu pertanyaan Noul stitch — KUTIP KEDUA BARIS.
+
+    Dokumen RESMI TypeSafe, cookbook 'Structure recovery' (Pass 1):
+    pertanyaan stitch "quotes both lines, so the model judges the exact
+    text in question rather than finding it by id among 28 lines".
+    Dulu instruksi hanya menyebut ID baris — model harus mencari teksnya
+    di state (sampai 240 baris per panggilan). Sekarang teksnya dikutip
+    langsung di instruksi. AMAN dari context rot: kandidat stitch selalu
+    ≤60 kar per baris (`_KANDIDAT_MAKS_KAR`), jadi kutipan menambah
+    ≤120 kar per pertanyaan.
+    """
+    return {'instructions':
+            (f'Does line L{n:04d} pick up mid-sentence, continuing a '
+             f'sentence left unfinished at the end of line L{n - 1:04d}? '
+             f'Line L{n - 1:04d}: "{sebelum}". Line L{n:04d}: "{sesudah}".'),
+            'type': 'noul'}
+
+
 def _pecah_blok(teks: str) -> list:
     """PASS 1 — Jev MENYAMBUNG baris terbelah → daftar blok.
 
@@ -950,8 +969,13 @@ def _pecah_blok(teks: str) -> list:
            baris kosong (`kosong`) — semuanya dibaca KODE, tak dikirim ke Jev.
            KODE juga MENYARING kandidat (`_kandidat_sambung`) — sesuai
            kelemahan #5: "saring di kode dulu; kirim hanya yang perlu".
+           Sejak v4 (10 Nov 2026) kode juga MEMUTUSKAN pasangan yang PASTI
+           (`app/sambung_kode.py`): yang pasti sambung / pasti tidak
+           sambung tidak ditanya ke Jev lagi — terukur di fid=115: 63 batch
+           jadi 13 batch, fid=81: 5 batch jadi 0, tanpa mengubah peta bab.
     JEV  : satu `noul` per pasangan kandidat baris — "does line Lxxx pick up
            mid-sentence?" Dikirim per jatah supaya tak kena context rot.
+           Hanya untuk pasangan yang kode TIDAK BISA putuskan.
     KODE : gabung baris tersambung jadi blok (ambang dari cookbook).
 
     Balik: [{'text':…, 'lines':[…], 'kosong':bool}] — [] bila Jev mati.
@@ -965,19 +989,34 @@ def _pecah_blok(teks: str) -> list:
     if len(baris) < 4:
         return []
 
+    #  KODE DULU (v4, 10 Nov 2026): putuskan pasangan yang PASTI oleh kode
+    #  (`sambung_kode`: True = pasti sambung, False = pasti tidak, None =
+    #  tanya Jev). Yang meragukan tetap ditanya (jalur lama, tidak berubah).
+    try:
+        from .sambung_kode import sambung_kode as _sk
+    except Exception:                                     # noqa: BLE001
+        _sk = None
+    sambung_kode_jawaban: dict = {}
+    tanya_kandidat: list = []
+    for _n in _kandidat_sambung(baris):
+        _d = _sk(baris[_n - 1], baris[_n]) if _sk else None
+        if _d is True:
+            sambung_kode_jawaban[f'L{_n:04d}'] = {'noul': 1.0}
+        elif _d is False:
+            sambung_kode_jawaban[f'L{_n:04d}'] = {'noul': 0.0}
+        else:
+            tanya_kandidat.append(_n)
+
     #  JEV pass 1 — sambung (HANYA baris kandidat + tetangga kirinya)
     sambung: dict = {}
-    kandidat = _kandidat_sambung(baris)
+    kandidat = tanya_kandidat
     for mulai in range(0, len(kandidat), _GAL_KAND):
         sub = kandidat[mulai:mulai + _GAL_KAND]
         #  Jev butuh baris SEBELUMNYA untuk menilai "menyambung ke atas?" —
         #  itu SATU-SATUNYA tetangga yang perlu; sisanya tak dikirim.
         perlu = sorted({n - 1 for n in sub} | set(sub))
         state = '\n'.join(f'L{n:04d}| {baris[n][:200]}' for n in perlu)
-        tanya = {f'L{n:04d}': {'instructions':
-                 (f'Does line L{n:04d} pick up mid-sentence, '
-                  f'continuing a sentence left unfinished at the end of '
-                  f'line L{n - 1:04d}?'), 'type': 'noul'}
+        tanya = {f'L{n:04d}': _tanya_sambung(n, baris[n - 1], baris[n])
                  for n in sub}
         if not tanya:
             continue
@@ -994,7 +1033,10 @@ def _pecah_blok(teks: str) -> list:
         kosong = not b
         gabung = False
         if blok and not kosong:
-            noul = (sambung.get(f'L{n:04d}') or {}).get('noul')
+            #  Kode dulu (v4): jawaban kode mengalahkan — Jev hanya ditanya
+            #  untuk pasangan yang kode tidak bisa putuskan.
+            noul = (sambung_kode_jawaban.get(f'L{n:04d}')
+                    or sambung.get(f'L{n:04d}') or {}).get('noul')
             if noul is not None:
                 ambang = (_SAMBUNG_AKHIR if _akhir_kalimat(baris[n - 1])
                           else _SAMBUNG_GANTUNG)
@@ -1399,9 +1441,14 @@ def periksa_mutu(db, file_id: int, teks: str) -> dict:
     keputusan = 'bersih' if not kurang else 'kurang'
     if ragu and not kurang:
         keputusan = 'ragu'
+    #  v8 (10 Nov 2026): label 'model' WAJIB model yang benar-benar melayani.
+    #  Dulu `satpam.MODEL` (env EDUAI_SATPAM_MODEL) — MENIPU, karena panggilan
+    #  di atas lewat `satpam.tanya_bebas_mutu` → `jev.tanya()` tanpa argumen
+    #  model, jadi selalu `jev.MODEL_DEFAULT` (bawaan 1.13).
+    from . import jev as _jev
     return {'ok': True, 'keputusan': keputusan, 'ada': ada,
             'kurang': kurang, 'ragu': ragu, 'skor': skor,
-            'detik': round(detik, 2), 'model': satpam.MODEL,
+            'detik': round(detik, 2), 'model': _jev.MODEL_DEFAULT,
             'alasan': (f'Jev periksa {len(ada)} poin: {len(kurang)} kurang, '
                        f'{len(ragu)} perlu diperiksa')}
 

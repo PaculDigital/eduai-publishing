@@ -58,16 +58,15 @@ sys.path.insert(0, '/app')
 
 log = logging.getLogger('hakim_peta')
 
-# ── setelan: MEMINJAM setelan satpam (KUNCI/BASE/MODEL) — jangan bikin setelan baru
+# ── setelan: MEMINJAM setelan satpam — jangan bikin setelan baru.
+#  v8 (10 Nov 2026): pinjaman BASE/KUNCI/MODEL/BATAS_DETIK DIHAPUS — tidak
+#  pernah dibaca (Hakim bertanya lewat `jev.tanya()`, model ikut
+#  `jev.MODEL_DEFAULT`). Yang dipinjam hanya AKTIF (kill-switch).
 try:
     from . import satpam as _satpam
     _AKTIF = bool(getattr(_satpam, 'AKTIF', False))
-    _BASE = getattr(_satpam, 'BASE', '')
-    _KUNCI = getattr(_satpam, 'KUNCI', '')
-    _MODEL = getattr(_satpam, 'MODEL', '')
-    _BATAS = float(getattr(_satpam, 'BATAS_DETIK', 90))
 except Exception:                                     # P2: telan
-    _AKTIF, _BASE, _KUNCI, _MODEL, _BATAS = False, '', '', '', 90.0
+    _AKTIF = False
 
 #  Label judul yang diperiksa hakim (paragraf/biasa BUKAN tugas hakim)
 LABEL_JUDUL = ('bab', 'subbab')
@@ -76,9 +75,15 @@ LABEL_JUDUL = ('bab', 'subbab')
 MAKS_TANYA = 24          # kandidat per panggilan (batas aman teruji 156; ini hemat)
 MAKS_TANYA_TOTAL = 48    # batas pertanyaan sempit per peta — selebihnya 'belum'
 
-#  Titik tengah netral skala noul 0..1 (BUKAN ambang yang disetel per naskah).
-#  Di bawah 0,5 = Jev sendiri tidak yakin ⇒ 'ragu'. Di atasnya ⇒ 'sepakat'.
-AMBANG_RAGU = 0.5
+#  Ambang 'ragu' skala noul 0..1 (dokumen RESMI TypeSafe, halaman Noul):
+#  "A good starting point is 0.7 for yes and 0.3 for no. ... Values
+#  between 0.3 and 0.7 can go to a person rather than either code path."
+#  Dulu 0,5 (titik tengah netral) — akibatnya noul 0,5–0,7 yang menurut
+#  dokumen resmi masih pita tengah (layak diperiksa manusia) sudah
+#  dibaca 'sepakat'. Sekarang < 0,7 ⇒ 'ragu' (masuk antrean manusia),
+#  ≥ 0,7 ⇒ 'sepakat'. Hakim tetap LOG SAJA, tidak memblokir — perubahan
+#  ini hanya menambah bendera ragu, bukan vonis baru.
+AMBANG_RAGU = 0.7
 
 #  ── daftar TERTUTUP header output SPSS (salinan daftar di peta3_jev.py —
 #     ubah keduanya bila daftar berubah; hanya exact-match, huruf kecil).
@@ -94,6 +99,13 @@ _ROMAWI = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7,
            'VIII': 8, 'IX': 9, 'X': 10, 'XI': 11, 'XII': 12}
 _POLA_BAB = re.compile(r'^BAB\s+([IVX0-9]+)\b', re.I)
 _POLA_NOMOR = re.compile(r'^(\d+(?:\.\d+)*)\.?\s')
+
+# ── kupas nomor halaman ("13 BAB I" -> "BAB I"), dipakai saat MENCARI pola.
+try:
+    from .sambung_kode import tanpa_nomor_halaman as _tanpa_no
+except Exception:                                     # noqa: BLE001
+    def _tanpa_no(s):
+        return re.sub(r'^\d{1,3}\s+', '', (s or '').strip(), count=1)
 _POLA_SPSS_KATA = re.compile(
     r'\b(Coefficients|Cronbach|Sum of Squares|Mean Square|Sig\.|Std\. Error|'
     r'Reliability Statistics|Model Summary|ANOVA|Descriptive Statistics|'
@@ -211,7 +223,7 @@ def _huruf_awal_kecil(s):
     """True bila HURUF pertama judul huruf kecil (awalan nomor dikupas dulu:
     '1.1 latar belakang' = huruf kecil. Salinan helper di peta3_jev.py —
     hakim tidak boleh mengimpor skrip root)."""
-    t = re.sub(r'^\d+(?:\.\d+)*\s*', '', (s or '').strip())
+    t = re.sub(r'^\d+(?:\.\d+)*\.?\s*', '', (s or '').strip())
     return bool(t) and t[:1].islower()
 
 
@@ -219,8 +231,12 @@ def _audit_struktural(peta_surveyor: dict, kand: list[dict]) -> dict[int, list[s
     """AUDIT STRUKTURAL DETERMINISTIK (kode saja, nol goyang).
 
     Aturan (putusan Bos 10 Okt 2026):
-      · nomor-loncat      — urutan bernomor melompat (1.1 → 1.3, BAB II → BAB IV)
-      · subbab-yatim      — subbab tanpa BAB induk sebelumnya
+      · nomor-loncat      — urutan bernomor melompat (1.1 → 1.3, BAB II → BAB IV),
+                            HANYA bila nomor yang dilewati tidak ada di mana
+                            pun dalam teks naskah (v4, 10 Nov 2026)
+      · subbab-yatim      — subbab tanpa BAB induk; HANYA bila naskah tidak
+                            punya BAB sama sekali — subbab sebelum BAB pertama
+                            adalah pendahuluan, bukan yatim (v4, 10 Nov 2026)
       · judul-panjang     — judul >300 karakter (ambang dari profil kampus)
       · judul-huruf-kecil — judul diawali huruf kecil
       · fragmen-tabel     — judul berisi pipa tabel / header SPSS
@@ -239,14 +255,38 @@ def _audit_struktural(peta_surveyor: dict, kand: list[dict]) -> dict[int, list[s
     def _tambah(i, alasan):
         temuan.setdefault(int(i), []).append(alasan)
 
+    # ── NOMOR YANG MUNCUL DI TEKS (v4, 10 Nov 2026) ─────────────────────
+    #    Loncatan HANYA ditandai bila nomor yang dilewati TIDAK ADA di mana
+    #    pun dalam naskah. Terukur live: "4.3.3 Reduksi Data" dan "3.3 Metode
+    #    Pengumpulan Data" ditandai nomor-loncat padahal judul asli — nomor
+    #    yang dilewati muncul di bagian lain naskah (daftar isi / rujukan).
+    nomor_di_teks: set[str] = set()
+    bab_di_teks: set[str] = set()
+    for _bt in baris:
+        _tt = _tanpa_no(' '.join(str(_bt).split()))
+        nomor_di_teks.update(re.findall(r'\b(\d+(?:\.\d+)+)\b', _tt))
+        # rujukan BAB bisa di tengah kalimat ("seperti pada BAB II") —
+        # cari di mana pun, bukan hanya awal baris.
+        bab_di_teks.update(m.upper()
+                           for m in re.findall(r'\bBAB\s+([IVX0-9]+)\b', _tt, re.I))
+
+    # ── ZONA PENDAHULUAN (v4, 10 Nov 2026) ──────────────────────────────
+    #    Subbab SEBELUM BAB pertama adalah pendahuluan (PERSETUJUAN
+    #    PEMBIMBING, MOTTO, ...) — terukur WULAN-1: 15 curiga, kebanyakan
+    #    subbab-yatim dari pendahuluan. Bila naskah MEMANG tidak punya BAB
+    #    sama sekali, tetap ditandai (uji offline: fixture tanpa bab).
+    ada_bab_sama_sekali = bool(gabung) or any(
+        k.get('label') == 'bab'
+        or _POLA_BAB.match(_tanpa_no(k.get('teks') or ''))
+        for k in kand)
+
     # ── urutan nomor + BAB ganda + subbab yatim ──────────────────────────
-    ada_bab = bool(gabung)       # judul BAB dari `gabung` sudah cukup jadi induk
     bab_angka_terakhir = None
     bab_nomor: dict[str, int] = {}
     nomor_induk: dict[str, int] = {}     # induk -> nomor anak terakhir
     for k in kand:
         i, teks = k['i'], k['teks']
-        m_bab = _POLA_BAB.match(teks)
+        m_bab = _POLA_BAB.match(_tanpa_no(teks))
         if k['label'] == 'bab' or m_bab:
             if m_bab:
                 nomor = m_bab.group(1).upper()
@@ -256,12 +296,14 @@ def _audit_struktural(peta_surveyor: dict, kand: list[dict]) -> dict[int, list[s
                 if nomor in _ROMAWI:
                     angka = _ROMAWI[nomor]
                     if bab_angka_terakhir is not None and angka > bab_angka_terakhir + 1:
-                        _tambah(i, 'nomor-loncat')
+                        _loncat = [r for r, a in _ROMAWI.items()
+                                   if bab_angka_terakhir < a < angka]
+                        if not any(r in bab_di_teks for r in _loncat):
+                            _tambah(i, 'nomor-loncat')
                     bab_angka_terakhir = angka
-            ada_bab = True
             continue
         # subbab bernomor: cek induk + loncatan
-        m = _POLA_NOMOR.match(teks)
+        m = _POLA_NOMOR.match(_tanpa_no(teks))
         if m:
             nomor = m.group(1)
             bagian = nomor.split('.')
@@ -269,9 +311,12 @@ def _audit_struktural(peta_surveyor: dict, kand: list[dict]) -> dict[int, list[s
                 induk = '.'.join(bagian[:-1])
                 anak = int(bagian[-1])
                 if induk in nomor_induk and anak > nomor_induk[induk] + 1:
-                    _tambah(i, 'nomor-loncat')
+                    _loncat = [f'{induk}.{n}'
+                               for n in range(nomor_induk[induk] + 1, anak)]
+                    if not any(n in nomor_di_teks for n in _loncat):
+                        _tambah(i, 'nomor-loncat')
                 nomor_induk[induk] = max(nomor_induk.get(induk, 0), anak)
-        if not ada_bab:
+        if not ada_bab_sama_sekali:
             _tambah(i, 'subbab-yatim')
 
     # ── bentuk judul (per kandidat) ──────────────────────────────────────

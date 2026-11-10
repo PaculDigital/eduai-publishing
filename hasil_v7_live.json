@@ -1,0 +1,1059 @@
+{
+  "112": [
+    {
+      "run": 1,
+      "wall": 25.48,
+      "panggilan": {
+        "choice": 23,
+        "noul": 17,
+        "lain": 0
+      },
+      "kand_jml": 1668,
+      "gelombang": 21,
+      "tanya_ulang": 147,
+      "tanya_ulang_goyang_pb": 31,
+      "tanya_ulang_goyang_pb_balik": 3,
+      "pb_bertahan": 2,
+      "pb_dibatalkan": 1,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 4,
+      "buang": 76,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "paragraf": 22,
+        "biasa": 1604,
+        "subbab": 80,
+        "bab": 3
+      },
+      "goyang": 64,
+      "bab": [
+        "2. BAB II TINJAUAN PUSTAKA",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "subbab_jml": 80,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 5,
+      "pisah_subbab_ekor_jml": 4,
+      "koreksi_batas_paragraf": 2,
+      "bab_kode": 1,
+      "bab_ganda": 0,
+      "bab_demosi": 0,
+      "waktu_stitch": 8.811,
+      "waktu_total": 22.354,
+      "hakim": {
+        "jumlah_sepakat": 74,
+        "jumlah_ragu": 2,
+        "jumlah_curiga": 5,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 1
+    },
+    {
+      "run": 2,
+      "wall": 28.17,
+      "panggilan": {
+        "choice": 23,
+        "noul": 17,
+        "lain": 0
+      },
+      "kand_jml": 1673,
+      "gelombang": 21,
+      "tanya_ulang": 145,
+      "tanya_ulang_goyang_pb": 24,
+      "tanya_ulang_goyang_pb_balik": 1,
+      "pb_bertahan": 1,
+      "pb_dibatalkan": 0,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 4,
+      "buang": 76,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "paragraf": 20,
+        "biasa": 1614,
+        "subbab": 76,
+        "bab": 4
+      },
+      "goyang": 55,
+      "bab": [
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "subbab_jml": 76,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 5,
+      "pisah_subbab_ekor_jml": 5,
+      "koreksi_batas_paragraf": 4,
+      "bab_kode": 1,
+      "bab_ganda": 0,
+      "bab_demosi": 0,
+      "waktu_stitch": 7.89,
+      "waktu_total": 24.677,
+      "hakim": {
+        "jumlah_sepakat": 70,
+        "jumlah_ragu": 2,
+        "jumlah_curiga": 5,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 1
+    },
+    {
+      "run": 3,
+      "wall": 25.25,
+      "panggilan": {
+        "choice": 24,
+        "noul": 17,
+        "lain": 0
+      },
+      "kand_jml": 1667,
+      "gelombang": 21,
+      "tanya_ulang": 145,
+      "tanya_ulang_goyang_pb": 20,
+      "tanya_ulang_goyang_pb_balik": 3,
+      "pb_bertahan": 3,
+      "pb_dibatalkan": 0,
+      "tanya_ulang_gelombang": 3,
+      "gabung": 4,
+      "buang": 77,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "paragraf": 23,
+        "biasa": 1606,
+        "subbab": 75,
+        "bab": 4
+      },
+      "goyang": 57,
+      "bab": [
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "subbab_jml": 75,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 5,
+      "pisah_subbab_ekor_jml": 4,
+      "koreksi_batas_paragraf": 5,
+      "bab_kode": 1,
+      "bab_ganda": 0,
+      "bab_demosi": 0,
+      "waktu_stitch": 8.013,
+      "waktu_total": 20.93,
+      "hakim": {
+        "jumlah_sepakat": 71,
+        "jumlah_ragu": 3,
+        "jumlah_curiga": 2,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 1
+    }
+  ],
+  "115": [
+    {
+      "run": 1,
+      "wall": 22.46,
+      "panggilan": {
+        "choice": 23,
+        "noul": 13,
+        "lain": 0
+      },
+      "kand_jml": 1692,
+      "gelombang": 21,
+      "tanya_ulang": 143,
+      "tanya_ulang_goyang_pb": 20,
+      "tanya_ulang_goyang_pb_balik": 2,
+      "pb_bertahan": 2,
+      "pb_dibatalkan": 0,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 4,
+      "buang": 117,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "paragraf": 26,
+        "biasa": 1637,
+        "subbab": 67,
+        "bab": 4
+      },
+      "goyang": 65,
+      "bab": [
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "subbab_jml": 67,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 5,
+      "pisah_subbab_ekor_jml": 4,
+      "koreksi_batas_paragraf": 6,
+      "bab_kode": 1,
+      "bab_ganda": 0,
+      "bab_demosi": 0,
+      "waktu_stitch": 5.601,
+      "waktu_total": 18.139,
+      "hakim": {
+        "jumlah_sepakat": 63,
+        "jumlah_ragu": 2,
+        "jumlah_curiga": 3,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 1
+    },
+    {
+      "run": 2,
+      "wall": 22.27,
+      "panggilan": {
+        "choice": 23,
+        "noul": 13,
+        "lain": 0
+      },
+      "kand_jml": 1688,
+      "gelombang": 21,
+      "tanya_ulang": 138,
+      "tanya_ulang_goyang_pb": 22,
+      "tanya_ulang_goyang_pb_balik": 4,
+      "pb_bertahan": 3,
+      "pb_dibatalkan": 1,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 4,
+      "buang": 116,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "paragraf": 24,
+        "biasa": 1633,
+        "subbab": 69,
+        "bab": 4
+      },
+      "goyang": 63,
+      "bab": [
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "subbab_jml": 69,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 5,
+      "pisah_subbab_ekor_jml": 4,
+      "koreksi_batas_paragraf": 9,
+      "bab_kode": 1,
+      "bab_ganda": 0,
+      "bab_demosi": 1,
+      "waktu_stitch": 5.503,
+      "waktu_total": 17.507,
+      "hakim": {
+        "jumlah_sepakat": 65,
+        "jumlah_ragu": 1,
+        "jumlah_curiga": 4,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 1
+    },
+    {
+      "run": 3,
+      "wall": 22.76,
+      "panggilan": {
+        "choice": 23,
+        "noul": 13,
+        "lain": 0
+      },
+      "kand_jml": 1687,
+      "gelombang": 21,
+      "tanya_ulang": 142,
+      "tanya_ulang_goyang_pb": 26,
+      "tanya_ulang_goyang_pb_balik": 1,
+      "pb_bertahan": 1,
+      "pb_dibatalkan": 0,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 4,
+      "buang": 116,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "paragraf": 23,
+        "biasa": 1633,
+        "subbab": 70,
+        "bab": 3
+      },
+      "goyang": 68,
+      "bab": [
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "subbab_jml": 70,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 5,
+      "pisah_subbab_ekor_jml": 4,
+      "koreksi_batas_paragraf": 4,
+      "bab_kode": 1,
+      "bab_ganda": 0,
+      "bab_demosi": 0,
+      "waktu_stitch": 6.068,
+      "waktu_total": 18.331,
+      "hakim": {
+        "jumlah_sepakat": 65,
+        "jumlah_ragu": 3,
+        "jumlah_curiga": 3,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 1
+    }
+  ],
+  "81": [
+    {
+      "run": 1,
+      "wall": 5.91,
+      "panggilan": {
+        "choice": 7,
+        "noul": 0,
+        "lain": 0
+      },
+      "kand_jml": 486,
+      "gelombang": 5,
+      "tanya_ulang": 118,
+      "tanya_ulang_goyang_pb": 28,
+      "tanya_ulang_goyang_pb_balik": 4,
+      "pb_bertahan": 4,
+      "pb_dibatalkan": 0,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 10,
+      "buang": 720,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "subbab": 131,
+        "paragraf": 173,
+        "biasa": 182
+      },
+      "goyang": 37,
+      "bab": [],
+      "subbab_jml": 131,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 0,
+      "pisah_subbab_ekor_jml": 0,
+      "koreksi_batas_paragraf": 1,
+      "bab_kode": 0,
+      "bab_ganda": 0,
+      "bab_demosi": 0,
+      "waktu_stitch": 0.061,
+      "waktu_total": 3.725,
+      "hakim": {
+        "jumlah_sepakat": 131,
+        "jumlah_ragu": 0,
+        "jumlah_curiga": 0,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 0
+    },
+    {
+      "run": 2,
+      "wall": 5.92,
+      "panggilan": {
+        "choice": 7,
+        "noul": 0,
+        "lain": 0
+      },
+      "kand_jml": 486,
+      "gelombang": 5,
+      "tanya_ulang": 112,
+      "tanya_ulang_goyang_pb": 24,
+      "tanya_ulang_goyang_pb_balik": 4,
+      "pb_bertahan": 4,
+      "pb_dibatalkan": 0,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 10,
+      "buang": 720,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "subbab": 131,
+        "paragraf": 173,
+        "biasa": 182
+      },
+      "goyang": 38,
+      "bab": [],
+      "subbab_jml": 131,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 0,
+      "pisah_subbab_ekor_jml": 0,
+      "koreksi_batas_paragraf": 1,
+      "bab_kode": 0,
+      "bab_ganda": 0,
+      "bab_demosi": 0,
+      "waktu_stitch": 0.062,
+      "waktu_total": 3.631,
+      "hakim": {
+        "jumlah_sepakat": 131,
+        "jumlah_ragu": 0,
+        "jumlah_curiga": 0,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 0
+    },
+    {
+      "run": 3,
+      "wall": 5.98,
+      "panggilan": {
+        "choice": 7,
+        "noul": 0,
+        "lain": 0
+      },
+      "kand_jml": 486,
+      "gelombang": 5,
+      "tanya_ulang": 125,
+      "tanya_ulang_goyang_pb": 31,
+      "tanya_ulang_goyang_pb_balik": 5,
+      "pb_bertahan": 5,
+      "pb_dibatalkan": 0,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 10,
+      "buang": 720,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "subbab": 131,
+        "paragraf": 166,
+        "biasa": 189
+      },
+      "goyang": 45,
+      "bab": [],
+      "subbab_jml": 131,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 0,
+      "pisah_subbab_ekor_jml": 0,
+      "koreksi_batas_paragraf": 1,
+      "bab_kode": 0,
+      "bab_ganda": 0,
+      "bab_demosi": 0,
+      "waktu_stitch": 0.062,
+      "waktu_total": 3.839,
+      "hakim": {
+        "jumlah_sepakat": 131,
+        "jumlah_ragu": 0,
+        "jumlah_curiga": 0,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 0
+    }
+  ],
+  "WULAN-1": [
+    {
+      "run": 1,
+      "wall": 4.86,
+      "panggilan": {
+        "choice": 6,
+        "noul": 1,
+        "lain": 0
+      },
+      "kand_jml": 427,
+      "gelombang": 4,
+      "tanya_ulang": 119,
+      "tanya_ulang_goyang_pb": 30,
+      "tanya_ulang_goyang_pb_balik": 4,
+      "pb_bertahan": 3,
+      "pb_dibatalkan": 1,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 4,
+      "buang": 199,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "biasa": 304,
+        "subbab": 58,
+        "paragraf": 98,
+        "bab": 4
+      },
+      "goyang": 44,
+      "bab": [
+        "1. BAB I PENDAHULUAN",
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN"
+      ],
+      "subbab_jml": 58,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 4,
+      "pisah_subbab_ekor_jml": 30,
+      "koreksi_batas_paragraf": 3,
+      "bab_kode": 0,
+      "bab_ganda": 0,
+      "bab_demosi": 5,
+      "waktu_stitch": 0.347,
+      "waktu_total": 3.646,
+      "hakim": {
+        "jumlah_sepakat": 56,
+        "jumlah_ragu": 1,
+        "jumlah_curiga": 1,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 1
+    },
+    {
+      "run": 2,
+      "wall": 4.88,
+      "panggilan": {
+        "choice": 6,
+        "noul": 1,
+        "lain": 0
+      },
+      "kand_jml": 427,
+      "gelombang": 4,
+      "tanya_ulang": 121,
+      "tanya_ulang_goyang_pb": 33,
+      "tanya_ulang_goyang_pb_balik": 1,
+      "pb_bertahan": 1,
+      "pb_dibatalkan": 0,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 4,
+      "buang": 199,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "biasa": 304,
+        "subbab": 55,
+        "paragraf": 100,
+        "bab": 5
+      },
+      "goyang": 48,
+      "bab": [
+        "1. BAB I PENDAHULUAN",
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "bagian ini menjelaskan tentang jenis, waktu, dan tempat desain, jenis data, subyek dan obyek penelitian selanjutnya menjelaskan metode pengumpulan data, meliputi tahap pengelolaan data kualitatif pada penelitian, dan menjelaskan metode.",
+        "4. BAB IV HASIL DAN PEMBAHASAN"
+      ],
+      "subbab_jml": 55,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 4,
+      "pisah_subbab_ekor_jml": 30,
+      "koreksi_batas_paragraf": 5,
+      "bab_kode": 0,
+      "bab_ganda": 0,
+      "bab_demosi": 3,
+      "waktu_stitch": 0.37,
+      "waktu_total": 3.502,
+      "hakim": {
+        "jumlah_sepakat": 53,
+        "jumlah_ragu": 1,
+        "jumlah_curiga": 1,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 1
+    },
+    {
+      "run": 3,
+      "wall": 5.1,
+      "panggilan": {
+        "choice": 6,
+        "noul": 1,
+        "lain": 0
+      },
+      "kand_jml": 427,
+      "gelombang": 4,
+      "tanya_ulang": 123,
+      "tanya_ulang_goyang_pb": 30,
+      "tanya_ulang_goyang_pb_balik": 2,
+      "pb_bertahan": 2,
+      "pb_dibatalkan": 0,
+      "tanya_ulang_gelombang": 2,
+      "gabung": 4,
+      "buang": 199,
+      "gagal": 0,
+      "jev_mati": false,
+      "label": {
+        "biasa": 304,
+        "subbab": 57,
+        "paragraf": 99,
+        "bab": 4
+      },
+      "goyang": 41,
+      "bab": [
+        "1. BAB I PENDAHULUAN",
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN"
+      ],
+      "subbab_jml": 57,
+      "berekor_jml": 0,
+      "pisah_bab_ekor_jml": 4,
+      "pisah_subbab_ekor_jml": 30,
+      "koreksi_batas_paragraf": 4,
+      "bab_kode": 0,
+      "bab_ganda": 0,
+      "bab_demosi": 3,
+      "waktu_stitch": 0.52,
+      "waktu_total": 3.748,
+      "hakim": {
+        "jumlah_sepakat": 55,
+        "jumlah_ragu": 1,
+        "jumlah_curiga": 1,
+        "jumlah_belum": 0
+      },
+      "hakim_panggilan_jev": 1
+    }
+  ],
+  "_agregat": {
+    "112": {
+      "wall": {
+        "rata": 26.3,
+        "min": 25.25,
+        "maks": 28.17
+      },
+      "goyang": {
+        "rata": 58.67,
+        "min": 55,
+        "maks": 64
+      },
+      "kand_jml": {
+        "rata": 1669.33,
+        "min": 1667,
+        "maks": 1673
+      },
+      "tanya_ulang": {
+        "rata": 145.67,
+        "min": 145,
+        "maks": 147
+      },
+      "tanya_ulang_goyang_pb": {
+        "rata": 25.0,
+        "min": 20,
+        "maks": 31
+      },
+      "tanya_ulang_goyang_pb_balik": {
+        "rata": 2.33,
+        "min": 1,
+        "maks": 3
+      },
+      "pb_bertahan": {
+        "rata": 2.0,
+        "min": 1,
+        "maks": 3
+      },
+      "pb_dibatalkan": {
+        "rata": 0.33,
+        "min": 0,
+        "maks": 1
+      },
+      "subbab_jml": {
+        "rata": 77.0,
+        "min": 75,
+        "maks": 80
+      },
+      "berekor_jml": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      },
+      "pisah_subbab_ekor_jml": {
+        "rata": 4.33,
+        "min": 4,
+        "maks": 5
+      },
+      "pisah_bab_ekor_jml": {
+        "rata": 5.0,
+        "min": 5,
+        "maks": 5
+      },
+      "koreksi_batas_paragraf": {
+        "rata": 3.67,
+        "min": 2,
+        "maks": 5
+      },
+      "panggilan_total": {
+        "rata": 40.33,
+        "min": 40,
+        "maks": 41
+      },
+      "label_bab": {
+        "rata": 3.67,
+        "min": 3,
+        "maks": 4
+      },
+      "label_subbab": {
+        "rata": 77.0,
+        "min": 75,
+        "maks": 80
+      },
+      "label_paragraf": {
+        "rata": 21.67,
+        "min": 20,
+        "maks": 23
+      },
+      "label_biasa": {
+        "rata": 1608.0,
+        "min": 1604,
+        "maks": 1614
+      },
+      "bab_judul_irisan": [
+        "2. BAB II TINJAUAN PUSTAKA",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "bab_judul_gabungan": [
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "subbab_judul_irisan_jml": null,
+      "subbab_judul_gabungan_jml": null,
+      "hakim_curiga": {
+        "rata": 4.0,
+        "min": 2,
+        "maks": 5
+      },
+      "hakim_ragu": {
+        "rata": 2.33,
+        "min": 2,
+        "maks": 3
+      }
+    },
+    "115": {
+      "wall": {
+        "rata": 22.5,
+        "min": 22.27,
+        "maks": 22.76
+      },
+      "goyang": {
+        "rata": 65.33,
+        "min": 63,
+        "maks": 68
+      },
+      "kand_jml": {
+        "rata": 1689.0,
+        "min": 1687,
+        "maks": 1692
+      },
+      "tanya_ulang": {
+        "rata": 141.0,
+        "min": 138,
+        "maks": 143
+      },
+      "tanya_ulang_goyang_pb": {
+        "rata": 22.67,
+        "min": 20,
+        "maks": 26
+      },
+      "tanya_ulang_goyang_pb_balik": {
+        "rata": 2.33,
+        "min": 1,
+        "maks": 4
+      },
+      "pb_bertahan": {
+        "rata": 2.0,
+        "min": 1,
+        "maks": 3
+      },
+      "pb_dibatalkan": {
+        "rata": 0.33,
+        "min": 0,
+        "maks": 1
+      },
+      "subbab_jml": {
+        "rata": 68.67,
+        "min": 67,
+        "maks": 70
+      },
+      "berekor_jml": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      },
+      "pisah_subbab_ekor_jml": {
+        "rata": 4.0,
+        "min": 4,
+        "maks": 4
+      },
+      "pisah_bab_ekor_jml": {
+        "rata": 5.0,
+        "min": 5,
+        "maks": 5
+      },
+      "koreksi_batas_paragraf": {
+        "rata": 6.33,
+        "min": 4,
+        "maks": 9
+      },
+      "panggilan_total": {
+        "rata": 36.0,
+        "min": 36,
+        "maks": 36
+      },
+      "label_bab": {
+        "rata": 3.67,
+        "min": 3,
+        "maks": 4
+      },
+      "label_subbab": {
+        "rata": 68.67,
+        "min": 67,
+        "maks": 70
+      },
+      "label_paragraf": {
+        "rata": 24.33,
+        "min": 23,
+        "maks": 26
+      },
+      "label_biasa": {
+        "rata": 1634.33,
+        "min": 1633,
+        "maks": 1637
+      },
+      "bab_judul_irisan": [
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "bab_judul_gabungan": [
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "5. BAB V PENUTUP"
+      ],
+      "subbab_judul_irisan_jml": null,
+      "subbab_judul_gabungan_jml": null,
+      "hakim_curiga": {
+        "rata": 3.33,
+        "min": 3,
+        "maks": 4
+      },
+      "hakim_ragu": {
+        "rata": 2.0,
+        "min": 1,
+        "maks": 3
+      }
+    },
+    "81": {
+      "wall": {
+        "rata": 5.94,
+        "min": 5.91,
+        "maks": 5.98
+      },
+      "goyang": {
+        "rata": 40.0,
+        "min": 37,
+        "maks": 45
+      },
+      "kand_jml": {
+        "rata": 486.0,
+        "min": 486,
+        "maks": 486
+      },
+      "tanya_ulang": {
+        "rata": 118.33,
+        "min": 112,
+        "maks": 125
+      },
+      "tanya_ulang_goyang_pb": {
+        "rata": 27.67,
+        "min": 24,
+        "maks": 31
+      },
+      "tanya_ulang_goyang_pb_balik": {
+        "rata": 4.33,
+        "min": 4,
+        "maks": 5
+      },
+      "pb_bertahan": {
+        "rata": 4.33,
+        "min": 4,
+        "maks": 5
+      },
+      "pb_dibatalkan": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      },
+      "subbab_jml": {
+        "rata": 131.0,
+        "min": 131,
+        "maks": 131
+      },
+      "berekor_jml": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      },
+      "pisah_subbab_ekor_jml": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      },
+      "pisah_bab_ekor_jml": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      },
+      "koreksi_batas_paragraf": {
+        "rata": 1.0,
+        "min": 1,
+        "maks": 1
+      },
+      "panggilan_total": {
+        "rata": 7.0,
+        "min": 7,
+        "maks": 7
+      },
+      "label_bab": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      },
+      "label_subbab": {
+        "rata": 131.0,
+        "min": 131,
+        "maks": 131
+      },
+      "label_paragraf": {
+        "rata": 170.67,
+        "min": 166,
+        "maks": 173
+      },
+      "label_biasa": {
+        "rata": 184.33,
+        "min": 182,
+        "maks": 189
+      },
+      "bab_judul_irisan": [],
+      "bab_judul_gabungan": [],
+      "subbab_judul_irisan_jml": null,
+      "subbab_judul_gabungan_jml": null,
+      "hakim_curiga": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      },
+      "hakim_ragu": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      }
+    },
+    "WULAN-1": {
+      "wall": {
+        "rata": 4.95,
+        "min": 4.86,
+        "maks": 5.1
+      },
+      "goyang": {
+        "rata": 44.33,
+        "min": 41,
+        "maks": 48
+      },
+      "kand_jml": {
+        "rata": 427.0,
+        "min": 427,
+        "maks": 427
+      },
+      "tanya_ulang": {
+        "rata": 121.0,
+        "min": 119,
+        "maks": 123
+      },
+      "tanya_ulang_goyang_pb": {
+        "rata": 31.0,
+        "min": 30,
+        "maks": 33
+      },
+      "tanya_ulang_goyang_pb_balik": {
+        "rata": 2.33,
+        "min": 1,
+        "maks": 4
+      },
+      "pb_bertahan": {
+        "rata": 2.0,
+        "min": 1,
+        "maks": 3
+      },
+      "pb_dibatalkan": {
+        "rata": 0.33,
+        "min": 0,
+        "maks": 1
+      },
+      "subbab_jml": {
+        "rata": 56.67,
+        "min": 55,
+        "maks": 58
+      },
+      "berekor_jml": {
+        "rata": 0.0,
+        "min": 0,
+        "maks": 0
+      },
+      "pisah_subbab_ekor_jml": {
+        "rata": 30.0,
+        "min": 30,
+        "maks": 30
+      },
+      "pisah_bab_ekor_jml": {
+        "rata": 4.0,
+        "min": 4,
+        "maks": 4
+      },
+      "koreksi_batas_paragraf": {
+        "rata": 4.0,
+        "min": 3,
+        "maks": 5
+      },
+      "panggilan_total": {
+        "rata": 7.0,
+        "min": 7,
+        "maks": 7
+      },
+      "label_bab": {
+        "rata": 4.33,
+        "min": 4,
+        "maks": 5
+      },
+      "label_subbab": {
+        "rata": 56.67,
+        "min": 55,
+        "maks": 58
+      },
+      "label_paragraf": {
+        "rata": 99.0,
+        "min": 98,
+        "maks": 100
+      },
+      "label_biasa": {
+        "rata": 304.0,
+        "min": 304,
+        "maks": 304
+      },
+      "bab_judul_irisan": [
+        "1. BAB I PENDAHULUAN",
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN"
+      ],
+      "bab_judul_gabungan": [
+        "1. BAB I PENDAHULUAN",
+        "2. BAB II TINJAUAN PUSTAKA",
+        "3. BAB III METODOLOGI PENELITIAN",
+        "4. BAB IV HASIL DAN PEMBAHASAN",
+        "bagian ini menjelaskan tentang jenis, waktu, dan tempat desain, jenis data, subyek dan obyek penelitian selanjutnya menjelaskan metode pengumpulan data, meliputi tahap pengelolaan data kualitatif pada penelitian, dan menjelaskan metode."
+      ],
+      "subbab_judul_irisan_jml": null,
+      "subbab_judul_gabungan_jml": null,
+      "hakim_curiga": {
+        "rata": 1.0,
+        "min": 1,
+        "maks": 1
+      },
+      "hakim_ragu": {
+        "rata": 1.0,
+        "min": 1,
+        "maks": 1
+      }
+    }
+  },
+  "_catatan": "Dibangun dari log tercetak hasil_v7_live.log: pelari v7 menyelesaikan 12 run lalu crash di _agregat (dictionary changed size during iteration) sebelum menulis JSON. Angka per run diparse dari log yang sama; tidak ada panggilan Jev tambahan. subbab_judul_irisan/gabungan_jml = null karena daftar judul subbab tidak tercetak di log. Total panggilan Jev sesi ini 280 (271 surveyor + 9 hakim: 112=121+3, 115=108+3, 81=21+0, WULAN-1=21+3). Sidik DB tetap (28, 108, 235) sebelum dan sesudah setiap run."
+}

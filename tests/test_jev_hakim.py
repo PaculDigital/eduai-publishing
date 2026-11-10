@@ -52,6 +52,22 @@ class FakeSatpam:
                     if sum(1 for b, _ in self.panggilan if tengah in b) <= 1:
                         conf = 0.3
                 label = 'bab' if tengah.startswith('BAB') else 'paragraf'
+                # ── v6.4: penanda JEV-BAB — fake melabel 'bab' untuk
+                #    menguji demosi deterministik (tanpa penanda BAB asli).
+                if 'JEV-BAB' in tengah:
+                    label = 'bab'
+                # ── v6.3: penanda GOYANG-PB — suara terbelah paragraf/biasa
+                #    antar gelombang (panggilan 1: paragraf 0,3 → tanya-ulang
+                #    karena p rendah; panggilan 2: biasa 0,9 → goyang PB;
+                #    panggilan 3: paragraf 0,9 → tanya-ulang batas goyang).
+                if 'GOYANG-PB' in tengah:
+                    n = sum(1 for b, _ in self.panggilan if tengah in b)
+                    if n <= 1:
+                        label, conf = 'paragraf', 0.3
+                    elif n == 2:
+                        label, conf = 'biasa', 0.9
+                    else:
+                        label, conf = 'paragraf', 0.9
                 jawab[nama] = {'choice': label, 'confidence': conf}
         return jawab
 
@@ -110,9 +126,22 @@ class FakeKonversi:
         blok = []
         for n, b in enumerate(baris):
             kosong = not b
+            # cerminan pagar asli (app/sambung_kode v6): judul BAB tidak
+            # disambung ke kalimat sesudahnya yang diawali huruf kecil.
+            _bab = bool(re.match(
+                r'^(?:\d{1,3}\s+)?(?:\d+[.)]\s*)?BAB\s+[IVX0-9]+\b',
+                blok[-1]['text'], re.I)) if blok and not kosong else False
+            # cerminan pagar asli (app/sambung_kode v7): judul subbab
+            # bernomor juga tidak disambung ke kalimat sesudahnya.
+            _subbab = bool(re.match(
+                r'^\d+(?:\.\d+)+\.?\s+\S',
+                blok[-1]['text'])) if blok and not kosong else False
+            _lanjut_kalimat = bool(b[:1].islower() or re.match(
+                r'^(bab|bagian)\s+ini\b', b, re.I)) if b else False
             if (blok and not kosong and not blok[-1]['kosong']
                     and len(blok[-1]['text']) <= 60 and len(b) <= 60
-                    and b[:1].islower()):
+                    and b[:1].islower()
+                    and not ((_bab or _subbab) and _lanjut_kalimat)):
                 blok[-1]['text'] = (blok[-1]['text'] + ' ' + b).strip()
                 blok[-1]['lines'].append(n)
             else:
@@ -143,6 +172,16 @@ def _stub_app():
 def _muat_peta3():
     _stub_app()
     spec = importlib.util.spec_from_file_location('_peta3_uji', str(ROOT / 'peta3_jev.py'))
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def _muat_asli(nama, jalur):
+    """Muat modul ASLI (satpam/konversi) dengan nama berbeda — modulnya
+    hanya impor stdlib di tingkat atas, jadi aman dimuat meski `app.*`
+    di-stub untuk peta3_jev."""
+    spec = importlib.util.spec_from_file_location(nama, str(jalur))
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
     return m
@@ -247,6 +286,88 @@ def main():
         len(FAKE_SATPAM.panggilan) > jml_sebelum)
     P.RULE_VERSION = 'jev-peta-v3-stitch'
     P._CACHE_PETA.clear()
+
+    # ── 2b. TANYA-ULANG BERGELOMBANG (v5) ────────────────────────────────
+    #    130 kandidat ragu (> cap 120): v4 hanya menanya 120 pertama,
+    #    v5 menanya semua dalam 2 gelombang (120 + 10).
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.panggilan.clear()
+    FAKE_SATPAM.rendah = {'RAGU'}
+    banyak = '\n'.join(
+        'Paragraf isi RAGU nomor %03d tentang pemasaran digital dan kinerja bisnis usaha kecil di Indonesia.'
+        % n for n in range(130))
+    peta_b = P.petakan_dari_teks(banyak, putaran=1)
+    cek('tanya-ulang bergelombang: 130 ragu ditanya semua',
+        peta_b.get('tanya_ulang_jml') == 130, f"dapat {peta_b.get('tanya_ulang_jml')}")
+    cek('tanya-ulang bergelombang: 2 gelombang (120 + 10)',
+        peta_b.get('tanya_ulang_gelombang') == 2, f"dapat {peta_b.get('tanya_ulang_gelombang')}")
+    cek('tanya-ulang bergelombang: sesudah tanya ulang p membaik',
+        all((peta_b['p'].get(i) or 0) >= 0.5 for i in peta_b['label']))
+    # cap gelombang via env: maks 1 gelombang -> hanya 120 yang ditanya
+    os.environ['EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG'] = '1'
+    P._CACHE_PETA.clear()
+    FAKE_SATPAM.panggilan.clear()
+    peta_c = P.petakan_dari_teks(banyak, putaran=1)
+    cek('tanya-ulang bergelombang: env maks 1 gelombang -> 120 saja',
+        peta_c.get('tanya_ulang_jml') == 120
+        and peta_c.get('tanya_ulang_gelombang') == 1,
+        f"dapat {peta_c.get('tanya_ulang_jml')}/{peta_c.get('tanya_ulang_gelombang')}")
+    os.environ.pop('EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG', None)
+    FAKE_SATPAM.rendah = set()
+
+    # ── 2c. PISAH JUDUL MENEMPEL (v5) ────────────────────────────────────
+    FakeKonversi.mode = 'normal'
+    menempel = ('58 BAB III METODOLOGI PENELITIAN 3.1 Jenis Penelitian '
+                '3.2 Metode Penelitian')
+    d = P._susun_dari_bersih(menempel)
+    cek('pisah judul: satu baris jadi 3 baris',
+        d.get('pisah_judul_jml') == 2, f"dapat {d.get('pisah_judul_jml')}")
+    cek('pisah judul: BAB III dikenali sebagai bab satu baris',
+        any(v[0].upper().startswith('BAB III') for v in d.get('gabung', {}).values()))
+    cek('pisah judul: 3.1/3.2 diputuskan kode (bukan Jev)',
+        d.get('kode_label', {}).get(
+            next(i for i, b in enumerate(d['baris']) if b.strip() == '3.1 Jenis Penelitian')) == 'subbab'
+        and d.get('kode_label', {}).get(
+            next(i for i, b in enumerate(d['baris']) if b.strip() == '3.2 Metode Penelitian')) == 'subbab')
+    kalimat_bab = 'Seperti dijelaskan pada BAB II dan 2.1 Tinjauan Pustaka sebelumnya.'
+    cek('pisah judul: kalimat biasa menyebut BAB tidak terpisah',
+        P._pisah_judul_menempel(kalimat_bab) == [kalimat_bab])
+    cek('pisah judul: "3.1 kali lipat" di kalimat tidak terpisah',
+        P._pisah_judul_menempel(
+            'Hasil penelitian menunjukkan 3.1 kali lipat dari sebelumnya.') == [
+                'Hasil penelitian menunjukkan 3.1 kali lipat dari sebelumnya.'])
+    satu_bab = P._susun_dari_bersih('BAB II TINJAUAN PUSTAKA\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.')
+    cek('bab satu baris: "BAB II TINJAUAN PUSTAKA" masuk gabung',
+        any(v[1] == 'TINJAUAN PUSTAKA' for v in satu_bab.get('gabung', {}).values()))
+    bukan_bab = P._susun_dari_bersih('BAB III membahas metode penelitian ini.\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.')
+    cek('bab satu baris: kalimat "BAB III membahas..." BUKAN gabung',
+        not any(v[0].upper().startswith('BAB III') for v in bukan_bab.get('gabung', {}).values()))
+
+    # ── 2d. TEKS PECAH PER HURUF (v5) ────────────────────────────────────
+    from app.sambung_kode import perbaiki_spasi_huruf as _psh
+    _baru, _j = _psh('D i n a m i k a P a s a r')
+    cek('spasi huruf: "D i n a m i k a P a s a r" -> "Dinamika Pasar"',
+        _baru == 'Dinamika Pasar', f'dapat {_baru!r}')
+    _baru, _j = _psh('B A B I P E N D A H U L U A N')
+    cek('spasi huruf: "B A B I ..." -> "BAB I PENDAHULUAN"',
+        _baru == 'BAB I PENDAHULUAN', f'dapat {_baru!r}')
+    _baru, _j = _psh('58 B A B I I I M E T O D O L O G I P E N E L I T I A N')
+    cek('spasi huruf: "B A B I I I ..." -> "58 BAB III METODOLOGI PENELITIAN"',
+        _baru == '58 BAB III METODOLOGI PENELITIAN', f'dapat {_baru!r}')
+    _baru, _j = _psh('S P S S dan A B C D tetap utuh')
+    cek('spasi huruf: "S P S S" digabung, "A B C D" dibiarkan',
+        _baru == 'SPSS dan A B C D tetap utuh', f'dapat {_baru!r}')
+    _baru, _j = _psh('Hasil penelitian ini biasa saja tanpa spasi huruf.')
+    cek('spasi huruf: kalimat biasa tidak berubah',
+        _baru == 'Hasil penelitian ini biasa saja tanpa spasi huruf.' and _j == 0)
+    _baru, _j = _psh('1.1 L a t a r B e l a k a n g')
+    cek('spasi huruf: "1.1 L a t a r ..." -> "1.1 Latar Belakang"',
+        _baru == '1.1 Latar Belakang', f'dapat {_baru!r}')
+    d = P._susun_dari_bersih('B A B I I I M E T O D O L O G I P E N E L I T I A N 3.1 J e n i s P e n e l i t i a n')
+    cek('spasi huruf + pisah judul: satu baris pecah jadi BAB III + 3.1',
+        d.get('spasi_huruf_jml', 0) >= 1 and d.get('pisah_judul_jml', 0) >= 1
+        and any(v[0].upper().startswith('BAB III') for v in d.get('gabung', {}).values()),
+        f"spasi={d.get('spasi_huruf_jml')} pisah={d.get('pisah_judul_jml')}")
 
     # ── 3. JEV MATI -> fallback ───────────────────────────────────────────
     #    (ganti satpam di modul P langsung — jangan muat ulang, _stub_app
@@ -384,6 +505,568 @@ def main():
     P._tidur_adaptif(t0, dasar=0.05)
     cek('jeda adaptif: panggilan cepat -> tidur sisa jarak',
         0.03 < time.time() - mulai < 0.3)
+
+    # ── 6. SELARAS DOKUMEN RESMI TYPESAFE (v5.4) ─────────────────────────
+    #    Sumber: https://docs.typesafe.ai/primitives (+ /choice, /noul,
+    #    /confidence, /cookbooks/autoformat) — dibaca 10 Nov 2026.
+    S = _muat_asli('app.satpam_asli', ROOT / 'app' / 'satpam.py')
+    cek('dokumen: noul TANPA criteria sah',
+        S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x'}}) == [])
+    cek('dokumen: noul + criteria OBJEK {true,false} sah (dulu ditolak)',
+        S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x',
+                                'criteria': {'true': 'ya, sambung',
+                                             'false': 'tidak, putus'}}}) == [])
+    cek('dokumen: noul + criteria STRING tetap ditolak (akar 503 semu 07 Okt)',
+        len(S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x',
+                                   'criteria': 'Ya bila sambung'}})) == 1)
+    cek('dokumen: noul + criteria LIST ditolak',
+        len(S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x',
+                                   'criteria': ['ya', 'tidak']}})) == 1)
+    cek('dokumen: noul + criteria OBJEK tanpa true/false ditolak',
+        len(S._periksa_skema({'q': {'type': 'noul', 'instructions': 'x',
+                                   'criteria': {'ya': 'sambung'}}})) == 1)
+    cek('dokumen: choice TANPA criteria tetap ditolak',
+        len(S._periksa_skema({'q': {'type': 'choice',
+                                   'instructions': 'x'}})) == 1)
+    cek('dokumen: choice + criteria OBJEK sah',
+        S._periksa_skema({'q': {'type': 'choice', 'instructions': 'x',
+                                'criteria': {'a': 'opsi A'}}}) == [])
+
+    K = _muat_asli('app.konversi_asli', ROOT / 'app' / 'konversi.py')
+    _tq = K._tanya_sambung(5, 'Latar belakang penelitian ini',
+                          'membahas pemasaran digital.')
+    cek('dokumen: pertanyaan stitch mengutip KEDUA baris (bukan hanya ID)',
+        _tq['type'] == 'noul'
+        and 'Latar belakang penelitian ini' in _tq['instructions']
+        and 'membahas pemasaran digital.' in _tq['instructions'])
+    H._TANYA_FN = lambda bahan, tanya: {k: {'noul': 0.6} for k in tanya}
+    lap = H.periksa_peta(kalimat)
+    cek('dokumen: Hakim noul 0,6 (pita tengah 0,3-0,7) -> ragu, bukan sepakat',
+        lap['jumlah_ragu'] == 1 and lap['bagian'][1]['status'] == 'ragu')
+    H._TANYA_FN = lambda bahan, tanya: {k: {'noul': 0.9} for k in tanya}
+    lap = H.periksa_peta(kalimat)
+    cek('dokumen: Hakim noul 0,9 (>= 0,7) tetap sepakat',
+        lap['jumlah_sepakat'] == 2)
+    H._TANYA_FN = None
+    cek('dokumen: criteria bab/subbab bentuk OBJEK what/not_for',
+        isinstance(P.KRITERIA.get('bab'), dict)
+        and set(P.KRITERIA['bab']) >= {'what', 'not_for'}
+        and isinstance(P.KRITERIA.get('subbab'), dict)
+        and set(P.KRITERIA['subbab']) >= {'what', 'not_for'})
+    cek('dokumen: criteria tetap 4 opsi, paragraf/biasa satu baris',
+        set(P.KRITERIA) == {'bab', 'subbab', 'paragraf', 'biasa'}
+        and isinstance(P.KRITERIA['paragraf'], str)
+        and isinstance(P.KRITERIA['biasa'], str))
+
+    # ── 7. v6.1: SEGMENTASI SESUDAH STITCH ───────────────────────────────
+    #    Teks pecah per huruf hidup satu huruf per BARIS — pra-stitch tidak
+    #    bisa cocok lintas baris; stitch menyambungnya jadi "D i n a m i k a".
+    teks_huruf = (
+        'BAB I\nPENDAHULUAN\n'
+        'D\ni\nn\na\nm\ni\nk\na\n\n'
+        'M\ne\nm\nb\na\nh\na\ns\n\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    FakeKonversi.mode = 'normal'
+    d_huruf = P._susun_dari_bersih(teks_huruf)
+    cek('v6.1: huruf per baris jadi kata utuh sesudah stitch ("Dinamika")',
+        any('Dinamika' in b for b in d_huruf['baris']))
+    cek('v6.1: kata kamus baru ikut diperbaiki ("Membahas")',
+        any('Membahas' in b for b in d_huruf['baris']))
+    cek('v6.1: baris berspasi sebelum perbaikan = 2',
+        d_huruf.get('huruf_berspasi_sebelum') == 2,
+        str(d_huruf.get('huruf_berspasi_sebelum')))
+    cek('v6.1: baris berspasi sesudah perbaikan = 0',
+        d_huruf.get('huruf_berspasi_sesudah') == 0,
+        str(d_huruf.get('huruf_berspasi_sesudah')))
+    cek('v6.1: jumlah rangkaian diperbaiki sesudah stitch = 2',
+        d_huruf.get('spasi_huruf_sesudah_stitch') == 2,
+        str(d_huruf.get('spasi_huruf_sesudah_stitch')))
+    teks_asing = (
+        'BAB I\nPENDAHULUAN\n'
+        'Q\nw\ne\nr\nt\ny\n\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    d_asing = P._susun_dari_bersih(teks_asing)
+    cek('v6.1: rangkaian tak dikenal dibiarkan berspasi (tidak dikarang)',
+        any('Q w e r t y' in b for b in d_asing['baris']))
+    cek('v6.1: rangkaian tak dikenal tidak dihitung diperbaiki',
+        d_asing.get('spasi_huruf_sesudah_stitch') == 0,
+        str(d_asing.get('spasi_huruf_sesudah_stitch')))
+
+    # ── 8. v6.2: PISAH "BAB + JUDUL + KOMA + KALIMAT" ────────────────────
+    cek('v6.2: "3. BAB III ..., bagian ini ..." dipisah jadi judul + ekor',
+        P._pisah_bab_ekor(
+            '3. BAB III METODOLOGI PENELITIAN, bagian ini menjelaskan tentang')
+        == ['3. BAB III METODOLOGI PENELITIAN',
+            'bagian ini menjelaskan tentang'])
+    cek('v6.2: "5. BAB V PENUTUP, pada bab ini ..." dipisah',
+        P._pisah_bab_ekor(
+            '5. BAB V PENUTUP, pada bab ini penulis akan menjelaskan mengenai')
+        == ['5. BAB V PENUTUP',
+            'pada bab ini penulis akan menjelaskan mengenai'])
+    cek('v6.2: judul yang ekornya huruf BESAR tidak dipisah',
+        P._pisah_bab_ekor(
+            'BAB II TINJAUAN PUSTAKA, KERANGKA PEMIKIRAN DAN HIPOTESIS')
+        == ['BAB II TINJAUAN PUSTAKA, KERANGKA PEMIKIRAN DAN HIPOTESIS'])
+    cek('v6.2: judul tanpa koma tidak disentuh',
+        P._pisah_bab_ekor('BAB I PENDAHULUAN') == ['BAB I PENDAHULUAN'])
+    cek('v6.2: BAB di tengah kalimat tidak dipisah',
+        P._pisah_bab_ekor('Penelitian ini membahas BAB II, bagian ini menjelaskan')
+        == ['Penelitian ini membahas BAB II, bagian ini menjelaskan'])
+    # ujung-ke-ujung: judul + ekor terpisah di baris akhir (stitch fake
+    # sempat menyambung kembali — pisah sesudah stitch yang memisahkan).
+    teks_ekor = (
+        'BAB I\nPENDAHULUAN\n'
+        '3. BAB III METODOLOGI PENELITIAN, bagian ini menjelaskan tentang metode.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    d_ekor = P._susun_dari_bersih(teks_ekor)
+    cek('v6.2: judul BAB bersih tanpa ekor di baris akhir',
+        any(b.strip() == '3. BAB III METODOLOGI PENELITIAN'
+            for b in d_ekor['baris']),
+        str(d_ekor['baris']))
+    cek('v6.2: ekor kalimat jadi baris sendiri',
+        any(b.strip().startswith('bagian ini menjelaskan')
+            for b in d_ekor['baris']))
+    cek('v6.2: jumlah pisahan ekor tercatat',
+        d_ekor.get('pisah_bab_ekor_jml', 0) >= 1,
+        str(d_ekor.get('pisah_bab_ekor_jml')))
+    # pagar stitch: judul BAB + ekor lintas baris-kosong tidak disambung
+    # meski Jev bilang sambung (ekor ada di JOIN_SET fake).
+    from app.sambung_kode import sambung_kode as _sk6
+    cek('v6.2: sambung_kode tolak judul BAB + "bagian ini..."',
+        _sk6('BAB III METODOLOGI PENELITIAN',
+             'bagian ini menjelaskan tentang') is False)
+    cek('v6.2: sambung_kode tolak judul BAB + "Bab ini..."',
+        _sk6('BAB III METODOLOGI PENELITIAN',
+             'Bab ini menjelaskan tentang') is False)
+    cek('v6.2: sambung_kode tetap tanya lanjutan judul huruf besar',
+        _sk6('BAB III Metodologi', 'Penelitian') is None)
+    teks_lintas = (
+        'BAB I\nPENDAHULUAN\n'
+        'BAB III METODOLOGI PENELITIAN\n\n'
+        'membahas pemasaran digital di Indonesia.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    hasil_lintas = P._stitch_baris(teks_lintas,
+                                   tanya_fn=FAKE_SATPAM.tanya_bebas_mutu)
+    cek('v6.2: stitch lintas-kosong tidak menelan judul BAB',
+        'BAB III METODOLOGI PENELITIAN\n' in hasil_lintas
+        and 'membahas pemasaran digital di Indonesia.' in hasil_lintas,
+        hasil_lintas[:120])
+
+    # ── 9. v6.3: STABILKAN BATAS PARAGRAF ────────────────────────────────
+    #    (a) koreksi deterministik: 'paragraf' sesudah baris isi yang tidak
+    #    berakhir tanda akhir kalimat = lanjutan -> 'biasa'.
+    teks_batas = (
+        'BAB I\nPENDAHULUAN\n'
+        'Kalimat pertama yang berlanjut ke baris berikutnya dan masih panjang sekali\n'
+        'ke baris berikutnya yang jadi kandidat.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_batas = P.petakan_dari_teks(teks_batas)
+    lab_batas = {i: v for i, v in r_batas['label'].items()}
+    cek('v6.3: lanjutan kalimat (baris sebelum tanpa titik) jadi biasa',
+        lab_batas.get(3) == 'biasa', str(lab_batas))
+    cek('v6.3: paragraf sesudah kalimat selesai tetap paragraf',
+        lab_batas.get(4) == 'paragraf', str(lab_batas))
+    cek('v6.3: paragraf pertama sesudah judul tetap paragraf',
+        lab_batas.get(2) == 'paragraf', str(lab_batas))
+    cek('v6.3: koreksi batas tercatat',
+        r_batas.get('koreksi_batas_paragraf') == [3],
+        str(r_batas.get('koreksi_batas_paragraf')))
+    #    (b) judul sebelumnya mengecualikan koreksi.
+    teks_judul = (
+        'BAB I\nPENDAHULUAN\n'
+        '1.1 Latar Belakang\n'
+        'Isi paragraf pertama sesudah judul subbab ini.\n'
+        'Isi paragraf kedua yang panjang dan tidak terbelah sama sekali.\n'
+    )
+    r_judul = P.petakan_dari_teks(teks_judul)
+    cek('v6.3: paragraf sesudah subbab kode tidak didemosi',
+        r_judul['label'].get(3) == 'paragraf'
+        and r_judul.get('koreksi_batas_paragraf') == [],
+        str({k: v for k, v in r_judul['label'].items() if v != 'biasa'}))
+    #    (c) tanya-ulang batas goyang: suara terbelah paragraf/biasa
+    #    sesudah gelombang 1 ditanya sekali lagi di gelombang 2.
+    teks_pb = (
+        'BAB I\nPENDAHULUAN\n'
+        'Baris GOYANG-PB yang membuka paragraf baru.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_pb = P.petakan_dari_teks(teks_pb)
+    cek('v6.3: batas goyang paragraf/biasa ditanya ulang sekali lagi',
+        r_pb.get('tanya_ulang_goyang_pb_jml') == 1,
+        str(r_pb.get('tanya_ulang_goyang_pb_jml')))
+    cek('v6.3: tanya-ulang batas goyang memakai gelombang ke-2',
+        r_pb.get('tanya_ulang_gelombang', 0) >= 2,
+        str(r_pb.get('tanya_ulang_gelombang')))
+    #    (d) v7.2: balik label sesudah suara ekstra PB tercatat.
+    cek('v7.2: balik label tanya-ulang batas goyang tercatat',
+        r_pb.get('tanya_ulang_goyang_pb_balik_jml') == 1
+        and r_pb.get('tanya_ulang_goyang_pb_balik') == [[2, 'biasa', 'paragraf']],
+        str(r_pb.get('tanya_ulang_goyang_pb_balik')))
+
+    # ── 10. v6.4: DETEKSI BAB DETERMINISTIK ─────────────────────────────
+    #    (a) penanda BAB dipaksa 'bab' oleh kode (fake melabel 'paragraf').
+    teks_bab = (
+        'BAB I\nPENDAHULUAN\n'
+        '3. BAB III METODOLOGI PENELITIAN\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_bab = P.petakan_dari_teks(teks_bab)
+    cek('v6.4: "3. BAB III ..." dipaksa bab oleh kode',
+        r_bab['label'].get(2) == 'bab', str(r_bab['label']))
+    cek('v6.4: bab dari kode tercatat + asal kode',
+        r_bab.get('bab_kode') == [2] and r_bab.get('asal', {}).get(2) == 'kode',
+        str((r_bab.get('bab_kode'), r_bab.get('asal'))))
+    #    (b) nomor BAB yang sama 2x -> yang ke-2 jadi biasa.
+    teks_ganda = (
+        'BAB I\nPENDAHULUAN\n'
+        '3. BAB III METODOLOGI PENELITIAN\n'
+        '4. BAB III METODOLOGI PENELITIAN\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_ganda = P.petakan_dari_teks(teks_ganda)
+    cek('v6.4: BAB ganda (nomor sama) -> kemunculan ke-2 jadi biasa',
+        r_ganda['label'].get(2) == 'bab'
+        and r_ganda['label'].get(3) == 'biasa'
+        and r_ganda.get('bab_ganda') == [3],
+        str((r_ganda['label'], r_ganda.get('bab_ganda'))))
+    #    (c) "BAB 1" = "BAB I" (normalisasi angka).
+    cek('v6.4: angka BAB dinormalisasi (BAB 1 = BAB I)',
+        P._angka_bab('1') == 1 and P._angka_bab('I') == 1
+        and P._angka_bab('III') == 3 and P._angka_bab('V') == 5)
+    #    (d) label 'bab' Jev tanpa penanda didemosi.
+    teks_demosi = (
+        'BAB I\nPENDAHULUAN\n'
+        'Kalimat JEV-BAB penutup yang panjang dan berakhir titik.\n'
+        'Baris JEV-BAB tanpa titik akhir\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_demosi = P.petakan_dari_teks(teks_demosi)
+    cek('v6.4: bab Jev tanpa penanda + titik akhir -> paragraf',
+        r_demosi['label'].get(2) == 'paragraf', str(r_demosi['label']))
+    cek('v6.4: bab Jev tanpa penanda + tanpa titik -> biasa',
+        r_demosi['label'].get(3) == 'biasa', str(r_demosi['label']))
+    cek('v6.4: demosi bab tercatat',
+        r_demosi.get('bab_demosi') == [2, 3],
+        str(r_demosi.get('bab_demosi')))
+    #    (e) pengecualian: judul BAB tepat sesudah penanda BAB polos
+    #    yang judulnya kosong tetap 'bab'.
+    teks_judul_bab = (
+        'BAB I\n'
+        'Pendahuluan JEV-BAB\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+        'Isi paragraf kedua yang panjang dan tidak terbelah sama sekali.\n'
+    )
+    r_jb = P.petakan_dari_teks(teks_judul_bab)
+    cek('v6.4: judul BAB sesudah penanda polos tetap bab',
+        r_jb['label'].get(1) == 'bab', str(r_jb['label']))
+
+    # ── 11. v6.5: PROFIL KAMPUS — ISTILAH + PENOMORAN ───────────────────
+    cek('v6.5: istilah bawaan kuesioner = kuesioner + angket',
+        PK.istilah().get('kuesioner') == ['kuesioner', 'angket'],
+        str(PK.istilah()))
+    cek('v6.5: penomoran bawaan judul_titik_akhir = False',
+        PK.penomoran().get('judul_titik_akhir') is False,
+        str(PK.penomoran()))
+    cek('v6.5: Aturan 3 buang judul ANGKET (bawaan)',
+        P.dibuang('ANGKET PENELITIAN') is True)
+    cek('v6.5: Aturan 3 buang judul KUESIONER (bawaan)',
+        P.dibuang('KUESIONER PENELITIAN') is True)
+    with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as f:
+        json.dump({'istilah': {'kuesioner': ['kuesioner', 'angket',
+                                             'daftar pertanyaan']},
+                   'penomoran': {'judul_titik_akhir': True},
+                   'kampus': {'KampusX': {'penomoran': {'judul_titik_akhir': False}}}},
+                  f)
+        jalur = f.name
+    os.environ['EDUAI_PROFIL_KAMPUS'] = jalur
+    PK._cache.update({'jalur': None, 'mtime': None, 'isi': None})
+    cek('v6.5: istilah kuesioner dari config (tanpa hardcode)',
+        PK.istilah().get('kuesioner')
+        == ['kuesioner', 'angket', 'daftar pertanyaan'],
+        str(PK.istilah()))
+    cek('v6.5: Aturan 3 buang sebutan config "daftar pertanyaan"',
+        P.dibuang('DAFTAR PERTANYAAN PENELITIAN') is True)
+    cek('v6.5: penomoran judul_titik_akhir dari config = True',
+        PK.penomoran().get('judul_titik_akhir') is True)
+    cek('v6.5: penomoran per kampus boleh mematikan lagi (False)',
+        PK.penomoran('KampusX').get('judul_titik_akhir') is False)
+    cek('v6.5: nomor bertitik "1.1. Latar Belakang" dibaca kode',
+        P._nomor_bertindak_judul('1.1. Latar Belakang') is True)
+    cek('v6.5: judul bertitik akhir dibaca kode bila config True',
+        P._nomor_bertindak_judul('1.1. Latar Belakang.') is True)
+    os.environ.pop('EDUAI_PROFIL_KAMPUS', None)
+    PK._cache.update({'jalur': None, 'mtime': None, 'isi': None})
+    cek('v6.5: sebutan config tidak berlaku sesudah config dilepas',
+        P.dibuang('DAFTAR PERTANYAAN PENELITIAN') is False)
+    cek('v6.5: judul bertitik akhir ditolak bila config bawaan (False)',
+        P._nomor_bertindak_judul('1.1. Latar Belakang.') is False)
+    cek('v6.5: nomor bertitik tetap dibaca kode dengan config bawaan',
+        P._nomor_bertindak_judul('1.1. Latar Belakang') is True)
+    cek('v6.5: huruf awal kecil terkupas dari nomor bertitik',
+        P._huruf_awal_kecil('1.1. latar belakang') is True
+        and P._huruf_awal_kecil('1.1. Latar Belakang') is False)
+
+    # ── 12. v6.7: PERBAIKAN DARI UJI LIVE ───────────────────────────────
+    #    (a) pagar sambung_kode mengupas nomor daftar ("2. BAB II ...").
+    from app.sambung_kode import tanpa_nomor_halaman as _tnh
+    cek('v6.7: tanpa_nomor_halaman kupas nomor daftar juga',
+        _tnh('2. BAB II TINJAUAN PUSTAKA') == 'BAB II TINJAUAN PUSTAKA'
+        and _tnh('13 BAB I') == 'BAB I'
+        and _tnh('1.1 Latar Belakang') == '1.1 Latar Belakang')
+    cek('v6.7: sambung_kode tolak "2. BAB II ..." + "bagian ini..."',
+        _sk6('2. BAB II TINJAUAN PUSTAKA',
+             'bagian ini menjelaskan tentang') is False)
+    cek('v6.7: sambung_kode tolak "3. BAB III ..." + "pada bab ini..."',
+        _sk6('3. BAB III METODOLOGI PENELITIAN',
+             'pada bab ini penulis akan') is False)
+    #    (b) koreksi batas dipersempit: ':' dan baris terpotong (kata polos)
+    #    TIDAK didemosi; yang didemosi hanya awal huruf kecil / lanjutan
+    #    eksplisit (koma).
+    teks_sempit = (
+        'BAB I\nPENDAHULUAN\n'
+        'Hasil uji normalitas disajikan pada tabel berikut:\n'
+        'Berdasarkan kriteria uji normalitas, data dinyatakan berdistribusi normal.\n'
+        'Kalimat pertama yang berlanjut ke baris berikutnya dan masih panjang sekali,\n'
+        'ke baris berikutnya yang jadi kandidat.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_sempit = P.petakan_dari_teks(teks_sempit)
+    cek('v6.7: paragraf sesudah pengantar tabel (:) TIDAK didemosi',
+        r_sempit['label'].get(3) == 'paragraf', str(r_sempit['label']))
+    cek('v6.7: lanjutan huruf kecil sesudah koma tetap didemosi',
+        r_sempit['label'].get(5) == 'biasa', str(r_sempit['label']))
+    cek('v6.7: paragraf sesudah kalimat selesai tetap paragraf',
+        r_sempit['label'].get(6) == 'paragraf', str(r_sempit['label']))
+    cek('v6.7: hanya 1 koreksi batas pada teks sempit',
+        r_sempit.get('koreksi_batas_paragraf') == [5],
+        str(r_sempit.get('koreksi_batas_paragraf')))
+
+    # ── 13. v6.8: FRAGMEN 1-2 HURUF (contoh live fid=115) ────────────────
+    from app.sambung_kode import perbaiki_fragmen_huruf as _pfh
+    cek('v6.8: "d ij e l a s k a n o l e h l a i n" -> "dijelaskan oleh lain"',
+        _pfh('d ij e l a s k a n o l e h l a i n')[0]
+        == 'dijelaskan oleh lain')
+    cek('v6.8: "d i luar" (2 token) -> "di luar"',
+        _pfh('variabel d i luar variabel')[0]
+        == 'variabel di luar variabel')
+    cek('v6.8: "J u rn a l R i s e t ..." -> "Jurnal Riset ..."',
+        _pfh('J u rn a l R i s e t M a n aj e m e n')[0]
+        == 'Jurnal Riset Manajemen')
+    cek('v6.8: nama orang dibiarkan (tidak dikarang)',
+        _pfh('D i n a A l fi n a H e l m a n i a P u t r i')[0]
+        == 'D i n a A l fi n a H e l m a n i a P u t r i')
+    cek('v6.8: inisial "U S A" dibiarkan',
+        _pfh('U S A dan P B B')[0] == 'U S A dan P B B')
+    cek('v6.8: teks normal tidak berubah dan tidak dihitung',
+        _pfh('Kata di ke dalam kalimat biasa.')[1] == 0)
+    import app.sambung_kode as _SK
+    cek('v6.8: segmentasi "di" = kata, bukan Romawi',
+        _SK._segmentasi('di', dict(_SK.KATA_UMUM)) == [(0, 2, 'di')])
+    cek('v6.8: segmentasi "iv" tetap Romawi',
+        _SK._segmentasi('iv', dict(_SK.KATA_UMUM))
+        == [(0, 1, 'i'), (1, 2, 'v')])
+
+    # ── 14. v7.1: PISAH EKOR KALIMAT PADA JUDUL SUBBAB BERNOMOR ──────────
+    cek('v7.1: "1.1 LATAR BELAKANG Indonesia merupakan ..." dipisah',
+        P._pisah_subbab_ekor(
+            '1.1 LATAR BELAKANG Indonesia merupakan salah satu negara dengan')
+        == ['1.1 LATAR BELAKANG',
+            'Indonesia merupakan salah satu negara dengan'])
+    cek('v7.1: "1.3 Tujuan Penelitian 1. Untuk ..." dipisah di penanda butir',
+        P._pisah_subbab_ekor(
+            '1.3 Tujuan Penelitian 1. Untuk mengidentifikasi SWOT pada Usaha')
+        == ['1.3 Tujuan Penelitian',
+            '1. Untuk mengidentifikasi SWOT pada Usaha'])
+    cek('v7.1: "1.5 Sistematika Penulisan Agar ..." dipisah di kata awal',
+        P._pisah_subbab_ekor(
+            '1.5 Sistematika Penulisan Agar memberikan gambaran sekilas mengenai')
+        == ['1.5 Sistematika Penulisan',
+            'Agar memberikan gambaran sekilas mengenai'])
+    cek('v7.1: "1.2 Definisi Operasional adalah ..." dipisah di kata kecil',
+        P._pisah_subbab_ekor(
+            '1.2 Definisi Operasional adalah suatu batasan yang dipakai peneliti')
+        == ['1.2 Definisi Operasional',
+            'adalah suatu batasan yang dipakai peneliti'])
+    cek('v7.1: koma + kalimat dipisah',
+        P._pisah_subbab_ekor(
+            '1.1 Latar Belakang, Indonesia merupakan salah satu negara')
+        == ['1.1 Latar Belakang',
+            'Indonesia merupakan salah satu negara'])
+    cek('v7.1: penghubung judul tidak memicu pisah',
+        P._pisah_subbab_ekor('1.1 Latar Belakang dan Tujuan Penelitian')
+        == ['1.1 Latar Belakang dan Tujuan Penelitian'])
+    cek('v7.1: "Dalam" tanpa kalimat sesudahnya tidak memicu pisah',
+        P._pisah_subbab_ekor('1.2 Peran Dalam Organisasi')
+        == ['1.2 Peran Dalam Organisasi'])
+    cek('v7.1: judul CAPS tanpa ekor tidak disentuh',
+        P._pisah_subbab_ekor('1.1 LATAR BELAKANG') == ['1.1 LATAR BELAKANG'])
+    cek('v7.1: judul Title Case tanpa ekor tidak disentuh',
+        P._pisah_subbab_ekor('2.1 Jenis Penelitian Kualitatif')
+        == ['2.1 Jenis Penelitian Kualitatif'])
+    cek('v7.1: "KERANGKA PEMIKIRAN Teori Belajar" tidak dipisah',
+        P._pisah_subbab_ekor('1.2 KERANGKA PEMIKIRAN Teori Belajar')
+        == ['1.2 KERANGKA PEMIKIRAN Teori Belajar'])
+    cek('v7.1: koma + judul Title Case tidak dipisah',
+        P._pisah_subbab_ekor(
+            '1.2 Tinjauan Pustaka, Kerangka Pemikiran dan Hipotesis')
+        == ['1.2 Tinjauan Pustaka, Kerangka Pemikiran dan Hipotesis'])
+    cek('v7.1: nomor di tengah kalimat tidak dipisah',
+        P._pisah_subbab_ekor('Penelitian ini membahas 1.1 Latar Belakang')
+        == ['Penelitian ini membahas 1.1 Latar Belakang'])
+    cek('v7.1: nomor halaman di depan tetap menempel di judul',
+        P._pisah_subbab_ekor(
+            '13 1.1 LATAR BELAKANG Indonesia merupakan salah satu negara')
+        == ['13 1.1 LATAR BELAKANG',
+            'Indonesia merupakan salah satu negara'])
+    # ujung-ke-ujung: judul + ekor terpisah di baris akhir.
+    teks_subbab = (
+        'BAB I\nPENDAHULUAN\n'
+        '1.1 LATAR BELAKANG Indonesia merupakan salah satu negara dengan jumlah penduduk besar.\n'
+        '1.3 Tujuan Penelitian 1. Untuk mengidentifikasi SWOT pada Usaha Kecil Menengah.\n'
+        '1.5 Sistematika Penulisan Agar memberikan gambaran sekilas mengenai isi skripsi ini.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    d_subbab = P._susun_dari_bersih(teks_subbab)
+    cek('v7.1: judul subbab bersih tanpa ekor di baris akhir',
+        any(b.strip() == '1.1 LATAR BELAKANG' for b in d_subbab['baris'])
+        and any(b.strip() == '1.3 Tujuan Penelitian'
+                for b in d_subbab['baris'])
+        and any(b.strip() == '1.5 Sistematika Penulisan'
+                for b in d_subbab['baris']),
+        str(d_subbab['baris']))
+    cek('v7.1: ekor subbab jadi baris sendiri',
+        any(b.strip().startswith('Indonesia merupakan')
+            for b in d_subbab['baris'])
+        and any(b.strip().startswith('1. Untuk mengidentifikasi')
+                for b in d_subbab['baris'])
+        and any(b.strip().startswith('Agar memberikan')
+                for b in d_subbab['baris']))
+    cek('v7.1: jumlah pisahan ekor subbab tercatat',
+        d_subbab.get('pisah_subbab_ekor_jml', 0) >= 3,
+        str(d_subbab.get('pisah_subbab_ekor_jml')))
+    # pagar stitch: judul subbab + ekor lintas baris-kosong tidak disambung
+    # meski Jev bilang sambung (ekor ada di JOIN_SET fake).
+    from app.sambung_kode import sambung_kode as _sk7
+    cek('v7.1: sambung_kode tolak subbab + "Indonesia merupakan..."',
+        _sk7('1.1 Latar Belakang',
+             'Indonesia merupakan salah satu negara') is False)
+    cek('v7.1: sambung_kode tolak subbab + "Agar memberikan..."',
+        _sk7('1.5 Sistematika Penulisan',
+             'Agar memberikan gambaran sekilas') is False)
+    cek('v7.1: sambung_kode tolak subbab + huruf kecil',
+        _sk7('1.1 Latar Belakang',
+             'bagian ini menjelaskan tentang') is False)
+    cek('v7.1: sambung_kode tetap tanya lanjutan judul huruf besar',
+        _sk7('1.1 Latar', 'Belakang') is None)
+    cek('v7.1: sambung_kode tetap tanya penghubung judul "dan ..."',
+        _sk7('1.1 Latar', 'dan Tujuan Penelitian') is None)
+    teks_lintas_sub = (
+        'BAB I\nPENDAHULUAN\n'
+        '1.1 Latar Belakang\n\n'
+        'membahas pemasaran digital di Indonesia.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    hasil_lintas_sub = P._stitch_baris(teks_lintas_sub,
+                                       tanya_fn=FAKE_SATPAM.tanya_bebas_mutu)
+    cek('v7.1: stitch lintas-kosong tidak menelan judul subbab',
+        '1.1 Latar Belakang\n' in hasil_lintas_sub
+        and 'membahas pemasaran digital di Indonesia.' in hasil_lintas_sub,
+        hasil_lintas_sub[:120])
+
+    # ── 8. v8: SAKLAR MODEL YANG JUJUR ────────────────────────────────────
+    #    Audit 1.14 menemukan jebakan: env EDUAI_SATPAM_MODEL tampaknya
+    #    mengganti model, tapi tidak dipakai jalur peta sama sekali.
+    #    Perbaikan v8: fungsi mati + konstanta menipu dihapus; satu-satunya
+    #    saklar yang hidup = app/jev.py::MODEL_DEFAULT (bawaan 1.13).
+    import importlib
+    import urllib.request
+    os.environ['EDUAI_SATPAM_MODEL'] = 'SATPAM/typesafe/jev-1.14'
+    S8 = _muat_asli('app.satpam_asli_v8', ROOT / 'app' / 'satpam.py')
+    cek('v8: env EDUAI_SATPAM_MODEL tidak lagi melahirkan satpam.MODEL',
+        not hasattr(S8, 'MODEL'))
+    cek('v8: konstanta menipu BASE/KUNCI/BATAS_DETIK sudah tidak ada',
+        not hasattr(S8, 'BASE') and not hasattr(S8, 'KUNCI')
+        and not hasattr(S8, 'BATAS_DETIK'))
+    cek('v8: fungsi mati _tanya_bebas_lama sudah tidak ada',
+        not hasattr(S8, '_tanya_bebas_lama'))
+    cek('v8: setelan hidup AKTIF/AMBANG_LOLOS/AMBANG_TANYA tetap ada',
+        hasattr(S8, 'AKTIF') and hasattr(S8, 'AMBANG_LOLOS')
+        and hasattr(S8, 'AMBANG_TANYA'))
+    cek('v8: pinjaman mati di Hakim sudah tidak ada',
+        not hasattr(H, '_MODEL') and not hasattr(H, '_BASE')
+        and not hasattr(H, '_KUNCI') and not hasattr(H, '_BATAS'))
+    del os.environ['EDUAI_SATPAM_MODEL']
+
+    J8 = importlib.import_module('app.jev')
+    cek('v8: model bawaan tetap 1.13',
+        J8.MODEL_DEFAULT == 'SATPAM/typesafe/jev-1.13')
+
+    # ── transport palsu: tangkap body request, tanpa jaringan ──────────
+    class _ResponPalsu:
+        def __init__(self, badan):
+            self._badan = badan
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return self._badan
+
+    tangkapan = {}
+
+    def _urlopen_palsu(req, timeout=None):
+        tangkapan['data'] = req.data
+        return _ResponPalsu(json.dumps({'q1': {'noul': 0.9}}).encode())
+
+    _tanya = {'q1': {'type': 'noul',
+                     'instructions': 'apakah baris ini judul subbab?'}}
+    _urlopen_asli = urllib.request.urlopen
+    urllib.request.urlopen = _urlopen_palsu
+    try:
+        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
+        r = J8.tanya('bahan uji yang cukup panjang', _tanya)
+        cek('v8: saklar jev.MODEL_DEFAULT mengganti model di body request',
+            json.loads(tangkapan['data'])['model']
+            == 'SATPAM/typesafe/jev-1.14'
+            and r == {'q1': {'noul': 0.9}})
+        r = S8.tanya_bebas_mutu('bahan uji yang cukup panjang', _tanya)
+        cek('v8: jalur live satpam.tanya_bebas_mutu ikut saklar model',
+            json.loads(tangkapan['data'])['model']
+            == 'SATPAM/typesafe/jev-1.14'
+            and r == {'q1': {'noul': 0.9}})
+        H._AKTIF = True
+        H._TANYA_FN = None
+        r = H._tanya_jev('bahan uji yang cukup panjang', _tanya)
+        cek('v8: jalur live Hakim ikut saklar model',
+            json.loads(tangkapan['data'])['model']
+            == 'SATPAM/typesafe/jev-1.14'
+            and r == {'q1': {'noul': 0.9}})
+        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
+        r = J8.tanya('bahan uji yang cukup panjang', _tanya)
+        cek('v8: saklar dikembalikan ke 1.13, body request ikut kembali',
+            json.loads(tangkapan['data'])['model']
+            == 'SATPAM/typesafe/jev-1.13')
+    finally:
+        urllib.request.urlopen = _urlopen_asli
+        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
+
+    # ── label model periksa_mutu = model yang benar-benar melayani ─────
+    J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
+    _teks_mutu = ('Judul penelitian tentang pemasaran digital. '
+                  'Abstrak penelitian ini membahas pemasaran. ' * 20)
+    _hasil_mutu = K.periksa_mutu(None, 1, _teks_mutu)
+    cek('v8: label model periksa_mutu = MODEL_DEFAULT yang melayani',
+        _hasil_mutu.get('model') == 'SATPAM/typesafe/jev-1.14'
+        and _hasil_mutu.get('ok') is True)
+    J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:

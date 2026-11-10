@@ -7,10 +7,13 @@ KENAPA ADA (10 Nov 2026 — tahan ribuan jenis naskah):
   Supaya tidak hardcode per kampus di kode, angka dibaca dari
   `profil/kampus.json` (JSON murni, tanpa dependensi baru):
       {"aturan": {"judul_maks_kar": 300, "subbab_kode_maks_kar": 120},
+       "istilah": {"kuesioner": ["kuesioner", "angket"]},
+       "penomoran": {"judul_titik_akhir": false},
        "kampus": {"UPB": {"judul_maks_kar": 300}}}
   · Tidak ada berkas ⇒ bawaan di bawah (aman).
   · Berkas rusak ⇒ bawaan + log peringatan (jangan gagalkan pemetaan).
-  · Profil kampus hanya MENIMPA angka di atas, tidak menambah aturan baru.
+  · Profil kampus hanya MENIMPA angka/istilah/aturan di atas, tidak
+    menambah aturan baru.
   · Nama kampus diambil dari pemanggil bila ada; tanpa nama ⇒ "aturan" umum.
 ═══════════════════════════════════════════════════════════════════════════
 """
@@ -26,6 +29,27 @@ log = logging.getLogger(__name__)
 BAWAAN = {
     'judul_maks_kar': 300,        # Aturan 2 / hakim: judul lebih panjang ⇒ paragraf/curiga
     'subbab_kode_maks_kar': 120,  # baris bernomor dibaca kode: maks panjang judul
+}
+
+# ── ISTILAH (v6, 10 Nov 2026) ────────────────────────────────────────────
+#    Satu konsep, banyak sebutan per kampus: "kuesioner" di satu kampus =
+#    "angket" di kampus lain (temuan 09 Okt 2026). Aturan 3 (judul
+#    KUESIONER = lampiran, bukan struktur) memakai daftar ini, bukan
+#    hardcode dua kata di kode. Kampus boleh menambah sebutannya sendiri
+#    di config ("daftar pertanyaan", ...).
+BAWAAN_ISTILAH = {
+    'kuesioner': ['kuesioner', 'angket'],
+}
+
+# ── PENOMORAN (v6, 10 Nov 2026) ──────────────────────────────────────────
+#    Gaya penomoran judul per kampus. `judul_titik_akhir`: True bila judul
+#    bernomor di kampus itu BOLEH diakhiri titik ("1.1. Latar Belakang.")
+#    dan tetap dibaca kode sebagai sub-bab. False (bawaan) = titik akhir
+#    berarti kalimat, bukan judul (perilaku lama). Nomor bertitik
+#    ("1.1. Latar Belakang", titik sesudah ANGKA) selalu diterima kode —
+#    itu format penomoran, bukan titik akhir kalimat.
+BAWAAN_PENOMORAN = {
+    'judul_titik_akhir': False,
 }
 
 _cache: dict = {'jalur': None, 'mtime': None, 'isi': None}
@@ -78,3 +102,38 @@ def aturan(nama_kampus: str | None = None) -> dict:
                 if k in keluar and isinstance(v, (int, float)):
                     keluar[k] = v
     return keluar
+
+
+def _bagian_config(isi: dict, nama_bagian: str, nama_kampus: str | None,
+                   bawaan: dict) -> dict:
+    """Gabung satu bagian config: bawaan ← umum ← profil kampus."""
+    keluar = {k: (list(v) if isinstance(v, list) else v)
+              for k, v in bawaan.items()}
+    umum = isi.get(nama_bagian)
+    if isinstance(umum, dict):
+        for k, v in umum.items():
+            # `v` kosong (list kosong / False) tidak menimpa — KECUALI False
+            # yang sah untuk kunci bool (kampus boleh mematikan aturan).
+            if k in keluar and type(v) is type(keluar[k]) \
+                    and (v or isinstance(v, bool)):
+                keluar[k] = list(v) if isinstance(v, list) else v
+    if nama_kampus:
+        kampus = (isi.get('kampus') or {}).get(nama_kampus)
+        if isinstance(kampus, dict):
+            bagian = kampus.get(nama_bagian)
+            if isinstance(bagian, dict):
+                for k, v in bagian.items():
+                    if k in keluar and type(v) is type(keluar[k]) \
+                            and (v or isinstance(v, bool)):
+                        keluar[k] = list(v) if isinstance(v, list) else v
+    return keluar
+
+
+def istilah(nama_kampus: str | None = None) -> dict:
+    """Istilah efektif: {'kuesioner': ['kuesioner', 'angket', ...]}."""
+    return _bagian_config(muat(), 'istilah', nama_kampus, BAWAAN_ISTILAH)
+
+
+def penomoran(nama_kampus: str | None = None) -> dict:
+    """Aturan penomoran efektif: {'judul_titik_akhir': bool}."""
+    return _bagian_config(muat(), 'penomoran', nama_kampus, BAWAAN_PENOMORAN)
