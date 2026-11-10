@@ -37,7 +37,9 @@ log = logging.getLogger(__name__)
 #    v8 (11 Nov 2026): sambung_kode JOIN B-huruf-kecil (deterministik,
 #    terukur live Jev sendiri gabung 97-98% pasangan itu) + buang byte
 #    NUL di _susun_dari_bersih (artefak PDF fid=112: 103 NUL).
-RULE_VERSION = 'jev-peta-v8'
+RULE_VERSION = 'jev-peta-v9'  # v9 (11 Nov 2026): stitch deterministik
+# R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
+# -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
 # ── SAKLAR (env, tanpa ubah kode) ────────────────────────────────────────
 #    EDUAI_JEV_STITCH=0      ⇒ matikan pass-1 stitch (susun cara lama)

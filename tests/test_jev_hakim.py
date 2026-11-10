@@ -1109,8 +1109,58 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION kini jev-peta-v8',
-        P8.RULE_VERSION == 'jev-peta-v8')
+    cek('v8-aturan: RULE_VERSION naik dari v8 (kini v9)',
+        P8.RULE_VERSION == 'jev-peta-v9')
+    # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
+    #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
+    #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
+    #    gabungan yang diperiksa salah (butir/kutipan baru); tidak satu
+    #    pun gabung p>=0,6. R2-2: pemisahan SEMPURNA — 11 gabung-salah
+    #    di-override p<=0,47, 8 gabung-benar dipertahankan p>=0,74.
+    cek('v9-aturan: B dash = butir baru ("pasaran." + "- “AyuMeera")',
+        _sk8('pasaran.”', '- “AyuMeera bisa jadi pilihan utama') is False)
+    cek('v9-aturan: B dash = butir baru (SWOT "Opportunities")',
+        _sk8('Opportunities', '- Tren hijab instan dan simple') is False)
+    cek('v9-aturan: B en-dash = butir baru ("3.4.2 Tahapan")',
+        _sk8('3.4.2 Tahapan', '– Tahapan Analisis Data') is False)
+    cek('v9-aturan: B dash = butir baru (A kata gantung "komunitas")',
+        _sk8('komunitas', '- Pengaruh peran media sosial') is False)
+    cek('v9-aturan: B "-nya" TANPA spasi bukan penanda butir',
+        _sk8('Kalimat belum selesai', '-nya adalah lanjutan') is None)
+    cek('v9-aturan: judul 1 tingkat + ekor kalimat ("2. Manfaat Praktis")',
+        _sk8('2. Manfaat Praktis',
+             'Manfaat praktis dalam penelitian ini adalah dapat membantu')
+        is False)
+    cek('v9-aturan: judul 1 tingkat + ekor kalimat ("2. Wawancara")',
+        _sk8('2. Wawancara',
+             'Wawancara merupakan kegiatan untuk memperoleh penjelasan dan')
+        is False)
+    cek('v9-aturan: judul 1 tingkat + butir ("1. Kekuatan")',
+        _sk8('1. Kekuatan (Strength)',
+             'a. Produk relevan dengan kebutuhan hijabers lokal.') is False)
+    cek('v9-aturan: judul 1 tingkat + butir ("2. Ancaman")',
+        _sk8('2. Ancaman (Threats)', 'a. Harga pesaing lebih murah.')
+        is False)
+    cek('v9-aturan: lanjutan judul 1 tingkat tetap tanya Jev (p 0,94)',
+        _sk8('1. Mendukung Strategi', 'Agresif (Khoironi, 2023)') is None)
+    cek('v9-aturan: lanjutan judul 1 tingkat tetap tanya Jev ("Strategi Turn")',
+        _sk8('3. Mendukung', 'Strategi Turn') is None)
+    cek('v9-aturan: lanjutan judul 1 tingkat tetap tanya Jev (satu kata)',
+        _sk8('2. Mendukung Strategi', 'Diversifikasi') is None)
+    cek('v9-aturan: tahun "2023. ..." BUKAN judul bernomor',
+        _sk8('2023. Penelitian ini menunjukkan',
+             'Hasil penelitian menunjukkan bahwa') is None)
+    cek('v9-aturan: desimal koma "2,5 ..." BUKAN judul bernomor (tetap gabung)',
+        _sk8('2,5 juta responden yang', 'berpartisipasi dalam survei ini')
+        is True)
+    cek('v9-aturan: judul 1 tingkat PANJANG (>8 kata) tetap tanya/gabung',
+        _sk8('1. Membuat tabel matriks IFAS (Internal Startegy Factor '
+             'Analysis Sumary) dan',
+             'membuat keputusan yang lebih tepat') is True)
+    cek('v9-aturan: nomor halaman di depan judul 1 tingkat tetap kena SKIP',
+        _sk8('13 2. Manfaat Praktis',
+             'Manfaat praktis dalam penelitian ini adalah dapat membantu')
+        is False)
     # NUL: artefak PDF fid=112 (103 NUL di teks bersih) — dibuang di susun.
     FakeKonversi.mode = 'normal'
     teks_nul = ('BAB I\nPENDAHULUAN\n'

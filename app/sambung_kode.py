@@ -95,6 +95,15 @@ def _awal_kalimat(s):
     kecil = [w for w in kata[:4] if w[:1].islower()]
     return len(kata) >= 3 and len(kecil) >= 2
 _POLA_NOMOR_JUDUL = re.compile(r'^\d+(?:\.\d+)*\.?\s+\S')
+# ── v9: judul bernomor SATU tingkat ("2. Manfaat Praktis") — pola v7
+#    (_POLA_SUBBAB) hanya cocok nomor BERTINGKAT ("1.1 ..."), dan
+#    _POLA_NOMOR_JUDUL di atas terlalu longgar (cocok "2023. ..." tahun
+#    dan "2.5 ..." desimal). Pola ini ketat: 1-2 digit + titik/kurung +
+#    spasi — "2.5 juta" tidak cocok ('.' diikuti '5', bukan spasi),
+#    "2023. Penelitian" tidak cocok (4 digit).
+_POLA_NOMOR_1TINGKAT = re.compile(r'^\d{1,2}[.)]\s+\S')
+# ── v9: penanda butir ber-dash di awal baris ("- ...", "– ...", "• ...").
+_POLA_BUTIR_DASH = re.compile(r'^[-–—•]\s')
 _ROMAWI_TUNGGAL = re.compile(r'^[IVXLC]+$', re.I)
 # ── v8: penanda butir daftar ("d) ...", "e. ...", "ii. ..."). Butir daftar
 #    DINILAI paragraf baru (label kebenaran dasar 11 Nov 2026: 8/8 baris
@@ -192,6 +201,16 @@ def sambung_kode(a: str, b: str):
     # ── SKIP: B unsur baru (judul/bab/butir) ────────────────────────────
     if awal_judul_baru(tb):
         return False
+    # ── SKIP (v9): B penanda butir ber-dash ("- ...", "– ...", "• ...") ──
+    #    Tanda dash di awal baris = butir daftar / kutipan baru, BUKAN
+    #    lanjutan kalimat A. Terukur live 1.14 (11 Nov 2026, 2 naskah):
+    #    Jev hanya menggabungkan 22-26% pasangan ini (p-med 0,10-0,15),
+    #    dan SEMUA gabungan yang diperiksa adalah butir/kutipan baru yang
+    #    salah gabung (mis. A='pasaran.”' + B='- “AyuMeera bisa jadi...').
+    #    Tanpa spasi sesudah dash ("-nya") TIDAK kena — itu bisa jadi
+    #    lanjutan kata, bukan penanda butir.
+    if _POLA_BUTIR_DASH.match(tb):
+        return False
     # ── SKIP (v6): A judul BAB + B awal kalimat ─────────────────────────
     #    "BAB III METODOLOGI PENELITIAN" + "bagian ini menjelaskan..." —
     #    B huruf kecil / "Bab ini" = kalimat baru, bukan sambungan judul.
@@ -199,13 +218,24 @@ def sambung_kode(a: str, b: str):
     if _POLA_BAB.match(tanpa_nomor_halaman(ta)) and (
             tb[:1].islower() or re.match(r'^(bab|bagian)\s+ini\b', tb, re.I)):
         return False
-    # ── SKIP (v7): A judul subbab bernomor + B awal kalimat ─────────────
+    # ── SKIP (v7, diperluas v9): A judul bernomor + B awal kalimat ──────
     #    "1.1 Latar Belakang" + "Indonesia merupakan ..." — B kalimat baru,
     #    bukan sambungan judul (cacat terbesar v6). Lanjutan judul huruf
     #    BESAR ("Penelitian Kualitatif") tetap ditanya ke Jev; penghubung
     #    judul ("dan Tujuan ...") juga tetap ditanya — hanya kalimat yang
     #    ditolak mentah-mentah.
-    if _POLA_SUBBAB.match(tanpa_nomor_halaman(ta)) and _awal_kalimat(tb):
+    #    v9: tambah nomor SATU tingkat ("2. Manfaat Praktis") — TAPI hanya
+    #    bila A pendek (<=8 kata) dan nomornya 1-2 digit, supaya "2023. ..."
+    #    (tahun) dan "2.5 juta ..." (desimal) tidak kena. Nomor diukur dari
+    #    teks MENTAH yang hanya dikupas nomor halaman (tanpa_nomor_halaman
+    #    mengupas "2. " dari "2. Manfaat Praktis" — itu justru nomornya).
+    #    Terukur live 1.14 (11 Nov 2026): pemisahan SEMPURNA — 11 gabung
+    #    salah yang di-override p<=0,47, 8 gabung benar yang dipertahankan
+    #    p>=0,74 (B-nya bukan awal kalimat, tetap tanya Jev).
+    _ta_no_hal = re.sub(r'^\d{1,3}\s+', '', ta, count=1)
+    if (_POLA_SUBBAB.match(tanpa_nomor_halaman(ta))
+            or (_POLA_NOMOR_1TINGKAT.match(_ta_no_hal)
+                and len(ta.split()) <= 8)) and _awal_kalimat(tb):
         return False
     # ── SKIP: baris tabel (pipa) ────────────────────────────────────────
     if '|' in ta or '|' in tb:
