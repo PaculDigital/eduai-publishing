@@ -144,6 +144,14 @@ details.nota-mutu summary:hover{color:var(--hijau)}
 .baris-simpan select{flex:1;min-width:180px;padding:7px 9px;font-size:13px;
   border:1px solid var(--garis);border-radius:9px;background:#fff}
 .baris-simpan .kaki{flex-basis:100%;margin-top:0}
+/*  ── FILTER HASIL (10Nov26): saring daftar yang SUDAH terkumpul,
+    di sisi browser saja, tanpa memanggil server lagi ── */
+.baris-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
+  background:#fff;border:1px solid var(--garis);border-radius:12px;
+  padding:12px 14px;margin-bottom:14px}
+.baris-filter label{font-size:12.5px;font-weight:600;color:var(--teks-abu)}
+.baris-filter select{padding:7px 9px;font-size:13px;
+  border:1px solid var(--garis);border-radius:9px;background:#fff}
 /* ── PAKAI ULANG ANTAR BAB (13Okt26) ── */
 .lencana.pakai{background:#EEF2FF;color:#1D4ED8}
 .pakai-kotak{background:#fff;border:1.5px solid var(--hijau);border-radius:14px;
@@ -210,7 +218,7 @@ details.nota-mutu summary:hover{color:var(--hijau)}
     <!-- BAGIAN 1: cari otomatis AI -->
     <div class="bagian">
       <h2>{{ ikon('sparkles', 18) }} Pilihan EduAi</h2>
-      <p>EduAi mencarikan artikel untukmu. Pilihanmu tetap utuh.</p>
+      <p>EduAi mencarikan artikel untukmu. Pilihanmu tetap utuh. Setiap bantuan AI di sini biaya 1 Token Revisi.</p>
       <label for="naskah-ai">Naskah</label>
       <select id="naskah-ai"></select>
       <label for="bab-ai">Untuk BAB</label>
@@ -225,10 +233,10 @@ details.nota-mutu summary:hover{color:var(--hijau)}
             EduAi petakan judul naskah jadi kata kunci; user tetap bisa
             ubah/hapus. Keputusan akhir di user. -->
       <button class="tombol-samar" id="btn-bantu" onclick="bantuIsi()">
-        {{ ikon('sparkles', 15) }} EduAi bantu isi</button>
+        {{ ikon('sparkles', 15) }} EduAi bantu isi (1 Token Revisi)</button>
       <div id="bantu-info" class="bantu-info" hidden></div>
       <div id="bantu-chip" class="bantu-chip" hidden></div>
-      <button class="tombol" id="btn-ai" onclick="cariAI()">{{ ikon('sparkles', 16) }} Carikan artikel</button>
+      <button class="tombol" id="btn-ai" onclick="cariAI()">{{ ikon('sparkles', 16) }} Carikan artikel (1 Token Revisi)</button>
     </div>
 
     <!-- BAGIAN 2: cari sendiri (2× tanpa Token / minggu, lalu 1 Token) -->
@@ -298,6 +306,25 @@ details.nota-mutu summary:hover{color:var(--hijau)}
       <b>Link Jurnal.txt</b> berisi tautan semua artikelmu — bisa dibuka,
       diunduh, dan kalau dihapus bisa dibuat lagi kapan saja.</div>
   </div>
+  <!--  ── FILTER HASIL (10Nov26): Tahun + Sitasi minimal, menyaring
+        daftar yang sudah terkumpul di bawah, tanpa memanggil server ── -->
+  <div class="baris-filter" id="baris-filter">
+    <label for="filter-tahun">Tahun</label>
+    <select id="filter-tahun" onchange="terapkanFilter()">
+      <option value="semua">Semua tahun</option>
+      <option value="2024-2026">2024-2026</option>
+      <option value="2021-2023">2021-2023</option>
+      <option value="2019-2020">2019-2020</option>
+    </select>
+    <label for="filter-sitasi">Sitasi minimal</label>
+    <select id="filter-sitasi" onchange="terapkanFilter()">
+      <option value="0">Semua</option>
+      <option value="1">Dikutip 1 kali atau lebih</option>
+      <option value="10">Dikutip 10 kali atau lebih</option>
+      <option value="50">Dikutip 50 kali atau lebih</option>
+    </select>
+    <button class="mini" onclick="aturUlangFilter()">Atur ulang</button>
+  </div>
   <div id="daftar"><div class="kosong"><b>Belum ada artikel</b>
     Cari pakai salah satu cara di atas ya.</div></div>
 
@@ -313,6 +340,9 @@ function IKON(nama, uk){
 }
 const BAB_LABEL = {'BAB I':'BAB I','BAB II':'BAB II','BAB III':'BAB III'};
 const MAX_ART = 8;
+//  10Nov26 (putusan Boss 11:01): kata kunci tawaran AI berbayar,
+//  diisi saat pencarian manual mengembalikan `tidak_dipetakan`.
+let KK_TAWARAN = '';
 //  daftar naskah dikirim SERVER (tidak menambah endpoint baru)
 let NASKAH = {{ (daftar_naskah or [])|tojson }};
 
@@ -444,11 +474,51 @@ function kartuArtikel(a){
     ${blokAbs}</div>`;
 }
 
-function gambarDaftar(j){
+/*  ── FILTER HASIL (10Nov26): simpan daftar terakhir, saring di
+    browser saja. `simpan=false` dipakai saat menggambar hasil saring
+    supaya daftar penuhnya tidak hilang. ── */
+let DAFTAR_TERKINI = [];
+let BAB_SAAT_INI = '';
+function gambarDaftar(j, simpan){
+  if(simpan !== false && j.artikel){
+    DAFTAR_TERKINI = j.artikel;
+    BAB_SAAT_INI = j.bab || BAB_SAAT_INI;
+  }
   $('daftar').innerHTML = (j.artikel && j.artikel.length)
     ? j.artikel.map(kartuArtikel).join('')
     : `<div class="kosong"><b>Belum ada artikel untuk ${j.bab || 'bab ini'}</b>
          Cari pakai salah satu cara di atas ya.</div>`;
+}
+
+function terapkanFilter(){
+  const th = $('filter-tahun') ? $('filter-tahun').value : 'semua';
+  const minSit = parseInt(($('filter-sitasi') ? $('filter-sitasi').value : '0') || '0', 10);
+  let awal = 0, akhir = 9999;
+  if(th !== 'semua'){
+    const p = th.split('-');
+    awal = parseInt(p[0], 10); akhir = parseInt(p[1], 10);
+  }
+  const cocok = (DAFTAR_TERKINI || []).filter(function(a){
+    const tahun = parseInt(a.year || 0, 10);
+    if(th !== 'semua' && (!tahun || tahun < awal || tahun > akhir)){ return false; }
+    const sit = parseInt(a.cited_by_count || 0, 10);
+    if(sit < minSit){ return false; }
+    return true;
+  });
+  if(cocok.length){
+    gambarDaftar({artikel: cocok, bab: BAB_SAAT_INI}, false);
+  } else if((DAFTAR_TERKINI || []).length){
+    $('daftar').innerHTML = `<div class="kosong"><b>Tidak ada artikel yang cocok dengan filter ini</b>
+      Ubah tahun atau sitasi minimalnya ya.</div>`;
+  } else {
+    gambarDaftar({artikel: [], bab: BAB_SAAT_INI}, false);
+  }
+}
+
+function aturUlangFilter(){
+  if($('filter-tahun')){ $('filter-tahun').value = 'semua'; }
+  if($('filter-sitasi')){ $('filter-sitasi').value = '0'; }
+  gambarDaftar({artikel: DAFTAR_TERKINI, bab: BAB_SAAT_INI}, false);
 }
 
 async function muat(bab){
@@ -484,9 +554,15 @@ async function cariAI(){
   if(!kk){ pesan('Isi kata kuncinya dulu ya.', 'tidak'); return; }
   const b = $('btn-ai'); b.disabled = true; b.innerHTML = IKON('sparkles',16) + ' Mencari…';
   pesan('EduAi sedang mencarikan artikel untukmu…', 'ya');
-  const j = await api('cari-ai?file_id='+fid+'&bab='+encodeURIComponent(bab)+'&kata_kunci='+encodeURIComponent(kk), {method:'POST'});
-  b.disabled = false; b.innerHTML = IKON('sparkles',16) + ' Carikan artikel';
-  pesan(j.pesan || ('Dapat ' + (j.baru||0) + ' artikel.'), j.ok?'ya':'tidak');
+  //  10Nov26 11:22 (putusan Boss): SEMUA jalur AI Referensi biaya
+  //  1 Token Revisi per pemakaian, dipotong server sebelum AI jalan.
+  //  Tombol biasa maupun tawaran sesudah manual gagal sama biayanya.
+  const jalur = 'cari-ai?file_id='+fid+'&bab='+encodeURIComponent(bab)
+    +'&kata_kunci='+encodeURIComponent(kk);
+  const j = await api(jalur, {method:'POST'});
+  b.disabled = false; b.innerHTML = IKON('sparkles',16) + ' Carikan artikel (1 Token Revisi)';
+  pesan(j.pesan || ('Dapat ' + (j.baru||0) + ' artikel'
+        + (j.token_dipotong ? ' (1 Token Revisi)' : '') + '.'), j.ok?'ya':'tidak');
   if(j.ok){ $('kk-man').value = kk; gambarDaftar(j); gambarJatah(j.jatah); }
 }
 
@@ -510,12 +586,14 @@ async function bantuIsi(){
   let q = 'kata-kunci-ai?file_id=' + encodeURIComponent(fid);
   if(judul){ q += '&judul=' + encodeURIComponent(judul); }
   const j = await api(q, {method:'POST'});
-  b.disabled = false; b.innerHTML = IKON('sparkles',15) + ' EduAi bantu isi';
+  b.disabled = false; b.innerHTML = IKON('sparkles',15) + ' EduAi bantu isi (1 Token Revisi)';
   if(!j.ok){ pesan(j.pesan || 'Belum bisa dibaca.', 'tidak'); return; }
   $('kk-ai').value = j.usul || '';
+  //  10Nov26 11:22: bantuan ini memakai 1 Token Revisi per tekan,
+  //  walau kata kuncinya ketemu lewat daftar EduAi.
   info.textContent = (j.sumber_kata_kunci === 'kamus')
-    ? 'Kata kunci ini diambil dari daftar EduAi (cepat & tanpa biaya). Silakan ubah kalau perlu.'
-    : 'Kata kunci ini disusun EduAi dari judul naskahmu. Silakan ubah kalau perlu.';
+    ? 'Kata kunci ini diambil dari daftar EduAi. Bantuan ini memakai 1 Token Revisi. Silakan ubah kalau perlu.'
+    : 'Kata kunci ini disusun EduAi dari judul naskahmu. Bantuan ini memakai 1 Token Revisi. Silakan ubah kalau perlu.';
   info.hidden = false;
   (j.konsep || []).forEach(function(k){
     const s = document.createElement('span');
@@ -546,9 +624,32 @@ async function cariManual(){
   pesan('Sedang mencari…', 'ya');
   const j = await api('cari?file_id='+fid+'&bab='+encodeURIComponent(bab)+'&kata_kunci='+encodeURIComponent(kk), {method:'POST'});
   b.disabled = false; b.innerHTML = IKON('search',16) + ' Cari sendiri';
+  //  10Nov26 (putusan Boss 11:01): kata kunci tidak dikenali kamus →
+  //  tawarkan AI berbayar, JANGAN jalan otomatis. Token TIDAK terpotong
+  //  sebelum tombol tawaran ditekan.
+  if(j.kode === 'tidak_dipetakan'){
+    KK_TAWARAN = kk;
+    pesan((j.pesan || 'Belum ada hasil untuk kata kunci ini.')
+      + '<br><button class="tombol" style="margin-top:10px" onclick="cobaDenganAI()">'
+      + IKON('sparkles',15) + ' Coba dengan AI (1 Token Revisi)</button>', 'tidak');
+    return;
+  }
   pesan(j.pesan || ('Dapat ' + (j.baru||0) + ' artikel' +
         (j.jenis === 'gratis' ? ' (tanpa Token)' : ' (1 Token Revisi)')), j.ok?'ya':'tidak');
   if(j.ok){ gambarDaftar(j); gambarJatah(j.jatah); }
+}
+
+/*  10Nov26 (putusan Boss 11:01), tombol tawaran AI berbayar.
+    Baru di sini AI jalan dan token terpotong (1 Token Revisi, sekali).
+    Kata kunci, naskah, dan bab disalin dari kotak "Pencarian kamu". */
+async function cobaDenganAI(){
+  const kk = (KK_TAWARAN || $('kk-man').value || '').trim();
+  if(!kk){ pesan('Isi kata kuncinya dulu ya.', 'tidak'); return; }
+  $('kk-ai').value = kk;
+  if($('naskah-man').value){ $('naskah-ai').value = $('naskah-man').value; }
+  if($('bab-man').value){ $('bab-ai').value = $('bab-man').value; }
+  KK_TAWARAN = '';
+  cariAI();
 }
 
 async function tambahManual(){
