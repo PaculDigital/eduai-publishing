@@ -978,6 +978,96 @@ def main():
         and 'membahas pemasaran digital di Indonesia.' in hasil_lintas_sub,
         hasil_lintas_sub[:120])
 
+    # ── 8. v8: SAKLAR MODEL YANG JUJUR ────────────────────────────────────
+    #    Audit 1.14 menemukan jebakan: env EDUAI_SATPAM_MODEL tampaknya
+    #    mengganti model, tapi tidak dipakai jalur peta sama sekali.
+    #    Perbaikan v8: fungsi mati + konstanta menipu dihapus; satu-satunya
+    #    saklar yang hidup = app/jev.py::MODEL_DEFAULT (bawaan 1.13).
+    import importlib
+    import urllib.request
+    os.environ['EDUAI_SATPAM_MODEL'] = 'SATPAM/typesafe/jev-1.14'
+    S8 = _muat_asli('app.satpam_asli_v8', ROOT / 'app' / 'satpam.py')
+    cek('v8: env EDUAI_SATPAM_MODEL tidak lagi melahirkan satpam.MODEL',
+        not hasattr(S8, 'MODEL'))
+    cek('v8: konstanta menipu BASE/KUNCI/BATAS_DETIK sudah tidak ada',
+        not hasattr(S8, 'BASE') and not hasattr(S8, 'KUNCI')
+        and not hasattr(S8, 'BATAS_DETIK'))
+    cek('v8: fungsi mati _tanya_bebas_lama sudah tidak ada',
+        not hasattr(S8, '_tanya_bebas_lama'))
+    cek('v8: setelan hidup AKTIF/AMBANG_LOLOS/AMBANG_TANYA tetap ada',
+        hasattr(S8, 'AKTIF') and hasattr(S8, 'AMBANG_LOLOS')
+        and hasattr(S8, 'AMBANG_TANYA'))
+    cek('v8: pinjaman mati di Hakim sudah tidak ada',
+        not hasattr(H, '_MODEL') and not hasattr(H, '_BASE')
+        and not hasattr(H, '_KUNCI') and not hasattr(H, '_BATAS'))
+    del os.environ['EDUAI_SATPAM_MODEL']
+
+    J8 = importlib.import_module('app.jev')
+    cek('v8: model bawaan tetap 1.13',
+        J8.MODEL_DEFAULT == 'SATPAM/typesafe/jev-1.13')
+
+    # ── transport palsu: tangkap body request, tanpa jaringan ──────────
+    class _ResponPalsu:
+        def __init__(self, badan):
+            self._badan = badan
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return self._badan
+
+    tangkapan = {}
+
+    def _urlopen_palsu(req, timeout=None):
+        tangkapan['data'] = req.data
+        return _ResponPalsu(json.dumps({'q1': {'noul': 0.9}}).encode())
+
+    _tanya = {'q1': {'type': 'noul',
+                     'instructions': 'apakah baris ini judul subbab?'}}
+    _urlopen_asli = urllib.request.urlopen
+    urllib.request.urlopen = _urlopen_palsu
+    try:
+        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
+        r = J8.tanya('bahan uji yang cukup panjang', _tanya)
+        cek('v8: saklar jev.MODEL_DEFAULT mengganti model di body request',
+            json.loads(tangkapan['data'])['model']
+            == 'SATPAM/typesafe/jev-1.14'
+            and r == {'q1': {'noul': 0.9}})
+        r = S8.tanya_bebas_mutu('bahan uji yang cukup panjang', _tanya)
+        cek('v8: jalur live satpam.tanya_bebas_mutu ikut saklar model',
+            json.loads(tangkapan['data'])['model']
+            == 'SATPAM/typesafe/jev-1.14'
+            and r == {'q1': {'noul': 0.9}})
+        H._AKTIF = True
+        H._TANYA_FN = None
+        r = H._tanya_jev('bahan uji yang cukup panjang', _tanya)
+        cek('v8: jalur live Hakim ikut saklar model',
+            json.loads(tangkapan['data'])['model']
+            == 'SATPAM/typesafe/jev-1.14'
+            and r == {'q1': {'noul': 0.9}})
+        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
+        r = J8.tanya('bahan uji yang cukup panjang', _tanya)
+        cek('v8: saklar dikembalikan ke 1.13, body request ikut kembali',
+            json.loads(tangkapan['data'])['model']
+            == 'SATPAM/typesafe/jev-1.13')
+    finally:
+        urllib.request.urlopen = _urlopen_asli
+        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
+
+    # ── label model periksa_mutu = model yang benar-benar melayani ─────
+    J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
+    _teks_mutu = ('Judul penelitian tentang pemasaran digital. '
+                  'Abstrak penelitian ini membahas pemasaran. ' * 20)
+    _hasil_mutu = K.periksa_mutu(None, 1, _teks_mutu)
+    cek('v8: label model periksa_mutu = MODEL_DEFAULT yang melayani',
+        _hasil_mutu.get('model') == 'SATPAM/typesafe/jev-1.14'
+        and _hasil_mutu.get('ok') is True)
+    J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))
