@@ -32,7 +32,9 @@ log = logging.getLogger(__name__)
 #    stitch), pisah "BAB + judul + koma + kalimat", koreksi batas paragraf
 #    deterministik + tanya-ulang batas goyang, deteksi BAB deterministik
 #    (kode, bukan Jev), profil kampus istilah + penomoran titik akhir.
-RULE_VERSION = 'jev-peta-v6'
+#    v6.7: kupas nomor daftar di pagar judul BAB; batas paragraf hanya
+#    untuk lanjutan eksplisit. v6.8: gabung fragmen 1-2 huruf.
+RULE_VERSION = 'jev-peta-v6.8'
 
 # ── SAKLAR (env, tanpa ubah kode) ────────────────────────────────────────
 #    EDUAI_JEV_STITCH=0      ⇒ matikan pass-1 stitch (susun cara lama)
