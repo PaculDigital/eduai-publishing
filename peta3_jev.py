@@ -322,6 +322,73 @@ def _nomor_bertindak_judul(s):
     return teks[:1].isupper()
 
 
+# ── PISAH JUDUL MENEMPEL SATU BARIS (v5) ───────────────────────────────
+#    Artefak ekstraksi: "58 BAB III METODOLOGI PENELITIAN 3.1 Jenis
+#    Penelitian 3.2 Metode Penelitian" — beberapa judul menempel dalam
+#    SATU baris. Terukur live WULAN-1 (10 Nov 2026): baris itu jadi
+#    `curiga` Hakim dan tidak satu pun judulnya dikenali.
+#    ATURAN: pisah HANYA bila segmen SEBELUM titik pisah MIRIP JUDUL
+#    (mulai BAB/bernomor, atau ≥70% huruf besar, ≤120 kar, tanpa titik
+#    akhir kalimat) DAN titik pisah memulai judul baru (BAB / nomor
+#    bertingkat + huruf besar). Kalimat biasa yang menyebut "BAB II" atau
+#    "2.1" di tengah TIDAK terpisah — segmen sebelumnya bukan judul.
+_POLA_AWAL_JUDUL_PISAH = re.compile(
+    r'(BAB\s+[IVX0-9]+\b|\d+(?:\.\d+)+\s+[A-Z\u00C0-\u00DE])')
+
+
+def _segmen_mirip_judul(seg):
+    """True bila segmen ini mirip judul (bukan kalimat biasa)."""
+    t = re.sub(r'^\d{1,3}\s+', '', (seg or '').strip())   # kupas nomor halaman
+    if not t or len(t) > 120:
+        return False
+    if t[-1] in '.!?':
+        return False
+    if re.match(r'^(BAB\s+[IVX0-9]+\b|\d+(?:\.\d+)+\s+\S)', t, re.I):
+        return True
+    huruf = [c for c in t if c.isalpha()]
+    if huruf and sum(1 for c in huruf if c.isupper()) / len(huruf) >= 0.7:
+        return True
+    return False
+
+
+def _pisah_judul_menempel(s):
+    """Pisah satu baris berisi >1 judul jadi beberapa baris (deterministik).
+
+    Kembalikan daftar baris (1 elemen = tidak ada yang dipisah).
+    """
+    t = s or ''
+    if len(t) < 12:
+        return [s]
+    titik = [m.start() for m in _POLA_AWAL_JUDUL_PISAH.finditer(t)
+             if m.start() > 0]
+    if not titik:
+        return [s]
+    batas = [0] + titik + [len(t)]
+    segmen = [t[batas[k]:batas[k + 1]].strip() for k in range(len(batas) - 1)]
+    # segmen pertama boleh HANYA nomor halaman ("58") — tempelkan ke judul
+    # berikut, jangan jadikan segmen sendiri (kalau tidak, validasi gagal
+    # dan judul tidak pernah terpisah).
+    if len(segmen) > 1 and re.match(r'^\d{1,3}$', segmen[0]):
+        segmen = [segmen[0] + ' ' + segmen[1]] + segmen[2:]
+    # semua segmen KECUALI terakhir harus mirip judul (segmen terakhir
+    # memulai pola judul oleh konstruksi regex — terima apa adanya).
+    if not all(_segmen_mirip_judul(g) for g in segmen[:-1]):
+        return [s]
+    keluar = [g for g in segmen if g]
+    return keluar if len(keluar) > 1 else [s]
+
+
+def _pisah_judul_menempel_baris(baris):
+    """Terapkan `_pisah_judul_menempel` ke daftar baris. Kembalikan
+    (baris_baru, jumlah_pisahan)."""
+    keluar, jml = [], 0
+    for b in baris:
+        p = _pisah_judul_menempel(b)
+        jml += max(0, len(p) - 1)
+        keluar.extend(p)
+    return keluar, jml
+
+
 # ── PASS-1 STITCH (10 Nov 2026 — dipasang ke repo, dulu hanya di server) ──
 #    REKONSILIASI (bukti dari kode, 10 Nov 2026):
 #      · 10 Okt 2026 Bos memasang stitch di `peta3_jev.py` dan Wulan
@@ -506,6 +573,10 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     if pakai_stitch is None:
         pakai_stitch = _stitch_aktif()
     teks_asal = bersih            # sidik cache dihitung dari teks SEBELUM stitch
+    # ── v5: pisah judul menempel SEBELUM stitch (supaya stitch tidak
+    #    menelan judul yang menempel satu baris).
+    _baris_split, pisah_sebelum = _pisah_judul_menempel_baris(bersih.split('\n'))
+    bersih = '\n'.join(_baris_split)
     stitch_pakai = False
     waktu_stitch = 0.0
     if pakai_stitch and bersih:
@@ -515,6 +586,9 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
         stitch_pakai = hasil_stitch is not bersih and hasil_stitch != bersih
         bersih = hasil_stitch
     baris = bersih.split('\n')
+    # ── v5: pisah lagi SESUDAH stitch (blok bisa menyambung judul kembali).
+    baris, pisah_sesudah = _pisah_judul_menempel_baris(baris)
+    pisah_judul_jml = pisah_sebelum + pisah_sesudah
     if awal is None or awal < 0:
         awal = 0
     if akhir is None or akhir > len(baris):
@@ -555,6 +629,21 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             gabung[i] = (s_pola, '')
             i += 1
             continue
+        # ── BAB + JUDUL SATU BARIS (v5) ───────────────────────────────
+        #    "BAB III METODOLOGI PENELITIAN" — judul BAB tidak di baris
+        #    berikut, tapi menempel di baris yang sama. Kenali langsung
+        #    sebagai bab (deterministik, tanpa Jev). Syarat: judul mulai
+        #    huruf BESAR, tanpa titik akhir kalimat, <70 kar. Kalimat
+        #    biasa ("BAB III membahas metode penelitian ini.") TIDAK kena:
+        #    judulnya huruf kecil / berakhir titik.
+        m1 = re.match(r'^(BAB\s+[IVX0-9]+)\s+(\S.*)$', s_pola, re.I)
+        if m1:
+            _judul = m1.group(2).strip()
+            if _judul and _judul[0].isupper() and _judul[-1] not in '.?!' \
+                    and len(_judul) < 70:
+                gabung[i] = (m1.group(1), _judul)
+                i += 1
+                continue
         # ── BARIS BERNOMOR DIBACA KODE (10 Nov 2026) ──────────────────
         #    Nomor bertingkat yang memenuhi syarat KETAT ⇒ 'subbab' langsung,
         #    TIDAK dikirim ke Jev (hemat + deterministik). Yang tidak memenuhi
@@ -567,7 +656,7 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
         i += 1
     return {'baris': baris, 'kand': kand, 'gabung': gabung, 'buang': buang,
             'kode_label': kode_label, 'stitch_pakai': stitch_pakai,
-            'waktu_stitch': waktu_stitch,
+            'waktu_stitch': waktu_stitch, 'pisah_judul_jml': pisah_judul_jml,
             'teks_asal': teks_asal,
             'awal': awal, 'akhir': akhir, 'nama': nama, 't': _t}
 

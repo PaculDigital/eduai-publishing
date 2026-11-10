@@ -276,6 +276,34 @@ def main():
     os.environ.pop('EDUAI_JEV_TANYA_ULANG_MAKS_GELOMBANG', None)
     FAKE_SATPAM.rendah = set()
 
+    # ── 2c. PISAH JUDUL MENEMPEL (v5) ────────────────────────────────────
+    FakeKonversi.mode = 'normal'
+    menempel = ('58 BAB III METODOLOGI PENELITIAN 3.1 Jenis Penelitian '
+                '3.2 Metode Penelitian')
+    d = P._susun_dari_bersih(menempel)
+    cek('pisah judul: satu baris jadi 3 baris',
+        d.get('pisah_judul_jml') == 2, f"dapat {d.get('pisah_judul_jml')}")
+    cek('pisah judul: BAB III dikenali sebagai bab satu baris',
+        any(v[0].upper().startswith('BAB III') for v in d.get('gabung', {}).values()))
+    cek('pisah judul: 3.1/3.2 diputuskan kode (bukan Jev)',
+        d.get('kode_label', {}).get(
+            next(i for i, b in enumerate(d['baris']) if b.strip() == '3.1 Jenis Penelitian')) == 'subbab'
+        and d.get('kode_label', {}).get(
+            next(i for i, b in enumerate(d['baris']) if b.strip() == '3.2 Metode Penelitian')) == 'subbab')
+    kalimat_bab = 'Seperti dijelaskan pada BAB II dan 2.1 Tinjauan Pustaka sebelumnya.'
+    cek('pisah judul: kalimat biasa menyebut BAB tidak terpisah',
+        P._pisah_judul_menempel(kalimat_bab) == [kalimat_bab])
+    cek('pisah judul: "3.1 kali lipat" di kalimat tidak terpisah',
+        P._pisah_judul_menempel(
+            'Hasil penelitian menunjukkan 3.1 kali lipat dari sebelumnya.') == [
+                'Hasil penelitian menunjukkan 3.1 kali lipat dari sebelumnya.'])
+    satu_bab = P._susun_dari_bersih('BAB II TINJAUAN PUSTAKA\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.')
+    cek('bab satu baris: "BAB II TINJAUAN PUSTAKA" masuk gabung',
+        any(v[1] == 'TINJAUAN PUSTAKA' for v in satu_bab.get('gabung', {}).values()))
+    bukan_bab = P._susun_dari_bersih('BAB III membahas metode penelitian ini.\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.')
+    cek('bab satu baris: kalimat "BAB III membahas..." BUKAN gabung',
+        not any(v[0].upper().startswith('BAB III') for v in bukan_bab.get('gabung', {}).values()))
+
     # ── 3. JEV MATI -> fallback ───────────────────────────────────────────
     #    (ganti satpam di modul P langsung — jangan muat ulang, _stub_app
     #    akan menimpa stub satpam bila dipanggil lagi)
