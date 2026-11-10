@@ -304,6 +304,32 @@ def main():
     cek('bab satu baris: kalimat "BAB III membahas..." BUKAN gabung',
         not any(v[0].upper().startswith('BAB III') for v in bukan_bab.get('gabung', {}).values()))
 
+    # ── 2d. TEKS PECAH PER HURUF (v5) ────────────────────────────────────
+    from app.sambung_kode import perbaiki_spasi_huruf as _psh
+    _baru, _j = _psh('D i n a m i k a P a s a r')
+    cek('spasi huruf: "D i n a m i k a P a s a r" -> "Dinamika Pasar"',
+        _baru == 'Dinamika Pasar', f'dapat {_baru!r}')
+    _baru, _j = _psh('B A B I P E N D A H U L U A N')
+    cek('spasi huruf: "B A B I ..." -> "BAB I PENDAHULUAN"',
+        _baru == 'BAB I PENDAHULUAN', f'dapat {_baru!r}')
+    _baru, _j = _psh('58 B A B I I I M E T O D O L O G I P E N E L I T I A N')
+    cek('spasi huruf: "B A B I I I ..." -> "58 BAB III METODOLOGI PENELITIAN"',
+        _baru == '58 BAB III METODOLOGI PENELITIAN', f'dapat {_baru!r}')
+    _baru, _j = _psh('S P S S dan A B C D tetap utuh')
+    cek('spasi huruf: "S P S S" digabung, "A B C D" dibiarkan',
+        _baru == 'SPSS dan A B C D tetap utuh', f'dapat {_baru!r}')
+    _baru, _j = _psh('Hasil penelitian ini biasa saja tanpa spasi huruf.')
+    cek('spasi huruf: kalimat biasa tidak berubah',
+        _baru == 'Hasil penelitian ini biasa saja tanpa spasi huruf.' and _j == 0)
+    _baru, _j = _psh('1.1 L a t a r B e l a k a n g')
+    cek('spasi huruf: "1.1 L a t a r ..." -> "1.1 Latar Belakang"',
+        _baru == '1.1 Latar Belakang', f'dapat {_baru!r}')
+    d = P._susun_dari_bersih('B A B I I I M E T O D O L O G I P E N E L I T I A N 3.1 J e n i s P e n e l i t i a n')
+    cek('spasi huruf + pisah judul: satu baris pecah jadi BAB III + 3.1',
+        d.get('spasi_huruf_jml', 0) >= 1 and d.get('pisah_judul_jml', 0) >= 1
+        and any(v[0].upper().startswith('BAB III') for v in d.get('gabung', {}).values()),
+        f"spasi={d.get('spasi_huruf_jml')} pisah={d.get('pisah_judul_jml')}")
+
     # ── 3. JEV MATI -> fallback ───────────────────────────────────────────
     #    (ganti satpam di modul P langsung — jangan muat ulang, _stub_app
     #    akan menimpa stub satpam bila dipanggil lagi)

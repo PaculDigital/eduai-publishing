@@ -573,6 +573,14 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     if pakai_stitch is None:
         pakai_stitch = _stitch_aktif()
     teks_asal = bersih            # sidik cache dihitung dari teks SEBELUM stitch
+    # ── v5: perbaiki teks pecah per huruf ("D i n a m i k a") SEBELUM
+    #    stitch/pisah-judul — supaya kata utuh dikenali semua aturan.
+    #    Rangkaian yang tidak aman dibiarkan (lihat app/sambung_kode).
+    try:
+        from app.sambung_kode import perbaiki_spasi_huruf as _psh
+        bersih, spasi_huruf_jml = _psh(bersih)
+    except Exception:
+        spasi_huruf_jml = 0
     # ── v5: pisah judul menempel SEBELUM stitch (supaya stitch tidak
     #    menelan judul yang menempel satu baris).
     _baris_split, pisah_sebelum = _pisah_judul_menempel_baris(bersih.split('\n'))
@@ -657,6 +665,7 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     return {'baris': baris, 'kand': kand, 'gabung': gabung, 'buang': buang,
             'kode_label': kode_label, 'stitch_pakai': stitch_pakai,
             'waktu_stitch': waktu_stitch, 'pisah_judul_jml': pisah_judul_jml,
+            'spasi_huruf_jml': spasi_huruf_jml,
             'teks_asal': teks_asal,
             'awal': awal, 'akhir': akhir, 'nama': nama, 't': _t}
 
