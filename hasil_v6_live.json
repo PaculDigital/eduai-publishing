@@ -1,0 +1,199 @@
+{
+  "112": {
+    "wall": 30.33,
+    "panggilan": {
+      "choice": 24,
+      "noul": 17,
+      "lain": 0
+    },
+    "kand_jml": 1672,
+    "gelombang": 21,
+    "tanya_ulang": 153,
+    "tanya_ulang_goyang_pb": 24,
+    "tanya_ulang_gelombang": 3,
+    "gabung": 4,
+    "buang": 76,
+    "gagal": 0,
+    "jev_mati": false,
+    "label": {
+      "paragraf": 19,
+      "subbab": 82,
+      "bab": 3,
+      "biasa": 1606
+    },
+    "goyang": 63,
+    "bab": [
+      "2. BAB II TINJAUAN PUSTAKA",
+      "4. BAB IV HASIL DAN PEMBAHASAN",
+      "5. BAB V PENUTUP"
+    ],
+    "huruf": 0,
+    "menempel": 0,
+    "huruf_berspasi_sebelum": 0,
+    "huruf_berspasi_sesudah": 0,
+    "spasi_huruf_sesudah_stitch": 0,
+    "spasi_fragmen_jml": 0,
+    "pisah_bab_ekor_jml": 5,
+    "koreksi_batas_paragraf": 3,
+    "bab_kode": 1,
+    "bab_ganda": 0,
+    "bab_demosi": 0,
+    "waktu_stitch": 12.946,
+    "waktu_total": 25.876,
+    "hakim": {
+      "jumlah_sepakat": 74,
+      "jumlah_ragu": 4,
+      "jumlah_curiga": 5,
+      "jumlah_belum": 0
+    },
+    "hakim_panggilan_jev": 1,
+    "hakim_wall": 0.52
+  },
+  "115": {
+    "wall": 22.77,
+    "panggilan": {
+      "choice": 23,
+      "noul": 13,
+      "lain": 0
+    },
+    "kand_jml": 1684,
+    "gelombang": 21,
+    "tanya_ulang": 140,
+    "tanya_ulang_goyang_pb": 20,
+    "tanya_ulang_gelombang": 2,
+    "gabung": 4,
+    "buang": 117,
+    "gagal": 0,
+    "jev_mati": false,
+    "label": {
+      "paragraf": 29,
+      "subbab": 65,
+      "bab": 4,
+      "biasa": 1625
+    },
+    "goyang": 60,
+    "bab": [
+      "2. BAB II TINJAUAN PUSTAKA",
+      "3. BAB III METODOLOGI PENELITIAN",
+      "4. BAB IV HASIL DAN PEMBAHASAN",
+      "5. BAB V PENUTUP"
+    ],
+    "huruf": 42,
+    "menempel": 0,
+    "huruf_berspasi_sebelum": 53,
+    "huruf_berspasi_sesudah": 42,
+    "spasi_huruf_sesudah_stitch": 93,
+    "spasi_fragmen_jml": 94,
+    "pisah_bab_ekor_jml": 5,
+    "koreksi_batas_paragraf": 5,
+    "bab_kode": 1,
+    "bab_ganda": 0,
+    "bab_demosi": 1,
+    "waktu_stitch": 5.953,
+    "waktu_total": 18.068,
+    "hakim": {
+      "jumlah_sepakat": 61,
+      "jumlah_ragu": 2,
+      "jumlah_curiga": 3,
+      "jumlah_belum": 0
+    },
+    "hakim_panggilan_jev": 1,
+    "hakim_wall": 0.39
+  },
+  "81": {
+    "wall": 6.18,
+    "panggilan": {
+      "choice": 7,
+      "noul": 0,
+      "lain": 0
+    },
+    "kand_jml": 486,
+    "gelombang": 5,
+    "tanya_ulang": 116,
+    "tanya_ulang_goyang_pb": 25,
+    "tanya_ulang_gelombang": 2,
+    "gabung": 10,
+    "buang": 720,
+    "gagal": 0,
+    "jev_mati": false,
+    "label": {
+      "paragraf": 171,
+      "subbab": 130,
+      "biasa": 185
+    },
+    "goyang": 33,
+    "bab": [],
+    "huruf": 0,
+    "menempel": 0,
+    "huruf_berspasi_sebelum": 0,
+    "huruf_berspasi_sesudah": 0,
+    "spasi_huruf_sesudah_stitch": 0,
+    "spasi_fragmen_jml": 0,
+    "pisah_bab_ekor_jml": 0,
+    "koreksi_batas_paragraf": 2,
+    "bab_kode": 0,
+    "bab_ganda": 0,
+    "bab_demosi": 1,
+    "waktu_stitch": 0.074,
+    "waktu_total": 3.945,
+    "hakim": {
+      "jumlah_sepakat": 130,
+      "jumlah_ragu": 0,
+      "jumlah_curiga": 0,
+      "jumlah_belum": 0
+    },
+    "hakim_panggilan_jev": 0,
+    "hakim_wall": 0.09
+  },
+  "WULAN-1": {
+    "wall": 4.93,
+    "panggilan": {
+      "choice": 6,
+      "noul": 1,
+      "lain": 0
+    },
+    "kand_jml": 423,
+    "gelombang": 4,
+    "tanya_ulang": 105,
+    "tanya_ulang_goyang_pb": 23,
+    "tanya_ulang_gelombang": 2,
+    "gabung": 4,
+    "buang": 199,
+    "gagal": 0,
+    "jev_mati": false,
+    "label": {
+      "paragraf": 86,
+      "subbab": 46,
+      "bab": 4,
+      "biasa": 298
+    },
+    "goyang": 46,
+    "bab": [
+      "1. BAB I PENDAHULUAN",
+      "2. BAB II TINJAUAN PUSTAKA",
+      "3. BAB III METODOLOGI PENELITIAN",
+      "4. BAB IV HASIL DAN PEMBAHASAN"
+    ],
+    "huruf": 0,
+    "menempel": 0,
+    "huruf_berspasi_sebelum": 0,
+    "huruf_berspasi_sesudah": 0,
+    "spasi_huruf_sesudah_stitch": 0,
+    "spasi_fragmen_jml": 0,
+    "pisah_bab_ekor_jml": 4,
+    "koreksi_batas_paragraf": 3,
+    "bab_kode": 0,
+    "bab_ganda": 0,
+    "bab_demosi": 3,
+    "waktu_stitch": 0.376,
+    "waktu_total": 3.642,
+    "hakim": {
+      "jumlah_sepakat": 31,
+      "jumlah_ragu": 14,
+      "jumlah_curiga": 1,
+      "jumlah_belum": 0
+    },
+    "hakim_panggilan_jev": 1,
+    "hakim_wall": 0.41
+  }
+}
