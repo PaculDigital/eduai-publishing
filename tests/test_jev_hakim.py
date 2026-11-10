@@ -131,11 +131,17 @@ class FakeKonversi:
             _bab = bool(re.match(
                 r'^(?:\d{1,3}\s+)?(?:\d+[.)]\s*)?BAB\s+[IVX0-9]+\b',
                 blok[-1]['text'], re.I)) if blok and not kosong else False
+            # cerminan pagar asli (app/sambung_kode v7): judul subbab
+            # bernomor juga tidak disambung ke kalimat sesudahnya.
+            _subbab = bool(re.match(
+                r'^\d+(?:\.\d+)+\.?\s+\S',
+                blok[-1]['text'])) if blok and not kosong else False
             _lanjut_kalimat = bool(b[:1].islower() or re.match(
                 r'^(bab|bagian)\s+ini\b', b, re.I)) if b else False
             if (blok and not kosong and not blok[-1]['kosong']
                     and len(blok[-1]['text']) <= 60 and len(b) <= 60
-                    and b[:1].islower() and not (_bab and _lanjut_kalimat)):
+                    and b[:1].islower()
+                    and not ((_bab or _subbab) and _lanjut_kalimat)):
                 blok[-1]['text'] = (blok[-1]['text'] + ' ' + b).strip()
                 blok[-1]['lines'].append(n)
             else:
@@ -859,6 +865,113 @@ def main():
     cek('v6.8: segmentasi "iv" tetap Romawi',
         _SK._segmentasi('iv', dict(_SK.KATA_UMUM))
         == [(0, 1, 'i'), (1, 2, 'v')])
+
+    # ── 14. v7.1: PISAH EKOR KALIMAT PADA JUDUL SUBBAB BERNOMOR ──────────
+    cek('v7.1: "1.1 LATAR BELAKANG Indonesia merupakan ..." dipisah',
+        P._pisah_subbab_ekor(
+            '1.1 LATAR BELAKANG Indonesia merupakan salah satu negara dengan')
+        == ['1.1 LATAR BELAKANG',
+            'Indonesia merupakan salah satu negara dengan'])
+    cek('v7.1: "1.3 Tujuan Penelitian 1. Untuk ..." dipisah di penanda butir',
+        P._pisah_subbab_ekor(
+            '1.3 Tujuan Penelitian 1. Untuk mengidentifikasi SWOT pada Usaha')
+        == ['1.3 Tujuan Penelitian',
+            '1. Untuk mengidentifikasi SWOT pada Usaha'])
+    cek('v7.1: "1.5 Sistematika Penulisan Agar ..." dipisah di kata awal',
+        P._pisah_subbab_ekor(
+            '1.5 Sistematika Penulisan Agar memberikan gambaran sekilas mengenai')
+        == ['1.5 Sistematika Penulisan',
+            'Agar memberikan gambaran sekilas mengenai'])
+    cek('v7.1: "1.2 Definisi Operasional adalah ..." dipisah di kata kecil',
+        P._pisah_subbab_ekor(
+            '1.2 Definisi Operasional adalah suatu batasan yang dipakai peneliti')
+        == ['1.2 Definisi Operasional',
+            'adalah suatu batasan yang dipakai peneliti'])
+    cek('v7.1: koma + kalimat dipisah',
+        P._pisah_subbab_ekor(
+            '1.1 Latar Belakang, Indonesia merupakan salah satu negara')
+        == ['1.1 Latar Belakang',
+            'Indonesia merupakan salah satu negara'])
+    cek('v7.1: penghubung judul tidak memicu pisah',
+        P._pisah_subbab_ekor('1.1 Latar Belakang dan Tujuan Penelitian')
+        == ['1.1 Latar Belakang dan Tujuan Penelitian'])
+    cek('v7.1: "Dalam" tanpa kalimat sesudahnya tidak memicu pisah',
+        P._pisah_subbab_ekor('1.2 Peran Dalam Organisasi')
+        == ['1.2 Peran Dalam Organisasi'])
+    cek('v7.1: judul CAPS tanpa ekor tidak disentuh',
+        P._pisah_subbab_ekor('1.1 LATAR BELAKANG') == ['1.1 LATAR BELAKANG'])
+    cek('v7.1: judul Title Case tanpa ekor tidak disentuh',
+        P._pisah_subbab_ekor('2.1 Jenis Penelitian Kualitatif')
+        == ['2.1 Jenis Penelitian Kualitatif'])
+    cek('v7.1: "KERANGKA PEMIKIRAN Teori Belajar" tidak dipisah',
+        P._pisah_subbab_ekor('1.2 KERANGKA PEMIKIRAN Teori Belajar')
+        == ['1.2 KERANGKA PEMIKIRAN Teori Belajar'])
+    cek('v7.1: koma + judul Title Case tidak dipisah',
+        P._pisah_subbab_ekor(
+            '1.2 Tinjauan Pustaka, Kerangka Pemikiran dan Hipotesis')
+        == ['1.2 Tinjauan Pustaka, Kerangka Pemikiran dan Hipotesis'])
+    cek('v7.1: nomor di tengah kalimat tidak dipisah',
+        P._pisah_subbab_ekor('Penelitian ini membahas 1.1 Latar Belakang')
+        == ['Penelitian ini membahas 1.1 Latar Belakang'])
+    cek('v7.1: nomor halaman di depan tetap menempel di judul',
+        P._pisah_subbab_ekor(
+            '13 1.1 LATAR BELAKANG Indonesia merupakan salah satu negara')
+        == ['13 1.1 LATAR BELAKANG',
+            'Indonesia merupakan salah satu negara'])
+    # ujung-ke-ujung: judul + ekor terpisah di baris akhir.
+    teks_subbab = (
+        'BAB I\nPENDAHULUAN\n'
+        '1.1 LATAR BELAKANG Indonesia merupakan salah satu negara dengan jumlah penduduk besar.\n'
+        '1.3 Tujuan Penelitian 1. Untuk mengidentifikasi SWOT pada Usaha Kecil Menengah.\n'
+        '1.5 Sistematika Penulisan Agar memberikan gambaran sekilas mengenai isi skripsi ini.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    d_subbab = P._susun_dari_bersih(teks_subbab)
+    cek('v7.1: judul subbab bersih tanpa ekor di baris akhir',
+        any(b.strip() == '1.1 LATAR BELAKANG' for b in d_subbab['baris'])
+        and any(b.strip() == '1.3 Tujuan Penelitian'
+                for b in d_subbab['baris'])
+        and any(b.strip() == '1.5 Sistematika Penulisan'
+                for b in d_subbab['baris']),
+        str(d_subbab['baris']))
+    cek('v7.1: ekor subbab jadi baris sendiri',
+        any(b.strip().startswith('Indonesia merupakan')
+            for b in d_subbab['baris'])
+        and any(b.strip().startswith('1. Untuk mengidentifikasi')
+                for b in d_subbab['baris'])
+        and any(b.strip().startswith('Agar memberikan')
+                for b in d_subbab['baris']))
+    cek('v7.1: jumlah pisahan ekor subbab tercatat',
+        d_subbab.get('pisah_subbab_ekor_jml', 0) >= 3,
+        str(d_subbab.get('pisah_subbab_ekor_jml')))
+    # pagar stitch: judul subbab + ekor lintas baris-kosong tidak disambung
+    # meski Jev bilang sambung (ekor ada di JOIN_SET fake).
+    from app.sambung_kode import sambung_kode as _sk7
+    cek('v7.1: sambung_kode tolak subbab + "Indonesia merupakan..."',
+        _sk7('1.1 Latar Belakang',
+             'Indonesia merupakan salah satu negara') is False)
+    cek('v7.1: sambung_kode tolak subbab + "Agar memberikan..."',
+        _sk7('1.5 Sistematika Penulisan',
+             'Agar memberikan gambaran sekilas') is False)
+    cek('v7.1: sambung_kode tolak subbab + huruf kecil',
+        _sk7('1.1 Latar Belakang',
+             'bagian ini menjelaskan tentang') is False)
+    cek('v7.1: sambung_kode tetap tanya lanjutan judul huruf besar',
+        _sk7('1.1 Latar', 'Belakang') is None)
+    cek('v7.1: sambung_kode tetap tanya penghubung judul "dan ..."',
+        _sk7('1.1 Latar', 'dan Tujuan Penelitian') is None)
+    teks_lintas_sub = (
+        'BAB I\nPENDAHULUAN\n'
+        '1.1 Latar Belakang\n\n'
+        'membahas pemasaran digital di Indonesia.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    hasil_lintas_sub = P._stitch_baris(teks_lintas_sub,
+                                       tanya_fn=FAKE_SATPAM.tanya_bebas_mutu)
+    cek('v7.1: stitch lintas-kosong tidak menelan judul subbab',
+        '1.1 Latar Belakang\n' in hasil_lintas_sub
+        and 'membahas pemasaran digital di Indonesia.' in hasil_lintas_sub,
+        hasil_lintas_sub[:120])
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:

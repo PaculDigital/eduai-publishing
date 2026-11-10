@@ -51,6 +51,40 @@ _KATA_GANTUNG = {
 
 _POLA_BAB = re.compile(r'^BAB\s+([IVX0-9]+)\b', re.I)
 _POLA_NOMOR_HALAMAN = re.compile(r'^\d{1,3}$')
+# ── v7: judul subbab bernomor ("1.1 Latar Belakang") + awal kalimat ──────
+_POLA_SUBBAB = re.compile(r'^\d+(?:\.\d+)+\.?\s+\S')
+_KATA_PENGHUBUNG_JUDUL = frozenset({
+    'dan', 'atau', 'di', 'ke', 'dari', 'yang', 'per', 'antar', 'atas',
+    'bagi', 'tentang', 'hingga', 'serta', 'maupun', 'terhadap', 'antara',
+    'sampai', 'demi', 'kepada'})
+_KATA_AWAL_KALIMAT = frozenset({
+    'agar', 'dalam', 'pada', 'untuk', 'dengan', 'sebagai', 'karena',
+    'sehingga', 'oleh', 'namun', 'sedangkan', 'sementara', 'jika',
+    'apabila', 'ketika', 'setelah', 'sebelum', 'selama', 'melalui',
+    'berdasarkan', 'menurut', 'selain', 'ini', 'itu', 'hal', 'tersebut',
+    'bab', 'bagian'})
+
+
+def _awal_kalimat(s):
+    """True bila baris ini membaca seperti awal kalimat (bukan lanjutan
+    judul): huruf kecil non-penghubung, kata awal kalimat, atau >=2 kata
+    huruf kecil di 4 kata pertama. Penghubung judul ("dan Tujuan ...")
+    yang sisanya Title Case tetap dianggap lanjutan judul."""
+    kata = [w.strip('.,;:()[]"\'') for w in (s or '').split()]
+    kata = [w for w in kata if w and w[:1].isalpha()]
+    if not kata:
+        return False
+    if kata[0][:1].islower():
+        if kata[0].lower() in _KATA_PENGHUBUNG_JUDUL:
+            sisa = kata[1:]
+            if sisa and all(w[:1].isupper() for w in sisa[:3]):
+                return False
+            return True
+        return True
+    if kata[0].lower() in _KATA_AWAL_KALIMAT:
+        return True
+    kecil = [w for w in kata[:4] if w[:1].islower()]
+    return len(kata) >= 3 and len(kecil) >= 2
 _POLA_NOMOR_JUDUL = re.compile(r'^\d+(?:\.\d+)*\.?\s+\S')
 _ROMAWI_TUNGGAL = re.compile(r'^[IVXLC]+$', re.I)
 
@@ -127,6 +161,14 @@ def sambung_kode(a: str, b: str):
     #    Lanjutan judul huruf BESAR ("Penelitian") tetap ditanya ke Jev.
     if _POLA_BAB.match(tanpa_nomor_halaman(ta)) and (
             tb[:1].islower() or re.match(r'^(bab|bagian)\s+ini\b', tb, re.I)):
+        return False
+    # ── SKIP (v7): A judul subbab bernomor + B awal kalimat ─────────────
+    #    "1.1 Latar Belakang" + "Indonesia merupakan ..." — B kalimat baru,
+    #    bukan sambungan judul (cacat terbesar v6). Lanjutan judul huruf
+    #    BESAR ("Penelitian Kualitatif") tetap ditanya ke Jev; penghubung
+    #    judul ("dan Tujuan ...") juga tetap ditanya — hanya kalimat yang
+    #    ditolak mentah-mentah.
+    if _POLA_SUBBAB.match(tanpa_nomor_halaman(ta)) and _awal_kalimat(tb):
         return False
     # ── SKIP: baris tabel (pipa) ────────────────────────────────────────
     if '|' in ta or '|' in tb:

@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 #    (kode, bukan Jev), profil kampus istilah + penomoran titik akhir.
 #    v6.7: kupas nomor daftar di pagar judul BAB; batas paragraf hanya
 #    untuk lanjutan eksplisit. v6.8: gabung fragmen 1-2 huruf.
-RULE_VERSION = 'jev-peta-v6.8'
+RULE_VERSION = 'jev-peta-v7'
 
 # ── SAKLAR (env, tanpa ubah kode) ────────────────────────────────────────
 #    EDUAI_JEV_STITCH=0      ⇒ matikan pass-1 stitch (susun cara lama)
@@ -584,6 +584,150 @@ def _pisah_bab_ekor_baris(baris):
     return keluar, jml
 
 
+# ── PISAH EKOR KALIMAT PADA JUDUL SUBBAB BERNOMOR (v7) ─────────────────
+#    Cacat terbesar v6 (terukur live 10 Nov 2026): judul SUBBAB bernomor
+#    membawa ekor kalimat — "1.1 LATAR BELAKANG Indonesia merupakan
+#    salah satu negara den...", "1.3 Tujuan Penelitian 1. Untuk
+#    mengidentifikasi SWOT pada Us...", "1.5 Sistematika Penulisan Agar
+#    memberikan gambaran sekilas m...". Judul-judul itu DIBACA KODE
+#    (`_nomor_bertindak_judul`, tanpa Jev), jadi ekornya ikut jadi judul.
+#    ATURAN (deterministik, sebelum klasifikasi; ekor jadi baris sendiri):
+#      · penanda butir "1." sesudah judul -> pisah sebelum penanda;
+#      · koma + kalimat sesudahnya (>=2 kata huruf kecil di 4 kata pertama)
+#        -> pisah di koma (judul yang ekornya Title Case semua tidak kena);
+#      · kata huruf kecil BUKAN penghubung judul ("adalah", "merupakan")
+#        -> pisah sebelum kata itu;
+#      · kata awal kalimat ("Agar", "Dalam", "Pada", "Untuk", ...) +
+#        kalimat sesudahnya -> pisah sebelum kata itu;
+#      · kata Title Case sesudah deret CAPS + kalimat sesudahnya
+#        ("LATAR BELAKANG Indonesia merupakan ...") -> ekor mulai di kata
+#        Title Case itu, BUKAN di kata huruf kecilnya.
+#    Penghubung judul ("dan", "di", "ke", "dari", "yang", ...) boleh di
+#    tengah judul dan tidak memicu pisah. Judul tanpa ekor tidak disentuh.
+_KATA_PENGHUBUNG_JUDUL = frozenset({
+    'dan', 'atau', 'di', 'ke', 'dari', 'yang', 'per', 'antar', 'atas',
+    'bagi', 'tentang', 'hingga', 'serta', 'maupun', 'terhadap', 'antara',
+    'sampai', 'demi', 'kepada'})
+_KATA_AWAL_KALIMAT = frozenset({
+    'agar', 'dalam', 'pada', 'untuk', 'dengan', 'sebagai', 'karena',
+    'sehingga', 'oleh', 'namun', 'sedangkan', 'sementara', 'jika',
+    'apabila', 'ketika', 'setelah', 'sebelum', 'selama', 'melalui',
+    'berdasarkan', 'menurut', 'selain', 'ini', 'itu', 'hal', 'tersebut',
+    'bab', 'bagian'})
+_POLA_SUBBAB_EKOR = re.compile(
+    r'^((?:\d{1,3}\s+)?\d+(?:\.\d+)+\.?)\s+(.+)$')
+
+
+def _kalimat_ekor(kata):
+    """True bila daftar kata ini membaca seperti kalimat (bukan judul):
+    >=3 kata berhuruf dan >=2 kata huruf kecil di 4 kata pertama."""
+    kata = [w for w in (kata or []) if w and w[:1].isalpha()]
+    if len(kata) < 3:
+        return False
+    kecil = [w for w in kata[:4] if w[:1].islower()]
+    return len(kecil) >= 2
+
+
+def _judul_subbab(depan):
+    """True bila potongan ini mirip judul subbab (bukan kalimat)."""
+    d = (depan or '').strip()
+    if not d or len(d) > 120 or d[-1] in '.?!':
+        return False
+    kata = d.split()
+    if not kata:
+        return False
+    return all(w[:1].isupper()
+               or w.lower().strip('.,;:') in _KATA_PENGHUBUNG_JUDUL
+               or not w[:1].isalpha() for w in kata)
+
+
+def _pisah_subbab_ekor(s):
+    """Pisah satu baris "nomor + judul subbab + ekor kalimat" jadi dua baris.
+
+    Kembalikan [judul, ekor] bila pola cocok, [s] bila tidak.
+    """
+    t = (s or '').strip()
+    m = _POLA_SUBBAB_EKOR.match(t)
+    if not m:
+        return [s]
+    nomor, sisa = m.group(1), m.group(2).strip()
+    if not sisa or len(sisa) < 3:
+        return [s]
+    judul_awal = nomor + ' '
+
+    # ── 1. penanda butir sesudah judul: "... Penelitian 1. Untuk ..." ──
+    m_butir = re.search(r'\s(\d+[.)])\s+(?=[A-Z\u00C0-\u00DE])', sisa)
+    if m_butir:
+        depan = sisa[:m_butir.start()].strip()
+        ekor = sisa[m_butir.start() + 1:].strip()
+        if depan and _judul_subbab(depan) and _kalimat_ekor(ekor.split()):
+            return [judul_awal + depan, ekor]
+
+    # ── 2. koma + kalimat: "1.1 Latar Belakang, Indonesia merupakan ..." ──
+    for m_koma in re.finditer(r',\s+', sisa):
+        depan = sisa[:m_koma.start()].strip()
+        ekor = sisa[m_koma.end():].strip()
+        if depan and _judul_subbab(depan) and _kalimat_ekor(ekor.split()):
+            return [judul_awal + depan, ekor]
+
+    # ── 3. pindai kata: judul = deret kata judul; ekor mulai di kata yang
+    #    bukan kata judul (huruf kecil non-penghubung / kata awal kalimat).
+    kata = [(mm.start(), mm.group(0))
+            for mm in re.finditer(r'\S+', sisa)]
+    pisah = None
+    for idx, (pos, w) in enumerate(kata):
+        bersih = w.strip('.,;:()[]"\'')
+
+        if not bersih:
+            continue
+        if re.match(r'^\d+[.)]$', bersih):
+            pisah = idx
+            break
+        if bersih.isupper() and any(c.isalpha() for c in bersih):
+            continue                      # kata CAPS = kata judul
+        if bersih[:1].isupper():
+            if bersih.lower() in _KATA_AWAL_KALIMAT and _kalimat_ekor(
+                    [k[1] for k in kata[idx:]]):
+                pisah = idx
+                break
+            continue
+        if bersih.lower() in _KATA_PENGHUBUNG_JUDUL:
+            continue                      # penghubung judul, bukan ekor
+        pisah = idx
+        break
+    if pisah is None or pisah == 0:
+        return [s]
+    # ── ekor boleh mulai satu kata LEBIH AWAL: kata Title Case sesudah
+    #    deret CAPS ("LATAR BELAKANG Indonesia merupakan ...") adalah kata
+    #    pertama kalimat (nama diri), bukan kata judul.
+    if pisah > 1:
+        sebelum = kata[pisah - 1][1].strip('.,;:()[]"\'')
+
+        awal = kata[:pisah - 1]
+        if (sebelum[:1].isupper() and not sebelum.isupper()
+                and awal and all(
+                    k[1].strip('.,;:()[]"\'').isupper()
+                    for k in awal
+                    if k[1].strip('.,;:()[]"\'')[:1].isalpha())):
+            pisah -= 1
+    judul = judul_awal + ' '.join(k[1] for k in kata[:pisah]).strip()
+    ekor = ' '.join(k[1] for k in kata[pisah:]).strip()
+    if not judul.strip() or judul.strip() == nomor or len(ekor.split()) < 2:
+        return [s]
+    return [judul, ekor]
+
+
+def _pisah_subbab_ekor_baris(baris):
+    """Terapkan `_pisah_subbab_ekor` ke daftar baris. Kembalikan
+    (baris_baru, jumlah_pisahan)."""
+    keluar, jml = [], 0
+    for b in baris:
+        p = _pisah_subbab_ekor(b)
+        jml += max(0, len(p) - 1)
+        keluar.extend(p)
+    return keluar, jml
+
+
 def _pisah_judul_menempel_baris(baris):
     """Terapkan `_pisah_judul_menempel` ke daftar baris. Kembalikan
     (baris_baru, jumlah_pisahan)."""
@@ -834,6 +978,8 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     _baris_split, pisah_sebelum = _pisah_judul_menempel_baris(bersih.split('\n'))
     # ── v6: pisah "BAB + judul + koma + kalimat" SEBELUM stitch.
     _baris_split, pisah_ekor_sebelum = _pisah_bab_ekor_baris(_baris_split)
+    # ── v7: pisah ekor kalimat pada judul SUBBAB bernomor SEBELUM stitch.
+    _baris_split, pisah_subbab_sebelum = _pisah_subbab_ekor_baris(_baris_split)
     bersih = '\n'.join(_baris_split)
     stitch_pakai = False
     waktu_stitch = 0.0
@@ -873,8 +1019,11 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     # ── v6: pisah "BAB + judul + koma + kalimat" lagi SESUDAH stitch
     #    (stitch bisa menyambung kembali judul + ekor yang sudah dipisah).
     baris, pisah_ekor_sesudah = _pisah_bab_ekor_baris(baris)
+    # ── v7: pisah ekor subbab lagi SESUDAH stitch.
+    baris, pisah_subbab_sesudah = _pisah_subbab_ekor_baris(baris)
     pisah_judul_jml = pisah_sebelum + pisah_sesudah
     pisah_bab_ekor_jml = pisah_ekor_sebelum + pisah_ekor_sesudah
+    pisah_subbab_ekor_jml = pisah_subbab_sebelum + pisah_subbab_sesudah
     if awal is None or awal < 0:
         awal = 0
     if akhir is None or akhir > len(baris):
@@ -944,6 +1093,7 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             'kode_label': kode_label, 'stitch_pakai': stitch_pakai,
             'waktu_stitch': waktu_stitch, 'pisah_judul_jml': pisah_judul_jml,
             'pisah_bab_ekor_jml': pisah_bab_ekor_jml,
+            'pisah_subbab_ekor_jml': pisah_subbab_ekor_jml,
             'spasi_huruf_jml': spasi_huruf_jml + spasi_huruf_sesudah_stitch,
             'spasi_huruf_sebelum_stitch': spasi_huruf_jml,
             'spasi_huruf_sesudah_stitch': spasi_huruf_sesudah_stitch,
@@ -1326,6 +1476,7 @@ def _petakan_dari_hasil(d, putaran=None):
             'huruf_berspasi_sebelum': d.get('huruf_berspasi_sebelum', 0),
             'huruf_berspasi_sesudah': d.get('huruf_berspasi_sesudah', 0),
             'pisah_bab_ekor_jml': d.get('pisah_bab_ekor_jml', 0),
+            'pisah_subbab_ekor_jml': d.get('pisah_subbab_ekor_jml', 0),
             'koreksi_batas_paragraf': koreksi_batas,
             'tanya_ulang_goyang_pb_jml': tanya_ulang_goyang_pb_jml,
             'bab_kode': bab_kode, 'bab_ganda': bab_ganda,
