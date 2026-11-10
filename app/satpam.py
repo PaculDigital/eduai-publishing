@@ -24,8 +24,6 @@ import json
 import logging
 import os
 import time
-import urllib.error
-import urllib.request
 from typing import Any
 
 log = logging.getLogger(__name__)
@@ -35,11 +33,11 @@ AKTIF = (os.getenv('EDUAI_SATPAM_AKTIF') or '1').strip() not in ('0', 'false', '
 #  🛣️ JALAN TOL JEV (perintah Bos 09 Okt 2026): SATU-SATUNYA jalur = `app/jev.py`.
 #     Jalur B (endpoint sarat-umum) SUDAH DIHAPUS TOTAL — tidak ada lagi di
 #     berkas ini, dan TIDAK BOLEH dikembalikan.
-BASE = 'jalan tol'          # tidak dipakai lagi; pemanggilan lewat `jev.tanya()`
-MODEL = (os.getenv('EDUAI_SATPAM_MODEL') or 'SATPAM/typesafe/jev-1.13').strip()
-# kunci: pakai kunci 9router yang SUDAH dipakai app (jangan buat kunci baru)
-KUNCI = (os.getenv('EDUAI_SATPAM_KEY') or os.getenv('EDUAI_ROUTER_KEY') or '').strip()
-BATAS_DETIK = float(os.getenv('EDUAI_SATPAM_TIMEOUT') or '60')
+#  v8 (10 Nov 2026): jalur langsung lama `_tanya_bebas_lama` + setelan
+#     BASE/MODEL/KUNCI/BATAS_DETIK DIHAPUS. Fungsi itu mati (0 pemanggil) dan
+#     env EDUAI_SATPAM_MODEL MENIPU: menyetelnya tidak mengganti model peta
+#     (semua jalur bermuara ke `jev.tanya()` tanpa argumen model). Satu-satunya
+#     saklar model yang hidup = `app/jev.py::MODEL_DEFAULT` (bawaan 1.13).
 AMBANG_LOLOS = float(os.getenv('EDUAI_SATPAM_AMBANG') or '0.80')
 AMBANG_TANYA = 0.50
 
@@ -482,47 +480,6 @@ def tanya_bebas_mutu(bahan: str, pertanyaan: dict[str, Any]) -> dict[str, Any] |
         #  salah PROGRAMMER (bukan gangguan) ⇒ naikkan, jangan ditelan
         log.error('[satpam] tanya_bebas_mutu: %s', e)
         raise
-
-
-def _tanya_bebas_lama(bahan: str, pertanyaan: dict[str, Any]) -> dict[str, Any] | None:
-    """Tanya Jev dengan BAHAN SIAP (bukan naskah + peta). Dipakai mutu.
-
-    ⚠️ BEDA dengan `tanya_bebas()`: yang itu menyusun bahan lewat
-    `_susun_state()` (peta bab). Yang ini menerima bahan yang SUDAH disusun
-    pemanggil (mis. `konversi._bahan_mutu()`).
-
-    SELALU balik dict atau None. TIDAK PERNAH melempar galat.
-    """
-    if not AKTIF or not bahan or not pertanyaan:
-        return None
-    #  🛡️ PAGAR SKEMA (sama seperti `tanya_bebas`) — cegah 503 semu.
-    keluhan = _periksa_skema(pertanyaan)
-    if keluhan:
-        raise ValueError('Skema pertanyaan Jev salah — perbaiki dulu: '
-                         + ' | '.join(keluhan))
-
-    body = {
-        'model': MODEL,
-        'messages': [{'role': 'user',
-                      'content': json.dumps({'state': bahan,
-                                             'questions': pertanyaan})}],
-    }
-    req = urllib.request.Request(
-        BASE, data=json.dumps(body).encode(),
-        headers={'Authorization': f'Bearer {KUNCI}',
-                 'Content-Type': 'application/json'})
-    try:
-        with urllib.request.urlopen(req, timeout=BATAS_DETIK) as r:
-            mentah = r.read().decode()
-    except Exception as e:                                    # P1 + P2: telan galat
-        log.warning('[satpam] tanya_bebas_mutu gagal: %s: %s', type(e).__name__, e)
-        return None
-
-    jawab = _urai_balasan(mentah)
-    if jawab is None:
-        log.warning('[satpam] tanya_bebas_mutu: balasan tak terbaca (%d byte)',
-                    len(mentah))
-    return jawab
 
 
 # ────────────────────────── BLOK PROMPT ──────────────────────────
