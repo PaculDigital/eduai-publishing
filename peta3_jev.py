@@ -160,6 +160,86 @@ POLA_CAPTION = re.compile(r'^(tabel|gambar|grafik|diagram|bagan|skema)\s*\.?\s*\
 POLA_SUMBER = re.compile(r'^(sumber|source)\s*[:.]', re.I)
 POLA_MARKER = re.compile(r'^\[\[.*\]\]$')
 POLA_BAB = re.compile(r'^BAB\s+([IVX0-9]+)\s*$', re.I)   # ivx = Romawi · 0-9 = varian "BAB 1" (usul Bos 09 Okt)
+# ── POLA BAB BERNOMOR (v6): seperti _POLA_BAB_TEKS tapi MENANGKAP nomornya
+#    (grup 1) — dipakai deteksi BAB deterministik (angka dinormalisasi,
+#    jadi "BAB 1" dan "BAB I" dikenali sebagai BAB yang sama).
+_POLA_BAB_NOMOR = re.compile(
+    r'^(?:\d{1,3}\s+)?(?:\d+[.)]\s*|[IVX]+[.)]\s*)?BAB\s+([IVX0-9]+)\b', re.I)
+_ROMAWI_BAB = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6, 'VII': 7,
+               'VIII': 8, 'IX': 9, 'X': 10, 'XI': 11, 'XII': 12, 'XIII': 13,
+               'XIV': 14, 'XV': 15}
+
+
+def _angka_bab(nomor):
+    """Normalisasi nomor BAB ("I", "1", "III") jadi angka; None bila aneh."""
+    t = (nomor or '').strip().upper()
+    if t.isdigit():
+        try:
+            n = int(t)
+            return n if 1 <= n <= 30 else None
+        except ValueError:
+            return None
+    return _ROMAWI_BAB.get(t)
+
+
+def _koreksi_bab_deterministik(baris, label, kand, sistematika, gabung,
+                               kode_label):
+    """Deteksi BAB oleh KODE (v6) — penanda BAB itu deterministik, jangan
+    serahkan ke Jev (sumber susunan BAB berbeda antar run di v5).
+
+    1. Paksa 'bab': kandidat yang diawali penanda BAB ("BAB I", "BAB 1",
+       "3. BAB III ...") dan bukan sistematika ⇒ 'bab', asal 'kode'.
+       Nomor dinormalisasi: "BAB 1" = "BAB I".
+    2. Ganda: nomor BAB yang sama muncul 2x (kepala berjalan / sisa daftar
+       isi) ⇒ kemunculan ke-2 dst jadi 'biasa' (yang pertama yang asli).
+    3. Demosi: label 'bab' dari Jev TANPA penanda BAB ⇒ bukan bab. Kecuali
+       (a) tepat sesudah penanda BAB polos yang judulnya kosong di gabung
+       ("BAB I" lalu "Pendahuluan" — itu judul BAB asli), dan (b) baris
+       huruf BESAR pendek tanpa titik akhir (judul yang penandanya hilang
+       saat ekstraksi). Yang didemosi jadi 'paragraf' bila berakhir tanda
+       akhir kalimat, sisanya 'biasa'.
+    Kembalikan (bab_kode, bab_ganda, bab_demosi) — daftar indeks baris.
+    """
+    bab_kode, bab_ganda, bab_demosi = [], [], []
+    lihat = {}
+    for i, _t in kand:
+        if i in sistematika:
+            continue
+        t = re.sub(r'^\d{1,3}\s+', '', baris[i].strip())
+        m = _POLA_BAB_NOMOR.match(t)
+        if not m:
+            continue
+        angka = _angka_bab(m.group(1))
+        if angka is None:
+            continue
+        if angka in lihat:
+            label[i] = 'biasa'
+            bab_ganda.append(i)
+        else:
+            lihat[angka] = i
+            if label.get(i) != 'bab':
+                label[i] = 'bab'
+            bab_kode.append(i)
+    for i, _t in kand:
+        if label.get(i) != 'bab' or i in sistematika:
+            continue
+        t = re.sub(r'^\d{1,3}\s+', '', baris[i].strip())
+        if _POLA_BAB_NOMOR.match(t):
+            continue
+        j = i - 1
+        while j >= 0 and not baris[j].strip():
+            j -= 1
+        if j >= 0 and j in gabung:
+            _penanda, _judul = gabung[j]
+            if POLA_BAB.match(_penanda.strip()) and not _judul:
+                continue
+        if t and t == t.upper() and len(t) <= 70 \
+                and not re.search(r'[.!?…]["\')\]]*\s*$', t):
+            continue
+        label[i] = ('paragraf' if re.search(r'[.!?…]["\')\]]*\s*$', t)
+                    else 'biasa')
+        bab_demosi.append(i)
+    return bab_kode, bab_ganda, bab_demosi
 # ── ATURAN D1: POLA AWALAN (bukan pola baris-penuh).
 #    ⚠️ POLA_BAB (baris-penuh) TIDAK PERNAH cocok pada KANDIDAT: semua baris
 #    "BAB I" polos sudah disedot ke `gabung` di susun() ⇒ tak pernah jadi kand.
@@ -1131,6 +1211,16 @@ def _petakan_dari_hasil(d, putaran=None):
             label[i] = 'biasa'
             koreksi_batas.append(i)
 
+    # ── v6: DETEKSI BAB DETERMINISTIK (kode, bukan Jev) ──────────────────
+    #    Penanda BAB ("BAB I", "BAB 1") itu deterministik — putuskan di kode
+    #    supaya susunan BAB sama di tiap run (v5: 3 BAB tersusun berbeda
+    #    antar run). Yang dipaksa 'bab' asal-nya 'kode' (seperti baris
+    #    bernomor); ganda/demosi dicatat untuk laporan.
+    bab_kode, bab_ganda, bab_demosi = _koreksi_bab_deterministik(
+        baris, label, kand, sistematika, d['gabung'], kode_label)
+    for i in bab_kode:
+        asal[i] = 'kode'
+
     # ── JEV MATI TOTAL: semua gelombang gagal ⇒ pemanggil WAJIB fallback
     #    (dulu: semua label 'biasa' tanpa jejak ⇒ hakim/pemutus jalur tak
     #    bisa bedakan "peta memang tanpa judul" vs "Jev gagal").
@@ -1158,6 +1248,8 @@ def _petakan_dari_hasil(d, putaran=None):
             'pisah_bab_ekor_jml': d.get('pisah_bab_ekor_jml', 0),
             'koreksi_batas_paragraf': koreksi_batas,
             'tanya_ulang_goyang_pb_jml': tanya_ulang_goyang_pb_jml,
+            'bab_kode': bab_kode, 'bab_ganda': bab_ganda,
+            'bab_demosi': bab_demosi,
             'jev_mati': jev_mati, 'stitch_pakai': d.get('stitch_pakai', False),
             'versi_aturan': RULE_VERSION}
 

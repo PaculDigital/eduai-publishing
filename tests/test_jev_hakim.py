@@ -52,6 +52,10 @@ class FakeSatpam:
                     if sum(1 for b, _ in self.panggilan if tengah in b) <= 1:
                         conf = 0.3
                 label = 'bab' if tengah.startswith('BAB') else 'paragraf'
+                # ── v6.4: penanda JEV-BAB — fake melabel 'bab' untuk
+                #    menguji demosi deterministik (tanpa penanda BAB asli).
+                if 'JEV-BAB' in tengah:
+                    label = 'bab'
                 # ── v6.3: penanda GOYANG-PB — suara terbelah paragraf/biasa
                 #    antar gelombang (panggilan 1: paragraf 0,3 → tanya-ulang
                 #    karena p rendah; panggilan 2: biasa 0,9 → goyang PB;
@@ -692,6 +696,63 @@ def main():
     cek('v6.3: tanya-ulang batas goyang memakai gelombang ke-2',
         r_pb.get('tanya_ulang_gelombang', 0) >= 2,
         str(r_pb.get('tanya_ulang_gelombang')))
+
+    # ── 10. v6.4: DETEKSI BAB DETERMINISTIK ─────────────────────────────
+    #    (a) penanda BAB dipaksa 'bab' oleh kode (fake melabel 'paragraf').
+    teks_bab = (
+        'BAB I\nPENDAHULUAN\n'
+        '3. BAB III METODOLOGI PENELITIAN\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_bab = P.petakan_dari_teks(teks_bab)
+    cek('v6.4: "3. BAB III ..." dipaksa bab oleh kode',
+        r_bab['label'].get(2) == 'bab', str(r_bab['label']))
+    cek('v6.4: bab dari kode tercatat + asal kode',
+        r_bab.get('bab_kode') == [2] and r_bab.get('asal', {}).get(2) == 'kode',
+        str((r_bab.get('bab_kode'), r_bab.get('asal'))))
+    #    (b) nomor BAB yang sama 2x -> yang ke-2 jadi biasa.
+    teks_ganda = (
+        'BAB I\nPENDAHULUAN\n'
+        '3. BAB III METODOLOGI PENELITIAN\n'
+        '4. BAB III METODOLOGI PENELITIAN\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_ganda = P.petakan_dari_teks(teks_ganda)
+    cek('v6.4: BAB ganda (nomor sama) -> kemunculan ke-2 jadi biasa',
+        r_ganda['label'].get(2) == 'bab'
+        and r_ganda['label'].get(3) == 'biasa'
+        and r_ganda.get('bab_ganda') == [3],
+        str((r_ganda['label'], r_ganda.get('bab_ganda'))))
+    #    (c) "BAB 1" = "BAB I" (normalisasi angka).
+    cek('v6.4: angka BAB dinormalisasi (BAB 1 = BAB I)',
+        P._angka_bab('1') == 1 and P._angka_bab('I') == 1
+        and P._angka_bab('III') == 3 and P._angka_bab('V') == 5)
+    #    (d) label 'bab' Jev tanpa penanda didemosi.
+    teks_demosi = (
+        'BAB I\nPENDAHULUAN\n'
+        'Kalimat JEV-BAB penutup yang panjang dan berakhir titik.\n'
+        'Baris JEV-BAB tanpa titik akhir\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_demosi = P.petakan_dari_teks(teks_demosi)
+    cek('v6.4: bab Jev tanpa penanda + titik akhir -> paragraf',
+        r_demosi['label'].get(2) == 'paragraf', str(r_demosi['label']))
+    cek('v6.4: bab Jev tanpa penanda + tanpa titik -> biasa',
+        r_demosi['label'].get(3) == 'biasa', str(r_demosi['label']))
+    cek('v6.4: demosi bab tercatat',
+        r_demosi.get('bab_demosi') == [2, 3],
+        str(r_demosi.get('bab_demosi')))
+    #    (e) pengecualian: judul BAB tepat sesudah penanda BAB polos
+    #    yang judulnya kosong tetap 'bab'.
+    teks_judul_bab = (
+        'BAB I\n'
+        'Pendahuluan JEV-BAB\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+        'Isi paragraf kedua yang panjang dan tidak terbelah sama sekali.\n'
+    )
+    r_jb = P.petakan_dari_teks(teks_judul_bab)
+    cek('v6.4: judul BAB sesudah penanda polos tetap bab',
+        r_jb['label'].get(1) == 'bab', str(r_jb['label']))
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
