@@ -835,6 +835,31 @@ def main():
         r_sempit.get('koreksi_batas_paragraf') == [5],
         str(r_sempit.get('koreksi_batas_paragraf')))
 
+    # ── 13. v6.8: FRAGMEN 1-2 HURUF (contoh live fid=115) ────────────────
+    from app.sambung_kode import perbaiki_fragmen_huruf as _pfh
+    cek('v6.8: "d ij e l a s k a n o l e h l a i n" -> "dijelaskan oleh lain"',
+        _pfh('d ij e l a s k a n o l e h l a i n')[0]
+        == 'dijelaskan oleh lain')
+    cek('v6.8: "d i luar" (2 token) -> "di luar"',
+        _pfh('variabel d i luar variabel')[0]
+        == 'variabel di luar variabel')
+    cek('v6.8: "J u rn a l R i s e t ..." -> "Jurnal Riset ..."',
+        _pfh('J u rn a l R i s e t M a n aj e m e n')[0]
+        == 'Jurnal Riset Manajemen')
+    cek('v6.8: nama orang dibiarkan (tidak dikarang)',
+        _pfh('D i n a A l fi n a H e l m a n i a P u t r i')[0]
+        == 'D i n a A l fi n a H e l m a n i a P u t r i')
+    cek('v6.8: inisial "U S A" dibiarkan',
+        _pfh('U S A dan P B B')[0] == 'U S A dan P B B')
+    cek('v6.8: teks normal tidak berubah dan tidak dihitung',
+        _pfh('Kata di ke dalam kalimat biasa.')[1] == 0)
+    import app.sambung_kode as _SK
+    cek('v6.8: segmentasi "di" = kata, bukan Romawi',
+        _SK._segmentasi('di', dict(_SK.KATA_UMUM)) == [(0, 2, 'di')])
+    cek('v6.8: segmentasi "iv" tetap Romawi',
+        _SK._segmentasi('iv', dict(_SK.KATA_UMUM))
+        == [(0, 1, 'i'), (1, 2, 'v')])
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))

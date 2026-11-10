@@ -836,6 +836,7 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     stitch_pakai = False
     waktu_stitch = 0.0
     spasi_huruf_sesudah_stitch = 0
+    spasi_fragmen_jml = 0
     huruf_berspasi_sebelum = 0
     huruf_berspasi_sesudah = 0
     if pakai_stitch and bersih:
@@ -856,6 +857,13 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             bersih, spasi_huruf_sesudah_stitch = _psh2(bersih)
         except Exception:
             spasi_huruf_sesudah_stitch = 0
+        # ── v6.8: gabung fragmen 1-2 huruf ("d ij e l a s k a n") — pola
+        #    run huruf-tunggal tidak cocok pada potongan 2 huruf.
+        try:
+            from app.sambung_kode import perbaiki_fragmen_huruf as _pfh
+            bersih, spasi_fragmen_jml = _pfh(bersih)
+        except Exception:
+            spasi_fragmen_jml = 0
         huruf_berspasi_sesudah = _hitung_baris_berspasi(bersih.split('\n'))
     baris = bersih.split('\n')
     # ── v5: pisah lagi SESUDAH stitch (blok bisa menyambung judul kembali).
@@ -937,6 +945,7 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             'spasi_huruf_jml': spasi_huruf_jml + spasi_huruf_sesudah_stitch,
             'spasi_huruf_sebelum_stitch': spasi_huruf_jml,
             'spasi_huruf_sesudah_stitch': spasi_huruf_sesudah_stitch,
+            'spasi_fragmen_jml': spasi_fragmen_jml,
             'huruf_berspasi_sebelum': huruf_berspasi_sebelum,
             'huruf_berspasi_sesudah': huruf_berspasi_sesudah,
             'teks_asal': teks_asal,
@@ -1311,6 +1320,7 @@ def _petakan_dari_hasil(d, putaran=None):
             'tanya_ulang_gelombang': tanya_ulang_gelombang,
             'spasi_huruf_jml': d.get('spasi_huruf_jml', 0),
             'spasi_huruf_sesudah_stitch': d.get('spasi_huruf_sesudah_stitch', 0),
+            'spasi_fragmen_jml': d.get('spasi_fragmen_jml', 0),
             'huruf_berspasi_sebelum': d.get('huruf_berspasi_sebelum', 0),
             'huruf_berspasi_sesudah': d.get('huruf_berspasi_sesudah', 0),
             'pisah_bab_ekor_jml': d.get('pisah_bab_ekor_jml', 0),

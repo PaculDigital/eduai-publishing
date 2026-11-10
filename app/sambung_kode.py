@@ -302,6 +302,11 @@ KATA_UMUM_V6 = {
     'perekonomian': 30, 'perdagangan': 30, 'pertanian': 30, 'perikanan': 30,
     'peternakan': 30, 'kehutanan': 30, 'pertambangan': 30, 'energi': 30,
     'pariwisata': 30,
+    # ── v6.8: kata 2 huruf + kata yang muncul di pecahan fid=115 ────────
+    #    'di'/'ke' WAJIB ada supaya "d i" jadi kata, bukan "D I" (angka
+    #    Romawi); 'riset'/'citra'/'merek'/'luar' dari contoh live fid=115.
+    'di': 30, 'ke': 30, 'luar': 30, 'citra': 30, 'merek': 30, 'hal': 30,
+    'riset': 30,
 }
 KATA_UMUM.update(KATA_UMUM_V6)
 _POLA_RUN_SPASI = re.compile(r'(?<![A-Za-z0-9])([A-Za-z](?: [A-Za-z]){2,})(?![A-Za-z0-9])')
@@ -311,6 +316,11 @@ _PANJANG_TAK_DIKENAL_MAKS = 10
 _DENDA_PER_KATA = 0.5
 _DENDA_TAK_DIKENAL = 6.0
 _BATAS_TAK_DIKENAL = 0.25          # maks 25% huruf rangkaian boleh tak dikenal
+_BONUS_KATA = 2.0                  # v6.8: kata kamus diutamakan atas angka
+#    Romawi tunggal — TANPA bonus, "di" (log 31 − 0,5 ≈ 2,9) kalah dari
+#    "D"+"I" (2 × (log 11 − 0,5) ≈ 3,8) dan kata 2 huruf jadi "D I".
+#    Bonus ini TIDAK mengubah pemenang antar kata kamus (sama-sama +2,0),
+#    hanya menahan Romawi supaya tidak memecah kata.
 _SKOR_ROMAWI = _math.log(11) - _DENDA_PER_KATA
 
 
@@ -327,12 +337,14 @@ def _kosakata_dari_teks(teks):
     return {w: 3 + n for w, n in hitung.items()}
 
 
-def _segmentasi(huruf, frek):
+def _segmentasi(huruf, frek, batas_tak_dikenal=_BATAS_TAK_DIKENAL):
     """Segmentasi rangkaian huruf jadi kata-kata kamus (program dinamis).
 
     `huruf`: string huruf kecil tanpa spasi. Kembalikan daftar
     (awal, akhir, kata) — kata None berarti segmen tak dikenal —
     atau None bila tidak ada segmentasi yang lolos pagar.
+    `batas_tak_dikenal`: maks fraksi huruf tak dikenal (bawaan 0,25;
+    jalur fragmen v6.8 memakai 0,40 karena potongannya lebih kasar).
     """
     n = len(huruf)
     # dp[i] = (skor, pilihan) terbaik untuk huruf[:i]; pilihan = daftar segmen.
@@ -351,7 +363,7 @@ def _segmentasi(huruf, frek):
         for j in range(i + 2, min(n, i + _PANJANG_KATA_MAKS) + 1):
             kata = huruf[i:j]
             if kata in frek:
-                s = skor_i + _math.log(frek[kata] + 1) - _DENDA_PER_KATA
+                s = skor_i + _math.log(frek[kata] + 1) - _DENDA_PER_KATA + _BONUS_KATA
                 if dp[j][0] is None or s > dp[j][0]:
                     dp[j] = (s, pil_i + [(i, j, kata)])
         # ── kata tak dikenal (3..10 huruf, didenda berat) ──
@@ -365,7 +377,7 @@ def _segmentasi(huruf, frek):
     tak_dikenal = sum(b - a for a, b, k in pilihan if k is None)
     ada_kamus = any(k is not None and len(k) > 1 for _, _, k in pilihan)
     semua_romawi = all(k is not None and len(k) == 1 for _, _, k in pilihan)
-    if tak_dikenal / n > _BATAS_TAK_DIKENAL:
+    if tak_dikenal / n > batas_tak_dikenal:
         return None
     if not ada_kamus and not semua_romawi:
         return None
@@ -432,3 +444,106 @@ def perbaiki_spasi_huruf(teks):
         return baru
 
     return _POLA_RUN_SPASI.sub(_ganti, t), jml
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# PERBAIKAN FRAGMEN 1-2 HURUF (v6.8)
+# ───────────────────────────────────────────────────────────────────────
+# Sisa korupsi fid=115 sesudah v6.1: BUKAN rangkaian huruf tunggal saja —
+# ekstraksi PDF menyisakan potongan 2 huruf utuh ("d ij e l a s k a n",
+# "J u rn a l", "A l fi n a"). Pola run huruf-tunggal tidak pernah cocok
+# pada potongan itu, jadi 50 baris tetap berspasi (terukur live 10 Nov).
+#
+# CARA: dalam satu baris, cari rangkaian token 1-2 huruf berurutan
+# (≥3 token, ≥4 huruf), gabung hurufnya, lalu segmentasi dengan DP yang
+# sama (batas tak dikenal 0,40 — potongannya lebih kasar). Terima HANYA
+# bila ada ≥1 kata kamus (len>1). Nama orang ("Dina Alfina Helmania
+# Putri") DITOLAK dengan aman karena tak dikenal 78%, dan dibiarkan apa
+# adanya. Segmen tak dikenal di dalam rangkaian yang diterima dibiarkan
+# berspasi (tidak dikarang kata).
+# ═══════════════════════════════════════════════════════════════════════
+_BATAS_TAK_DIKENAL_FRAGMEN = 0.40
+_POLA_TOKEN_PENDEK = re.compile(r'^[A-Za-z]{1,2}$')
+
+
+def _perbaiki_satu_fragmen(token, frek):
+    """Perbaiki SATU rangkaian token 1-2 huruf. Kembalikan (teks, ok)."""
+    huruf = ''.join(token).lower()
+    huruf_asli = ''.join(token)
+    if len(huruf) < 2:
+        return ' '.join(token), False
+    pilihan = _segmentasi(huruf, frek, _BATAS_TAK_DIKENAL_FRAGMEN)
+    if pilihan is None:
+        return ' '.join(token), False
+    ada_kamus = any(k is not None and len(k) > 1 for _, _, k in pilihan)
+    if not ada_kamus:
+        return ' '.join(token), False
+    semua_kapital = huruf_asli.isupper()
+    keluar, gabung = [], False
+    for a, b, kata in pilihan:
+        if kata is None:
+            keluar.append(' '.join(huruf_asli[a:b]))
+        else:
+            if len(kata) == 1 and keluar and keluar[-1] and \
+                    all(c in 'IVXLC' for c in keluar[-1]):
+                keluar[-1] = keluar[-1] + kata.upper()
+            else:
+                keluar.append(_bentuk_kata(kata, huruf_asli[a].isupper(),
+                                           semua_kapital))
+            gabung = True
+    baru = ' '.join(keluar)
+    # sudah benar sejak awal ("di ke") bukan perbaikan — jangan dihitung.
+    return baru, (gabung and baru != ' '.join(token))
+
+
+def _run_fragmen_layak(jalan):
+    """True bila rangkaian token pendek layak dicoba diperbaiki.
+
+    ≥3 token + ≥4 huruf (kasus umum), ATAU tepat 2 token (kasus "d i"
+    sebelum kata utuh — "luar" memutus rangkaian, jadi "d i" hanya
+    berdua). Validasi kamus di `_perbaiki_satu_fragmen` yang menjaga:
+    "U S" / "A B" (inisial) gagal segmentasi dan dibiarkan.
+    """
+    n = len(jalan)
+    total = sum(len(x) for x in jalan)
+    return (n >= 3 and total >= 4) or (n == 2 and total >= 2)
+
+
+def perbaiki_fragmen_huruf(teks):
+    """Perbaiki fragmen 1-2 huruf di seluruh teks (dipakai SESUDAH stitch).
+
+    Kembalikan (teks_baru, jumlah_rangkaian_yang_diperbaiki).
+    Rangkaian yang tidak bisa disegmentasi dengan aman dibiarkan utuh.
+    """
+    t = teks or ''
+    if ' ' not in t:
+        return t, 0
+    frek = dict(KATA_UMUM)
+    frek.update(_kosakata_dari_teks(t))
+    jml = 0
+    keluar_baris = []
+    for baris in t.split('\n'):
+        token = baris.split(' ')
+        keluar, jalan = [], []
+        for tok in token:
+            if _POLA_TOKEN_PENDEK.match(tok):
+                jalan.append(tok)
+                continue
+            if _run_fragmen_layak(jalan):
+                baru, ok = _perbaiki_satu_fragmen(jalan, frek)
+                if ok:
+                    jml += 1
+                keluar.append(baru)
+            else:
+                keluar.extend(jalan)
+            jalan = []
+            keluar.append(tok)
+        if _run_fragmen_layak(jalan):
+            baru, ok = _perbaiki_satu_fragmen(jalan, frek)
+            if ok:
+                jml += 1
+            keluar.append(baru)
+        else:
+            keluar.extend(jalan)
+        keluar_baris.append(' '.join(keluar))
+    return '\n'.join(keluar_baris), jml
