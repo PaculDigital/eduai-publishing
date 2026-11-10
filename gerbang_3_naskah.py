@@ -9,11 +9,34 @@ ATURAN GERBANG (ditulis di sini, bukan dikarang diam-diam):
       bukan regresi (dicatat sebagai peringatan). FAIL bila BAB itu hilang
       di >= 2 run (gerbang jalan 2 run; bila 1 run saja, hilang di run itu
       = FAIL).
-  G2  SUBBAB BERUBAH: FAIL bila jumlah subbab peta baru menyimpang lebih
-      dari AMBANG_SUBBAB_SELISIH = 5 dari median baseline. Ambang 5 dipilih
-      karena rentang antar-run v7 paling besar adalah 5 (fid=112: 75-80;
-      fid=115: 67-70; fid=81: 131-131). Diambil dari median 2 run (bila
-      2 run) atau 1 run.
+  G2  SUBBAB BERUBAH: FAIL bila median subbab peta baru menyimpang lebih
+      dari AMBANG per naskah dari median baseline. Ambang per naskah
+      (tersimpan di gerbang_baseline.json, field 'ambang_g2') dihitung
+      dari sebaran antar-sesi yang terukur, BUKAN satu angka global:
+        ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2
+      dengan subbab_run = semua run kode v7 yang tersimpan (v7 3 run +
+      ab114-1.13 + deploy + gerbang 2 run; sesi kode lama v5/v6 tidak
+      masuk karena kodenya beda). Nilai saat ini: 81=2 (7 run, semua
+      131), 112=6 (5 run, 75-82, median 78), 115=8 (6 run, 67-78,
+      median 72.5). "+2" adalah margin eksplisit untuk sesi yang belum
+      teramati (n kecil, rentang sejati lebih lebar) — lebih kecil dari
+      regresi terkecil yang gerbang wajib tangkap (+10 subbab, kasus
+      uji mandiri 5). Konsekuensi jujur: gerbang TIDAK bisa membedakan
+      regresi kecil (+-5) dari drift model biasa; ia hanya menangkap
+      regresi besar. Ambang lama (global 5 dari median satu sore v7)
+      DITARIK 10 Nov 2026 karena terbukti terlalu ketat: dua sesi malam
+      yang sepakat (deploy 21:22 dan gerbang 22:30) gagal G2 padahal
+      diff kode v7->HEAD pada jalur klasifikasi kosong (drift model,
+      bukan regresi). Median diambil dari 2 run (bila 2 run) atau 1 run.
+  G1  CATATAN PENGUKURAN (10 Nov 2026): daftar 'bab' pelari live
+      (jalankan_gerbang.py) adalah GABUNGAN label Jev + judul gabung
+      kode, sedangkan daftar 'bab' v7 hanya label Jev. Karena itu
+      baseline BAB tetap gabungan label Jev v7 (112/115: II-V; 81: I-V
+      dari gabung kode yang terbukti selaras) dan TIDAK ditambah BAB I /
+      BAB VI dari daftar gabung gerbang — judul BAB VI yang sama persis
+      di dua naskah berbeda menunjukkan ia berasal dari jalur gabung,
+      bukan pengukuran Jev. Soal BAB VI sudah masuk paket sengketa
+      (ground_truth_115.tsv baris 69) menunggu label manusia.
   G3  JUDUL BAB SAMPAH: FAIL bila ada judul BAB di peta baru yang:
       - panjangnya > 80 karakter, ATAU
       - mengandung '. ' (tanda kalimat di tengah judul), ATAU
@@ -47,7 +70,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 BASELINE_PATH = ROOT / 'ground_truth' / 'gerbang_baseline.json'
 
-AMBANG_SUBBAB_SELISIH = 5
+AMBANG_SUBBAB_SELISIH = 5  # fallback bila baseline belum punya ambang_g2
 PANJANG_JUDUL_SAMPAH = 80
 
 # Biaya live (dari angka live v7, 10 Nov 2026) — ditulis, bukan dikarang.
@@ -111,15 +134,17 @@ def nilai_naskah(runs, baseline_naskah, fid):
         return False, gagal, peringatan
     for p in sorted(hilang_hitung):
         peringatan.append('derau (bukan gagal): %s' % p)
-    # G2: subbab vs median baseline
+    # G2: subbab vs median baseline, ambang per naskah dari baseline
     subbab = [r.get('subbab_jml') for r in runs if r.get('subbab_jml') is not None]
     if subbab:
         med = sorted(subbab)[len(subbab) // 2]
-        if abs(med - baseline_naskah['subbab_median']) > AMBANG_SUBBAB_SELISIH:
-            return False, ['G2 subbab berubah: median run %d vs baseline %d '
-                           '(selisih > %d)'
+        ambang = baseline_naskah.get('ambang_g2', AMBANG_SUBBAB_SELISIH)
+        if abs(med - baseline_naskah['subbab_median']) > ambang:
+            return False, ['G2 subbab berubah: median run %s vs baseline %s '
+                           '(selisih %s > ambang fid=%s %s)'
                            % (med, baseline_naskah['subbab_median'],
-                              AMBANG_SUBBAB_SELISIH)], peringatan
+                              abs(med - baseline_naskah['subbab_median']),
+                              fid, ambang)], peringatan
     return True, [], peringatan
 
 
