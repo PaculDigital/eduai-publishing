@@ -982,7 +982,8 @@ def main():
     #    Audit 1.14 menemukan jebakan: env EDUAI_SATPAM_MODEL tampaknya
     #    mengganti model, tapi tidak dipakai jalur peta sama sekali.
     #    Perbaikan v8: fungsi mati + konstanta menipu dihapus; satu-satunya
-    #    saklar yang hidup = app/jev.py::MODEL_DEFAULT (bawaan 1.13).
+    #    saklar yang hidup = app/jev.py::MODEL_DEFAULT (bawaan 1.14
+    #    sejak Gas Bos 10 Nov 2026; sebelumnya 1.13).
     import importlib
     import urllib.request
     os.environ['EDUAI_SATPAM_MODEL'] = 'SATPAM/typesafe/jev-1.14'
@@ -1003,8 +1004,8 @@ def main():
     del os.environ['EDUAI_SATPAM_MODEL']
 
     J8 = importlib.import_module('app.jev')
-    cek('v8: model bawaan tetap 1.13',
-        J8.MODEL_DEFAULT == 'SATPAM/typesafe/jev-1.13')
+    cek('v8: model bawaan kini 1.14 (Gas Bos 10 Nov 2026)',
+        J8.MODEL_DEFAULT == 'SATPAM/typesafe/jev-1.14')
 
     # ── transport palsu: tangkap body request, tanpa jaringan ──────────
     class _ResponPalsu:
@@ -1049,14 +1050,14 @@ def main():
             json.loads(tangkapan['data'])['model']
             == 'SATPAM/typesafe/jev-1.14'
             and r == {'q1': {'noul': 0.9}})
-        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
+        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
         r = J8.tanya('bahan uji yang cukup panjang', _tanya)
-        cek('v8: saklar dikembalikan ke 1.13, body request ikut kembali',
+        cek('v8: saklar dikembalikan ke 1.14, body request ikut kembali',
             json.loads(tangkapan['data'])['model']
-            == 'SATPAM/typesafe/jev-1.13')
+            == 'SATPAM/typesafe/jev-1.14')
     finally:
         urllib.request.urlopen = _urlopen_asli
-        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
+        J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
 
     # ── label model periksa_mutu = model yang benar-benar melayani ─────
     J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
@@ -1066,7 +1067,7 @@ def main():
     cek('v8: label model periksa_mutu = MODEL_DEFAULT yang melayani',
         _hasil_mutu.get('model') == 'SATPAM/typesafe/jev-1.14'
         and _hasil_mutu.get('ok') is True)
-    J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.13'
+    J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
