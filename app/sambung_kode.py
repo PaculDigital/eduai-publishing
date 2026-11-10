@@ -56,13 +56,18 @@ _ROMAWI_TUNGGAL = re.compile(r'^[IVXLC]+$', re.I)
 
 
 def tanpa_nomor_halaman(s: str) -> str:
-    """Kupas awalan nomor halaman ("13 BAB I" -> "BAB I").
+    """Kupas awalan nomor halaman ("13 BAB I" -> "BAB I") DAN nomor daftar
+    ("2. BAB II" -> "BAB II").
 
     Dipakai saat MENCARI pola BAB/judul bernomor: nomor halaman menempel
-    di awal baris hasil ekstraksi. Hanya mengupas 1-3 digit di awal baris;
-    teks lain tidak disentuh.
+    di awal baris hasil ekstraksi, nomor daftar menempel di depan judul
+    sistematika. Hanya mengupas awalan; teks lain tidak disentuh.
+    (v6.7: dulu hanya nomor halaman — "2. BAB II ..." lolos dari pagar
+    judul BAB di `sambung_kode`, sehingga stitch menyambung lagi judul
+    + ekor kalimat yang sudah dipisah v6.2.)
     """
-    return re.sub(r'^\d{1,3}\s+', '', (s or '').strip(), count=1)
+    t = re.sub(r'^\d{1,3}\s+', '', (s or '').strip(), count=1)
+    return re.sub(r'^\d+[.)]\s+', '', t, count=1)
 
 
 def akhir_kalimat_nyata(s: str) -> bool:

@@ -800,6 +800,41 @@ def main():
         P._huruf_awal_kecil('1.1. latar belakang') is True
         and P._huruf_awal_kecil('1.1. Latar Belakang') is False)
 
+    # ── 12. v6.7: PERBAIKAN DARI UJI LIVE ───────────────────────────────
+    #    (a) pagar sambung_kode mengupas nomor daftar ("2. BAB II ...").
+    from app.sambung_kode import tanpa_nomor_halaman as _tnh
+    cek('v6.7: tanpa_nomor_halaman kupas nomor daftar juga',
+        _tnh('2. BAB II TINJAUAN PUSTAKA') == 'BAB II TINJAUAN PUSTAKA'
+        and _tnh('13 BAB I') == 'BAB I'
+        and _tnh('1.1 Latar Belakang') == '1.1 Latar Belakang')
+    cek('v6.7: sambung_kode tolak "2. BAB II ..." + "bagian ini..."',
+        _sk6('2. BAB II TINJAUAN PUSTAKA',
+             'bagian ini menjelaskan tentang') is False)
+    cek('v6.7: sambung_kode tolak "3. BAB III ..." + "pada bab ini..."',
+        _sk6('3. BAB III METODOLOGI PENELITIAN',
+             'pada bab ini penulis akan') is False)
+    #    (b) koreksi batas dipersempit: ':' dan baris terpotong (kata polos)
+    #    TIDAK didemosi; yang didemosi hanya awal huruf kecil / lanjutan
+    #    eksplisit (koma).
+    teks_sempit = (
+        'BAB I\nPENDAHULUAN\n'
+        'Hasil uji normalitas disajikan pada tabel berikut:\n'
+        'Berdasarkan kriteria uji normalitas, data dinyatakan berdistribusi normal.\n'
+        'Kalimat pertama yang berlanjut ke baris berikutnya dan masih panjang sekali,\n'
+        'ke baris berikutnya yang jadi kandidat.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    r_sempit = P.petakan_dari_teks(teks_sempit)
+    cek('v6.7: paragraf sesudah pengantar tabel (:) TIDAK didemosi',
+        r_sempit['label'].get(3) == 'paragraf', str(r_sempit['label']))
+    cek('v6.7: lanjutan huruf kecil sesudah koma tetap didemosi',
+        r_sempit['label'].get(5) == 'biasa', str(r_sempit['label']))
+    cek('v6.7: paragraf sesudah kalimat selesai tetap paragraf',
+        r_sempit['label'].get(6) == 'paragraf', str(r_sempit['label']))
+    cek('v6.7: hanya 1 koreksi batas pada teks sempit',
+        r_sempit.get('koreksi_batas_paragraf') == [5],
+        str(r_sempit.get('koreksi_batas_paragraf')))
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))

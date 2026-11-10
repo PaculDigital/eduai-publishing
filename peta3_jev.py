@@ -182,6 +182,21 @@ def _angka_bab(nomor):
     return _ROMAWI_BAB.get(t)
 
 
+# ── KATA GANTUNG (v6.7): kata terakhir baris yang WAJIB diikuti lanjutan
+#    dalam kalimat yang sama. Salinan dari `app/sambung_kode.py` (di sana
+#    dipakai putusan sambung; di sini dipakai koreksi batas paragraf) —
+#    ubah keduanya bila daftar berubah.
+_KATA_GANTUNG = {
+    'dan', 'yang', 'di', 'ke', 'dari', 'untuk', 'dengan', 'atau', 'serta',
+    'dalam', 'pada', 'oleh', 'sebagai', 'adalah', 'bahwa', 'jika', 'karena',
+    'agar', 'supaya', 'yaitu', 'yakni', 'saat', 'ketika', 'sambil', 'tanpa',
+    'antara', 'melalui', 'terhadap', 'kepada', 'demi', 'guna', 'hingga',
+    'sampai', 'sejak', 'sebelum', 'sesudah', 'setelah', 'apabila',
+    'meskipun', 'walaupun', 'namun', 'tetapi', 'sedangkan', 'sementara',
+    'juga', 'pun', 'lah', 'kah', 'tah',
+}
+
+
 def _koreksi_bab_deterministik(baris, label, kand, sistematika, gabung,
                                kode_label):
     """Deteksi BAB oleh KODE (v6) — penanda BAB itu deterministik, jangan
@@ -1221,17 +1236,27 @@ def _petakan_dari_hasil(d, putaran=None):
         boleh[i] = True
 
     # ── v6: KOREKSI BATAS PARAGRAF (deterministik, tanpa Jev) ─────────────
-    #    Paragraf baru tidak bisa mulai di tengah kalimat: bila baris isi
-    #    sebelumnya TIDAK diakhiri tanda akhir kalimat (. ! ? …), kandidat
-    #    'paragraf' ini adalah lanjutan, bukan awal paragraf baru ⇒ 'biasa'.
-    #    Judul sebelumnya (bab/subbab/gabung/kode) dikecualikan — paragraf
-    #    pertama sesudah judul memang baru. Butir daftar bernomor dan baris
-    #    mirip judul huruf besar dikecualikan (batasnya ambigu, jangan tebak).
-    #    Blok sistematika tak disentuh (konsisten dengan Aturan 5).
+    #    Paragraf baru tidak bisa mulai di tengah kalimat — TAPI "tengah
+    #    kalimat" harus dibuktikan sinyal EKSPLISIT, bukan sekadar "baris
+    #    sebelumnya tidak berakhir titik". Terukur live fid=81 (diag 10 Nov):
+    #    25 demosi, ~20 SALAH — baris sebelumnya berakhir ':' (pengantar
+    #    tabel: "...disajikan pada tabel berikut:"), fragmen SPSS
+    #    ("Item-Total Statistics", "a. Dependent Variable: ..."), atau
+    #    baris TERPOTONG ekstraksi ("...terhadap Keberl..."), yang semuanya
+    #    diikuti paragraf baru yang sah. Jadi demosi HANYA bila:
+    #      (a) kandidat diawali huruf KECIL (paragraf tak pernah mulai
+    #          huruf kecil — perluasan Aturan 5 ke paragraf), ATAU
+    #      (b) baris sebelumnya berakhir tanda lanjutan EKSPLISIT: koma,
+    #          titik-koma, kurung buka, strip, atau kata gantung
+    #          (dan/yang/di/ke/...) sebagai kata terakhir.
+    #    Titik-dua ':' TIDAK masuk — itu pengantar tabel/daftar, sesudahnya
+    #    paragraf baru. Judul sebelumnya, butir daftar, dan baris mirip
+    #    judul tetap dikecualikan; blok sistematika tak disentuh.
     koreksi_batas = []
     for i, _t in kand:
         if label.get(i) != 'paragraf' or i in sistematika:
             continue
+        t_ini = baris[i].strip()
         j = i - 1
         while j >= 0 and (not baris[j].strip() or j in d['buang']):
             j -= 1
@@ -1245,7 +1270,12 @@ def _petakan_dari_hasil(d, putaran=None):
             continue
         if sebelum and sebelum == sebelum.upper() and len(sebelum) <= 60:
             continue
-        if not re.search(r'[.!?…]["\')\]]*\s*$', sebelum):
+        lanjut_eksplisit = (
+            sebelum.endswith((',', ';', '(', '-', '\u2013', '\u2014'))
+            or (sebelum.split()
+                and re.sub(r'[^A-Za-z]+$', '',
+                           sebelum.split()[-1].lower()) in _KATA_GANTUNG))
+        if t_ini[:1].islower() or lanjut_eksplisit:
             label[i] = 'biasa'
             koreksi_batas.append(i)
 
