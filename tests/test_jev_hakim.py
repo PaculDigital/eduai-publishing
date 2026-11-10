@@ -754,6 +754,52 @@ def main():
     cek('v6.4: judul BAB sesudah penanda polos tetap bab',
         r_jb['label'].get(1) == 'bab', str(r_jb['label']))
 
+    # ── 11. v6.5: PROFIL KAMPUS — ISTILAH + PENOMORAN ───────────────────
+    cek('v6.5: istilah bawaan kuesioner = kuesioner + angket',
+        PK.istilah().get('kuesioner') == ['kuesioner', 'angket'],
+        str(PK.istilah()))
+    cek('v6.5: penomoran bawaan judul_titik_akhir = False',
+        PK.penomoran().get('judul_titik_akhir') is False,
+        str(PK.penomoran()))
+    cek('v6.5: Aturan 3 buang judul ANGKET (bawaan)',
+        P.dibuang('ANGKET PENELITIAN') is True)
+    cek('v6.5: Aturan 3 buang judul KUESIONER (bawaan)',
+        P.dibuang('KUESIONER PENELITIAN') is True)
+    with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as f:
+        json.dump({'istilah': {'kuesioner': ['kuesioner', 'angket',
+                                             'daftar pertanyaan']},
+                   'penomoran': {'judul_titik_akhir': True},
+                   'kampus': {'KampusX': {'penomoran': {'judul_titik_akhir': False}}}},
+                  f)
+        jalur = f.name
+    os.environ['EDUAI_PROFIL_KAMPUS'] = jalur
+    PK._cache.update({'jalur': None, 'mtime': None, 'isi': None})
+    cek('v6.5: istilah kuesioner dari config (tanpa hardcode)',
+        PK.istilah().get('kuesioner')
+        == ['kuesioner', 'angket', 'daftar pertanyaan'],
+        str(PK.istilah()))
+    cek('v6.5: Aturan 3 buang sebutan config "daftar pertanyaan"',
+        P.dibuang('DAFTAR PERTANYAAN PENELITIAN') is True)
+    cek('v6.5: penomoran judul_titik_akhir dari config = True',
+        PK.penomoran().get('judul_titik_akhir') is True)
+    cek('v6.5: penomoran per kampus boleh mematikan lagi (False)',
+        PK.penomoran('KampusX').get('judul_titik_akhir') is False)
+    cek('v6.5: nomor bertitik "1.1. Latar Belakang" dibaca kode',
+        P._nomor_bertindak_judul('1.1. Latar Belakang') is True)
+    cek('v6.5: judul bertitik akhir dibaca kode bila config True',
+        P._nomor_bertindak_judul('1.1. Latar Belakang.') is True)
+    os.environ.pop('EDUAI_PROFIL_KAMPUS', None)
+    PK._cache.update({'jalur': None, 'mtime': None, 'isi': None})
+    cek('v6.5: sebutan config tidak berlaku sesudah config dilepas',
+        P.dibuang('DAFTAR PERTANYAAN PENELITIAN') is False)
+    cek('v6.5: judul bertitik akhir ditolak bila config bawaan (False)',
+        P._nomor_bertindak_judul('1.1. Latar Belakang.') is False)
+    cek('v6.5: nomor bertitik tetap dibaca kode dengan config bawaan',
+        P._nomor_bertindak_judul('1.1. Latar Belakang') is True)
+    cek('v6.5: huruf awal kecil terkupas dari nomor bertitik',
+        P._huruf_awal_kecil('1.1. latar belakang') is True
+        and P._huruf_awal_kecil('1.1. Latar Belakang') is False)
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))

@@ -363,7 +363,9 @@ def dibuang(s):
     # ATURAN 3 (vonis Bos 09 Okt): judul KUESIONER PENELITIAN = isi LAMPIRAN,
     #   bukan struktur BAB I-V. Konsisten dengan kebijakan lampiran yang sudah
     #   jalan (LAMPIRAN 1-11, DAFTAR LAMPIRAN sudah dibuang).
-    if re.match(r'^\s*(KUESIONER|ANGKET)\b', s, re.I):
+    #   v6: sebutannya dari profil kampus (istilah.kuesioner), bukan hardcode
+    #   — kampus lain boleh memakai "angket" atau sebutan sendiri.
+    if _pola_kuesioner().match(s):
         return True
     if _PEMBUANG.match(s) or _TITIK_ISI.search(s) or POLA_MARKER.match(s):
         return True
@@ -382,7 +384,40 @@ def dibuang(s):
 #    '?' (butir bertanya) atau '.' (kalimat). Yang TIDAK memenuhi syarat
 #    tetap jadi kandidat Jev (mis. "1.1 latar belakang" huruf kecil,
 #    "2. Wawancara" nomor tunggal — kode tak bisa bedakan dari butir daftar).
-_POLA_NOMOR_BERTINGKAT = re.compile(r'^(\d+(?:\.\d+)+)\s+(\S.*)$')
+#    v6: titik sesudah ANGKA ("1.1. Latar Belakang") selalu diterima kode —
+#    itu format penomoran; titik di AKHIR judul ("...Belakang.") hanya
+#    diterima bila profil kampus `penomoran.judul_titik_akhir` = true.
+_POLA_NOMOR_BERTINGKAT = re.compile(r'^(\d+(?:\.\d+)+)\.?\s+(\S.*)$')
+_POLA_KUESIONER_CACHE = {'terms': None, 'pola': None}
+
+
+def _pola_kuesioner():
+    """Pola judul kuesioner/angket dari profil kampus (cache per istilah).
+
+    Gagal baca config ⇒ bawaan ('kuesioner', 'angket') — jangan gagalkan.
+    """
+    try:
+        from app import profil_kampus as _pk
+        terms = tuple((_pk.istilah() or {}).get('kuesioner')
+                      or ('kuesioner', 'angket'))
+    except Exception:
+        terms = ('kuesioner', 'angket')
+    if _POLA_KUESIONER_CACHE.get('terms') != terms:
+        _POLA_KUESIONER_CACHE.update({
+            'terms': terms,
+            'pola': re.compile(
+                r'^\s*(?:%s)\b' % '|'.join(re.escape(t) for t in terms),
+                re.I)})
+    return _POLA_KUESIONER_CACHE['pola']
+
+
+def _judul_titik_akhir_boleh():
+    """True bila profil kampus membolehkan titik di akhir judul bernomor."""
+    try:
+        from app import profil_kampus as _pk
+        return bool((_pk.penomoran() or {}).get('judul_titik_akhir'))
+    except Exception:
+        return False
 
 
 def _ambang(nama, bawaan):
@@ -403,7 +438,7 @@ def _huruf_awal_kecil(s):
     '1.1 latar belakang' = huruf kecil, '1.1 Latar' bukan). Tanpa kupasan
     ini, judul bernomor yang huruf kecil lolos dari Aturan 5 (angka '1'
     bukan huruf kecil — bug terukur 10 Nov 2026)."""
-    t = re.sub(r'^\d+(?:\.\d+)*\s*', '', (s or '').strip())
+    t = re.sub(r'^\d+(?:\.\d+)*\.?\s*', '', (s or '').strip())
     return bool(t) and t[:1].islower()
 
 
@@ -415,7 +450,10 @@ def _nomor_bertindak_judul(s):
     teks = m.group(2)
     if len(s.strip()) > _ambang('subbab_kode_maks_kar', 120):
         return False
-    if teks.endswith('?') or teks.endswith('.'):
+    if teks.endswith('?'):
+        return False
+    # v6: titik akhir judul hanya boleh bila profil kampus mengizinkan.
+    if teks.endswith('.') and not _judul_titik_akhir_boleh():
         return False
     return teks[:1].isupper()
 

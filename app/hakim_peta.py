@@ -224,7 +224,7 @@ def _huruf_awal_kecil(s):
     """True bila HURUF pertama judul huruf kecil (awalan nomor dikupas dulu:
     '1.1 latar belakang' = huruf kecil. Salinan helper di peta3_jev.py —
     hakim tidak boleh mengimpor skrip root)."""
-    t = re.sub(r'^\d+(?:\.\d+)*\s*', '', (s or '').strip())
+    t = re.sub(r'^\d+(?:\.\d+)*\.?\s*', '', (s or '').strip())
     return bool(t) and t[:1].islower()
 
 
