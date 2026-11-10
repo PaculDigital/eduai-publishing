@@ -1441,9 +1441,14 @@ def periksa_mutu(db, file_id: int, teks: str) -> dict:
     keputusan = 'bersih' if not kurang else 'kurang'
     if ragu and not kurang:
         keputusan = 'ragu'
+    #  v8 (10 Nov 2026): label 'model' WAJIB model yang benar-benar melayani.
+    #  Dulu `satpam.MODEL` (env EDUAI_SATPAM_MODEL) — MENIPU, karena panggilan
+    #  di atas lewat `satpam.tanya_bebas_mutu` → `jev.tanya()` tanpa argumen
+    #  model, jadi selalu `jev.MODEL_DEFAULT` (bawaan 1.13).
+    from . import jev as _jev
     return {'ok': True, 'keputusan': keputusan, 'ada': ada,
             'kurang': kurang, 'ragu': ragu, 'skor': skor,
-            'detik': round(detik, 2), 'model': satpam.MODEL,
+            'detik': round(detik, 2), 'model': _jev.MODEL_DEFAULT,
             'alasan': (f'Jev periksa {len(ada)} poin: {len(kurang)} kurang, '
                        f'{len(ragu)} perlu diperiksa')}
 
