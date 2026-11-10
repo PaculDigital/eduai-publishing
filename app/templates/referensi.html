@@ -218,7 +218,7 @@ details.nota-mutu summary:hover{color:var(--hijau)}
     <!-- BAGIAN 1: cari otomatis AI -->
     <div class="bagian">
       <h2>{{ ikon('sparkles', 18) }} Pilihan EduAi</h2>
-      <p>EduAi mencarikan artikel untukmu. Pilihanmu tetap utuh.</p>
+      <p>EduAi mencarikan artikel untukmu. Pilihanmu tetap utuh. Setiap bantuan AI di sini biaya 1 Token Revisi.</p>
       <label for="naskah-ai">Naskah</label>
       <select id="naskah-ai"></select>
       <label for="bab-ai">Untuk BAB</label>
@@ -233,10 +233,10 @@ details.nota-mutu summary:hover{color:var(--hijau)}
             EduAi petakan judul naskah jadi kata kunci; user tetap bisa
             ubah/hapus. Keputusan akhir di user. -->
       <button class="tombol-samar" id="btn-bantu" onclick="bantuIsi()">
-        {{ ikon('sparkles', 15) }} EduAi bantu isi</button>
+        {{ ikon('sparkles', 15) }} EduAi bantu isi (1 Token Revisi)</button>
       <div id="bantu-info" class="bantu-info" hidden></div>
       <div id="bantu-chip" class="bantu-chip" hidden></div>
-      <button class="tombol" id="btn-ai" onclick="cariAI()">{{ ikon('sparkles', 16) }} Carikan artikel</button>
+      <button class="tombol" id="btn-ai" onclick="cariAI()">{{ ikon('sparkles', 16) }} Carikan artikel (1 Token Revisi)</button>
     </div>
 
     <!-- BAGIAN 2: cari sendiri (2× tanpa Token / minggu, lalu 1 Token) -->
@@ -548,19 +548,19 @@ async function gambarKesempatan(){
   }catch(_){ /* diamkan — bukan hal fatal */ }
 }
 
-async function cariAI(berbayar){
+async function cariAI(){
   const fid = $('naskah-ai').value, bab = $('bab-ai').value, kk = $('kk-ai').value.trim();
   if(!fid){ pesan('Belum ada naskah ya.', 'tidak'); return; }
   if(!kk){ pesan('Isi kata kuncinya dulu ya.', 'tidak'); return; }
   const b = $('btn-ai'); b.disabled = true; b.innerHTML = IKON('sparkles',16) + ' Mencari…';
   pesan('EduAi sedang mencarikan artikel untukmu…', 'ya');
-  //  10Nov26 (putusan Boss 11:01): pencarian AI lewat TAWARAN
-  //  (berbayar) memotong 1 Token Revisi. Tombol biasa tetap gratis.
-  let jalur = 'cari-ai?file_id='+fid+'&bab='+encodeURIComponent(bab)
+  //  10Nov26 11:22 (putusan Boss): SEMUA jalur AI Referensi biaya
+  //  1 Token Revisi per pemakaian, dipotong server sebelum AI jalan.
+  //  Tombol biasa maupun tawaran sesudah manual gagal sama biayanya.
+  const jalur = 'cari-ai?file_id='+fid+'&bab='+encodeURIComponent(bab)
     +'&kata_kunci='+encodeURIComponent(kk);
-  if(berbayar){ jalur += '&pakai_token=1'; }
   const j = await api(jalur, {method:'POST'});
-  b.disabled = false; b.innerHTML = IKON('sparkles',16) + ' Carikan artikel';
+  b.disabled = false; b.innerHTML = IKON('sparkles',16) + ' Carikan artikel (1 Token Revisi)';
   pesan(j.pesan || ('Dapat ' + (j.baru||0) + ' artikel'
         + (j.token_dipotong ? ' (1 Token Revisi)' : '') + '.'), j.ok?'ya':'tidak');
   if(j.ok){ $('kk-man').value = kk; gambarDaftar(j); gambarJatah(j.jatah); }
@@ -586,12 +586,14 @@ async function bantuIsi(){
   let q = 'kata-kunci-ai?file_id=' + encodeURIComponent(fid);
   if(judul){ q += '&judul=' + encodeURIComponent(judul); }
   const j = await api(q, {method:'POST'});
-  b.disabled = false; b.innerHTML = IKON('sparkles',15) + ' EduAi bantu isi';
+  b.disabled = false; b.innerHTML = IKON('sparkles',15) + ' EduAi bantu isi (1 Token Revisi)';
   if(!j.ok){ pesan(j.pesan || 'Belum bisa dibaca.', 'tidak'); return; }
   $('kk-ai').value = j.usul || '';
+  //  10Nov26 11:22: bantuan ini memakai 1 Token Revisi per tekan,
+  //  walau kata kuncinya ketemu lewat daftar EduAi.
   info.textContent = (j.sumber_kata_kunci === 'kamus')
-    ? 'Kata kunci ini diambil dari daftar EduAi (cepat & tanpa biaya). Silakan ubah kalau perlu.'
-    : 'Kata kunci ini disusun EduAi dari judul naskahmu. Silakan ubah kalau perlu.';
+    ? 'Kata kunci ini diambil dari daftar EduAi. Bantuan ini memakai 1 Token Revisi. Silakan ubah kalau perlu.'
+    : 'Kata kunci ini disusun EduAi dari judul naskahmu. Bantuan ini memakai 1 Token Revisi. Silakan ubah kalau perlu.';
   info.hidden = false;
   (j.konsep || []).forEach(function(k){
     const s = document.createElement('span');
@@ -647,7 +649,7 @@ async function cobaDenganAI(){
   if($('naskah-man').value){ $('naskah-ai').value = $('naskah-man').value; }
   if($('bab-man').value){ $('bab-ai').value = $('bab-man').value; }
   KK_TAWARAN = '';
-  cariAI(true);
+  cariAI();
 }
 
 async function tambahManual(){

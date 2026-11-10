@@ -1,7 +1,7 @@
 """RUTE JURNAL & PENCARIAN REFERENSI (ACC Bos 06Okt26 — langkah 5).
 
 PINTU API untuk fitur 2 jalur:
-  · Auto AI  : cari artikel + simpan per bab (GRATIS sampai kerangka)
+  · Auto AI  : cari artikel + simpan per bab (1 Token Revisi/pemakaian)
   · Manual   : cari sendiri (2× gratis/7hari, lewat itu 1 Token Revisi)
   · Unduh    : PDF open-access → workspace user
 
@@ -369,21 +369,23 @@ async def cari(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  3. CARI AUTO AI, GRATIS dari tombol biasa (putusan Bos 06Okt26),
-#     BERBAYAR 1 Token Revisi hanya lewat tawaran (putusan Bos 10Nov26)
+#  3. CARI AUTO AI, SELALU 1 Token Revisi (putusan Bos 10Nov26 11:22)
+#     Berlaku di SEMUA jalur: tombol "Carikan artikel" langsung maupun
+#     tawaran sesudah pencarian manual gagal. Tidak ada jalur AI gratis
+#     lagi di Referensi (putusan 06Okt26 yang menggratiskan tombol
+#     biasa DICABUT keputusan ini).
 # ══════════════════════════════════════════════════════════════════════
 @router.post('/cari-ai')
 async def cari_ai(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
-                  paksa: bool = False, pakai_token: bool = False,
+                  paksa: bool = False,
                   u: User = Depends(wajib_login_api),
                   db: Session = Depends(get_db)) -> dict[str, Any]:
     """Pencarian OTOMATIS oleh AI, jalan saat tombol ditekan.
 
-    Tombol "Carikan artikel" biasa tetap GRATIS (tidak memakai jatah
-    manual). Hanya pencarian lewat TAWARAN di layar sesudah pencarian
-    manual 0 hasil (`pakai_token=1`) yang memotong 1 Token Revisi,
-    sekali, sebelum AI jalan. Token DIKEMBALIKAN bila AI tidak bisa
-    memetakan kata kunci atau tidak ada hasil.
+    Tarif: SELALU 1 Token Revisi per pemakaian, dipotong SEKALI sebelum
+    AI jalan (tidak ada potong ganda: tawaran sesudah manual gagal hanya
+    memanggil rute ini sekali). Token DIKEMBALIKAN bila AI tidak bisa
+    memetakan kata kunci, tidak ada hasil, atau pencarian gagal.
 
     ⭐ 13Okt26 (putusan Bos 2A): `pakai_ai=True` ⇒ kalau KAMUS tidak
     mengenali kata kunci, AI memetakan dulu (1 panggilan). Kalau AI pun
@@ -395,23 +397,24 @@ async def cari_ai(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
         raise HTTPException(400, detail={'ok': False,
                                         'pesan': 'Isi kata kuncinya dulu ya.'})
 
-    #  ── 10Nov26: potong 1 Token Revisi HANYA bila lewat tawaran ──
-    berbayar = bool(pakai_token)
+    #  ── 10Nov26 11:22: potong 1 Token Revisi di SEMUA jalur AI ──
     token_ai = 0
-    if berbayar:
-        from . import kuota as _kuota_ai
-        try:
-            potong = _kuota_ai.potong_banyak(db, u, _jatah.HARGA_TOKEN,
-                                             jenis_addon='ai')
-            token_ai = int(potong.get('dipotong') or 0)
-        except HTTPException as e:
-            #  402 dari dompet → teruskan pesan hangat + tawaran AddOn
-            if getattr(e, 'status_code', None) == 402:
-                return {'ok': False, 'kode': 'saldo_kurang',
-                        'tawarkan': 'ADDON',
-                        'pesan': _jatah.pesan_tidak_cukup_saldo(),
-                        'jatah': _jatah.ringkas(db, u.id)}
-            raise
+    from . import kuota as _kuota_ai
+    try:
+        potong = _kuota_ai.potong_banyak(db, u, _jatah.HARGA_TOKEN,
+                                         jenis_addon='ai')
+        token_ai = int(potong.get('dipotong') or 0)
+    except HTTPException as e:
+        #  402 dari dompet → teruskan pesan hangat + tawaran AddOn;
+        #  403 (paket gratis tidak boleh beli AddOn) → tawaran UPGRADE.
+        if getattr(e, 'status_code', None) in (402, 403):
+            det = getattr(e, 'detail', None) or {}
+            return {'ok': False, 'kode': 'saldo_kurang',
+                    'tawarkan': det.get('tawarkan', 'ADDON'),
+                    'pesan': det.get('pesan')
+                             or _jatah.pesan_tidak_cukup_saldo(),
+                    'jatah': _jatah.ringkas(db, u.id)}
+        raise
 
     def _kembali_ai():
         if token_ai:
@@ -475,8 +478,7 @@ async def cari_ai(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
                           'atau pakai kata kunci Indonesia untuk jurnal '
                           'dalam negeri (Garuda).')
                          + (' Tokenmu dikembalikan ya.' if token_ai
-                            else ' Pencarian ini gratis, '
-                                 'tidak mengurangi jatahmu.')}
+                            else '')}
 
     data = _jurnal.tambah(_jurnal.baca(prof), bab, dapat, asal='ai')
     _jurnal.tulis(prof, data)
@@ -486,7 +488,7 @@ async def cari_ai(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
         'artikel': _jurnal.daftar(data, bab),
         'baru': len(dapat), 'info': hasil.get('info'),
         'sumber_kata_kunci': hasil.get('sumber_kata_kunci', ''),
-        'gratis': not berbayar,
+        'gratis': False,
         'token_dipotong': token_ai,
         'sisa_slot_manual': _jurnal.sisa_slot_manual(data, bab),
         'jatah': _jatah.ringkas(db, u.id),
@@ -505,7 +507,13 @@ async def kata_kunci_ai(bab: str = '1', judul: str = '', file_id: int = 0,
     bisa mengubahnya — keputusan akhir tetap di user (putusan Bos: user
     lebih memegang kendali).
 
-    TIDAK menyimpan apa pun & TIDAK memotong jatah.
+    Tarif: SELALU 1 Token Revisi per pemakaian (putusan Bos 10Nov26
+    11:22, AI selalu 1 token di semua jalur). Tombol ini adalah jalur
+    bantuan AI, jadi biayanya per TEKAN tombol, walau kata kunci
+    akhirnya ketemu lewat kamus (kamus hanya langkah cepat pertama di
+    dalam jalur ini, bukan jalur gratis terpisah). Token dipotong
+    SEBELUM pemetaan jalan dan DIKEMBALIKAN bila pemetaan gagal.
+    TIDAK menyimpan apa pun.
     """
     from . import pustaka as _pustaka
     t = (judul or '').strip()
@@ -522,6 +530,31 @@ async def kata_kunci_ai(bab: str = '1', judul: str = '', file_id: int = 0,
     if not t:
         return {'ok': False, 'pesan': 'Tulis judulnya dulu ya, atau pilih '
                                       'naskah supaya EduAi bisa membacanya.'}
+
+    #  ── 10Nov26 11:22: potong 1 Token Revisi per pemakaian ──
+    token_bantu = 0
+    from . import kuota as _kuota_bantu
+    try:
+        potong = _kuota_bantu.potong_banyak(db, u, _jatah.HARGA_TOKEN,
+                                            jenis_addon='ai')
+        token_bantu = int(potong.get('dipotong') or 0)
+    except HTTPException as e:
+        #  402 dari dompet → pesan hangat + tawaran AddOn;
+        #  403 (paket gratis tidak boleh beli AddOn) → tawaran UPGRADE.
+        if getattr(e, 'status_code', None) in (402, 403):
+            det = getattr(e, 'detail', None) or {}
+            return {'ok': False, 'kode': 'saldo_kurang',
+                    'tawarkan': det.get('tawarkan', 'ADDON'),
+                    'pesan': det.get('pesan')
+                             or _jatah.pesan_tidak_cukup_saldo(),
+                    'jatah': _jatah.ringkas(db, u.id)}
+        raise
+
+    def _kembali_bantu():
+        if token_bantu:
+            from . import kuota as _kuota_kembali
+            _kuota_kembali.kembalikan_banyak(db, u, token_bantu)
+
     #  ⚠️ 13Okt26 — WAJIB jalur `_async` + `await` (pola resmi proyek,
     #     sama seperti belajar.py:570). Memakai jalur sinkron di dalam
     #     rute ⇒ `asyncio.run` di event loop hidup = SELALU gagal.
@@ -533,13 +566,20 @@ async def kata_kunci_ai(bab: str = '1', judul: str = '', file_id: int = 0,
             sumber = 'ai' if kw.get('konsep') else ''
     except Exception as e:                                    # noqa: BLE001
         log.warning('[jurnal] bantu isi kata kunci gagal: %s', e)
-        return {'ok': False, 'pesan': 'Sedang sibuk, coba lagi sebentar ya.'}
+        _kembali_bantu()
+        db.commit()
+        return {'ok': False, 'pesan': 'Sedang sibuk, coba lagi sebentar ya.',
+                'token_dikembalikan': token_bantu}
 
     if not kw.get('konsep'):
+        _kembali_bantu()
+        db.commit()
         return {'ok': False, 'kode': 'tidak_dipetakan',
+                'token_dikembalikan': token_bantu,
                 'pesan': ('EduAi belum bisa memetakan judul ini. Coba tulis '
                           'kata kuncinya sendiri di kotak di atas — '
-                          'sebut variabelnya langsung.')}
+                          'sebut variabelnya langsung.')
+                         + (' Tokenmu dikembalikan ya.' if token_bantu else '')}
 
     #  Usul 1 baris siap-tempel + daftar konsep (bisa user ubah/hapus)
     return {'ok': True, 'judul': t, 'sumber_kata_kunci': sumber,
@@ -548,7 +588,8 @@ async def kata_kunci_ai(bab: str = '1', judul: str = '', file_id: int = 0,
                         'en': x.get('en') or [],
                         'id': x.get('id') or []} for x in kw['konsep']],
             'q_scopus': kw.get('q_scopus', ''),
-            'gratis': True}
+            'gratis': False,
+            'token_dipotong': token_bantu}
 
 
 # ══════════════════════════════════════════════════════════════════════
