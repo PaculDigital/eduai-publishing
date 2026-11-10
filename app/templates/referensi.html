@@ -144,6 +144,14 @@ details.nota-mutu summary:hover{color:var(--hijau)}
 .baris-simpan select{flex:1;min-width:180px;padding:7px 9px;font-size:13px;
   border:1px solid var(--garis);border-radius:9px;background:#fff}
 .baris-simpan .kaki{flex-basis:100%;margin-top:0}
+/*  ── FILTER HASIL (10Nov26): saring daftar yang SUDAH terkumpul,
+    di sisi browser saja, tanpa memanggil server lagi ── */
+.baris-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
+  background:#fff;border:1px solid var(--garis);border-radius:12px;
+  padding:12px 14px;margin-bottom:14px}
+.baris-filter label{font-size:12.5px;font-weight:600;color:var(--teks-abu)}
+.baris-filter select{padding:7px 9px;font-size:13px;
+  border:1px solid var(--garis);border-radius:9px;background:#fff}
 /* ── PAKAI ULANG ANTAR BAB (13Okt26) ── */
 .lencana.pakai{background:#EEF2FF;color:#1D4ED8}
 .pakai-kotak{background:#fff;border:1.5px solid var(--hijau);border-radius:14px;
@@ -298,6 +306,25 @@ details.nota-mutu summary:hover{color:var(--hijau)}
       <b>Link Jurnal.txt</b> berisi tautan semua artikelmu — bisa dibuka,
       diunduh, dan kalau dihapus bisa dibuat lagi kapan saja.</div>
   </div>
+  <!--  ── FILTER HASIL (10Nov26): Tahun + Sitasi minimal, menyaring
+        daftar yang sudah terkumpul di bawah, tanpa memanggil server ── -->
+  <div class="baris-filter" id="baris-filter">
+    <label for="filter-tahun">Tahun</label>
+    <select id="filter-tahun" onchange="terapkanFilter()">
+      <option value="semua">Semua tahun</option>
+      <option value="2024-2026">2024-2026</option>
+      <option value="2021-2023">2021-2023</option>
+      <option value="2019-2020">2019-2020</option>
+    </select>
+    <label for="filter-sitasi">Sitasi minimal</label>
+    <select id="filter-sitasi" onchange="terapkanFilter()">
+      <option value="0">Semua</option>
+      <option value="1">Dikutip 1 kali atau lebih</option>
+      <option value="10">Dikutip 10 kali atau lebih</option>
+      <option value="50">Dikutip 50 kali atau lebih</option>
+    </select>
+    <button class="mini" onclick="aturUlangFilter()">Atur ulang</button>
+  </div>
   <div id="daftar"><div class="kosong"><b>Belum ada artikel</b>
     Cari pakai salah satu cara di atas ya.</div></div>
 
@@ -444,11 +471,51 @@ function kartuArtikel(a){
     ${blokAbs}</div>`;
 }
 
-function gambarDaftar(j){
+/*  ── FILTER HASIL (10Nov26): simpan daftar terakhir, saring di
+    browser saja. `simpan=false` dipakai saat menggambar hasil saring
+    supaya daftar penuhnya tidak hilang. ── */
+let DAFTAR_TERKINI = [];
+let BAB_SAAT_INI = '';
+function gambarDaftar(j, simpan){
+  if(simpan !== false && j.artikel){
+    DAFTAR_TERKINI = j.artikel;
+    BAB_SAAT_INI = j.bab || BAB_SAAT_INI;
+  }
   $('daftar').innerHTML = (j.artikel && j.artikel.length)
     ? j.artikel.map(kartuArtikel).join('')
     : `<div class="kosong"><b>Belum ada artikel untuk ${j.bab || 'bab ini'}</b>
          Cari pakai salah satu cara di atas ya.</div>`;
+}
+
+function terapkanFilter(){
+  const th = $('filter-tahun') ? $('filter-tahun').value : 'semua';
+  const minSit = parseInt(($('filter-sitasi') ? $('filter-sitasi').value : '0') || '0', 10);
+  let awal = 0, akhir = 9999;
+  if(th !== 'semua'){
+    const p = th.split('-');
+    awal = parseInt(p[0], 10); akhir = parseInt(p[1], 10);
+  }
+  const cocok = (DAFTAR_TERKINI || []).filter(function(a){
+    const tahun = parseInt(a.year || 0, 10);
+    if(th !== 'semua' && (!tahun || tahun < awal || tahun > akhir)){ return false; }
+    const sit = parseInt(a.cited_by_count || 0, 10);
+    if(sit < minSit){ return false; }
+    return true;
+  });
+  if(cocok.length){
+    gambarDaftar({artikel: cocok, bab: BAB_SAAT_INI}, false);
+  } else if((DAFTAR_TERKINI || []).length){
+    $('daftar').innerHTML = `<div class="kosong"><b>Tidak ada artikel yang cocok dengan filter ini</b>
+      Ubah tahun atau sitasi minimalnya ya.</div>`;
+  } else {
+    gambarDaftar({artikel: [], bab: BAB_SAAT_INI}, false);
+  }
+}
+
+function aturUlangFilter(){
+  if($('filter-tahun')){ $('filter-tahun').value = 'semua'; }
+  if($('filter-sitasi')){ $('filter-sitasi').value = '0'; }
+  gambarDaftar({artikel: DAFTAR_TERKINI, bab: BAB_SAAT_INI}, false);
 }
 
 async function muat(bab){

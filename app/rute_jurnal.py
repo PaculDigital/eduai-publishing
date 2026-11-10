@@ -317,13 +317,52 @@ async def cari(file_id: int = 0, bab: str = '1', kata_kunci: str = '',
             raise
 
     #  ── Cari lewat SATU mesin resmi ──
+    #  10Nov26: kata kunci yang TIDAK ada di kamus (mis. "pemasaran")
+    #  dulu langsung 0 hasil karena sumber tidak pernah dipanggil.
+    #  Sekarang, kalau kamus tidak mengenali, petakan dulu lewat AI
+    #  (pola yang sama seperti /cari-ai, 1 panggilan, AI hanya menyusun
+    #  kata kunci, artikel tetap dari mesin nyata + audit DOI).
+    #  Kalau AI juga tidak bisa memetakan, jawab jujur di bawah dan
+    #  token dikembalikan seperti pencarian 0 hasil biasa.
     prof = _profil_atau_buat(db, fb.id, u.id)
+    _kw_awal = None
     try:
-        hasil = _jurnal.cari_untuk_bab('', bab, kk, maks=20)
-    except Exception as e:                                    # noqa: BLE001
-        log.warning('[jurnal] pencarian gagal: %s', e)
-        hasil = {'ok': False, 'pesan': 'Pencarian gagal, coba lagi ya.',
-                 'artikel': []}
+        from . import pustaka as _pustaka_cari
+        _kw_awal = _pustaka_cari.kata_kunci(kk)
+    except Exception:                                         # noqa: BLE001
+        _kw_awal = None
+    if _kw_awal is not None and not _kw_awal.get('konsep'):
+        _kw_ai: dict = {'konsep': []}
+        try:
+            from . import pustaka as _pustaka_ai
+            _kw_ai = await _pustaka_ai.kata_kunci_ai_async(kk)
+        except Exception as e:                                # noqa: BLE001
+            log.warning('[jurnal] petakan kata kunci gagal: %s', e)
+            _kw_ai = {'konsep': []}
+        if not _kw_ai.get('konsep'):
+            if token_terpotong:
+                from . import kuota as _kuota_ai
+                _kuota_ai.kembalikan_banyak(db, u, token_terpotong)
+            db.commit()
+            return {'ok': False, 'kode': 'tidak_dipetakan',
+                    'pesan': ('EduAi belum bisa memetakan kata kunci ini. '
+                              'Coba tulis kata kuncinya lebih spesifik, '
+                              'misalnya sebut variabelnya langsung.'),
+                    'token_dikembalikan': token_terpotong,
+                    'jatah': _jatah.ringkas(db, u.id)}
+        try:
+            hasil = _jurnal.cari_untuk_bab_konsep(_kw_ai, kk, bab, maks=20)
+        except Exception as e:                                # noqa: BLE001
+            log.warning('[jurnal] pencarian gagal: %s', e)
+            hasil = {'ok': False, 'pesan': 'Pencarian gagal, coba lagi ya.',
+                     'artikel': []}
+    else:
+        try:
+            hasil = _jurnal.cari_untuk_bab('', bab, kk, maks=20)
+        except Exception as e:                                # noqa: BLE001
+            log.warning('[jurnal] pencarian gagal: %s', e)
+            hasil = {'ok': False, 'pesan': 'Pencarian gagal, coba lagi ya.',
+                     'artikel': []}
 
     #  ── Gagal / 0 hasil → token DIKEMBALIKAN (pagar anti-rugi) ──
     dapat = hasil.get('artikel') or []

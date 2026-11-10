@@ -177,6 +177,16 @@ async def halaman_referensi(request: Request,
     })
 
 
+#  📚 REFERENSI BARU (10Nov26): alamat /referensi/baru tidak pernah punya
+#  rute, jadi dibuka langsung selalu 404. Tambah artikel sendiri sudah
+#  ada di halaman /referensi, jadi alamat ini dialihkan ke sana saja.
+@_router_kolaborasi.get('/referensi/baru', response_class=HTMLResponse)
+async def halaman_referensi_baru(request: Request,
+                                 db: Session = Depends(get_db)):
+    _wajib_login_kolab(request, db)
+    return RedirectResponse('/referensi', status_code=303)
+
+
 #  🔍 UJI PLAGIARISME (ACC Bos 16 Okt 2026) — tab ke-6: uji kemiripan naskah.
 #  ⚠️ PETA LAPIS (putusan Bos: "sebut jumlah lapis sebelum ngoding"):
 # ══════════════════════════════════════════════════════════════════════════
