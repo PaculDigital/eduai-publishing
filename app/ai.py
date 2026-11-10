@@ -4428,6 +4428,24 @@ async def peta_mulai(
                 #  user kalau naskahnya pecah. Tidak mengubah bentuk lama.
                 if _mutu_rusak:
                     hasil['mutu'] = _m
+                #  ── HAKIM v2 (10 Nov 2026) — LOG SAJA, tidak mengubah label
+                #     atau bentuk balasan. Kill-switch: EDUAI_HAKIM_AKTIF=0.
+                try:
+                    from . import hakim_peta as _hakim
+                    if _hakim.aktif():
+                        _lap_hakim = _hakim.periksa_peta(_peta_surveyor)
+                        log.info('[peta] hakim: %s', _lap_hakim.get('alasan'))
+                        hasil['hakim'] = {
+                            'jumlah_sepakat': _lap_hakim.get('jumlah_sepakat'),
+                            'jumlah_ragu': _lap_hakim.get('jumlah_ragu'),
+                            'jumlah_curiga': _lap_hakim.get('jumlah_curiga'),
+                            'jumlah_belum': _lap_hakim.get('jumlah_belum'),
+                            'alasan': _lap_hakim.get('alasan'),
+                            'bagian_curiga': [b for b in _lap_hakim.get('bagian', [])
+                                            if b.get('status') == 'curiga'],
+                        }
+                except Exception as e:                              # noqa: BLE001
+                    log.warning('[peta] hakim dilewati: %s: %s', type(e).__name__, e)
                 if body.get('file_id'):
                     try:
                         if prof is None:

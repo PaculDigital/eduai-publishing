@@ -331,10 +331,20 @@ def _deteksi_bagian(teks: str) -> list[dict]:
         peta = None
         try:
             from .peta_jembatan import dari_surveyor as _jembatan
-            peta = _jembatan(_surveyor_teks(bersih), bersih)
+            _ps = _surveyor_teks(bersih)
+            peta = _jembatan(_ps, bersih)
             if peta:
                 log.info('[versi] _deteksi_bagian: jalur JEV (%d bagian)',
                          len(peta))
+                #  ── HAKIM v2 (10 Nov 2026) — LOG SAJA, tidak mengubah peta.
+                #     Kill-switch: EDUAI_HAKIM_AKTIF=0.
+                try:
+                    from . import hakim_peta as _hakim
+                    if _hakim.aktif() and _ps:
+                        _lh = _hakim.periksa_peta(_ps)
+                        log.info('[versi] hakim: %s', _lh.get('alasan'))
+                except Exception as e:                            # noqa: BLE001
+                    log.info('[versi] hakim dilewati (%s)', e)
             else:
                 peta = None
         except Exception as e:                                # noqa: BLE001
