@@ -1069,6 +1069,72 @@ def main():
         and _hasil_mutu.get('ok') is True)
     J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
 
+    # ── 9. v8-aturan: JOIN B-HURUF-KECIL (stitch deterministik) ─────────
+    #    Terukur 11 Nov 2026: 1.267/1.877 pasangan stitch fid=112 dan
+    #    906/1.431 fid=115 adalah B-huruf-kecil; live 1.14 Jev sendiri
+    #    menggabungkan 98,0% / 97,4% pasangan itu. Aturan ini membuat
+    #    deterministik apa yang Jev hampir selalu lakukan — bukan tebakan
+    #    baru. (RULE_VERSION naik ke v8; cache lama kedaluwarsa otomatis.)
+    from app.sambung_kode import sambung_kode as _sk8
+    from app.sambung_kode import _judul_pendek as _jp8
+    cek('v8-aturan: B huruf kecil = lanjutan ("Ekonomi" + "dan ...")',
+        _sk8('Ekonomi',
+             'dan Industri Nasional (KEIN) bekerja sama untuk mendorong')
+        is True)
+    cek('v8-aturan: B huruf kecil = lanjutan (fragmen satu kata)',
+        _sk8('muslim', 'pada') is True
+        and _sk8('fashion', 'muslim') is True)
+    cek('v8-aturan: B huruf kecil = lanjutan (kalimat terbelah panjang)',
+        _sk8('Manfaat praktis dalam penelitian ini adalah dapat membantu',
+             'wirausahawan membuat keputusan yang lebih tepat mengenai')
+        is True)
+    cek('v8-aturan: B huruf kecil = lanjutan (kata terbelah "Turn"+"around")',
+        _sk8('Strategi Turn', 'around') is None)
+    cek('v8-aturan: A judul pendek ALL-CAPS tetap ditanya Jev',
+        _sk8('KESIMPULAN', 'dari hasil penelitian tersebut') is None)
+    cek('v8-aturan: B penanda butir tetap ditanya Jev ("e. ...")',
+        _sk8('(Mahardhani,2023)', 'e. Positive Word-of-Mouth') is None)
+    cek('v8-aturan: B penanda butir tetap ditanya Jev ("b) ...")',
+        _sk8('63', 'b) Editing Data') is None)
+    cek('v8-aturan: B penanda butir tetap ditanya Jev ("c. ...")',
+        _sk8('b. Rating 2 = Netral', 'c. Rating 3 = Penting') is None)
+    cek('v8-aturan: SKIP lama tetap menang atas JOIN baru (subbab bernomor)',
+        _sk8('1.1 Latar Belakang',
+             'bagian ini menjelaskan tentang') is False)
+    cek('v8-aturan: _judul_pendek kenali judul, bukan fragmen',
+        _jp8('Strategi Turn') is True
+        and _jp8('KESIMPULAN') is True
+        and _jp8('Islam Malang') is True
+        and _jp8('Ekonomi') is False
+        and _jp8('45') is False
+        and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
+    P8 = _muat_peta3()
+    cek('v8-aturan: RULE_VERSION kini jev-peta-v8',
+        P8.RULE_VERSION == 'jev-peta-v8')
+    # NUL: artefak PDF fid=112 (103 NUL di teks bersih) — dibuang di susun.
+    FakeKonversi.mode = 'normal'
+    teks_nul = ('BAB I\nPENDAHULUAN\n'
+                'Kalimat dengan\x00 NUL di tengah dan cukup panjang untuk lolos saringan baris pendek.\n'
+                'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n')
+    d_nul = P._susun_dari_bersih(teks_nul)
+    cek('v8-aturan: byte NUL dibuang dari baris susun',
+        not any('\x00' in b for b in d_nul['baris']),
+        str(d_nul['baris']))
+    # stitch lintas-kosong B-huruf-kecil: diputuskan KODE, tanpa Jev.
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.panggilan.clear()
+    teks_lintas_kecil = ('Kalimat pertama yang belum selesai\n\n'
+                         'dan berlanjut di baris berikut ini.\n'
+                         'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n')
+    hasil_lk = P._stitch_baris(teks_lintas_kecil,
+                               tanya_fn=FAKE_SATPAM.tanya_bebas_mutu)
+    cek('v8-aturan: stitch lintas-kosong B-huruf-kecil tersambung',
+        'Kalimat pertama yang belum selesai dan berlanjut di baris berikut ini.'
+        in hasil_lk)
+    cek('v8-aturan: pasangan B-huruf-kecil TIDAK ditanya ke Jev',
+        FAKE_SATPAM.panggilan == [],
+        str(FAKE_SATPAM.panggilan))
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))

@@ -34,7 +34,10 @@ log = logging.getLogger(__name__)
 #    (kode, bukan Jev), profil kampus istilah + penomoran titik akhir.
 #    v6.7: kupas nomor daftar di pagar judul BAB; batas paragraf hanya
 #    untuk lanjutan eksplisit. v6.8: gabung fragmen 1-2 huruf.
-RULE_VERSION = 'jev-peta-v7'
+#    v8 (11 Nov 2026): sambung_kode JOIN B-huruf-kecil (deterministik,
+#    terukur live Jev sendiri gabung 97-98% pasangan itu) + buang byte
+#    NUL di _susun_dari_bersih (artefak PDF fid=112: 103 NUL).
+RULE_VERSION = 'jev-peta-v8'
 
 # ── SAKLAR (env, tanpa ubah kode) ────────────────────────────────────────
 #    EDUAI_JEV_STITCH=0      ⇒ matikan pass-1 stitch (susun cara lama)
@@ -965,6 +968,11 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     if pakai_stitch is None:
         pakai_stitch = _stitch_aktif()
     teks_asal = bersih            # sidik cache dihitung dari teks SEBELUM stitch
+    # ── v8: buang byte NUL (artefak ekstraksi PDF — terukur fid=112: 103
+    #    NUL di teks bersih). NUL bukan isi: ia merusak cek huruf awal
+    #    (t[:1] bukan huruf) sehingga Aturan 5 / koreksi_batas /
+    #    sambung_kode salah baca baris. Sidik cache tetap dari teks_asal.
+    bersih = (bersih or '').replace('\x00', '')
     # ── v5: perbaiki teks pecah per huruf ("D i n a m i k a") SEBELUM
     #    stitch/pisah-judul — supaya kata utuh dikenali semua aturan.
     #    Rangkaian yang tidak aman dibiarkan (lihat app/sambung_kode).

@@ -77,7 +77,16 @@ def _awal_kalimat(s):
     if kata[0][:1].islower():
         if kata[0].lower() in _KATA_PENGHUBUNG_JUDUL:
             sisa = kata[1:]
-            if sisa and all(w[:1].isupper() for w in sisa[:3]):
+            # Lanjutan JUDUL bila kata sesudah penghubung SEMUA Title
+            # Case (penghubung di tengah judul tidak dihitung). Jendela
+            # 4 kata (v8, 11 Nov 2026): kalimat "dan Industri Nasional
+            # (KEIN) bekerja ..." punya kata huruf kecil ke-4 ("bekerja")
+            # — jendela 3 salah mengiranya judul (terukur pasangan stitch
+            # fid=112). Judul lanjutan "dan Tujuan Penelitian" (2 kata)
+            # tetap False di jendela 4.
+            if sisa and all(
+                    w[:1].isupper() or w.lower() in _KATA_PENGHUBUNG_JUDUL
+                    for w in sisa[:4]):
                 return False
             return True
         return True
@@ -87,6 +96,34 @@ def _awal_kalimat(s):
     return len(kata) >= 3 and len(kecil) >= 2
 _POLA_NOMOR_JUDUL = re.compile(r'^\d+(?:\.\d+)*\.?\s+\S')
 _ROMAWI_TUNGGAL = re.compile(r'^[IVXLC]+$', re.I)
+# ── v8: penanda butir daftar ("d) ...", "e. ...", "ii. ..."). Butir daftar
+#    DINILAI paragraf baru (label kebenaran dasar 11 Nov 2026: 8/8 baris
+#    huruf-kecil yang benarnya paragraf adalah butir) — jadi B butir
+#    TIDAK BOLEH ikut aturan JOIN huruf-kecil di bawah.
+_POLA_BUTIR = re.compile(r'^[a-z][.)]\s')
+_POLA_BUTIR_ROMAWI = re.compile(r'^[ivx]{1,4}[.)]\s')
+
+
+def _judul_pendek(s: str) -> bool:
+    """True bila baris ini mirip judul pendek (bukan fragmen kalimat):
+    ≤8 kata DAN (semua huruf BESAR, atau tiap kata berhuruf diawali huruf
+    besar). Satu kata Title Case ("Ekonomi") BUKAN judul pendek — itu
+    fragmen (terukur: 'Ekonomi' + 'dan Industri...' adalah lanjutan).
+    Baris tanpa huruf ("45") bukan judul."""
+    t = (s or '').strip()
+    kata = t.split()
+    if not kata or len(kata) > 8:
+        return False
+    huruf = [w for w in kata if any(c.isalpha() for c in w)]
+    if not huruf:
+        return False
+    if t == t.upper():
+        return True
+    # Title Case HANYA bila >=2 kata berhuruf: satu kata Title Case
+    # ("Ekonomi", "Berdasarkan") adalah fragmen, bukan judul — terukur
+    # 83/83 pasangan fid=112/115. Judul satu kata di naskah ini ALL-CAPS
+    # (ditangkap cabang atas).
+    return len(huruf) >= 2 and all(w[:1].isupper() for w in huruf)
 
 
 def tanpa_nomor_halaman(s: str) -> str:
@@ -186,6 +223,32 @@ def sambung_kode(a: str, b: str):
     # ── JOIN: kata terakhir A kata gantung (wajib ada lanjutan) ─────────
     kata = ta.split()
     if kata and re.sub(r'[^A-Za-z]+$', '', kata[-1].lower()) in _KATA_GANTUNG:
+        return True
+    # ── JOIN (v8): B diawali huruf kecil (bukan penanda butir) ───────────
+    #    Paragraf/subbab/bab TIDAK PERNAH mulai huruf kecil (Aturan 5 +
+    #    koreksi_batas di peta3_jev) — jadi B huruf kecil PASTI melanjutkan
+    #    kalimat A, bukan unsur baru. Terukur 11 Nov 2026:
+    #      · offline (nol Jev): 1.267/1.877 pasangan fid=112 dan 906/1.431
+    #        fid=115 adalah B-huruf-kecil;
+    #      · live 1.14: Jev sendiri menggabungkan 98,0% (112) dan 97,4%
+    #        (115) pasangan itu — aturan ini hanya membuat deterministik
+    #        apa yang Jev hampir selalu lakukan (bukan menebak baru);
+    #      · 24/25 (112) dan 24/24 (115) pasangan B-kecil yang Jev TIDAK
+    #        gabungkan adalah penanda butir — karena itu butir
+    #        DIKECUALIKAN di bawah.
+    #    PENGECUALIAN (tetap tanya Jev): B penanda butir ("d) ...",
+    #    "e. ...", "ii. ...") — butir daftar dinilai paragraf baru;
+    #    A judul pendek ("Strategi Turn", "KESIMPULAN") — bisa jadi judul
+    #    yang kalimat sesudahnya mulai huruf kecil karena kerusakan
+    #    ekstraksi; B penghubung judul ("dan Tujuan Penelitian") — itu
+    #    lanjutan JUDUL, bukan kalimat (`_awal_kalimat` False).
+    #    (A berakhir ':' sudah ditolak SKIP di atas via
+    #    akhir_kalimat_nyata; A judul BAB/bernomor sudah ditolak SKIP
+    #    v6/v7 di atas.)
+    if tb[:1].islower() and _awal_kalimat(tb) \
+            and not _POLA_BUTIR.match(tb) \
+            and not _POLA_BUTIR_ROMAWI.match(tb) \
+            and not _judul_pendek(ta):
         return True
     return None
 
