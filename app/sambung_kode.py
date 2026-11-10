@@ -116,6 +116,13 @@ def sambung_kode(a: str, b: str):
     # ── SKIP: B unsur baru (judul/bab/butir) ────────────────────────────
     if awal_judul_baru(tb):
         return False
+    # ── SKIP (v6): A judul BAB + B awal kalimat ─────────────────────────
+    #    "BAB III METODOLOGI PENELITIAN" + "bagian ini menjelaskan..." —
+    #    B huruf kecil / "Bab ini" = kalimat baru, bukan sambungan judul.
+    #    Lanjutan judul huruf BESAR ("Penelitian") tetap ditanya ke Jev.
+    if _POLA_BAB.match(tanpa_nomor_halaman(ta)) and (
+            tb[:1].islower() or re.match(r'^(bab|bagian)\s+ini\b', tb, re.I)):
+        return False
     # ── SKIP: baris tabel (pipa) ────────────────────────────────────────
     if '|' in ta or '|' in tb:
         return False

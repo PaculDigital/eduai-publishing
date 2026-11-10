@@ -396,6 +396,59 @@ def _pisah_judul_menempel(s):
     return keluar if len(keluar) > 1 else [s]
 
 
+# ── PISAH "BAB + JUDUL + KOMA + KALIMAT" (v6) ───────────────────────────
+#    Pola NYATA di naskah (v5 TIDAK menangani — 0 baris cocok pola lama
+#    "58 BAB III ... 3.1 ...", tapi judul BAB fid=115/112 membawa ekor):
+#      "3. BAB III METODOLOGI PENELITIAN, bagian ini menjelaskan tentang"
+#      "5. BAB V PENUTUP, pada bab ini penulis akan menjelaskan mengenai"
+#    ATURAN: pisah HANYA bila ekor sesudah koma memulai KALIMAT (huruf
+#    kecil, atau frasa "bagian ini"/"Bab ini"/"pada bab ini"). Judul yang
+#    ekornya huruf BESAR ("BAB II TINJAUAN PUSTAKA, KERANGKA PEMIKIRAN...")
+#    TIDAK dipisah — itu masih judul. Judul tanpa koma tidak disentuh.
+#    Nomor daftar di depan ("3. ", "5. ") tetap menempel di baris judul
+#    supaya pola BAB deterministik (v6.4) tetap mengenalinya.
+_POLA_BAB_EKOR = re.compile(
+    r'^((?:\d{1,3}\s+)?(?:\d+[.)]\s*)?BAB\s+[IVX0-9]+\s+[^,]{2,80}),\s+(.+)$',
+    re.I)
+
+
+def _pisah_bab_ekor(s):
+    """Pisah satu baris "BAB + judul + koma + kalimat" jadi dua baris.
+
+    Kembalikan [judul, ekor] bila pola cocok, [s] bila tidak.
+    """
+    t = s or ''
+    m = _POLA_BAB_EKOR.match(t.strip())
+    if not m:
+        return [s]
+    judul, ekor = m.group(1).strip(), m.group(2).strip()
+    if not judul or not ekor or len(ekor) < 3:
+        return [s]
+    # judul harus mirip judul: tiap kata diawali huruf BESAR (judul CAPS
+    # maupun Title Case lolos; kalimat biasa tidak).
+    kata_judul = judul.split()
+    if not kata_judul:
+        return [s]
+    if not all(w[:1].isupper() or not w[:1].isalpha() for w in kata_judul):
+        return [s]
+    # ekor harus memulai kalimat: huruf kecil, atau frasa sistematika.
+    if not (ekor[:1].islower()
+            or re.match(r'(?:bagian|bab|pada)\s+(?:ini|bab)\b', ekor, re.I)):
+        return [s]
+    return [judul, ekor]
+
+
+def _pisah_bab_ekor_baris(baris):
+    """Terapkan `_pisah_bab_ekor` ke daftar baris. Kembalikan
+    (baris_baru, jumlah_pisahan)."""
+    keluar, jml = [], 0
+    for b in baris:
+        p = _pisah_bab_ekor(b)
+        jml += max(0, len(p) - 1)
+        keluar.extend(p)
+    return keluar, jml
+
+
 def _pisah_judul_menempel_baris(baris):
     """Terapkan `_pisah_judul_menempel` ke daftar baris. Kembalikan
     (baris_baru, jumlah_pisahan)."""
@@ -499,6 +552,18 @@ def _stitch_baris(teks, tanya_fn=None):
         _sk = None
     pasangan = []          # (idx_blok_sebelum, idx_blok_sesudah) -> tanya Jev
     langsung = []          # pasangan yang PASTI sambung (kode, tanpa Jev)
+    def _didahului_bab(a):
+        """True bila blok sebelum `a` (lewati kosong) adalah penanda BAB
+        polos ("BAB III") — artinya blok `a` adalah JUDUL bab itu (hasil
+        `_perbaiki_gabung_bab` yang memecah "BAB III METODOLOGI..." jadi
+        dua blok). Judul bab tidak boleh disambung ke kalimat sesudahnya.
+        """
+        k = a - 1
+        while k >= 0 and (blok[k].get('kosong')
+                          or not (blok[k].get('text') or '').strip()):
+            k -= 1
+        return k >= 0 and bool(POLA_BAB.match(
+            (blok[k].get('text') or '').strip()))
     for a in range(len(blok)):
         if blok[a].get('kosong') or not (blok[a].get('text') or '').strip():
             continue
@@ -508,7 +573,15 @@ def _stitch_baris(teks, tanya_fn=None):
         if b < len(blok) and b > a + 1:
             sebelum = (blok[a].get('text') or '').strip()
             sesudah = (blok[b].get('text') or '').strip()
-            if POLA_BAB.match(sebelum) or POLA_BAB.match(sesudah):
+            # ── v6: jangan gabung melewati garis BAB — pola AWALAN (bukan
+            #    baris-penuh): "BAB III METODOLOGI PENELITIAN" juga garis
+            #    BAB. Dulu POLA_BAB baris-penuh tidak cocok pada judul
+            #    ber kata, sehingga judul + ekor kalimat bisa disambung.
+            #    Termasuk judul yang sudah dipecah `_perbaiki_gabung_bab`
+            #    (blok judul didahului penanda BAB polos).
+            if (_POLA_BAB_TEKS.match(sebelum)
+                    or _POLA_BAB_TEKS.match(sesudah)
+                    or _didahului_bab(a)):
                 continue
             d = _sk(sebelum, sesudah) if _sk else None
             if d is False:
@@ -624,6 +697,8 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     # ── v5: pisah judul menempel SEBELUM stitch (supaya stitch tidak
     #    menelan judul yang menempel satu baris).
     _baris_split, pisah_sebelum = _pisah_judul_menempel_baris(bersih.split('\n'))
+    # ── v6: pisah "BAB + judul + koma + kalimat" SEBELUM stitch.
+    _baris_split, pisah_ekor_sebelum = _pisah_bab_ekor_baris(_baris_split)
     bersih = '\n'.join(_baris_split)
     stitch_pakai = False
     waktu_stitch = 0.0
@@ -652,7 +727,11 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     baris = bersih.split('\n')
     # ── v5: pisah lagi SESUDAH stitch (blok bisa menyambung judul kembali).
     baris, pisah_sesudah = _pisah_judul_menempel_baris(baris)
+    # ── v6: pisah "BAB + judul + koma + kalimat" lagi SESUDAH stitch
+    #    (stitch bisa menyambung kembali judul + ekor yang sudah dipisah).
+    baris, pisah_ekor_sesudah = _pisah_bab_ekor_baris(baris)
     pisah_judul_jml = pisah_sebelum + pisah_sesudah
+    pisah_bab_ekor_jml = pisah_ekor_sebelum + pisah_ekor_sesudah
     if awal is None or awal < 0:
         awal = 0
     if akhir is None or akhir > len(baris):
@@ -721,6 +800,7 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     return {'baris': baris, 'kand': kand, 'gabung': gabung, 'buang': buang,
             'kode_label': kode_label, 'stitch_pakai': stitch_pakai,
             'waktu_stitch': waktu_stitch, 'pisah_judul_jml': pisah_judul_jml,
+            'pisah_bab_ekor_jml': pisah_bab_ekor_jml,
             'spasi_huruf_jml': spasi_huruf_jml + spasi_huruf_sesudah_stitch,
             'spasi_huruf_sebelum_stitch': spasi_huruf_jml,
             'spasi_huruf_sesudah_stitch': spasi_huruf_sesudah_stitch,
@@ -1014,6 +1094,7 @@ def _petakan_dari_hasil(d, putaran=None):
             'spasi_huruf_sesudah_stitch': d.get('spasi_huruf_sesudah_stitch', 0),
             'huruf_berspasi_sebelum': d.get('huruf_berspasi_sebelum', 0),
             'huruf_berspasi_sesudah': d.get('huruf_berspasi_sesudah', 0),
+            'pisah_bab_ekor_jml': d.get('pisah_bab_ekor_jml', 0),
             'jev_mati': jev_mati, 'stitch_pakai': d.get('stitch_pakai', False),
             'versi_aturan': RULE_VERSION}
 

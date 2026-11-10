@@ -110,9 +110,16 @@ class FakeKonversi:
         blok = []
         for n, b in enumerate(baris):
             kosong = not b
+            # cerminan pagar asli (app/sambung_kode v6): judul BAB tidak
+            # disambung ke kalimat sesudahnya yang diawali huruf kecil.
+            _bab = bool(re.match(
+                r'^(?:\d{1,3}\s+)?(?:\d+[.)]\s*)?BAB\s+[IVX0-9]+\b',
+                blok[-1]['text'], re.I)) if blok and not kosong else False
+            _lanjut_kalimat = bool(b[:1].islower() or re.match(
+                r'^(bab|bagian)\s+ini\b', b, re.I)) if b else False
             if (blok and not kosong and not blok[-1]['kosong']
                     and len(blok[-1]['text']) <= 60 and len(b) <= 60
-                    and b[:1].islower()):
+                    and b[:1].islower() and not (_bab and _lanjut_kalimat)):
                 blok[-1]['text'] = (blok[-1]['text'] + ' ' + b).strip()
                 blok[-1]['lines'].append(n)
             else:
@@ -564,6 +571,68 @@ def main():
     cek('v6.1: rangkaian tak dikenal tidak dihitung diperbaiki',
         d_asing.get('spasi_huruf_sesudah_stitch') == 0,
         str(d_asing.get('spasi_huruf_sesudah_stitch')))
+
+    # ── 8. v6.2: PISAH "BAB + JUDUL + KOMA + KALIMAT" ────────────────────
+    cek('v6.2: "3. BAB III ..., bagian ini ..." dipisah jadi judul + ekor',
+        P._pisah_bab_ekor(
+            '3. BAB III METODOLOGI PENELITIAN, bagian ini menjelaskan tentang')
+        == ['3. BAB III METODOLOGI PENELITIAN',
+            'bagian ini menjelaskan tentang'])
+    cek('v6.2: "5. BAB V PENUTUP, pada bab ini ..." dipisah',
+        P._pisah_bab_ekor(
+            '5. BAB V PENUTUP, pada bab ini penulis akan menjelaskan mengenai')
+        == ['5. BAB V PENUTUP',
+            'pada bab ini penulis akan menjelaskan mengenai'])
+    cek('v6.2: judul yang ekornya huruf BESAR tidak dipisah',
+        P._pisah_bab_ekor(
+            'BAB II TINJAUAN PUSTAKA, KERANGKA PEMIKIRAN DAN HIPOTESIS')
+        == ['BAB II TINJAUAN PUSTAKA, KERANGKA PEMIKIRAN DAN HIPOTESIS'])
+    cek('v6.2: judul tanpa koma tidak disentuh',
+        P._pisah_bab_ekor('BAB I PENDAHULUAN') == ['BAB I PENDAHULUAN'])
+    cek('v6.2: BAB di tengah kalimat tidak dipisah',
+        P._pisah_bab_ekor('Penelitian ini membahas BAB II, bagian ini menjelaskan')
+        == ['Penelitian ini membahas BAB II, bagian ini menjelaskan'])
+    # ujung-ke-ujung: judul + ekor terpisah di baris akhir (stitch fake
+    # sempat menyambung kembali — pisah sesudah stitch yang memisahkan).
+    teks_ekor = (
+        'BAB I\nPENDAHULUAN\n'
+        '3. BAB III METODOLOGI PENELITIAN, bagian ini menjelaskan tentang metode.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    d_ekor = P._susun_dari_bersih(teks_ekor)
+    cek('v6.2: judul BAB bersih tanpa ekor di baris akhir',
+        any(b.strip() == '3. BAB III METODOLOGI PENELITIAN'
+            for b in d_ekor['baris']),
+        str(d_ekor['baris']))
+    cek('v6.2: ekor kalimat jadi baris sendiri',
+        any(b.strip().startswith('bagian ini menjelaskan')
+            for b in d_ekor['baris']))
+    cek('v6.2: jumlah pisahan ekor tercatat',
+        d_ekor.get('pisah_bab_ekor_jml', 0) >= 1,
+        str(d_ekor.get('pisah_bab_ekor_jml')))
+    # pagar stitch: judul BAB + ekor lintas baris-kosong tidak disambung
+    # meski Jev bilang sambung (ekor ada di JOIN_SET fake).
+    from app.sambung_kode import sambung_kode as _sk6
+    cek('v6.2: sambung_kode tolak judul BAB + "bagian ini..."',
+        _sk6('BAB III METODOLOGI PENELITIAN',
+             'bagian ini menjelaskan tentang') is False)
+    cek('v6.2: sambung_kode tolak judul BAB + "Bab ini..."',
+        _sk6('BAB III METODOLOGI PENELITIAN',
+             'Bab ini menjelaskan tentang') is False)
+    cek('v6.2: sambung_kode tetap tanya lanjutan judul huruf besar',
+        _sk6('BAB III Metodologi', 'Penelitian') is None)
+    teks_lintas = (
+        'BAB I\nPENDAHULUAN\n'
+        'BAB III METODOLOGI PENELITIAN\n\n'
+        'membahas pemasaran digital di Indonesia.\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n'
+    )
+    hasil_lintas = P._stitch_baris(teks_lintas,
+                                   tanya_fn=FAKE_SATPAM.tanya_bebas_mutu)
+    cek('v6.2: stitch lintas-kosong tidak menelan judul BAB',
+        'BAB III METODOLOGI PENELITIAN\n' in hasil_lintas
+        and 'membahas pemasaran digital di Indonesia.' in hasil_lintas,
+        hasil_lintas[:120])
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
