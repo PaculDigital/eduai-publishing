@@ -10,15 +10,40 @@
     "subbab_per_run": [
       131,
       131,
+      131,
+      131,
+      131,
+      131,
       131
     ],
     "subbab_median": 131,
     "paragraf_per_run": [
+      173,
+      173,
       166,
       173,
-      173
+      170,
+      165,
+      176
     ],
-    "sumber": "hasil_v7_live.json (3 run per naskah, 10 Nov 2026)"
+    "paragraf_median": 173,
+    "ambang_g2": 2,
+    "rentang_subbab_run": [
+      131,
+      131
+    ],
+    "median_sesi": [
+      131,
+      131,
+      131,
+      131
+    ],
+    "rentang_median_sesi": [
+      131,
+      131
+    ],
+    "sumber": "sesi kode v7 (b41392a + v8 tanpa ubah klasifikasi): v7(3 run), ab114-1.13(1 run), deploy(1 run), gerbang(2 run)",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
   },
   "112": {
     "bab": [
@@ -28,17 +53,36 @@
       "BAB V PENUTUP"
     ],
     "subbab_per_run": [
-      75,
+      80,
       76,
-      80
+      75,
+      78,
+      82
     ],
-    "subbab_median": 76,
+    "subbab_median": 78,
     "paragraf_per_run": [
-      20,
       22,
-      23
+      20,
+      23,
+      32,
+      22
     ],
-    "sumber": "hasil_v7_live.json (3 run per naskah, 10 Nov 2026)"
+    "paragraf_median": 22,
+    "ambang_g2": 6,
+    "rentang_subbab_run": [
+      75,
+      82
+    ],
+    "median_sesi": [
+      76,
+      82
+    ],
+    "rentang_median_sesi": [
+      76,
+      82
+    ],
+    "sumber": "sesi kode v7 (b41392a + v8 tanpa ubah klasifikasi): v7(3 run), gerbang(2 run)",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
   },
   "115": {
     "bab": [
@@ -50,14 +94,66 @@
     "subbab_per_run": [
       67,
       69,
-      70
+      70,
+      75,
+      75,
+      78
     ],
-    "subbab_median": 69,
+    "subbab_median": 72.5,
     "paragraf_per_run": [
-      23,
+      26,
       24,
-      26
+      23,
+      20,
+      23,
+      18
     ],
-    "sumber": "hasil_v7_live.json (3 run per naskah, 10 Nov 2026)"
+    "paragraf_median": 23.0,
+    "ambang_g2": 8,
+    "rentang_subbab_run": [
+      67,
+      78
+    ],
+    "median_sesi": [
+      69,
+      75,
+      78
+    ],
+    "rentang_median_sesi": [
+      69,
+      78
+    ],
+    "sumber": "sesi kode v7 (b41392a + v8 tanpa ubah klasifikasi): v7(3 run), deploy(1 run), gerbang(2 run)",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
+  },
+  "WULAN-1": {
+    "bab": [],
+    "subbab_per_run": [
+      58,
+      55,
+      57
+    ],
+    "subbab_median": 57,
+    "paragraf_per_run": [
+      98,
+      100,
+      99
+    ],
+    "paragraf_median": 99,
+    "ambang_g2": 4,
+    "rentang_subbab_run": [
+      55,
+      58
+    ],
+    "median_sesi": [
+      57
+    ],
+    "rentang_median_sesi": [
+      57,
+      57
+    ],
+    "sumber": "sesi kode v7 (b41392a + v8 tanpa ubah klasifikasi): v7(3 run)",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2",
+    "catatan": "referensi saja — gerbang hanya memeriksa fid 81/112/115; WULAN-1 hanya punya 1 sesi v7 (3 run), jadi ambangnya dari rentang run."
   }
 }
