@@ -113,23 +113,15 @@ def petakan_semua(mentah, tsv):
             hasil[kunci] = {'idx': skor[0][1], 'alasan': 'konteks',
                             'skor': skor[0][0]}
             continue
-        # 5b. kembar serupa: sisa kandidat berlabel sama DAN tetangga
-        #     3-barisnya identik -> hasil rantai sama untuk kandidat mana
-        #     pun (label Jev sama, konteks agen kedua sama). Pilih pertama,
-        #     catat semua kandidat untuk verifikasi flag Hakim di Fase A.
-        def _tanda(j):
-            ttd = []
-            for arah in (-1, 1):
-                k, ambil = j + arah, []
-                while 0 <= k < len(baris) and len(ambil) < 3:
-                    if norm(baris[k]):
-                        ambil.append(norm(baris[k]))
-                    k += arah
-                ttd.append(tuple(ambil))
-            return (label.get(j), tuple(ttd))
-
-        if len({_tanda(j) for j in cocok}) == 1:
-            hasil[kunci] = {'idx': cocok[0], 'alasan': 'ambigu-serupa',
+        # 5b. kembar serupa: sisa kandidat berlabel sama -> pilih yang
+        #     terdekat dengan baris_no (ruang teks sumber; selisih idx -
+        #     baris_no terbanyak -1..-7 di baris yang sudah terpetakan).
+        #     Hasil rantai sama untuk kandidat mana pun bila label dan
+        #     konteks dekatnya identik; catat semua kandidat.
+        if len({label.get(j) for j in cocok}) == 1:
+            harap = int(r['baris_no'])
+            pilih = min(cocok, key=lambda j: abs(j - harap))
+            hasil[kunci] = {'idx': pilih, 'alasan': 'ambigu-dekat',
                             'kandidat': cocok}
             continue
         hasil[kunci] = {'idx': None, 'alasan': 'ambigu',

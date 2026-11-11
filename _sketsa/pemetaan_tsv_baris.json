@@ -361,21 +361,11 @@
   "alasan": "unik"
  },
  "T3|73": {
-  "idx": null,
-  "alasan": "ambigu",
+  "idx": 377,
+  "alasan": "ambigu-dekat",
   "kandidat": [
    377,
    449
-  ],
-  "skor": [
-   [
-    1,
-    449
-   ],
-   [
-    1,
-    377
-   ]
   ]
  },
  "T3|74": {
