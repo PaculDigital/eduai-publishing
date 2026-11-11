@@ -14,33 +14,33 @@ ATURAN GERBANG (ditulis di sini, bukan dikarang diam-diam):
       (tersimpan di gerbang_baseline.json, field 'ambang_g2') dihitung
       dari sebaran antar-run yang terukur, BUKAN satu angka global:
         ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2
-      dengan subbab_run = semua run 1.14 yang tersimpan. Nilai saat ini
-      (baseline 1.14, 10 Nov 2026): 81=3 (4 run, 129-131, median 130),
-      112=3 (2 run, 79-81, median 80), 115=3 (2 run, 75-76, median
-      75.5). "+2" adalah margin eksplisit untuk sesi yang belum
+      dengan subbab_run = semua run v9/v10 yang tersimpan. Nilai saat ini
+      (baseline v10, 11 Nov 2026, 4 run): 81=3 (4 run, 129-130, median
+      130.0), 112=8 (4 run, 76-88, median 82.5), 115=6 (4 run, 79-87,
+      median 82.0). "+2" adalah margin eksplisit untuk sesi yang belum
       teramati (n kecil, rentang sejati lebih lebar) — lebih kecil dari
       regresi terkecil yang gerbang wajib tangkap (+10 subbab, kasus
       uji mandiri 5). Konsekuensi jujur: gerbang TIDAK bisa membedakan
-      regresi kecil (+-3) dari drift model biasa; ia hanya menangkap
-      regresi besar. PERHATIAN n kecil: 112/115 baru punya 2 run, jadi
-      rentang terukur adalah batas bawah dan ambang 3 ketat — lebar
-      drift 1.13 (112=7, 115=11) menunjukkan sesi 1.14 berikutnya bisa
-      duduk di batas. Bila G2 gagal mepet, ulangi satu sesi segar
-      sebelum menvonis regresi. Baseline 1.13 tersimpan di
-      ground_truth/gerbang_baseline_113.json dan TIDAK berlaku lagi
-      untuk menilai run 1.14. Median diambil dari 2 run (bila 2 run)
-      atau 1 run (cara gerbang: sorted[len//2], upper-middle).
-  BATAS DETEKSI (1.14, 10 Nov 2026, jangan disembunyikan): ambang G2=3
-  di semua naskah. Regresi yang menggeser median sesi >3 dari median
-  baseline tertangkap (termasuk +-10 dari baseline di semua naskah);
-  regresi <=3 TIDAK bisa dibedakan dari drift model. Risiko sebaliknya
-  yang lebih nyata di 1.14: ambang 3 ketat karena 112/115 baru punya
-  2 run — lebar drift 1.13 (112=7, 115=11) menunjukkan sesi 1.14
-  berikutnya bisa duduk di batas ambang padahal bukan regresi. Jadi
-  G2 yang gagal mepet (selisih 4-5) harus diulang satu sesi segar
-  sebelum divonis regresi, dan satu sesi 1.14 tambahan (2 run x 3
-  naskah) akan melebarkan rentang terukur dan menaikkan ambang bila
-  drift memang selebar 1.13.
+      regresi kecil dari drift model biasa; ia hanya menangkap regresi
+      besar. PERHATIAN: ambang 112 kini 8 (dulu 4 pada baseline 2-run)
+      karena sesi2 segar memberi 76 dan 88 — median 4 run tetap 82.5,
+      yang melebar hanya sebaran. Baseline v9 2-run tersimpan di
+      ground_truth/gerbang_baseline_v9_2run.json; baseline 1.14 (v8)
+      di gerbang_baseline_114.json. Keduanya TIDAK berlaku lagi untuk
+      menilai run v10: gerbang v9 GAGAL melawan baseline v8 (112 median
+      84 vs 80.0, 115 median 87 vs 75.5) karena pergeseran SISTEMATIS
+      aturan R2-1/R2-2 (judul bernomor 1 tingkat dipertahankan sebagai
+      subbab, butir dash dipisah) — bukan regresi (skor-teks tidak
+      turun, goyang antar-run turun). Median diambil dari 2 run (bila
+      2 run) atau 1 run (cara gerbang: sorted[len//2], upper-middle).
+  BATAS DETEKSI (v10, 11 Nov 2026, jangan disembunyikan): ambang G2=3
+  (81), 8 (112), 6 (115). Regresi yang menggeser median sesi melebihi
+  ambang itu tertangkap; regresi di bawah ambang TIDAK bisa dibedakan
+  dari drift model — untuk 112, gerbang kini hanya menangkap regresi
+  >8 subbab, itu harga drift 1.14 yang terukur (rentang 12 antar 4
+  run). Sesi v10 berikutnya bisa duduk di batas ambang padahal bukan
+  regresi. Jadi G2 yang gagal mepet (selisih 4-5) harus diulang satu
+  sesi segar sebelum divonis regresi.
   G1  CATATAN PENGUKURAN (10 Nov 2026): daftar 'bab' pelari live
       (jalankan_gerbang.py) adalah GABUNGAN label Jev + judul gabung
       kode, sedangkan daftar 'bab' baseline hanya label Jev. Karena itu
@@ -221,20 +221,40 @@ def muat_peta_114():
     return out
 
 
+def muat_peta_r2():
+    """Peta tersimpan v9 (hasil_r2_114.json) sebagai peta 'baik'.
+
+    2 run per naskah; 'bab' = daftar gabung pelari live (Jev + gabung
+    kode), sama seperti yang dikeluarkan jalankan_gerbang.py. Dipakai
+    uji mandiri sejak baseline pindah ke v9 (11 Nov 2026): peta 1.14
+    (v8) tidak lagi lolos G2 melawan baseline v9 (112 selisih 2,5,
+    115 selisih 7,5 dari median baru — pergeseran sistematis aturan
+    R2-1/R2-2, bukan regresi), jadi peta 'baik' harus dari aturan
+    yang sama dengan baseline.
+    """
+    d = json.load(open(ROOT / 'hasil_r2_114.json', encoding='utf-8'))
+    out = {}
+    for fid in ('81', '112', '115'):
+        out[fid] = [{'bab': list(r.get('bab') or []),
+                     'subbab_jml': r['label_hitung'].get('subbab')}
+                    for r in d['run'][fid]]
+    return out
+
+
 def uji_mandiri():
     """Uji offline: 6 kasus. Semua harus berperilaku sesuai harapan."""
     baseline = muat_baseline()
-    p114 = muat_peta_114()
+    p114 = muat_peta_r2()
     kasus = []
 
     def tambah(nama, maps, harap_lolos):
         ok, hasil = nilai_gerbang(maps, baseline)
         kasus.append((nama, harap_lolos, ok, hasil))
 
-    # 1. peta 1.14 asli (2 run) -> harus LOLOS
-    tambah('1.14 asli (2 run)', {k: v[:2] for k, v in p114.items()}, True)
-    # 2. peta 1.14 asli (1 run saja) -> harus LOLOS (jalur 1 run)
-    tambah('1.14 asli (1 run)', {k: v[:1] for k, v in p114.items()}, True)
+    # 1. peta v9 asli (2 run) -> harus LOLOS
+    tambah('v9 asli (2 run)', {k: v[:2] for k, v in p114.items()}, True)
+    # 2. peta v9 asli (1 run saja) -> harus LOLOS (jalur 1 run)
+    tambah('v9 asli (1 run)', {k: v[:1] for k, v in p114.items()}, True)
     # 3. BAB dibuang di KEDUA run fid=112 -> harus GAGAL (G1)
     m = json.loads(json.dumps(p114))
     for r in m['112'][:2]:

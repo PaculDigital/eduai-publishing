@@ -37,7 +37,7 @@ log = logging.getLogger(__name__)
 #    v8 (11 Nov 2026): sambung_kode JOIN B-huruf-kecil (deterministik,
 #    terukur live Jev sendiri gabung 97-98% pasangan itu) + buang byte
 #    NUL di _susun_dari_bersih (artefak PDF fid=112: 103 NUL).
-RULE_VERSION = 'jev-peta-v9'  # v9 (11 Nov 2026): stitch deterministik
+RULE_VERSION = 'jev-peta-v10'  # v10 (11 Nov 2026): R2-3 demosi BAB tanpa pengecualian sistematika
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
@@ -220,6 +220,17 @@ def _koreksi_bab_deterministik(baris, label, kand, sistematika, gabung,
        huruf BESAR pendek tanpa titik akhir (judul yang penandanya hilang
        saat ekstraksi). Yang didemosi jadi 'paragraf' bila berakhir tanda
        akhir kalimat, sisanya 'biasa'.
+       v9 R2-3 (11 Nov 2026): demosi ini TIDAK lagi melewati baris
+       sistematika. Alasan terukur: 3 judul BAB sampah di sesi live
+       segar v9 (112 run1 idx 467, 112 run2 idx 451, 115 run2 idx 471)
+       semuanya baris deskripsi blok sistematika ("pada bab ini penulis
+       akan menjelaskan...", "bagian ini menjelaskan tentang landasan")
+       yang dilabeli 'bab' oleh Jev — pengecualian sistematika-lah yang
+       melindungi mereka, dan demosi 0 kali jalan di 18 run tersimpan.
+       Salinan judul asli di blok sistematika ("1. BAB I PENDAHULUAN")
+       tetap aman: mereka COCOK _POLA_BAB_NOMOR jadi `continue` sebelum
+       demosi; yang didemosi hanya baris tanpa penanda BAB. Pemaksaan
+       'bab' (langkah 1) tetap melewati sistematika, tidak diubah.
     Kembalikan (bab_kode, bab_ganda, bab_demosi) — daftar indeks baris.
     """
     bab_kode, bab_ganda, bab_demosi = [], [], []
@@ -242,8 +253,9 @@ def _koreksi_bab_deterministik(baris, label, kand, sistematika, gabung,
             if label.get(i) != 'bab':
                 label[i] = 'bab'
             bab_kode.append(i)
+    # ── v9 R2-3: demosi TIDAK melewati sistematika (lihat docstring) ──
     for i, _t in kand:
-        if label.get(i) != 'bab' or i in sistematika:
+        if label.get(i) != 'bab':
             continue
         t = re.sub(r'^\d{1,3}\s+', '', baris[i].strip())
         if _POLA_BAB_NOMOR.match(t):

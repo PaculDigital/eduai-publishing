@@ -1109,8 +1109,8 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION naik dari v8 (kini v9)',
-        P8.RULE_VERSION == 'jev-peta-v9')
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v10)',
+        P8.RULE_VERSION == 'jev-peta-v10')
     # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
     #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
     #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
@@ -1184,6 +1184,40 @@ def main():
     cek('v8-aturan: pasangan B-huruf-kecil TIDAK ditanya ke Jev',
         FAKE_SATPAM.panggilan == [],
         str(FAKE_SATPAM.panggilan))
+    # ── 11. v10-aturan: DEMOSI BAB TANPA PENGECUALIAN SISTEMATIKA (R2-3) ─
+    #    Terukur live 1.14 (11 Nov 2026, sesi segar v9): 3 judul BAB sampah
+    #    lolos ke daftar bab, semuanya baris deskripsi blok sistematika
+    #    yang dilabeli 'bab' oleh Jev — pengecualian sistematika-lah yang
+    #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
+    #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
+    #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v10)',
+        P8.RULE_VERSION == 'jev-peta-v10')
+    baris_r23 = [
+        'terbagi menjadi beberapa bab antara lain:',
+        '1. BAB I PENDAHULUAN',
+        'bagian ini berisikan latar belakang masalah,',
+        '2. BAB II TINJAUAN PUSTAKA',
+        'bagian ini menjelaskan tentang landasan',
+        '5. BAB V PENUTUP',
+        'pada bab ini penulis akan menjelaskan mengenai kesimpulan penelitian dan saran.',
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.',
+    ]
+    label_r23 = {1: 'bab', 3: 'bab', 4: 'bab', 5: 'bab', 6: 'bab'}
+    kand_r23 = [(i, baris_r23[i]) for i in range(len(baris_r23))]
+    sist_r23 = {1, 2, 3, 4, 5, 6}
+    _bk, _bg, demosi_r23 = P._koreksi_bab_deterministik(
+        baris_r23, label_r23, kand_r23, sist_r23, {}, set())
+    cek('v10-aturan: deskripsi sistematika "pada bab ini ..." didemosi ke paragraf',
+        label_r23.get(6) == 'paragraf', str(label_r23))
+    cek('v10-aturan: deskripsi sistematika "bagian ini ..." didemosi ke biasa',
+        label_r23.get(4) == 'biasa', str(label_r23))
+    cek('v10-aturan: salinan judul sistematika "1. BAB I ..." tetap bab',
+        label_r23.get(1) == 'bab', str(label_r23))
+    cek('v10-aturan: salinan judul sistematika "5. BAB V ..." tetap bab',
+        label_r23.get(5) == 'bab', str(label_r23))
+    cek('v10-aturan: demosi bab sistematika tercatat',
+        sorted(demosi_r23) == [4, 6], str(demosi_r23))
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:

@@ -1,0 +1,115 @@
+{
+  "112": {
+    "wall": 23.48,
+    "panggilan": {
+      "choice": 23,
+      "noul": 17,
+      "lain": 0
+    },
+    "kand_jml": 1670,
+    "gelombang": 21,
+    "tanya_ulang": 128,
+    "tanya_ulang_gelombang": 2,
+    "gabung": 4,
+    "buang": 77,
+    "gagal": 0,
+    "jev_mati": false,
+    "label": {
+      "biasa": 1603,
+      "subbab": 78,
+      "bab": 1,
+      "paragraf": 26
+    },
+    "goyang": 55,
+    "bab": [
+      "5. BAB V PENUTUP, pada bab ini penulis akan menjelaskan mengenai"
+    ],
+    "huruf": 0,
+    "menempel": 0,
+    "waktu_stitch": 6.979,
+    "waktu_total": 18.111,
+    "hakim": {
+      "jumlah_sepakat": 70,
+      "jumlah_ragu": 3,
+      "jumlah_curiga": 5,
+      "jumlah_belum": 0
+    },
+    "hakim_panggilan_jev": 1,
+    "hakim_wall": 0.33
+  },
+  "115": {
+    "wall": 21.6,
+    "panggilan": {
+      "choice": 22,
+      "noul": 13,
+      "lain": 0
+    },
+    "kand_jml": 1686,
+    "gelombang": 21,
+    "tanya_ulang": 119,
+    "tanya_ulang_gelombang": 1,
+    "gabung": 4,
+    "buang": 116,
+    "gagal": 0,
+    "jev_mati": false,
+    "label": {
+      "biasa": 1622,
+      "subbab": 75,
+      "bab": 3,
+      "paragraf": 24
+    },
+    "goyang": 65,
+    "bab": [
+      "3. BAB III METODOLOGI PENELITIAN, bagian ini menjelaskan tentang",
+      "4. BAB IV HASIL DAN PEMBAHASAN, bagian ini penulis akan",
+      "5. BAB V PENUTUP, pada bab ini penulis akan menjelaskan mengenai"
+    ],
+    "huruf": 54,
+    "menempel": 0,
+    "waktu_stitch": 5.026,
+    "waktu_total": 16.801,
+    "hakim": {
+      "jumlah_sepakat": 64,
+      "jumlah_ragu": 3,
+      "jumlah_curiga": 8,
+      "jumlah_belum": 0
+    },
+    "hakim_panggilan_jev": 1,
+    "hakim_wall": 0.37
+  },
+  "81": {
+    "wall": 5.05,
+    "panggilan": {
+      "choice": 6,
+      "noul": 0,
+      "lain": 0
+    },
+    "kand_jml": 486,
+    "gelombang": 5,
+    "tanya_ulang": 88,
+    "tanya_ulang_gelombang": 1,
+    "gabung": 10,
+    "buang": 720,
+    "gagal": 0,
+    "jev_mati": false,
+    "label": {
+      "biasa": 186,
+      "paragraf": 169,
+      "subbab": 131
+    },
+    "goyang": 39,
+    "bab": [],
+    "huruf": 0,
+    "menempel": 0,
+    "waktu_stitch": 0.047,
+    "waktu_total": 2.973,
+    "hakim": {
+      "jumlah_sepakat": 131,
+      "jumlah_ragu": 0,
+      "jumlah_curiga": 0,
+      "jumlah_belum": 0
+    },
+    "hakim_panggilan_jev": 0,
+    "hakim_wall": 0.08
+  }
+}

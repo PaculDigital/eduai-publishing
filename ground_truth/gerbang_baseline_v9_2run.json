@@ -1,0 +1,109 @@
+{
+  "model": "1.14",
+  "rule_version": "jev-peta-v9",
+  "tanggal": "2026-11-11",
+  "catatan": "Baseline gerbang RULE_VERSION jev-peta-v9 (MODEL_DEFAULT SATPAM/typesafe/jev-1.14). Baseline 1.14 (v8) tersimpan di gerbang_baseline_114.json. Alasan bangun ulang: gerbang v9 GAGAL melawan baseline v8 (112 median 84 vs 80.0, 115 median 87 vs 75.5) karena pergeseran SISTEMATIS dari aturan baru (R2-2 mempertahankan judul bernomor 1 tingkat sebagai subbab, R2-1 memisahkan butir dash) — bukan regresi: skor-teks tidak turun, goyang antar-run turun. PERHATIAN: tiap naskah baru punya 2 run, jadi rentang antar-run adalah batas bawah dan ambang G2 ketat — sesi v9 berikutnya bisa duduk di batas karena drift model. Bila G2 gagal mepet, ulangi satu sesi segar sebelum menvonis regresi.",
+  "81": {
+    "model": "1.14",
+    "rule_version": "jev-peta-v9",
+    "bab": [
+      "BAB I PENDAHULUAN",
+      "BAB II TINJAUAN PUSTAKA",
+      "BAB III METODE PENELITIAN",
+      "BAB IV HASIL DAN PEMBAHASAN",
+      "BAB V PENUTUP"
+    ],
+    "subbab_per_run": [
+      130,
+      129
+    ],
+    "subbab_median": 129.5,
+    "paragraf_per_run": [
+      194,
+      195
+    ],
+    "paragraf_median": 194.5,
+    "ambang_g2": 3,
+    "rentang_subbab_run": [
+      129,
+      130
+    ],
+    "median_sesi": [
+      130
+    ],
+    "rentang_median_sesi": [
+      130,
+      130
+    ],
+    "sumber": "run v9: r2-run1=130, r2-run2=129",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
+  },
+  "112": {
+    "model": "1.14",
+    "rule_version": "jev-peta-v9",
+    "bab": [
+      "BAB II TINJAUAN PUSTAKA",
+      "BAB III METODOLOGI PENELITIAN",
+      "BAB IV HASIL DAN PEMBAHASAN",
+      "BAB V PENUTUP"
+    ],
+    "subbab_per_run": [
+      84,
+      81
+    ],
+    "subbab_median": 82.5,
+    "paragraf_per_run": [
+      71,
+      78
+    ],
+    "paragraf_median": 74.5,
+    "ambang_g2": 4,
+    "rentang_subbab_run": [
+      81,
+      84
+    ],
+    "median_sesi": [
+      84
+    ],
+    "rentang_median_sesi": [
+      84,
+      84
+    ],
+    "sumber": "run v9: r2-run1=84, r2-run2=81",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
+  },
+  "115": {
+    "model": "1.14",
+    "rule_version": "jev-peta-v9",
+    "bab": [
+      "BAB II TINJAUAN PUSTAKA",
+      "BAB III METODOLOGI PENELITIAN",
+      "BAB IV HASIL DAN PEMBAHASAN",
+      "BAB V PENUTUP"
+    ],
+    "subbab_per_run": [
+      87,
+      80
+    ],
+    "subbab_median": 83.5,
+    "paragraf_per_run": [
+      71,
+      66
+    ],
+    "paragraf_median": 68.5,
+    "ambang_g2": 6,
+    "rentang_subbab_run": [
+      80,
+      87
+    ],
+    "median_sesi": [
+      87
+    ],
+    "rentang_median_sesi": [
+      87,
+      87
+    ],
+    "sumber": "run v9: r2-run1=87, r2-run2=80",
+    "rumus_ambang_g2": "ambang_g2 = ceil((max(subbab_run) - min(subbab_run)) / 2) + 2"
+  }
+}
