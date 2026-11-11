@@ -1,0 +1,102 @@
+{
+  "model_diminta": "SATPAM/typesafe/jev-1.14",
+  "rule_version": "jev-peta-v11",
+  "kelompok": "verifikasi-v11 tahap 5 (naskah uji)",
+  "cabang": "agen/wulan/optimalkan-jev-hakim-v5",
+  "pelari": "jalankan_verifikasi_v11.py (petakan_dari_teks 1 run + Hakim v2)",
+  "bukti_impor": {
+    "sk_dasar": true,
+    "sk_r21_dash_false": false,
+    "sk_r22_judul1_false": false,
+    "profil_romawi": "romawi_tanpa_bab",
+    "profil_chapter": "chapter",
+    "profil_bom": 1,
+    "profil_pemisah": 1,
+    "sambung_kode_file": "/tmp/jev-verifikasi-v11/app/sambung_kode.py",
+    "profil_kampus_file": "/tmp/jev-verifikasi-v11/app/profil_kampus.py",
+    "peta3_jev_file": "/tmp/jev-verifikasi-v11/peta3_jev.py",
+    "rule_version": "jev-peta-v11"
+  },
+  "entri": [
+    {
+      "kode": "AC2",
+      "bidang": "perhotelan",
+      "nama": "Skripsi perhotelan 1",
+      "berkas_teks": "grup3/AC2.txt",
+      "kata_teks_asli": 7412,
+      "kata_teks_bersih": 7411,
+      "baris_teks_bersih": 530,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 10,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 0,
+        "daftar_isi": false,
+        "sistematika_kata": 3,
+        "kata": 7411,
+        "baris": 530
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 0,
+        "sistematika": true,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0036,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 4,
+        "kata": 7411,
+        "baris": 530,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    }
+  ],
+  "berhasil_jml": 0,
+  "gagal_jml": 1,
+  "panggilan_petakan_total": 0,
+  "panggilan_hakim_total": 0,
+  "panggilan_probe_total": 2,
+  "panggilan_total": 2
+}

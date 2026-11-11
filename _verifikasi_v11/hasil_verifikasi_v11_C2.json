@@ -1,0 +1,917 @@
+{
+  "model_diminta": "SATPAM/typesafe/jev-1.14",
+  "rule_version": "jev-peta-v11",
+  "kelompok": "verifikasi-v11 tahap 5 (naskah uji)",
+  "cabang": "agen/wulan/optimalkan-jev-hakim-v5",
+  "pelari": "jalankan_verifikasi_v11.py (petakan_dari_teks 1 run + Hakim v2)",
+  "bukti_impor": {
+    "sk_dasar": true,
+    "sk_r21_dash_false": false,
+    "sk_r22_judul1_false": false,
+    "profil_romawi": "romawi_tanpa_bab",
+    "profil_chapter": "chapter",
+    "profil_bom": 1,
+    "profil_pemisah": 1,
+    "sambung_kode_file": "/tmp/jev-verifikasi-v11/app/sambung_kode.py",
+    "profil_kampus_file": "/tmp/jev-verifikasi-v11/app/profil_kampus.py",
+    "peta3_jev_file": "/tmp/jev-verifikasi-v11/peta3_jev.py",
+    "rule_version": "jev-peta-v11"
+  },
+  "entri": [
+    {
+      "kode": "AO-2",
+      "bidang": "Administrasi Negara",
+      "nama": "Skripsi Administrasi Negara 1 (seri Bab I-V)",
+      "berkas_teks": "administrasi-negara/Administrasi-Negara-1.txt",
+      "kata_teks_asli": 15350,
+      "kata_teks_bersih": 15350,
+      "baris_teks_bersih": 702,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 13,
+        "bab_arab": 2,
+        "bab_titik": 0,
+        "tabel_kata": 19,
+        "daftar_isi": false,
+        "sistematika_kata": 0,
+        "kata": 15350,
+        "baris": 702
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "campuran",
+        "bab_romawi": [
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [
+          1
+        ],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 5,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0044,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 0,
+        "kata": 15350,
+        "baris": 702,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "S2",
+      "bidang": "Ekonomi Pembangunan",
+      "nama": "Skripsi Ekonomi Pembangunan 12 (seri)",
+      "berkas_teks": "ekonomi-pembangunan/S2_Skripsi_Ekonomi_Pembangunan_12_seri.txt",
+      "kata_teks_asli": 18049,
+      "kata_teks_bersih": 17812,
+      "baris_teks_bersih": 2185,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 8,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 54,
+        "daftar_isi": false,
+        "sistematika_kata": 0,
+        "kata": 17812,
+        "baris": 2185
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 1,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0011,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 5,
+        "kata": 17812,
+        "baris": 2185,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "AN-1",
+      "bidang": "Hukum",
+      "nama": "Skripsi Jur Hukum 1 (seri Bab I-V)",
+      "berkas_teks": "hukum/Jur-Hukum-1.txt",
+      "kata_teks_asli": 16014,
+      "kata_teks_bersih": 16009,
+      "baris_teks_bersih": 488,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 14,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 0,
+        "daftar_isi": false,
+        "sistematika_kata": 2,
+        "kata": 16009,
+        "baris": 488
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 4,
+        "sistematika": true,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0119,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 0,
+        "kata": 16009,
+        "baris": 488,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "AK-3",
+      "bidang": "Manajemen",
+      "nama": "Manajemen Pemasaran 4 (seri Bab I-VI)",
+      "berkas_teks": "manajemen/Manajemen-Pemasaran-4.txt",
+      "kata_teks_asli": 10832,
+      "kata_teks_bersih": 10826,
+      "baris_teks_bersih": 784,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 16,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 16,
+        "daftar_isi": false,
+        "sistematika_kata": 0,
+        "kata": 10826,
+        "baris": 784
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V",
+          "VI"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 5,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0008,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 6,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 1,
+        "nul_jml": 0,
+        "bom_jml": 0,
+        "kata": 10826,
+        "baris": 784,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "M3",
+      "bidang": "Skripsi ESP Syariah",
+      "nama": "muti (seri)",
+      "berkas_teks": "esp-syariah/M3_muti_seri.txt",
+      "kata_teks_asli": 14781,
+      "kata_teks_bersih": 14707,
+      "baris_teks_bersih": 1046,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 5,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 36,
+        "daftar_isi": false,
+        "sistematika_kata": 0,
+        "kata": 14707,
+        "baris": 1046
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 1,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0051,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 5,
+        "kata": 14707,
+        "baris": 1046,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "D3",
+      "bidang": "ekonomi",
+      "nama": "Seri skripsi ekonomi 6",
+      "berkas_teks": "ekonomi/skripsi-ekonomi-6.txt",
+      "kata_teks_asli": 17766,
+      "kata_teks_bersih": 16964,
+      "baris_teks_bersih": 1907,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 7,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 56,
+        "daftar_isi": false,
+        "sistematika_kata": 0,
+        "kata": 16964,
+        "baris": 1907
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 0,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0004,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 5,
+        "kata": 16964,
+        "baris": 1907,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "AA3",
+      "bidang": "hukum-tata-negara",
+      "nama": "ht.042b.doc",
+      "berkas_teks": "grup3/AA3.txt",
+      "kata_teks_asli": 15553,
+      "kata_teks_bersih": 15529,
+      "baris_teks_bersih": 658,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 7,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 0,
+        "daftar_isi": false,
+        "sistematika_kata": 0,
+        "kata": 15529,
+        "baris": 658
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 8,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 0,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.004,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 4,
+        "empat_bab": true,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 0,
+        "kata": 15529,
+        "baris": 658,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "W3",
+      "bidang": "komunikasi",
+      "nama": "KOM 13.doc",
+      "berkas_teks": "grup3/W3.txt",
+      "kata_teks_asli": 31316,
+      "kata_teks_bersih": 29533,
+      "baris_teks_bersih": 2429,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 5,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 7,
+        "daftar_isi": false,
+        "sistematika_kata": 0,
+        "kata": 29533,
+        "baris": 2429
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 5,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 0,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0005,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 0,
+        "kata": 29533,
+        "baris": 2429,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "E3",
+      "bidang": "pendidikan-bhs-arab",
+      "nama": "Seri Tarbiyah / Skripsi Tarbiyah 11",
+      "berkas_teks": "pendidikan-bhs-arab/tarbiyah-11.txt",
+      "kata_teks_asli": 11411,
+      "kata_teks_bersih": 11411,
+      "baris_teks_bersih": 3492,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 5,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 25,
+        "daftar_isi": true,
+        "sistematika_kata": 4,
+        "kata": 11411,
+        "baris": 3492
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 0,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0005,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 5,
+        "kata": 11411,
+        "baris": 3492,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "AE2",
+      "bidang": "pendidikan-ekonomi",
+      "nama": "skripsi 1,2,3,4,5 komplit revisi.doc",
+      "berkas_teks": "grup3/AE2.txt",
+      "kata_teks_asli": 17571,
+      "kata_teks_bersih": 17561,
+      "baris_teks_bersih": 2083,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 5,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 10,
+        "daftar_isi": false,
+        "sistematika_kata": 0,
+        "kata": 17561,
+        "baris": 2083
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 0,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.001,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 1,
+        "kata": 17561,
+        "baris": 2083,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "C4",
+      "bidang": "perbankan-syariah",
+      "nama": "Seri Skripsi Perbankan Syariah 37",
+      "berkas_teks": "perbankan-syariah/perbankan-syariah-37.txt",
+      "kata_teks_asli": 11876,
+      "kata_teks_bersih": 11677,
+      "baris_teks_bersih": 1471,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 6,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 21,
+        "daftar_isi": false,
+        "sistematika_kata": 0,
+        "kata": 11677,
+        "baris": 1471
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 0,
+        "sistematika": false,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0012,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 5,
+        "kata": 11677,
+        "baris": 1471,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    },
+    {
+      "kode": "AC2",
+      "bidang": "perhotelan",
+      "nama": "Skripsi perhotelan 1",
+      "berkas_teks": "grup3/AC2.txt",
+      "kata_teks_asli": 7412,
+      "kata_teks_bersih": 7411,
+      "baris_teks_bersih": 530,
+      "bentuk": {
+        "chapter": 0,
+        "bab_romawi": 10,
+        "bab_arab": 0,
+        "bab_titik": 0,
+        "tabel_kata": 0,
+        "daftar_isi": false,
+        "sistematika_kata": 3,
+        "kata": 7411,
+        "baris": 530
+      },
+      "profil_bentuk": {
+        "penomoran_bab": "romawi",
+        "bab_romawi": [
+          "I",
+          "II",
+          "III",
+          "IV",
+          "V"
+        ],
+        "bab_arab": [],
+        "chapter": [],
+        "romawi_tanpa_bab_jml": 0,
+        "romawi_judul": [],
+        "romawi_judul_jml": 0,
+        "pemisah_gabung_jml": 0,
+        "sistematika": true,
+        "tabel_baris_pipa": 0,
+        "tabel_padat": false,
+        "rasio_inggris": 0.0036,
+        "bahasa_inggris": false,
+        "kti_d3": false,
+        "jml_bab_terdeteksi": 5,
+        "empat_bab": false,
+        "huruf_berspasi_jml": 0,
+        "nul_jml": 0,
+        "bom_jml": 4,
+        "kata": 7411,
+        "baris": 530,
+        "aturan": {
+          "judul_romawi_tanpa_bab": false
+        },
+        "antrean_manusia": false,
+        "alasan_antrean": []
+      },
+      "bukti_model": {
+        "model_dilayani": "typesafe/jev-1.14-20261014",
+        "satpam_penyedia": "openrouter",
+        "satpam_jejak": [
+          {
+            "penyedia": "resmi",
+            "model": "jev-1.14.0",
+            "hasil": "GAGAL",
+            "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+          },
+          {
+            "penyedia": "openrouter",
+            "model": "typesafe/jev-1.14",
+            "hasil": "DIPAKAI"
+          }
+        ],
+        "provider": "TypeSafe"
+      },
+      "status": "gagal",
+      "alasan": "probe model bukan jev-1.14.0: 'typesafe/jev-1.14-20261014'"
+    }
+  ],
+  "berhasil_jml": 0,
+  "gagal_jml": 12,
+  "panggilan_petakan_total": 0,
+  "panggilan_hakim_total": 0,
+  "panggilan_probe_total": 24,
+  "panggilan_total": 24
+}

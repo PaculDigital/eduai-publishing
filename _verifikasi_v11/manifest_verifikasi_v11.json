@@ -1,0 +1,713 @@
+[
+ {
+  "kode": "AO-2",
+  "bidang": "Administrasi Negara",
+  "nama": "Skripsi Administrasi Negara 1 (seri Bab I-V)",
+  "grup_asal": 4,
+  "teks": "teks_latih/administrasi-negara/Administrasi-Negara-1.txt",
+  "sumber_teks": "manifest_grup4",
+  "ada": true,
+  "kata_lokal": 15350,
+  "kata_v10": null,
+  "panggilan_v10": 14,
+  "label_v10": {
+   "biasa": 333,
+   "subbab": 27,
+   "paragraf": 118
+  },
+  "goyang_v10": 86,
+  "teks_scratch": "administrasi-negara/Administrasi-Negara-1.txt"
+ },
+ {
+  "kode": "AP-3",
+  "bidang": "Administrasi Niaga",
+  "nama": "SKRIPSI SUGANA PUJARAMA (ISI).doc",
+  "grup_asal": 4,
+  "teks": "teks_latih/administrasi-niaga/Sugana-Pujarama.txt",
+  "sumber_teks": "manifest_grup4",
+  "ada": true,
+  "kata_lokal": 7748,
+  "kata_v10": null,
+  "panggilan_v10": 13,
+  "label_v10": {
+   "paragraf": 90,
+   "biasa": 376,
+   "subbab": 57
+  },
+  "goyang_v10": 56,
+  "teks_scratch": "administrasi-niaga/Sugana-Pujarama.txt"
+ },
+ {
+  "kode": "AJ-1",
+  "bidang": "Akuntansi",
+  "nama": "Skripsi Fix.doc",
+  "grup_asal": 4,
+  "teks": "teks_latih/akuntansi/Skripsi-Fix.txt",
+  "sumber_teks": "manifest_grup4",
+  "ada": true,
+  "kata_lokal": 10575,
+  "kata_v10": null,
+  "panggilan_v10": 32,
+  "label_v10": {
+   "biasa": 1325,
+   "paragraf": 109,
+   "bab": 2,
+   "subbab": 73
+  },
+  "goyang_v10": 115,
+  "teks_scratch": "akuntansi/Skripsi-Fix.txt"
+ },
+ {
+  "kode": "T3",
+  "bidang": "Bahasa Inggris",
+  "nama": "endah orig.doc",
+  "grup_asal": 2,
+  "teks": "teks_latih/bahasa-inggris/T3_endah_orig_doc.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 8146,
+  "kata_v10": 8146,
+  "panggilan_v10": 10,
+  "label_v10": {
+   "biasa": 249,
+   "bab": 19,
+   "paragraf": 116,
+   "subbab": 91
+  },
+  "goyang_v10": 68,
+  "teks_scratch": "bahasa-inggris/T3_endah_orig_doc.txt"
+ },
+ {
+  "kode": "R3",
+  "bidang": "Bimbingan Konseling",
+  "nama": "skripsi hasil final.rtf",
+  "grup_asal": 2,
+  "teks": "teks_latih/bimbingan-konseling/R3_skripsi_hasil_final_rtf.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 21243,
+  "kata_v10": 21243,
+  "panggilan_v10": 16,
+  "label_v10": {
+   "subbab": 68,
+   "biasa": 647,
+   "paragraf": 166,
+   "bab": 3
+  },
+  "goyang_v10": 131,
+  "teks_scratch": "bimbingan-konseling/R3_skripsi_hasil_final_rtf.txt"
+ },
+ {
+  "kode": "S2",
+  "bidang": "Ekonomi Pembangunan",
+  "nama": "Skripsi Ekonomi Pembangunan 12 (seri)",
+  "grup_asal": 2,
+  "teks": "teks_latih/ekonomi-pembangunan/S2_Skripsi_Ekonomi_Pembangunan_12_seri.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 18049,
+  "kata_v10": 18049,
+  "panggilan_v10": 26,
+  "label_v10": {
+   "biasa": 1162,
+   "bab": 10,
+   "paragraf": 127,
+   "subbab": 78
+  },
+  "goyang_v10": 71,
+  "teks_scratch": "ekonomi-pembangunan/S2_Skripsi_Ekonomi_Pembangunan_12_seri.txt"
+ },
+ {
+  "kode": "AN-1",
+  "bidang": "Hukum",
+  "nama": "Skripsi Jur Hukum 1 (seri Bab I-V)",
+  "grup_asal": 4,
+  "teks": "teks_latih/hukum/Jur-Hukum-1.txt",
+  "sumber_teks": "manifest_grup4",
+  "ada": true,
+  "kata_lokal": 16014,
+  "kata_v10": null,
+  "panggilan_v10": 12,
+  "label_v10": {
+   "subbab": 30,
+   "biasa": 225,
+   "paragraf": 115,
+   "bab": 6
+  },
+  "goyang_v10": 61,
+  "teks_scratch": "hukum/Jur-Hukum-1.txt"
+ },
+ {
+  "kode": "AM-2",
+  "bidang": "Hukum Perdata",
+  "nama": "Skripsi Hukum 10 / ENDAH (seri Bab I-V)",
+  "grup_asal": 4,
+  "teks": "teks_latih/hukum-perdata/Hukum-10-ENDAH.txt",
+  "sumber_teks": "manifest_grup4",
+  "ada": true,
+  "kata_lokal": 15069,
+  "kata_v10": null,
+  "panggilan_v10": 14,
+  "label_v10": {
+   "subbab": 32,
+   "paragraf": 157,
+   "biasa": 305,
+   "bab": 4
+  },
+  "goyang_v10": 114,
+  "teks_scratch": "hukum-perdata/Hukum-10-ENDAH.txt"
+ },
+ {
+  "kode": "U3",
+  "bidang": "Hukum Pidana",
+  "nama": "Skripsi Hukum Pidana 1 (seri, Bab I-IV)",
+  "grup_asal": 2,
+  "teks": "teks_latih/hukum-pidana/U3_Skripsi_Hukum_Pidana_1_seri_Bab_I_IV.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 15536,
+  "kata_v10": 15536,
+  "panggilan_v10": 12,
+  "label_v10": {
+   "paragraf": 122,
+   "bab": 6,
+   "subbab": 14,
+   "biasa": 383
+  },
+  "goyang_v10": 70,
+  "teks_scratch": "hukum-pidana/U3_Skripsi_Hukum_Pidana_1_seri_Bab_I_IV.txt"
+ },
+ {
+  "kode": "AL-2",
+  "bidang": "Informatika Multimedia",
+  "nama": "peta pusat belanja (seri PDF Bab I-V)",
+  "grup_asal": 4,
+  "teks": "teks_latih/informatika-multimedia/peta-pusat-belanja.txt",
+  "sumber_teks": "manifest_grup4",
+  "ada": true,
+  "kata_lokal": 4827,
+  "kata_v10": null,
+  "panggilan_v10": 14,
+  "label_v10": {
+   "subbab": 60,
+   "biasa": 564,
+   "paragraf": 52
+  },
+  "goyang_v10": 55,
+  "teks_scratch": "informatika-multimedia/peta-pusat-belanja.txt"
+ },
+ {
+  "kode": "AI-2",
+  "bidang": "Kimia",
+  "nama": "SKRIPSI BEKTI FEBRI.doc",
+  "grup_asal": 4,
+  "teks": "teks_latih/kimia/SKRIPSI-BEKTI-FEBRI.txt",
+  "sumber_teks": "manifest_grup4",
+  "ada": true,
+  "kata_lokal": 12873,
+  "kata_v10": null,
+  "panggilan_v10": 24,
+  "label_v10": {
+   "subbab": 132,
+   "paragraf": 143,
+   "biasa": 816,
+   "bab": 2
+  },
+  "goyang_v10": 95,
+  "teks_scratch": "kimia/SKRIPSI-BEKTI-FEBRI.txt"
+ },
+ {
+  "kode": "AK-3",
+  "bidang": "Manajemen",
+  "nama": "Manajemen Pemasaran 4 (seri Bab I-VI)",
+  "grup_asal": 4,
+  "teks": "teks_latih/manajemen/Manajemen-Pemasaran-4.txt",
+  "sumber_teks": "manifest_grup4",
+  "ada": true,
+  "kata_lokal": 10832,
+  "kata_v10": null,
+  "panggilan_v10": 14,
+  "label_v10": {
+   "paragraf": 121,
+   "biasa": 346,
+   "subbab": 54
+  },
+  "goyang_v10": 57,
+  "teks_scratch": "manajemen/Manajemen-Pemasaran-4.txt"
+ },
+ {
+  "kode": "Q3",
+  "bidang": "Matematika",
+  "nama": "Skripsi matematika 12 (seri)",
+  "grup_asal": 2,
+  "teks": "teks_latih/matematika/Q3_Skripsi_matematika_12_seri.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 6450,
+  "kata_v10": 6450,
+  "panggilan_v10": 14,
+  "label_v10": {
+   "subbab": 30,
+   "biasa": 693,
+   "paragraf": 53
+  },
+  "goyang_v10": 51,
+  "teks_scratch": "matematika/Q3_Skripsi_matematika_12_seri.txt"
+ },
+ {
+  "kode": "O3",
+  "bidang": "Pendidikan Agama Islam",
+  "nama": "Pelaksanaan Program Pembelajaran PAI Pada Lembaga Pendidikan.doc",
+  "grup_asal": 2,
+  "teks": "teks_latih/pendidikan-agama-islam/O3_Pelaksanaan_Program_Pembelajaran_PAI_Pada_Lembaga_Pendidikan_doc.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 12028,
+  "kata_v10": 12028,
+  "panggilan_v10": 20,
+  "label_v10": {
+   "paragraf": 71,
+   "bab": 4,
+   "biasa": 1127,
+   "subbab": 50
+  },
+  "goyang_v10": 67,
+  "teks_scratch": "pendidikan-agama-islam/O3_Pelaksanaan_Program_Pembelajaran_PAI_Pada_Lembaga_Pendidikan_doc.txt"
+ },
+ {
+  "kode": "P2",
+  "bidang": "Pendidikan Elektro",
+  "nama": "Skripsi Pendidikan Elektro 1 (seri)",
+  "grup_asal": 2,
+  "teks": "teks_latih/pendidikan-elektro/P2_Skripsi_Pendidikan_Elektro_1_seri.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 5485,
+  "kata_v10": 5485,
+  "panggilan_v10": 13,
+  "label_v10": {
+   "subbab": 56,
+   "biasa": 605,
+   "paragraf": 58,
+   "bab": 1
+  },
+  "goyang_v10": 59,
+  "teks_scratch": "pendidikan-elektro/P2_Skripsi_Pendidikan_Elektro_1_seri.txt"
+ },
+ {
+  "kode": "M3",
+  "bidang": "Skripsi ESP Syariah",
+  "nama": "muti (seri)",
+  "grup_asal": 2,
+  "teks": "teks_latih/esp-syariah/M3_muti_seri.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 14781,
+  "kata_v10": 14781,
+  "panggilan_v10": 12,
+  "label_v10": {
+   "subbab": 154,
+   "bab": 10,
+   "paragraf": 193,
+   "biasa": 309
+  },
+  "goyang_v10": 108,
+  "teks_scratch": "esp-syariah/M3_muti_seri.txt"
+ },
+ {
+  "kode": "N3",
+  "bidang": "Skripsi Kebidanan",
+  "nama": "Skripsi Kebidanan 5.pdf",
+  "grup_asal": 2,
+  "teks": "teks_latih/kebidanan/N3_Skripsi_Kebidanan_5_pdf.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 8392,
+  "kata_v10": 8392,
+  "panggilan_v10": 16,
+  "label_v10": {
+   "subbab": 128,
+   "bab": 1,
+   "biasa": 622,
+   "paragraf": 51
+  },
+  "goyang_v10": 55,
+  "teks_scratch": "kebidanan/N3_Skripsi_Kebidanan_5_pdf.txt"
+ },
+ {
+  "kode": "L3",
+  "bidang": "Teknik Industri",
+  "nama": "Skripsi Teknik Industri 5 (seri)",
+  "grup_asal": 2,
+  "teks": "teks_latih/teknik-industri/L3_Skripsi_Teknik_Industri_5_seri.txt",
+  "sumber_teks": "hasil_grup2.berkas_teks",
+  "ada": true,
+  "kata_lokal": 9545,
+  "kata_v10": 9545,
+  "panggilan_v10": 25,
+  "label_v10": {
+   "biasa": 1072,
+   "bab": 10,
+   "paragraf": 122,
+   "subbab": 91
+  },
+  "goyang_v10": 58,
+  "teks_scratch": "teknik-industri/L3_Skripsi_Teknik_Industri_5_seri.txt"
+ },
+ {
+  "kode": "B4",
+  "bidang": "campuran",
+  "nama": "Seri Campuran / Teknik Arsitektur / Skripsi Teknik Arsitektur 2",
+  "grup_asal": 1,
+  "teks": "teks_latih/campuran/arsitektur-2.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 22335,
+  "kata_v10": 22335,
+  "panggilan_v10": 38,
+  "label_v10": {
+   "subbab": 160,
+   "biasa": 2306,
+   "paragraf": 188
+  },
+  "goyang_v10": 170,
+  "teks_scratch": "campuran/arsitektur-2.txt"
+ },
+ {
+  "kode": "D3",
+  "bidang": "ekonomi",
+  "nama": "Seri skripsi ekonomi 6",
+  "grup_asal": 1,
+  "teks": "teks_latih/ekonomi/skripsi-ekonomi-6.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 17766,
+  "kata_v10": 17766,
+  "panggilan_v10": 26,
+  "label_v10": {
+   "bab": 10,
+   "subbab": 61,
+   "paragraf": 214,
+   "biasa": 1095
+  },
+  "goyang_v10": 119,
+  "teks_scratch": "ekonomi/skripsi-ekonomi-6.txt"
+ },
+ {
+  "kode": "F4",
+  "bidang": "ekonomi-manajemen",
+  "nama": "Seri Skripsi Ekonomi Manajemen 8",
+  "grup_asal": 1,
+  "teks": "teks_latih/ekonomi-manajemen/ekonomi-manajemen-8.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 7628,
+  "kata_v10": 7628,
+  "panggilan_v10": 10,
+  "label_v10": {
+   "bab": 10,
+   "subbab": 46,
+   "paragraf": 103,
+   "biasa": 254
+  },
+  "goyang_v10": 61,
+  "teks_scratch": "ekonomi-manajemen/ekonomi-manajemen-8.txt"
+ },
+ {
+  "kode": "X3",
+  "bidang": "fisika",
+  "nama": "skripsi fisika 22",
+  "grup_asal": 3,
+  "teks": "/tmp/grup3/tar/teks/X3.txt",
+  "sumber_teks": "tmp_grup3",
+  "ada": true,
+  "kata_lokal": 6480,
+  "kata_v10": 6480,
+  "panggilan_v10": 6,
+  "label_v10": {
+   "bab": 9,
+   "subbab": 26,
+   "paragraf": 66,
+   "biasa": 89
+  },
+  "goyang_v10": 22,
+  "teks_scratch": "grup3/X3.txt"
+ },
+ {
+  "kode": "AA3",
+  "bidang": "hukum-tata-negara",
+  "nama": "ht.042b.doc",
+  "grup_asal": 3,
+  "teks": "/tmp/grup3/tar/teks/AA3.txt",
+  "sumber_teks": "tmp_grup3",
+  "ada": true,
+  "kata_lokal": 15553,
+  "kata_v10": 15553,
+  "panggilan_v10": 12,
+  "label_v10": {
+   "subbab": 45,
+   "paragraf": 85,
+   "biasa": 382,
+   "bab": 4
+  },
+  "goyang_v10": 86,
+  "teks_scratch": "grup3/AA3.txt"
+ },
+ {
+  "kode": "AD3",
+  "bidang": "ilmu-tanah",
+  "nama": "SKRIPSI TIAR.doc",
+  "grup_asal": 3,
+  "teks": "/tmp/grup3/tar/teks/AD3.txt",
+  "sumber_teks": "tmp_grup3",
+  "ada": true,
+  "kata_lokal": 4550,
+  "kata_v10": 4550,
+  "panggilan_v10": 10,
+  "label_v10": {
+   "bab": 5,
+   "subbab": 17,
+   "paragraf": 66,
+   "biasa": 281
+  },
+  "goyang_v10": 16,
+  "teks_scratch": "grup3/AD3.txt"
+ },
+ {
+  "kode": "A4",
+  "bidang": "informatika",
+  "nama": "Seri Koleksi Skripsi Informatika 3 / Website Lembaga Pendidikan",
+  "grup_asal": 1,
+  "teks": "teks_latih/informatika/koleksi-informatika-3-website-lembaga-pendidikan.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 3505,
+  "kata_v10": 3505,
+  "panggilan_v10": 7,
+  "label_v10": {
+   "subbab": 72,
+   "paragraf": 63,
+   "biasa": 170,
+   "bab": 6
+  },
+  "goyang_v10": 28,
+  "teks_scratch": "informatika/koleksi-informatika-3-website-lembaga-pendidikan.txt"
+ },
+ {
+  "kode": "W3",
+  "bidang": "komunikasi",
+  "nama": "KOM 13.doc",
+  "grup_asal": 3,
+  "teks": "/tmp/grup3/tar/teks/W3.txt",
+  "sumber_teks": "tmp_grup3",
+  "ada": true,
+  "kata_lokal": 31316,
+  "kata_v10": 31316,
+  "panggilan_v10": 21,
+  "label_v10": {
+   "subbab": 128,
+   "paragraf": 241,
+   "biasa": 975
+  },
+  "goyang_v10": 195,
+  "teks_scratch": "grup3/W3.txt"
+ },
+ {
+  "kode": "Z3",
+  "bidang": "pendidikan-bahasa-indonesia",
+  "nama": "Tekpendidikan.doc",
+  "grup_asal": 3,
+  "teks": "/tmp/grup3/tar/teks/Z3.txt",
+  "sumber_teks": "tmp_grup3",
+  "ada": true,
+  "kata_lokal": 17564,
+  "kata_v10": 17564,
+  "panggilan_v10": 12,
+  "label_v10": {
+   "subbab": 78,
+   "paragraf": 181,
+   "biasa": 312,
+   "bab": 8
+  },
+  "goyang_v10": 127,
+  "teks_scratch": "grup3/Z3.txt"
+ },
+ {
+  "kode": "E3",
+  "bidang": "pendidikan-bhs-arab",
+  "nama": "Seri Tarbiyah / Skripsi Tarbiyah 11",
+  "grup_asal": 1,
+  "teks": "teks_latih/pendidikan-bhs-arab/tarbiyah-11.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 11411,
+  "kata_v10": 11411,
+  "panggilan_v10": 30,
+  "label_v10": {
+   "bab": 10,
+   "subbab": 46,
+   "paragraf": 133,
+   "biasa": 1452
+  },
+  "goyang_v10": 89,
+  "teks_scratch": "pendidikan-bhs-arab/tarbiyah-11.txt"
+ },
+ {
+  "kode": "J3",
+  "bidang": "pendidikan-biologi",
+  "nama": "Seri Skripsi Pendidikan Biologi 12",
+  "grup_asal": 1,
+  "teks": "teks_latih/pendidikan-biologi/biologi-12.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 5689,
+  "kata_v10": 5689,
+  "panggilan_v10": 8,
+  "label_v10": {
+   "bab": 11,
+   "subbab": 44,
+   "biasa": 173,
+   "paragraf": 80
+  },
+  "goyang_v10": 32,
+  "teks_scratch": "pendidikan-biologi/biologi-12.txt"
+ },
+ {
+  "kode": "AE2",
+  "bidang": "pendidikan-ekonomi",
+  "nama": "skripsi 1,2,3,4,5 komplit revisi.doc",
+  "grup_asal": 3,
+  "teks": "/tmp/grup3/tar/teks/AE2.txt",
+  "sumber_teks": "tmp_grup3",
+  "ada": true,
+  "kata_lokal": 17571,
+  "kata_v10": 17571,
+  "panggilan_v10": 23,
+  "label_v10": {
+   "bab": 2,
+   "subbab": 69,
+   "paragraf": 169,
+   "biasa": 1328
+  },
+  "goyang_v10": 131,
+  "teks_scratch": "grup3/AE2.txt"
+ },
+ {
+  "kode": "C4",
+  "bidang": "perbankan-syariah",
+  "nama": "Seri Skripsi Perbankan Syariah 37",
+  "grup_asal": 1,
+  "teks": "teks_latih/perbankan-syariah/perbankan-syariah-37.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 11876,
+  "kata_v10": 11876,
+  "panggilan_v10": 13,
+  "label_v10": {
+   "bab": 9,
+   "subbab": 68,
+   "paragraf": 145,
+   "biasa": 487
+  },
+  "goyang_v10": 72,
+  "teks_scratch": "perbankan-syariah/perbankan-syariah-37.txt"
+ },
+ {
+  "kode": "AC2",
+  "bidang": "perhotelan",
+  "nama": "Skripsi perhotelan 1",
+  "grup_asal": 3,
+  "teks": "/tmp/grup3/tar/teks/AC2.txt",
+  "sumber_teks": "tmp_grup3",
+  "ada": true,
+  "kata_lokal": 7412,
+  "kata_v10": 7412,
+  "panggilan_v10": 8,
+  "label_v10": {
+   "subbab": 46,
+   "paragraf": 74,
+   "biasa": 269,
+   "bab": 7
+  },
+  "goyang_v10": 51,
+  "teks_scratch": "grup3/AC2.txt"
+ },
+ {
+  "kode": "G3",
+  "bidang": "psikologi",
+  "nama": "Skripsi Prikologi 30.doc",
+  "grup_asal": 1,
+  "teks": "teks_latih/psikologi/prikologi-30.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 10747,
+  "kata_v10": 10747,
+  "panggilan_v10": 10,
+  "label_v10": {
+   "paragraf": 149,
+   "subbab": 51,
+   "biasa": 204,
+   "bab": 4
+  },
+  "goyang_v10": 73,
+  "teks_scratch": "psikologi/prikologi-30.txt"
+ },
+ {
+  "kode": "I4",
+  "bidang": "teknik-mesin",
+  "nama": "Seri RANCANG BANGUN MESIN PENGUPAS BIJI KOPI PORTABLE",
+  "grup_asal": 1,
+  "teks": "teks_latih/teknik-mesin/pengupas-biji-kopi.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 5319,
+  "kata_v10": 5319,
+  "panggilan_v10": 13,
+  "label_v10": {
+   "paragraf": 58,
+   "biasa": 539,
+   "subbab": 42
+  },
+  "goyang_v10": 42,
+  "teks_scratch": "teknik-mesin/pengupas-biji-kopi.txt"
+ },
+ {
+  "kode": "Y2",
+  "bidang": "teknik-pertanian",
+  "nama": "SKRIPSI TIAR.doc",
+  "grup_asal": 3,
+  "teks": "/tmp/grup3/tar/teks/Y2.txt",
+  "sumber_teks": "tmp_grup3",
+  "ada": true,
+  "kata_lokal": 4550,
+  "kata_v10": 4550,
+  "panggilan_v10": 10,
+  "label_v10": {
+   "bab": 5,
+   "subbab": 14,
+   "paragraf": 62,
+   "biasa": 292
+  },
+  "goyang_v10": 22,
+  "teks_scratch": "grup3/Y2.txt"
+ },
+ {
+  "kode": "H1",
+  "bidang": "teknik-sipil",
+  "nama": "20080525011125Mulyadi Lubis05914005.pdf",
+  "grup_asal": 1,
+  "teks": "teks_latih/teknik-sipil/mulyadi-lubis.txt",
+  "sumber_teks": "manifest_grup1",
+  "ada": true,
+  "kata_lokal": 24012,
+  "kata_v10": 24012,
+  "panggilan_v10": 40,
+  "label_v10": {
+   "biasa": 2234,
+   "subbab": 219,
+   "paragraf": 187
+  },
+  "goyang_v10": 167,
+  "teks_scratch": "teknik-sipil/mulyadi-lubis.txt"
+ }
+]
