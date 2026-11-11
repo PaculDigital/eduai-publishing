@@ -37,7 +37,17 @@ log = logging.getLogger(__name__)
 #    v8 (11 Nov 2026): sambung_kode JOIN B-huruf-kecil (deterministik,
 #    terukur live Jev sendiri gabung 97-98% pasangan itu) + buang byte
 #    NUL di _susun_dari_bersih (artefak PDF fid=112: 103 NUL).
-RULE_VERSION = 'jev-peta-v10'  # v10 (11 Nov 2026): R2-3 demosi BAB tanpa pengecualian sistematika
+#    v11 (11 Nov 2026): LAPISAN BENTUK dari latihan 112 naskah —
+#    profil_bentuk() deterministik (Lapis 1), pendapat_kedua() hanya
+#    untuk baris goyang (Lapis 2, jawaban disuntik, nol Jev di sini),
+#    antrean manusia untuk bentuk tak dikenal (Lapis 3, ditandai di
+#    hasil, bukan diam-diam dipetakan). v13: pendapat_kedua() JUGA untuk
+#    baris ditandai Hakim yang tidak goyang (suara tunggal Jev). Aturan baru: buang BOM (66/112
+#    teks), buang pemisah gabungan '===== ... =====' (117 baris di 50
+#    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
+#    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
+#    bentuknya memang begitu (6 entri: Y1, Y2, AD1, AD2, AD3, AG1).
+RULE_VERSION = 'jev-peta-v15'  # v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi — kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
@@ -189,6 +199,242 @@ def _angka_bab(nomor):
     return _ROMAWI_BAB.get(t)
 
 
+# ── v11 LAPIS 1 — PENGENAL BENTUK DETERMINISTIK ─────────────────────────
+#    Dibaca SEBELUM pemetaan, dari teks mentah saja (tanpa Jev).
+#    Bukti ambang (latihan 112 naskah, 11 Nov 2026, tabel_latih112.json):
+#      - penomoran Romawi tanpa kata BAB: 6 entri, 3 bidang (Y1, Y2, AD1,
+#        AD2, AD3, AG1) — semuanya jml_bab_terdeteksi == 0 sebelum v11.
+#      - CHAPTER Inggris: 4 naskah (T1, T2, T3, AH1), masing-masing 5 bab.
+#      - pemisah gabungan: 117 baris di 50 teks (pola luas, lihat bawah),
+#        semuanya pagar nama berkas, nol isi asli.
+#      - rasio Inggris >= 0,02: hanya ke-4 naskah CHAPTER (0,159-0,244);
+#        tertinggi berikutnya 0,012 — pemisah bersih.
+#      - tabel padat (>20 baris pipa): 3 naskah (K1 60, Q3 36, B2 22);
+#        berikutnya 6 — pemisah bersih.
+#      - KTI D3: 3 naskah (N1, N2, N3). Empat bab: 5 naskah (O1, O2, O3,
+#        U3, AA3). Sistematika: 36 naskah. BOM: 66 teks.
+#    Satu-satunya aturan yang DIPILIH profil (gated) adalah deteksi judul
+#    Romawi tanpa kata BAB — tanpa pagar profil, baris 'II. ...' di naskah
+#    ber-BAB (mis. O1, romawi_tanpa_bab_jml 8) akan salah jadi bab.
+#    CHAPTER, pemisah, dan BOM ditangani tanpa pagar: polanya tidak ambigu
+#    (CHAPTER polos tidak pernah muncul sebagai isi biasa; pemisah selalu
+#    pagar nama berkas; BOM bukan isi).
+#    Bahasa Inggris HANYA dilaporkan, tidak mengantrekan: ke-4 naskah
+#    Inggris terukur terpetakan lewat aturan CHAPTER; RENCANA_LAPISAN_
+#    BENTUK.md mengusulkan antrean untuk Inggris, tapi putusan Boss soal
+#    itu (no 1-4) belum ada — jangan blokir yang sudah jalan.
+_KATA_INGGRIS = frozenset({'the', 'and', 'of', 'to', 'in', 'is', 'are',
+                            'for', 'with', 'chapter', 'introduction'})
+_POLA_BAB_ROMAWI_PROFIL = re.compile(
+    r'^\s*(?:\d{1,3}\s+)?(?:\d+[.)]\s*)?BAB\s+([IVX]+)\b', re.I)
+_POLA_BAB_ARAB_PROFIL = re.compile(
+    r'^\s*(?:\d{1,3}\s+)?(?:\d+[.)]\s*)?BAB\s+(\d+)\b', re.I)
+_POLA_CHAPTER_PROFIL = re.compile(
+    r'^\s*(?:\d{1,3}\s+)?(?:\d+[.)]\s*)?CHAPTER\s+([IVX0-9]+)\b', re.I)
+_POLA_ROMAWI_TANPA_BAB = re.compile(
+    r'^\s*([IVX]{1,4})[.]\s+[A-Z\u00C0-\u00DE][^.]{2,60}$')
+_POLA_PEMISAH_GABUNGAN = re.compile(r'^={3,}.*={3,}\s*$')
+_POLA_CHAPTER_POLOS = re.compile(r'^CHAPTER\s+([IVX0-9]+)\s*$', re.I)
+_POLA_ROMAWI_JUDUL = re.compile(r'^([IVX]{1,4})\.\s+(\S(?:.*\S)?)\s*$')
+# Kosakata judul BAB untuk aturan Romawi: gabungan judul yang terukur
+# dalam bentuk Romawi (PENDAHULUAN, TINJAUAN PUSTAKA, PELAKSANAAN
+# PENELITIAN, HASIL DAN PEMBAHASAN, KESIMPULAN DAN SARAN — 6 entri) dan
+# judul BAB yang terukur di naskah ber-BAB lain di 112 teks. Judul di luar
+# kosakata ini tetap jadi kandidat Jev, tidak dipaksa jadi bab.
+_JUDUL_BAB_ROMAWI = frozenset({
+    'PENDAHULUAN', 'TINJAUAN PUSTAKA', 'LANDASAN TEORI', 'KAJIAN PUSTAKA',
+    'METODE PENELITIAN', 'METODOLOGI PENELITIAN', 'PELAKSANAAN PENELITIAN',
+    'HASIL DAN PEMBAHASAN', 'HASIL PENELITIAN DAN PEMBAHASAN', 'PENUTUP',
+    'KESIMPULAN DAN SARAN', 'KESIMPULAN'})
+
+
+def profil_bentuk(teks):
+    """LAPIS 1 (v11): profil bentuk naskah dari teks mentah (deterministik).
+
+    Kembalikan dict profil; kunci 'antrean_manusia' True + 'alasan_antrean'
+    berisi bila bentuk tak dikenal (Lapis 3): tidak ada penanda BAB /
+    CHAPTER / judul Romawi sama sekali, atau NUL > 50 (ambang dari
+    fid=112: 103 NUL merusak cek huruf awal, v8). Huruf berspasi HANYA
+    dilaporkan, tidak mengantrekan: tidak ada ambang gagal yang terukur
+    (maks 8 di 112 teks latih).
+    """
+    baris = (teks or '').split('\n')
+    romawi, arab, chapter = set(), set(), set()
+    romawi_tanpa, romawi_judul, pemisah = 0, [], 0
+    for b in baris:
+        s = b.strip().replace('\ufeff', '')
+        if _POLA_PEMISAH_GABUNGAN.match(s):
+            pemisah += 1
+            continue
+        m = _POLA_BAB_ROMAWI_PROFIL.match(s)
+        if m:
+            romawi.add(m.group(1).upper())
+            continue
+        m = _POLA_BAB_ARAB_PROFIL.match(s)
+        if m:
+            arab.add(int(m.group(1)))
+            continue
+        m = _POLA_CHAPTER_PROFIL.match(s)
+        if m:
+            chapter.add(m.group(1).upper())
+            continue
+        if _POLA_ROMAWI_TANPA_BAB.match(s):
+            romawi_tanpa += 1
+            m2 = _POLA_ROMAWI_JUDUL.match(s)
+            if m2 and m2.group(2).strip().upper() in _JUDUL_BAB_ROMAWI:
+                romawi_judul.append(m2.group(2).strip().upper())
+    kata = (teks or '').split()
+    n_kata = len(kata)
+    inggris = sum(1 for w in kata
+                  if w.lower().strip('.,;:()') in _KATA_INGGRIS)
+    rasio_inggris = round(inggris / max(1, n_kata), 4)
+    tabel_baris = sum(1 for b in baris if b.count('|') >= 2)
+    if romawi and arab:
+        penomoran = 'campuran'
+    elif romawi:
+        penomoran = 'romawi'
+    elif arab:
+        penomoran = 'arab'
+    elif chapter:
+        penomoran = 'chapter'
+    elif romawi_judul:
+        penomoran = 'romawi_tanpa_bab'
+    else:
+        penomoran = 'tidak_ada'
+    nul = (teks or '').count('\x00')
+    alasan_antrean = []
+    if penomoran == 'tidak_ada':
+        alasan_antrean.append(
+            'tidak ada penanda BAB/CHAPTER/judul Romawi')
+    if nul > 50:
+        alasan_antrean.append(
+            'banyak byte NUL (%d), ekstraksi rusak' % nul)
+    return {
+        'penomoran_bab': penomoran,
+        'bab_romawi': sorted(romawi),
+        'bab_arab': sorted(arab),
+        'chapter': sorted(chapter),
+        'romawi_tanpa_bab_jml': romawi_tanpa,
+        'romawi_judul': sorted(set(romawi_judul)),
+        'romawi_judul_jml': len(romawi_judul),
+        'pemisah_gabung_jml': pemisah,
+        'sistematika': bool(re.search(r'SISTEMATIKA\s+PENULISAN',
+                                       teks or '', re.I)),
+        'tabel_baris_pipa': tabel_baris,
+        'tabel_padat': tabel_baris > 20,
+        'rasio_inggris': rasio_inggris,
+        'bahasa_inggris': rasio_inggris >= 0.02,
+        'kti_d3': bool(re.search(r'Karya Tulis Ilmiah|Ahli Madya',
+                                 teks or '')),
+        'jml_bab_terdeteksi': len(romawi | {str(a) for a in arab}
+                                  | chapter),
+        'empat_bab': len(romawi | {str(a) for a in arab} | chapter) == 4,
+        'huruf_berspasi_jml': sum(
+            1 for b in baris
+            if re.search(r'(?:[A-Za-z]\s){4,}[A-Za-z]', b)),
+        'nul_jml': nul,
+        'bom_jml': (teks or '').count('\ufeff'),
+        'kata': n_kata,
+        'baris': len(baris),
+        # Satu-satunya saklar aturan yang dipilih profil (lihat atas).
+        'aturan': {'judul_romawi_tanpa_bab':
+                   penomoran == 'romawi_tanpa_bab'},
+        'antrean_manusia': bool(alasan_antrean),
+        'alasan_antrean': alasan_antrean,
+    }
+
+
+def pendapat_kedua(idx, teks_baris, suara, p, jawaban_kedua=None,
+                  mode='suara'):
+    """LAPIS 2 (v11) — pendapat kedua HANYA untuk baris goyang.
+    v13 (11 Nov 2026, koreksi gating): JUGA untuk baris yang ditandai
+    Hakim (ragu/curiga) meski tidak goyang — suara Jev-nya tunggal, dan
+    jawaban kedua yang disuntik tetap diadili dengan aturan yang sama
+    (sepakat -> tetap, beda bukan soal bab -> berbalik, beda soal bab /
+    tidak yakin -> antrean). Tanpa jawaban kedua, suara tunggal tetap
+    'bukan-goyang' (tidak ada yang perlu diadili).
+
+    Murni deterministik, NOL panggilan Jev: `jawaban_kedua` DISUNTIK oleh
+    pemanggil (agen kedua live, tanya ulang, atau model 1.13 sebagai
+    pembanding) — fungsi ini tidak pernah memanggil Jev sendiri.
+    `suara`/`p` = suara + confidence tersimpan dari run.
+
+    mode='suara' (bawaan, v11 — adjudikasi suara):
+      'bukan-goyang'      — suara tersimpan sepakat (bukan sengketa) DAN
+                            tidak ada jawaban kedua yang disuntik.
+      'tetap'             — pendapat kedua sepakat dengan suara teratas,
+                            atau sepakat dengan minoritas tapi kurang yakin.
+      'berbalik'          — pendapat kedua sepakat dengan suara minoritas
+                            DAN confidence-nya >= suara teratas.
+      'antrean-manusia'   — tidak ada pendapat kedua, pendapat kedua tidak
+                            yakin (confidence < 0,5), atau tiga suara
+                            berbeda. Label TIDAK dipaksa.
+
+    mode='agen-kedua' (v12, rantai 3 langkah — Gas Bos 11 Nov 2026):
+    jawaban kedua adalah PEMBACA KEDUA yang independen (baca konteks lebar,
+    suara Jev TIDAK ditunjukkan). Aturan Bos: bila beda, keputusan agen
+    kedua yang dipakai — KECUALI beda soal judul bab.
+      'tetap'             — agen kedua sepakat dengan suara teratas.
+      'berbalik'          — agen kedua beda DAN bukan soal judul bab
+                            (label agen kedua dipakai, apa pun suara lamanya).
+      'antrean-manusia'   — tidak ada jawaban kedua, tidak yakin
+                            (confidence < 0,5), atau beda soal judul bab
+                            (label kedua ATAU label Jev adalah 'bab').
+                            Label TIDAK dipaksa.
+    """
+    votes = [v for v in (suara or []) if v]
+    if len(set(votes)) <= 1 and (not jawaban_kedua
+                                 or not jawaban_kedua.get('label')):
+        return {'idx': idx, 'putusan': 'bukan-goyang',
+                'label': votes[0] if votes else None,
+                'alasan': 'suara tersimpan sepakat'}
+    if not jawaban_kedua or not jawaban_kedua.get('label'):
+        return {'idx': idx, 'putusan': 'antrean-manusia', 'label': None,
+                'alasan': 'tidak ada pendapat kedua'}
+    j = jawaban_kedua['label']
+    cj = jawaban_kedua.get('confidence')
+    if not isinstance(cj, (int, float)) or cj < 0.5:
+        return {'idx': idx, 'putusan': 'antrean-manusia', 'label': None,
+                'alasan': 'pendapat kedua tidak yakin (confidence < 0,5)'}
+    atas_c = -1.0
+    # Suara teratas memakai aturan yang SAMA dengan _hitung_label: confidence
+    # tertinggi; seri -> suara yang pertama muncul. (Tanpa ini, seri 0,9 vs
+    # 0,9 bisa memilih label berbeda dari label menang pipeline.)
+    skor, urutan = {}, {}
+    for urut, (v, c) in enumerate(zip(suara or [], p or [])):
+        if not v:
+            continue
+        s = float(c) if isinstance(c, (int, float)) else 0.0
+        if v not in skor or s > skor[v]:
+            skor[v] = s
+        if v not in urutan:
+            urutan[v] = urut
+    atas = max(skor, key=lambda v: (skor[v], -urutan[v]))
+    atas_c = skor[atas]
+    if j == atas:
+        return {'idx': idx, 'putusan': 'tetap', 'label': atas,
+                'alasan': 'pendapat kedua sepakat dengan suara teratas'}
+    if mode == 'agen-kedua':
+        # Aturan Bos (rantai 3 langkah): beda → keputusan agen kedua dipakai,
+        # KECUALI beda soal judul bab → manusia yang putuskan.
+        if j == 'bab' or atas == 'bab':
+            return {'idx': idx, 'putusan': 'antrean-manusia', 'label': None,
+                    'alasan': 'beda soal judul bab, manusia yang putuskan'}
+        return {'idx': idx, 'putusan': 'berbalik', 'label': j,
+                'alasan': 'agen kedua beda (bukan soal bab), keputusannya '
+                          'dipakai'}
+    if j in set(votes):
+        if cj >= atas_c:
+            return {'idx': idx, 'putusan': 'berbalik', 'label': j,
+                    'alasan': 'pendapat kedua sepakat dengan minoritas '
+                              'dan lebih yakin'}
+        return {'idx': idx, 'putusan': 'tetap', 'label': atas,
+                'alasan': 'pendapat kedua sepakat dengan minoritas tapi '
+                          'kurang yakin'}
+    return {'idx': idx, 'putusan': 'antrean-manusia', 'label': None,
+            'alasan': 'tiga suara berbeda, manusia yang putuskan'}
+
+
 # ── KATA GANTUNG (v6.7): kata terakhir baris yang WAJIB diikuti lanjutan
 #    dalam kalimat yang sama. Salinan dari `app/sambung_kode.py` (di sana
 #    dipakai putusan sambung; di sini dipakai koreksi batas paragraf) —
@@ -267,8 +513,17 @@ def _koreksi_bab_deterministik(baris, label, kand, sistematika, gabung,
             _penanda, _judul = gabung[j]
             if POLA_BAB.match(_penanda.strip()) and not _judul:
                 continue
+        # ── v14: fragmen gambar/tabel — "Pada Gambar" lalu "MANAJEMEN
+        #    PROYEK" (H1 no 72): judul gambar yang terbelah, bukan bab.
+        #    Baris sebelumnya penunjuk gambar/tabel ⇒ pengecualian huruf
+        #    BESAR (b) TIDAK berlaku, baris didemosi seperti biasa.
+        _sebelum_gambar = (
+            j >= 0 and re.match(
+                r'^(?:Pada\s+)?(?:Gambar|Tabel|Grafik)\b',
+                baris[j].strip(), re.I))
         if t and t == t.upper() and len(t) <= 70 \
-                and not re.search(r'[.!?…]["\')\]]*\s*$', t):
+                and not re.search(r'[.!?…]["\')\]]*\s*$', t) \
+                and not _sebelum_gambar:
             continue
         label[i] = ('paragraf' if re.search(r'[.!?…]["\')\]]*\s*$', t)
                     else 'biasa')
@@ -293,6 +548,7 @@ _FRASA_SISTEMATIKA = re.compile(r'(?:Bab|bagian)\s+ini\b', re.I)
 _PEMBUANG = re.compile(
     r'^\s*(?:\[\[.*?\]\]|Sumber\s*:|Keterangan\s*:'
     r'|DAFTAR\s+(?:PUSTAKA|ISI|TABEL|GAMBAR|LAMPIRAN)'
+    r'|TABLE\s+OF\s+CONTEN\w*'  # v14: "TABLE OF CONTENS" (salah eja) di T3
     r'|LAMPIRAN\b|Lampiran\s+\d)\s*', re.I)
 _TITIK_ISI = re.compile(r'\.{4,}|[\u2026]{2,}')
 
@@ -327,6 +583,248 @@ def _spss_header(s):
     return len(t) > 2 and t[-1].islower() and t[:-1] in _SPSS_HEADER
 
 
+# ── v14 (11 Nov 2026): DETEKTOR BLOK DAFTAR ISI/SISTEMATIKA ───────────────
+#    Salah terbesar v11/v13 di 279 baris berlabel: 42 baris benarnya `biasa`
+#    dilabeli `bab` — salinan sistematika/daftar isi. Akar: `gabung` tidak
+#    punya dedupe dan tidak punya deteksi salinan; `_tandai_sistematika`
+#    hanya melihat kandidat Jev dan mensyaratkan pengikut "Bab ini"/"bagian
+#    ini", sehingga melewatkan "Pada bab ini", "terdiri dari", dan bentuk
+#    satu baris "BAB X: Judul". Detektor ini TEKS SAJA (tanpa label Jev),
+#    supaya jalan SEBELUM Lapis 2 dan Hakim mengaudit peta yang sudah bersih.
+_POLA_PENANDA_POLOS = re.compile(
+    r'^\s*(?:BAB|Bab|bab|CHAPTER|Chapter|Chapter\s+)?\s*'
+    r'(?:[IVXLCDM]+|\d+)\s*[.:]?\s*$', re.I)
+_POLA_JUDUL_SATU_BARIS = re.compile(
+    r'^\s*(?:BAB|Bab|bab|CHAPTER|Chapter)\s+'
+    r'(?:[IVXLCDM]+|\d+)\s*[:.]\s+\S', re.I)
+_POLA_FRAGMEN_TITIK_DUA = re.compile(r'^\s*:\s*[A-Za-z]')
+_POLA_PENGIKUT_SISTEMATIKA = re.compile(
+    r'(?:Bab|bagian)\s+ini\b|Pada\s+bab\s+ini\b'
+    r'|terdiri\s+dari\b|Berisi\s+tentang\b|berisi\s+tentang\b'
+    r'|^\s*Berisi\b', re.I)
+#    ⚠️ 'Dalam bab ini' SENGAJA tidak masuk: kalimat pembuka bab asli
+#    ("Dalam bab ini akan diuraikan...") memakainya, sehingga penanda bab
+#    asli ikut "didukung" dan tertelan blok (C4 idx 536, Bab IV asli).
+_POLA_GARIS_NOMOR_HALAMAN = re.compile(r'\?{2,}|[.…]{2,}\s*(?:[IVXLCDMivxlcdm]+|\d+)\s*$')
+_POLA_ARTIFAK_NOMOR_HALAMAN = re.compile(r'\?{2,}')  # "????" dari angka yang hilang
+_POLA_HEADER_DAFTAR_ISI = re.compile(
+    r'^\s*(?:TABLE\s+OF\s+CONTEN\w*|DAFTAR\s+ISI)\b', re.I)
+
+
+def _norm_teks(s):
+    return ' '.join(str(s or '').split())
+
+
+def _nomor_penanda(teks):
+    """Nomor bab dari penanda ('BAB II' -> 'II', 'CHAPTER I' -> 'I',
+    'Bab 3' -> '3'), atau None. Dipakai dedupe gabung."""
+    m = re.match(r'^\s*(?:BAB|CHAPTER)\s+([IVXLCDM]+|\d+)\b', str(teks or ''),
+                 re.I)
+    if m:
+        return m.group(1).upper()
+    m = re.match(r'^\s*([IVXLCDM]+|\d+)\s*[.:]\s+\S', str(teks or ''))
+    if m:
+        return m.group(1).upper()
+    return None
+
+
+def _judul_bersih(teks):
+    """Judul gabung tanpa artefak nomor halaman ('.... 1', '???? 28')."""
+    t = _norm_teks(teks)
+    t = re.sub(r'\?{2,}\s*[.]*\s*(?:[IVXLCDMivxlcdm]+|\d+)?\s*$', '', t)
+    t = re.sub(r'[.…]{2,}\s*(?:[IVXLCDMivxlcdm]+|\d+)\s*$', '', t)
+    return _norm_teks(t)
+
+
+def _deteksi_blok_daftar_isi(baris, gabung):
+    """Kembalikan himpunan indeks baris anggota blok salinan sistematika /
+    daftar isi (hanya teks + gabung, tanpa label Jev).
+
+    Penanda = (a) penanda polos di kunci gabung, (b) bentuk satu baris
+    "BAB X: Judul" / "CHAPTER X: ...", (c) fragmen ":..." (ekor judul yang
+    terbelah saat stitch). Pendukung = pengikut deskripsi ("Bab ini",
+    "Pada bab ini", "terdiri dari", "Berisi tentang"), garis nomor
+    halaman (".... 1", "???? 28"), atau uraian panjang (>=60 kar, bukan
+    penanda) dalam <=3 baris sesudah penanda.
+    Tipe S (sistematika): gerombol penanda berurutan rapat (jarak <=15),
+    >=3 penanda dan >=2 didukung; blok hanya penanda didukung + penanda
+    yang diapit dua penanda didukung (penanda bab asli sesudah daftar
+    tidak masuk blok).
+    Tipe D (daftar isi): >=3 penanda satu baris dalam 15 baris.
+    Tipe T (daftar isi pendek): header daftar isi + >=2 penanda satu
+    baris dalam 40 baris sesudahnya.
+    """
+    gabung = gabung or {}
+    kunci = set(gabung.keys())
+    penanda = {}   # idx -> ('polos'|'satu-baris'|'fragmen', didukung: bool)
+    for i, t in enumerate(baris):
+        tn = _norm_teks(t)
+        if not tn:
+            continue
+        if i in kunci and _POLA_PENANDA_POLOS.match(tn):
+            penanda[i] = ('polos', False)
+        elif _POLA_JUDUL_SATU_BARIS.match(tn):
+            penanda[i] = ('satu-baris', False)
+        elif _POLA_FRAGMEN_TITIK_DUA.match(tn) and len(tn) > 3:
+            penanda[i] = ('fragmen', False)
+    if not penanda:
+        return set()
+    # ── pendukung: pengikut / garis nomor halaman dalam <=3 baris sesudah
+    #    penanda, ATAU fragmen (':'-baris) tepat sesudah penanda. Jendela 3
+    #    baris karena baris judul sering menyela antara penanda dan uraian
+    #    (P2: penanda, judul, 'A9800', uraian). Fragmen hanya dihitung bila
+    #    TEPAT sesudah penanda (O3: penanda lalu ': Pendahuluan...').
+    #    ⚠️ SENGAJA tidak ada pendukung "uraian panjang": paragraf isi bab
+    #    asli juga panjang, sehingga penanda bab asli ikut "didukung" dan
+    #    tertelan blok (AN-1 idx 103, R3 idx 18, AJ-1 idx 1/45).
+    for i in penanda:
+        for j in range(i, min(len(baris), i + 4)):
+            t = _norm_teks(baris[j])
+            if _POLA_PENGIKUT_SISTEMATIKA.search(t) or \
+                    _POLA_GARIS_NOMOR_HALAMAN.search(t):
+                penanda[i] = (penanda[i][0], True)
+                break
+        if penanda[i][1]:
+            continue
+        # fragmen tepat sesudah penanda (atau 1 baris sesudahnya — pola
+        # G3: penanda, judul, fragmen ': ...' sebagai sambungan judul).
+        # Baris isi bab asli tidak pernah diawali ':' dalam 2 baris
+        # sesudah penanda (judulnya bukan fragmen, isinya prosa biasa).
+        _dilihat = 0
+        j = i + 1
+        while j < len(baris) and _dilihat < 2:
+            if _norm_teks(baris[j]):
+                _dilihat += 1
+                if _POLA_FRAGMEN_TITIK_DUA.match(_norm_teks(baris[j])) \
+                        and len(_norm_teks(baris[j])) > 3:
+                    penanda[i] = (penanda[i][0], True)
+                    break
+            j += 1
+    blok = set()
+    idxs = sorted(penanda)
+    # ── Tipe D: >=3 penanda satu baris dalam 15 baris ──
+    sb = [i for i in idxs if penanda[i][0] == 'satu-baris']
+    for a in range(len(sb)):
+        kelompok = [sb[a]]
+        for b in sb[a + 1:]:
+            if b - sb[a] <= 15:
+                kelompok.append(b)
+            else:
+                break
+        if len(kelompok) >= 3:
+            blok.update(kelompok)
+    # ── Tipe S: gerombol penanda yang berurutan rapat (jarak <=15 baris),
+    #    >=3 penanda dan >=2 didukung. Blok HANYA berisi penanda yang
+    #    DIDUKUNG + penanda yang DIAPIT dua penanda didukung dalam gerombol
+    #    yang sama. ⚠️ Penanda bab ASLI yang tepat sesudah daftar
+    #    sistematika (R3 idx 18, AN-1 idx 103, AJ-1 idx 1/45) TIDAK
+    #    didukung (diikuti judul + isi, bukan uraian daftar) dan berada
+    #    SESUDAH penanda didukung terakhir ⇒ TIDAK masuk blok. Aturan lama
+    #    ("seluruh kelompok dalam 40 baris") menelan mereka.
+    for a in range(len(idxs)):
+        kelompok = [idxs[a]]
+        for b in idxs[a + 1:]:
+            if b - kelompok[-1] <= 15:
+                kelompok.append(b)
+            else:
+                break
+        if len(kelompok) < 3:
+            continue
+        didukung = [i for i in kelompok if penanda[i][1]]
+        if len(didukung) < 2:
+            continue
+        blok.update(didukung)
+        for i in kelompok:
+            if didukung[0] < i < didukung[-1]:
+                blok.add(i)
+    # ── Tipe T: header daftar isi + >=2 judul satu baris dalam 40 baris
+    #    sesudahnya. Menangkap salinan daftar isi yang hanya memuat 2
+    #    judul (T3 salinan kedua idx 948-959: 'TABLE OF CONTENS' lalu
+    #    'CHAPTER I: INTRODUCTION', 'CHAPTER II: ...' — Tipe D butuh >=3).
+    #    Aman: dua judul bab satu baris dalam 40 baris sesudah header TOC
+    #    hanya bisa jadi daftar isi (bab asli berjauhan ratusan baris).
+    for h, t in enumerate(baris):
+        if not _POLA_HEADER_DAFTAR_ISI.match(_norm_teks(t)):
+            continue
+        sesudah = [i for i in sb if h < i <= h + 40]
+        if len(sesudah) >= 2:
+            blok.add(h)
+            blok.update(sesudah)
+    # ── perluasan: baris deskripsi di antara penanda blok ──
+    if blok:
+        lo, hi = min(blok), max(blok)
+        for i in range(lo, hi + 1):
+            t = _norm_teks(baris[i])
+            if not t:
+                continue
+            if _POLA_PENGIKUT_SISTEMATIKA.search(t) or \
+                    _POLA_GARIS_NOMOR_HALAMAN.search(t):
+                blok.add(i)
+    return blok
+
+
+def _bersihkan_gabung_daftar_isi(baris, gabung):
+    """Bersihkan `gabung` dari salinan daftar isi/sistematika (v14).
+
+    (1) hapus judul berartefak nomor halaman (".... 1", "???? 28");
+    (2) hapus entri gabung di dalam blok daftar isi terdeteksi;
+    (3) dedupe per nomor bab — pertahankan entri terbaik (berjudul >
+    berjudul > polos; bila seri, yang terakhir — bab asli sesudah TOC
+    depan). Entri gabung yang dihapus tidak lagi membuat label 'bab' di
+    skor maupun di peta.
+    """
+    gabung = dict(gabung or {})
+    blok = _deteksi_blok_daftar_isi(baris, gabung)
+    bersih = {}
+    for i, (penanda, judul) in gabung.items():
+        judul_bersih = _judul_bersih(judul) if judul else ''
+        if judul and judul_bersih != _norm_teks(judul):
+            continue  # (1) judul berartefak nomor halaman
+        if i in blok:
+            continue  # (2) entri di dalam blok salinan
+        bersih[i] = (penanda, judul)
+    # (3) dedupe per nomor bab
+    per_nomor = {}
+    for i, (penanda, judul) in sorted(bersih.items()):
+        nomor = _nomor_penanda(penanda) or _nomor_penanda(judul)
+        if nomor is None:
+            per_nomor.setdefault(('__tanpa_nomor__', i), (i, penanda, judul))
+            continue
+        lama = per_nomor.get(nomor)
+        if lama is None:
+            per_nomor[nomor] = (i, penanda, judul)
+            continue
+        # skor: berjudul 2, polos 1; seri -> pertahankan yang TERAKHIR
+        # (v14 koreksi: TOC depan berjudul mendahului bab asli — N3:
+        # salinan 'BAB I PENDAHULUAN' idx 0 mendahului bab asli idx 214;
+        # "pertama" menyimpan salinan dan membuang bab asli. Bab asli
+        # selalu sesudah TOC depan, jadi seri dimenangkan yang terakhir.)
+        skor_baru = 2 if judul else 1
+        skor_lama = 2 if lama[2] else 1
+        if skor_baru >= skor_lama:
+            per_nomor[nomor] = (i, penanda, judul)
+    hasil = {i: (penanda, judul)
+             for i, penanda, judul in per_nomor.values()}
+    return hasil, blok
+
+
+def _demosi_blok_daftar_isi(baris, label, kand, blok):
+    """Demosi per baris (label 'bab'/'subbab' -> 'biasa') untuk baris di
+    dalam blok daftar isi/sistematika, plus dua aturan fragmen:
+    baris diawali ':' tidak pernah 'bab'/'subbab' (ekor judul terbelah).
+    Jalan SEBELUM Lapis 2 supaya Hakim mengaudit peta yang sudah bersih
+    dan agen kedua tidak terbuang untuk baris yang sudah pasti salinan.
+    """
+    for i, _t in kand:
+        if label.get(i) not in ('bab', 'subbab'):
+            continue
+        t = _norm_teks(baris[i])
+        if i in blok:
+            label[i] = 'biasa'
+        elif _POLA_FRAGMEN_TITIK_DUA.match(t):
+            label[i] = 'biasa'
+
+
 # ── ATURAN D1 (putusan Bos 09 Okt): BLOK SISTEMATIKA PENULISAN ────────────
 #    Naskah skripsi sering memuat blok "SISTEMATIKA PENULISAN" yang menyebut
 #    SEMUA judul bab berurutan rapat (BAB I..V, masing-masing diikuti satu
@@ -334,13 +832,22 @@ def _spss_header(s):
 #    Deteksi DETERMINISTIK (tanpa AI): ≥3 penyebutan "BAB X" dalam ~30 baris
 #    berurutan, yang masing-masing diikuti baris berawalan "Bab ini".
 #    ⛔ AKSI = TANDAI, JANGAN BUANG (data, bukan sampah — pelajaran Uji 8).
-def _tandai_sistematika(baris, label, kand):
+def _tandai_sistematika(baris, label, kand, gabung=None):
     """Kembalikan himpunan indeks baris anggota blok SISTEMATIKA.
 
     ⚠️ KOKOH (perbaikan 09 Okt, usul Bos): calon diambil dari POLA TEKS
     (`POLA_BAB`) — BUKAN dari label Jev. Kalau bergantung label Jev, satu
     kali Jev melabel 'BAB I' jadi 'subbab' ⇒ deteksi GAGAL DIAM-DIAM
     (tidak ada peringatan). Pola teks = deterministik, tak bisa goyang.
+
+    ── v14: bila `gabung` diberikan, gabungkan detektor blok daftar isi /
+    sistematika (`_deteksi_blok_daftar_isi`) — D1 di atas mensyaratkan
+    pengikut "Bab ini"/"bagian ini" dan hanya melihat kandidat, sehingga
+    melewatkan "Pada bab ini", "terdiri dari", bentuk satu baris
+    "BAB X: Judul", dan salinan daftar isi. Gabungan ini penting karena
+    `_koreksi_bab_deterministik` langkah 1 melewati anggota sistematika:
+    tanpa gabungan, judul satu baris salinan daftar isi yang sudah
+    didemosi v14 akan DIPAKSA kembali jadi 'bab' oleh langkah 1.
     """
     idx_kand = {i for i, _t in kand}
     calon = [i for i in sorted(idx_kand)
@@ -374,6 +881,9 @@ def _tandai_sistematika(baris, label, kand):
                     break
         if len(blok) >= MIN_BAB:
             hasil.update(blok)
+    # ── v14: gabungkan detektor blok daftar isi/sistematika ──────────
+    if gabung is not None:
+        hasil |= _deteksi_blok_daftar_isi(baris, gabung)
     return hasil
 
 
@@ -474,6 +984,49 @@ def _huruf_awal_kecil(s):
     bukan huruf kecil — bug terukur 10 Nov 2026)."""
     t = re.sub(r'^\d+(?:\.\d+)*\.?\s*', '', (s or '').strip())
     return bool(t) and t[:1].islower()
+
+
+def _penanda_huruf_kepala_blok(baris, i):
+    """True bila baris ini penanda huruf yang MENGEPALAI blok penjelasan
+    (v14, pengecualian ATURAN 5 — temuan pilot v12).
+
+    'a) Persetubuhan' yang diikuti uraian prosa adalah subbab; 'a) ...'
+    yang hanya butir dalam daftar tetap bukan subbab. Syarat: penanda
+    huruf tunggal `^[a-z][.)]` / `^\\([a-z]\\)`, teks sesudah penanda
+    PENDEK (<=60 kar, judul — bukan kalimat definisi), DAN baris
+    non-kosong berikut adalah prosa penjelasan (>=40 kar, bukan penanda
+    lain, bukan keterangan tabel, bukan judul bernomor/bab).
+    Terukur di 14 baris penanda huruf kedua paket label: ketujuh yang
+    benar subbab memenuhi syarat; yang benar biasa gagal karena baris
+    berikut penanda lain/keterangan tabel/judul, atau teks panjang.
+    Batasan: baris benar paragraf yang kalimat definisi ('b. Konfrontasi
+    yaitu...', U3 no 87) lolos dari pengecualian karena teksnya panjang —
+    itu masalah `koreksi_batas`, di luar v14.
+    """
+    t = (baris[i] or '').strip()
+    m = re.match(r'^(?:\([a-z]\)|[a-z][.)])\s+(.*)$', t)
+    if not m:
+        return False
+    sisa = m.group(1).strip()
+    if not sisa or len(sisa) > 60:
+        return False
+    j = i + 1
+    while j < len(baris) and not (baris[j] or '').strip():
+        j += 1
+    if j >= len(baris):
+        return False
+    berikut = (baris[j] or '').strip()
+    if len(berikut) < 40:
+        return False
+    if re.match(r'^(?:\([a-z]\)|[a-z][.)])\s', berikut):
+        return False                       # butir daftar berikutnya
+    if re.match(r'^(?:Sumber|Keterangan)\s*:', berikut, re.I):
+        return False                       # keterangan tabel
+    if _POLA_NOMOR_BERTINGKAT.match(berikut):
+        return False                       # judul bernomor
+    if _POLA_BAB_NOMOR.match(berikut):
+        return False                       # judul bab
+    return True
 
 
 def _nomor_bertindak_judul(s):
@@ -987,6 +1540,14 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
     #    (t[:1] bukan huruf) sehingga Aturan 5 / koreksi_batas /
     #    sambung_kode salah baca baris. Sidik cache tetap dari teks_asal.
     bersih = (bersih or '').replace('\x00', '')
+    # ── v11: buang BOM (artefak konversi .doc — terukur 66 dari 112 teks
+    #    latih: BOM menempel di judul bab, mis. '\ufeffBAB I' di bab_gabung
+    #    T1, '\ufeffBAB I' di bab_judul_label X1. BOM bukan isi.
+    bersih = bersih.replace('\ufeff', '')
+    # ── v11 Lapis 1: profil bentuk dihitung dari teks mentah (sebelum
+    #    stitch/pisah-judul) — stitch menyambung baris sehingga penanda
+    #    bentuk tidak lagi terbaca.
+    profil = profil_bentuk(bersih)
     # ── v5: perbaiki teks pecah per huruf ("D i n a m i k a") SEBELUM
     #    stitch/pisah-judul — supaya kata utuh dikenali semua aturan.
     #    Rangkaian yang tidak aman dibiarkan (lihat app/sambung_kode).
@@ -1067,6 +1628,15 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             buang.append(i)
             i += 1
             continue
+        # ── v11: PEMISAH GABUNGAN — artefak skrip gabung berkas ('=====
+        #    BAB I (BAB 1.doc) =====', '===== SKRIPSI.doc =====', garis
+        #    '====...'). Terukur 117 baris di 50 dari 112 teks latih,
+        #    SEMUANYA pagar nama berkas, nol isi asli; di AM-2/AO-1 sempat
+        #    terlabel 'bab'. Buang deterministik, jangan jadi kandidat.
+        if _POLA_PEMISAH_GABUNGAN.match(s):
+            buang.append(i)
+            i += 1
+            continue
         # ── NOMOR HALAMAN NEMPEL (WULAN-1, terukur live 10 Nov 2026) ─────
         #    "13 BAB I" / "13 1.1 Latar Belakang" — kupas awalan 1-3 digit
         #    HANYA untuk pencocokan pola; teks asli baris tidak diubah.
@@ -1086,6 +1656,26 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             gabung[i] = (s_pola, '')
             i += 1
             continue
+        # ── v11: CHAPTER POLOS (Inggris) — cermin POLA_BAB. Terukur 4
+        #    naskah (T1, T2, T3, AH1): 'CHAPTER II' lalu judul di baris
+        #    berikut ('THEORITICAL BACKGROUND'). Bentuk satu baris
+        #    'CHAPTER I: INTRODUCTION' SENGAJA tidak dipakai: satu-satunya
+        #    kemunculan terukur ada di DAFTAR ISI (T2 baris 1011-1039).
+        m = _POLA_CHAPTER_POLOS.match(s_pola)
+        if m:
+            j = i + 1
+            while j < akhir and not baris[j].strip():
+                j += 1
+            if j < akhir:
+                s2 = baris[j].strip()
+                if s2 and s2 == s2.upper() and 4 < len(s2) < 70:
+                    gabung[i] = ('CHAPTER ' + m.group(1).upper(), s2)
+                    i = j + 1
+                    continue
+            # CHAPTER tanpa judul menyusul → tetap bab
+            gabung[i] = ('CHAPTER ' + m.group(1).upper(), '')
+            i += 1
+            continue
         # ── BAB + JUDUL SATU BARIS (v5) ───────────────────────────────
         #    "BAB III METODOLOGI PENELITIAN" — judul BAB tidak di baris
         #    berikut, tapi menempel di baris yang sama. Kenali langsung
@@ -1101,6 +1691,21 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
                 gabung[i] = (m1.group(1), _judul)
                 i += 1
                 continue
+        # ── v11: JUDUL ROMAWI TANPA KATA BAB — hanya bila profil bilang
+        #    bentuk naskah memang begitu (penomoran_bab ==
+        #    'romawi_tanpa_bab': tanpa BAB/CHAPTER sama sekali). Terukur 6
+        #    entri, 3 bidang (Y1, Y2, AD1, AD2, AD3, AG1): 'I. PENDAHULUAN',
+        #    'II. TINJAUAN PUSTAKA', dst. Judul HARUS sama persis dengan
+        #    kosakata judul BAB terukur — 'III. TABLE: ...' (T1, naskah
+        #    CHAPTER) dan 'VI. Pp. 1187-1196.' (sitasi) tidak kena. Tanpa
+        #    pagar profil, baris 'II. ...' di naskah ber-BAB (mis. O1)
+        #    akan salah jadi bab.
+        if profil.get('penomoran_bab') == 'romawi_tanpa_bab':
+            m = _POLA_ROMAWI_JUDUL.match(s_pola)
+            if m and m.group(2).strip().upper() in _JUDUL_BAB_ROMAWI:
+                gabung[i] = (m.group(1).upper() + '.', m.group(2).strip())
+                i += 1
+                continue
         # ── BARIS BERNOMOR DIBACA KODE (10 Nov 2026) ──────────────────
         #    Nomor bertingkat yang memenuhi syarat KETAT ⇒ 'subbab' langsung,
         #    TIDAK dikirim ke Jev (hemat + deterministik). Yang tidak memenuhi
@@ -1111,7 +1716,13 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             continue
         kand.append((i, s))
         i += 1
+    # ── v14: bersihkan gabung dari salinan daftar isi/sistematika ───────
+    #    Dedupe per nomor bab + hapus entri di blok salinan + judul
+    #    berartefak nomor halaman. Blok terdeteksi dikembalikan supaya
+    #    `_petakan_dari_hasil` bisa mendemosi label per barisnya.
+    gabung, _blok_daftar_isi = _bersihkan_gabung_daftar_isi(baris, gabung)
     return {'baris': baris, 'kand': kand, 'gabung': gabung, 'buang': buang,
+            'blok_daftar_isi': sorted(_blok_daftar_isi),
             'kode_label': kode_label, 'stitch_pakai': stitch_pakai,
             'waktu_stitch': waktu_stitch, 'pisah_judul_jml': pisah_judul_jml,
             'pisah_bab_ekor_jml': pisah_bab_ekor_jml,
@@ -1123,15 +1734,19 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
             'huruf_berspasi_sebelum': huruf_berspasi_sebelum,
             'huruf_berspasi_sesudah': huruf_berspasi_sesudah,
             'teks_asal': teks_asal,
-            'awal': awal, 'akhir': akhir, 'nama': nama, 't': _t}
+            'awal': awal, 'akhir': akhir, 'nama': nama, 't': _t,
+            'profil': profil}
 
 
-def petakan_dari_teks(teks, awal=None, akhir=None, putaran=None):
+def petakan_dari_teks(teks, awal=None, akhir=None, putaran=None,
+                      pendapat_kedua_fn=None, hakim_tandai_fn=None):
     """PETA 3 TINGKAT dari TEKS LANGSUNG (tanpa fid) — untuk pintu LAYAR.
 
     Dipakai `app/peta3_jev.py::petakan_teks()` ← `versi._deteksi_bagian()`.
     ⚠️ Teks DIANGGAP SUDAH bersih (pemanggil sudah `buang_daftar_isi`).
     Cache: teks sama + aturan sama ⇒ peta lama dipakai (Rp 0, tanpa Jev).
+    `hakim_tandai_fn` (v13): fn(peta_sementara) -> set idx baris yang
+    Hakim tandai ragu/curiga — gerbang Lapis 2 (lihat _petakan_dari_hasil).
     """
     if putaran is None:
         try:
@@ -1139,17 +1754,24 @@ def petakan_dari_teks(teks, awal=None, akhir=None, putaran=None):
         except ValueError:
             putaran = 1
     kunci = _kunci_cache(teks or '', putaran)
-    dari_cache = _cache_ambil(kunci)
-    if dari_cache is not None:
-        log.info('[peta3] peta dari cache (sidik %s…)', kunci[0][:8])
-        return dari_cache
+    # ── v11: bila pendapat kedua disuntik, hasil bergantung pada fn —
+    #    jangan pakai/simpan cache (kuncinya tidak memuat fn).
+    #    v13: sama untuk hakim_tandai_fn (hasil bergantung pada gerbang).
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
+        dari_cache = _cache_ambil(kunci)
+        if dari_cache is not None:
+            log.info('[peta3] peta dari cache (sidik %s…)', kunci[0][:8])
+            return dari_cache
     d = _susun_dari_bersih(teks or '', awal, akhir, '')
-    hasil = _petakan_dari_hasil(d, putaran)
-    _cache_simpan(kunci, hasil)
+    hasil = _petakan_dari_hasil(d, putaran, pendapat_kedua_fn,
+                                hakim_tandai_fn)
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
+        _cache_simpan(kunci, hasil)
     return hasil
 
 
-def petakan(fid, awal=None, akhir=None, putaran=None):
+def petakan(fid, awal=None, akhir=None, putaran=None,
+            pendapat_kedua_fn=None, hakim_tandai_fn=None):
     if putaran is None:
         try:
             putaran = max(1, int(os.getenv('EDUAI_JEVI_PUTARAN') or '1'))
@@ -1157,16 +1779,22 @@ def petakan(fid, awal=None, akhir=None, putaran=None):
             putaran = 1
     d = susun(fid, awal, akhir)
     kunci = _kunci_cache(d.get('teks_asal') or '\n'.join(d['baris']), putaran)
-    dari_cache = _cache_ambil(kunci)
-    if dari_cache is not None:
-        log.info('[peta3] peta dari cache (fid=%s, sidik %s…)', fid, kunci[0][:8])
-        return dari_cache
-    hasil = _petakan_dari_hasil(d, putaran)
-    _cache_simpan(kunci, hasil)
+    # ── v11: lihat petakan_dari_teks — cache dilewati bila fn disuntik.
+    #    v13: sama untuk hakim_tandai_fn.
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
+        dari_cache = _cache_ambil(kunci)
+        if dari_cache is not None:
+            log.info('[peta3] peta dari cache (fid=%s, sidik %s…)', fid, kunci[0][:8])
+            return dari_cache
+    hasil = _petakan_dari_hasil(d, putaran, pendapat_kedua_fn,
+                                hakim_tandai_fn)
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
+        _cache_simpan(kunci, hasil)
     return hasil
 
 
-def _petakan_dari_hasil(d, putaran=None):
+def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
+                        hakim_tandai_fn=None):
     """INTI `petakan()` — bekerja dari hasil `_susun_dari_bersih()`.
 
     Dipisahkan 14 Okt 2026 (Lapis 5) supaya jalur fid & jalur TEKS memakai
@@ -1375,6 +2003,157 @@ def _petakan_dari_hasil(d, putaran=None):
                     tanya_ulang_goyang_pb_balik.append(
                         [_i, lab_sebelum_pb.get(_i), label.get(_i)])
 
+    # ── v14: DEMOSI BLOK DAFTAR ISI/SISTEMATIKA (sebelum Lapis 2) ──────
+    #    Salinan sistematika/daftar isi yang lolos sebagai 'bab'/'subbab'
+    #    didemosi ke 'biasa' di sini (teks saja, deterministik), supaya
+    #    Hakim mengaudit peta yang sudah bersih dan agen kedua tidak
+    #    terbuang. `_kandidat_judul` Hakim hanya mengambil baris berlabel
+    #    judul, jadi baris yang didemosi otomatis keluar dari antrean agen.
+    #    Blok dihitung di `_susun_dari_bersih` dari gabung PRA-pembersihan
+    #    (penanda polos butuh kunci gabung); bila dict `d` tidak membawanya
+    #    (jalur lama/uji), hitung ulang dari gabung yang ada.
+    _blok_v14 = d.get('blok_daftar_isi')
+    if _blok_v14 is None:
+        _blok_v14 = sorted(_deteksi_blok_daftar_isi(baris, d.get('gabung') or {}))
+    _demosi_blok_daftar_isi(baris, label, kand, set(_blok_v14))
+
+    # ── v11 LAPIS 2 — PENDAPAT KEDUA HANYA UNTUK BARIS GOYANG ──────────
+    #    Dijalankan sesudah tanya-ulang v5, sebelum koreksi deterministik.
+    #    `pendapat_kedua_fn` disuntik pemanggil: fn(idx, teks_baris, suara,
+    #    p[, konteks]) -> {'label': ..., 'confidence': ...} | None. Fungsi
+    #    ini TIDAK memanggil Jev — jawaban kedua datang dari luar.
+    #    v12 RANTAI 3 LANGKAH (Gas Bos 11 Nov 2026): fn = agen kedua yang
+    #    hidup (`app.agen_kedua.buat_pendapat_kedua_fn()`); putusan memakai
+    #    mode='agen-kedua' (beda → keputusan agen kedua dipakai, kecuali
+    #    beda soal judul bab → antrean manusia). Bila fn None (bawaan,
+    #    termasuk semua pemanggil lama): perilaku sama persis dengan v10,
+    #    nol panggilan tambahan. Putusan 'berbalik' mengubah label;
+    #    'antrean-manusia' TIDAK mengubah label, baris dicatat ke antrean.
+    #    Konteks lebar (3 baris sebelum/sesudah + judul bab terdekat)
+    #    diberikan sebagai argumen ke-5 BILA fn mendeklarasikannya; fn lama
+    #    4-arg (mis. lambda uji) tetap dipanggil 4-arg — uji lama tetap lulus.
+    #    ── v13 GATING HAKIM (Gas Bos 11 Nov 2026) ─────────────────────
+    #    Bila `hakim_tandai_fn` disuntik pemanggil — fn(peta_sementara)
+    #    -> set idx baris yang Hakim tandai ragu/curiga (produksi:
+    #    `app.hakim_peta.tandai_ragu_curiga`) — agen kedua dipanggil untuk
+    #    SEMUA baris yang ditandai Hakim, goyang atau tidak (keputusan Bos:
+    #    "bukan per baris goyang"). Baris goyang yang tidak ditandai
+    #    dilewati, label Jev dipakai apa adanya. Baris ditandai yang
+    #    tidak goyang diadili dari suara tunggalnya (label Jev saat ini).
+    #    Peta sementara yang diaudit Hakim adalah peta SAAT INI
+    #    (pra-koreksi deterministik): label hasil tanya-ulang, gabung
+    #    stitch, dan sistematika yang dihitung di sini khusus untuk
+    #    gerbang (D1 di bawah tetap menghitung ulang pada tempatnya —
+    #    tidak diubah). Bila fn mengembalikan None / galat ⇒ himpunan
+    #    kosong + dicatat (`hakim_tandai_galat`): Lapis 2 tidak memanggil
+    #    agen kedua sama sekali (gagal tertutup, bukan tebak). Bila fn
+    #    TIDAK disuntik (None): perilaku WARISAN v12 — tiap baris goyang
+    #    diadili (pelari/uji lama tetap jalan; produksi WAJIB menyuntik
+    #    fn ini).
+    pk_jml = 0
+    pk_berbalik = []
+    pk_antrean = []
+    pk_jawaban = []
+    hakim_tandai = None          # v13: None = gerbang tidak dipakai (warisan)
+    hakim_tandai_galat = None    # v13: pesan galat fn gerbang (bila ada)
+    if pendapat_kedua_fn is not None:
+        if hakim_tandai_fn is not None:
+            try:
+                _sist_gerbang = _tandai_sistematika(baris, label, kand,
+                                                  d.get('gabung'))
+            except Exception:
+                _sist_gerbang = set()
+            _peta_sementara = {
+                'baris': baris, 'label': dict(label),
+                'gabung': d.get('gabung') or {},
+                'sistematika': sorted(_sist_gerbang),
+                'p': dict(p_label),
+            }
+            try:
+                _ditandai = hakim_tandai_fn(_peta_sementara)
+                hakim_tandai = sorted(set(_ditandai or []))
+            except Exception as _e:             # gagal tertutup: 0 panggilan
+                hakim_tandai = []
+                hakim_tandai_galat = '%s: %s' % (type(_e).__name__, _e)
+            _adili = list(hakim_tandai)
+        else:
+            _adili = [gi for gi, _v in goyang]
+        _goyang_set = {gi for gi, _v in goyang}
+        try:
+            import inspect as _inspect
+            _n_arg_fn = len(_inspect.signature(
+                pendapat_kedua_fn).parameters)
+        except Exception:
+            _n_arg_fn = 0
+
+        def _konteks_lebar(gi):
+            sebelum = [baris[k] for k in range(max(0, gi - 3), gi)]
+            sesudah = [baris[k]
+                       for k in range(gi + 1, min(len(baris), gi + 4))]
+            # Judul bab terdekat: judul deterministik di gabung DIDAHULUKAN
+            # (judul bab hasil susun TIDAK masuk dict `label` — hanya baris
+            # kandidat yang ada di sana), lalu label 'bab' dari Jev.
+            judul = None
+            for k in range(gi - 1, -1, -1):
+                if k in (d.get('gabung') or {}):
+                    judul = ' '.join(d['gabung'][k]).strip()
+                    break
+                if label.get(k) == 'bab':
+                    judul = baris[k]
+                    break
+            return {'sebelum': sebelum, 'sesudah': sesudah,
+                    'judul_bab_terdekat': judul}
+
+        for gi in _adili:
+            # Suara Jev: dari semua/conf bila ada; baris ditandai yang
+            # tidak goyang dan tidak punya suara tersimpan (label
+            # deterministik) -> suara tunggal dari label saat ini.
+            _suara = list(semua.get(gi) or [label.get(gi)])
+            _conf = list(conf.get(gi) or [p_label.get(gi, 0.5)])
+            if not _suara or _suara[0] is None:
+                continue               # baris tanpa label Jev: tidak diadili
+            label_jev = label.get(gi)
+            try:
+                if _n_arg_fn >= 5:
+                    jw2 = pendapat_kedua_fn(
+                        gi, baris[gi], list(_suara), list(_conf),
+                        _konteks_lebar(gi))
+                else:
+                    jw2 = pendapat_kedua_fn(gi, baris[gi],
+                                            list(_suara), list(_conf))
+            except Exception:
+                jw2 = None
+            if jw2 is None and gi not in _goyang_set:
+                # v13: agen kedua gagal pada baris ditandai Hakim yang
+                # tidak goyang — flag Hakim tetap berdiri, masuk antrean
+                # manusia (bukan diam-diam dilewati).
+                put = {'idx': gi, 'putusan': 'antrean-manusia',
+                       'label': None,
+                       'alasan': 'tidak ada pendapat kedua'}
+            else:
+                put = pendapat_kedua(gi, baris[gi], _suara, _conf, jw2,
+                                    mode='agen-kedua')
+            if put['putusan'] == 'bukan-goyang':
+                continue
+            pk_jml += 1
+            pk_jawaban.append({
+                'idx': gi, 'label_jev': label_jev,
+                'label_kedua': (jw2 or {}).get('label')
+                               if isinstance(jw2, dict) else None,
+                'confidence': (jw2 or {}).get('confidence')
+                              if isinstance(jw2, dict) else None,
+                'putusan': put['putusan'],
+                'label_akhir': put['label'],
+                'alasan': (jw2 or {}).get('alasan', '')
+                          if isinstance(jw2, dict) else '',
+                'model': (jw2 or {}).get('model', '')
+                         if isinstance(jw2, dict) else ''})
+            if put['putusan'] == 'berbalik':
+                pk_berbalik.append([gi, label.get(gi), put['label']])
+                label[gi] = put['label']
+            elif put['putusan'] == 'antrean-manusia':
+                pk_antrean.append(gi)
+
     # ── ATURAN 2 (vonis Bos 09 Okt) — KOREKSI LABEL, BUKAN SARINGAN BUANG.
     #    Judul sub-bab hampir selalu PENDEK. Kalau Jev bilang 'subbab' tapi
     #    barisnya PANJANG (>ambang profil kampus, bawaan 300 kar), itu paragraf
@@ -1398,7 +2177,7 @@ def _petakan_dari_hasil(d, putaran=None):
             koreksi_spss.append(i)
 
     # ── D1 (putusan Bos 09 Okt): TANDAI blok SISTEMATIKA — JANGAN BUANG.
-    sistematika = _tandai_sistematika(baris, label, kand)
+    sistematika = _tandai_sistematika(baris, label, kand, d.get('gabung'))
 
     # ── ATURAN 5 (vonis Bos 09 Okt) — KOREKSI LABEL, BUKAN BUANG.
     #    Baris diawali HURUF KECIL tidak pernah jadi awal BAB/SUB-BAB:
@@ -1406,12 +2185,17 @@ def _petakan_dari_hasil(d, putaran=None):
     #    ⛔ Deterministik, NOL risiko buang — hanya mengubah label.
     #    Terukur naskah Wulandari fid=112 (PDF): 116 error tertangkap
     #    (38 sub-bab + 78 paragraf diawali huruf kecil).
+    #    ── v14 PENGECUALIAN (temuan pilot v12): penanda huruf yang
+    #    MENGEPALAI blok penjelasan BOLEH jadi subbab — 'a) Persetubuhan'
+    #    yang diikuti uraian prosa adalah subbab; 'a) ...' yang hanya
+    #    butir daftar tetap bukan subbab (lihat _penanda_huruf_kepala_blok).
     koreksi_kecil = []
     for i, _t in kand:
         if i in sistematika:
             continue                      # blok sistematika jangan disentuh
         t = baris[i].strip()
-        if label.get(i) in ('bab', 'subbab') and _huruf_awal_kecil(t):
+        if label.get(i) in ('bab', 'subbab') and _huruf_awal_kecil(t) \
+                and not _penanda_huruf_kepala_blok(baris, i):
             label[i] = 'biasa'
             koreksi_kecil.append(i)
 
@@ -1520,7 +2304,27 @@ def _petakan_dari_hasil(d, putaran=None):
             'bab_kode': bab_kode, 'bab_ganda': bab_ganda,
             'bab_demosi': bab_demosi,
             'jev_mati': jev_mati, 'stitch_pakai': d.get('stitch_pakai', False),
-            'versi_aturan': RULE_VERSION}
+            'versi_aturan': RULE_VERSION,
+            # ── v11 Lapis 1-3: profil bentuk + antrean manusia. `antrean_
+            #    manusia` True berarti peta ini TIDAK boleh dipakai otomatis
+            #    sebelum manusia meninjau (bentuk tak dikenal, atau ada
+            #    baris goyang yang pendapat keduanya tidak sepakat).
+            'profil_bentuk': d.get('profil'),
+            'antrean_manusia': bool(
+                (d.get('profil') or {}).get('alasan_antrean')) or bool(pk_antrean),
+            'alasan_antrean': list(
+                (d.get('profil') or {}).get('alasan_antrean') or []),
+            'pendapat_kedua_jml': pk_jml,
+            'pendapat_kedua_berbalik': pk_berbalik,
+            'pendapat_kedua_antrean': pk_antrean,
+            # v12 rantai 3 langkah: jejak tiap jawaban agen kedua (label Jev,
+            # label agen kedua, putusan, model yang melayani) — untuk audit
+            # dan pilot. Kosong bila fn tidak disuntik.
+            'pendapat_kedua_jawaban': pk_jawaban,
+            # v13 gating Hakim: idx yang ditandai Hakim (None = gerbang
+            # tidak dipakai, warisan v12); galat fn gerbang (bila ada).
+            'hakim_tandai': hakim_tandai,
+            'hakim_tandai_galat': hakim_tandai_galat}
 
 
 def main():

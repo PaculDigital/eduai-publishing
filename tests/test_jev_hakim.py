@@ -1109,8 +1109,8 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v10)',
-        P8.RULE_VERSION == 'jev-peta-v10')
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v15)',
+        P8.RULE_VERSION == 'jev-peta-v15')
     # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
     #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
     #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
@@ -1191,8 +1191,8 @@ def main():
     #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
     #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
     #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
-    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v10)',
-        P8.RULE_VERSION == 'jev-peta-v10')
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v15)',
+        P8.RULE_VERSION == 'jev-peta-v15')
     baris_r23 = [
         'terbagi menjadi beberapa bab antara lain:',
         '1. BAB I PENDAHULUAN',
@@ -1218,6 +1218,871 @@ def main():
         label_r23.get(5) == 'bab', str(label_r23))
     cek('v10-aturan: demosi bab sistematika tercatat',
         sorted(demosi_r23) == [4, 6], str(demosi_r23))
+
+    # ── 12. v11-aturan: LAPISAN BENTUK (latihan 112 naskah) ─────────────
+    #    Lapis 1 profil_bentuk() deterministik; aturan baru: BOM, pemisah
+    #    gabungan, CHAPTER polos, judul Romawi tanpa kata BAB (berpagar
+    #    profil); Lapis 2 pendapat_kedua() hanya untuk baris goyang
+    #    (jawaban disuntik, nol Jev di sini); Lapis 3 antrean manusia.
+    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v15)',
+        P8.RULE_VERSION == 'jev-peta-v15')
+    # --- 12f. v12 rantai 3 langkah: mode agen-kedua + pabrik agen kedua ---
+    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v15)',
+        P8.RULE_VERSION == 'jev-peta-v15')
+    # --- 12a. profil_bentuk ---
+    teks_romawi = ('I. PENDAHULUAN\nIsi pendahuluan yang cukup panjang dan menjelaskan latar belakang masalah penelitian ini.\n'
+                   'II. TINJAUAN PUSTAKA\nIsi tinjauan pustaka yang cukup panjang dan menjelaskan teori yang dipakai dalam penelitian ini.\n'
+                   'III. PELAKSANAAN PENELITIAN\nIsi pelaksanaan penelitian yang cukup panjang dan menjelaskan cara penelitian dilakukan.\n'
+                   'IV. HASIL DAN PEMBAHASAN\nIsi hasil dan pembahasan yang cukup panjang dan menjelaskan temuan penelitian ini.\n'
+                   'V. KESIMPULAN DAN SARAN\nIsi kesimpulan dan saran yang cukup panjang dan menutup penelitian ini dengan baik.\n')
+    prof_r = P8.profil_bentuk(teks_romawi)
+    cek('v11-profil: Romawi tanpa BAB dikenali (Y1/AD1/AG1)',
+        prof_r['penomoran_bab'] == 'romawi_tanpa_bab', str(prof_r['penomoran_bab']))
+    cek('v11-profil: judul Romawi terukur masuk kosakata',
+        prof_r['romawi_judul'] == ['HASIL DAN PEMBAHASAN', 'KESIMPULAN DAN SARAN',
+                                   'PELAKSANAAN PENELITIAN', 'PENDAHULUAN',
+                                   'TINJAUAN PUSTAKA'], str(prof_r['romawi_judul']))
+    cek('v11-profil: Romawi tanpa BAB tidak masuk antrean',
+        prof_r['antrean_manusia'] is False)
+    cek('v11-profil: saklar judul Romawi menyala',
+        prof_r['aturan']['judul_romawi_tanpa_bab'] is True)
+    teks_chapter = ('CHAPTER I\nINTRODUCTION\n'
+                    'The study of the English and Indonesian adverbs in the text of the novels and the translation of the words in the corpus.\n'
+                    'CHAPTER II\nTHEORETICAL BACKGROUND\n'
+                    'The theory of the adverbs and the classification of the forms in the English language and in the Indonesian language.\n')
+    prof_c = P8.profil_bentuk(teks_chapter)
+    cek('v11-profil: CHAPTER Inggris dikenali (T1/T2/T3/AH1)',
+        prof_c['penomoran_bab'] == 'chapter' and prof_c['chapter'] == ['I', 'II'],
+        str(prof_c))
+    cek('v11-profil: rasio Inggris di atas ambang 0,02',
+        prof_c['bahasa_inggris'] is True and prof_c['rasio_inggris'] >= 0.02,
+        str(prof_c['rasio_inggris']))
+    cek('v11-profil: CHAPTER Inggris tidak masuk antrean',
+        prof_c['antrean_manusia'] is False)
+    prof_n = P8.profil_bentuk('BAB I\nPENDAHULUAN\n1.1 Latar Belakang\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\nBAB II\nTINJAUAN PUSTAKA\n')
+    cek('v11-profil: BAB Romawi biasa dikenali',
+        prof_n['penomoran_bab'] == 'romawi' and prof_n['jml_bab_terdeteksi'] == 2)
+    prof_a = P8.profil_bentuk('BAB 1\nPENDAHULUAN\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\nBAB 2\nTINJAUAN PUSTAKA\n')
+    cek('v11-profil: BAB Arab dikenali',
+        prof_a['penomoran_bab'] == 'arab' and prof_a['bab_arab'] == [1, 2])
+    prof_x = P8.profil_bentuk('BAB I\nPENDAHULUAN\nBAB 2\nTINJAUAN PUSTAKA\n')
+    cek('v11-profil: campuran Romawi + Arab dikenali',
+        prof_x['penomoran_bab'] == 'campuran')
+    prof_t = P8.profil_bentuk('Kalimat biasa satu yang panjang dan menjelaskan sesuatu yang penting di sini.\n'
+                              'Kalimat biasa dua yang panjang dan menjelaskan sesuatu yang lain dengan jelas sekali.\n')
+    cek('v11-profil: tanpa penanda apa pun -> tidak_ada + antrean',
+        prof_t['penomoran_bab'] == 'tidak_ada' and prof_t['antrean_manusia'] is True
+        and prof_t['alasan_antrean'] == ['tidak ada penanda BAB/CHAPTER/judul Romawi'],
+        str(prof_t))
+    prof_nul = P8.profil_bentuk('BAB I\nPENDAHULUAN\n' + 'x\x00' * 60 + '\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\n')
+    cek('v11-profil: NUL > 50 -> antrean (fid=112: 103 NUL)',
+        prof_nul['antrean_manusia'] is True
+        and any('NUL' in a for a in prof_nul['alasan_antrean']), str(prof_nul))
+    prof_tab = P8.profil_bentuk('\n'.join('a | b | c' for _ in range(21)) + '\nBAB I\nPENDAHULUAN\n')
+    cek('v11-profil: tabel padat > 20 baris pipa (K1 60, Q3 36, B2 22)',
+        prof_tab['tabel_padat'] is True and prof_tab['tabel_baris_pipa'] == 21)
+    cek('v11-profil: KTI D3 dikenali (N1/N2/N3)',
+        P8.profil_bentuk('Karya Tulis Ilmiah ini disusun untuk memenuhi syarat Ahli Madya.\nBAB I\nPENDAHULUAN\n')['kti_d3'] is True)
+    prof_4 = P8.profil_bentuk('BAB I\nPENDAHULUAN\nBAB II\nTINJAUAN PUSTAKA\nBAB III\nMETODE PENELITIAN\nBAB IV\nPENUTUP\n')
+    cek('v11-profil: empat bab dikenali (O1/O2/O3/U3/AA3)',
+        prof_4['empat_bab'] is True and prof_4['jml_bab_terdeteksi'] == 4)
+    cek('v11-profil: sistematika dikenali (36 naskah)',
+        P8.profil_bentuk('SISTEMATIKA PENULISAN\nBAB I\nPENDAHULUAN\n')['sistematika'] is True)
+    cek('v11-profil: pemisah gabungan dihitung (117 baris di 50 teks)',
+        P8.profil_bentuk('===== BAB I (BAB 1.doc) =====\nBAB I\nPENDAHULUAN\n===== SKRIPSI.doc =====\n')['pemisah_gabung_jml'] == 2)
+    cek('v11-profil: BOM dihitung (66 teks)',
+        P8.profil_bentuk('\ufeffBAB I\nPENDAHULUAN\n')['bom_jml'] == 1)
+    # --- 12b. susun: aturan baru ---
+    d_bom = P8._susun_dari_bersih('\ufeffBAB I\nPENDAHULUAN\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\n')
+    cek('v11-susun: BOM dibuang dari baris',
+        not any('\ufeff' in b for b in d_bom['baris']), str(d_bom['baris']))
+    cek('v11-susun: BAB I ber-BOM tetap dikenali sebagai bab',
+        any(v[0] == 'BAB I' and v[1] == 'PENDAHULUAN'
+            for v in d_bom.get('gabung', {}).values()), str(d_bom.get('gabung')))
+    d_pem = P8._susun_dari_bersih('===== BAB I (BAB 1.doc) =====\nBAB I\nPENDAHULUAN\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\n===== SKRIPSI.doc =====\nIsi paragraf kedua yang panjang dan menjelaskan banyak hal penting di sini.\n')
+    idx_pem = [i for i, b in enumerate(d_pem['baris']) if '=====' in b]
+    cek('v11-susun: pemisah gabungan dibuang, bukan kandidat',
+        idx_pem and all(i in d_pem['buang'] for i in idx_pem)
+        and all(i not in dict(d_pem['kand']) for i in idx_pem),
+        str((idx_pem, d_pem['buang'], d_pem['kand'])))
+    d_ch = P8._susun_dari_bersih('CHAPTER II\nTHEORETICAL BACKGROUND\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\n')
+    cek('v11-susun: CHAPTER polos + judul dikenali sebagai bab',
+        any(v[0] == 'CHAPTER II' and v[1] == 'THEORETICAL BACKGROUND'
+            for v in d_ch.get('gabung', {}).values()), str(d_ch.get('gabung')))
+    d_ch1 = P8._susun_dari_bersih('CHAPTER I:\tINTRODUCTION\n1.1 Background of study\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\n')
+    cek('v11-susun: CHAPTER satu baris bertitik-dua TIDAK dipaksa (daftar isi T2)',
+        not any(v[0].startswith('CHAPTER') for v in d_ch1.get('gabung', {}).values()),
+        str(d_ch1.get('gabung')))
+    d_ro = P8._susun_dari_bersih(teks_romawi)
+    cek('v11-susun: judul Romawi tanpa BAB jadi gabung bila profil begitu',
+        {v[0] for v in d_ro.get('gabung', {}).values()}
+        == {'I.', 'II.', 'III.', 'IV.', 'V.'}, str(d_ro.get('gabung')))
+    d_ro_off = P8._susun_dari_bersih('BAB I\nPENDAHULUAN\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\nII. TINJAUAN PUSTAKA\nIsi tinjauan pustaka yang cukup panjang dan menjelaskan teori yang dipakai dalam penelitian ini.\n')
+    cek('v11-susun: judul Romawi TIDAK jadi bab bila naskah ber-BAB (O1)',
+        not any(v[0] == 'II.' for v in d_ro_off.get('gabung', {}).values()),
+        str(d_ro_off.get('gabung')))
+    d_ro_sitasi = P8._susun_dari_bersih('BAB I\nPENDAHULUAN\nVI. Pp. 1187-1196.\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\n')
+    cek('v11-susun: Romawi sitasi bukan judul (tidak masuk gabung)',
+        not any(v[0] == 'VI.' for v in d_ro_sitasi.get('gabung', {}).values()),
+        str(d_ro_sitasi.get('gabung')))
+    # --- 12c. pendapat_kedua (unit, tanpa Jev) ---
+    cek('v11-pk: suara sepakat -> bukan-goyang',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'paragraf'], [0.9, 0.9])['putusan'] == 'bukan-goyang')
+    cek('v11-pk: sepakat suara teratas -> tetap',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'paragraf', 'confidence': 0.8}) == {'idx': 3, 'putusan': 'tetap', 'label': 'paragraf',
+                          'alasan': 'pendapat kedua sepakat dengan suara teratas'})
+    cek('v11-pk: minoritas + lebih yakin -> berbalik',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.6, 0.55],
+                          {'label': 'biasa', 'confidence': 0.9})['putusan'] == 'berbalik'
+        and P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.6, 0.55],
+                              {'label': 'biasa', 'confidence': 0.9})['label'] == 'biasa')
+    cek('v11-pk: minoritas tapi kurang yakin -> tetap',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'biasa', 'confidence': 0.7})['putusan'] == 'tetap')
+    cek('v11-pk: tanpa pendapat kedua -> antrean, label tidak dipaksa',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6], None) == {'idx': 3, 'putusan': 'antrean-manusia', 'label': None,
+                          'alasan': 'tidak ada pendapat kedua'})
+    cek('v11-pk: pendapat kedua tidak yakin -> antrean',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'biasa', 'confidence': 0.4})['putusan'] == 'antrean-manusia')
+    cek('v11-pk: tiga suara berbeda -> antrean',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'subbab', 'confidence': 0.9})['putusan'] == 'antrean-manusia')
+    # --- 12d. kait petakan: pendapat kedua disuntik dari suara tersimpan ---
+    #    Tiap panggilan memakai penanda GOYANG-PB berbeda: FakeSatpam
+    #    menghitung panggilan per tengah, jadi teks yang sama diulang tidak
+    #    lagi goyang pada panggilan ke-2 (penghitung sudah lewat ambang).
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.rendah = set()
+    P8._CACHE_PETA.clear()
+    teks_pk = ('BAB I\nPENDAHULUAN\n'
+               'Kalimat GOYANG-PB-V11A tentang pemasaran digital dan kinerja bisnis usaha kecil di Indonesia yang panjang.\n')
+    r_pk0 = P8.petakan_dari_teks(teks_pk, putaran=1)
+    idx_pk = next(i for i, b in enumerate(r_pk0['baris']) if 'GOYANG-PB-V11A' in b)
+    cek('v11-kait: tanpa fn -> perilaku v10 (label paragraf, pk 0)',
+        r_pk0['label'].get(idx_pk) == 'paragraf' and r_pk0.get('pendapat_kedua_jml') == 0,
+        str((r_pk0['label'].get(idx_pk), r_pk0.get('pendapat_kedua_jml'), r_pk0.get('goyang'))))
+    cek('v11-kait: baris goyang tercatat sebelum pendapat kedua',
+        any(g[0] == idx_pk for g in r_pk0.get('goyang', [])),
+        str(r_pk0.get('goyang')))
+    teks_pk1 = teks_pk.replace('GOYANG-PB-V11A', 'GOYANG-PB-V11B')
+    r_pk1 = P8.petakan_dari_teks(
+        teks_pk1, putaran=1,
+        pendapat_kedua_fn=lambda i, t, s, p: {'label': 'biasa', 'confidence': 0.95})
+    idx_pk1 = next(i for i, b in enumerate(r_pk1['baris']) if 'GOYANG-PB-V11B' in b)
+    cek('v11-kait: pendapat kedua minoritas + yakin -> label berbalik',
+        r_pk1['label'].get(idx_pk1) == 'biasa'
+        and r_pk1.get('pendapat_kedua_berbalik') == [[idx_pk1, 'paragraf', 'biasa']],
+        str((r_pk1['label'].get(idx_pk1), r_pk1.get('pendapat_kedua_berbalik'))))
+    teks_pk2 = teks_pk.replace('GOYANG-PB-V11A', 'GOYANG-PB-V11C')
+    r_pk2 = P8.petakan_dari_teks(
+        teks_pk2, putaran=1,
+        pendapat_kedua_fn=lambda i, t, s, p: None)
+    idx_pk2 = next(i for i, b in enumerate(r_pk2['baris']) if 'GOYANG-PB-V11C' in b)
+    cek('v11-kait: pendapat kedua kosong -> label tetap, baris ke antrean',
+        r_pk2['label'].get(idx_pk2) == 'paragraf'
+        and r_pk2.get('pendapat_kedua_antrean') == [idx_pk2]
+        and r_pk2.get('antrean_manusia') is True,
+        str((r_pk2['label'].get(idx_pk2), r_pk2.get('pendapat_kedua_antrean'))))
+    # --- 12e. gerbang antrean: bentuk tak dikenal ditandai, bukan dipetakan diam-diam ---
+    r_tidak = P8.petakan_dari_teks(
+        'Kalimat biasa satu yang panjang dan menjelaskan sesuatu yang penting di sini.\n'
+        'Kalimat biasa dua yang panjang dan menjelaskan sesuatu yang lain dengan jelas sekali.\n'
+        'Kalimat biasa tiga yang panjang dan menutup bagian ini dengan kesimpulan yang jelas.\n',
+        putaran=1)
+    cek('v11-gerbang: tanpa penanda -> antrean_manusia True + alasan',
+        r_tidak.get('antrean_manusia') is True
+        and r_tidak.get('alasan_antrean') == ['tidak ada penanda BAB/CHAPTER/judul Romawi']
+        and r_tidak.get('profil_bentuk', {}).get('penomoran_bab') == 'tidak_ada',
+        str((r_tidak.get('antrean_manusia'), r_tidak.get('alasan_antrean'))))
+    cek('v11-gerbang: naskah biasa ber-BAB tidak masuk antrean',
+        P8.petakan_dari_teks(
+            'BAB I\nPENDAHULUAN\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\n',
+            putaran=1).get('antrean_manusia') is False)
+    # --- 12f. v12 RANTAI 3 LANGKAH: mode agen-kedua + pabrik agen kedua ---
+    # 12f-1. mode agen-kedua (unit, tanpa Jev)
+    cek('v12-pk2: agen-kedua sepakat -> tetap',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'paragraf', 'confidence': 0.8},
+                          mode='agen-kedua')['putusan'] == 'tetap')
+    cek('v12-pk2: agen-kedua beda bukan-bab -> berbalik (keputusan agen kedua dipakai)',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'subbab', 'confidence': 0.9},
+                          mode='agen-kedua') == {
+            'idx': 3, 'putusan': 'berbalik', 'label': 'subbab',
+            'alasan': 'agen kedua beda (bukan soal bab), keputusannya dipakai'})
+    cek('v12-pk2: agen-kedua beda soal judul bab (label kedua bab) -> antrean',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'bab', 'confidence': 0.9},
+                          mode='agen-kedua')['putusan'] == 'antrean-manusia')
+    cek('v12-pk2: agen-kedua beda soal judul bab (label Jev bab) -> antrean',
+        P8.pendapat_kedua(3, 'x', ['bab', 'paragraf'], [0.9, 0.6],
+                          {'label': 'paragraf', 'confidence': 0.9},
+                          mode='agen-kedua')['putusan'] == 'antrean-manusia')
+    cek('v12-pk2: agen-kedua tidak yakin -> antrean',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'biasa', 'confidence': 0.4},
+                          mode='agen-kedua')['putusan'] == 'antrean-manusia')
+    cek('v12-pk2: tanpa jawaban kedua -> antrean',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          None, mode='agen-kedua')['putusan'] == 'antrean-manusia')
+    cek('v12-pk2: mode suara lama tetap (label ketiga -> antrean)',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'subbab', 'confidence': 0.9})['putusan']
+        == 'antrean-manusia')
+    # 12f-2. modul agen_kedua (unit, tanpa jaringan — penanya palsu)
+    import app.agen_kedua as AK
+    _env_lama = os.environ.get('EDUAI_AGEN_KEDUA_AKTIF')
+    os.environ.pop('EDUAI_AGEN_KEDUA_AKTIF', None)
+    cek('v12-ak: saklar bawaan mati',
+        AK.aktif() is False)
+    cek('v12-ak: pabrik mati -> None (perilaku v11)',
+        AK.buat_pendapat_kedua_fn() is None)
+    os.environ['EDUAI_AGEN_KEDUA_AKTIF'] = '1'
+    cek('v12-ak: saklar nyala bila env 1',
+        AK.aktif() is True)
+
+    def _penanya_palsu(prompt):
+        return (json.dumps({'label': 'biasa', 'confidence': 0.9,
+                            'alasan': 'butir enumerasi'}, ensure_ascii=False),
+                'model-palsu')
+
+    fn_ak = AK.buat_pendapat_kedua_fn(penanya=_penanya_palsu)
+    cek('v12-ak: pabrik nyala -> fn terpanggil',
+        callable(fn_ak) and hasattr(fn_ak, 'log'))
+    jw_ak = fn_ak(5, '2. Manfaat Praktis', ['paragraf', 'biasa'], [0.9, 0.6],
+                  {'sebelum': ['1. Pendahuluan'], 'sesudah': ['Isi.'],
+                   'judul_bab_terdekat': 'BAB I'})
+    cek('v12-ak: fn kembalikan label+confidence agen kedua',
+        jw_ak == {'label': 'biasa', 'confidence': 0.9,
+                  'alasan': 'butir enumerasi', 'model': 'model-palsu'})
+    cek('v12-ak: fn mencatat log keputusan',
+        len(fn_ak.log) == 1 and fn_ak.log[0]['idx'] == 5
+        and fn_ak.log[0]['label_kedua'] == 'biasa')
+
+    def _penanya_galat(prompt):
+        raise RuntimeError('jaringan mati (uji)')
+
+    fn_galat = AK.buat_pendapat_kedua_fn(penanya=_penanya_galat)
+    cek('v12-ak: penanya galat -> None (gagal tertutup, bukan tebakan)',
+        fn_galat(5, 'x', ['paragraf', 'biasa'], [0.9, 0.6]) is None)
+    cek('v12-ak: urai jawaban JSON sah',
+        AK._urai_jawaban(
+            'ini {"label": "subbab", "confidence": 0.8, "alasan": "ok"} akhir')
+        == {'label': 'subbab', 'confidence': 0.8, 'alasan': 'ok'})
+    cek('v12-ak: urai jawaban label tidak sah -> None',
+        AK._urai_jawaban('{"label": "judul", "confidence": 0.9}') is None)
+    cek('v12-ak: urai jawaban bukan JSON -> None',
+        AK._urai_jawaban('tidak ada json di sini') is None)
+    cek('v12-ak: prompt memuat aturan label + konteks lebar',
+        'biasa' in AK._prompt('2. Manfaat',
+                              {'sebelum': ['a'], 'sesudah': ['b'],
+                               'judul_bab_terdekat': 'BAB I'})
+        and 'BARIS YANG DINILAI' in AK._prompt('2. Manfaat', None))
+    if _env_lama is None:
+        os.environ.pop('EDUAI_AGEN_KEDUA_AKTIF', None)
+    else:
+        os.environ['EDUAI_AGEN_KEDUA_AKTIF'] = _env_lama
+    cek('v12-ak: saklar mati lagi sesudah uji -> pabrik None',
+        AK.buat_pendapat_kedua_fn() is None)
+    # 12f-3. kait petakan: mode agen-kedua lewat wiring (FakeSatpam)
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.rendah = set()
+    P8._CACHE_PETA.clear()
+    teks_v12 = ('BAB I\nPENDAHULUAN\n'
+                'Kalimat GOYANG-PB-V12A tentang pemasaran digital dan kinerja bisnis usaha kecil di Indonesia yang panjang.\n')
+    r_v12a = P8.petakan_dari_teks(
+        teks_v12, putaran=1,
+        pendapat_kedua_fn=lambda i, t, s, p: {'label': 'subbab',
+                                              'confidence': 0.9})
+    idx_v12a = next(i for i, b in enumerate(r_v12a['baris'])
+                    if 'GOYANG-PB-V12A' in b)
+    cek('v12-kait: agen kedua label ketiga (bukan soal bab) -> berbalik',
+        r_v12a['label'].get(idx_v12a) == 'subbab'
+        and r_v12a.get('pendapat_kedua_berbalik') == [[idx_v12a, 'paragraf', 'subbab']],
+        str((r_v12a['label'].get(idx_v12a),
+             r_v12a.get('pendapat_kedua_berbalik'))))
+    teks_v12b = teks_v12.replace('GOYANG-PB-V12A', 'GOYANG-PB-V12B')
+    r_v12b = P8.petakan_dari_teks(
+        teks_v12b, putaran=1,
+        pendapat_kedua_fn=lambda i, t, s, p: {'label': 'bab',
+                                              'confidence': 0.95})
+    idx_v12b = next(i for i, b in enumerate(r_v12b['baris'])
+                    if 'GOYANG-PB-V12B' in b)
+    cek('v12-kait: agen kedua beda soal judul bab -> antrean, label tetap',
+        r_v12b['label'].get(idx_v12b) == 'paragraf'
+        and idx_v12b in r_v12b.get('pendapat_kedua_antrean', [])
+        and r_v12b.get('antrean_manusia') is True,
+        str((r_v12b['label'].get(idx_v12b),
+             r_v12b.get('pendapat_kedua_antrean'))))
+    _konteks_diterima = {}
+
+    def _fn_konteks(i, t, s, p, k=None):
+        _konteks_diterima['k'] = k
+        return {'label': 'biasa', 'confidence': 0.9}
+
+    teks_v12c = teks_v12.replace('GOYANG-PB-V12A', 'GOYANG-PB-V12C')
+    P8._CACHE_PETA.clear()
+    r_v12c = P8.petakan_dari_teks(teks_v12c, putaran=1,
+                                  pendapat_kedua_fn=_fn_konteks)
+    cek('v12-kait: fn menerima konteks lebar (sebelum/sesudah/judul bab)',
+        isinstance(_konteks_diterima.get('k'), dict)
+        and 'PENDAHULUAN' in ' '.join(_konteks_diterima['k'].get('sebelum', []))
+        and _konteks_diterima['k'].get('judul_bab_terdekat') == 'BAB I PENDAHULUAN',
+        str(_konteks_diterima.get('k')))
+    cek('v12-kait: jejak jawaban agen kedua tercatat di hasil',
+        any(j.get('idx') == idx_v12a and j.get('putusan') == 'berbalik'
+            and j.get('label_jev') == 'paragraf'
+            and j.get('label_kedua') == 'subbab'
+            for j in r_v12a.get('pendapat_kedua_jawaban', [])),
+        str(r_v12a.get('pendapat_kedua_jawaban')))
+    # --- 13a. v13 GATING HAKIM: agen kedua HANYA baris ditandai Hakim ---
+    #    Pola GOYANG-PB yang sama seperti 12d (FakeSatpam): baris penanda
+    #    goyang paragraf/biasa, label menang paragraf.
+    cek('v15-versi: RULE_VERSION jev-peta-v15',
+        P8.RULE_VERSION == 'jev-peta-v15', str(P8.RULE_VERSION))
+
+    def _teks_v13(penanda):
+        return ('BAB I\nPENDAHULUAN\n'
+                'Kalimat %s tentang pemasaran digital dan kinerja bisnis '
+                'usaha kecil di Indonesia yang panjang.\n' % penanda)
+
+    def _fn_rekam(_dipanggil):
+        def _fn(i, t, s, p, k=None):
+            _dipanggil.append(i)
+            return {'label': 'biasa', 'confidence': 0.95}
+        return _fn
+
+    def _hakim_tandai_teks(penanda):
+        def _fn(peta):
+            return {i for i, b in enumerate(peta.get('baris') or [])
+                    if penanda in b}
+        return _fn
+
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.rendah = set()
+    # 13a-1. goyang TANPA tanda Hakim -> agen kedua TIDAK dipanggil.
+    P8._CACHE_PETA.clear()
+    _dipanggil_a = []
+    r_v13a = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13A'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_a),
+        hakim_tandai_fn=lambda peta: set())
+    idx_v13a = next(i for i, b in enumerate(r_v13a['baris'])
+                    if 'GOYANG-PB-V13A' in b)
+    cek('v13-gating: goyang tanpa tanda Hakim -> agen kedua tidak dipanggil',
+        _dipanggil_a == [] and r_v13a.get('pendapat_kedua_jml') == 0
+        and r_v13a['label'].get(idx_v13a) == 'paragraf'
+        and r_v13a.get('hakim_tandai') == [],
+        str((_dipanggil_a, r_v13a.get('pendapat_kedua_jml'),
+             r_v13a['label'].get(idx_v13a), r_v13a.get('hakim_tandai'))))
+    # 13a-2. goyang DITANDAI Hakim -> agen kedua dipanggil, berbalik jalan.
+    P8._CACHE_PETA.clear()
+    _dipanggil_b = []
+    r_v13b = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13B'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_b),
+        hakim_tandai_fn=_hakim_tandai_teks('GOYANG-PB-V13B'))
+    idx_v13b = next(i for i, b in enumerate(r_v13b['baris'])
+                    if 'GOYANG-PB-V13B' in b)
+    cek('v13-gating: goyang ditandai Hakim -> agen kedua dipanggil + berbalik',
+        _dipanggil_b == [idx_v13b]
+        and r_v13b['label'].get(idx_v13b) == 'biasa'
+        and r_v13b.get('pendapat_kedua_berbalik') == [[idx_v13b, 'paragraf', 'biasa']]
+        and r_v13b.get('hakim_tandai') == [idx_v13b],
+        str((_dipanggil_b, r_v13b['label'].get(idx_v13b),
+             r_v13b.get('pendapat_kedua_berbalik'), r_v13b.get('hakim_tandai'))))
+    # 13a-3. fn gerbang mengembalikan None -> gagal tertutup, 0 panggilan.
+    P8._CACHE_PETA.clear()
+    _dipanggil_c = []
+    r_v13c = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13C'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_c),
+        hakim_tandai_fn=lambda peta: None)
+    idx_v13c = next(i for i, b in enumerate(r_v13c['baris'])
+                    if 'GOYANG-PB-V13C' in b)
+    cek('v13-gating: fn gerbang None -> agen kedua tidak dipanggil',
+        _dipanggil_c == [] and r_v13c.get('pendapat_kedua_jml') == 0
+        and r_v13c['label'].get(idx_v13c) == 'paragraf'
+        and r_v13c.get('hakim_tandai') == [],
+        str((_dipanggil_c, r_v13c.get('pendapat_kedua_jml'),
+             r_v13c.get('hakim_tandai'))))
+    # 13a-4. fn gerbang galat -> gagal tertutup + galat tercatat.
+    P8._CACHE_PETA.clear()
+    _dipanggil_d = []
+
+    def _hakim_galat(peta):
+        raise RuntimeError('hakim mati (uji)')
+
+    r_v13d = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13D'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_d),
+        hakim_tandai_fn=_hakim_galat)
+    idx_v13d = next(i for i, b in enumerate(r_v13d['baris'])
+                    if 'GOYANG-PB-V13D' in b)
+    cek('v13-gating: fn gerbang galat -> 0 panggilan + galat tercatat',
+        _dipanggil_d == [] and r_v13d.get('pendapat_kedua_jml') == 0
+        and r_v13d['label'].get(idx_v13d) == 'paragraf'
+        and r_v13d.get('hakim_tandai') == []
+        and r_v13d.get('hakim_tandai_galat') is not None,
+        str((_dipanggil_d, r_v13d.get('hakim_tandai_galat'))))
+    # 13a-5. saklar mati (tanpa pendapat_kedua_fn) -> perilaku v11, gerbang
+    #    tidak dipakai (hakim_tandai None).
+    P8._CACHE_PETA.clear()
+    r_v13e = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13E'), putaran=1,
+        hakim_tandai_fn=_hakim_tandai_teks('GOYANG-PB-V13E'))
+    idx_v13e = next(i for i, b in enumerate(r_v13e['baris'])
+                    if 'GOYANG-PB-V13E' in b)
+    cek('v13-gating: tanpa pendapat_kedua_fn -> perilaku v11, gerbang None',
+        r_v13e.get('pendapat_kedua_jml') == 0
+        and r_v13e['label'].get(idx_v13e) == 'paragraf'
+        and r_v13e.get('hakim_tandai') is None,
+        str((r_v13e.get('pendapat_kedua_jml'),
+             r_v13e['label'].get(idx_v13e), r_v13e.get('hakim_tandai'))))
+    # 13a-6. warisan: tanpa fn gerbang, tiap baris goyang tetap diadili (v12).
+    P8._CACHE_PETA.clear()
+    _dipanggil_f = []
+    r_v13f = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13F'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_f))
+    idx_v13f = next(i for i, b in enumerate(r_v13f['baris'])
+                    if 'GOYANG-PB-V13F' in b)
+    cek('v13-gating: tanpa fn gerbang -> warisan v12 (per goyang)',
+        _dipanggil_f == [idx_v13f]
+        and r_v13f['label'].get(idx_v13f) == 'biasa'
+        and r_v13f.get('hakim_tandai') is None,
+        str((_dipanggil_f, r_v13f['label'].get(idx_v13f),
+             r_v13f.get('hakim_tandai'))))
+    # 13a-7. helper tandai_ragu_curiga (unit, tanpa Jev — _TANYA_FN palsu).
+    def _tanya_palsu(bahan, pertanyaan):
+        out = {}
+        for nama in (pertanyaan or {}):
+            out[nama] = {'noul': 0.5}
+        return out
+
+    _tanya_lama = H._TANYA_FN
+    H._TANYA_FN = _tanya_palsu
+    try:
+        _peta_h = {'baris': ['BAB I', 'PENDAHULUAN',
+                             '1.1 Latar Belakang yang panjang sekali dan '
+                             'menjelaskan banyak hal penting di sini.',
+                             'Isi paragraf biasa yang panjang dan menjelaskan '
+                             'banyak hal penting di sini.'],
+                   'label': {0: 'bab', 1: 'bab', 2: 'subbab', 3: 'paragraf'},
+                   'gabung': {0: ['BAB I', 'PENDAHULUAN']},
+                   'sistematika': [], 'p': {0: 0.9, 1: 0.9, 2: 0.8, 3: 0.9}}
+        _tandai = H.tandai_ragu_curiga(_peta_h)
+        cek('v13-hakim: tandai_ragu_curiga kembalikan set idx ragu/curiga',
+            isinstance(_tandai, set) and 2 in _tandai,
+            str(_tandai))
+        cek('v13-hakim: tandai peta tanpa kandidat -> set kosong (bukan galat)',
+            H.tandai_ragu_curiga({'baris': [], 'label': {}, 'gabung': {},
+                                  'sistematika': [], 'p': {}}) == set())
+    finally:
+        H._TANYA_FN = _tanya_lama
+
+    # --- 13a-8. v13 KOREKSI: suara tunggal + jawaban kedua -> diadili
+    #    (baris ditandai Hakim yang tidak goyang). Tanpa jawaban, tetap
+    #    'bukan-goyang' (kontrak v11 tidak berubah).
+    _pk_tb = P8.pendapat_kedua(3, 'x', ['subbab'], [0.9],
+        {'label': 'biasa', 'confidence': 0.95}, mode='agen-kedua')
+    cek('v13-pk: suara tunggal + jawaban beda (bukan bab) -> berbalik',
+        _pk_tb['putusan'] == 'berbalik' and _pk_tb['label'] == 'biasa',
+        str(_pk_tb))
+    _pk_tt = P8.pendapat_kedua(3, 'x', ['subbab'], [0.9],
+        {'label': 'subbab', 'confidence': 0.95}, mode='agen-kedua')
+    cek('v13-pk: suara tunggal + jawaban sepakat -> tetap',
+        _pk_tt['putusan'] == 'tetap' and _pk_tt['label'] == 'subbab',
+        str(_pk_tt))
+    cek('v13-pk: suara tunggal tanpa jawaban -> bukan-goyang (kontrak v11)',
+        P8.pendapat_kedua(3, 'x', ['subbab'], [0.9])['putusan']
+        == 'bukan-goyang')
+    _pk_tbb = P8.pendapat_kedua(3, 'x', ['subbab'], [0.9],
+        {'label': 'bab', 'confidence': 0.95}, mode='agen-kedua')
+    cek('v13-pk: suara tunggal + jawaban bab -> antrean-manusia',
+        _pk_tbb['putusan'] == 'antrean-manusia', str(_pk_tbb))
+    _pk_trg = P8.pendapat_kedua(3, 'x', ['subbab'], [0.9],
+        {'label': 'biasa', 'confidence': 0.4}, mode='agen-kedua')
+    cek('v13-pk: suara tunggal + jawaban tidak yakin -> antrean-manusia',
+        _pk_trg['putusan'] == 'antrean-manusia', str(_pk_trg))
+    # 13a-9. KOREKSI v13: baris DITANDAI Hakim yang TIDAK goyang -> agen
+    #    kedua tetap dipanggil + berbalik (bukan dilewati seperti v13 awal
+    #    yang hanya mengadili goyang yang ditandai).
+    P8._CACHE_PETA.clear()
+    _dipanggil_i = []
+    r_v13i = P8.petakan_dari_teks(
+        _teks_v13('DITANDAI-V13I'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_i),
+        hakim_tandai_fn=_hakim_tandai_teks('DITANDAI-V13I'))
+    idx_v13i = next(i for i, b in enumerate(r_v13i['baris'])
+                    if 'DITANDAI-V13I' in b)
+    cek('v13-gating: ditandai Hakim TIDAK goyang -> agen kedua dipanggil + berbalik',
+        _dipanggil_i == [idx_v13i]
+        and r_v13i['label'].get(idx_v13i) == 'biasa'
+        and r_v13i.get('pendapat_kedua_berbalik')
+        == [[idx_v13i, 'paragraf', 'biasa']]
+        and r_v13i.get('hakim_tandai') == [idx_v13i]
+        and not any(g[0] == idx_v13i for g in r_v13i.get('goyang') or []),
+        str((_dipanggil_i, r_v13i['label'].get(idx_v13i),
+             r_v13i.get('pendapat_kedua_berbalik'), r_v13i.get('hakim_tandai'),
+             r_v13i.get('goyang'))))
+    # 13a-10. Baris ditandai TIDAK goyang + agen kedua gagal (None) ->
+    #    antrean manusia (flag Hakim tidak hilang diam-diam).
+    P8._CACHE_PETA.clear()
+    r_v13j = P8.petakan_dari_teks(
+        _teks_v13('DITANDAI-V13J'), putaran=1,
+        pendapat_kedua_fn=lambda i, t, s, p: None,
+        hakim_tandai_fn=_hakim_tandai_teks('DITANDAI-V13J'))
+    idx_v13j = next(i for i, b in enumerate(r_v13j['baris'])
+                    if 'DITANDAI-V13J' in b)
+    cek('v13-gating: ditandai TIDAK goyang + agen kedua gagal -> antrean',
+        r_v13j.get('pendapat_kedua_antrean') == [idx_v13j]
+        and r_v13j['label'].get(idx_v13j) == 'paragraf'
+        and r_v13j.get('pendapat_kedua_jml') == 1,
+        str((r_v13j.get('pendapat_kedua_antrean'),
+             r_v13j['label'].get(idx_v13j), r_v13j.get('pendapat_kedua_jml'))))
+
+    # --- 14. v14 PERBAIKAN LABEL BAB: salinan sistematika/daftar isi ------
+    #    Salah terbesar v11/v13 di 279 baris berlabel: 42 baris benarnya
+    #    `biasa` dilabeli `bab`. Aturan deterministik (1A pembersihan gabung,
+    #    1B demosi blok) + pengecualian ATURAN 5 untuk penanda huruf kepala
+    #    blok + prompt agen kedua yang tajam (diuji live terpisah).
+    # 14a-1. Detektor blok: sistematika R3 (penanda polos + "terdiri dari").
+    _baris_r3 = [
+        'BAB I', 'Pendahuluan',
+        'terdiri dari: Latar Belakang, Rumusan Masalah, dan Tujuan Penelitian.',
+        'BAB II', 'Kajian Teori',
+        'Bab ini membahas teori pemasaran dan perilaku konsumen secara mendalam.',
+        'BAB III', 'Metode Penelitian',
+        'Pada bab ini dijelaskan metode yang digunakan dalam penelitian ini.',
+        'BAB IV', 'Hasil Penelitian',
+        'Berisi tentang hasil olah data dan pembahasan temuan penelitian.',
+        'BAB V', 'Penutup',
+        'Bab ini berisi kesimpulan dan saran dari penelitian ini.',
+    ]
+    _gabung_r3 = {0: ('BAB I', ''), 3: ('BAB II', ''), 6: ('BAB III', ''),
+                  9: ('BAB IV', ''), 12: ('BAB V', '')}
+    _blok_r3 = P8._deteksi_blok_daftar_isi(_baris_r3, _gabung_r3)
+    cek('v14-blok: sistematika R3 terdeteksi (5 penanda polos)',
+        {0, 3, 6, 9, 12} <= _blok_r3, str(sorted(_blok_r3)))
+
+    # 14a-2. Detektor blok: daftar isi T3 (bentuk satu baris, tanpa gabung).
+    _baris_t3 = [
+        'TABLE OF CONTENS',
+        'CHAPTER I: INTRODUCTION',
+        'CHAPTER II: LITERATURE REVIEW',
+        'CHAPTER III: RESEARCH METHODOLOGY',
+        'CHAPTER IV: RESULTS AND DISCUSSION',
+        'CHAPTER V: CONCLUSION',
+    ]
+    _blok_t3 = P8._deteksi_blok_daftar_isi(_baris_t3, {})
+    cek('v14-blok: daftar isi T3 terdeteksi (judul satu baris)',
+        {1, 2, 3, 4} <= _blok_t3, str(sorted(_blok_t3)))
+
+    # 14a-3. Negatif: bab asli berjauhan TIDAK jadi blok.
+    _baris_asli = ['BAB I', 'PENDAHULUAN', 'Kalimat isi bab satu.'] + \
+        ['Kalimat isi lanjutan nomor %d.' % n for n in range(60)] + \
+        ['BAB II', 'KAJIAN TEORI', 'Kalimat isi bab dua.'] + \
+        ['Kalimat isi lanjutan nomor %d.' % n for n in range(60, 120)] + \
+        ['BAB III', 'METODE PENELITIAN', 'Kalimat isi bab tiga.']
+    _gabung_asli = {0: ('BAB I', 'PENDAHULUAN'),
+                    63: ('BAB II', 'KAJIAN TEORI'),
+                    126: ('BAB III', 'METODE PENELITIAN')}
+    _blok_asli = P8._deteksi_blok_daftar_isi(_baris_asli, _gabung_asli)
+    cek('v14-blok: bab asli berjauhan TIDAK terdeteksi sebagai blok',
+        _blok_asli == set(), str(sorted(_blok_asli)))
+
+    # 14a-4. Fragmen titik-dua G3 (ekor judul terbelah) masuk blok.
+    _baris_g3 = [
+        'Bab I', 'Pendahuluan', ': PENGANTAR UMUM TENTANG PENELITIAN',
+        'Bab II', 'Kajian Teori', ': LANDASAN TEORI DAN KERANGKA PIKIR',
+        'Bab III', 'Metode Penelitian', ': METODE YANG DIGUNAKAN',
+        'Bab IV', 'Hasil Penelitian', 'Berisi tentang hasil dan pembahasan.',
+        'Bab V', 'Penutup', 'Bab ini berisi kesimpulan dan saran.',
+    ]
+    _gabung_g3 = {0: ('Bab I', ''), 3: ('Bab II', ''), 6: ('Bab III', ''),
+                  9: ('Bab IV', ''), 12: ('Bab V', '')}
+    _blok_g3 = P8._deteksi_blok_daftar_isi(_baris_g3, _gabung_g3)
+    cek('v14-blok: fragmen titik-dua G3 masuk blok',
+        {0, 2, 3, 5, 6, 8, 9, 12} <= _blok_g3, str(sorted(_blok_g3)))
+
+    # 14b-1. Pembersihan gabung: dedupe per nomor bab (berjudul menang).
+    _g_dedupe = {0: ('BAB I', 'PENDAHULUAN'), 50: ('BAB I', ''),
+                 100: ('BAB II', 'KAJIAN TEORI')}
+    _bersih, _blok = P8._bersihkan_gabung_daftar_isi(_baris_asli, _g_dedupe)
+    cek('v14-gabung: dedupe per nomor bab (berjudul menang, polos gugur)',
+        _bersih.get(0) == ('BAB I', 'PENDAHULUAN')
+        and 50 not in _bersih and _bersih.get(100) == ('BAB II', 'KAJIAN TEORI'),
+        str(_bersih))
+
+    # 14b-2. Pembersihan gabung: judul berartefak nomor halaman dibuang.
+    _g_art = {10: ('BAB II', 'LANDASAN TEORI??????????????????.. 4'),
+              20: ('BAB III', 'METODOLOGI PENELITIAN')}
+    _bersih2, _ = P8._bersihkan_gabung_daftar_isi(
+        ['Kalimat isi.'] * 30, _g_art)
+    cek('v14-gabung: judul berartefak nomor halaman dibuang',
+        10 not in _bersih2 and 20 in _bersih2, str(_bersih2))
+
+    # 14b-3. Pembersihan gabung: entri di blok salinan dibuang semua.
+    _bersih3, _blok3 = P8._bersihkan_gabung_daftar_isi(_baris_r3, _gabung_r3)
+    cek('v14-gabung: entri gabung di blok sistematika dibuang semua',
+        _bersih3 == {}, str(_bersih3))
+
+    # 14c-1. Demosi blok: 'bab'/'subbab' di blok -> 'biasa', di luar tetap.
+    _lab = {0: 'bab', 1: 'paragraf', 3: 'subbab', 6: 'bab', 20: 'bab'}
+    _kand = [(i, _baris_r3[i]) for i in range(len(_baris_r3))]
+    P8._demosi_blok_daftar_isi(_baris_r3, _lab, _kand, _blok_r3)
+    cek('v14-demosi: bab/subbab di blok -> biasa, bab di luar blok tetap',
+        _lab[0] == 'biasa' and _lab[3] == 'biasa' and _lab[6] == 'biasa'
+        and _lab[1] == 'paragraf' and _lab[20] == 'bab',
+        str(_lab))
+
+    # 14c-2. Fragmen titik-dua: ': PENGANTAR' tidak pernah bab/subbab.
+    _lab2 = {2: 'bab', 5: 'subbab', 7: 'bab'}
+    _kand2 = [(i, _baris_g3[i]) for i in range(len(_baris_g3))]
+    P8._demosi_blok_daftar_isi(_baris_g3, _lab2, _kand2, set())
+    cek('v14-demosi: fragmen titik-dua -> biasa walau di luar blok',
+        _lab2[2] == 'biasa' and _lab2[5] == 'biasa' and _lab2[7] == 'bab',
+        str(_lab2))
+
+    # 14d-1. ATURAN 5: penanda huruf kepala blok BOLEH jadi subbab.
+    _b_u2 = ['a) Persetubuhan',
+             'Persetubuhan adalah hubungan seksual yang dilakukan oleh pasangan '
+             'suami istri yang sah menurut hukum dan agama.']
+    cek('v14-aturan5: "a) Persetubuhan" + uraian -> kepala blok (True)',
+        P8._penanda_huruf_kepala_blok(_b_u2, 0) is True)
+    _b_g3 = ['d. Mengenali Emosi Orang Lain',
+             'Kemampuan untuk mengenali emosi orang lain disebut juga empati. '
+             'Menurut Goleman (2002 :57) kemampuan seseorang untuk mengenali '
+             'orang lain atau peduli, menunjukkan kemampuan empati seseorang.']
+    cek('v14-aturan5: "d. Mengenali Emosi Orang Lain" + uraian -> True',
+        P8._penanda_huruf_kepala_blok(_b_g3, 0) is True)
+
+    # 14d-2. ATURAN 5: penanda huruf butir daftar tetap BUKAN subbab.
+    _b_daftar = ['a) Butir pertama dalam daftar enumerasi ini.',
+                 'b) Butir kedua dalam daftar enumerasi ini.',
+                 'c) Butir ketiga dalam daftar enumerasi ini.']
+    cek('v14-aturan5: penanda huruf diikuti butir lain -> bukan kepala blok',
+        P8._penanda_huruf_kepala_blok(_b_daftar, 0) is False)
+    _b_tabel = ['a) Lihat tabel berikut untuk rincian angka.',
+                'Sumber: Data primer yang diolah peneliti pada tahun 2024.']
+    cek('v14-aturan5: penanda huruf diikuti keterangan tabel -> False',
+        P8._penanda_huruf_kepala_blok(_b_tabel, 0) is False)
+    _b_panjang = ['b. Konfrontasi yaitu salah satu teknik pemeriksaan dalam '
+                  'rangka penyidikan dengan cara mempertemukan satu dengan '
+                  'lainnya untuk menguji kebenaran keterangan masing-masing.',
+                  '2. Pemeriksaan dan penyitaan benda-benda yang dapat '
+                  'menjadi barang bukti terjadinya tindak pidana perkosaan.']
+    cek('v14-aturan5: kalimat definisi panjang -> False (koreksi_batas)',
+        P8._penanda_huruf_kepala_blok(_b_panjang, 0) is False)
+
+    # 14e-1. Fragmen gambar: "Pada Gambar" + "MANAJEMEN PROYEK" -> demosi.
+    _b_h1 = ['BAB I', 'PENDAHULUAN',
+             'Pada Gambar 2.1 disajikan alur manajemen proyek penelitian.',
+             'MANAJEMEN PROYEK',
+             'Kalimat isi bab satu yang panjang tentang pemasaran digital.']
+    _lab_h1 = {3: 'bab'}
+    _kand_h1 = [(3, _b_h1[3])]
+    P8._koreksi_bab_deterministik(_b_h1, _lab_h1, _kand_h1, set(),
+                                  {0: ('BAB I', 'PENDAHULUAN')}, {})
+    cek('v14-demosi: fragmen gambar "MANAJEMEN PROYEK" -> biasa',
+        _lab_h1[3] == 'biasa', str(_lab_h1))
+
+    # 14e-2. Regresi: huruf BESAR pendek TANPA penunjuk gambar tetap bab.
+    _b_h1b = ['BAB I', 'PENDAHULUAN',
+              'Kalimat isi bab satu yang panjang tentang pemasaran digital.',
+              'MANAJEMEN PROYEK',
+              'Kalimat isi berikutnya yang panjang tentang pemasaran digital.']
+    _lab_h1b = {3: 'bab'}
+    _kand_h1b = [(3, _b_h1b[3])]
+    P8._koreksi_bab_deterministik(_b_h1b, _lab_h1b, _kand_h1b, set(),
+                                  {0: ('BAB I', 'PENDAHULUAN')}, {})
+    cek('v14-demosi: huruf BESAR pendek tanpa penunjuk gambar tetap bab',
+        _lab_h1b[3] == 'bab', str(_lab_h1b))
+
+    # 14f. End-to-end: judul satu baris salinan daftar isi yang Jev labeli
+    #    'bab' didemosi v14 jadi 'biasa'; bab asli (gabung) tidak tersentuh.
+    _baris_e2e = [
+        'TABLE OF CONTENS',
+        'CHAPTER I: INTRODUCTION JEV-BAB',
+        'CHAPTER II: LITERATURE REVIEW JEV-BAB',
+        'CHAPTER III: RESEARCH METHODOLOGY JEV-BAB',
+        'BAB I',
+        'PENDAHULUAN',
+        'Kalimat isi bab satu yang panjang tentang pemasaran digital dan kinerja bisnis usaha kecil di Indonesia.',
+        'BAB II',
+        'KAJIAN TEORI',
+        'Kalimat isi bab dua yang panjang tentang pemasaran digital dan kinerja bisnis usaha kecil di Indonesia.',
+    ]
+    _gabung_e2e = {4: ('BAB I', 'PENDAHULUAN'), 7: ('BAB II', 'KAJIAN TEORI')}
+    _gabung_bersih_e2e, _blok_e2e = P8._bersihkan_gabung_daftar_isi(
+        _baris_e2e, _gabung_e2e)
+    _d_e2e = {
+        'baris': _baris_e2e,
+        'kand': [(i, _baris_e2e[i]) for i in (1, 2, 3, 6, 9)],
+        't': lambda i: _baris_e2e[i] if 0 <= i < len(_baris_e2e) else '',
+        'gabung': _gabung_bersih_e2e,
+        'blok_daftar_isi': sorted(_blok_e2e),
+        'buang': set(),
+        'kode_label': {},
+        'awal': 0, 'akhir': len(_baris_e2e), 'nama': 'uji-v14-e2e',
+    }
+    P8._CACHE_PETA.clear()
+    _r_e2e = P8._petakan_dari_hasil(_d_e2e, putaran=1)
+    cek('v14-e2e: 3 judul salinan daftar isi -> biasa, isi tetap paragraf',
+        _r_e2e['label'].get(1) == 'biasa'
+        and _r_e2e['label'].get(2) == 'biasa'
+        and _r_e2e['label'].get(3) == 'biasa'
+        and _r_e2e['label'].get(6) == 'paragraf'
+        and _r_e2e['label'].get(9) == 'paragraf',
+        str({i: _r_e2e['label'].get(i) for i in (1, 2, 3, 6, 9)}))
+    cek('v14-e2e: gabung bab asli utuh sesudah pembersihan',
+        _r_e2e['gabung'] == _gabung_e2e, str(_r_e2e['gabung']))
+
+    # 14g. _PEMBUANG: "TABLE OF CONTENS" (salah eja) dibuang sebagai judul
+    #    daftar isi; "TABLE OF CONTENTS" yang benar juga dibuang.
+    cek('v14-pembuang: TABLE OF CONTENS / CONTENTS dibuang',
+        bool(P8._PEMBUANG.match('TABLE OF CONTENS'))
+        and bool(P8._PEMBUANG.match('TABLE OF CONTENTS'))
+        and P8.dibuang('TABLE OF CONTENS') is True)
+
+    # 14h-1. Dedupe seri -> TERAKHIR (N3): TOC depan berjudul mendahului
+    #    bab asli; yang bertahan harus bab asli (idx besar), bukan salinan.
+    _baris_n3 = ['Kalimat isi.'] * 310
+    _baris_n3[0] = 'BAB I'
+    _baris_n3[26] = 'BAB II'
+    _baris_n3[214] = 'BAB I'
+    _baris_n3[309] = 'BAB II'
+    _g_n3 = {0: ('BAB I', 'PENDAHULUAN'), 26: ('BAB II', 'TINJAUAN PUSTAKA'),
+             214: ('BAB I', 'PENDAHULUAN'), 309: ('BAB II', 'TINJAUAN PUSTAKA')}
+    _bersih_n3, _blok_n3 = P8._bersihkan_gabung_daftar_isi(_baris_n3, _g_n3)
+    cek('v14-gabung: dedupe seri berjudul -> terakhir menang (bab asli)',
+        _bersih_n3 == {214: ('BAB I', 'PENDAHULUAN'),
+                       309: ('BAB II', 'TINJAUAN PUSTAKA')},
+        str(_bersih_n3))
+
+    # 14h-2. Tipe T: header TOC + 2 judul satu baris sesudahnya -> blok.
+    _baris_t3b = [
+        'TABLE OF CONTENS', '',
+        'TITLE…………………………………………………………………………… i',
+        'CHAPTER I: INTRODUCTION', '',
+        'CHAPTER II: REVIEW OF RELATED LITERATURE',
+    ]
+    _blok_t3b = P8._deteksi_blok_daftar_isi(_baris_t3b, {})
+    cek('v14-blok: Tipe T (header TOC + 2 judul satu baris) -> blok',
+        {0, 3, 5} <= _blok_t3b, str(sorted(_blok_t3b)))
+    _baris_t3c = ['TABLE OF CONTENS', '', 'CHAPTER I: INTRODUCTION']
+    cek('v14-blok: Tipe T butuh >=2 judul (1 saja bukan blok)',
+        P8._deteksi_blok_daftar_isi(_baris_t3c, {}) == set(),
+        str(sorted(P8._deteksi_blok_daftar_isi(_baris_t3c, {}))))
+
+    # 14h-3. Penjaga C4: bab asli yang didahului butir rumus ': = 0' dan
+    #    diikuti kalimat pembuka 'Dalam bab ini...' TIDAK masuk blok.
+    _baris_c4 = [
+        'Untuk menentukan apakah diterima atau ditolak maka dengan '
+        'menggunakan uji rasio.',
+        ': = 0 berarti budaya perusahaan tidak berpengaruh terhadap '
+        'efektivitas organisasi.',
+        ': > 0 berarti budaya perusahaan berpengaruh terhadap efektivitas '
+        'organisasi.',
+        '', 'BAB IV', 'HASIL PENELITIAN DAN PEMBAHASAN', '',
+        'Dalam bab ini akan diuraikan pembahasan atas jawaban wawancara '
+        'dan kuesioner untuk penelitian ini.',
+        '4.1 Karakteristik Responden',
+    ]
+    _gabung_c4 = {4: ('BAB IV', 'HASIL PENELITIAN DAN PEMBAHASAN')}
+    _blok_c4 = P8._deteksi_blok_daftar_isi(_baris_c4, _gabung_c4)
+    cek('v14-blok: bab asli C4 (rumus + "Dalam bab ini") bukan blok',
+        4 not in _blok_c4, str(sorted(_blok_c4)))
+    cek('v14-fragmen: ": = 0" dan ": > 0" bukan fragmen judul',
+        not P8._POLA_FRAGMEN_TITIK_DUA.match(': = 0 berarti')
+        and not P8._POLA_FRAGMEN_TITIK_DUA.match(': > 0 berarti')
+        and bool(P8._POLA_FRAGMEN_TITIK_DUA.match(': PENGANTAR')))
+
+    # 14h-4. Demosi kehilangan perlindungan (a): judul salinan yang
+    #    penandanya sudah terhapus dari gabung didemosi; judul bab asli
+    #    yang penandanya masih di gabung tetap dilindungi.
+    _b_salinan = ['BAB III', 'Metode Penelitian', 'Kalimat isi.']
+    _lab_sal = {1: 'bab'}
+    P8._koreksi_bab_deterministik(_b_salinan, _lab_sal, [(1, _b_salinan[1])],
+                                  set(), {}, {})
+    cek('v14-demosi: judul salinan tanpa penanda di gabung -> biasa',
+        _lab_sal[1] == 'biasa', str(_lab_sal))
+    _b_asli = ['BAB III', 'Metode Penelitian', 'Kalimat isi.']
+    _lab_asli = {1: 'bab'}
+    P8._koreksi_bab_deterministik(_b_asli, _lab_asli, [(1, _b_asli[1])],
+                                  set(), {0: ('BAB III', '')}, {})
+    cek('v14-demosi: judul asli dgn penanda polos di gabung tetap bab',
+        _lab_asli[1] == 'bab', str(_lab_asli))
+
+    # ── v15: BOM di buang_daftar_isi ─────────────────────────────────────
+    # Akar (R3 Bimbingan Konseling): satu BOM menempel di depan "BAB I"
+    # ASLI membuat pola `^[ \t]*BAB` tidak cocok, sehingga salinan
+    # SISTEMATIKA yang bersih jadi patokan potong dan isi BAB I asli hilang.
+    _ST15 = _muat_asli('app.state_asli_v15', ROOT / 'app' / 'state.py')
+
+    cek('v15-rapi: BOM + zero-width dikupas di kedua ujung',
+        _ST15._rapi('\ufeffBAB I\u200b') == 'BAB I'
+        and _ST15._rapi('\u200b\u200c  x  \ufeff') == 'x',
+        repr(_ST15._rapi('\ufeffBAB I\u200b')))
+    cek('v15-pola: _POLA_JUDUL_BAB cocok "BAB I" ber-BOM',
+        bool(_ST15._POLA_JUDUL_BAB.match('\ufeffBAB I')))
+
+    # 15a. Mini-R3: BAB I asli ber-BOM + salinan sistematika sesudahnya.
+    _t_r3 = (
+        '\n\n===== skripsi hasil final.rtf =====\n\n'
+        '\ufeffBAB I\nPENDAHULUAN\n\n    A. LATAR BELAKANG\n'
+        '      Anak berbakat memiliki kepribadian yang unik.\n\n'
+        '    G. SISTEMATIKA PENULISAN LAPORAN DAN PEMBAHASAN\n'
+        'Untuk mempermudah penulisan, sistematika disusun sebagai berikut: \n'
+        'BAB I \tPendahuluan, terdiri dari: Latar Belakang Masalah, '
+        'Rumusan Masalah.\n'
+        'BAB II \tKajian Pustaka, terdiri dari: Pengertian.\n')
+    _awal_r3 = _ST15.awal_isi_naskah(_t_r3)
+    cek('v15-awal: BAB I asli ber-BOM jadi patokan (bukan salinan)',
+        _awal_r3 == _t_r3.index('\ufeffBAB I'),
+        f'awal={_awal_r3} harap={_t_r3.index(chr(0xfeff) + "BAB I")}')
+    _buang_r3 = _ST15.buang_daftar_isi(_t_r3)
+    cek('v15-buang: isi BAB I asli utuh (LATAR BELAKANG tidak terbuang)',
+        'LATAR BELAKANG' in _buang_r3
+        and _buang_r3.startswith('\ufeffBAB I'),
+        repr(_buang_r3[:60]))
+
+    # 15b. Tanpa BOM: perilaku sama seperti dulu (jangkar BAB I asli).
+    _t_nobom = _t_r3.replace('\ufeff', '')
+    cek('v15-nobom: tanpa BOM jangkar tetap BAB I asli',
+        _ST15.awal_isi_naskah(_t_nobom) == _t_nobom.index('BAB I')
+        and 'LATAR BELAKANG' in _ST15.buang_daftar_isi(_t_nobom))
+
+    # 15c. Salinan sistematika TANPA BOM yang muncul DULUAN (sebelum BAB I
+    #    asli) tetap dilewati sebagai patokan.
+    _t_sal_dulu = (
+        'KATA PENGANTAR\n\n    G. SISTEMATIKA PENULISAN\n'
+        'Sistematika penulisan laporan ini disusun sebagai berikut:\n'
+        'BAB I \tPendahuluan, terdiri dari: Latar Belakang.\n'
+        'BAB II \tKajian Pustaka, terdiri dari: Pengertian.\n\n'
+        'BAB I\nPENDAHULUAN\n\n1.1 Latar Belakang\nIsi bahasan asli.\n')
+    _awal_sal = _ST15.awal_isi_naskah(_t_sal_dulu)
+    cek('v15-salinan: salinan sistematika di depan dilewati, BAB I asli menang',
+        _awal_sal == _t_sal_dulu.rindex('\nBAB I\n') + 1,
+        f'awal={_awal_sal}')
+
+    # 15d. Daftar isi bertitik-pengarah tetap ditolak (regresi perilaku lama).
+    _t_daftar = (
+        'DAFTAR ISI\nBAB I PENDAHULUAN ....... 1\n'
+        '1.1 Latar Belakang .... 2\n\nBAB I\nPENDAHULUAN\n\nIsi bahasan.\n')
+    cek('v15-daftar: BAB I daftar isi bertitik tetap ditolak',
+        _ST15.awal_isi_naskah(_t_daftar) == _t_daftar.rindex('\nBAB I\n') + 1)
+
+    # 15e. Kepala blok SISTEMATIKA saja (tanpa "terdiri dari") juga dilewati.
+    _t_kepala = (
+        '    G. SISTEMATIKA PENULISAN\n'
+        'BAB I Pendahuluan\nBAB II Kajian Pustaka\n\n'
+        'BAB I\nPENDAHULUAN\n\n1.1 Latar Belakang\nIsi.\n')
+    cek('v15-kepala: salinan di bawah kepala SISTEMATIKA dilewati',
+        _ST15.awal_isi_naskah(_t_kepala) == _t_kepala.rindex('\nBAB I\n') + 1)
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:

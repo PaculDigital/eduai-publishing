@@ -1,0 +1,4247 @@
+{
+ "per_bidang": {
+  "informatika": {
+   "kode": [
+    "A1",
+    "A2",
+    "A3",
+    "A4"
+   ],
+   "bab": 21,
+   "subbab": 320,
+   "paragraf": 297,
+   "biasa": 4596,
+   "goyang": 235,
+   "ragu": 15,
+   "curiga": 1,
+   "panggilan": 98,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "A1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 4,
+      "rasio_inggris": 0.0048,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 6,
+      "huruf_berspasi_jml": 2,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 11298,
+      "baris": 2888
+     },
+     "bab_label": 3,
+     "goyang": 52,
+     "ragu": 5,
+     "curiga": 0
+    },
+    {
+     "kode": "A2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 6,
+      "rasio_inggris": 0.0089,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 6,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 10687,
+      "baris": 3317
+     },
+     "bab_label": 6,
+     "goyang": 59,
+     "ragu": 1,
+     "curiga": 0
+    },
+    {
+     "kode": "A3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 1,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 5,
+      "tabel_kata_jml": 16,
+      "rasio_inggris": 0.009,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 12496,
+      "baris": 3950
+     },
+     "bab_label": 6,
+     "goyang": 96,
+     "ragu": 4,
+     "curiga": 1
+    },
+    {
+     "kode": "A4",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0003,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 4,
+      "kata": 3505,
+      "baris": 961
+     },
+     "bab_label": 6,
+     "goyang": 28,
+     "ragu": 5,
+     "curiga": 0
+    }
+   ]
+  },
+  "campuran": {
+   "kode": [
+    "B1",
+    "B2",
+    "B3",
+    "B4"
+   ],
+   "bab": 87,
+   "subbab": 613,
+   "paragraf": 531,
+   "biasa": 6537,
+   "goyang": 543,
+   "ragu": 78,
+   "curiga": 2,
+   "panggilan": 119,
+   "bab_nol": [
+    "B1",
+    "B4"
+   ],
+   "bentuk": [
+    {
+     "kode": "B1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 32,
+      "rasio_inggris": 0.0007,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 6,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 17524,
+      "baris": 6173
+     },
+     "bab_label": 0,
+     "goyang": 165,
+     "ragu": 4,
+     "curiga": 1
+    },
+    {
+     "kode": "B2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 22,
+      "tabel_kata_jml": 4,
+      "rasio_inggris": 0.0006,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 4843,
+      "baris": 642
+     },
+     "bab_label": 1,
+     "goyang": 62,
+     "ragu": 17,
+     "curiga": 1
+    },
+    {
+     "kode": "B3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 30,
+      "rasio_inggris": 0.0039,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 14356,
+      "baris": 4582
+     },
+     "bab_label": 86,
+     "goyang": 146,
+     "ragu": 21,
+     "curiga": 0
+    },
+    {
+     "kode": "B4",
+     "profil": {
+      "bab_romawi": [
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [
+       1
+      ],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 30,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 22335,
+      "baris": 5111
+     },
+     "bab_label": 0,
+     "goyang": 170,
+     "ragu": 36,
+     "curiga": 0
+    }
+   ]
+  },
+  "perbankan-syariah": {
+   "kode": [
+    "C1",
+    "C2",
+    "C3",
+    "C4"
+   ],
+   "bab": 23,
+   "subbab": 376,
+   "paragraf": 551,
+   "biasa": 5887,
+   "goyang": 365,
+   "ragu": 30,
+   "curiga": 1,
+   "panggilan": 119,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "C1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 18,
+      "rasio_inggris": 0.0016,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 27583,
+      "baris": 8171
+     },
+     "bab_label": 2,
+     "goyang": 189,
+     "ragu": 17,
+     "curiga": 1
+    },
+    {
+     "kode": "C2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 19,
+      "rasio_inggris": 0.0083,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 14287,
+      "baris": 2929
+     },
+     "bab_label": 2,
+     "goyang": 60,
+     "ragu": 3,
+     "curiga": 0
+    },
+    {
+     "kode": "C3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI",
+       "VII"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 6,
+      "rasio_inggris": 0.0009,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 7,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 10346,
+      "baris": 1310
+     },
+     "bab_label": 10,
+     "goyang": 44,
+     "ragu": 3,
+     "curiga": 0
+    },
+    {
+     "kode": "C4",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 28,
+      "rasio_inggris": 0.0012,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 11876,
+      "baris": 1497
+     },
+     "bab_label": 9,
+     "goyang": 72,
+     "ragu": 7,
+     "curiga": 0
+    }
+   ]
+  },
+  "ekonomi": {
+   "kode": [
+    "D1",
+    "D2",
+    "D3"
+   ],
+   "bab": 12,
+   "subbab": 193,
+   "paragraf": 370,
+   "biasa": 3062,
+   "goyang": 274,
+   "ragu": 38,
+   "curiga": 2,
+   "panggilan": 69,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "D1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 9,
+      "rasio_inggris": 0.0002,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 9184,
+      "baris": 395
+     },
+     "bab_label": 1,
+     "goyang": 74,
+     "ragu": 13,
+     "curiga": 0
+    },
+    {
+     "kode": "D2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 23,
+      "rasio_inggris": 0.007,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 11777,
+      "baris": 3784
+     },
+     "bab_label": 1,
+     "goyang": 81,
+     "ragu": 2,
+     "curiga": 2
+    },
+    {
+     "kode": "D3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 50,
+      "rasio_inggris": 0.0003,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 17766,
+      "baris": 1939
+     },
+     "bab_label": 10,
+     "goyang": 119,
+     "ragu": 23,
+     "curiga": 0
+    }
+   ]
+  },
+  "pendidikan-bhs-arab": {
+   "kode": [
+    "E1",
+    "E2",
+    "E3"
+   ],
+   "bab": 17,
+   "subbab": 211,
+   "paragraf": 327,
+   "biasa": 4896,
+   "goyang": 367,
+   "ragu": 36,
+   "curiga": 4,
+   "panggilan": 89,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "E1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 22,
+      "rasio_inggris": 0.0001,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 15483,
+      "baris": 3780
+     },
+     "bab_label": 6,
+     "goyang": 113,
+     "ragu": 4,
+     "curiga": 3
+    },
+    {
+     "kode": "E2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0024,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 17227,
+      "baris": 3762
+     },
+     "bab_label": 1,
+     "goyang": 165,
+     "ragu": 20,
+     "curiga": 1
+    },
+    {
+     "kode": "E3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0005,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 11411,
+      "baris": 3492
+     },
+     "bab_label": 10,
+     "goyang": 89,
+     "ragu": 12,
+     "curiga": 0
+    }
+   ]
+  },
+  "ekonomi-manajemen": {
+   "kode": [
+    "F1",
+    "F2",
+    "F3",
+    "F4"
+   ],
+   "bab": 12,
+   "subbab": 266,
+   "paragraf": 505,
+   "biasa": 1921,
+   "goyang": 318,
+   "ragu": 32,
+   "curiga": 1,
+   "panggilan": 54,
+   "bab_nol": [
+    "F1",
+    "F2"
+   ],
+   "bentuk": [
+    {
+     "kode": "F1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 66,
+      "rasio_inggris": 0.0007,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 16352,
+      "baris": 2804
+     },
+     "bab_label": 0,
+     "goyang": 143,
+     "ragu": 11,
+     "curiga": 1
+    },
+    {
+     "kode": "F2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 14,
+      "rasio_inggris": 0.0008,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 1,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 14254,
+      "baris": 1398
+     },
+     "bab_label": 0,
+     "goyang": 66,
+     "ragu": 5,
+     "curiga": 0
+    },
+    {
+     "kode": "F3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 12,
+      "rasio_inggris": 0.0017,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 6962,
+      "baris": 610
+     },
+     "bab_label": 2,
+     "goyang": 48,
+     "ragu": 9,
+     "curiga": 0
+    },
+    {
+     "kode": "F4",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 1,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 19,
+      "rasio_inggris": 0.0004,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 7628,
+      "baris": 639
+     },
+     "bab_label": 10,
+     "goyang": 61,
+     "ragu": 7,
+     "curiga": 0
+    }
+   ]
+  },
+  "psikologi": {
+   "kode": [
+    "G1",
+    "G2",
+    "G3"
+   ],
+   "bab": 6,
+   "subbab": 203,
+   "paragraf": 451,
+   "biasa": 1182,
+   "goyang": 291,
+   "ragu": 34,
+   "curiga": 0,
+   "panggilan": 37,
+   "bab_nol": [
+    "G1"
+   ],
+   "bentuk": [
+    {
+     "kode": "G1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 5,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 44,
+      "rasio_inggris": 0.0007,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 1,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 16626,
+      "baris": 2293
+     },
+     "bab_label": 0,
+     "goyang": 129,
+     "ragu": 18,
+     "curiga": 0
+    },
+    {
+     "kode": "G2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 3,
+      "rasio_inggris": 0.0015,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 18600,
+      "baris": 727
+     },
+     "bab_label": 2,
+     "goyang": 89,
+     "ragu": 1,
+     "curiga": 0
+    },
+    {
+     "kode": "G3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 8,
+      "rasio_inggris": 0.0023,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 10747,
+      "baris": 1028
+     },
+     "bab_label": 4,
+     "goyang": 73,
+     "ragu": 15,
+     "curiga": 0
+    }
+   ]
+  },
+  "teknik-sipil": {
+   "kode": [
+    "H1",
+    "H2",
+    "H3"
+   ],
+   "bab": 10,
+   "subbab": 306,
+   "paragraf": 369,
+   "biasa": 2847,
+   "goyang": 272,
+   "ragu": 35,
+   "curiga": 1,
+   "panggilan": 60,
+   "bab_nol": [
+    "H1"
+   ],
+   "bentuk": [
+    {
+     "kode": "H1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 39,
+      "rasio_inggris": 0.0001,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 6,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 24012,
+      "baris": 6262
+     },
+     "bab_label": 0,
+     "goyang": 167,
+     "ragu": 27,
+     "curiga": 1
+    },
+    {
+     "kode": "H2",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [
+       2,
+       4,
+       5
+      ],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 23,
+      "rasio_inggris": 0.0005,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 3,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 8577,
+      "baris": 1709
+     },
+     "bab_label": 5,
+     "goyang": 51,
+     "ragu": 4,
+     "curiga": 0
+    },
+    {
+     "kode": "H3",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [
+       2,
+       4,
+       5
+      ],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 23,
+      "rasio_inggris": 0.0005,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 3,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 8577,
+      "baris": 1709
+     },
+     "bab_label": 5,
+     "goyang": 54,
+     "ragu": 4,
+     "curiga": 0
+    }
+   ]
+  },
+  "teknik-mesin": {
+   "kode": [
+    "I1",
+    "I2",
+    "I3",
+    "I4"
+   ],
+   "bab": 0,
+   "subbab": 260,
+   "paragraf": 332,
+   "biasa": 2661,
+   "goyang": 229,
+   "ragu": 28,
+   "curiga": 0,
+   "panggilan": 60,
+   "bab_nol": [
+    "I1",
+    "I2",
+    "I3",
+    "I4"
+   ],
+   "bentuk": [
+    {
+     "kode": "I1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 12,
+      "rasio_inggris": 0.0003,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 7065,
+      "baris": 1148
+     },
+     "bab_label": 0,
+     "goyang": 35,
+     "ragu": 3,
+     "curiga": 0
+    },
+    {
+     "kode": "I2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 12,
+      "rasio_inggris": 0.0005,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 1,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 10161,
+      "baris": 2988
+     },
+     "bab_label": 0,
+     "goyang": 93,
+     "ragu": 2,
+     "curiga": 0
+    },
+    {
+     "kode": "I3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 6550,
+      "baris": 1824
+     },
+     "bab_label": 0,
+     "goyang": 59,
+     "ragu": 23,
+     "curiga": 0
+    },
+    {
+     "kode": "I4",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 5319,
+      "baris": 1434
+     },
+     "bab_label": 0,
+     "goyang": 42,
+     "ragu": 0,
+     "curiga": 0
+    }
+   ]
+  },
+  "pendidikan-biologi": {
+   "kode": [
+    "J1",
+    "J2",
+    "J3"
+   ],
+   "bab": 28,
+   "subbab": 123,
+   "paragraf": 267,
+   "biasa": 765,
+   "goyang": 123,
+   "ragu": 40,
+   "curiga": 0,
+   "panggilan": 28,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "J1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 6,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 6972,
+      "baris": 1120
+     },
+     "bab_label": 8,
+     "goyang": 55,
+     "ragu": 16,
+     "curiga": 0
+    },
+    {
+     "kode": "J2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 1,
+      "rasio_inggris": 0.0009,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 1,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 5711,
+      "baris": 530
+     },
+     "bab_label": 9,
+     "goyang": 36,
+     "ragu": 9,
+     "curiga": 0
+    },
+    {
+     "kode": "J3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 2,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 5689,
+      "baris": 572
+     },
+     "bab_label": 11,
+     "goyang": 32,
+     "ragu": 15,
+     "curiga": 0
+    }
+   ]
+  },
+  "teknik-telekomunikasi": {
+   "kode": [
+    "K1"
+   ],
+   "bab": 9,
+   "subbab": 57,
+   "paragraf": 102,
+   "biasa": 487,
+   "goyang": 63,
+   "ragu": 6,
+   "curiga": 0,
+   "panggilan": 13,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "K1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 60,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.004,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 9490,
+      "baris": 1435
+     },
+     "bab_label": 9,
+     "goyang": 63,
+     "ragu": 6,
+     "curiga": 0
+    }
+   ]
+  },
+  "Teknik Industri": {
+   "kode": [
+    "L1",
+    "L2",
+    "L3"
+   ],
+   "bab": 19,
+   "subbab": 310,
+   "paragraf": 465,
+   "biasa": 3653,
+   "goyang": 302,
+   "ragu": 31,
+   "curiga": 1,
+   "panggilan": 71,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "L1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 58,
+      "rasio_inggris": 0.002,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 2,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 23708,
+      "baris": 3878
+     },
+     "bab_label": 8,
+     "goyang": 209,
+     "ragu": 27,
+     "curiga": 1
+    },
+    {
+     "kode": "L2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 9,
+      "rasio_inggris": 0.0004,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 7780,
+      "baris": 3020
+     },
+     "bab_label": 1,
+     "goyang": 35,
+     "ragu": 3,
+     "curiga": 0
+    },
+    {
+     "kode": "L3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 58,
+      "rasio_inggris": 0.0054,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 6,
+      "kata": 9545,
+      "baris": 2309
+     },
+     "bab_label": 10,
+     "goyang": 58,
+     "ragu": 1,
+     "curiga": 0
+    }
+   ]
+  },
+  "Skripsi ESP Syariah": {
+   "kode": [
+    "M1",
+    "M2",
+    "M3"
+   ],
+   "bab": 22,
+   "subbab": 356,
+   "paragraf": 541,
+   "biasa": 1855,
+   "goyang": 324,
+   "ragu": 16,
+   "curiga": 4,
+   "panggilan": 50,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "M1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 1,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 10,
+      "rasio_inggris": 0.0007,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 17387,
+      "baris": 1110
+     },
+     "bab_label": 2,
+     "goyang": 102,
+     "ragu": 1,
+     "curiga": 3
+    },
+    {
+     "kode": "M2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 6,
+      "tabel_kata_jml": 24,
+      "rasio_inggris": 0.0055,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 29157,
+      "baris": 2341
+     },
+     "bab_label": 10,
+     "goyang": 114,
+     "ragu": 3,
+     "curiga": 1
+    },
+    {
+     "kode": "M3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 17,
+      "rasio_inggris": 0.0051,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 14781,
+      "baris": 1048
+     },
+     "bab_label": 10,
+     "goyang": 108,
+     "ragu": 12,
+     "curiga": 0
+    }
+   ]
+  },
+  "Skripsi Kebidanan": {
+   "kode": [
+    "N1",
+    "N2",
+    "N3"
+   ],
+   "bab": 4,
+   "subbab": 530,
+   "paragraf": 178,
+   "biasa": 2190,
+   "goyang": 219,
+   "ragu": 32,
+   "curiga": 7,
+   "panggilan": 51,
+   "bab_nol": [
+    "N1"
+   ],
+   "bentuk": [
+    {
+     "kode": "N1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 2,
+      "rasio_inggris": 0.0071,
+      "kti_d3": true,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 8689,
+      "baris": 2668
+     },
+     "bab_label": 0,
+     "goyang": 73,
+     "ragu": 11,
+     "curiga": 1
+    },
+    {
+     "kode": "N2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 4,
+      "rasio_inggris": 0.0,
+      "kti_d3": true,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 9671,
+      "baris": 4103
+     },
+     "bab_label": 3,
+     "goyang": 91,
+     "ragu": 11,
+     "curiga": 6
+    },
+    {
+     "kode": "N3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 6,
+      "rasio_inggris": 0.0,
+      "kti_d3": true,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 8392,
+      "baris": 2872
+     },
+     "bab_label": 1,
+     "goyang": 55,
+     "ragu": 10,
+     "curiga": 0
+    }
+   ]
+  },
+  "Pendidikan Agama Islam": {
+   "kode": [
+    "O1",
+    "O2",
+    "O3"
+   ],
+   "bab": 14,
+   "subbab": 160,
+   "paragraf": 387,
+   "biasa": 3245,
+   "goyang": 325,
+   "ragu": 34,
+   "curiga": 1,
+   "panggilan": 63,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "O1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 8,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0001,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 4,
+      "huruf_berspasi_jml": 2,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 20768,
+      "baris": 1242
+     },
+     "bab_label": 6,
+     "goyang": 162,
+     "ragu": 20,
+     "curiga": 1
+    },
+    {
+     "kode": "O2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0006,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 4,
+      "huruf_berspasi_jml": 1,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 16352,
+      "baris": 2696
+     },
+     "bab_label": 4,
+     "goyang": 96,
+     "ragu": 2,
+     "curiga": 0
+    },
+    {
+     "kode": "O3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 1,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0024,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 4,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 12028,
+      "baris": 2030
+     },
+     "bab_label": 4,
+     "goyang": 67,
+     "ragu": 12,
+     "curiga": 0
+    }
+   ]
+  },
+  "Pendidikan Elektro": {
+   "kode": [
+    "P1",
+    "P2"
+   ],
+   "bab": 2,
+   "subbab": 268,
+   "paragraf": 147,
+   "biasa": 1891,
+   "goyang": 156,
+   "ragu": 8,
+   "curiga": 1,
+   "panggilan": 38,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "P1",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [
+       1,
+       2,
+       3,
+       4,
+       5
+      ],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 22,
+      "rasio_inggris": 0.0044,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 13074,
+      "baris": 3666
+     },
+     "bab_label": 1,
+     "goyang": 97,
+     "ragu": 4,
+     "curiga": 1
+    },
+    {
+     "kode": "P2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 2,
+      "rasio_inggris": 0.0038,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 5485,
+      "baris": 1270
+     },
+     "bab_label": 1,
+     "goyang": 59,
+     "ragu": 4,
+     "curiga": 0
+    }
+   ]
+  },
+  "Matematika": {
+   "kode": [
+    "Q1",
+    "Q2",
+    "Q3"
+   ],
+   "bab": 1,
+   "subbab": 147,
+   "paragraf": 326,
+   "biasa": 2978,
+   "goyang": 236,
+   "ragu": 29,
+   "curiga": 1,
+   "panggilan": 67,
+   "bab_nol": [
+    "Q1",
+    "Q3"
+   ],
+   "bentuk": [
+    {
+     "kode": "Q1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 4,
+      "tabel_kata_jml": 64,
+      "rasio_inggris": 0.0068,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 19875,
+      "baris": 4727
+     },
+     "bab_label": 0,
+     "goyang": 107,
+     "ragu": 16,
+     "curiga": 0
+    },
+    {
+     "kode": "Q2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 9,
+      "rasio_inggris": 0.0002,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 9189,
+      "baris": 399
+     },
+     "bab_label": 1,
+     "goyang": 78,
+     "ragu": 13,
+     "curiga": 0
+    },
+    {
+     "kode": "Q3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 36,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0022,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 7,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 6450,
+      "baris": 1509
+     },
+     "bab_label": 0,
+     "goyang": 51,
+     "ragu": 0,
+     "curiga": 1
+    }
+   ]
+  },
+  "Bimbingan Konseling": {
+   "kode": [
+    "R1",
+    "R2",
+    "R3"
+   ],
+   "bab": 5,
+   "subbab": 243,
+   "paragraf": 587,
+   "biasa": 1742,
+   "goyang": 404,
+   "ragu": 73,
+   "curiga": 5,
+   "panggilan": 47,
+   "bab_nol": [
+    "R2"
+   ],
+   "bentuk": [
+    {
+     "kode": "R1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0002,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 20198,
+      "baris": 1505
+     },
+     "bab_label": 2,
+     "goyang": 152,
+     "ragu": 27,
+     "curiga": 5
+    },
+    {
+     "kode": "R2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0001,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 14601,
+      "baris": 1199
+     },
+     "bab_label": 0,
+     "goyang": 121,
+     "ragu": 23,
+     "curiga": 0
+    },
+    {
+     "kode": "R3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 2,
+      "rasio_inggris": 0.0003,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 6,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 21243,
+      "baris": 1248
+     },
+     "bab_label": 3,
+     "goyang": 131,
+     "ragu": 23,
+     "curiga": 0
+    }
+   ]
+  },
+  "Ekonomi Pembangunan": {
+   "kode": [
+    "S1",
+    "S2"
+   ],
+   "bab": 10,
+   "subbab": 98,
+   "paragraf": 185,
+   "biasa": 2264,
+   "goyang": 100,
+   "ragu": 10,
+   "curiga": 2,
+   "panggilan": 49,
+   "bab_nol": [
+    "S1"
+   ],
+   "bentuk": [
+    {
+     "kode": "S1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI",
+       "VII"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0072,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 7,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 6216,
+      "baris": 2013
+     },
+     "bab_label": 0,
+     "goyang": 29,
+     "ragu": 3,
+     "curiga": 0
+    },
+    {
+     "kode": "S2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 34,
+      "rasio_inggris": 0.0011,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 18049,
+      "baris": 2228
+     },
+     "bab_label": 10,
+     "goyang": 71,
+     "ragu": 7,
+     "curiga": 2
+    }
+   ]
+  },
+  "Bahasa Inggris": {
+   "kode": [
+    "T1",
+    "T2",
+    "T3"
+   ],
+   "bab": 52,
+   "subbab": 537,
+   "paragraf": 351,
+   "biasa": 2305,
+   "goyang": 316,
+   "ragu": 56,
+   "curiga": 14,
+   "panggilan": 54,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "T1",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "romawi_tanpa_bab_jml": 21,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.1586,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 14647,
+      "baris": 3425
+     },
+     "bab_label": 18,
+     "goyang": 200,
+     "ragu": 48,
+     "curiga": 11
+    },
+    {
+     "kode": "T2",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 3,
+      "rasio_inggris": 0.1872,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 3,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 7191,
+      "baris": 1064
+     },
+     "bab_label": 15,
+     "goyang": 48,
+     "ragu": 3,
+     "curiga": 0
+    },
+    {
+     "kode": "T3",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.2442,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 1,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 8146,
+      "baris": 1014
+     },
+     "bab_label": 19,
+     "goyang": 68,
+     "ragu": 5,
+     "curiga": 3
+    }
+   ]
+  },
+  "Hukum Pidana": {
+   "kode": [
+    "U1",
+    "U2",
+    "U3"
+   ],
+   "bab": 20,
+   "subbab": 188,
+   "paragraf": 545,
+   "biasa": 2960,
+   "goyang": 309,
+   "ragu": 36,
+   "curiga": 1,
+   "panggilan": 72,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "U1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 1,
+      "tabel_kata_jml": 3,
+      "rasio_inggris": 0.012,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 42114,
+      "baris": 31340
+     },
+     "bab_label": 6,
+     "goyang": 163,
+     "ragu": 28,
+     "curiga": 1
+    },
+    {
+     "kode": "U2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0012,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 10431,
+      "baris": 388
+     },
+     "bab_label": 8,
+     "goyang": 76,
+     "ragu": 2,
+     "curiga": 0
+    },
+    {
+     "kode": "U3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 1,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 4,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 4,
+      "kata": 15536,
+      "baris": 795
+     },
+     "bab_label": 6,
+     "goyang": 70,
+     "ragu": 6,
+     "curiga": 0
+    }
+   ]
+  },
+  "tesis": {
+   "kode": [
+    "V1"
+   ],
+   "bab": 10,
+   "subbab": 109,
+   "paragraf": 183,
+   "biasa": 1385,
+   "goyang": 107,
+   "ragu": 7,
+   "curiga": 1,
+   "panggilan": 27,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "V1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 45,
+      "rasio_inggris": 0.0045,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 1,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 19677,
+      "baris": 2691
+     },
+     "bab_label": 10,
+     "goyang": 107,
+     "ragu": 7,
+     "curiga": 1
+    }
+   ]
+  },
+  "komunikasi": {
+   "kode": [
+    "W1",
+    "W2",
+    "W3"
+   ],
+   "bab": 1,
+   "subbab": 360,
+   "paragraf": 554,
+   "biasa": 4714,
+   "goyang": 424,
+   "ragu": 69,
+   "curiga": 3,
+   "panggilan": 89,
+   "bab_nol": [
+    "W2",
+    "W3"
+   ],
+   "bentuk": [
+    {
+     "kode": "W1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 85,
+      "rasio_inggris": 0.005,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 8,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 20899,
+      "baris": 9127
+     },
+     "bab_label": 1,
+     "goyang": 105,
+     "ragu": 11,
+     "curiga": 0
+    },
+    {
+     "kode": "W2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 22,
+      "rasio_inggris": 0.0052,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 25402,
+      "baris": 2739
+     },
+     "bab_label": 0,
+     "goyang": 124,
+     "ragu": 21,
+     "curiga": 0
+    },
+    {
+     "kode": "W3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 5,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 12,
+      "rasio_inggris": 0.0022,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 31316,
+      "baris": 2741
+     },
+     "bab_label": 0,
+     "goyang": 195,
+     "ragu": 37,
+     "curiga": 3
+    }
+   ]
+  },
+  "fisika": {
+   "kode": [
+    "X1",
+    "X2",
+    "X3"
+   ],
+   "bab": 22,
+   "subbab": 131,
+   "paragraf": 236,
+   "biasa": 871,
+   "goyang": 128,
+   "ragu": 5,
+   "curiga": 1,
+   "panggilan": 27,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "X1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 4,
+      "rasio_inggris": 0.0011,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 9270,
+      "baris": 726
+     },
+     "bab_label": 9,
+     "goyang": 49,
+     "ragu": 1,
+     "curiga": 0
+    },
+    {
+     "kode": "X2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 11,
+      "rasio_inggris": 0.0002,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 2,
+      "kata": 8624,
+      "baris": 1616
+     },
+     "bab_label": 4,
+     "goyang": 57,
+     "ragu": 4,
+     "curiga": 1
+    },
+    {
+     "kode": "X3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 6480,
+      "baris": 371
+     },
+     "bab_label": 9,
+     "goyang": 22,
+     "ragu": 0,
+     "curiga": 0
+    }
+   ]
+  },
+  "teknik-pertanian": {
+   "kode": [
+    "Y1",
+    "Y2"
+   ],
+   "bab": 10,
+   "subbab": 64,
+   "paragraf": 170,
+   "biasa": 809,
+   "goyang": 65,
+   "ragu": 3,
+   "curiga": 0,
+   "panggilan": 23,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "Y1",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 5,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 9,
+      "rasio_inggris": 0.0018,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 0,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 7389,
+      "baris": 2043
+     },
+     "bab_label": 5,
+     "goyang": 43,
+     "ragu": 1,
+     "curiga": 0
+    },
+    {
+     "kode": "Y2",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 5,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0002,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 0,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 4550,
+      "baris": 831
+     },
+     "bab_label": 5,
+     "goyang": 22,
+     "ragu": 2,
+     "curiga": 0
+    }
+   ]
+  },
+  "pendidikan-bahasa-indonesia": {
+   "kode": [
+    "Z1",
+    "Z2",
+    "Z3"
+   ],
+   "bab": 11,
+   "subbab": 296,
+   "paragraf": 481,
+   "biasa": 1660,
+   "goyang": 366,
+   "ragu": 62,
+   "curiga": 1,
+   "panggilan": 46,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "Z1",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [
+       1,
+       2,
+       3,
+       4,
+       5
+      ],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0018,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 13935,
+      "baris": 1261
+     },
+     "bab_label": 1,
+     "goyang": 130,
+     "ragu": 9,
+     "curiga": 0
+    },
+    {
+     "kode": "Z2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0014,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 10479,
+      "baris": 2792
+     },
+     "bab_label": 2,
+     "goyang": 109,
+     "ragu": 27,
+     "curiga": 0
+    },
+    {
+     "kode": "Z3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "IX",
+       "V",
+       "VI",
+       "VII",
+       "VIII",
+       "X"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 2,
+      "rasio_inggris": 0.0016,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 10,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 17564,
+      "baris": 1038
+     },
+     "bab_label": 8,
+     "goyang": 127,
+     "ragu": 26,
+     "curiga": 1
+    }
+   ]
+  },
+  "hukum-tata-negara": {
+   "kode": [
+    "AA1",
+    "AA2",
+    "AA3"
+   ],
+   "bab": 8,
+   "subbab": 128,
+   "paragraf": 340,
+   "biasa": 1057,
+   "goyang": 228,
+   "ragu": 39,
+   "curiga": 1,
+   "panggilan": 35,
+   "bab_nol": [
+    "AA2"
+   ],
+   "bentuk": [
+    {
+     "kode": "AA1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0043,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 16864,
+      "baris": 880
+     },
+     "bab_label": 4,
+     "goyang": 78,
+     "ragu": 3,
+     "curiga": 1
+    },
+    {
+     "kode": "AA2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0002,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 8789,
+      "baris": 423
+     },
+     "bab_label": 0,
+     "goyang": 64,
+     "ragu": 18,
+     "curiga": 0
+    },
+    {
+     "kode": "AA3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 8,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.004,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 4,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 15553,
+      "baris": 691
+     },
+     "bab_label": 4,
+     "goyang": 86,
+     "ragu": 18,
+     "curiga": 0
+    }
+   ]
+  },
+  "ppkn": {
+   "kode": [
+    "AB1",
+    "AB2"
+   ],
+   "bab": 18,
+   "subbab": 78,
+   "paragraf": 153,
+   "biasa": 221,
+   "goyang": 87,
+   "ragu": 12,
+   "curiga": 0,
+   "panggilan": 14,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "AB1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 4440,
+      "baris": 408
+     },
+     "bab_label": 8,
+     "goyang": 48,
+     "ragu": 5,
+     "curiga": 0
+    },
+    {
+     "kode": "AB2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 4440,
+      "baris": 408
+     },
+     "bab_label": 10,
+     "goyang": 39,
+     "ragu": 7,
+     "curiga": 0
+    }
+   ]
+  },
+  "perhotelan": {
+   "kode": [
+    "AC1",
+    "AC2"
+   ],
+   "bab": 7,
+   "subbab": 102,
+   "paragraf": 135,
+   "biasa": 584,
+   "goyang": 132,
+   "ragu": 37,
+   "curiga": 0,
+   "panggilan": 17,
+   "bab_nol": [
+    "AC1"
+   ],
+   "bentuk": [
+    {
+     "kode": "AC1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI"
+      ],
+      "bab_arab": [
+       17
+      ],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 2,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0011,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 7,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 5346,
+      "baris": 659
+     },
+     "bab_label": 0,
+     "goyang": 81,
+     "ragu": 19,
+     "curiga": 0
+    },
+    {
+     "kode": "AC2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0036,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 7412,
+      "baris": 532
+     },
+     "bab_label": 7,
+     "goyang": 51,
+     "ragu": 18,
+     "curiga": 0
+    }
+   ]
+  },
+  "ilmu-tanah": {
+   "kode": [
+    "AD1",
+    "AD2",
+    "AD3"
+   ],
+   "bab": 15,
+   "subbab": 106,
+   "paragraf": 284,
+   "biasa": 1071,
+   "goyang": 91,
+   "ragu": 13,
+   "curiga": 0,
+   "panggilan": 32,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "AD1",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 5,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 9,
+      "rasio_inggris": 0.0018,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 0,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 7389,
+      "baris": 2043
+     },
+     "bab_label": 5,
+     "goyang": 39,
+     "ragu": 1,
+     "curiga": 0
+    },
+    {
+     "kode": "AD2",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 5,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 17,
+      "rasio_inggris": 0.0015,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 0,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 8473,
+      "baris": 792
+     },
+     "bab_label": 5,
+     "goyang": 36,
+     "ragu": 7,
+     "curiga": 0
+    },
+    {
+     "kode": "AD3",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 5,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0002,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 0,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 4550,
+      "baris": 831
+     },
+     "bab_label": 5,
+     "goyang": 16,
+     "ragu": 5,
+     "curiga": 0
+    }
+   ]
+  },
+  "pendidikan-ekonomi": {
+   "kode": [
+    "AE1",
+    "AE2"
+   ],
+   "bab": 2,
+   "subbab": 125,
+   "paragraf": 340,
+   "biasa": 1758,
+   "goyang": 227,
+   "ragu": 38,
+   "curiga": 1,
+   "panggilan": 36,
+   "bab_nol": [
+    "AE1"
+   ],
+   "bentuk": [
+    {
+     "kode": "AE1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 6,
+      "rasio_inggris": 0.0008,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 6,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 17672,
+      "baris": 1652
+     },
+     "bab_label": 0,
+     "goyang": 96,
+     "ragu": 18,
+     "curiga": 0
+    },
+    {
+     "kode": "AE2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 6,
+      "rasio_inggris": 0.001,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 17571,
+      "baris": 2084
+     },
+     "bab_label": 2,
+     "goyang": 131,
+     "ragu": 20,
+     "curiga": 1
+    }
+   ]
+  },
+  "bimbingan-konseling": {
+   "kode": [
+    "AF1"
+   ],
+   "bab": 1,
+   "subbab": 90,
+   "paragraf": 236,
+   "biasa": 405,
+   "goyang": 154,
+   "ragu": 27,
+   "curiga": 0,
+   "panggilan": 14,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "AF1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 2,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 15,
+      "rasio_inggris": 0.0008,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 14287,
+      "baris": 1266
+     },
+     "bab_label": 1,
+     "goyang": 154,
+     "ragu": 27,
+     "curiga": 0
+    }
+   ]
+  },
+  "peternakan": {
+   "kode": [
+    "AG1"
+   ],
+   "bab": 3,
+   "subbab": 43,
+   "paragraf": 118,
+   "biasa": 963,
+   "goyang": 65,
+   "ragu": 9,
+   "curiga": 0,
+   "panggilan": 21,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "AG1",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 10,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 21,
+      "rasio_inggris": 0.0005,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 0,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 1,
+      "kata": 10303,
+      "baris": 2197
+     },
+     "bab_label": 3,
+     "goyang": 65,
+     "ragu": 9,
+     "curiga": 0
+    }
+   ]
+  },
+  "pendidikan-bahasa-inggris": {
+   "kode": [
+    "AH1"
+   ],
+   "bab": 9,
+   "subbab": 48,
+   "paragraf": 69,
+   "biasa": 360,
+   "goyang": 55,
+   "ragu": 4,
+   "curiga": 0,
+   "panggilan": 10,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "AH1",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [],
+      "chapter": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 10,
+      "rasio_inggris": 0.234,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 5,
+      "kata": 8365,
+      "baris": 890
+     },
+     "bab_label": 9,
+     "goyang": 55,
+     "ragu": 4,
+     "curiga": 0
+    }
+   ]
+  },
+  "Kimia": {
+   "kode": [
+    "AI-1",
+    "AI-2"
+   ],
+   "bab": 2,
+   "subbab": 212,
+   "paragraf": 287,
+   "biasa": 2887,
+   "goyang": 192,
+   "ragu": 30,
+   "curiga": 0,
+   "panggilan": 69,
+   "bab_nol": [
+    "AI-1"
+   ],
+   "bentuk": [
+    {
+     "kode": "AI-1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 4,
+      "tabel_kata_jml": 64,
+      "rasio_inggris": 0.0068,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 19876,
+      "baris": 4724
+     },
+     "bab_label": 0,
+     "goyang": 97,
+     "ragu": 13,
+     "curiga": 0
+    },
+    {
+     "kode": "AI-2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 77,
+      "rasio_inggris": 0.0115,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 12873,
+      "baris": 2379
+     },
+     "bab_label": 2,
+     "goyang": 95,
+     "ragu": 17,
+     "curiga": 0
+    }
+   ]
+  },
+  "Akuntansi": {
+   "kode": [
+    "AJ-1",
+    "AJ-2",
+    "AJ-3"
+   ],
+   "bab": 3,
+   "subbab": 228,
+   "paragraf": 297,
+   "biasa": 3750,
+   "goyang": 255,
+   "ragu": 18,
+   "curiga": 2,
+   "panggilan": 85,
+   "bab_nol": [
+    "AJ-2"
+   ],
+   "bentuk": [
+    {
+     "kode": "AJ-1",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [
+       1,
+       2,
+       3,
+       4,
+       5
+      ],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 2,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 3,
+      "rasio_inggris": 0.0006,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 10575,
+      "baris": 2685
+     },
+     "bab_label": 2,
+     "goyang": 115,
+     "ragu": 12,
+     "curiga": 0
+    },
+    {
+     "kode": "AJ-2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 3,
+      "rasio_inggris": 0.007,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 11685,
+      "baris": 1388
+     },
+     "bab_label": 0,
+     "goyang": 65,
+     "ragu": 3,
+     "curiga": 0
+    },
+    {
+     "kode": "AJ-3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 23,
+      "rasio_inggris": 0.007,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 11781,
+      "baris": 3785
+     },
+     "bab_label": 1,
+     "goyang": 75,
+     "ragu": 3,
+     "curiga": 2
+    }
+   ]
+  },
+  "Manajemen": {
+   "kode": [
+    "AK-1",
+    "AK-2",
+    "AK-3"
+   ],
+   "bab": 4,
+   "subbab": 236,
+   "paragraf": 442,
+   "biasa": 1998,
+   "goyang": 273,
+   "ragu": 25,
+   "curiga": 0,
+   "panggilan": 58,
+   "bab_nol": [
+    "AK-1",
+    "AK-3"
+   ],
+   "bentuk": [
+    {
+     "kode": "AK-1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": false,
+      "tabel_baris_pipa": 1,
+      "tabel_kata_jml": 61,
+      "rasio_inggris": 0.0014,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 17496,
+      "baris": 2682
+     },
+     "bab_label": 0,
+     "goyang": 90,
+     "ragu": 3,
+     "curiga": 0
+    },
+    {
+     "kode": "AK-2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 20,
+      "rasio_inggris": 0.0027,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 13699,
+      "baris": 1400
+     },
+     "bab_label": 4,
+     "goyang": 126,
+     "ragu": 17,
+     "curiga": 0
+    },
+    {
+     "kode": "AK-3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V",
+       "VI"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 6,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 12,
+      "rasio_inggris": 0.0008,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 6,
+      "huruf_berspasi_jml": 1,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 10832,
+      "baris": 785
+     },
+     "bab_label": 0,
+     "goyang": 57,
+     "ragu": 5,
+     "curiga": 0
+    }
+   ]
+  },
+  "Informatika Multimedia": {
+   "kode": [
+    "AL-1",
+    "AL-2"
+   ],
+   "bab": 2,
+   "subbab": 142,
+   "paragraf": 113,
+   "biasa": 1360,
+   "goyang": 123,
+   "ragu": 6,
+   "curiga": 0,
+   "panggilan": 33,
+   "bab_nol": [
+    "AL-2"
+   ],
+   "bentuk": [
+    {
+     "kode": "AL-1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0005,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 8628,
+      "baris": 1686
+     },
+     "bab_label": 2,
+     "goyang": 68,
+     "ragu": 4,
+     "curiga": 0
+    },
+    {
+     "kode": "AL-2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0002,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 4827,
+      "baris": 1265
+     },
+     "bab_label": 0,
+     "goyang": 55,
+     "ragu": 2,
+     "curiga": 0
+    }
+   ]
+  },
+  "Hukum Perdata": {
+   "kode": [
+    "AM-1",
+    "AM-2",
+    "AM-3"
+   ],
+   "bab": 13,
+   "subbab": 248,
+   "paragraf": 658,
+   "biasa": 3780,
+   "goyang": 397,
+   "ragu": 43,
+   "curiga": 2,
+   "panggilan": 93,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "AM-1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0003,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 15645,
+      "baris": 1711
+     },
+     "bab_label": 1,
+     "goyang": 120,
+     "ragu": 7,
+     "curiga": 1
+    },
+    {
+     "kode": "AM-2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0009,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 15069,
+      "baris": 624
+     },
+     "bab_label": 4,
+     "goyang": 114,
+     "ragu": 9,
+     "curiga": 0
+    },
+    {
+     "kode": "AM-3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": true,
+      "tabel_baris_pipa": 1,
+      "tabel_kata_jml": 3,
+      "rasio_inggris": 0.012,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 42114,
+      "baris": 31337
+     },
+     "bab_label": 8,
+     "goyang": 163,
+     "ragu": 27,
+     "curiga": 1
+    }
+   ]
+  },
+  "Hukum": {
+   "kode": [
+    "AN-1",
+    "AN-2",
+    "AN-3"
+   ],
+   "bab": 16,
+   "subbab": 123,
+   "paragraf": 415,
+   "biasa": 1588,
+   "goyang": 256,
+   "ragu": 20,
+   "curiga": 1,
+   "panggilan": 50,
+   "bab_nol": [],
+   "bentuk": [
+    {
+     "kode": "AN-1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0119,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 16014,
+      "baris": 491
+     },
+     "bab_label": 6,
+     "goyang": 61,
+     "ragu": 3,
+     "curiga": 0
+    },
+    {
+     "kode": "AN-2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0004,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 11274,
+      "baris": 497
+     },
+     "bab_label": 6,
+     "goyang": 85,
+     "ragu": 10,
+     "curiga": 0
+    },
+    {
+     "kode": "AN-3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": true,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.0003,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 15645,
+      "baris": 1711
+     },
+     "bab_label": 4,
+     "goyang": 110,
+     "ragu": 7,
+     "curiga": 1
+    }
+   ]
+  },
+  "Administrasi Negara": {
+   "kode": [
+    "AO-1",
+    "AO-2"
+   ],
+   "bab": 10,
+   "subbab": 92,
+   "paragraf": 245,
+   "biasa": 592,
+   "goyang": 185,
+   "ragu": 11,
+   "curiga": 1,
+   "panggilan": 27,
+   "bab_nol": [
+    "AO-2"
+   ],
+   "bentuk": [
+    {
+     "kode": "AO-1",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 0,
+      "rasio_inggris": 0.004,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 13292,
+      "baris": 535
+     },
+     "bab_label": 10,
+     "goyang": 99,
+     "ragu": 8,
+     "curiga": 0
+    },
+    {
+     "kode": "AO-2",
+     "profil": {
+      "bab_romawi": [
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [
+       1
+      ],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 5,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 9,
+      "rasio_inggris": 0.0044,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 15350,
+      "baris": 702
+     },
+     "bab_label": 0,
+     "goyang": 86,
+     "ragu": 3,
+     "curiga": 1
+    }
+   ]
+  },
+  "Administrasi Niaga": {
+   "kode": [
+    "AP-1",
+    "AP-2",
+    "AP-3"
+   ],
+   "bab": 1,
+   "subbab": 199,
+   "paragraf": 327,
+   "biasa": 2149,
+   "goyang": 223,
+   "ragu": 41,
+   "curiga": 0,
+   "panggilan": 56,
+   "bab_nol": [
+    "AP-1",
+    "AP-3"
+   ],
+   "bentuk": [
+    {
+     "kode": "AP-1",
+     "profil": {
+      "bab_romawi": [],
+      "bab_arab": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7
+      ],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 7,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 20,
+      "rasio_inggris": 0.0011,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 7,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 8788,
+      "baris": 1916
+     },
+     "bab_label": 0,
+     "goyang": 57,
+     "ragu": 6,
+     "curiga": 0
+    },
+    {
+     "kode": "AP-2",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 1,
+      "pemisah_gabung_jml": 5,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 17,
+      "rasio_inggris": 0.0,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 14072,
+      "baris": 2918
+     },
+     "bab_label": 1,
+     "goyang": 110,
+     "ragu": 30,
+     "curiga": 0
+    },
+    {
+     "kode": "AP-3",
+     "profil": {
+      "bab_romawi": [
+       "I",
+       "II",
+       "III",
+       "IV",
+       "V"
+      ],
+      "bab_arab": [],
+      "chapter": [],
+      "romawi_tanpa_bab_jml": 0,
+      "pemisah_gabung_jml": 0,
+      "sistematika": false,
+      "tabel_baris_pipa": 0,
+      "tabel_kata_jml": 15,
+      "rasio_inggris": 0.0015,
+      "kti_d3": false,
+      "jml_bab_terdeteksi": 5,
+      "huruf_berspasi_jml": 0,
+      "nul_jml": 0,
+      "bom_jml": 0,
+      "kata": 7748,
+      "baris": 1359
+     },
+     "bab_label": 0,
+     "goyang": 56,
+     "ragu": 5,
+     "curiga": 0
+    }
+   ]
+  }
+ },
+ "total_panggilan": 2170,
+ "total_goyang": 9804,
+ "total_ragu": 1216,
+ "total_curiga": 63
+}

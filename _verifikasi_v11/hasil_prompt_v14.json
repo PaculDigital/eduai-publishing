@@ -1,0 +1,1147 @@
+{
+ "model": "google/gemini-2.5-flash",
+ "transport": "openrouter",
+ "prompt": "v14 (ATURAN_BAB_TAJAM)",
+ "n": 63,
+ "salah_bab_benar": 17,
+ "salah_bab_total": 42,
+ "benar_bab_benar": 12,
+ "benar_bab_total": 21,
+ "gagal_none": 0,
+ "baris": [
+  {
+   "naskah": "R3",
+   "no": "1",
+   "kelompok": "salah-bab",
+   "teks": "BAB I",
+   "label_benar": "biasa",
+   "idx": 0,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab telanjang yang diikuti oleh uraian sistematika, menunjukkan itu adalah salinan sistematika penulisan, bukan judul bab asli.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.37
+  },
+  {
+   "naskah": "R3",
+   "no": "2",
+   "kelompok": "salah-bab",
+   "teks": "BAB II",
+   "label_benar": "biasa",
+   "idx": 3,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab yang bersih, diikuti oleh uraian isi bab di baris berikutnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.18
+  },
+  {
+   "naskah": "R3",
+   "no": "3",
+   "kelompok": "salah-bab",
+   "teks": "BAB III",
+   "label_benar": "biasa",
+   "idx": 6,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab yang bersih, diikuti oleh judul bab lain dan tidak ada indikasi sebagai daftar isi atau running head.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.17
+  },
+  {
+   "naskah": "R3",
+   "no": "4",
+   "kelompok": "salah-bab",
+   "teks": "Metode Penelitian",
+   "label_benar": "biasa",
+   "idx": 7,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab yang bersih, diikuti oleh uraian isi bab di baris berikutnya, dan didahului oleh penanda bab sebelumnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.1
+  },
+  {
+   "naskah": "R3",
+   "no": "5",
+   "kelompok": "salah-bab",
+   "teks": "BAB IV",
+   "label_benar": "biasa",
+   "idx": 9,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab telanjang tanpa judul, dan dikelilingi oleh uraian sistematika.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.07
+  },
+  {
+   "naskah": "R3",
+   "no": "6",
+   "kelompok": "salah-bab",
+   "teks": "BAB V",
+   "label_benar": "biasa",
+   "idx": 12,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab asli yang bersih, tidak ada indikasi sebagai daftar isi atau running head.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.97
+  },
+  {
+   "naskah": "AM-2",
+   "no": "14",
+   "kelompok": "benar-bab",
+   "teks": "MENGGUNAKAN CONTAINER ANTARA PT. DJAKARTA LLOYD",
+   "label_benar": "bab",
+   "idx": 348,
+   "label_v11": "subbab",
+   "jawaban_prompt_baru": {
+    "label": "paragraf",
+    "confidence": 0.8,
+    "alasan": "Baris ini adalah bagian dari kalimat yang terpotong dan merupakan kelanjutan dari judul bab sebelumnya, bukan judul bab atau subbab baru.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.03
+  },
+  {
+   "naskah": "AI-2",
+   "no": "18",
+   "kelompok": "salah-bab",
+   "teks": "BAB I",
+   "label_benar": "biasa",
+   "idx": 1676,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah bagian dari daftar isi, bukan judul bab asli di badan naskah.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.86
+  },
+  {
+   "naskah": "AI-2",
+   "no": "19",
+   "kelompok": "salah-bab",
+   "teks": "PENDAHULUAN???????????????????.. 1",
+   "label_benar": "biasa",
+   "idx": 1677,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah entri daftar isi karena mengandung nomor halaman di ujungnya dan merupakan kelanjutan dari entri daftar isi sebelumnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.95
+  },
+  {
+   "naskah": "AI-2",
+   "no": "20",
+   "kelompok": "salah-bab",
+   "teks": "BAB II",
+   "label_benar": "biasa",
+   "idx": 1685,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah bagian dari daftar isi karena hanya berisi 'BAB II' tanpa judul dan diikuti oleh nomor halaman di baris berikutnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.83
+  },
+  {
+   "naskah": "AI-2",
+   "no": "21",
+   "kelompok": "salah-bab",
+   "teks": "LANDASAN TEORI??????????????????.. 4",
+   "label_benar": "biasa",
+   "idx": 1686,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah entri daftar isi karena mengandung nomor halaman di ujungnya dan diikuti oleh entri daftar isi lainnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.06
+  },
+  {
+   "naskah": "AI-2",
+   "no": "22",
+   "kelompok": "salah-bab",
+   "teks": "BAB III",
+   "label_benar": "biasa",
+   "idx": 1701,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah bagian dari daftar isi karena diikuti nomor halaman di baris sesudahnya dan tidak ada judul bab lengkap.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.17
+  },
+  {
+   "naskah": "AI-2",
+   "no": "23",
+   "kelompok": "salah-bab",
+   "teks": "METODOLOGI PENELITIAN??????????????? 28",
+   "label_benar": "biasa",
+   "idx": 1702,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah entri daftar isi karena mengandung nomor halaman di ujungnya dan merupakan pengulangan dari judul bab terdekat.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.89
+  },
+  {
+   "naskah": "AI-2",
+   "no": "24",
+   "kelompok": "salah-bab",
+   "teks": "BAB IV",
+   "label_benar": "biasa",
+   "idx": 1718,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab baru tanpa nomor halaman dan diikuti oleh judul bab di baris berikutnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.95
+  },
+  {
+   "naskah": "X3",
+   "no": "33",
+   "kelompok": "benar-bab",
+   "teks": "PENDAHULUAN",
+   "label_benar": "bab",
+   "idx": 1,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah bagian dari judul bab yang terpisah dari penanda babnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.1
+  },
+  {
+   "naskah": "X3",
+   "no": "37",
+   "kelompok": "benar-bab",
+   "teks": "METODOLOGI PENELITIAN",
+   "label_benar": "bab",
+   "idx": 159,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah bagian dari judul bab yang terpisah dari penanda babnya, dan diikuti oleh subbab.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.35
+  },
+  {
+   "naskah": "Z3",
+   "no": "41",
+   "kelompok": "salah-bab",
+   "teks": "Bab IV",
+   "label_benar": "biasa",
+   "idx": 118,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bab asli yang bersih, tidak diawali titik dua, tidak ada nomor halaman, dan tidak dalam daftar isi.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.95
+  },
+  {
+   "naskah": "Z3",
+   "no": "42",
+   "kelompok": "salah-bab",
+   "teks": ": Nilai-Nilai Pancasila, Kepahlawanan dan Patriotisme",
+   "label_benar": "biasa",
+   "idx": 121,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris diawali dengan titik dua, menunjukkan bahwa ini adalah bagian dari daftar isi atau sistematika, bukan judul bab asli.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.99
+  },
+  {
+   "naskah": "Z3",
+   "no": "47",
+   "kelompok": "benar-bab",
+   "teks": "BAB IV",
+   "label_benar": "bab",
+   "idx": 540,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini hanya 'BAB IV' tanpa judul, dan baris berikutnya adalah 'HASIL PENELITIAN DAN PEMBAHASAN', yang merupakan judul bab sebenarnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.96
+  },
+  {
+   "naskah": "Z3",
+   "no": "48",
+   "kelompok": "benar-bab",
+   "teks": "HASIL PENELITIAN DAN PEMBAHASAN",
+   "label_benar": "bab",
+   "idx": 541,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab yang lengkap dan bersih, sesuai dengan konteks judul bab terdekat sebelumnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.9
+  },
+  {
+   "naskah": "H1",
+   "no": "67",
+   "kelompok": "salah-bab",
+   "teks": "BAB I",
+   "label_benar": "biasa",
+   "idx": 163,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab telanjang tanpa judul, dan baris sebelumnya adalah 'DAFTAR ISI', menunjukkan ini adalah bagian dari daftar isi atau sistematika.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.89
+  },
+  {
+   "naskah": "H1",
+   "no": "69",
+   "kelompok": "salah-bab",
+   "teks": "BAB V",
+   "label_benar": "biasa",
+   "idx": 228,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab yang bersih dan tidak memenuhi kriteria 'biasa' untuk salinan daftar isi atau running head.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.04
+  },
+  {
+   "naskah": "H1",
+   "no": "70",
+   "kelompok": "benar-bab",
+   "teks": "BAB V",
+   "label_benar": "bab",
+   "idx": 320,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bab yang terulang tanpa judul lengkap, kemungkinan running head atau bagian dari daftar isi.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.94
+  },
+  {
+   "naskah": "H1",
+   "no": "72",
+   "kelompok": "salah-bab",
+   "teks": "MANAJEMEN PROYEK",
+   "label_benar": "biasa",
+   "idx": 2281,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.8,
+    "alasan": "Baris ini terlihat seperti judul tetapi tidak memiliki penomoran bab atau subbab yang jelas dan kemungkinan merupakan bagian dari daftar isi atau running head.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.89
+  },
+  {
+   "naskah": "T3",
+   "no": "75",
+   "kelompok": "salah-bab",
+   "teks": "TABLE OF CONTENS",
+   "label_benar": "biasa",
+   "idx": 948,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul daftar isi, bukan bagian dari badan naskah.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.85
+  },
+  {
+   "naskah": "T3",
+   "no": "76",
+   "kelompok": "salah-bab",
+   "teks": "CHAPTER II: REVIEW OF RELATED LITERATURE",
+   "label_benar": "biasa",
+   "idx": 745,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab yang bersih dan lengkap, mengikuti pola penomoran bab.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.97
+  },
+  {
+   "naskah": "T3",
+   "no": "77",
+   "kelompok": "salah-bab",
+   "teks": "CHAPTER V: CONCLUSION AND SUGGESTION",
+   "label_benar": "biasa",
+   "idx": 753,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab asli yang bersih, tanpa nomor halaman, dan tidak dalam konteks daftar isi atau sistematika.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.8
+  },
+  {
+   "naskah": "T3",
+   "no": "79",
+   "kelompok": "salah-bab",
+   "teks": "TABLE OF CONTENS",
+   "label_benar": "biasa",
+   "idx": 948,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul daftar isi, bukan bagian dari badan naskah.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.1
+  },
+  {
+   "naskah": "T3",
+   "no": "80",
+   "kelompok": "salah-bab",
+   "teks": "CHAPTER I: INTRODUCTION",
+   "label_benar": "biasa",
+   "idx": 957,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bab asli, bukan bagian dari daftar isi atau sistematika.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.09
+  },
+  {
+   "naskah": "U3",
+   "no": "81",
+   "kelompok": "salah-bab",
+   "teks": "BAB III",
+   "label_benar": "biasa",
+   "idx": 6,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah penanda bab baru yang bersih dan diikuti oleh judul bab pada baris berikutnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.87
+  },
+  {
+   "naskah": "AL-2",
+   "no": "91",
+   "kelompok": "salah-bab",
+   "teks": "BAB IV",
+   "label_benar": "biasa",
+   "idx": 73,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab baru yang diikuti oleh judul bab di baris berikutnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.03
+  },
+  {
+   "naskah": "AL-2",
+   "no": "92",
+   "kelompok": "salah-bab",
+   "teks": "PEMBAHASAN MASALAH Pada bab ini dijelaskan, pembahasan yang berhubungan dengan proses pembuatan aplikasi ini, yang meliputi proses-proses Penentuan Struktur Navigasi,Kontrol Navigasi, Perencanaan",
+   "label_benar": "biasa",
+   "idx": 75,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah kalimat isi yang menjelaskan isi bab, bukan judul bab atau subbab.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.86
+  },
+  {
+   "naskah": "O3",
+   "no": "97",
+   "kelompok": "salah-bab",
+   "teks": "BAB I",
+   "label_benar": "biasa",
+   "idx": 0,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab tanpa judul, tetapi tidak ada indikasi bahwa ini adalah salinan sistematika atau daftar isi.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.88
+  },
+  {
+   "naskah": "O3",
+   "no": "98",
+   "kelompok": "salah-bab",
+   "teks": "BAB II",
+   "label_benar": "biasa",
+   "idx": 2,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bab baru yang bersih dan tidak memenuhi kriteria 'biasa'.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.16
+  },
+  {
+   "naskah": "O3",
+   "no": "100",
+   "kelompok": "salah-bab",
+   "teks": "BAB III",
+   "label_benar": "biasa",
+   "idx": 5,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab asli yang bersih, tidak diawali titik dua, tidak ada nomor halaman, dan tidak merupakan bagian dari daftar isi atau sistematika.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.95
+  },
+  {
+   "naskah": "O3",
+   "no": "101",
+   "kelompok": "salah-bab",
+   "teks": ": Program Pembelajaran Pendidikan Agama Islam di SMU N 1 Pleret meliputi : Hakekat Program Imtak di SMU N 1 Pleret, Analisis Hasil Pembelajaran Pendidikan Agama Islam di Kelas, Faktor Pendukung serta Penghambat Program dan Usaha Mengatasinya.",
+   "label_benar": "biasa",
+   "idx": 6,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini diawali dengan titik dua dan merupakan bagian dari penjelasan sistematika, bukan judul bab atau subbab.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.79
+  },
+  {
+   "naskah": "P2",
+   "no": "108",
+   "kelompok": "salah-bab",
+   "teks": "BAB V",
+   "label_benar": "biasa",
+   "idx": 92,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab baru yang diikuti oleh judul bab di baris berikutnya, bukan bagian dari daftar isi atau running head.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.91
+  },
+  {
+   "naskah": "P2",
+   "no": "109",
+   "kelompok": "salah-bab",
+   "teks": "PENUTUP Berisi tentang Kesimpulan.",
+   "label_benar": "biasa",
+   "idx": 93,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah salinan sistematika penulisan karena ada frasa 'Berisi tentang' dan judul bab terdekat sudah BAB V.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.98
+  },
+  {
+   "naskah": "P2",
+   "no": "111",
+   "kelompok": "benar-bab",
+   "teks": "BABV",
+   "label_benar": "bab",
+   "idx": 964,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab baru, diikuti oleh judul bab di baris berikutnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.77
+  },
+  {
+   "naskah": "W3",
+   "no": "145",
+   "kelompok": "benar-bab",
+   "teks": "BAB II",
+   "label_benar": "bab",
+   "idx": 41,
+   "label_v11": null,
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab yang diikuti oleh judul bab di baris berikutnya, bukan bagian dari daftar isi atau sistematika.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.82
+  },
+  {
+   "naskah": "W3",
+   "no": "146",
+   "kelompok": "benar-bab",
+   "teks": "Tinjauan Pustaka",
+   "label_benar": "bab",
+   "idx": 42,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bagian yang menjelaskan isi bab, dan diikuti oleh uraian.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.9
+  },
+  {
+   "naskah": "AA3",
+   "no": "153",
+   "kelompok": "benar-bab",
+   "teks": "BAB II",
+   "label_benar": "bab",
+   "idx": 154,
+   "label_v11": null,
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab baru yang diikuti oleh judul bab pada baris berikutnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.74
+  },
+  {
+   "naskah": "AA3",
+   "no": "154",
+   "kelompok": "benar-bab",
+   "teks": "TINJAUAN TERHADAP PEMBAGIAN KEKUASAAN DI INDONESIA SETELAH PERUBAHAN UUD 1945",
+   "label_benar": "bab",
+   "idx": 155,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bagian yang menjelaskan isi bab, bukan judul bab utama.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.01
+  },
+  {
+   "naskah": "AA3",
+   "no": "155",
+   "kelompok": "benar-bab",
+   "teks": "BAB III",
+   "label_benar": "bab",
+   "idx": 364,
+   "label_v11": null,
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab yang diikuti oleh judul bab pada baris berikutnya, bukan salinan daftar isi atau running head.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.03
+  },
+  {
+   "naskah": "AA3",
+   "no": "156",
+   "kelompok": "benar-bab",
+   "teks": "PERAN DPR DALAM PROSES PENGANGKATAN DUTA BESAR RI SETELAH PERUBAHAN UUD 1945",
+   "label_benar": "bab",
+   "idx": 365,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bagian yang menjelaskan isi bab, dan diikuti oleh uraian.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.07
+  },
+  {
+   "naskah": "AE2",
+   "no": "161",
+   "kelompok": "benar-bab",
+   "teks": "BAB I",
+   "label_benar": "bab",
+   "idx": 0,
+   "label_v11": null,
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini hanya penanda bab tanpa judul, dan baris sesudahnya adalah judul bab yang sebenarnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.04
+  },
+  {
+   "naskah": "AE2",
+   "no": "162",
+   "kelompok": "benar-bab",
+   "teks": "PENDAHULUAN",
+   "label_benar": "bab",
+   "idx": 1,
+   "label_v11": null,
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah bagian dari judul bab yang terpisah dari penanda babnya, dan diikuti oleh subbab.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.98
+  },
+  {
+   "naskah": "AC2",
+   "no": "169",
+   "kelompok": "salah-bab",
+   "teks": "BAB II : TINJAUAN PUSTAKA",
+   "label_benar": "biasa",
+   "idx": 46,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab yang bersih, diawali dengan penanda bab dan judul, serta tidak memenuhi kriteria 'biasa'.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.95
+  },
+  {
+   "naskah": "AC2",
+   "no": "172",
+   "kelompok": "benar-bab",
+   "teks": "BAB III",
+   "label_benar": "bab",
+   "idx": 159,
+   "label_v11": null,
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab baru yang bersih dan diikuti oleh judul bab di baris berikutnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.98
+  },
+  {
+   "naskah": "AC2",
+   "no": "173",
+   "kelompok": "benar-bab",
+   "teks": "GAMBARAN UMUM OBYEK PENELITIAN",
+   "label_benar": "bab",
+   "idx": 160,
+   "label_v11": null,
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab yang bersih, mengikuti penanda bab sebelumnya, dan diikuti oleh subbab.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.01
+  },
+  {
+   "naskah": "AN-1",
+   "no": "193",
+   "kelompok": "salah-bab",
+   "teks": "Bab II : INSTRUMEN HUKUM HAM INTERNASIONAL DAN NASIONAL YANG BERKAITAN DENGAN PENAHANAN",
+   "label_benar": "biasa",
+   "idx": 85,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab asli yang bersih, ditandai dengan 'Bab II' diikuti judul lengkap, dan tidak memenuhi kriteria 'biasa'.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.9
+  },
+  {
+   "naskah": "AN-1",
+   "no": "194",
+   "kelompok": "salah-bab",
+   "teks": "Bab IV : ANALISIS YURIDIS TERHADAP PENAHANAN AUNG SAN SUU KYI OLEH PEMERINTAH MYANMAR MENURUT INTERNATIONAL COVENANT ON CIVIL AND POLITICAL RIGHTS",
+   "label_benar": "biasa",
+   "idx": 89,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab asli yang bersih, tidak ada nomor halaman, dan tidak berada dalam daftar salinan.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.11
+  },
+  {
+   "naskah": "AN-1",
+   "no": "195",
+   "kelompok": "salah-bab",
+   "teks": "Bab V : PENUTUP",
+   "label_benar": "biasa",
+   "idx": 91,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 1.0,
+    "alasan": "Baris ini adalah judul bab asli yang bersih, tidak ada nomor halaman, dan tidak berada dalam daftar salinan.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.29
+  },
+  {
+   "naskah": "AN-1",
+   "no": "196",
+   "kelompok": "benar-bab",
+   "teks": "INSTRUMEN HUKUM HAM INTERNASIONAL DAN HUKUM NASIONAL YANG BERKAITAN DENGAN PENAHANAN",
+   "label_benar": "bab",
+   "idx": 105,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bagian yang menjelaskan isi di bawahnya, ditandai dengan huruf kapital tanpa penomoran angka.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.23
+  },
+  {
+   "naskah": "AN-1",
+   "no": "199",
+   "kelompok": "benar-bab",
+   "teks": "PEMERINTAH MYANMAR",
+   "label_benar": "bab",
+   "idx": 252,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah kelanjutan dari judul bab yang terpotong dari baris sebelumnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.16
+  },
+  {
+   "naskah": "G3",
+   "no": "250",
+   "kelompok": "salah-bab",
+   "teks": ": Tinjauan Pustaka",
+   "label_benar": "biasa",
+   "idx": 50,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris diawali dengan titik dua, menunjukkan itu adalah bagian dari daftar isi atau sistematika, bukan judul bab asli.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 0.88
+  },
+  {
+   "naskah": "G3",
+   "no": "251",
+   "kelompok": "salah-bab",
+   "teks": ": Metodologi Penelitian",
+   "label_benar": "biasa",
+   "idx": 53,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bab yang bersih, diawali dengan 'Bab III' dan diikuti oleh judul 'Metodologi Penelitian', serta tidak ada indikasi sebagai salinan daftar isi atau running head.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.19
+  },
+  {
+   "naskah": "G3",
+   "no": "252",
+   "kelompok": "salah-bab",
+   "teks": ": Laporan Penelitian",
+   "label_benar": "biasa",
+   "idx": 56,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bagian yang diikuti oleh uraian, dan tidak memenuhi kriteria 'bab' atau 'biasa'.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 0.98
+  },
+  {
+   "naskah": "G3",
+   "no": "254",
+   "kelompok": "salah-bab",
+   "teks": ": Penutup",
+   "label_benar": "biasa",
+   "idx": 59,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bab 'Penutup' yang muncul setelah 'Bab V' dan sebelum uraian isinya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.27
+  },
+  {
+   "naskah": "N3",
+   "no": "256",
+   "kelompok": "benar-bab",
+   "teks": "BAB III",
+   "label_benar": "bab",
+   "idx": 64,
+   "label_v11": null,
+   "jawaban_prompt_baru": {
+    "label": "bab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penanda bab yang diikuti oleh judul bab di baris berikutnya, bukan bagian dari daftar isi atau running head.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.28
+  },
+  {
+   "naskah": "AJ-1",
+   "no": "272",
+   "kelompok": "salah-bab",
+   "teks": "Bab 2: Tinjauan Kepustakaan",
+   "label_benar": "biasa",
+   "idx": 31,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "biasa",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah bagian dari daftar sistematika penulisan yang diuraikan sebelumnya, bukan judul bab asli.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": true,
+   "detik": 1.03
+  },
+  {
+   "naskah": "AJ-1",
+   "no": "275",
+   "kelompok": "salah-bab",
+   "teks": ": Hasil dan Pembahasan",
+   "label_benar": "biasa",
+   "idx": 36,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bagian yang diawali dengan titik dua, yang mengindikasikan subbab.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.01
+  },
+  {
+   "naskah": "AJ-1",
+   "no": "277",
+   "kelompok": "benar-bab",
+   "teks": "Kesimpulan dan Saran",
+   "label_benar": "bab",
+   "idx": 39,
+   "label_v11": "bab",
+   "jawaban_prompt_baru": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bagian yang diikuti oleh uraian, dan tidak memiliki penomoran bab.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "benar": false,
+   "detik": 1.12
+  }
+ ]
+}

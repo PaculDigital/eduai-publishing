@@ -8,11 +8,11 @@ konteks di TSV, dan baseline Oktober fid=81.
 
 | Naskah | bab | subbab | paragraf | biasa | total |
 |---|---|---|---|---|---|
-| fid=81 | 0 | 0 | 12 | 9 | 21 |
+| fid=81 | 0 | 0 | 11 | 10 | 21 |
 | fid=112 | 1 | 0 | 1 | 8 | 10 |
 | fid=115 | 1 | 1 | 1 | 6 | 9 |
 | WULAN-1 | 0 | 0 | 1 | 2 | 3 |
-| **Total** | **2** | **1** | **15** | **25** | **43** |
+| **Total** | **2** | **1** | **14** | **26** | **43** |
 
 ## Aturan yang dipakai (konsisten di semua naskah)
 
@@ -26,21 +26,32 @@ konteks di TSV, dan baseline Oktober fid=81.
    topik sama, ekor kalimat, fragmen sitasi/atribusi dalam kurung,
    fragmen tabel.
 5. Tidak ada baris yang Wulan beri `ragu`: semua bisa diputuskan dengan
-   aturan di atas, tapi 6 baris keyakinan sedang (di bawah) mohon Boss
-   periksa ulang.
+   aturan di atas. 6 baris keyakinan sedang di bawah sudah diperiksa ulang
+   Wulan 11 Nov 2026 (Putaran 3): 5 tetap, 1 berubah (no 11).
 
-## Keyakinan sedang (6 baris fid=81, mohon Boss periksa ulang)
+## Keyakinan sedang (6 baris fid=81 — sudah diperiksa ulang 11 Nov 2026)
 
 Konteks di TSV terpotong, jadi keputusan memakai aturan ganti topik,
-bukan bukti jeda paragraf yang terlihat langsung:
+bukan bukti jeda paragraf yang terlihat langsung. Periksa ulang memakai
+teks penuh `_naskah_asih.txt` (baris sumber di bawah) dan label run yang
+tersimpan:
 
 - 81 no 4: `biasa` — definisi Keberlanjutan Usaha kedua, topik sama.
+  TETAP.
 - 81 no 8: `biasa` — definisi Digital Marketing kedua, topik sama.
-- 81 no 11: `paragraf` — studi terdahulu berbeda (Clarissa et al.),
-  pola kalimat pembuka paragraf.
+  TETAP.
+- 81 no 11: `biasa` — BERUBAH dari `paragraf`. Studi kedua (Clarissa et
+  al., baris 369) dalam daftar bukti di bawah pengantar baris 365
+  (Hipotesis Kedua); studi pertama (baris 367, Hanaysha) `biasa` menurut
+  kedua model, jadi studi kedua ini lanjutan blok yang sama, bukan blok
+  baru. Alasan lama (studi berbeda = blok baru) kalah oleh struktur
+  daftar: dua butir sejajar di bawah satu pengantar tidak bisa yang satu
+  lanjutan dan yang satu blok baru tanpa penanda batas.
 - 81 no 12: `biasa` — penjelasan sesudah rumus, lanjutan paragraf sampel.
+  TETAP.
 - 81 no 13: `biasa` — kalimat sitasi lanjutan, topik sama (uji asumsi).
-- 81 no 17: `biasa` — kalimat koefisien kedua, topik sama.
+  TETAP.
+- 81 no 17: `biasa` — kalimat koefisien kedua, topik sama. TETAP.
 
 ## Keputusan tersulit
 
@@ -59,7 +70,8 @@ bukan bukti jeda paragraf yang terlihat langsung:
 
 ## Temuan jujur: skor 1.13 vs 1.14 di 21 baris fid=81
 
-Diukur dari label Wulan ini: **1.13 benar 8/21, 1.14 benar 13/21.**
+Diukur dari label Wulan ini (sesudah periksa ulang 11 Nov 2026):
+**1.13 benar 9/21, 1.14 benar 12/21.**
 Artinya pada subset sengketa ini 1.14 lebih baik, dan itu BERTENTANGAN
 dengan vonis lama yang memakai jarak ke baseline Oktober (paragraf 157).
 
@@ -70,10 +82,12 @@ yang seharusnya menjadi wasit, bukan baseline lama. Bila label Wulan
 benar, jumlah paragraf sejati fid=81 lebih dekat ke ~185 daripada 157,
 dan 1.14 memang lebih sering benar pada baris sengketa.
 
-Tapi Wulan ingatkan: ini hanya 21 baris sengketa, bukan seluruh naskah,
-dan 6 di antaranya keyakinan sedang. Vonis pindah model tetap butuh
-Boss memeriksa 6 baris itu, plus sengketa paragraf antar-run v7 yang
-belum ada di paket ini (butuh Gas ~180 panggilan Jev).
+Tapi Wulan ingatkan: ini hanya 21 baris sengketa, bukan seluruh naskah.
+Periksa ulang 11 Nov 2026 mengubah 1 baris (81 no 11: `paragraf` jadi
+`biasa`), sehingga skor menyempit dari 13/21 vs 8/21 menjadi 12/21 vs
+9/21 — vonis pindah 1.14 TETAP (dan di baris keyakinan tinggi 12/15 vs
+3/15), tapi selisihnya kini 3, bukan 5. Sengketa paragraf antar-run v7
+sudah masuk paket (354 baris), dan labelnya sudah lengkap.
 
 ## Verifikasi
 
@@ -87,7 +101,7 @@ belum ada di paket ini (butuh Gas ~180 panggilan Jev).
 
 Diisi empat jalur paralel dari teks naskah (`_teks/` + konteks TSV), nol
 panggilan Jev. 354/354 terisi, 0 kosong, 0 ragu. Total paket kini
-**397/397 terisi** (bab 6, subbab 41, paragraf 97, biasa 253, ragu 0).
+**397/397 terisi** (bab 6, subbab 41, paragraf 96, biasa 254, ragu 0).
 
 | Naskah | baru terisi | bab | subbab | paragraf | biasa | ragu |
 |---|---|---|---|---|---|---|
@@ -100,21 +114,31 @@ Catatan: 45 baris teks kosong di fid=112 dilabel `biasa` (artefak
 ekstraksi/jeda halaman/sel tabel, bukan awal blok isi). Naskah fid=115
 sendiri salah nomor bab (judul Bab IV tertulis "BAB VI", tetap `bab`).
 
-## Keyakinan sedang — total 20 baris, mohon Boss periksa ulang
+## Keyakinan sedang — total 20 baris, SELESAI diperiksa ulang 11 Nov 2026
+
+Perintah Boss 11 Nov 2026 08:09 WIB: selesaikan sekaligus, jangan
+ditunggu lagi. Wulan periksa ulang ke-20 baris dengan konteks lebar
+dari teks sumber (`_naskah_asih.txt` untuk fid=81; `_teks/` untuk
+112/115/WULAN-1) dan label run yang tersimpan. Hasil: **19 vonis tetap,
+1 berubah** (81 no 11: `paragraf` jadi `biasa`, lihat Putaran 3 di
+atas). **0 baris tersisa dengan status menunggu Boss.**
 
 - fid=81: no 4, 8, 11, 12, 13, 17 (putaran 1), no 24, 27 (putaran 2).
 - fid=112: no 11, 92, 57, 78, 79, 80, 141, 147, 183.
 - fid=115: no 47, 61.
 - WULAN-1: no 4.
-Semua sudah ditandai "Keyakinan sedang, mohon Boss periksa ulang." di
-kolom catatan_boss masing-masing.
+Kolom `catatan_boss` masing-masing kini berisi vonis akhir +
+alasannya, diawali "Wulan (periksa ulang 11 Nov 2026)".
 
 ## Skor model 1.13 vs 1.14 dari label (berkas skor_model.json)
 
 Bukti langsung (21 baris `beda_model_113_114` fid=81, satu-satunya baris
-yang kedua model diuji di baris yang sama): **1.13 benar 8/21, 1.14 benar
-13/21**. Tanpa 6 baris keyakinan sedang: **1.13 benar 3/15, 1.14 benar
+yang kedua model diuji di baris yang sama; dihitung ulang dari TSV
+11 Nov 2026 sesudah periksa ulang): **1.13 benar 9/21, 1.14 benar
+12/21**. Tanpa 6 baris keyakinan sedang: **1.13 benar 3/15, 1.14 benar
 12/15** — keunggulan 1.14 justru lebih kuat di baris keyakinan tinggi.
+Periksa ulang menyempitkan selisih (dari 13 vs 8 menjadi 12 vs 9)
+karena 81 no 11 berbalik ke 1.13, tapi vonis pindah 1.14 TETAP.
 
 Bukti pendukung (354 baris `sengketa_paragraf`, kedua run adalah 1.13):
 run 1 benar 172/354 (48,6%), run 2 benar 125/354 (35,3%), tidak ada

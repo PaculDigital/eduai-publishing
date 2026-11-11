@@ -1,0 +1,245 @@
+{
+ "berkas": "ground_truth_latih112.tsv",
+ "total_baris": 254,
+ "tanggal": "2026-11-11",
+ "panggilan_jev": 0,
+ "per_bidang": {
+  "Administrasi Negara": 7,
+  "Administrasi Niaga": 7,
+  "Akuntansi": 7,
+  "Bahasa Inggris": 7,
+  "Bimbingan Konseling": 7,
+  "Ekonomi Pembangunan": 7,
+  "Hukum": 7,
+  "Hukum Perdata": 7,
+  "Hukum Pidana": 7,
+  "Informatika Multimedia": 7,
+  "Kimia": 7,
+  "Manajemen": 7,
+  "Matematika": 7,
+  "Pendidikan Agama Islam": 7,
+  "Pendidikan Elektro": 7,
+  "Skripsi ESP Syariah": 7,
+  "Skripsi Kebidanan": 7,
+  "Teknik Industri": 7,
+  "bimbingan-konseling": 3,
+  "campuran": 7,
+  "ekonomi": 7,
+  "ekonomi-manajemen": 7,
+  "fisika": 6,
+  "hukum-tata-negara": 4,
+  "ilmu-tanah": 5,
+  "informatika": 7,
+  "komunikasi": 3,
+  "pendidikan-bahasa-indonesia": 3,
+  "pendidikan-bahasa-inggris": 4,
+  "pendidikan-bhs-arab": 7,
+  "pendidikan-biologi": 7,
+  "pendidikan-ekonomi": 3,
+  "perbankan-syariah": 7,
+  "perhotelan": 3,
+  "peternakan": 5,
+  "ppkn": 5,
+  "psikologi": 7,
+  "teknik-mesin": 7,
+  "teknik-sipil": 7,
+  "teknik-telekomunikasi": 7,
+  "tesis": 7
+ },
+ "per_jenis": {
+  "deterministik_daftar_isi": 4,
+  "deterministik_nomor_polos": 2,
+  "deterministik_pemisah": 3,
+  "goyang_bab": 67,
+  "goyang_subbab": 54,
+  "hakim_curiga": 37,
+  "hakim_ragu": 87
+ },
+ "per_label": {
+  "bab": 6,
+  "biasa": 140,
+  "paragraf": 68,
+  "ragu": 1,
+  "subbab": 39
+ },
+ "per_bidang_label": {
+  "Administrasi Negara": {
+   "biasa": 7
+  },
+  "Administrasi Niaga": {
+   "biasa": 4,
+   "paragraf": 1,
+   "subbab": 2
+  },
+  "Akuntansi": {
+   "biasa": 5,
+   "subbab": 2
+  },
+  "Bahasa Inggris": {
+   "biasa": 7
+  },
+  "Bimbingan Konseling": {
+   "biasa": 7
+  },
+  "Ekonomi Pembangunan": {
+   "paragraf": 3,
+   "subbab": 4
+  },
+  "Hukum": {
+   "bab": 1,
+   "biasa": 5,
+   "paragraf": 1
+  },
+  "Hukum Perdata": {
+   "biasa": 5,
+   "paragraf": 1,
+   "subbab": 1
+  },
+  "Hukum Pidana": {
+   "bab": 3,
+   "biasa": 1,
+   "paragraf": 1,
+   "subbab": 2
+  },
+  "Informatika Multimedia": {
+   "biasa": 5,
+   "paragraf": 2
+  },
+  "Kimia": {
+   "biasa": 4,
+   "paragraf": 3
+  },
+  "Manajemen": {
+   "biasa": 7
+  },
+  "Matematika": {
+   "biasa": 2,
+   "paragraf": 4,
+   "subbab": 1
+  },
+  "Pendidikan Agama Islam": {
+   "biasa": 7
+  },
+  "Pendidikan Elektro": {
+   "biasa": 7
+  },
+  "Skripsi ESP Syariah": {
+   "biasa": 3,
+   "subbab": 4
+  },
+  "Skripsi Kebidanan": {
+   "biasa": 5,
+   "subbab": 2
+  },
+  "Teknik Industri": {
+   "biasa": 1,
+   "paragraf": 6
+  },
+  "bimbingan-konseling": {
+   "biasa": 3
+  },
+  "campuran": {
+   "bab": 1,
+   "biasa": 3,
+   "ragu": 1,
+   "subbab": 2
+  },
+  "ekonomi": {
+   "biasa": 3,
+   "paragraf": 4
+  },
+  "ekonomi-manajemen": {
+   "biasa": 4,
+   "paragraf": 1,
+   "subbab": 2
+  },
+  "fisika": {
+   "biasa": 3,
+   "paragraf": 1,
+   "subbab": 2
+  },
+  "hukum-tata-negara": {
+   "biasa": 2,
+   "paragraf": 2
+  },
+  "ilmu-tanah": {
+   "paragraf": 5
+  },
+  "informatika": {
+   "biasa": 6,
+   "subbab": 1
+  },
+  "komunikasi": {
+   "biasa": 2,
+   "paragraf": 1
+  },
+  "pendidikan-bahasa-indonesia": {
+   "biasa": 1,
+   "paragraf": 2
+  },
+  "pendidikan-bahasa-inggris": {
+   "biasa": 3,
+   "paragraf": 1
+  },
+  "pendidikan-bhs-arab": {
+   "biasa": 7
+  },
+  "pendidikan-biologi": {
+   "bab": 1,
+   "biasa": 1,
+   "paragraf": 3,
+   "subbab": 2
+  },
+  "pendidikan-ekonomi": {
+   "biasa": 1,
+   "paragraf": 2
+  },
+  "perbankan-syariah": {
+   "biasa": 7
+  },
+  "perhotelan": {
+   "paragraf": 3
+  },
+  "peternakan": {
+   "biasa": 2,
+   "paragraf": 3
+  },
+  "ppkn": {
+   "paragraf": 5
+  },
+  "psikologi": {
+   "biasa": 2,
+   "paragraf": 4,
+   "subbab": 1
+  },
+  "teknik-mesin": {
+   "biasa": 2,
+   "paragraf": 1,
+   "subbab": 4
+  },
+  "teknik-sipil": {
+   "biasa": 1,
+   "paragraf": 4,
+   "subbab": 2
+  },
+  "teknik-telekomunikasi": {
+   "biasa": 2,
+   "paragraf": 2,
+   "subbab": 3
+  },
+  "tesis": {
+   "biasa": 3,
+   "paragraf": 2,
+   "subbab": 2
+  }
+ },
+ "bidang_tanpa_baris": [
+  "teknik-pertanian"
+ ],
+ "alasan_bidang_tanpa_baris": "Satu-satunya naskah belajar teknik-pertanian (Y1) adalah grup 3; ketujuh kandidatnya berbasis idx yang ditunda (lihat _sketsa/kandidat_idx_grup3_tertunda.json), jadi tidak ada baris yang lolos.",
+ "teks_dari_baris_utuh": 130,
+ "teks_dari_cuplikan": 124,
+ "konteks_diisi_jangkar": 15,
+ "kandidat_idx_grup3_tertunda": 738,
+ "catatan": "Label diisi Wulan dari teks (bukan Boss). Satu baris berlabel ragu (no 132). 41 dari 42 bidang terwakili."
+}

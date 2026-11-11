@@ -95,3 +95,20 @@ Label Boss dipakai untuk tiga keputusan:
 3. **Gerbang 3-naskah** (`../gerbang_3_naskah.py`) — pemeriksaan otomatis
    sebelum pilot produksi: BAB tidak boleh hilang, subbab tidak boleh
    berubah lebih dari ambang, tidak boleh ada judul BAB sampah.
+
+---
+
+## Paket Latih 112 Naskah (tahap 3, 11 November 2026)
+
+| Berkas | Isi |
+|---|---|
+| `ground_truth_latih112.tsv` | 254 baris sengketa dari 76 naskah BELAJAR (112 naskah tahap 1, 42 bidang), semua sudah berlabel oleh Wulan dari teks |
+| `ringkasan_latih112.json` | Hitungan per bidang, per jenis, per label |
+| `ringkasan_latih112.md` | Ringkasan + catatan kejujuran isi (baca dulu sebelum memakai TSV) |
+
+Pembagian belajar/uji ada di `../pembagian.json` (76 belajar + 36 uji).
+**Nol panggilan Jev** untuk membangun paket ini. 738 kandidat idx grup 3
+tertunda (tidak ditebak); teknik-pertanian 0 baris karena satu-satunya
+naskah belajarnya (Y1) hanya punya kandidat idx grup 3. Satu baris
+berlabel `ragu` (no 132). Verifikasi live (tahap 5) TERTUNDA, perkiraan
+~540 panggilan untuk 36 naskah uji.

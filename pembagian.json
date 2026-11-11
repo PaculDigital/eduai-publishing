@@ -1,0 +1,450 @@
+{
+ "aturan": "4 naskah: 3 belajar+1 uji; 3 naskah: 2+1; 2 naskah: 1+1; 1 naskah: belajar saja",
+ "duplikat": [
+  [
+   "H2",
+   "H3"
+  ],
+  [
+   "Y1",
+   "AD1"
+  ],
+  [
+   "Y2",
+   "AD3"
+  ],
+  [
+   "AB1",
+   "AB2"
+  ],
+  [
+   "AM-1",
+   "AN-3"
+  ],
+  [
+   "D1",
+   "Q2"
+  ],
+  [
+   "D2",
+   "AJ-3"
+  ],
+  [
+   "U1",
+   "AM-3"
+  ]
+ ],
+ "catatan_perbaikan": [
+  "H3 (duplikat H2) dipindah ke belajar; H1 jadi uji teknik-sipil sebagai ganti",
+  "AB2 (duplikat AB1) dipindah ke belajar; uji ppkn kosong (tidak ada anggota bersih untuk ditukar)",
+  "AN-3 (duplikat AM-1) dipindah ke belajar; AN-1 jadi uji Hukum sebagai ganti",
+  "AJ-3 (duplikat D2) dipindah ke belajar; AJ-1 jadi uji Akuntansi sebagai ganti",
+  "AM-3 (duplikat U1) dipindah ke belajar; AM-1 jadi uji Hukum Perdata sebagai ganti",
+  "AM-1 (duplikat AN-3) dipindah ke belajar; AM-2 jadi uji Hukum Perdata sebagai ganti"
+ ],
+ "kebocoran_tersisa": [],
+ "total_belajar": 76,
+ "total_uji": 36,
+ "bidang": [
+  {
+   "bidang": "Administrasi Negara",
+   "belajar": [
+    "AO-1"
+   ],
+   "uji": [
+    "AO-2"
+   ]
+  },
+  {
+   "bidang": "Administrasi Niaga",
+   "belajar": [
+    "AP-1",
+    "AP-2"
+   ],
+   "uji": [
+    "AP-3"
+   ]
+  },
+  {
+   "bidang": "Akuntansi",
+   "belajar": [
+    "AJ-2",
+    "AJ-3"
+   ],
+   "uji": [
+    "AJ-1"
+   ]
+  },
+  {
+   "bidang": "Bahasa Inggris",
+   "belajar": [
+    "T1",
+    "T2"
+   ],
+   "uji": [
+    "T3"
+   ]
+  },
+  {
+   "bidang": "Bimbingan Konseling",
+   "belajar": [
+    "R1",
+    "R2"
+   ],
+   "uji": [
+    "R3"
+   ]
+  },
+  {
+   "bidang": "Ekonomi Pembangunan",
+   "belajar": [
+    "S1"
+   ],
+   "uji": [
+    "S2"
+   ]
+  },
+  {
+   "bidang": "Hukum",
+   "belajar": [
+    "AN-2",
+    "AN-3"
+   ],
+   "uji": [
+    "AN-1"
+   ]
+  },
+  {
+   "bidang": "Hukum Perdata",
+   "belajar": [
+    "AM-1",
+    "AM-3"
+   ],
+   "uji": [
+    "AM-2"
+   ]
+  },
+  {
+   "bidang": "Hukum Pidana",
+   "belajar": [
+    "U1",
+    "U2"
+   ],
+   "uji": [
+    "U3"
+   ]
+  },
+  {
+   "bidang": "Informatika Multimedia",
+   "belajar": [
+    "AL-1"
+   ],
+   "uji": [
+    "AL-2"
+   ]
+  },
+  {
+   "bidang": "Kimia",
+   "belajar": [
+    "AI-1"
+   ],
+   "uji": [
+    "AI-2"
+   ]
+  },
+  {
+   "bidang": "Manajemen",
+   "belajar": [
+    "AK-1",
+    "AK-2"
+   ],
+   "uji": [
+    "AK-3"
+   ]
+  },
+  {
+   "bidang": "Matematika",
+   "belajar": [
+    "Q1",
+    "Q2"
+   ],
+   "uji": [
+    "Q3"
+   ]
+  },
+  {
+   "bidang": "Pendidikan Agama Islam",
+   "belajar": [
+    "O1",
+    "O2"
+   ],
+   "uji": [
+    "O3"
+   ]
+  },
+  {
+   "bidang": "Pendidikan Elektro",
+   "belajar": [
+    "P1"
+   ],
+   "uji": [
+    "P2"
+   ]
+  },
+  {
+   "bidang": "Skripsi ESP Syariah",
+   "belajar": [
+    "M1",
+    "M2"
+   ],
+   "uji": [
+    "M3"
+   ]
+  },
+  {
+   "bidang": "Skripsi Kebidanan",
+   "belajar": [
+    "N1",
+    "N2"
+   ],
+   "uji": [
+    "N3"
+   ]
+  },
+  {
+   "bidang": "Teknik Industri",
+   "belajar": [
+    "L1",
+    "L2"
+   ],
+   "uji": [
+    "L3"
+   ]
+  },
+  {
+   "bidang": "bimbingan-konseling",
+   "belajar": [
+    "AF1"
+   ],
+   "uji": []
+  },
+  {
+   "bidang": "campuran",
+   "belajar": [
+    "B1",
+    "B2",
+    "B3"
+   ],
+   "uji": [
+    "B4"
+   ]
+  },
+  {
+   "bidang": "ekonomi",
+   "belajar": [
+    "D1",
+    "D2"
+   ],
+   "uji": [
+    "D3"
+   ]
+  },
+  {
+   "bidang": "ekonomi-manajemen",
+   "belajar": [
+    "F1",
+    "F2",
+    "F3"
+   ],
+   "uji": [
+    "F4"
+   ]
+  },
+  {
+   "bidang": "fisika",
+   "belajar": [
+    "X1",
+    "X2"
+   ],
+   "uji": [
+    "X3"
+   ]
+  },
+  {
+   "bidang": "hukum-tata-negara",
+   "belajar": [
+    "AA1",
+    "AA2"
+   ],
+   "uji": [
+    "AA3"
+   ]
+  },
+  {
+   "bidang": "ilmu-tanah",
+   "belajar": [
+    "AD1",
+    "AD2"
+   ],
+   "uji": [
+    "AD3"
+   ]
+  },
+  {
+   "bidang": "informatika",
+   "belajar": [
+    "A1",
+    "A2",
+    "A3"
+   ],
+   "uji": [
+    "A4"
+   ]
+  },
+  {
+   "bidang": "komunikasi",
+   "belajar": [
+    "W1",
+    "W2"
+   ],
+   "uji": [
+    "W3"
+   ]
+  },
+  {
+   "bidang": "pendidikan-bahasa-indonesia",
+   "belajar": [
+    "Z1",
+    "Z2"
+   ],
+   "uji": [
+    "Z3"
+   ]
+  },
+  {
+   "bidang": "pendidikan-bahasa-inggris",
+   "belajar": [
+    "AH1"
+   ],
+   "uji": []
+  },
+  {
+   "bidang": "pendidikan-bhs-arab",
+   "belajar": [
+    "E1",
+    "E2"
+   ],
+   "uji": [
+    "E3"
+   ]
+  },
+  {
+   "bidang": "pendidikan-biologi",
+   "belajar": [
+    "J1",
+    "J2"
+   ],
+   "uji": [
+    "J3"
+   ]
+  },
+  {
+   "bidang": "pendidikan-ekonomi",
+   "belajar": [
+    "AE1"
+   ],
+   "uji": [
+    "AE2"
+   ]
+  },
+  {
+   "bidang": "perbankan-syariah",
+   "belajar": [
+    "C1",
+    "C2",
+    "C3"
+   ],
+   "uji": [
+    "C4"
+   ]
+  },
+  {
+   "bidang": "perhotelan",
+   "belajar": [
+    "AC1"
+   ],
+   "uji": [
+    "AC2"
+   ]
+  },
+  {
+   "bidang": "peternakan",
+   "belajar": [
+    "AG1"
+   ],
+   "uji": []
+  },
+  {
+   "bidang": "ppkn",
+   "belajar": [
+    "AB1",
+    "AB2"
+   ],
+   "uji": []
+  },
+  {
+   "bidang": "psikologi",
+   "belajar": [
+    "G1",
+    "G2"
+   ],
+   "uji": [
+    "G3"
+   ]
+  },
+  {
+   "bidang": "teknik-mesin",
+   "belajar": [
+    "I1",
+    "I2",
+    "I3"
+   ],
+   "uji": [
+    "I4"
+   ]
+  },
+  {
+   "bidang": "teknik-pertanian",
+   "belajar": [
+    "Y1"
+   ],
+   "uji": [
+    "Y2"
+   ]
+  },
+  {
+   "bidang": "teknik-sipil",
+   "belajar": [
+    "H2",
+    "H3"
+   ],
+   "uji": [
+    "H1"
+   ]
+  },
+  {
+   "bidang": "teknik-telekomunikasi",
+   "belajar": [
+    "K1"
+   ],
+   "uji": []
+  },
+  {
+   "bidang": "tesis",
+   "belajar": [
+    "V1"
+   ],
+   "uji": []
+  }
+ ]
+}

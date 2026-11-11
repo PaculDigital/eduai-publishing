@@ -1,0 +1,1304 @@
+{
+ "kode": "AC2",
+ "rule_version": "jev-peta-v13",
+ "model_diminta": "SATPAM/typesafe/jev-1.14",
+ "model_melayani": "typesafe/jev-1.14-20261014",
+ "model_override": null,
+ "bukti_model": {
+  "model_dilayani": "typesafe/jev-1.14-20261014",
+  "satpam_penyedia": "openrouter",
+  "satpam_jejak": [
+   {
+    "penyedia": "resmi",
+    "model": "jev-1.14.0",
+    "hasil": "GAGAL",
+    "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+   },
+   {
+    "penyedia": "openrouter",
+    "model": "typesafe/jev-1.14",
+    "hasil": "DIPAKAI"
+   }
+  ],
+  "provider": "TypeSafe"
+ },
+ "probe_jml": 1,
+ "panggilan_jev": {
+  "choice": 7,
+  "noul": 3,
+  "lain": 0
+ },
+ "panggilan_total": 10,
+ "wall_detik": 14.58,
+ "wall_petakan_detik": 12.22,
+ "sidik_sebelum": [
+  28,
+  108,
+  235
+ ],
+ "sidik_sesudah": [
+  28,
+  108,
+  235
+ ],
+ "sidik_berubah": false,
+ "hakim_tandai_pra": [
+  34,
+  39,
+  82,
+  89,
+  105,
+  199,
+  205,
+  326,
+  327,
+  397,
+  458,
+  461,
+  485,
+  498
+ ],
+ "hakim_tandai_galat": null,
+ "hakim_final": {
+  "jumlah_sepakat": 34,
+  "jumlah_ragu": 13,
+  "jumlah_curiga": 0,
+  "jumlah_belum": 0
+ },
+ "flag_pasca": [
+  34,
+  39,
+  82,
+  105,
+  199,
+  205,
+  326,
+  327,
+  397,
+  458,
+  461,
+  485,
+  498
+ ],
+ "flag_selisih": {
+  "hanya_pra": [
+   89
+  ],
+  "hanya_pasca": []
+ },
+ "rekaman": [
+  {
+   "idx": 34,
+   "teks": "    1. Penelitian Lapangan.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.56
+   ],
+   "konteks": {
+    "sebelum": [
+     "D.  Metode Penelitian",
+     "\tUntuk Menyusun Karya Tulis Akhir ini penulis mengelompokkan bagian-bagian mana yang harus didahulukan dan melakukan penelitian lebih mendalam. Adapun tahapan-tahapan tersebut adalah sebagai berikut :",
+     ""
+    ],
+    "sesudah": [
+     "Pada penelitian lapangan ini penulis terjun langsung yang berupa Praktek Kerja Lapangan yang dimulai tanggal 12 April – 12 Oktober 2004. Selain itu penulis juga melakukan wawancara dengan para sales person.",
+     "",
+     "    2. Penelitian Kepustakaan."
+    ],
+    "judul_bab_terdekat": "BAB I PENDAHULUAN"
+   }
+  },
+  {
+   "idx": 39,
+   "teks": "\tDiharapkan hasil kerja yang yang mendekati sasaran dapat menjadi manfaat di kemudian hari bagi penulis khususnya dan masyarakat umum. ",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.75
+   ],
+   "konteks": {
+    "sebelum": [
+     "",
+     "    2. Penelitian Kepustakaan.",
+     "Pengumpulan data-data dengan jalan penelitian terhadap buku-buku yang berkaitan dengan masalah di atas."
+    ],
+    "sesudah": [
+     "    E. Sistematika Penulisan",
+     "\tPenulis menyusun Karya Tulis Akhir ini berdasarkan sistematika sebagai berikut :",
+     ""
+    ],
+    "judul_bab_terdekat": "BAB I PENDAHULUAN"
+   }
+  },
+  {
+   "idx": 82,
+   "teks": "\tBeberapa hal yang harus dikuasai oleh tenaga penjual / Sales person adalah (1) product knowledge, (2) price policy, (3) human relation.",
+   "suara": [
+    "subbab",
+    "paragraf"
+   ],
+   "conf": [
+    0.31,
+    0.25
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Dapat mengarahkan sasaran mana dan kepada siapa produk akan ditawarkan dan dijual.",
+     "    • Dapat meyakinkan atas manfaat dan kelebihan produk yang ditawarkan.",
+     "    • Dapat meyakinkan calon pelanggan yang diketahui ragu-ragu dalam mengambil keputusan atau menentukan pilihan."
+    ],
+    "sesudah": [
+     "1.  \tProduct Knowledge  (pengetahuan tentang produk)",
+     "Adalah yang meliputi masalah yang berhubungan dengan keadaan fisik, jenis, ukuran, design dan warna, manfaat terhadap konsumen, bahkan kelebihannya dengan produk lain yang sama.",
+     "2.   Price Policy (kebijaksanaan harga jual)"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 89,
+   "teks": "             Setelah menguasai tiga hal penting diatas maka ada baiknya melakukan tahapan demi tahapan dalam proses penjualan. Tahapan-tahapan tersebut adalah langkah-langkah yang perlu diperhatikan oleh seorang Sales dalam melakukan proses penjualan yang diharapkan berujung pada keberhasilan. Langkah-langkah tersebut adalah sbb :",
+   "suara": [
+    "subbab",
+    "paragraf"
+   ],
+   "conf": [
+    0.49,
+    0.41
+   ],
+   "konteks": {
+    "sebelum": [
+     "Sejenis produk yang ditawarkan atau dijual mempunyai klasifikasi harga. Adanya suatu design harga tertentu yang ditawarkan untuk suatu volume penjualan. Apakah ada insentif tertentu (discount/commission) bagi pembeli.",
+     "3. \tHuman Relation.",
+     "Kemampuan tenaga penjual dalam hubungannya dengan masyarakat pasar tertentu untuk mempengaruhinya dan pada akhirnya menjadi konsumen. Pendekatan perorangan sangat membantu keberhasilan dengan ditunjang kemampuan berkomunikasi."
+    ],
+    "sesudah": [
+     "1.  \tApproach (pendekatan kepada prospek)",
+     "Pendekatan kepada calon pembeli/konsumen memerlukan persiapan dan perencanaan yang baik yang antara lain pengetahuan tentang :",
+     "    • Siapakah calon pembeli/konsumen ?"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 105,
+   "teks": "4.  \tClosing The Sale.",
+   "suara": [
+    "paragraf",
+    "subbab"
+   ],
+   "conf": [
+    0.4,
+    0.43
+   ],
+   "konteks": {
+    "sebelum": [
+     "Satu hal lain yang tak kalah pentingnya adalah First Impression atau kesan pertama kepada pelaku penjualan yang positif akan membantu kelancaran proses penjualan.",
+     "3.  \tSelling (menjual)",
+     "Proses menjual dari seorang sales harus dapat memberi keyakinan kepada pembeli atas manfaat dan kelebihan produk yang ditawarkan. Dengan bekal Product Knowledge dan pengembangan komunikasi yang efektif diharapkan pembeli menjadi pelaku pembeli."
+    ],
+    "sesudah": [
+     "Suatu transaksi penjualan terjadi karena penjualan memperoleh persetujuan dari calon pembeli untuk membeli atau menggunakan produk/jasa yang ditawarkan. Tahapan ini merupakan keberhasilan seorang penjual mempengaruhi dan meyakinkan calon pembeli. Langkah-langkah administratif untuk menutup penjualan dapat berupa : statement, order dan tanda terima pembayaran. Dalam jasa pelayanan wisata maka pembeli/konsumen akan menikmati produk wisata setelah terjadinya closing the sale.",
+     "5.  \tAfter Sales Service",
+     "Kesempurnaan dari suatu penjualan yang berhasil adalah ditutup dengan Pelayanan Purna Jual. Kegiatan tersebut antara lain  :"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 199,
+   "teks": "    • Sidewalk Cafes menyediakan masakan dari Indonesia dan international untuk makan pagi dan makan malam.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.51
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Japanese Sushi Bar menyediakan masakan Jepang untuk makan siang dan makan malam",
+     "    • Wendy’s American fast food restaurant yang menyediakan makan siang dan makan malam.",
+     ""
+    ],
+    "sesudah": [
+     "    3. Sarana Olahraga",
+     "    • Fitness Center yang dilengkapi dengan fitness equipment, squash court, sauna, kamar ganti dan pelatih yang berpengalaman.",
+     "    • Kolam renang dengan area seluas 1.295 m2. Terdapat juga kolam renang untuk anak-anak "
+    ],
+    "judul_bab_terdekat": "BAB III GAMBARAN UMUM OBYEK PENELITIAN"
+   }
+  },
+  {
+   "idx": 205,
+   "teks": "Aston Hotel Sudirman tidak memiliki laundry sendiri namun memiliki laundry service yang setiap harinya dilakukan pagi hari lalu dikirim ke laundrette. Untuk valet dilakukan sore hari dan hari itu pula diantarkan ke tiap kamar.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.69
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Kolam renang dengan area seluas 1.295 m2. Terdapat juga kolam renang untuk anak-anak ",
+     "    • Lapangan tenis",
+     "    4. Laundry Service"
+    ],
+    "sesudah": [
+     "    5. The Business Center",
+     "    • Private office, meeting facilities, clerical administrative dan bantuan sekretaris",
+     "    • Tempat kerja pribadi yang dilengkapi dengan personal computer, internet access, e-mail capability, fax, IDD telephone service dan modem hook up."
+    ],
+    "judul_bab_terdekat": "BAB III GAMBARAN UMUM OBYEK PENELITIAN"
+   }
+  },
+  {
+   "idx": 326,
+   "teks": "    • Mengetahui keadaan dan perkembangan yang terjadi saat ini, baik di dalam negeri maupun di luar negeri.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.51
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Membuat projection, budget dan forecast mengenai occupancy dan revenue hotel.",
+     "    • Membuat sales & marketing plan untuk tahun yang akan datang.",
+     "    • Membuat market share, segmentasi pasar dan comparison sebagai dasar pembuatan corporate rate."
+    ],
+    "sesudah": [
+     "    5. Marketing Communication Manager.",
+     "    • Membina dan memelihara hubungan baik dengan publik internal, yaitu dengan para karyawan maupun tamu hotel, dan publik eksternal yang meliputi hubungan dengan masyarakat sekitar, pemerintah dan pers.",
+     "    • Mengembangkan program pemasaran untuk mendukung kegiatan penjualan kamar dan restoran."
+    ],
+    "judul_bab_terdekat": "BAB III GAMBARAN UMUM OBYEK PENELITIAN"
+   }
+  },
+  {
+   "idx": 327,
+   "teks": "    5. Marketing Communication Manager.",
+   "suara": [
+    "biasa",
+    "subbab"
+   ],
+   "conf": [
+    0.2,
+    0.43
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Membuat sales & marketing plan untuk tahun yang akan datang.",
+     "    • Membuat market share, segmentasi pasar dan comparison sebagai dasar pembuatan corporate rate.",
+     "    • Mengetahui keadaan dan perkembangan yang terjadi saat ini, baik di dalam negeri maupun di luar negeri."
+    ],
+    "sesudah": [
+     "    • Membina dan memelihara hubungan baik dengan publik internal, yaitu dengan para karyawan maupun tamu hotel, dan publik eksternal yang meliputi hubungan dengan masyarakat sekitar, pemerintah dan pers.",
+     "    • Mengembangkan program pemasaran untuk mendukung kegiatan penjualan kamar dan restoran.",
+     "    • Bertanggung jawab atas penyelenggaraan publikasi dalam rangka pemasaran perusahaan."
+    ],
+    "judul_bab_terdekat": "BAB III GAMBARAN UMUM OBYEK PENELITIAN"
+   }
+  },
+  {
+   "idx": 397,
+   "teks": "    • Memusatkan perhatian pada masalah yang menjadi penyebab konflik serta mampu mengenal dan mendeskripsikan masalah tersebut.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.53
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Menyatakan posisi, perasaan dan pikiran secara terbuka, jujur dan langsung tanpa berusaha menyembunyikan obyek yang riil dari hal yang tidak disetujui.",
+     "    • Merespon atau bereaksi secara terbuka untuk setiap pesan yang diterima.",
+     "    • Mengaku sepenuhnya dan bertanggung jawab atas pikiran dan perasaan sendiri."
+    ],
+    "sesudah": [
+     "    2. Empati.",
+     "    • Menampilkan sikap empati kepada pihak lain.",
+     "    • Mensahkan atau membenarkan perasaan atau perilaku pihak lain tanpa harus disertai persetujuan terhadap konflik yang terjadi."
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   }
+  },
+  {
+   "idx": 458,
+   "teks": "    4. Site Inspection.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.68
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Apabila pembicaraan belum selesai, tanyakan kepada klien untuk datang ke hotel atau kita yang akan mengunjungi kantornya.",
+     "    • Mengumpulkan banyak informasi yang bisa di dapat dari klien kita, seperti apakah pernah menggunakan hotel sebelumnya, perusahaannya bergerak dalam bidang apa, tamunya berasal darimana dan sebagainya.",
+     "\t"
+    ],
+    "sesudah": [
+     "Apabila tamu berkeinginan untuk melihat lokasi dan bentuk kamar di Aston Hotel, sales dapat menunjukkan dan mendampingi tamu tersebut. Biasanya sales akan mengajak tamu berkeliling lingkungan hotel untuk menunjukkan kepada tamu seluruh fasilitas dan semua tipe kamar yang terdapat di Aston Hotel.",
+     "",
+     "Standard Operating Procedures (S.O.P) – Client Visit To The Hotel."
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   }
+  },
+  {
+   "idx": 461,
+   "teks": "Standard Operating Procedures (S.O.P) – Client Visit To The Hotel.",
+   "suara": [
+    "paragraf",
+    "subbab"
+   ],
+   "conf": [
+    0.47,
+    0.55
+   ],
+   "konteks": {
+    "sebelum": [
+     "    4. Site Inspection.",
+     "Apabila tamu berkeinginan untuk melihat lokasi dan bentuk kamar di Aston Hotel, sales dapat menunjukkan dan mendampingi tamu tersebut. Biasanya sales akan mengajak tamu berkeliling lingkungan hotel untuk menunjukkan kepada tamu seluruh fasilitas dan semua tipe kamar yang terdapat di Aston Hotel.",
+     ""
+    ],
+    "sesudah": [
+     "    • Undang klien untuk datang ke hotel dan melihat fasilitas yang ada. Fleksible dengan lokasi yang diinginkan klien untuk bertemu.",
+     "    • Persiapkan daftar menu, harga kamar, banquet, dan kunci sebelumnya.",
+     "    • Menugaskan salah seorang staf F&B untuk bertemu dengan tamu, sehingga apabila ada pertanyaan mengenai F&B dapat segera terjawab dan terselesaikan."
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   }
+  },
+  {
+   "idx": 485,
+   "teks": "Standard Operating Procedures (S.O.P)  - Closing The Deal.",
+   "suara": [
+    "subbab",
+    "subbab"
+   ],
+   "conf": [
+    0.21,
+    0.76
+   ],
+   "konteks": {
+    "sebelum": [
+     "",
+     "\tSetelah pertemuan tersebut selesai dan dicapai kesepakatan mengenai harga dan kontrak yang diinginkan maka sales akan membuat laporan kepada Director Of  Sales.  Hasil dari pertemuan tersebut akan dituangkan dalam corporate rate, yaitu harga yang telah disepakati dan akan berlaku untuk seluruh tamu dari suatu perusahaan yang menginap di Aston Hotel. Harga setiap corporate rate antara satu perusahaan dengan perusahaan lainnya tidaklah sama. Selain itu, perjanjian tersebut juga dibuatkan dalam suatu contract apabila tamu tersebut menginap lebih dari 1 bulan.",
+     ""
+    ],
+    "sesudah": [
+     "    • Profesional",
+     "    • Pergunakan teknik bertelepon yang baik.",
+     "    • Mempersiapkan diri untuk negosiasi."
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   }
+  },
+  {
+   "idx": 498,
+   "teks": "    • Satu minggu sebelum tamu menginap, seluruh detail sudah harus dikonfirmasi meliputi : jumlah tamu dalam kamar, tipe kamar, permintaan khusus, waktu kedatangan, transportasi, pengantaran barang, gift, help desk set-up, billing instructions.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.55
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Membuat perubahan yang menyangkut perjanjian kontrak.",
+     "    • Mengirimkan konfirmasi kontrak.",
+     "    • Menindaklanjuti untuk mengcek kontrak yang sudah dikirim."
+    ],
+    "sesudah": [
+     "",
+     "    C.   Hambatan-Hambatan Dalam Pelaksanaan",
+     ""
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   }
+  }
+ ],
+ "pendapat_kedua_jml": 14,
+ "pendapat_kedua_antrean": [
+  34,
+  39,
+  82,
+  89,
+  105,
+  199,
+  205,
+  326,
+  327,
+  397,
+  458,
+  461,
+  485,
+  498
+ ],
+ "goyang_jml": 63,
+ "goyang": [
+  [
+   8,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   15,
+   [
+    "biasa",
+    "paragraf",
+    "biasa"
+   ]
+  ],
+  [
+   46,
+   [
+    "paragraf",
+    "bab"
+   ]
+  ],
+  [
+   50,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   67,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   69,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   72,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   77,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   82,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   83,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   84,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   86,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   87,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   89,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   95,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   102,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   104,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   105,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   106,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   117,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   144,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   146,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   148,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   149,
+   [
+    "paragraf",
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   150,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   154,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   155,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   157,
+   [
+    "paragraf",
+    "biasa",
+    "paragraf"
+   ]
+  ],
+  [
+   170,
+   [
+    "paragraf",
+    "biasa",
+    "paragraf"
+   ]
+  ],
+  [
+   171,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   172,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   173,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   204,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   209,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   295,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   296,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   315,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   316,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   321,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   327,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   332,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   333,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   340,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   348,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   353,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   366,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   381,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   382,
+   [
+    "biasa",
+    "paragraf",
+    "biasa"
+   ]
+  ],
+  [
+   388,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   392,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   400,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   411,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   421,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   422,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   423,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   424,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   426,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   441,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   459,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   461,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   506,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   507,
+   [
+    "paragraf",
+    "biasa",
+    "paragraf"
+   ]
+  ],
+  [
+   519,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ]
+ ],
+ "label": {
+  "3": "subbab",
+  "5": "paragraf",
+  "6": "biasa",
+  "7": "biasa",
+  "8": "biasa",
+  "9": "biasa",
+  "11": "subbab",
+  "13": "subbab",
+  "14": "paragraf",
+  "15": "paragraf",
+  "17": "paragraf",
+  "18": "paragraf",
+  "19": "paragraf",
+  "20": "biasa",
+  "21": "biasa",
+  "22": "biasa",
+  "23": "biasa",
+  "24": "paragraf",
+  "25": "paragraf",
+  "27": "subbab",
+  "29": "paragraf",
+  "31": "paragraf",
+  "32": "paragraf",
+  "34": "subbab",
+  "35": "paragraf",
+  "37": "paragraf",
+  "38": "paragraf",
+  "39": "subbab",
+  "40": "paragraf",
+  "41": "paragraf",
+  "43": "bab",
+  "44": "paragraf",
+  "46": "bab",
+  "47": "paragraf",
+  "49": "bab",
+  "50": "paragraf",
+  "51": "biasa",
+  "53": "bab",
+  "54": "paragraf",
+  "56": "bab",
+  "57": "paragraf",
+  "64": "subbab",
+  "66": "paragraf",
+  "67": "paragraf",
+  "68": "biasa",
+  "69": "biasa",
+  "70": "paragraf",
+  "72": "subbab",
+  "74": "paragraf",
+  "77": "subbab",
+  "78": "biasa",
+  "79": "biasa",
+  "80": "biasa",
+  "81": "paragraf",
+  "82": "subbab",
+  "83": "paragraf",
+  "84": "biasa",
+  "85": "paragraf",
+  "86": "paragraf",
+  "87": "biasa",
+  "88": "paragraf",
+  "89": "paragraf",
+  "90": "paragraf",
+  "91": "biasa",
+  "92": "biasa",
+  "93": "biasa",
+  "94": "biasa",
+  "95": "biasa",
+  "96": "paragraf",
+  "97": "biasa",
+  "98": "biasa",
+  "99": "biasa",
+  "100": "biasa",
+  "101": "paragraf",
+  "102": "paragraf",
+  "103": "paragraf",
+  "104": "paragraf",
+  "105": "subbab",
+  "106": "paragraf",
+  "107": "paragraf",
+  "108": "paragraf",
+  "109": "biasa",
+  "110": "biasa",
+  "111": "biasa",
+  "112": "biasa",
+  "114": "subbab",
+  "116": "paragraf",
+  "117": "biasa",
+  "118": "biasa",
+  "119": "biasa",
+  "120": "biasa",
+  "121": "biasa",
+  "122": "biasa",
+  "123": "biasa",
+  "125": "subbab",
+  "127": "paragraf",
+  "128": "biasa",
+  "129": "biasa",
+  "130": "biasa",
+  "131": "biasa",
+  "132": "biasa",
+  "133": "biasa",
+  "134": "biasa",
+  "135": "biasa",
+  "136": "biasa",
+  "137": "biasa",
+  "138": "biasa",
+  "139": "biasa",
+  "140": "biasa",
+  "142": "biasa",
+  "143": "paragraf",
+  "144": "paragraf",
+  "145": "paragraf",
+  "146": "biasa",
+  "147": "biasa",
+  "148": "biasa",
+  "149": "paragraf",
+  "150": "paragraf",
+  "153": "subbab",
+  "154": "biasa",
+  "155": "biasa",
+  "156": "biasa",
+  "157": "paragraf",
+  "163": "subbab",
+  "165": "paragraf",
+  "166": "paragraf",
+  "167": "biasa",
+  "168": "biasa",
+  "169": "biasa",
+  "170": "biasa",
+  "171": "paragraf",
+  "172": "biasa",
+  "173": "biasa",
+  "175": "subbab",
+  "177": "paragraf",
+  "178": "paragraf",
+  "179": "paragraf",
+  "180": "biasa",
+  "181": "biasa",
+  "182": "biasa",
+  "183": "biasa",
+  "184": "biasa",
+  "185": "biasa",
+  "186": "biasa",
+  "187": "biasa",
+  "188": "biasa",
+  "189": "biasa",
+  "190": "biasa",
+  "191": "biasa",
+  "192": "subbab",
+  "193": "biasa",
+  "194": "biasa",
+  "195": "biasa",
+  "196": "biasa",
+  "197": "biasa",
+  "199": "subbab",
+  "200": "biasa",
+  "201": "biasa",
+  "202": "biasa",
+  "203": "subbab",
+  "204": "biasa",
+  "205": "subbab",
+  "206": "biasa",
+  "207": "biasa",
+  "208": "biasa",
+  "209": "biasa",
+  "210": "biasa",
+  "211": "biasa",
+  "212": "biasa",
+  "213": "biasa",
+  "214": "biasa",
+  "215": "biasa",
+  "216": "biasa",
+  "217": "biasa",
+  "218": "biasa",
+  "219": "biasa",
+  "220": "biasa",
+  "221": "biasa",
+  "222": "biasa",
+  "223": "biasa",
+  "224": "biasa",
+  "225": "biasa",
+  "226": "biasa",
+  "227": "biasa",
+  "228": "biasa",
+  "229": "biasa",
+  "231": "subbab",
+  "233": "paragraf",
+  "234": "biasa",
+  "235": "biasa",
+  "236": "biasa",
+  "237": "biasa",
+  "238": "biasa",
+  "252": "subbab",
+  "295": "subbab",
+  "296": "subbab",
+  "297": "biasa",
+  "298": "biasa",
+  "299": "biasa",
+  "300": "biasa",
+  "301": "biasa",
+  "302": "biasa",
+  "303": "biasa",
+  "304": "biasa",
+  "307": "subbab",
+  "308": "biasa",
+  "309": "biasa",
+  "310": "biasa",
+  "311": "biasa",
+  "312": "biasa",
+  "313": "biasa",
+  "314": "biasa",
+  "315": "biasa",
+  "316": "subbab",
+  "317": "biasa",
+  "318": "biasa",
+  "319": "biasa",
+  "320": "biasa",
+  "321": "biasa",
+  "322": "biasa",
+  "323": "biasa",
+  "324": "biasa",
+  "325": "biasa",
+  "326": "subbab",
+  "327": "subbab",
+  "328": "biasa",
+  "329": "biasa",
+  "330": "biasa",
+  "331": "biasa",
+  "332": "biasa",
+  "333": "paragraf",
+  "334": "biasa",
+  "335": "biasa",
+  "336": "biasa",
+  "337": "biasa",
+  "338": "biasa",
+  "339": "biasa",
+  "340": "biasa",
+  "341": "biasa",
+  "342": "biasa",
+  "343": "biasa",
+  "344": "biasa",
+  "345": "biasa",
+  "346": "biasa",
+  "347": "biasa",
+  "348": "biasa",
+  "349": "biasa",
+  "350": "biasa",
+  "351": "biasa",
+  "352": "biasa",
+  "353": "biasa",
+  "361": "subbab",
+  "363": "paragraf",
+  "364": "paragraf",
+  "365": "paragraf",
+  "366": "paragraf",
+  "367": "biasa",
+  "368": "biasa",
+  "369": "biasa",
+  "370": "paragraf",
+  "371": "paragraf",
+  "372": "biasa",
+  "373": "biasa",
+  "374": "biasa",
+  "375": "paragraf",
+  "376": "paragraf",
+  "377": "biasa",
+  "378": "biasa",
+  "379": "paragraf",
+  "381": "subbab",
+  "382": "biasa",
+  "383": "biasa",
+  "384": "biasa",
+  "385": "biasa",
+  "386": "biasa",
+  "387": "paragraf",
+  "388": "paragraf",
+  "389": "biasa",
+  "390": "biasa",
+  "391": "paragraf",
+  "392": "paragraf",
+  "393": "biasa",
+  "394": "biasa",
+  "395": "biasa",
+  "396": "biasa",
+  "397": "subbab",
+  "398": "biasa",
+  "399": "biasa",
+  "400": "biasa",
+  "401": "biasa",
+  "402": "biasa",
+  "404": "biasa",
+  "405": "biasa",
+  "406": "biasa",
+  "407": "biasa",
+  "408": "biasa",
+  "409": "biasa",
+  "410": "biasa",
+  "411": "biasa",
+  "412": "paragraf",
+  "417": "subbab",
+  "419": "paragraf",
+  "420": "paragraf",
+  "421": "subbab",
+  "422": "biasa",
+  "423": "biasa",
+  "424": "paragraf",
+  "426": "subbab",
+  "427": "biasa",
+  "428": "biasa",
+  "429": "biasa",
+  "430": "biasa",
+  "431": "biasa",
+  "432": "biasa",
+  "433": "biasa",
+  "434": "biasa",
+  "435": "biasa",
+  "436": "biasa",
+  "437": "biasa",
+  "438": "biasa",
+  "439": "biasa",
+  "440": "biasa",
+  "441": "biasa",
+  "443": "subbab",
+  "444": "paragraf",
+  "446": "biasa",
+  "447": "biasa",
+  "448": "biasa",
+  "449": "biasa",
+  "450": "biasa",
+  "451": "biasa",
+  "452": "biasa",
+  "453": "biasa",
+  "454": "biasa",
+  "455": "biasa",
+  "456": "biasa",
+  "458": "subbab",
+  "459": "paragraf",
+  "461": "subbab",
+  "462": "biasa",
+  "463": "biasa",
+  "464": "biasa",
+  "465": "biasa",
+  "466": "biasa",
+  "467": "biasa",
+  "468": "biasa",
+  "469": "biasa",
+  "470": "biasa",
+  "471": "biasa",
+  "472": "biasa",
+  "473": "biasa",
+  "474": "biasa",
+  "475": "biasa",
+  "476": "biasa",
+  "477": "biasa",
+  "478": "biasa",
+  "479": "biasa",
+  "480": "biasa",
+  "481": "biasa",
+  "483": "paragraf",
+  "485": "subbab",
+  "486": "biasa",
+  "487": "biasa",
+  "488": "biasa",
+  "489": "biasa",
+  "490": "biasa",
+  "491": "biasa",
+  "492": "biasa",
+  "493": "biasa",
+  "494": "biasa",
+  "495": "biasa",
+  "496": "biasa",
+  "497": "biasa",
+  "498": "subbab",
+  "500": "subbab",
+  "502": "paragraf",
+  "503": "biasa",
+  "504": "biasa",
+  "505": "biasa",
+  "506": "biasa",
+  "507": "paragraf",
+  "516": "subbab",
+  "518": "paragraf",
+  "519": "paragraf",
+  "520": "biasa",
+  "522": "subbab",
+  "524": "paragraf",
+  "525": "paragraf",
+  "526": "biasa",
+  "527": "biasa",
+  "528": "biasa"
+ },
+ "bab_label": []
+}
