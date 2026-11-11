@@ -1,0 +1,3383 @@
+[
+ {
+  "naskah": "R3",
+  "no": "1",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "label-live-v15",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "R3",
+  "no": "2",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "label-live-v15",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "R3",
+  "no": "3",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "label-live-v15",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "R3",
+  "no": "4",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "demosi-hilang-perlindungan-a",
+  "cara_v15": "label-live-v15",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "R3",
+  "no": "5",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "label-live-v15",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "R3",
+  "no": "6",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "label-live-v15",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "R3",
+  "no": "7",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "label-live-v15",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "R3",
+  "no": "8",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "adjudikasi-agen-kedua",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AM-2",
+  "no": "9",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AM-2",
+  "no": "10",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AM-2",
+  "no": "11",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AM-2",
+  "no": "12",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AM-2",
+  "no": "13",
+  "label_benar": "subbab",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AM-2",
+  "no": "14",
+  "label_benar": "bab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AM-2",
+  "no": "15",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AM-2",
+  "no": "16",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AI-2",
+  "no": "17",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AI-2",
+  "no": "18",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AI-2",
+  "no": "19",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AI-2",
+  "no": "20",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AI-2",
+  "no": "21",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AI-2",
+  "no": "22",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AI-2",
+  "no": "23",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AI-2",
+  "no": "24",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Q3",
+  "no": "25",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Q3",
+  "no": "26",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Q3",
+  "no": "27",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Q3",
+  "no": "28",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Q3",
+  "no": "29",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Q3",
+  "no": "30",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Q3",
+  "no": "31",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Q3",
+  "no": "32",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "X3",
+  "no": "33",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "X3",
+  "no": "34",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "X3",
+  "no": "35",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "X3",
+  "no": "36",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "X3",
+  "no": "37",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "X3",
+  "no": "38",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "X3",
+  "no": "39",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "X3",
+  "no": "40",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Z3",
+  "no": "41",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Z3",
+  "no": "42",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Z3",
+  "no": "43",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Z3",
+  "no": "44",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Z3",
+  "no": "45",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Z3",
+  "no": "46",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Z3",
+  "no": "47",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Z3",
+  "no": "48",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "I4",
+  "no": "49",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "I4",
+  "no": "50",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "I4",
+  "no": "51",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "I4",
+  "no": "52",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "I4",
+  "no": "53",
+  "label_benar": "subbab",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "I4",
+  "no": "54",
+  "label_benar": "subbab",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "I4",
+  "no": "55",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "I4",
+  "no": "56",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Y2",
+  "no": "57",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Y2",
+  "no": "58",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Y2",
+  "no": "59",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Y2",
+  "no": "60",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Y2",
+  "no": "61",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Y2",
+  "no": "62",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Y2",
+  "no": "63",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "Y2",
+  "no": "64",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "H1",
+  "no": "65",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "H1",
+  "no": "66",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "H1",
+  "no": "67",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "H1",
+  "no": "68",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "H1",
+  "no": "69",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "H1",
+  "no": "70",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "H1",
+  "no": "71",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "H1",
+  "no": "72",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "fragmen-gambar",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "T3",
+  "no": "73",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "T3",
+  "no": "74",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "T3",
+  "no": "75",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "T3",
+  "no": "76",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "T3",
+  "no": "77",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "T3",
+  "no": "78",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "T3",
+  "no": "79",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "T3",
+  "no": "80",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "U3",
+  "no": "81",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "U3",
+  "no": "82",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "U3",
+  "no": "83",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "U3",
+  "no": "84",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "U3",
+  "no": "85",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "U3",
+  "no": "86",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "U3",
+  "no": "87",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "U3",
+  "no": "88",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AL-2",
+  "no": "89",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AL-2",
+  "no": "90",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AL-2",
+  "no": "91",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AL-2",
+  "no": "92",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AL-2",
+  "no": "93",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AL-2",
+  "no": "94",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AL-2",
+  "no": "95",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AL-2",
+  "no": "96",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "O3",
+  "no": "97",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    3,
+    3
+   ],
+   "idx_baru": 29240,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "O3",
+  "no": "98",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    5,
+    5
+   ],
+   "idx_baru": 29549,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "O3",
+  "no": "99",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 29556,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "O3",
+  "no": "100",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 29859,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "O3",
+  "no": "101",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 29867,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "O3",
+  "no": "102",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    4,
+    4
+   ],
+   "idx_baru": 30117,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "O3",
+  "no": "103",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    3,
+    3
+   ],
+   "idx_baru": 31867,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "O3",
+  "no": "104",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 81075,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "P2",
+  "no": "105",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "P2",
+  "no": "106",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "P2",
+  "no": "107",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "P2",
+  "no": "108",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "gabung-bersih",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "P2",
+  "no": "109",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "demosi-hilang-perlindungan-a",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "P2",
+  "no": "110",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "P2",
+  "no": "111",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "P2",
+  "no": "112",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "L3",
+  "no": "113",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    5,
+    5
+   ],
+   "idx_baru": 1695,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "L3",
+  "no": "114",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 3233,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "L3",
+  "no": "115",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 27390,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "L3",
+  "no": "116",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 29892,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "L3",
+  "no": "117",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 30201,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "L3",
+  "no": "118",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 30441,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "L3",
+  "no": "119",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    5,
+    5
+   ],
+   "idx_baru": 51082,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "L3",
+  "no": "120",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    5,
+    5
+   ],
+   "idx_baru": 69754,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "B4",
+  "no": "121",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "B4",
+  "no": "122",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "B4",
+  "no": "123",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "B4",
+  "no": "124",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "B4",
+  "no": "125",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "B4",
+  "no": "126",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "B4",
+  "no": "127",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "B4",
+  "no": "128",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "F4",
+  "no": "129",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "F4",
+  "no": "130",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "F4",
+  "no": "131",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "F4",
+  "no": "132",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "F4",
+  "no": "133",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "F4",
+  "no": "134",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": null,
+  "label_v15": null,
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "F4",
+  "no": "135",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "F4",
+  "no": "136",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "J3",
+  "no": "137",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "J3",
+  "no": "138",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "J3",
+  "no": "139",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "J3",
+  "no": "140",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "J3",
+  "no": "141",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "J3",
+  "no": "142",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "J3",
+  "no": "143",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "J3",
+  "no": "144",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "W3",
+  "no": "145",
+  "label_benar": "bab",
+  "label_v11": null,
+  "label_v14": null,
+  "label_v15": null,
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "W3",
+  "no": "146",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "W3",
+  "no": "147",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "W3",
+  "no": "148",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "W3",
+  "no": "149",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "W3",
+  "no": "150",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "W3",
+  "no": "151",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "W3",
+  "no": "152",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AA3",
+  "no": "153",
+  "label_benar": "bab",
+  "label_v11": null,
+  "label_v14": null,
+  "label_v15": null,
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AA3",
+  "no": "154",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AA3",
+  "no": "155",
+  "label_benar": "bab",
+  "label_v11": null,
+  "label_v14": null,
+  "label_v15": null,
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AA3",
+  "no": "156",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AA3",
+  "no": "157",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AA3",
+  "no": "158",
+  "label_benar": "subbab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AA3",
+  "no": "159",
+  "label_benar": "subbab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AA3",
+  "no": "160",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AE2",
+  "no": "161",
+  "label_benar": "bab",
+  "label_v11": null,
+  "label_v14": null,
+  "label_v15": null,
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AE2",
+  "no": "162",
+  "label_benar": "bab",
+  "label_v11": null,
+  "label_v14": null,
+  "label_v15": null,
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AE2",
+  "no": "163",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AE2",
+  "no": "164",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AE2",
+  "no": "165",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AE2",
+  "no": "166",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AE2",
+  "no": "167",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AE2",
+  "no": "168",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AC2",
+  "no": "169",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AC2",
+  "no": "170",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AC2",
+  "no": "171",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AC2",
+  "no": "172",
+  "label_benar": "bab",
+  "label_v11": null,
+  "label_v14": null,
+  "label_v15": null,
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AC2",
+  "no": "173",
+  "label_benar": "bab",
+  "label_v11": null,
+  "label_v14": null,
+  "label_v15": null,
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AC2",
+  "no": "174",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AC2",
+  "no": "175",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AC2",
+  "no": "176",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AK-3",
+  "no": "177",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AK-3",
+  "no": "178",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AK-3",
+  "no": "179",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AK-3",
+  "no": "180",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AK-3",
+  "no": "181",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AK-3",
+  "no": "182",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AK-3",
+  "no": "183",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AK-3",
+  "no": "184",
+  "label_benar": "subbab",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AO-2",
+  "no": "185",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AO-2",
+  "no": "186",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AO-2",
+  "no": "187",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AO-2",
+  "no": "188",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AO-2",
+  "no": "189",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AO-2",
+  "no": "190",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AO-2",
+  "no": "191",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AO-2",
+  "no": "192",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AN-1",
+  "no": "193",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AN-1",
+  "no": "194",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AN-1",
+  "no": "195",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AN-1",
+  "no": "196",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AN-1",
+  "no": "197",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AN-1",
+  "no": "198",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AN-1",
+  "no": "199",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "bab",
+  "label_v15": "bab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AN-1",
+  "no": "200",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "D3",
+  "no": "201",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "D3",
+  "no": "202",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "D3",
+  "no": "203",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "D3",
+  "no": "204",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "D3",
+  "no": "205",
+  "label_benar": "subbab",
+  "label_v11": "biasa",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "aturan5-pengecualian",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "D3",
+  "no": "206",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "D3",
+  "no": "207",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "D3",
+  "no": "208",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "E3",
+  "no": "209",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "E3",
+  "no": "210",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "E3",
+  "no": "211",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "E3",
+  "no": "212",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "E3",
+  "no": "213",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "E3",
+  "no": "214",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "E3",
+  "no": "215",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "E3",
+  "no": "216",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "S2",
+  "no": "217",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (KONTEKS TIDAK UTUH!)",
+  "konteks_cek": {
+   "utuh": false,
+   "konteks_skor": [
+    5,
+    6
+   ],
+   "idx_baru": 25589,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "S2",
+  "no": "218",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 39261,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "S2",
+  "no": "219",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 45096,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "S2",
+  "no": "220",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 89737,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "S2",
+  "no": "221",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 93628,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "S2",
+  "no": "222",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 101189,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "S2",
+  "no": "223",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 111631,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "C4",
+  "no": "224",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "C4",
+  "no": "225",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "C4",
+  "no": "226",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "C4",
+  "no": "227",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "C4",
+  "no": "228",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "C4",
+  "no": "229",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "C4",
+  "no": "230",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "C4",
+  "no": "231",
+  "label_benar": "subbab",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "M3",
+  "no": "232",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 28338,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "M3",
+  "no": "233",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 36740,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "M3",
+  "no": "234",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 41195,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "M3",
+  "no": "235",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 45037,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "M3",
+  "no": "236",
+  "label_benar": "subbab",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 52122,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "M3",
+  "no": "237",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 58240,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "M3",
+  "no": "238",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 83648,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "M3",
+  "no": "239",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 83922,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "A4",
+  "no": "240",
+  "label_benar": "subbab",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 11372,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "A4",
+  "no": "241",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 14159,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "A4",
+  "no": "242",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 14647,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "A4",
+  "no": "243",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 17501,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "A4",
+  "no": "244",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 20012,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "A4",
+  "no": "245",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (KONTEKS TIDAK UTUH!)",
+  "konteks_cek": {
+   "utuh": false,
+   "konteks_skor": [
+    4,
+    6
+   ],
+   "idx_baru": 21880,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "A4",
+  "no": "246",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 23044,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "A4",
+  "no": "247",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (konteks lokal utuh di teks bersih baru)",
+  "konteks_cek": {
+   "utuh": true,
+   "konteks_skor": [
+    6,
+    6
+   ],
+   "idx_baru": 24384,
+   "ditemukan": true
+  }
+ },
+ {
+  "naskah": "G3",
+  "no": "248",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "G3",
+  "no": "249",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "paragraf-di-blok-suara-bab",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "G3",
+  "no": "250",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "G3",
+  "no": "251",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "G3",
+  "no": "252",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "G3",
+  "no": "253",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "paragraf-di-blok-suara-bab",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "G3",
+  "no": "254",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "G3",
+  "no": "255",
+  "label_benar": "subbab",
+  "label_v11": "biasa",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "aturan5-pengecualian",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "N3",
+  "no": "256",
+  "label_benar": "bab",
+  "label_v11": null,
+  "label_v14": null,
+  "label_v15": null,
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "N3",
+  "no": "257",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "N3",
+  "no": "258",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "N3",
+  "no": "259",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "N3",
+  "no": "260",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "N3",
+  "no": "261",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "N3",
+  "no": "262",
+  "label_benar": "subbab",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "N3",
+  "no": "263",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AP-3",
+  "no": "264",
+  "label_benar": "paragraf",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AP-3",
+  "no": "265",
+  "label_benar": "subbab",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AP-3",
+  "no": "266",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AP-3",
+  "no": "267",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AP-3",
+  "no": "268",
+  "label_benar": "paragraf",
+  "label_v11": "subbab",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AP-3",
+  "no": "269",
+  "label_benar": "subbab",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AP-3",
+  "no": "270",
+  "label_benar": "biasa",
+  "label_v11": "subbab",
+  "label_v14": "subbab",
+  "label_v15": "subbab",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AP-3",
+  "no": "271",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AJ-1",
+  "no": "272",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AJ-1",
+  "no": "273",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "paragraf-di-blok-suara-bab",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AJ-1",
+  "no": "274",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "paragraf-di-blok-suara-bab",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AJ-1",
+  "no": "275",
+  "label_benar": "biasa",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "blok",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AJ-1",
+  "no": "276",
+  "label_benar": "biasa",
+  "label_v11": "paragraf",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "paragraf-di-blok-suara-bab",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AJ-1",
+  "no": "277",
+  "label_benar": "bab",
+  "label_v11": "bab",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "demosi-hilang-perlindungan-a",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AJ-1",
+  "no": "278",
+  "label_benar": "paragraf",
+  "label_v11": "paragraf",
+  "label_v14": "paragraf",
+  "label_v15": "paragraf",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ },
+ {
+  "naskah": "AJ-1",
+  "no": "279",
+  "label_benar": "biasa",
+  "label_v11": "biasa",
+  "label_v14": "biasa",
+  "label_v15": "biasa",
+  "cara_v14": "rantai-v13",
+  "cara_v15": "dibawa-v14 (teks bersih tak berubah)",
+  "konteks_cek": null
+ }
+]

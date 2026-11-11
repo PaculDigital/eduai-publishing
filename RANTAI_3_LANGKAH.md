@@ -262,8 +262,58 @@ adalah `bab`; bila tanya-ulang sudah membaliknya ke `paragraf`,
 produksi tidak mendemosinya. Bahkan bila ke-5 baris (d) gugur, skor
 jadi 193/279 (69,2%) — kenaikan dari v13 tetap besar. Temuan lanjutan
 (diluar v14): `buang_daftar_isi` memotong teks di salinan sistematika
-bukan BAB I asli karena BOM (R3) — jangan diubah tanpa Gas (menggeser
-semua indeks).
+bukan BAB I asli karena BOM (R3) — diperbaiki di v15 (lihat 3e).
+
+## 3e. v15 — Perbaikan BOM di `buang_daftar_isi` (Gas Bos 11 Nov 2026 13:51 WIB)
+
+**Akar masalah (terbukti reproduksi di teks R3):** teks R3 punya 1 BOM
+(`\ufeff`) di offset 39, tepat sebelum "BAB I" asli. Pola
+`^[ \t]*(?i:BAB)[ \t]+I\b` di `awal_isi_naskah()` (`app/state.py:443`)
+tidak cocok — BOM bukan spasi/tab dan `\s` Python tidak menangkapnya
+(kategori Cf, bukan whitespace). Akibatnya BAB I asli terlewat dan
+salinan SISTEMATIKA di offset 13203 ("BAB I \tPendahuluan, terdiri
+dari: ...") yang bersih jadi patokan potong; `buang_daftar_isi()`
+memotong teks[13203:], membuang ~13.164 karakter isi BAB I asli
+(Latar Belakang s.d. bagian F).
+
+**Perbaikan (`app/state.py`, RULE_VERSION v14 → `jev-peta-v15`):**
+kupas BOM dan karakter tak terlihat sejenis (`\ufeff\u200b\u200c\u200d
+\u2060`) SEBELUM memutuskan batas daftar isi/BAB I — helper `_rapi()`,
+pola baru `_POLA_AWAL_ISI`, `_POLA_JUDUL_BAB`, plus guard sistematika
+di `awal_isi_naskah()`: lewati kandidat bila `terdiri dari` ada di
+sisa/baris berikutnya, atau bila 2 baris bukan-kosong sebelumnya cocok
+kepala blok SISTEMATIKA. Gating Hakim v13, saklar agen kedua, dan
+aturan v14 TIDAK berubah perilakunya. Uji offline 321 lulus (313 lama
++ 8 baru v15).
+
+**Banding lama vs baru di 35 naskah uji (0 panggilan Jev):** 29 tidak
+berubah (teks bersih byte-identik), 6 berubah — semuanya teks
+BERTAMBAH (isi asli kembali): R3 +13.164 kar, O3 +30.118 kar, A4
++3.188 kar, S2 +2.736 kar, L3 +1.191 kar, M3 +610 kar.
+
+**Run live R3 v15 (container, 22 panggilan: 21 Jev + 1 probe, model
+`typesafe/jev-1.14-20261014` via OpenRouter, TypeSafe resmi 402):**
+teks bersih 21.238 kata / 1.244 baris, diawali
+`'\ufeffBAB I\nPENDAHULUAN\n\n A. LATAR BELAKANG...'` — LATAR
+BELAKANG ada, potongan di BAB I asli terbukti live. Gabung tepat 6 bab
+asli berjudul (v11: 11 entri termasuk 6 salinan telanjang); goyang 138
+(v11: 140). DB tidak berubah (28/108/235).
+
+**Skor 279 baris (`_sketsa/ukur_v15.py`, kunci `perbaikan_bom_v15` di
+`hasil_verifikasi_v11.json`): v15 199/279 (71,3%) vs v14 198/279
+(71,0%)** — +1 net (R3 no 7 'Penutup': subbab → biasa, benar),
+McNemar p=1,0 (tidak signifikan, hanya 1 baris berbalik); salah-bab
+tetap 0; antrean tetap 1. R3 live: 8/8 baris benar (v14: 7/8).
+**Batasan jujur:** hanya R3 yang dipetakan ulang live; 232 baris dari
+29 naskah tak berubah dibawa dari v14 (teks bersih identik); 39 baris
+dari 5 naskah berubah lain dibawa dari v14 dengan syarat konteks lokal
+utuh di teks bersih baru — 37/39 utuh, 2 tidak utuh (A4 no 245, 4/6;
+S2 no 217, 5/6) karena jalur lama membuang caption/butir yang kini
+dipertahankan. Keduanya SUDAH salah di v14, jadi bila run segar
+membaliknya skor jadi 201/279, bila tidak tetap 199/279; tidak ada
+skenario keduanya yang membuat v15 di bawah v14. Pemetaan ulang ke-6
+naskah (~105 panggilan) tidak dilakukan — di atas anggaran ~50
+panggilan tugas ini (terpakai 23: 22 live R3 + 1 adjudikasi).
 
 ## 4. Biaya per naskah (perkiraan)
 
@@ -378,6 +428,18 @@ dari suara v11 tersimpan; di run segar goyang model bisa loloskan
 sebagian (G3 no 250 jadi `paragraf`, bukan `biasa`). Deploy v14 tetap
 butuh Gas Bos (branch, belum push/merge/deploy).
 
+**v15 — perbaikan BOM TERBUKTI di titik temuan, skor tidak turun.**
+`buang_daftar_isi` kini mengupas BOM sebelum mencari BAB I asli dan
+melewati salinan sistematika (guard `terdiri dari` + kepala blok
+SISTEMATIKA). Run live R3 membuktikan teks tidak lagi terpotong
+(LATAR BELAKANG kembali, gabung 6 bab asli saja) dan 8/8 baris R3
+benar. Skor 279 baris: v15 199/279 (71,3%) vs v14 198/279 (71,0%),
++1 net, McNemar p=1,0; salah-bab tetap 0, antrean tetap 1. Batasan:
+hanya R3 dipetakan ulang live; 37/39 baris dibawa dari naskah berubah
+lain konteksnya utuh, 2 tidak utuh tapi keduanya sudah salah di v14
+(skenario terburuk 199, terbaik 201). Deploy v15 tetap butuh Gas Bos
+(branch, belum push/merge/deploy).
+
 **Yang masih kurang / perlu putusan Bos:**
 1. **Pengukuran penuh di 35 naskah uji — SELESAI 11 Nov 2026**
    (lihat 3c di atas).
@@ -404,6 +466,12 @@ butuh Gas Bos (branch, belum push/merge/deploy).
    (uji prompt 63 baris), `_sketsa/uji_prompt_v14.py`,
    `_sketsa/adjudikasi_g3_v14.py`, `_sketsa/ukur_v14.py` (evaluator),
    `_verifikasi_v11/jalankan_gating_g3.py` (pelari live G3).
+7. **Berkas v15:** `_verifikasi_v11/hasil_gating_r3.json` (run live
+   R3 + adjudikasi 1 baris), `_sketsa/ukur_v15.py` (evaluator,
+   kunci `perbaikan_bom_v15` di `hasil_verifikasi_v11.json`),
+   `_sketsa/hasil_ukur_v15_baris.json` (label per baris v11/v14/v15),
+   `_sketsa/adjudikasi_r3_v15.py`,
+   `_verifikasi_v11/jalankan_gating_r3.py` (pelari live R3).
 
 ## 7. Berkas pilot
 

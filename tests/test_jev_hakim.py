@@ -1109,8 +1109,8 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v14)',
-        P8.RULE_VERSION == 'jev-peta-v14')
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v15)',
+        P8.RULE_VERSION == 'jev-peta-v15')
     # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
     #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
     #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
@@ -1191,8 +1191,8 @@ def main():
     #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
     #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
     #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
-    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v14)',
-        P8.RULE_VERSION == 'jev-peta-v14')
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v15)',
+        P8.RULE_VERSION == 'jev-peta-v15')
     baris_r23 = [
         'terbagi menjadi beberapa bab antara lain:',
         '1. BAB I PENDAHULUAN',
@@ -1224,11 +1224,11 @@ def main():
     #    gabungan, CHAPTER polos, judul Romawi tanpa kata BAB (berpagar
     #    profil); Lapis 2 pendapat_kedua() hanya untuk baris goyang
     #    (jawaban disuntik, nol Jev di sini); Lapis 3 antrean manusia.
-    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v14)',
-        P8.RULE_VERSION == 'jev-peta-v14')
+    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v15)',
+        P8.RULE_VERSION == 'jev-peta-v15')
     # --- 12f. v12 rantai 3 langkah: mode agen-kedua + pabrik agen kedua ---
-    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v14)',
-        P8.RULE_VERSION == 'jev-peta-v14')
+    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v15)',
+        P8.RULE_VERSION == 'jev-peta-v15')
     # --- 12a. profil_bentuk ---
     teks_romawi = ('I. PENDAHULUAN\nIsi pendahuluan yang cukup panjang dan menjelaskan latar belakang masalah penelitian ini.\n'
                    'II. TINJAUAN PUSTAKA\nIsi tinjauan pustaka yang cukup panjang dan menjelaskan teori yang dipakai dalam penelitian ini.\n'
@@ -1540,8 +1540,8 @@ def main():
     # --- 13a. v13 GATING HAKIM: agen kedua HANYA baris ditandai Hakim ---
     #    Pola GOYANG-PB yang sama seperti 12d (FakeSatpam): baris penanda
     #    goyang paragraf/biasa, label menang paragraf.
-    cek('v14-versi: RULE_VERSION jev-peta-v14',
-        P8.RULE_VERSION == 'jev-peta-v14', str(P8.RULE_VERSION))
+    cek('v15-versi: RULE_VERSION jev-peta-v15',
+        P8.RULE_VERSION == 'jev-peta-v15', str(P8.RULE_VERSION))
 
     def _teks_v13(penanda):
         return ('BAB I\nPENDAHULUAN\n'
@@ -2016,6 +2016,73 @@ def main():
                                   set(), {0: ('BAB III', '')}, {})
     cek('v14-demosi: judul asli dgn penanda polos di gabung tetap bab',
         _lab_asli[1] == 'bab', str(_lab_asli))
+
+    # ── v15: BOM di buang_daftar_isi ─────────────────────────────────────
+    # Akar (R3 Bimbingan Konseling): satu BOM menempel di depan "BAB I"
+    # ASLI membuat pola `^[ \t]*BAB` tidak cocok, sehingga salinan
+    # SISTEMATIKA yang bersih jadi patokan potong dan isi BAB I asli hilang.
+    _ST15 = _muat_asli('app.state_asli_v15', ROOT / 'app' / 'state.py')
+
+    cek('v15-rapi: BOM + zero-width dikupas di kedua ujung',
+        _ST15._rapi('\ufeffBAB I\u200b') == 'BAB I'
+        and _ST15._rapi('\u200b\u200c  x  \ufeff') == 'x',
+        repr(_ST15._rapi('\ufeffBAB I\u200b')))
+    cek('v15-pola: _POLA_JUDUL_BAB cocok "BAB I" ber-BOM',
+        bool(_ST15._POLA_JUDUL_BAB.match('\ufeffBAB I')))
+
+    # 15a. Mini-R3: BAB I asli ber-BOM + salinan sistematika sesudahnya.
+    _t_r3 = (
+        '\n\n===== skripsi hasil final.rtf =====\n\n'
+        '\ufeffBAB I\nPENDAHULUAN\n\n    A. LATAR BELAKANG\n'
+        '      Anak berbakat memiliki kepribadian yang unik.\n\n'
+        '    G. SISTEMATIKA PENULISAN LAPORAN DAN PEMBAHASAN\n'
+        'Untuk mempermudah penulisan, sistematika disusun sebagai berikut: \n'
+        'BAB I \tPendahuluan, terdiri dari: Latar Belakang Masalah, '
+        'Rumusan Masalah.\n'
+        'BAB II \tKajian Pustaka, terdiri dari: Pengertian.\n')
+    _awal_r3 = _ST15.awal_isi_naskah(_t_r3)
+    cek('v15-awal: BAB I asli ber-BOM jadi patokan (bukan salinan)',
+        _awal_r3 == _t_r3.index('\ufeffBAB I'),
+        f'awal={_awal_r3} harap={_t_r3.index(chr(0xfeff) + "BAB I")}')
+    _buang_r3 = _ST15.buang_daftar_isi(_t_r3)
+    cek('v15-buang: isi BAB I asli utuh (LATAR BELAKANG tidak terbuang)',
+        'LATAR BELAKANG' in _buang_r3
+        and _buang_r3.startswith('\ufeffBAB I'),
+        repr(_buang_r3[:60]))
+
+    # 15b. Tanpa BOM: perilaku sama seperti dulu (jangkar BAB I asli).
+    _t_nobom = _t_r3.replace('\ufeff', '')
+    cek('v15-nobom: tanpa BOM jangkar tetap BAB I asli',
+        _ST15.awal_isi_naskah(_t_nobom) == _t_nobom.index('BAB I')
+        and 'LATAR BELAKANG' in _ST15.buang_daftar_isi(_t_nobom))
+
+    # 15c. Salinan sistematika TANPA BOM yang muncul DULUAN (sebelum BAB I
+    #    asli) tetap dilewati sebagai patokan.
+    _t_sal_dulu = (
+        'KATA PENGANTAR\n\n    G. SISTEMATIKA PENULISAN\n'
+        'Sistematika penulisan laporan ini disusun sebagai berikut:\n'
+        'BAB I \tPendahuluan, terdiri dari: Latar Belakang.\n'
+        'BAB II \tKajian Pustaka, terdiri dari: Pengertian.\n\n'
+        'BAB I\nPENDAHULUAN\n\n1.1 Latar Belakang\nIsi bahasan asli.\n')
+    _awal_sal = _ST15.awal_isi_naskah(_t_sal_dulu)
+    cek('v15-salinan: salinan sistematika di depan dilewati, BAB I asli menang',
+        _awal_sal == _t_sal_dulu.rindex('\nBAB I\n') + 1,
+        f'awal={_awal_sal}')
+
+    # 15d. Daftar isi bertitik-pengarah tetap ditolak (regresi perilaku lama).
+    _t_daftar = (
+        'DAFTAR ISI\nBAB I PENDAHULUAN ....... 1\n'
+        '1.1 Latar Belakang .... 2\n\nBAB I\nPENDAHULUAN\n\nIsi bahasan.\n')
+    cek('v15-daftar: BAB I daftar isi bertitik tetap ditolak',
+        _ST15.awal_isi_naskah(_t_daftar) == _t_daftar.rindex('\nBAB I\n') + 1)
+
+    # 15e. Kepala blok SISTEMATIKA saja (tanpa "terdiri dari") juga dilewati.
+    _t_kepala = (
+        '    G. SISTEMATIKA PENULISAN\n'
+        'BAB I Pendahuluan\nBAB II Kajian Pustaka\n\n'
+        'BAB I\nPENDAHULUAN\n\n1.1 Latar Belakang\nIsi.\n')
+    cek('v15-kepala: salinan di bawah kepala SISTEMATIKA dilewati',
+        _ST15.awal_isi_naskah(_t_kepala) == _t_kepala.rindex('\nBAB I\n') + 1)
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:

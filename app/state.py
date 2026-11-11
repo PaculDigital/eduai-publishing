@@ -75,6 +75,29 @@ SECTION_TITLE_LOOKUP: dict[str, str] = {
     '5.3': 'Keterbatasan Penelitian',
 }
 
+# ── Karakter tak terlihat (BOM dll) ───────────────────────────────────────
+# 🔴 BUG v15 (11 Nov 2026, naskah R3 Bimbingan Konseling): satu BOM `\ufeff`
+#    menempel di depan "BAB I" ASLI (awal BAB I badan naskah) membuat pola
+#    `^[ \t]*BAB` di `awal_isi_naskah()` tidak cocok — BOM bukan spasi/tab,
+#    dan `\s` Python juga tidak menangkapnya (kategori Cf, bukan whitespace).
+#    Akibatnya BAB I asli terlewat dan salinan SISTEMATIKA ("BAB I \tPendahuluan,
+#    terdiri dari: ...") yang bersih jadi patokan potong — seluruh isi BAB I
+#    sebelum sistematika (Latar Belakang s.d. bagian F, ~13 ribu kar) ikut
+#    terbuang oleh `buang_daftar_isi()`, lalu salinan sistematika yang masuk peta.
+#    Perbaikan: kupas karakter tak terlihat ini SEBELUM memutuskan batas.
+_TAK_TERLIHAT = '\ufeff\u200b\u200c\u200d\u2060'
+
+
+def _rapi(baris: str) -> str:
+    """Strip spasi/tab + karakter tak terlihat di kedua ujung baris.
+
+    `str.strip()` TIDAK mengupas BOM/zero-width (bukan whitespace bagi
+    Python), jadi pemakaian `.strip()` di jalur penentu batas diganti
+    helper ini.
+    """
+    return (baris or '').strip(' \t\r\n' + _TAK_TERLIHAT)
+
+
 # ── HEADING_PATTERN — section-state.js baris 164 ────────────────────────
 # Nomor sub-bab (1.1 / A.1), judul BAB (BAB I / BAB IV), atau LAMPIRAN.
 HEADING_PATTERN = re.compile(
@@ -149,8 +172,19 @@ _POLA_BARIS_DAFTAR_GAMBAR_NEMPEL = re.compile(
     re.MULTILINE)
 
 # Judul bab besar di naskah utuh: "BAB 1 PENDAHULUAN" / "BAB I PENDAHULUAN"
+# Kelas awal mencakup _TAK_TERLIHAT (BUG v15): "BAB I" ber-BOM di badan
+# naskah harus tetap dikenali sebagai judul bab di jalur konservatif.
 _POLA_JUDUL_BAB = re.compile(
-    r'^\s*BAB\s+([IVX]+|\d+)\s*$', re.IGNORECASE | re.MULTILINE)
+    r'^[\s' + _TAK_TERLIHAT + r']*BAB\s+([IVX]+|\d+)\s*$',
+    re.IGNORECASE | re.MULTILINE)
+
+# Pola "BAB I" pertama yang judulnya BERSIH (dipakai awal_isi_naskah).
+# Kelas awal/pemisah mencakup _TAK_TERLIHAT (BUG v15): "BAB I" ber-BOM
+# di badan naskah harus tetap cocok, kalau tidak salinan sistematika
+# yang bersih jadi patokan potong.
+_POLA_AWAL_ISI = re.compile(
+    r'^[ \t' + _TAK_TERLIHAT + r']*(?i:BAB)[ \t' + _TAK_TERLIHAT
+    + r']+I\b(?![IVXLC])(.*)$', re.MULTILINE)
 
 
 def kategori_bab_besar(nomor: str | None) -> str:
@@ -365,7 +399,7 @@ def _baris_setelahnya(teks: str, pos: int) -> str | None:
     if pos >= len(teks):
         return None
     for b in teks[pos:].split('\n'):
-        b_str = b.strip()
+        b_str = _rapi(b)
         if b_str:
             return b_str
     return None
@@ -387,7 +421,7 @@ def _masih_isi_daftar(baris: str) -> bool:
     """
     if not baris:
         return False
-    b = baris.strip()
+    b = _rapi(baris)
     # penanda daftar seperti "Daftar Gambar"
     if _PENANDA_DAFTAR.match(b):
         return True
@@ -397,6 +431,28 @@ def _masih_isi_daftar(baris: str) -> bool:
     # sangat pendek → hampir pasti baris daftar (nama bab)
     if len(b) <= 60:
         return True
+    return False
+
+
+def _di_bawah_sistematika(teks: str, pos: int) -> bool:
+    """Apakah kandidat BAB I ini salinan di blok SISTEMATIKA?
+
+    Salinan sistematika didahului (dalam beberapa baris) oleh kepala blok
+    "G. SISTEMATIKA PENULISAN ..." — sedangkan BAB I asli di badan naskah
+    tidak pernah didahului kepala itu. Hanya KEPALA BLOK yang dihitung
+    (baris diawali SISTEMATIKA / "X. SISTEMATIKA"), bukan kata
+    'sistematika' di tengah kalimat (mis. kata pengantar) — supaya tidak
+    salah menolak BAB I asli.
+
+    Jendela pandang hanya 2 baris bukan-kosong ke belakang: kepala blok
+    berada 1-2 baris di atas salinan PERTAMA (kepala, kalimat pengantar,
+    salinan). BAB I asli yang muncul SESUDAH blok sistematika selesai
+    berjarak >=3 baris dari kepala itu, jadi tidak ikut tertolak.
+    """
+    sebelumnya = [b for b in teks[:pos].split('\n') if _rapi(b)][-2:]
+    for b in sebelumnya:
+        if re.match(r'(?:[A-Z]\.\s*)?sistematika\b', _rapi(b), re.I):
+            return True
     return False
 
 
@@ -437,14 +493,31 @@ def awal_isi_naskah(teks: str) -> int:
         tesis S2 sastra           → 20.4%  sisa='PENDAHULUAN'
 
     Kembalikan 0 bila tidak yakin (aman: teks tidak dipotong).
+
+    CATATAN v15: 0 juga berarti jangkar TEPAT di posisi 0 (teks diawali
+    "BAB I", mis. ber-BOM di karakter pertama — kasus A4). `buang_daftar_isi`
+    membaca 0 sebagai "tidak ada jangkar" lalu memakai jalur konservatif;
+    untuk teks seperti itu hasilnya tetap benar (isi badan utuh, hanya
+    baris mirip-daftar seperti caption gambar yang ikut terbuang — perilaku
+    lama jalur konservatif, terverifikasi di A4). Kontrak 0 ini dipertahankan
+    karena `app/versi.py` juga memakainya (`ofs > 0`).
     """
     if not teks:
         return 0
-    for m in re.finditer(r'^[ \t]*(?i:BAB)[ \t]+I\b(?![IVXLC])(.*)$', teks, re.M):
-        sisa = (m.group(1) or '').strip()
-        nxt = [x.strip() for x in teks[m.end():m.end() + 120].split('\n')
-               if x.strip()][:1]
+    for m in re.finditer(_POLA_AWAL_ISI, teks):
+        sisa = _rapi(m.group(1) or '')
+        nxt = [_rapi(x) for x in teks[m.end():m.end() + 120].split('\n')
+               if _rapi(x)][:1]
         nxtv = nxt[0] if nxt else ''
+        # 🔴 BUG v15 (11 Nov 2026, R3): salinan SISTEMATIKA ("BAB I
+        #    Pendahuluan, terdiri dari: ...") BUKAN awal isi — ia enumerasi
+        #    bab di dalam badan BAB I. Lewati bila kandidat (atau baris
+        #    berikutnya) adalah enumerasi sistematika, atau bila ia berada
+        #    tepat di bawah kepala blok SISTEMATIKA.
+        if (re.search(r'terdiri dari', sisa, re.I)
+                or re.search(r'terdiri dari', nxtv, re.I)
+                or _di_bawah_sistematika(teks, m.start())):
+            continue
         kandidat = sisa if sisa else nxtv
         if len(kandidat) < 3:
             continue
@@ -577,7 +650,9 @@ def buang_daftar_isi(teks: str) -> str:
     # itu penanda BERURUTAN → tidak memperpanjang lewati.
     penanda_terakhir = -10**9
     for b in bersih.split('\n'):
-        b_str = b.strip()
+        # v15: _rapi (bukan .strip()) supaya "BAB I"/penanda ber-BOM tetap
+        # dikenali di jalur konservatif ini.
+        b_str = _rapi(b)
         pos += len(b) + 1
         if _PENANDA_DAFTAR.match(b_str):
             # DAFTAR PUSTAKA itu bagian SAH (bukan daftar isi) — jangan buang isinya

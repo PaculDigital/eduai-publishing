@@ -7686,5 +7686,195 @@
       "beda_label_vs_peta_v11": 225,
       "catatan_beda_label": "sebagian besar goyang model di wilayah tabel / daftar pustaka, bukan ulah v14; yang relevan v14 adalah baris sistematika + 9 penanda huruf subbab baru (idx 83, 98, 108, 110, 114, 144, 189, 191, 196)"
     }
+  },
+  "perbaikan_bom_v15": {
+    "rule_version": "jev-peta-v15",
+    "n_baris": 279,
+    "skor": {
+      "v11": {
+        "benar": 136,
+        "total": 279
+      },
+      "v14": {
+        "benar": 198,
+        "total": 279,
+        "per_label": {
+          "bab": {
+            "benar": 10,
+            "total": 21
+          },
+          "subbab": {
+            "benar": 30,
+            "total": 45
+          },
+          "paragraf": {
+            "benar": 55,
+            "total": 75
+          },
+          "biasa": {
+            "benar": 103,
+            "total": 138
+          }
+        }
+      },
+      "v15": {
+        "benar": 199,
+        "total": 279,
+        "per_label": {
+          "bab": {
+            "benar": 10,
+            "total": 21
+          },
+          "subbab": {
+            "benar": 30,
+            "total": 45
+          },
+          "paragraf": {
+            "benar": 55,
+            "total": 75
+          },
+          "biasa": {
+            "benar": 104,
+            "total": 138
+          }
+        }
+      }
+    },
+    "mcnemar_v15_vs_v14": {
+      "b": 1,
+      "c": 0,
+      "p": 1.0
+    },
+    "salah_bab_benar_biasa": {
+      "v14": 0,
+      "v15": 0
+    },
+    "r3_live": {
+      "panggilan_jev": 21,
+      "probe_jml": 1,
+      "model_melayani": "typesafe/jev-1.14-20261014",
+      "baris": 1186,
+      "gabung": {
+        "0": [
+          "BAB I",
+          "PENDAHULUAN"
+        ],
+        "67": [
+          "BAB II",
+          "KAJIAN TEORI"
+        ],
+        "463": [
+          "BAB III",
+          "METODE PENELITIAN"
+        ],
+        "540": [
+          "BAB IV",
+          "LAPORAN HASIL PENELITIAN"
+        ],
+        "1023": [
+          "BAB V",
+          "PEMBAHASAN HASIL PENELITIAN"
+        ],
+        "1058": [
+          "BAB VI",
+          "PENUTUP"
+        ]
+      },
+      "baris_r3": [
+        {
+          "no": "1",
+          "benar": "biasa",
+          "v14": "biasa",
+          "v15": "biasa",
+          "cara": "label-live-v15",
+          "idx_live": 49
+        },
+        {
+          "no": "2",
+          "benar": "biasa",
+          "v14": "biasa",
+          "v15": "biasa",
+          "cara": "label-live-v15",
+          "idx_live": 52
+        },
+        {
+          "no": "3",
+          "benar": "biasa",
+          "v14": "biasa",
+          "v15": "biasa",
+          "cara": "label-live-v15",
+          "idx_live": 55
+        },
+        {
+          "no": "4",
+          "benar": "biasa",
+          "v14": "biasa",
+          "v15": "biasa",
+          "cara": "label-live-v15",
+          "idx_live": 56
+        },
+        {
+          "no": "5",
+          "benar": "biasa",
+          "v14": "biasa",
+          "v15": "biasa",
+          "cara": "label-live-v15",
+          "idx_live": 58
+        },
+        {
+          "no": "6",
+          "benar": "biasa",
+          "v14": "biasa",
+          "v15": "biasa",
+          "cara": "label-live-v15",
+          "idx_live": 61
+        },
+        {
+          "no": "7",
+          "benar": "biasa",
+          "v14": "subbab",
+          "v15": "biasa",
+          "cara": "label-live-v15",
+          "idx_live": 65
+        },
+        {
+          "no": "8",
+          "benar": "biasa",
+          "v14": "biasa",
+          "v15": "biasa",
+          "cara": "adjudikasi-agen-kedua",
+          "idx_live": 66
+        }
+      ]
+    },
+    "konteks_dibawa_39_baris": {
+      "utuh": 37,
+      "total": 39,
+      "tidak_utuh": [
+        {
+          "naskah": "A4",
+          "no": "245",
+          "utuh": false,
+          "konteks_skor": [
+            4,
+            6
+          ],
+          "idx_baru": 21880,
+          "ditemukan": true
+        },
+        {
+          "naskah": "S2",
+          "no": "217",
+          "utuh": false,
+          "konteks_skor": [
+            5,
+            6
+          ],
+          "idx_baru": 25589,
+          "ditemukan": true
+        }
+      ]
+    },
+    "catatan": "Hanya R3 dipetakan ulang live (temuan BOM ada di R3). 29 naskah teks bersihnya byte-identik lama-vs-baru, label v14 dibawa. 39 baris di 5 naskah berubah lain dibawa dari v14 HANYA bila konteks lokalnya (3 baris sebelum/sesudah TSV) utuh di teks bersih baru: 37/39 utuh. 2 tidak utuh (A4 no 245, konteks 4/6; S2 no 217, konteks 5/6) karena jalur lama membuang baris caption/butir yang kini dipertahankan, sehingga satu potongan konteks tidak lagi bersebelahan; KEDUANYA sudah salah di v14 (A4 no 245: benar biasa, v14 subbab; S2 no 217: benar paragraf, v14 biasa), jadi bila run segar membalik keduanya skor jadi 201/279, bila tidak tetap 199/279; tidak ada skenario dari kedua baris ini yang membuat v15 di bawah v14."
   }
 }

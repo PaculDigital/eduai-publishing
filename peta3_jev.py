@@ -47,7 +47,7 @@ log = logging.getLogger(__name__)
 #    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
 #    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
 #    bentuknya memang begitu (6 entri: Y1, Y2, AD1, AD2, AD3, AG1).
-RULE_VERSION = 'jev-peta-v14'  # v14 (11 Nov 2026): PERBAIKAN LABEL BAB — aturan deterministik anti salinan sistematika/daftar isi (1A pembersihan gabung, 1B demosi blok) + pengecualian ATURAN 5 untuk penanda huruf kepala blok; gating Hakim v13 + saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
+RULE_VERSION = 'jev-peta-v15'  # v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi — kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
