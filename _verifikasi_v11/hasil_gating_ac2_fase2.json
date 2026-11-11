@@ -1,0 +1,537 @@
+{
+ "kode": "AC2",
+ "rule_version": "jev-peta-v13",
+ "model_agen_kedua": "google/gemini-2.5-flash",
+ "transport_agen_kedua": "openrouter",
+ "panggilan_agen_kedua": 14,
+ "panggilan_agen_kedua_dari_rekaman": 0,
+ "catatan_sistematika": "sistematika dari peta AC2 tersimpan tahap 5 (hampiran; pelari live tidak menyimpan baris)",
+ "baris": [
+  {
+   "idx": 34,
+   "teks": "    1. Penelitian Lapangan.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.56
+   ],
+   "konteks": {
+    "sebelum": [
+     "D.  Metode Penelitian",
+     "\tUntuk Menyusun Karya Tulis Akhir ini penulis mengelompokkan bagian-bagian mana yang harus didahulukan dan melakukan penelitian lebih mendalam. Adapun tahapan-tahapan tersebut adalah sebagai berikut :",
+     ""
+    ],
+    "sesudah": [
+     "Pada penelitian lapangan ini penulis terjun langsung yang berupa Praktek Kerja Lapangan yang dimulai tanggal 12 April – 12 Oktober 2004. Selain itu penulis juga melakukan wawancara dengan para sales person.",
+     "",
+     "    2. Penelitian Kepustakaan."
+    ],
+    "judul_bab_terdekat": "BAB I PENDAHULUAN"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penomoran yang mengepalai blok penjelasan sendiri, seperti yang ditunjukkan oleh baris sesudahnya.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "subbab",
+   "putusan_rantai": "tetap",
+   "alasan_putusan": "pendapat kedua sepakat dengan suara teratas",
+   "label_rantai_l2": "subbab",
+   "label_rantai": "subbab",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 39,
+   "teks": "\tDiharapkan hasil kerja yang yang mendekati sasaran dapat menjadi manfaat di kemudian hari bagi penulis khususnya dan masyarakat umum. ",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.75
+   ],
+   "konteks": {
+    "sebelum": [
+     "",
+     "    2. Penelitian Kepustakaan.",
+     "Pengumpulan data-data dengan jalan penelitian terhadap buku-buku yang berkaitan dengan masalah di atas."
+    ],
+    "sesudah": [
+     "    E. Sistematika Penulisan",
+     "\tPenulis menyusun Karya Tulis Akhir ini berdasarkan sistematika sebagai berikut :",
+     ""
+    ],
+    "judul_bab_terdekat": "BAB I PENDAHULUAN"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah kalimat isi biasa yang merupakan bagian dari paragraf.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "paragraf",
+   "putusan_rantai": "berbalik",
+   "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+   "label_rantai_l2": "paragraf",
+   "label_rantai": "paragraf",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 82,
+   "teks": "\tBeberapa hal yang harus dikuasai oleh tenaga penjual / Sales person adalah (1) product knowledge, (2) price policy, (3) human relation.",
+   "suara": [
+    "subbab",
+    "paragraf"
+   ],
+   "conf": [
+    0.31,
+    0.25
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Dapat mengarahkan sasaran mana dan kepada siapa produk akan ditawarkan dan dijual.",
+     "    • Dapat meyakinkan atas manfaat dan kelebihan produk yang ditawarkan.",
+     "    • Dapat meyakinkan calon pelanggan yang diketahui ragu-ragu dalam mengambil keputusan atau menentukan pilihan."
+    ],
+    "sesudah": [
+     "1.  \tProduct Knowledge  (pengetahuan tentang produk)",
+     "Adalah yang meliputi masalah yang berhubungan dengan keadaan fisik, jenis, ukuran, design dan warna, manfaat terhadap konsumen, bahkan kelebihannya dengan produk lain yang sama.",
+     "2.   Price Policy (kebijaksanaan harga jual)"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah kalimat isi biasa yang memperkenalkan daftar butir berikutnya.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "paragraf",
+   "putusan_rantai": "berbalik",
+   "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+   "label_rantai_l2": "paragraf",
+   "label_rantai": "paragraf",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 89,
+   "teks": "             Setelah menguasai tiga hal penting diatas maka ada baiknya melakukan tahapan demi tahapan dalam proses penjualan. Tahapan-tahapan tersebut adalah langkah-langkah yang perlu diperhatikan oleh seorang Sales dalam melakukan proses penjualan yang diharapkan berujung pada keberhasilan. Langkah-langkah tersebut adalah sbb :",
+   "suara": [
+    "subbab",
+    "paragraf"
+   ],
+   "conf": [
+    0.49,
+    0.41
+   ],
+   "konteks": {
+    "sebelum": [
+     "Sejenis produk yang ditawarkan atau dijual mempunyai klasifikasi harga. Adanya suatu design harga tertentu yang ditawarkan untuk suatu volume penjualan. Apakah ada insentif tertentu (discount/commission) bagi pembeli.",
+     "3. \tHuman Relation.",
+     "Kemampuan tenaga penjual dalam hubungannya dengan masyarakat pasar tertentu untuk mempengaruhinya dan pada akhirnya menjadi konsumen. Pendekatan perorangan sangat membantu keberhasilan dengan ditunjang kemampuan berkomunikasi."
+    ],
+    "sesudah": [
+     "1.  \tApproach (pendekatan kepada prospek)",
+     "Pendekatan kepada calon pembeli/konsumen memerlukan persiapan dan perencanaan yang baik yang antara lain pengetahuan tentang :",
+     "    • Siapakah calon pembeli/konsumen ?"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   },
+   "label_live_v11": "paragraf",
+   "jawaban_agen_kedua": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah kalimat isi biasa yang menjelaskan tahapan proses penjualan.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "paragraf",
+   "putusan_rantai": "berbalik",
+   "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+   "label_rantai_l2": "paragraf",
+   "label_rantai": "paragraf",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 105,
+   "teks": "4.  \tClosing The Sale.",
+   "suara": [
+    "paragraf",
+    "subbab"
+   ],
+   "conf": [
+    0.4,
+    0.43
+   ],
+   "konteks": {
+    "sebelum": [
+     "Satu hal lain yang tak kalah pentingnya adalah First Impression atau kesan pertama kepada pelaku penjualan yang positif akan membantu kelancaran proses penjualan.",
+     "3.  \tSelling (menjual)",
+     "Proses menjual dari seorang sales harus dapat memberi keyakinan kepada pembeli atas manfaat dan kelebihan produk yang ditawarkan. Dengan bekal Product Knowledge dan pengembangan komunikasi yang efektif diharapkan pembeli menjadi pelaku pembeli."
+    ],
+    "sesudah": [
+     "Suatu transaksi penjualan terjadi karena penjualan memperoleh persetujuan dari calon pembeli untuk membeli atau menggunakan produk/jasa yang ditawarkan. Tahapan ini merupakan keberhasilan seorang penjual mempengaruhi dan meyakinkan calon pembeli. Langkah-langkah administratif untuk menutup penjualan dapat berupa : statement, order dan tanda terima pembayaran. Dalam jasa pelayanan wisata maka pembeli/konsumen akan menikmati produk wisata setelah terjadinya closing the sale.",
+     "5.  \tAfter Sales Service",
+     "Kesempurnaan dari suatu penjualan yang berhasil adalah ditutup dengan Pelayanan Purna Jual. Kegiatan tersebut antara lain  :"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "subbab",
+    "confidence": 0.0,
+    "alasan": "Baris ini adalah penomoran yang mengepalai blok penjelasan sendiri.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "subbab",
+   "putusan_rantai": "antrean-manusia",
+   "alasan_putusan": "pendapat kedua tidak yakin (confidence < 0,5)",
+   "label_rantai_l2": null,
+   "label_rantai": null,
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 199,
+   "teks": "    • Sidewalk Cafes menyediakan masakan dari Indonesia dan international untuk makan pagi dan makan malam.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.51
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Japanese Sushi Bar menyediakan masakan Jepang untuk makan siang dan makan malam",
+     "    • Wendy’s American fast food restaurant yang menyediakan makan siang dan makan malam.",
+     ""
+    ],
+    "sesudah": [
+     "    3. Sarana Olahraga",
+     "    • Fitness Center yang dilengkapi dengan fitness equipment, squash court, sauna, kamar ganti dan pelatih yang berpengalaman.",
+     "    • Kolam renang dengan area seluas 1.295 m2. Terdapat juga kolam renang untuk anak-anak "
+    ],
+    "judul_bab_terdekat": "BAB III GAMBARAN UMUM OBYEK PENELITIAN"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah butir dalam daftar, yang merupakan bagian dari isi dan bukan judul bab atau subbab.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "paragraf",
+   "putusan_rantai": "berbalik",
+   "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+   "label_rantai_l2": "paragraf",
+   "label_rantai": "paragraf",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 205,
+   "teks": "Aston Hotel Sudirman tidak memiliki laundry sendiri namun memiliki laundry service yang setiap harinya dilakukan pagi hari lalu dikirim ke laundrette. Untuk valet dilakukan sore hari dan hari itu pula diantarkan ke tiap kamar.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.69
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Kolam renang dengan area seluas 1.295 m2. Terdapat juga kolam renang untuk anak-anak ",
+     "    • Lapangan tenis",
+     "    4. Laundry Service"
+    ],
+    "sesudah": [
+     "    5. The Business Center",
+     "    • Private office, meeting facilities, clerical administrative dan bantuan sekretaris",
+     "    • Tempat kerja pribadi yang dilengkapi dengan personal computer, internet access, e-mail capability, fax, IDD telephone service dan modem hook up."
+    ],
+    "judul_bab_terdekat": "BAB III GAMBARAN UMUM OBYEK PENELITIAN"
+   },
+   "label_live_v11": "subbab",
+   "tsv_no": "174",
+   "label_benar": "paragraf",
+   "jenis_sengketa": "hakim_ragu",
+   "v11_benar": false,
+   "jawaban_agen_kedua": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah kalimat isi yang menjelaskan poin sebelumnya, bukan judul atau subbab.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "paragraf",
+   "putusan_rantai": "berbalik",
+   "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+   "label_rantai_l2": "paragraf",
+   "label_rantai": "paragraf",
+   "koreksi_rantai": [],
+   "rantai_benar": true
+  },
+  {
+   "idx": 326,
+   "teks": "    • Mengetahui keadaan dan perkembangan yang terjadi saat ini, baik di dalam negeri maupun di luar negeri.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.51
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Membuat projection, budget dan forecast mengenai occupancy dan revenue hotel.",
+     "    • Membuat sales & marketing plan untuk tahun yang akan datang.",
+     "    • Membuat market share, segmentasi pasar dan comparison sebagai dasar pembuatan corporate rate."
+    ],
+    "sesudah": [
+     "    5. Marketing Communication Manager.",
+     "    • Membina dan memelihara hubungan baik dengan publik internal, yaitu dengan para karyawan maupun tamu hotel, dan publik eksternal yang meliputi hubungan dengan masyarakat sekitar, pemerintah dan pers.",
+     "    • Mengembangkan program pemasaran untuk mendukung kegiatan penjualan kamar dan restoran."
+    ],
+    "judul_bab_terdekat": "BAB III GAMBARAN UMUM OBYEK PENELITIAN"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah butir dalam daftar, yang merupakan bagian dari isi, bukan judul bab atau subbab.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "paragraf",
+   "putusan_rantai": "berbalik",
+   "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+   "label_rantai_l2": "paragraf",
+   "label_rantai": "paragraf",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 327,
+   "teks": "    5. Marketing Communication Manager.",
+   "suara": [
+    "biasa",
+    "subbab"
+   ],
+   "conf": [
+    0.2,
+    0.43
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Membuat sales & marketing plan untuk tahun yang akan datang.",
+     "    • Membuat market share, segmentasi pasar dan comparison sebagai dasar pembuatan corporate rate.",
+     "    • Mengetahui keadaan dan perkembangan yang terjadi saat ini, baik di dalam negeri maupun di luar negeri."
+    ],
+    "sesudah": [
+     "    • Membina dan memelihara hubungan baik dengan publik internal, yaitu dengan para karyawan maupun tamu hotel, dan publik eksternal yang meliputi hubungan dengan masyarakat sekitar, pemerintah dan pers.",
+     "    • Mengembangkan program pemasaran untuk mendukung kegiatan penjualan kamar dan restoran.",
+     "    • Bertanggung jawab atas penyelenggaraan publikasi dalam rangka pemasaran perusahaan."
+    ],
+    "judul_bab_terdekat": "BAB III GAMBARAN UMUM OBYEK PENELITIAN"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penomoran yang mengepalai blok penjelasan sendiri.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "subbab",
+   "putusan_rantai": "tetap",
+   "alasan_putusan": "pendapat kedua sepakat dengan suara teratas",
+   "label_rantai_l2": "subbab",
+   "label_rantai": "subbab",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 397,
+   "teks": "    • Memusatkan perhatian pada masalah yang menjadi penyebab konflik serta mampu mengenal dan mendeskripsikan masalah tersebut.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.53
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Menyatakan posisi, perasaan dan pikiran secara terbuka, jujur dan langsung tanpa berusaha menyembunyikan obyek yang riil dari hal yang tidak disetujui.",
+     "    • Merespon atau bereaksi secara terbuka untuk setiap pesan yang diterima.",
+     "    • Mengaku sepenuhnya dan bertanggung jawab atas pikiran dan perasaan sendiri."
+    ],
+    "sesudah": [
+     "    2. Empati.",
+     "    • Menampilkan sikap empati kepada pihak lain.",
+     "    • Mensahkan atau membenarkan perasaan atau perilaku pihak lain tanpa harus disertai persetujuan terhadap konflik yang terjadi."
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah butir dalam daftar, yang merupakan bagian dari isi dan bukan judul bab atau subbab.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "paragraf",
+   "putusan_rantai": "berbalik",
+   "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+   "label_rantai_l2": "paragraf",
+   "label_rantai": "paragraf",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 458,
+   "teks": "    4. Site Inspection.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.68
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Apabila pembicaraan belum selesai, tanyakan kepada klien untuk datang ke hotel atau kita yang akan mengunjungi kantornya.",
+     "    • Mengumpulkan banyak informasi yang bisa di dapat dari klien kita, seperti apakah pernah menggunakan hotel sebelumnya, perusahaannya bergerak dalam bidang apa, tamunya berasal darimana dan sebagainya.",
+     "\t"
+    ],
+    "sesudah": [
+     "Apabila tamu berkeinginan untuk melihat lokasi dan bentuk kamar di Aston Hotel, sales dapat menunjukkan dan mendampingi tamu tersebut. Biasanya sales akan mengajak tamu berkeliling lingkungan hotel untuk menunjukkan kepada tamu seluruh fasilitas dan semua tipe kamar yang terdapat di Aston Hotel.",
+     "",
+     "Standard Operating Procedures (S.O.P) – Client Visit To The Hotel."
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini memiliki penomoran dan diikuti oleh penjelasan, menunjukkan ini adalah subbab.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "subbab",
+   "putusan_rantai": "tetap",
+   "alasan_putusan": "pendapat kedua sepakat dengan suara teratas",
+   "label_rantai_l2": "subbab",
+   "label_rantai": "subbab",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 461,
+   "teks": "Standard Operating Procedures (S.O.P) – Client Visit To The Hotel.",
+   "suara": [
+    "paragraf",
+    "subbab"
+   ],
+   "conf": [
+    0.47,
+    0.55
+   ],
+   "konteks": {
+    "sebelum": [
+     "    4. Site Inspection.",
+     "Apabila tamu berkeinginan untuk melihat lokasi dan bentuk kamar di Aston Hotel, sales dapat menunjukkan dan mendampingi tamu tersebut. Biasanya sales akan mengajak tamu berkeliling lingkungan hotel untuk menunjukkan kepada tamu seluruh fasilitas dan semua tipe kamar yang terdapat di Aston Hotel.",
+     ""
+    ],
+    "sesudah": [
+     "    • Undang klien untuk datang ke hotel dan melihat fasilitas yang ada. Fleksible dengan lokasi yang diinginkan klien untuk bertemu.",
+     "    • Persiapkan daftar menu, harga kamar, banquet, dan kunci sebelumnya.",
+     "    • Menugaskan salah seorang staf F&B untuk bertemu dengan tamu, sehingga apabila ada pertanyaan mengenai F&B dapat segera terjawab dan terselesaikan."
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bagian yang diikuti oleh daftar butir-butir penjelasan.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "subbab",
+   "putusan_rantai": "tetap",
+   "alasan_putusan": "pendapat kedua sepakat dengan suara teratas",
+   "label_rantai_l2": "subbab",
+   "label_rantai": "subbab",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 485,
+   "teks": "Standard Operating Procedures (S.O.P)  - Closing The Deal.",
+   "suara": [
+    "subbab",
+    "subbab"
+   ],
+   "conf": [
+    0.21,
+    0.76
+   ],
+   "konteks": {
+    "sebelum": [
+     "",
+     "\tSetelah pertemuan tersebut selesai dan dicapai kesepakatan mengenai harga dan kontrak yang diinginkan maka sales akan membuat laporan kepada Director Of  Sales.  Hasil dari pertemuan tersebut akan dituangkan dalam corporate rate, yaitu harga yang telah disepakati dan akan berlaku untuk seluruh tamu dari suatu perusahaan yang menginap di Aston Hotel. Harga setiap corporate rate antara satu perusahaan dengan perusahaan lainnya tidaklah sama. Selain itu, perjanjian tersebut juga dibuatkan dalam suatu contract apabila tamu tersebut menginap lebih dari 1 bulan.",
+     ""
+    ],
+    "sesudah": [
+     "    • Profesional",
+     "    • Pergunakan teknik bertelepon yang baik.",
+     "    • Mempersiapkan diri untuk negosiasi."
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah judul bagian yang diikuti oleh poin-poin penjelasan.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "subbab",
+   "putusan_rantai": "tetap",
+   "alasan_putusan": "pendapat kedua sepakat dengan suara teratas",
+   "label_rantai_l2": "subbab",
+   "label_rantai": "subbab",
+   "koreksi_rantai": []
+  },
+  {
+   "idx": 498,
+   "teks": "    • Satu minggu sebelum tamu menginap, seluruh detail sudah harus dikonfirmasi meliputi : jumlah tamu dalam kamar, tipe kamar, permintaan khusus, waktu kedatangan, transportasi, pengantaran barang, gift, help desk set-up, billing instructions.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.55
+   ],
+   "konteks": {
+    "sebelum": [
+     "    • Membuat perubahan yang menyangkut perjanjian kontrak.",
+     "    • Mengirimkan konfirmasi kontrak.",
+     "    • Menindaklanjuti untuk mengcek kontrak yang sudah dikirim."
+    ],
+    "sesudah": [
+     "",
+     "    C.   Hambatan-Hambatan Dalam Pelaksanaan",
+     ""
+    ],
+    "judul_bab_terdekat": "BAB IV PEMBAHASAN MASALAH"
+   },
+   "label_live_v11": "subbab",
+   "jawaban_agen_kedua": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah butir dalam daftar, bukan judul bab atau subbab, dan berisi informasi substantif.",
+    "model": "google/gemini-2.5-flash"
+   },
+   "agen_kedua_label": "paragraf",
+   "putusan_rantai": "berbalik",
+   "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+   "label_rantai_l2": "paragraf",
+   "label_rantai": "paragraf",
+   "koreksi_rantai": []
+  }
+ ],
+ "ringkasan_putusan": {
+  "tetap": 5,
+  "berbalik": 8,
+  "antrean-manusia": 1
+ }
+}

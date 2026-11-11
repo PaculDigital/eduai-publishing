@@ -131,6 +131,51 @@ ATURAN 5 TIDAK diubah (tugas terpisah, butuh Gas sendiri).
   beda soal bab → antrean; jawaban tidak yakin → antrean; saklar mati →
   perilaku v11 lama; konteks lebar diteruskan; jejak `pk_jawaban`.
 
+## 3c. Hasil ukur gating v13 (11 Nov 2026)
+
+**Pengukuran penuh 279 baris label manusia (35 naskah uji): v11 136/279
+(48,7%) → rantai gating v13 150/279 (53,8%), +14 net (18 diperbaiki,
+4 dirusak), antrean 4.** McNemar pada pasangan tak sepakat (18 lawan 4):
+p eksak binomial dua-sisi 0,004 — signifikan. Per label benar: biasa
+49→55, paragraf 43→55, subbab 32→28, bab 12→12 (tidak berubah: 0 baris
+benar-bab ditandai Hakim). Per kelompok: TypeSafe 76→83, OpenRouter
+60→67 (seimbang). Per jenis: hakim_ragu 4→15 (dari 19 yang ditandai),
+hakim_curiga 4→5, goyang_subbab 59→60, beda_subbab 4→5. 39 baris
+ditandai (6 curiga + 32 ragu + 1 ambigu-serupa T3|73), 39 panggilan
+agen kedua, 0 gagal. 2 baris berbalik ikut berubah oleh koreksi
+deterministik pasca-L2 — keduanya membantu (paragraf→biasa, benar).
+4 baris dirusak rantai: 3 agen kedua membalik subbab benar jadi biasa
+(H1-71, B4-121, A4-244), 1 masuk antrean (F4-134: beda soal bab).
+
+**Ruang lingkup vonis:** 279 baris adalah baris SENGKETA, bukan sampel
+acak. +14 berlaku di baris sulit; di seluruh 2.400+ baris sebagian
+besar sepakat dan tidak tersentuh rantai. Rantai tidak memperbaiki
+label bab (judul_bab_sampah 3/35 tetap 3/35; goyang_bab 14/43 tetap
+14/43) dan 26 baris gabung-saja bukan kandidat Hakim.
+
+**Run live kecil AC2 (kode v13, container):** probe melayani
+`typesafe/jev-1.14-20261014` lewat OpenRouter (TypeSafe resmi 402).
+Perekam dipanggil tepat 14 baris = himpunan ditandai Hakim pra-koreksi
+(lawan 63 goyang di wiring v12 lama); flag pasca-koreksi 13 baris —
+selisih 1 (idx 89 hilang pasca-koreksi, labelnya berubah sehingga bukan
+lagi kandidat). 10 panggilan Jev pipeline + 1 probe; DB tidak berubah
+(sidik 28/108/235 tetap). Fase 2 (VM, 14 panggilan agen kedua): tetap 5,
+berbalik 8, antrean 1 (idx 105: confidence agen kedua 0,0); baris TSV
+no 174 diperbaiki (subbab→paragraf, benar).
+
+**Biaya terukur:** flag 390 baris di 35 naskah = 11,1/naskah (median 7,
+rentang 0–43; lawan goyang 83,1/naskah di v12). Agen kedua ~Rp50/naskah
+rata-rata (~Rp32 median) pada ~Rp4,5/panggilan; total dengan Jev
+pemetaan ~Rp210/naskah — target Boss tercapai (bukan ~Rp535).
+Anggaran pengukuran: 64 panggilan (Fase B 39 + AC2 live 11 + AC2
+Fase 2 14) dari batas ~100.
+
+Caveat ukur: flag memakai peta final tersimpan (selisih pra/pasca
+terukur di AC2: 1/14); jawaban Jev tahap 5 dipakai apa adanya (jawaban
+segar bisa berbeda — flag live AC2 14 lawan 16 tersimpan); koreksi
+pasca-L2 di Fase B tanpa kode_label (tidak tersimpan); semua biaya
+estimasi lokal (jembatan tidak mengembalikan token usage).
+
 ## 4. Biaya per naskah (perkiraan)
 
 Harga Jev: ~Rp10,5/panggilan (terukur: 40 panggilan Rp419). Jev memakai
@@ -227,28 +272,25 @@ Biaya pilot: Jev 29 panggilan ~Rp305 + OpenRouter 23 panggilan ~Rp105
 
 ## 6. Vonis jujur + yang masih kurang
 
-**Rantai TERBUKTI memperbaiki label judul palsu yang ditandai Hakim**
-(Arm B: 2/16 → 10/16) dan **tidak merusak satu baris pun** di pilot.
-**Tapi rantai BELUM TERBUKTI menaikkan presisi keseluruhan:**
-sampel kecil (21 baris yang bisa diadili), label v11 Arm B turunan
-(bukan dari run live), konteks Arm B lebih sempit dari live, dan
-pengukuran penuh di 35 naskah uji masih menunggu label manusia selesai
-(dikerjakan agen lain secara paralel — jangan sentuh naskah uji sebelum
-labelnya selesai).
+**Rantai gating v13 TERBUKTI lebih presisi dari v11 pada 279 baris
+sengketa** (150/279 lawan 136/279, +14 net, McNemar p=0,004), dengan
+biaya agen kedua terukur ~Rp50/naskah (11,1 panggilan/naskah, median 7)
+dan wiring live terbukti di AC2 (perekam tepat 14 baris ditandai).
+**Tapi ini BUKAN produksi massal tanpa pengawasan:** 4 baris antrean
+butuh manusia, label bab tidak membaik sama sekali, vonis hanya berlaku
+di baris sulit (bukan seluruh peta), dan 4 baris dirusak rantai.
 
 **Yang masih kurang / perlu putusan Bos:**
-1. **Pengukuran penuh di 35 naskah uji** (menunggu label selesai).
+1. **Pengukuran penuh di 35 naskah uji — SELESAI 11 Nov 2026**
+   (lihat 3c di atas).
 2. **Transport produksi belum teruji:** combo 9router 503 saat pilot.
    Wajib uji asap 1 panggilan dari dalam container sebelum saklar
    dinyalakan; bila masih 503, rantai tidak bisa jalan di produksi
    (opsi: OpenRouter PINNED sebagai transport produksi, perlu putusan).
-3. **Selisih rancangan lawan wiring:** perintah Bos "agen kedua HANYA
-   baris yang ditandai Hakim" (~11 panggilan/naskah, ~Rp50), tapi wiring
-   Lapis 2 yang diganti memanggil agen kedua per baris goyang
-   (~83 panggilan/naskah, ~Rp375). Hakim sendiri jalan SETELAH peta jadi,
-   jadi gating Hakim butuh ubah urutan pipeline (Hakim dulu, baru agen
-   kedua pada yang ditandai). Bos putuskan: tetap per goyang, atau ubah
-   ke gating Hakim.
+3. **Gating Hakim — SELESAI 11 Nov 2026 (Gas Bos 12:27 WIB):** wiring
+   diubah ke gating Hakim (v13) dan diukur penuh. Koreksi di tengah
+   jalan: v13 pertama salah memakai goyang yang ditandai (61 baris);
+   diperbaiki menjadi semua baris ditandai (390 baris) sebelum ukur.
 4. **Jebakan ATURAN 5 (temuan pilot, perlu aturan v13):** baris penanda
    huruf seperti "a) Persetubuhan" tidak pernah bisa jadi subbab — bila
    agen kedua bilang subbab, ATURAN 5 membatalkannya (huruf awal kecil)

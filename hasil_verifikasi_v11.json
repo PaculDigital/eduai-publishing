@@ -6713,5 +6713,251 @@
   },
   "metode": "Baris sengketa saja (bukan sampel acak): akurasi di sini adalah akurasi pada baris SULIT yang diperselisihkan, bukan presisi keseluruhan peta. label_v10 hanya diketahui di subset ketat (grup 3, metode teks) dan subset luas (+ cocok persis judul bab v10, hanya bisa menghasilkan bab). v11 None = baris tak ada di peta v11 (dihitung salah di akurasi keseluruhan, dipisah di akurasi_berlabel)."
  },
- "vonis_presisi_uji112": "v11 TIDAK TERBUKTI lebih presisi dari v10 di naskah uji. Head-to-head adil 56 baris grup 3: v11 29/56 (0,5179) lawan v10 22/56 (0,3929); pasangan berselisih 21 lawan 14, McNemar khi-kuadrat 1,4, p sekitar 0,24, tidak signifikan. v11 naik di bab/paragraf, turun tipis di biasa (subset ketat). Akurasi v11 pada 279 baris sengketa: 136/279 (0,4875); ini akurasi baris sulit, bukan presisi keseluruhan peta. Pola salah terbesar v11: 42 baris biasa dilabeli bab. 8 baris bab asli tanpa label di label_penuh v11 tapi judulnya ada di bab_gabung v11."
+ "vonis_presisi_uji112": "v11 TIDAK TERBUKTI lebih presisi dari v10 di naskah uji. Head-to-head adil 56 baris grup 3: v11 29/56 (0,5179) lawan v10 22/56 (0,3929); pasangan berselisih 21 lawan 14, McNemar khi-kuadrat 1,4, p sekitar 0,24, tidak signifikan. v11 naik di bab/paragraf, turun tipis di biasa (subset ketat). Akurasi v11 pada 279 baris sengketa: 136/279 (0,4875); ini akurasi baris sulit, bukan presisi keseluruhan peta. Pola salah terbesar v11: 42 baris biasa dilabeli bab. 8 baris bab asli tanpa label di label_penuh v11 tapi judulnya ada di bab_gabung v11.",
+ "rantai_gating_v13": {
+  "tanggal": "11 Nov 2026",
+  "rule_version": "jev-peta-v13",
+  "commit": "596551e (koreksi gating) + 560791d + 976c6c6",
+  "keputusan_boss": "agen kedua HANYA untuk baris ditandai Hakim (ragu/curiga), bukan per baris goyang",
+  "koreksi_gating": "implementasi v13 pertama (fb84999) salah memakai goyang yang ditandai (61 baris/35 naskah); diperbaiki sebelum pengukuran live menjadi SEMUA baris ditandai Hakim",
+  "pengukuran_279_baris": {
+   "n": 279,
+   "v11_benar": 136,
+   "rantai_benar": 150,
+   "v11_persen": 48.7,
+   "rantai_persen": 53.8,
+   "selisih_poin": 5.0,
+   "flip": {
+    "v11_salah_rantai_benar": 18,
+    "v11_benar_rantai_salah": 4
+   },
+   "mcnemar_chi2_tanpa_koreksi": 8.91,
+   "mcnemar_eksak_binomial_dua_sisi_p": 0.00434,
+   "antrean": 4,
+   "ditandai": 39,
+   "panggilan_agen_kedua": 0,
+   "per_label_benar": {
+    "bab": {
+     "n": 21,
+     "v11": 12,
+     "rantai": 12,
+     "ditandai": 0,
+     "antrean": 0
+    },
+    "biasa": {
+     "n": 138,
+     "v11": 49,
+     "rantai": 55,
+     "ditandai": 18,
+     "antrean": 3
+    },
+    "paragraf": {
+     "n": 75,
+     "v11": 43,
+     "rantai": 55,
+     "ditandai": 12,
+     "antrean": 0
+    },
+    "subbab": {
+     "n": 45,
+     "v11": 32,
+     "rantai": 28,
+     "ditandai": 9,
+     "antrean": 1
+    }
+   },
+   "per_kelompok": {
+    "OpenRouter": {
+     "n": 135,
+     "v11": 60,
+     "rantai": 67,
+     "ditandai": 17,
+     "antrean": 0
+    },
+    "TypeSafe": {
+     "n": 144,
+     "v11": 76,
+     "rantai": 83,
+     "ditandai": 22,
+     "antrean": 4
+    }
+   },
+   "per_jenis": {
+    "beda_bab": {
+     "n": 21,
+     "v11": 13,
+     "rantai": 13,
+     "ditandai": 0,
+     "antrean": 0
+    },
+    "beda_paragraf": {
+     "n": 3,
+     "v11": 1,
+     "rantai": 1,
+     "ditandai": 0,
+     "antrean": 0
+    },
+    "beda_paragraf_biasa": {
+     "n": 4,
+     "v11": 2,
+     "rantai": 2,
+     "ditandai": 0,
+     "antrean": 0
+    },
+    "beda_subbab": {
+     "n": 6,
+     "v11": 4,
+     "rantai": 5,
+     "ditandai": 1,
+     "antrean": 0
+    },
+    "deterministik_nomor_polos": {
+     "n": 1,
+     "v11": 0,
+     "rantai": 0,
+     "ditandai": 0,
+     "antrean": 0
+    },
+    "goyang_bab": {
+     "n": 43,
+     "v11": 14,
+     "rantai": 14,
+     "ditandai": 3,
+     "antrean": 3
+    },
+    "goyang_paragraf": {
+     "n": 24,
+     "v11": 18,
+     "rantai": 18,
+     "ditandai": 0,
+     "antrean": 0
+    },
+    "goyang_paragraf_biasa": {
+     "n": 24,
+     "v11": 14,
+     "rantai": 14,
+     "ditandai": 0,
+     "antrean": 0
+    },
+    "goyang_subbab": {
+     "n": 87,
+     "v11": 59,
+     "rantai": 60,
+     "ditandai": 9,
+     "antrean": 1
+    },
+    "hakim_curiga": {
+     "n": 10,
+     "v11": 4,
+     "rantai": 5,
+     "ditandai": 7,
+     "antrean": 0
+    },
+    "hakim_ragu": {
+     "n": 21,
+     "v11": 4,
+     "rantai": 15,
+     "ditandai": 19,
+     "antrean": 0
+    },
+    "judul_bab_sampah": {
+     "n": 35,
+     "v11": 3,
+     "rantai": 3,
+     "ditandai": 0,
+     "antrean": 0
+    }
+   },
+   "berkas_rinci": "_verifikasi_v11/hasil_rantai_gating.json"
+  },
+  "ruang_lingkup_vonis": "279 baris adalah baris SENGKETA (dipilih karena goyang / ditandai Hakim / deterministik), BUKAN sampel acak. +14 berlaku di baris sulit; di seluruh 2.400+ baris, sebagian besar sepakat dan tidak tersentuh rantai.",
+  "yang_tidak_diperbaiki": "label benar bab: 12/21 di v11 maupun rantai (0 baris bab-true ditandai Hakim); 3 baris goyang_bab yang ditandai semuanya masuk antrean (beda soal bab); 26 baris gabung-saja bukan kandidat Hakim, tidak tersentuh rantai.",
+  "biaya_agen_kedua_per_naskah": {
+   "flag_per_naskah_rata_rata": 11.14,
+   "flag_per_naskah_median": 7,
+   "flag_per_naskah_min_maks": [
+    0,
+    43
+   ],
+   "total_flag_35_naskah": 390,
+   "total_goyang_35_naskah_pembanding_v12": 2907,
+   "goyang_per_naskah_rata_rata_pembanding_v12": 83.1,
+   "perkiraan_rp_per_naskah_rata_rata": 50,
+   "perkiraan_rp_per_naskah_median": 32,
+   "asumsi": "~Rp4,5/panggilan agen kedua (Gemini 2.5 Flash, batas atas chars/4)",
+   "total_dengan_jev": "~Rp210/naskah (Jev pemetaan ~Rp160 + agen kedua ~Rp50)"
+  },
+  "run_live_ac2": {
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "panggilan_jev_pipeline": {
+    "choice": 7,
+    "noul": 3,
+    "lain": 0
+   },
+   "panggilan_jev_total_termasuk_probe": 11,
+   "sidik_db_berubah": false,
+   "hakim_tandai_pra_koreksi": [
+    34,
+    39,
+    82,
+    89,
+    105,
+    199,
+    205,
+    326,
+    327,
+    397,
+    458,
+    461,
+    485,
+    498
+   ],
+   "flag_pasca_koreksi": [
+    34,
+    39,
+    82,
+    105,
+    199,
+    205,
+    326,
+    327,
+    397,
+    458,
+    461,
+    485,
+    498
+   ],
+   "flag_selisih": {
+    "hanya_pra": [
+     89
+    ],
+    "hanya_pasca": []
+   },
+   "rekaman_barisan_diadili": 14,
+   "goyang_jml_pembanding": 63,
+   "fase2_putusan": {
+    "tetap": 5,
+    "berbalik": 8,
+    "antrean-manusia": 1
+   },
+   "fase2_panggilan_agen_kedua": 14,
+   "fase2_baris_tsv_no174": "benar=paragraf, v11=subbab (salah), rantai=paragraf (benar)",
+   "berkas": "_verifikasi_v11/hasil_gating_ac2.json, _verifikasi_v11/hasil_gating_ac2_fase2.json"
+  },
+  "caveat": [
+   "Flag diukur dari peta FINAL tersimpan (pasca-koreksi), sedangkan gating live memakai peta pra-koreksi; run AC2 mengukur selisihnya: 1 dari 14 flag (idx 89) hilang pasca-koreksi.",
+   "Hakim Source-2 (ragu) memakai jawaban Jev tahap 5 yang tersimpan; jawaban Jev segar bisa berbeda antar run (goyang) — flag live AC2 14 baris lawan 16 tersimpan.",
+   "Koreksi deterministik pasca-Lapis 2 di Fase B memakai sistematika yang dihitung ulang dari peta final dan tanpa kode_label (tidak tersimpan); 2 baris berubah oleh koreksi (keduanya membantu: paragraf->biasa, benar).",
+   "1 dari 14 jawaban agen kedua live (AC2 idx 105) ber-confidence 0,0 sehingga masuk antrean.",
+   "Semua angka token/biaya adalah estimasi lokal (batas atas chars/4); jembatan Jev tidak mengembalikan token usage."
+  ],
+  "anggaran_panggilan_pengukuran": {
+   "fase_B_agen_kedua": 39,
+   "ac2_live_jev": 11,
+   "ac2_fase2_agen_kedua": 14,
+   "total": 64,
+   "batas_tugas": "~100"
+  },
+  "vonis": "TERBUKTI lebih presisi dari v11 pada 279 baris sengketa: 150/279 (53,8%) lawan 136/279 (48,7%), +14 net (18 diperbaiki, 4 dirusak), McNemar p=0,004. BUKAN produksi massal tanpa pengawasan: 4 baris antrean butuh manusia, label bab tidak membaik, dan vonis hanya berlaku di baris sulit."
+ }
 }

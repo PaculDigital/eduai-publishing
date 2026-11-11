@@ -302,7 +302,8 @@ def buat_pendapat_kedua_fn(penanya=None, model: str | None = None):
     """Pabrik fn Lapis 2: fn(idx, teks_baris, suara, p, konteks=None).
 
     Saklar MATI ⇒ None (perilaku v11, nol panggilan). Saklar NYALA ⇒ fn
-    yang memanggil agen kedua per baris goyang dan mencatat tiap keputusan
+    yang memanggil agen kedua per baris yang ditandai Hakim (v13; warisan
+    v12: per baris goyang) dan mencatat tiap keputusan
     ke `fn.log` (list dict) + `LOG_KEPUTUSAN`. `penanya` yang disuntik
     dipakai sebagai transport; tanpa penanya dipakai combo 9router.
     """
