@@ -104,6 +104,39 @@ ATURAN_LABEL = (
 )
 
 
+# ── v14: daftar periksa TAJAM untuk baris kandidat bab (11 Nov 2026) ──────
+#    Salah terbesar v11/v13: 42 baris benarnya `biasa` dilabeli `bab`
+#    (salinan sistematika/daftar isi). Prompt lama hanya berkata "salinan
+#    ... adalah biasa" tanpa sinyal yang bisa diperiksa; uji live v13 pada
+#    3 baris bab yang ditandai: agen benar 1/3. Daftar ini memberi sinyal
+#    konkret yang bisa dicek dari baris + konteksnya.
+ATURAN_BAB_TAJAM = (
+    'Sebelum menjawab "bab", PERIKSA dulu lima hal ini — bila SATU saja '
+    'cocok, jawab "biasa", BUKAN "bab": '
+    '(1) baris diawali ":" (contoh ": PENGANTAR" — itu ekor judul yang '
+    'terbelah, bukan judul); '
+    '(2) baris hanya "BAB I"/"Bab II"/"CHAPTER I" TELANJANG tanpa judul, '
+    'sementara di dekatnya (dalam beberapa baris) ada uraian sistematika '
+    'seperti "Bab ini", "Pada bab ini", "terdiri dari", atau "Berisi '
+    'tentang" — itu salinan SISTEMATIKA PENULISAN, bukan bab asli; '
+    '(3) baris mengandung nomor halaman di ujungnya (contoh ".... 1", '
+    '".. 28", "???? 4", titik-titik panjang diikuti angka/romawi) — itu '
+    'entri DAFTAR ISI, bukan judul bab; '
+    '(4) baris adalah judul daftar isi itu sendiri ("TABLE OF CONTENS", '
+    '"DAFTAR ISI") atau judul bab yang terulang berurutan rapat '
+    '(BAB I sampai BAB V dalam belasan baris) — itu daftar isi, bukan '
+    'badan naskah; '
+    '(5) baris diawali penanda huruf kecil ("a)", "b.", "c)") dan diikuti '
+    'butir huruf lain — itu butir daftar, bukan subbab. '
+    'Sebaliknya, "bab" HANYA bila baris adalah judul bab ASLI di badan '
+    'naskah: penanda bab + judul bersih, tanpa nomor halaman, dan tidak '
+    'berada dalam daftar salinan. Penanda huruf yang MENGEPALAI blok '
+    'penjelasan (judul pendek lalu uraian panjang) adalah "subbab"; '
+    'penanda huruf yang kalimat definisi lengkap ("... yaitu ...") adalah '
+    '"paragraf".'
+)
+
+
 def _prompt(teks_baris: str, konteks: dict | None) -> str:
     """Prompt klasifikasi 4 label dengan konteks lebar (Bahasa Indonesia).
 
@@ -135,6 +168,7 @@ def _prompt(teks_baris: str, konteks: dict | None) -> str:
         'daftar isi/sistematika, atau judul bab yang terulang sebagai running '
         'head, adalah "biasa", BUKAN "bab". Baris penomoran yang hanya butir '
         'di tengah kalimat adalah "biasa", BUKAN "subbab".')
+    bagian.append('Daftar periksa sebelum menjawab "bab": ' + ATURAN_BAB_TAJAM)
     return '\n\n'.join(bagian)
 
 

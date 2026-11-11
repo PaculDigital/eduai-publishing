@@ -176,6 +176,95 @@ segar bisa berbeda — flag live AC2 14 lawan 16 tersimpan); koreksi
 pasca-L2 di Fase B tanpa kode_label (tidak tersimpan); semua biaya
 estimasi lokal (jembatan tidak mengembalikan token usage).
 
+## 3d. v14 — Perbaikan label bab (Gas Bos 11 Nov 2026 13:01 WIB)
+
+**Dua cacat yang diperbaiki** (dari 279 baris label manusia):
+(1) salah terbesar v11/v13: 42 baris yang benarnya `biasa` dilabeli
+`bab` (salinan sistematika/daftar isi); (2) jebakan ATURAN 5: penanda
+huruf kepala blok (`a) Persetubuhan`) tidak pernah bisa jadi subbab.
+RULE_VERSION v14. Gating Hakim v13 + saklar `EDUAI_AGEN_KEDUA_AKTIF=0`
+bawaan mati TIDAK berubah perilakunya.
+
+**Aturan deterministik (peta3_jev.py):** 1A pembersihan gabung
+(`_bersihkan_gabung_daftar_isi`): hapus judul berartefak nomor halaman,
+hapus entri gabung di blok daftar isi, dedupe per nomor bab (skor
+berjudul 2 > polos 1, seri → pertahankan yang TERAKHIR). 1B detektor
+blok (`_deteksi_blok_daftar_isi`, teks saja): penanda polos di kunci
+gabung, bentuk satu baris `BAB X: Judul`, fragmen `:...` diawali huruf;
+pendukung = pengikut deskripsi (`Bab ini`, `Pada bab ini`, `terdiri
+dari`, `Berisi tentang`, `Berisi`) atau garis nomor halaman dalam ≤3
+baris, ATAU fragmen dalam 2 baris; `Dalam bab ini` SENGAJA bukan
+pendukung (kalimat pembuka bab asli). Tipe S: gerombol penanda rapat
+(≤15), ≥3 penanda dan ≥2 didukung; blok hanya penanda didukung +
+penanda yang diapit dua penanda didukung. Tipe D: ≥3 penanda satu baris
+dalam 15 baris. Tipe T: header daftar isi + ≥2 judul satu baris dalam
+40 baris. Demosi (`_demosi_blok_daftar_isi`, sesudah tanya-ulang,
+sebelum Lapis 2): label `bab`/`subbab` → `biasa` untuk baris di blok,
+plus baris diawali `:` tidak pernah `bab`/`subbab`. Pengecualian
+ATURAN 5 (`_penanda_huruf_kepala_blok`): penanda huruf tunggal, teks
+≤60 kar, DAN baris berikut adalah prosa penjelasan (≥40 kar, bukan
+penanda lain/keterangan tabel/judul bernomor/bab). Prompt agen kedua
+tajam (`ATURAN_BAB_TAJAM` di `app/agen_kedua.py`): daftar periksa 5 hal
+sebelum menjawab `bab`, penanda huruf kepala blok = `subbab`, kalimat
+definisi (`... yaitu...`) = `paragraf`.
+
+**Skor simulasi deterministik di 279 baris yang sama (tanpa Jev,
+dari peta v11/v13 tersimpan): v11 136/279 (48,7%) → v13 150/279
+(53,8%) → v14 198/279 (71,0%).** McNemar v14 vs v13: b=50, c=2,
+p<0,0001 — TERBUKTI lebih presisi. Per label v14: bab 10/21, subbab
+30/45, paragraf 55/75, biasa 103/138 (v13: bab 12/21, subbab 28/45,
+paragraf 55/75, biasa 55/138). **Salah-bab (benar biasa, dilabeli
+bab): v13=39 → v14=0.** Antrean manusia: v13=4 → v14=1. Per-aturan
+(di 279 baris, 52 diubah): gabung-bersih 22 (21 benar), blok 19 (19
+benar), paragraf-di-blok-suara-bab 5 (5 benar), demosi-hilang-
+perlindungan-a 3 (2 benar), aturan5-pengecualian 2 (2 benar),
+fragmen-gambar 1 (1 benar). 2 regresi, keduanya label manusia yang
+meragukan: H1 no 70 `BAB V` (konteks TSV cocok salinan TOC idx 320,
+bukan bab asli idx 1174) dan AJ-1 no 277 `Kesimpulan dan Saran`
+(judul salinan sistematika idx 39; bab asli di idx 2001). Artefak:
+8 dari 21 baris benar-bab berlabel `None` di data tersimpan (kunci
+gabung), dihitung salah di KETIGA versi — angka bab 12/21 → 10/21
+terdistorsi di kedua sisi, delta +41 net dan McNemar tidak terpengaruh.
+
+**Uji prompt agen kedua v14 live (63 panggilan, Gemini 2.5 Flash
+PINNED via OpenRouter):** 42 baris salah-bab → 17 dijawab `biasa`
+(40%); 21 baris benar-bab → 12 dijawab `bab` (57%); total 29/63.
+Pembanding prompt lama: 1/3 benar (hanya 3 baris bab yang ditandai
+Hakim di v13; denominator berbeda, bukan head-to-head setara). Prompt
+tajam membantu tapi BUKAN andalan: 25/42 salinan masih dijawab `bab`
+dan 9/21 bab asli salah dinilai; aturan deterministik yang memperbaiki
+semua 42 di simulasi. Di produksi, salah agen soal judul bab masuk
+antrean (label tidak berubah), jadi kekeliruan prompt tertahan.
+
+**Run live kecil G3 (kode v14, container, 11 Nov 2026):** probe
+melayani `typesafe/jev-1.14-20261014` (OpenRouter; TypeSafe resmi
+masih 402). 12 panggilan Jev (choice 8 + noul 4, termasuk 1
+periksa_peta pasca) + 1 probe, 15,8 dtk; DB tidak berubah (sidik
+28/108/235 tetap). Gabung 10 → 5 entri: 5 penanda polos `Bab I`–`Bab V`
+salinan sistematika terbuang, 5 bab asli utuh (idx 0, 61, 241, 394,
+571). Baris target G3 (6): no 251/252/254 `bab` → `biasa` (benar),
+no 253 `paragraf` → `biasa` (benar), no 255 `d. Mengenali Emosi
+Orang Lain` `biasa` → `subbab` (benar, suara live [paragraf, subbab]),
+no 250 `: Tinjauan Pustaka` `bab` → `paragraf` (SEBAGIAN: bukan lagi
+bab palsu, tapi belum `biasa`). Adjudikasi 2 baris relevan v14 (VM,
+prompt baru): idx 193 sepakat `subbab` ("penomoran huruf yang
+mengepalai blok penjelasan sendiri"), idx 60 sepakat `paragraf`.
+38 baris rekaman lain tidak diadili ulang (gating v13 biasa, sudah
+diukur di 279 baris). 225 beda label vs peta v11 tersimpan — sebagian
+besar goyang model di wilayah tabel/daftar pustaka, bukan ulah v14.
+
+**Batasan jujur:** skor 198/279 adalah SIMULASI dari suara Jev v11
+tersimpan, bukan run segar. Di run segar, goyang model bisa membuat
+pemenang suara jadi `paragraf` sebelum demosi (demosi hanya menangkap
+`bab`/`subbab`) — terbukti live di G3 no 250. Aturan (d)
+(paragraf-di-blok-suara-bab, 5 baris) mengasumsikan label pra-demosi
+adalah `bab`; bila tanya-ulang sudah membaliknya ke `paragraf`,
+produksi tidak mendemosinya. Bahkan bila ke-5 baris (d) gugur, skor
+jadi 193/279 (69,2%) — kenaikan dari v13 tetap besar. Temuan lanjutan
+(diluar v14): `buang_daftar_isi` memotong teks di salinan sistematika
+bukan BAB I asli karena BOM (R3) — jangan diubah tanpa Gas (menggeser
+semua indeks).
+
 ## 4. Biaya per naskah (perkiraan)
 
 Harga Jev: ~Rp10,5/panggilan (terukur: 40 panggilan Rp419). Jev memakai
@@ -280,6 +369,15 @@ dan wiring live terbukti di AC2 (perekam tepat 14 baris ditandai).
 butuh manusia, label bab tidak membaik sama sekali, vonis hanya berlaku
 di baris sulit (bukan seluruh peta), dan 4 baris dirusak rantai.
 
+**v14 — label bab TERBUKTI membaik (simulasi + live kecil).**
+Simulasi deterministik di 279 baris yang sama: v14 198/279 (71,0%),
++48 net dari v13, McNemar p<0,0001; salah-bab 39 → 0; antrean 4 → 1.
+Run live G3 membuktikan wiring end-to-end (gabung 10 → 5, 5 dari 6
+baris target benar penuh, 1 sebagian). Batasan: skor adalah simulasi
+dari suara v11 tersimpan; di run segar goyang model bisa loloskan
+sebagian (G3 no 250 jadi `paragraf`, bukan `biasa`). Deploy v14 tetap
+butuh Gas Bos (branch, belum push/merge/deploy).
+
 **Yang masih kurang / perlu putusan Bos:**
 1. **Pengukuran penuh di 35 naskah uji — SELESAI 11 Nov 2026**
    (lihat 3c di atas).
@@ -291,15 +389,21 @@ di baris sulit (bukan seluruh peta), dan 4 baris dirusak rantai.
    diubah ke gating Hakim (v13) dan diukur penuh. Koreksi di tengah
    jalan: v13 pertama salah memakai goyang yang ditandai (61 baris);
    diperbaiki menjadi semua baris ditandai (390 baris) sebelum ukur.
-4. **Jebakan ATURAN 5 (temuan pilot, perlu aturan v13):** baris penanda
-   huruf seperti "a) Persetubuhan" tidak pernah bisa jadi subbab — bila
-   agen kedua bilang subbab, ATURAN 5 membatalkannya (huruf awal kecil)
-   dan v6 membatalkan paragraf juga. Perbaikan butuh ubah
-   `_huruf_awal_kecil` (kupas penanda huruf "a) "/"b) " dulu). BUKAN
-   bagian tugas ini; jangan ubah tanpa Gas.
-5. **Prompt perlu dipertajam** untuk dua pola salah terbanyak: penanda
-   huruf yang mengepalai blok penjelasan (subbab, bukan butir daftar)
-   dan fragmen/butir bernomor/peluru (biasa, bukan paragraf).
+4. **Jebakan ATURAN 5 — SELESAI di v14 (Gas Bos 11 Nov 2026 13:01
+   WIB):** penanda huruf kepala blok kini BOLEH jadi subbab
+   (`_penanda_huruf_kepala_blok`); penanda huruf butir daftar tetap
+   bukan subbab. Terbukti live di G3 no 255 (biasa → subbab, agen
+   kedua sepakat) dan simulasi 2/2 baris sengketa benar.
+5. **Prompt dipertajam di v14** (`ATURAN_BAB_TAJAM`): penanda huruf
+   kepala blok = subbab, kalimat definisi = paragraf, daftar periksa
+   5 hal sebelum menjawab `bab`. Uji live 63 baris: 17/42 salinan
+   dikenali, 12/21 bab asli benar — membantu tapi bukan andalan;
+   aturan deterministik yang memperbaiki semua 42 di simulasi.
+6. **Berkas v14:** `_verifikasi_v11/hasil_gating_g3.json` (run live
+   G3 + adjudikasi 2 baris), `_verifikasi_v11/hasil_prompt_v14.json`
+   (uji prompt 63 baris), `_sketsa/uji_prompt_v14.py`,
+   `_sketsa/adjudikasi_g3_v14.py`, `_sketsa/ukur_v14.py` (evaluator),
+   `_verifikasi_v11/jalankan_gating_g3.py` (pelari live G3).
 
 ## 7. Berkas pilot
 

@@ -1,0 +1,2852 @@
+{
+ "kode": "G3",
+ "rule_version": "jev-peta-v14",
+ "model_diminta": "SATPAM/typesafe/jev-1.14",
+ "model_melayani": "typesafe/jev-1.14-20261014",
+ "model_override": null,
+ "bukti_model": {
+  "model_dilayani": "typesafe/jev-1.14-20261014",
+  "satpam_penyedia": "openrouter",
+  "satpam_jejak": [
+   {
+    "penyedia": "resmi",
+    "model": "jev-1.14.0",
+    "hasil": "GAGAL",
+    "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+   },
+   {
+    "penyedia": "openrouter",
+    "model": "typesafe/jev-1.14",
+    "hasil": "DIPAKAI"
+   }
+  ],
+  "provider": "TypeSafe"
+ },
+ "probe_jml": 1,
+ "panggilan_jev": {
+  "choice": 8,
+  "noul": 4,
+  "lain": 0
+ },
+ "panggilan_total": 12,
+ "wall_detik": 15.83,
+ "wall_petakan_detik": 13.48,
+ "sidik_sebelum": [
+  28,
+  108,
+  235
+ ],
+ "sidik_sesudah": [
+  28,
+  108,
+  235
+ ],
+ "sidik_berubah": false,
+ "hakim_tandai_pra": [
+  30,
+  60,
+  80,
+  82,
+  83,
+  85,
+  93,
+  98,
+  103,
+  105,
+  108,
+  109,
+  110,
+  111,
+  113,
+  114,
+  123,
+  128,
+  132,
+  144,
+  168,
+  188,
+  189,
+  190,
+  191,
+  192,
+  193,
+  195,
+  196,
+  317,
+  336,
+  358,
+  371,
+  372,
+  405,
+  420,
+  433,
+  531,
+  534,
+  582
+ ],
+ "hakim_tandai_galat": null,
+ "hakim_final": {
+  "jumlah_sepakat": 36,
+  "jumlah_ragu": 11,
+  "jumlah_curiga": 10,
+  "jumlah_belum": 0
+ },
+ "flag_pasca": [
+  30,
+  80,
+  82,
+  83,
+  93,
+  98,
+  108,
+  110,
+  114,
+  123,
+  144,
+  168,
+  189,
+  191,
+  192,
+  193,
+  196,
+  371,
+  420,
+  433,
+  534
+ ],
+ "flag_selisih": {
+  "hanya_pra": [
+   60,
+   85,
+   103,
+   105,
+   109,
+   111,
+   113,
+   128,
+   132,
+   188,
+   190,
+   195,
+   317,
+   336,
+   358,
+   372,
+   405,
+   531,
+   582
+  ],
+  "hanya_pasca": []
+ },
+ "rekaman": [
+  {
+   "idx": 30,
+   "teks": "Prestasi belajar adalah hasil belajar yang dicapai oleh seorang siswa dari kegiatan belajar mengajar dalam bidang akademik di sekolah dalam jangka waktu tertentu.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.92
+   ],
+   "konteks": {
+    "sebelum": [
+     "Bertitik tolak dari latar belakang masalah yang telah diuraikan di atas, maka masalah penelitian ini dapat dirumuskan sebagai berikut : “Apakah ada hubungan antara kecerdasan emosional dengan Prestasi belajar pada siswa kelas II SMU di Jakarta?”",
+     "Pada penelitian ini yang menjadi pokok-pokok bahasan adalah sebagai berikut:",
+     "1. Prestasi belajar"
+    ],
+    "sesudah": [
+     "2. Kecerdasan Emosional",
+     "Kecerdasan emosional adalah kemampuan seseorang untuk memantau dan mengendalikan perasaan sendiri dan orang lain, serta menggunakan perasaan-perasaan itu untuk memandu pikiran dan tindakan ke arah yang positif.",
+     ""
+    ],
+    "judul_bab_terdekat": "BAB I PENDAHULUAN"
+   }
+  },
+  {
+   "idx": 60,
+   "teks": "Berisi tentang pembahasan hasil penelitian, kesimpulan dan saran dari peneliti.",
+   "suara": [
+    "bab"
+   ],
+   "conf": [
+    0.83
+   ],
+   "konteks": {
+    "sebelum": [
+     "Berisi tentang laporan pelaksanaan penelitian yang terdiri dari orientasi kancah penelitian, persiapan penelitian, pelaksanaan penelitian serta analisis data penelitian.",
+     "Bab V",
+     ": Penutup"
+    ],
+    "sesudah": [
+     "BAB II",
+     "TINJAUAN PUSTAKA",
+     ""
+    ],
+    "judul_bab_terdekat": "BAB I PENDAHULUAN"
+   }
+  },
+  {
+   "idx": 80,
+   "teks": "Perubahan dalam proses berlajar adalah karena pengalaman atau praktek yang dilakukan secara sengaja dan disadari. Pada ciri ini siswa menyadari bahwa ada perubahan dalam dirinya, seperti penambahan pengetahuan, kebiasaan dan keterampilan.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.84
+   ],
+   "konteks": {
+    "sebelum": [
+     "Belajar dapat dikatakan berhasil jika terjadi perubahan dalam diri siswa, namun tidak semua perubahan perilaku dapat dikatakan belajar karena perubahan tingkah laku akibat belajar memiliki ciri-ciri perwujudan yang khas (Muhibbidin Syah, 2000:116) antara lain :",
+     "",
+     "a. Perubahan Intensional"
+    ],
+    "sesudah": [
+     "b. Perubahan Positif dan aktif",
+     "Positif berarti perubahan tersebut baik dan bermanfaat bagi kehidupan serta sesuai dengan harapan karena memperoleh sesuatu yang baru, yang lebih baik dari sebelumnya. Sedangkan aktif artinya perubahan tersebut terjadi karena adanya usaha dari siswa yang bersangkutan.",
+     "c. Perubahan efektif dan fungsional"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 82,
+   "teks": "Positif berarti perubahan tersebut baik dan bermanfaat bagi kehidupan serta sesuai dengan harapan karena memperoleh sesuatu yang baru, yang lebih baik dari sebelumnya. Sedangkan aktif artinya perubahan tersebut terjadi karena adanya usaha dari siswa yang bersangkutan.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.81
+   ],
+   "konteks": {
+    "sebelum": [
+     "a. Perubahan Intensional",
+     "Perubahan dalam proses berlajar adalah karena pengalaman atau praktek yang dilakukan secara sengaja dan disadari. Pada ciri ini siswa menyadari bahwa ada perubahan dalam dirinya, seperti penambahan pengetahuan, kebiasaan dan keterampilan.",
+     "b. Perubahan Positif dan aktif"
+    ],
+    "sesudah": [
+     "c. Perubahan efektif dan fungsional",
+     "Perubahan dikatakan efektif apabila membawa pengaruh dan manfaat tertentu bagi siswa. Sedangkan perubahan yang fungsional artinya perubahan dalam diri siswa tersebut relatif menetap dan apabila dibutuhkan perubahan tersebut dapat direproduksi dan dimanfaatkan lagi.",
+     "Berdasarkan dari uraian di atas, maka dapat disimpulkan bahwa belajar adalah suatu proses usaha yang dilakukan siswa untuk memperoleh suatu perubahan tingkah laku yang baru secara keseluruhan, secara sengaja, disadari dan perubahan tersebut relatif menetap serta membawa pengaruh dan manfaat yang positif bagi siswa dalam berinteraksi dengan lingkungannya."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 83,
+   "teks": "c. Perubahan efektif dan fungsional",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.61
+   ],
+   "konteks": {
+    "sebelum": [
+     "Perubahan dalam proses berlajar adalah karena pengalaman atau praktek yang dilakukan secara sengaja dan disadari. Pada ciri ini siswa menyadari bahwa ada perubahan dalam dirinya, seperti penambahan pengetahuan, kebiasaan dan keterampilan.",
+     "b. Perubahan Positif dan aktif",
+     "Positif berarti perubahan tersebut baik dan bermanfaat bagi kehidupan serta sesuai dengan harapan karena memperoleh sesuatu yang baru, yang lebih baik dari sebelumnya. Sedangkan aktif artinya perubahan tersebut terjadi karena adanya usaha dari siswa yang bersangkutan."
+    ],
+    "sesudah": [
+     "Perubahan dikatakan efektif apabila membawa pengaruh dan manfaat tertentu bagi siswa. Sedangkan perubahan yang fungsional artinya perubahan dalam diri siswa tersebut relatif menetap dan apabila dibutuhkan perubahan tersebut dapat direproduksi dan dimanfaatkan lagi.",
+     "Berdasarkan dari uraian di atas, maka dapat disimpulkan bahwa belajar adalah suatu proses usaha yang dilakukan siswa untuk memperoleh suatu perubahan tingkah laku yang baru secara keseluruhan, secara sengaja, disadari dan perubahan tersebut relatif menetap serta membawa pengaruh dan manfaat yang positif bagi siswa dalam berinteraksi dengan lingkungannya.",
+     "2. Pengertian prestasi belajar"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 85,
+   "teks": "Berdasarkan dari uraian di atas, maka dapat disimpulkan bahwa belajar adalah suatu proses usaha yang dilakukan siswa untuk memperoleh suatu perubahan tingkah laku yang baru secara keseluruhan, secara sengaja, disadari dan perubahan tersebut relatif menetap serta membawa pengaruh dan manfaat yang positif bagi siswa dalam berinteraksi dengan lingkungannya.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.96
+   ],
+   "konteks": {
+    "sebelum": [
+     "Positif berarti perubahan tersebut baik dan bermanfaat bagi kehidupan serta sesuai dengan harapan karena memperoleh sesuatu yang baru, yang lebih baik dari sebelumnya. Sedangkan aktif artinya perubahan tersebut terjadi karena adanya usaha dari siswa yang bersangkutan.",
+     "c. Perubahan efektif dan fungsional",
+     "Perubahan dikatakan efektif apabila membawa pengaruh dan manfaat tertentu bagi siswa. Sedangkan perubahan yang fungsional artinya perubahan dalam diri siswa tersebut relatif menetap dan apabila dibutuhkan perubahan tersebut dapat direproduksi dan dimanfaatkan lagi."
+    ],
+    "sesudah": [
+     "2. Pengertian prestasi belajar",
+     "Untuk mendapatkan suatu prestasi tidaklah semudah yang dibayangkan, karena memerlukan perjuangan dan pengorbanan dengan berbagai tantangan yang harus dihadapi.",
+     "Penilaian terhadap hasil belajar siswa untuk mengetahui sejauhmana ia telah mencapai sasaran belajar inilah yang disebut sebagai prestasi belajar. Seperti yang dikatakan oleh Winkel (1997:168) bahwa proses belajar yang dialami oleh siswa menghasilkan perubahan-perubahan dalam bidang pengetahuan dan pemahaman, dalam bidang nilai, sikap dan keterampilan. Adanya perubahan tersebut tampak dalam prestasi belajar yang dihasilkan oleh siswa terhadap pertanyaan, persoalan atau tugas yang diberikan oleh guru. Melalui prestasi belajar siswa dapat mengetahui kemajuan-kemajuan yang telah dicapainya dalam belajar."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 93,
+   "teks": "3. Faktor-faktor yang mempengaruhi prestasi belajar.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.55
+   ],
+   "konteks": {
+    "sebelum": [
+     "Menurut Poerwodarminto (Mila Ratnawati, 1996 : 206) yang dimaksud dengan prestasi adalah hasil yang telah dicapai, dilakukan atau dikerjakan oleh seseorang. Sedangkan prestasi belajar itu sendiri diartikan sebagai prestasi yang dicapai oleh seorang siswa pada jangka waktu tertentu dan dicatat dalam buku rapor sekolah.",
+     "Dari beberapa definisi di atas, dapat ditarik kesimpulan bahwa prestasi belajar merupakan hasil usaha belajar yang dicapai seorang siswa berupa suatu kecakapan dari kegiatan belajar bidang akademik di sekolah pada jangka waktu tertentu yang dicatat pada setiap akhir semester di dalam buki laporan yang disebut rapor.",
+     ""
+    ],
+    "sesudah": [
+     "Untuk meraih prestasi belajar yang baik, banyak sekali faktor yang perlu diperhatikan, karena di dalam dunia pendidikan tidak sedikit siswa yang mengalami kegagalan. Kadang ada siswa yang memiliki dorongan yang kuat untuk berprestasi dan kesempatan untuk meningkatkan prestasi, tapi dalam kenyataannya prestasi yang dihasilkan di bawah kemampuannya.",
+     "Untuk meraih prestasi belajar yang baik banyak sekali faktor-faktor yang perlu diperhatikan. Menurut Sumadi Suryabrata (1998 : 233) dan Shertzer dan Stone (Winkle, 1997 : 591), secara garis besar faktor-faktor yang mempengaruhi belajar dan prestasi belajar dapat digolongkan menjadi dua bagian, yaitu faktor internal dan faktor eksternal.:",
+     ""
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 98,
+   "teks": "a. Faktor internal",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.6
+   ],
+   "konteks": {
+    "sebelum": [
+     "Untuk meraih prestasi belajar yang baik banyak sekali faktor-faktor yang perlu diperhatikan. Menurut Sumadi Suryabrata (1998 : 233) dan Shertzer dan Stone (Winkle, 1997 : 591), secara garis besar faktor-faktor yang mempengaruhi belajar dan prestasi belajar dapat digolongkan menjadi dua bagian, yaitu faktor internal dan faktor eksternal.:",
+     "",
+     ""
+    ],
+    "sesudah": [
+     "Merupakan faktor yang berasal dari dalam diri siswa yang dapat mempengaruhi prestasi belajar. Faktor ini dapat dibedakan menjadi dua kelompok, yaitu :",
+     "1). Faktor fisiologis",
+     "Dalam hal ini, faktor fisiologis yang dimaksud adalah faktor yang berhubungan dengan kesehatan dan pancaindera"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 103,
+   "teks": "Untuk dapat menempuh studi yang baik siswa perlu memperhatikan dan memelihara kesehatan tubuhnya. Keadaan fisik yang lemah dapat menjadi penghalang bagi siswa dalam menyelesaikan program studinya. Dalam upaya memelihara kesehatan fisiknya, siswa perlu memperhatikan pola makan dan pola tidur, untuk memperlancar metabolisme dalam tubuhnya. Selain itu, juga untuk memelihara kesehatan bahkan juga dapat meningkatkan ketangkasan fisik dibutuhkan olahraga yang teratur.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.72
+   ],
+   "konteks": {
+    "sebelum": [
+     "1). Faktor fisiologis",
+     "Dalam hal ini, faktor fisiologis yang dimaksud adalah faktor yang berhubungan dengan kesehatan dan pancaindera",
+     "a) Kesehatan badan"
+    ],
+    "sesudah": [
+     "b) Pancaindera",
+     "Berfungsinya pancaindera merupakan syarat dapatnya belajar itu berlangsung dengan baik. Dalam sistem pendidikan dewasa ini di antara pancaindera itu yang paling memegang peranan dalam belajar adalah mata dan telinga. Hal ini penting, karena sebagian besar hal-hal yang dipelajari oleh manusia dipelajari melalui penglihatan dan pendengaran. Dengan demikian, seorang anak yang memiliki cacat fisik atau bahkan cacat mental akan menghambat dirinya didalam menangkap pelajaran, sehingga pada akhirnya akan mempengaruhi prestasi belajarnya di sekolah.",
+     "2) Faktor psikologis"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 105,
+   "teks": "Berfungsinya pancaindera merupakan syarat dapatnya belajar itu berlangsung dengan baik. Dalam sistem pendidikan dewasa ini di antara pancaindera itu yang paling memegang peranan dalam belajar adalah mata dan telinga. Hal ini penting, karena sebagian besar hal-hal yang dipelajari oleh manusia dipelajari melalui penglihatan dan pendengaran. Dengan demikian, seorang anak yang memiliki cacat fisik atau bahkan cacat mental akan menghambat dirinya didalam menangkap pelajaran, sehingga pada akhirnya akan mempengaruhi prestasi belajarnya di sekolah.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.83
+   ],
+   "konteks": {
+    "sebelum": [
+     "a) Kesehatan badan",
+     "Untuk dapat menempuh studi yang baik siswa perlu memperhatikan dan memelihara kesehatan tubuhnya. Keadaan fisik yang lemah dapat menjadi penghalang bagi siswa dalam menyelesaikan program studinya. Dalam upaya memelihara kesehatan fisiknya, siswa perlu memperhatikan pola makan dan pola tidur, untuk memperlancar metabolisme dalam tubuhnya. Selain itu, juga untuk memelihara kesehatan bahkan juga dapat meningkatkan ketangkasan fisik dibutuhkan olahraga yang teratur.",
+     "b) Pancaindera"
+    ],
+    "sesudah": [
+     "2) Faktor psikologis",
+     "Ada banyak faktor psikologis yang dapat mempengaruhi prestasi belajar siswa, antara lain adalah :",
+     "a) Intelligensi"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 108,
+   "teks": "a) Intelligensi",
+   "suara": [
+    "paragraf",
+    "subbab"
+   ],
+   "conf": [
+    0.27,
+    0.51
+   ],
+   "konteks": {
+    "sebelum": [
+     "Berfungsinya pancaindera merupakan syarat dapatnya belajar itu berlangsung dengan baik. Dalam sistem pendidikan dewasa ini di antara pancaindera itu yang paling memegang peranan dalam belajar adalah mata dan telinga. Hal ini penting, karena sebagian besar hal-hal yang dipelajari oleh manusia dipelajari melalui penglihatan dan pendengaran. Dengan demikian, seorang anak yang memiliki cacat fisik atau bahkan cacat mental akan menghambat dirinya didalam menangkap pelajaran, sehingga pada akhirnya akan mempengaruhi prestasi belajarnya di sekolah.",
+     "2) Faktor psikologis",
+     "Ada banyak faktor psikologis yang dapat mempengaruhi prestasi belajar siswa, antara lain adalah :"
+    ],
+    "sesudah": [
+     "Pada umumnya, prestasi belajar yang ditampilkan siswa mempunyai kaitan yang erat dengan tingkat kecerdasan yang dimiliki siswa. Menurut Binet (Winkle,1997 :529) hakikat inteligensi adalah kemampuan untuk menetapkan dan mempertahankan suatu tujuan, untuk mengadakan suatu penyesuaian dalam rangka mencapai tujuan itu dan untuk menilai keadaan diri secara kritis dan objektif. Taraf inteligensi ini sangat mempengaruhi prestasi belajar seorang siswa, di mana siswa yang memiliki taraf inteligensi tinggi mempunyai peluang lebih besar untuk mencapai prestasi belajar yang lebih tinggi. Sebaliknya, siswa yang memiliki taraf inteligensi yang rendah diperkirakan juga akan memiliki prestasi belajar yang rendah. Namun bukanlah suatu yang tidak mungkin jika siswa dengan taraf inteligensi rendah memiliki prestasi belajar yang tinggi, juga sebaliknya .",
+     "b) Sikap",
+     "Sikap yang pasif, rendah diri dan kurang percaya diri dapat merupakan faktor yang menghambat siswa dalam menampilkan prestasi belajarnya. Menurut Sarlito Wirawan (1997:233) sikap adalah kesiapan seseorang untuk bertindak secara tertentu terhadap hal-hal tertentu. Sikap siswa yang positif terhadap mata pelajaran di sekolah merupakan langkah awal yang baik dalam proses belajar mengajar di sekolah."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 109,
+   "teks": "Pada umumnya, prestasi belajar yang ditampilkan siswa mempunyai kaitan yang erat dengan tingkat kecerdasan yang dimiliki siswa. Menurut Binet (Winkle,1997 :529) hakikat inteligensi adalah kemampuan untuk menetapkan dan mempertahankan suatu tujuan, untuk mengadakan suatu penyesuaian dalam rangka mencapai tujuan itu dan untuk menilai keadaan diri secara kritis dan objektif. Taraf inteligensi ini sangat mempengaruhi prestasi belajar seorang siswa, di mana siswa yang memiliki taraf inteligensi tinggi mempunyai peluang lebih besar untuk mencapai prestasi belajar yang lebih tinggi. Sebaliknya, siswa yang memiliki taraf inteligensi yang rendah diperkirakan juga akan memiliki prestasi belajar yang rendah. Namun bukanlah suatu yang tidak mungkin jika siswa dengan taraf inteligensi rendah memiliki prestasi belajar yang tinggi, juga sebaliknya .",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.77
+   ],
+   "konteks": {
+    "sebelum": [
+     "2) Faktor psikologis",
+     "Ada banyak faktor psikologis yang dapat mempengaruhi prestasi belajar siswa, antara lain adalah :",
+     "a) Intelligensi"
+    ],
+    "sesudah": [
+     "b) Sikap",
+     "Sikap yang pasif, rendah diri dan kurang percaya diri dapat merupakan faktor yang menghambat siswa dalam menampilkan prestasi belajarnya. Menurut Sarlito Wirawan (1997:233) sikap adalah kesiapan seseorang untuk bertindak secara tertentu terhadap hal-hal tertentu. Sikap siswa yang positif terhadap mata pelajaran di sekolah merupakan langkah awal yang baik dalam proses belajar mengajar di sekolah.",
+     "c) Motivasi"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 110,
+   "teks": "b) Sikap",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.6
+   ],
+   "konteks": {
+    "sebelum": [
+     "Ada banyak faktor psikologis yang dapat mempengaruhi prestasi belajar siswa, antara lain adalah :",
+     "a) Intelligensi",
+     "Pada umumnya, prestasi belajar yang ditampilkan siswa mempunyai kaitan yang erat dengan tingkat kecerdasan yang dimiliki siswa. Menurut Binet (Winkle,1997 :529) hakikat inteligensi adalah kemampuan untuk menetapkan dan mempertahankan suatu tujuan, untuk mengadakan suatu penyesuaian dalam rangka mencapai tujuan itu dan untuk menilai keadaan diri secara kritis dan objektif. Taraf inteligensi ini sangat mempengaruhi prestasi belajar seorang siswa, di mana siswa yang memiliki taraf inteligensi tinggi mempunyai peluang lebih besar untuk mencapai prestasi belajar yang lebih tinggi. Sebaliknya, siswa yang memiliki taraf inteligensi yang rendah diperkirakan juga akan memiliki prestasi belajar yang rendah. Namun bukanlah suatu yang tidak mungkin jika siswa dengan taraf inteligensi rendah memiliki prestasi belajar yang tinggi, juga sebaliknya ."
+    ],
+    "sesudah": [
+     "Sikap yang pasif, rendah diri dan kurang percaya diri dapat merupakan faktor yang menghambat siswa dalam menampilkan prestasi belajarnya. Menurut Sarlito Wirawan (1997:233) sikap adalah kesiapan seseorang untuk bertindak secara tertentu terhadap hal-hal tertentu. Sikap siswa yang positif terhadap mata pelajaran di sekolah merupakan langkah awal yang baik dalam proses belajar mengajar di sekolah.",
+     "c) Motivasi",
+     "Menurut Irwanto (1997 : 193) motivasi adalah penggerak perilaku. Motivasi belajar adalah pendorong seseorang untuk belajar. Motivasi timbul karena adanya keinginan atau kebutuhan-kebutuhan dalam diri seseorang. Seseorang berhasil dalam belajar karena ia ingin belajar. Sedangkan menurut Winkle (1991 : 39) motivasi belajar adalah keseluruhan daya penggerak di dalam diri siswa yang menimbulkan kegiatan belajar, yang menjamin kelangsungan dari kegiatan belajar dan yang memberikan arah pada kegiatan belajar itu; maka tujuan yang dikehendaki oleh siswa tercapai. Motivasi belajar merupakan faktor psikis yang bersifat non intelektual. Peranannya yang khas ialah dalam hal gairah atau semangat belajar, siswa yang termotivasi kuat akan mempunyai banyak energi untuk melakukan kegiatan belajar."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 111,
+   "teks": "Sikap yang pasif, rendah diri dan kurang percaya diri dapat merupakan faktor yang menghambat siswa dalam menampilkan prestasi belajarnya. Menurut Sarlito Wirawan (1997:233) sikap adalah kesiapan seseorang untuk bertindak secara tertentu terhadap hal-hal tertentu. Sikap siswa yang positif terhadap mata pelajaran di sekolah merupakan langkah awal yang baik dalam proses belajar mengajar di sekolah.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.77
+   ],
+   "konteks": {
+    "sebelum": [
+     "a) Intelligensi",
+     "Pada umumnya, prestasi belajar yang ditampilkan siswa mempunyai kaitan yang erat dengan tingkat kecerdasan yang dimiliki siswa. Menurut Binet (Winkle,1997 :529) hakikat inteligensi adalah kemampuan untuk menetapkan dan mempertahankan suatu tujuan, untuk mengadakan suatu penyesuaian dalam rangka mencapai tujuan itu dan untuk menilai keadaan diri secara kritis dan objektif. Taraf inteligensi ini sangat mempengaruhi prestasi belajar seorang siswa, di mana siswa yang memiliki taraf inteligensi tinggi mempunyai peluang lebih besar untuk mencapai prestasi belajar yang lebih tinggi. Sebaliknya, siswa yang memiliki taraf inteligensi yang rendah diperkirakan juga akan memiliki prestasi belajar yang rendah. Namun bukanlah suatu yang tidak mungkin jika siswa dengan taraf inteligensi rendah memiliki prestasi belajar yang tinggi, juga sebaliknya .",
+     "b) Sikap"
+    ],
+    "sesudah": [
+     "c) Motivasi",
+     "Menurut Irwanto (1997 : 193) motivasi adalah penggerak perilaku. Motivasi belajar adalah pendorong seseorang untuk belajar. Motivasi timbul karena adanya keinginan atau kebutuhan-kebutuhan dalam diri seseorang. Seseorang berhasil dalam belajar karena ia ingin belajar. Sedangkan menurut Winkle (1991 : 39) motivasi belajar adalah keseluruhan daya penggerak di dalam diri siswa yang menimbulkan kegiatan belajar, yang menjamin kelangsungan dari kegiatan belajar dan yang memberikan arah pada kegiatan belajar itu; maka tujuan yang dikehendaki oleh siswa tercapai. Motivasi belajar merupakan faktor psikis yang bersifat non intelektual. Peranannya yang khas ialah dalam hal gairah atau semangat belajar, siswa yang termotivasi kuat akan mempunyai banyak energi untuk melakukan kegiatan belajar.",
+     "b. Faktor eksternal"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 113,
+   "teks": "Menurut Irwanto (1997 : 193) motivasi adalah penggerak perilaku. Motivasi belajar adalah pendorong seseorang untuk belajar. Motivasi timbul karena adanya keinginan atau kebutuhan-kebutuhan dalam diri seseorang. Seseorang berhasil dalam belajar karena ia ingin belajar. Sedangkan menurut Winkle (1991 : 39) motivasi belajar adalah keseluruhan daya penggerak di dalam diri siswa yang menimbulkan kegiatan belajar, yang menjamin kelangsungan dari kegiatan belajar dan yang memberikan arah pada kegiatan belajar itu; maka tujuan yang dikehendaki oleh siswa tercapai. Motivasi belajar merupakan faktor psikis yang bersifat non intelektual. Peranannya yang khas ialah dalam hal gairah atau semangat belajar, siswa yang termotivasi kuat akan mempunyai banyak energi untuk melakukan kegiatan belajar.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.87
+   ],
+   "konteks": {
+    "sebelum": [
+     "b) Sikap",
+     "Sikap yang pasif, rendah diri dan kurang percaya diri dapat merupakan faktor yang menghambat siswa dalam menampilkan prestasi belajarnya. Menurut Sarlito Wirawan (1997:233) sikap adalah kesiapan seseorang untuk bertindak secara tertentu terhadap hal-hal tertentu. Sikap siswa yang positif terhadap mata pelajaran di sekolah merupakan langkah awal yang baik dalam proses belajar mengajar di sekolah.",
+     "c) Motivasi"
+    ],
+    "sesudah": [
+     "b. Faktor eksternal",
+     "Selain faktor-faktor yang ada dalam diri siswa, ada hal-hal lain diluar diri yang dapat mempengaruhi prestasi belajar yang akan diraih, antara lain adalah :",
+     "1). Faktor lingkungan keluarga a) Sosial ekonomi keluarga"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 114,
+   "teks": "b. Faktor eksternal",
+   "suara": [
+    "paragraf",
+    "subbab"
+   ],
+   "conf": [
+    0.48,
+    0.64
+   ],
+   "konteks": {
+    "sebelum": [
+     "Sikap yang pasif, rendah diri dan kurang percaya diri dapat merupakan faktor yang menghambat siswa dalam menampilkan prestasi belajarnya. Menurut Sarlito Wirawan (1997:233) sikap adalah kesiapan seseorang untuk bertindak secara tertentu terhadap hal-hal tertentu. Sikap siswa yang positif terhadap mata pelajaran di sekolah merupakan langkah awal yang baik dalam proses belajar mengajar di sekolah.",
+     "c) Motivasi",
+     "Menurut Irwanto (1997 : 193) motivasi adalah penggerak perilaku. Motivasi belajar adalah pendorong seseorang untuk belajar. Motivasi timbul karena adanya keinginan atau kebutuhan-kebutuhan dalam diri seseorang. Seseorang berhasil dalam belajar karena ia ingin belajar. Sedangkan menurut Winkle (1991 : 39) motivasi belajar adalah keseluruhan daya penggerak di dalam diri siswa yang menimbulkan kegiatan belajar, yang menjamin kelangsungan dari kegiatan belajar dan yang memberikan arah pada kegiatan belajar itu; maka tujuan yang dikehendaki oleh siswa tercapai. Motivasi belajar merupakan faktor psikis yang bersifat non intelektual. Peranannya yang khas ialah dalam hal gairah atau semangat belajar, siswa yang termotivasi kuat akan mempunyai banyak energi untuk melakukan kegiatan belajar."
+    ],
+    "sesudah": [
+     "Selain faktor-faktor yang ada dalam diri siswa, ada hal-hal lain diluar diri yang dapat mempengaruhi prestasi belajar yang akan diraih, antara lain adalah :",
+     "1). Faktor lingkungan keluarga a) Sosial ekonomi keluarga",
+     "Dengan sosial ekonomi yang memadai, seseorang lebih berkesempatan mendapatkan fasilitas belajar yang lebih baik, mulai dari buku, alat tulis hingga pemilihan sekolah"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 123,
+   "teks": "Kelengkapan fasilitas sekolah, seperti papan tulis, OHP akan membantu kelancaran proses belajar mengajar di sekolah; selain bentuk ruangan, sirkulasi udara dan lingkungan sekitar sekolah juga dapat mempengaruhi proses belajar mengajar",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.6
+   ],
+   "konteks": {
+    "sebelum": [
+     "c). Perhatian orang tua dan suasana hubungan antara anggota keluarga",
+     "Dukungan dari keluarga merupakan suatu pemacu semangat berpretasi bagi seseorang. Dukungan dalam hal ini bisa secara langsung, berupa pujian atau nasihat; maupun secara tidak langsung, seperti hubugan keluarga yang harmonis.",
+     "2). Faktor lingkungan sekolah a). Sarana dan prasarana"
+    ],
+    "sesudah": [
+     "b). Kompetensi guru dan siswa",
+     "Kualitas guru dan siswa sangat penting dalam meraih prestasi, kelengkapan sarana dan prasarana tanpa disertai kinerja yang baik dari para penggunanya akan sia-sia belaka. Bila seorang siswa merasa kebutuhannya untuk berprestasi dengan baik di sekolah terpenuhi, misalnya dengan tersedianya fasilitas dan tenaga pendidik yang berkualitas , yang dapat memenihi rasa ingintahuannya, hubungan dengan guru dan teman-temannya berlangsung harmonis, maka siswa akan memperoleh iklim belajar yang menyenangkan. Dengan demikian, ia akan terdorong untuk terus-menerus meningkatkan prestasi belajarnya.",
+     ""
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 128,
+   "teks": "c). Kurikulum dan metode mengajar",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.75
+   ],
+   "konteks": {
+    "sebelum": [
+     "Kualitas guru dan siswa sangat penting dalam meraih prestasi, kelengkapan sarana dan prasarana tanpa disertai kinerja yang baik dari para penggunanya akan sia-sia belaka. Bila seorang siswa merasa kebutuhannya untuk berprestasi dengan baik di sekolah terpenuhi, misalnya dengan tersedianya fasilitas dan tenaga pendidik yang berkualitas , yang dapat memenihi rasa ingintahuannya, hubungan dengan guru dan teman-temannya berlangsung harmonis, maka siswa akan memperoleh iklim belajar yang menyenangkan. Dengan demikian, ia akan terdorong untuk terus-menerus meningkatkan prestasi belajarnya.",
+     "",
+     ""
+    ],
+    "sesudah": [
+     "Hal ini meliputi materi dan bagaimana cara memberikan materi tersebut kepada siswa. Metrode pembelajaran yang lebih interaktif sangat diperlukan untuk menumbuhkan minat dan peran serta siswa dalam kegiatan pembelajaran. Sarlito Wirawan (1994:122) mengatakan bahwa faktor yang paling penting adalah faktor guru. Jika guru mengajar dengan arif bijaksana, tegas, memiliki disiplin tinggi, luwes dan mampu membuat siswa menjadi senang akan pelajaran, maka prestasi belajar siswa akan cenderung tinggi, palingtidak siswa tersebut tidak bosan dalam mengikuti pelajaran.",
+     "3). Faktor lingkungan masyarakat a). Sosial budaya",
+     "Pandangan masyarakat tentang pentingnya pendidikan akan mempengaruhi kesungguhan pendidik dan peserta didik. Masyarakat yang masih memandang rendah pendidikan akan enggan mengirimkan anaknya ke sekolah dan cenderung memandang rendah pekerjaan guru/pengajar"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 132,
+   "teks": "b). Partisipasi terhadap pendidikan",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.53
+   ],
+   "konteks": {
+    "sebelum": [
+     "Hal ini meliputi materi dan bagaimana cara memberikan materi tersebut kepada siswa. Metrode pembelajaran yang lebih interaktif sangat diperlukan untuk menumbuhkan minat dan peran serta siswa dalam kegiatan pembelajaran. Sarlito Wirawan (1994:122) mengatakan bahwa faktor yang paling penting adalah faktor guru. Jika guru mengajar dengan arif bijaksana, tegas, memiliki disiplin tinggi, luwes dan mampu membuat siswa menjadi senang akan pelajaran, maka prestasi belajar siswa akan cenderung tinggi, palingtidak siswa tersebut tidak bosan dalam mengikuti pelajaran.",
+     "3). Faktor lingkungan masyarakat a). Sosial budaya",
+     "Pandangan masyarakat tentang pentingnya pendidikan akan mempengaruhi kesungguhan pendidik dan peserta didik. Masyarakat yang masih memandang rendah pendidikan akan enggan mengirimkan anaknya ke sekolah dan cenderung memandang rendah pekerjaan guru/pengajar"
+    ],
+    "sesudah": [
+     "Bila semua pihak telah berpartisipasi dan mendukung kegiatan pendidikan, mulai dari pemerintah (berupa kebijakan dan anggaran) sampai pada masyarakat bawah, setiap orang akan lebih menghargai dan berusaha memajukan pendidikan dan ilmu pengetahuan.",
+     "",
+     "4. Pengukuran prestasi belajar"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 144,
+   "teks": "b. Penilaian berfungsi diagnostik",
+   "suara": [
+    "biasa",
+    "subbab"
+   ],
+   "conf": [
+    0.31,
+    0.47
+   ],
+   "konteks": {
+    "sebelum": [
+     "1). Memilih siswa yang akan diterima di sekolah",
+     "2) Memilih siswa untuk dapat naik kelas",
+     "3). Memilih siswa yang seharusnya dapat beasiswa"
+    ],
+    "sesudah": [
+     "Fungsi penilaian ini selain untuk mengetahui hasil yang dicapai siswa juga mengetahui kelemahan siswa sehingga dengan adanya penilaian, maka guru dapat mengetahui kelemahan dan kelebihan masing-masing siswa. Jika guru dapat mendeteksi kelemahan siswa, maka kelemahan tersebut dapat segera diperbaiki.",
+     "c. Penilaian berfungsi sebagai penempatan (placement)",
+     "Setiap siswa memiliki kemampuan berbeda satu sama lain. Penilaian dilakukan untuk mengetahui di mana seharusnya siswa tersebut ditempatkan sesuai dengan kemampuannya yang telah diperlihatkannya pada prestasi belajar yang telah dicapainya. Sebagai contoh penggunaan nilai rapor SMU kelas II menentukan jurusan studi di kelas III."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 168,
+   "teks": "Berdasarkan uraian tersebut, dapat disimpulkan bahwa emosi adalah suatu perasaan (afek) yang mendorong individu untuk merespon atau bertingkah laku terhadap stimulus, baik yang berasal dari dalam maupun dari luar dirinya.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.56
+   ],
+   "konteks": {
+    "sebelum": [
+     "h. malu : malu hati, kesal",
+     "Seperti yang telah diuraikan diatas, bahwa semua emosi menurut Goleman pada dasarnya adalah dorongan untuk bertindak. Jadi berbagai macam emosi itu mendorong individu untuk memberikan respon atau bertingkah laku terhadap stimulus yang ada. Dalam the Nicomachea Ethics pembahasan Aristoteles secara filsafat tentang kebajikan, karakter dan hidup yang benar, tantangannya adalah menguasai kehidupan emosional kita dengan kecerdasan. Nafsu, apabila dilatih dengan baik akan memiliki kebijaksanaan; nafsu membimbing pemikiran, nilai, dan kelangsungan hidup kita. Tetapi, nafsu dapat dengan mudah menjadi tak terkendalikan, dan hal itu seringkali terjadi. Menurut Aristoteles, masalahnya bukanlah mengenai emosionalitas, melainkan mengenai keselarasan antara emosi dan cara mengekspresikan (Goleman, 2002 : xvi).",
+     "Menurut Mayer (Goleman, 2002 : 65) orang cenderung menganut gaya-gaya khas dalam menangani dan mengatasi emosi mereka, yaitu : sadar diri, tenggelam dalam permasalahan, dan pasrah. Dengan melihat keadaan itu maka penting bagi setiap individu memiliki kecerdasan emosional agar menjadikan hidup lebih bermakna dan tidak menjadikan hidup yang di jalani menjadi sia-sia."
+    ],
+    "sesudah": [
+     "",
+     "2. Pengertian kecerdasan emosional",
+     "Istilah “kecerdasan emosional” pertama kali dilontarkan pada tahun 1990 oleh psikolog Peter Salovey dari Harvard University dan John Mayer dari University of New Hampshire untuk menerangkan kualitas-kualitas emosional yang tampaknya penting bagi keberhasilan."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 188,
+   "teks": "Mengenali emosi diri sendiri merupakan suatu kemampuan untuk mengenali perasaan sewaktu perasaan itu terjadi. Kemampuan ini merupakan dasar dari kecerdasan emosional, para ahli psikologi menyebutkan kesadaran diri sebagai metamood, yakni kesadaran seseorang akan emosinya sendiri. Menurut Mayer (Goleman, 2002 : 64) kesadaran diri adalah waspada terhadap suasana hati maupun pikiran tentang suasana hati, bila kurang waspada maka individu menjadi mudah larut dalam aliran emosi dan dikuasai oleh emosi. Kesadaran diri memang belum menjamin penguasaan emosi, namun merupakan salah satu prasyarat penting untuk mengendalikan emosi sehingga individu mudah menguasai emosi.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.72
+   ],
+   "konteks": {
+    "sebelum": [
+     "3. Faktor Kecerdasan Emosional",
+     "Goleman mengutip Salovey (2002:58-59) menempatkan menempatkan kecerdasan pribadi Gardner dalam definisi dasar tentang kecerdasan emosional yang dicetuskannya dan memperluas kemapuan tersebut menjadi lima kemampuan utama, yaitu :",
+     "a. Mengenali Emosi Diri"
+    ],
+    "sesudah": [
+     "b. Mengelola Emosi",
+     "Mengelola emosi merupakan kemampuan individu dalam menangani perasaan agar dapat terungkap dengan tepat atau selaras, sehingga tercapai keseimbangan dalam diri individu. Menjaga agar emosi yang merisaukan tetap terkendali merupakan kunci menuju kesejahteraan emosi. Emosi berlebihan, yang meningkat dengan intensitas terlampau lama akan mengoyak kestabilan kita (Goleman, 2002 : 77-78). Kemampuan ini mencakup kemampuan untuk menghibur diri sendiri, melepaskan kecemasan, kemurungan atau ketersinggungan dan akibat-akibat yang ditimbulkannya serta kemampuan untuk bangkit dari perasaan-perasaan yang menekan.",
+     "c. Memotivasi Diri Sendiri"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 189,
+   "teks": "b. Mengelola Emosi",
+   "suara": [
+    "subbab",
+    "subbab"
+   ],
+   "conf": [
+    0.24,
+    0.96
+   ],
+   "konteks": {
+    "sebelum": [
+     "Goleman mengutip Salovey (2002:58-59) menempatkan menempatkan kecerdasan pribadi Gardner dalam definisi dasar tentang kecerdasan emosional yang dicetuskannya dan memperluas kemapuan tersebut menjadi lima kemampuan utama, yaitu :",
+     "a. Mengenali Emosi Diri",
+     "Mengenali emosi diri sendiri merupakan suatu kemampuan untuk mengenali perasaan sewaktu perasaan itu terjadi. Kemampuan ini merupakan dasar dari kecerdasan emosional, para ahli psikologi menyebutkan kesadaran diri sebagai metamood, yakni kesadaran seseorang akan emosinya sendiri. Menurut Mayer (Goleman, 2002 : 64) kesadaran diri adalah waspada terhadap suasana hati maupun pikiran tentang suasana hati, bila kurang waspada maka individu menjadi mudah larut dalam aliran emosi dan dikuasai oleh emosi. Kesadaran diri memang belum menjamin penguasaan emosi, namun merupakan salah satu prasyarat penting untuk mengendalikan emosi sehingga individu mudah menguasai emosi."
+    ],
+    "sesudah": [
+     "Mengelola emosi merupakan kemampuan individu dalam menangani perasaan agar dapat terungkap dengan tepat atau selaras, sehingga tercapai keseimbangan dalam diri individu. Menjaga agar emosi yang merisaukan tetap terkendali merupakan kunci menuju kesejahteraan emosi. Emosi berlebihan, yang meningkat dengan intensitas terlampau lama akan mengoyak kestabilan kita (Goleman, 2002 : 77-78). Kemampuan ini mencakup kemampuan untuk menghibur diri sendiri, melepaskan kecemasan, kemurungan atau ketersinggungan dan akibat-akibat yang ditimbulkannya serta kemampuan untuk bangkit dari perasaan-perasaan yang menekan.",
+     "c. Memotivasi Diri Sendiri",
+     "Presatasi harus dilalui dengan dimilikinya motivasi dalam diri individu, yang berarti memiliki ketekunan untuk menahan diri terhadap kepuasan dan mengendalikan dorongan hati, serta mempunyai perasaan motivasi yang positif, yaitu antusianisme, gairah, optimis dan keyakinan diri."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 190,
+   "teks": "Mengelola emosi merupakan kemampuan individu dalam menangani perasaan agar dapat terungkap dengan tepat atau selaras, sehingga tercapai keseimbangan dalam diri individu. Menjaga agar emosi yang merisaukan tetap terkendali merupakan kunci menuju kesejahteraan emosi. Emosi berlebihan, yang meningkat dengan intensitas terlampau lama akan mengoyak kestabilan kita (Goleman, 2002 : 77-78). Kemampuan ini mencakup kemampuan untuk menghibur diri sendiri, melepaskan kecemasan, kemurungan atau ketersinggungan dan akibat-akibat yang ditimbulkannya serta kemampuan untuk bangkit dari perasaan-perasaan yang menekan.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.64
+   ],
+   "konteks": {
+    "sebelum": [
+     "a. Mengenali Emosi Diri",
+     "Mengenali emosi diri sendiri merupakan suatu kemampuan untuk mengenali perasaan sewaktu perasaan itu terjadi. Kemampuan ini merupakan dasar dari kecerdasan emosional, para ahli psikologi menyebutkan kesadaran diri sebagai metamood, yakni kesadaran seseorang akan emosinya sendiri. Menurut Mayer (Goleman, 2002 : 64) kesadaran diri adalah waspada terhadap suasana hati maupun pikiran tentang suasana hati, bila kurang waspada maka individu menjadi mudah larut dalam aliran emosi dan dikuasai oleh emosi. Kesadaran diri memang belum menjamin penguasaan emosi, namun merupakan salah satu prasyarat penting untuk mengendalikan emosi sehingga individu mudah menguasai emosi.",
+     "b. Mengelola Emosi"
+    ],
+    "sesudah": [
+     "c. Memotivasi Diri Sendiri",
+     "Presatasi harus dilalui dengan dimilikinya motivasi dalam diri individu, yang berarti memiliki ketekunan untuk menahan diri terhadap kepuasan dan mengendalikan dorongan hati, serta mempunyai perasaan motivasi yang positif, yaitu antusianisme, gairah, optimis dan keyakinan diri.",
+     "d. Mengenali Emosi Orang Lain"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 191,
+   "teks": "c. Memotivasi Diri Sendiri",
+   "suara": [
+    "paragraf",
+    "subbab"
+   ],
+   "conf": [
+    0.48,
+    0.83
+   ],
+   "konteks": {
+    "sebelum": [
+     "Mengenali emosi diri sendiri merupakan suatu kemampuan untuk mengenali perasaan sewaktu perasaan itu terjadi. Kemampuan ini merupakan dasar dari kecerdasan emosional, para ahli psikologi menyebutkan kesadaran diri sebagai metamood, yakni kesadaran seseorang akan emosinya sendiri. Menurut Mayer (Goleman, 2002 : 64) kesadaran diri adalah waspada terhadap suasana hati maupun pikiran tentang suasana hati, bila kurang waspada maka individu menjadi mudah larut dalam aliran emosi dan dikuasai oleh emosi. Kesadaran diri memang belum menjamin penguasaan emosi, namun merupakan salah satu prasyarat penting untuk mengendalikan emosi sehingga individu mudah menguasai emosi.",
+     "b. Mengelola Emosi",
+     "Mengelola emosi merupakan kemampuan individu dalam menangani perasaan agar dapat terungkap dengan tepat atau selaras, sehingga tercapai keseimbangan dalam diri individu. Menjaga agar emosi yang merisaukan tetap terkendali merupakan kunci menuju kesejahteraan emosi. Emosi berlebihan, yang meningkat dengan intensitas terlampau lama akan mengoyak kestabilan kita (Goleman, 2002 : 77-78). Kemampuan ini mencakup kemampuan untuk menghibur diri sendiri, melepaskan kecemasan, kemurungan atau ketersinggungan dan akibat-akibat yang ditimbulkannya serta kemampuan untuk bangkit dari perasaan-perasaan yang menekan."
+    ],
+    "sesudah": [
+     "Presatasi harus dilalui dengan dimilikinya motivasi dalam diri individu, yang berarti memiliki ketekunan untuk menahan diri terhadap kepuasan dan mengendalikan dorongan hati, serta mempunyai perasaan motivasi yang positif, yaitu antusianisme, gairah, optimis dan keyakinan diri.",
+     "d. Mengenali Emosi Orang Lain",
+     "Kemampuan untuk mengenali emosi orang lain disebut juga empati. Menurut Goleman (2002 :57) kemampuan seseorang untuk mengenali orang lain atau peduli, menunjukkan kemampuan empati seseorang. Individu yang memiliki kemampuan empati lebih mampu menangkap sinyal-sinyal sosial yang tersembunyi yang mengisyaratkan apa-apa yang dibutuhkan orang lain sehingga ia lebih mampu menerima sudut pandang orang lain, peka terhadap perasaan orang lain dan lebih mampu untuk mendengarkan orang lain."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 192,
+   "teks": "Presatasi harus dilalui dengan dimilikinya motivasi dalam diri individu, yang berarti memiliki ketekunan untuk menahan diri terhadap kepuasan dan mengendalikan dorongan hati, serta mempunyai perasaan motivasi yang positif, yaitu antusianisme, gairah, optimis dan keyakinan diri.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.77
+   ],
+   "konteks": {
+    "sebelum": [
+     "b. Mengelola Emosi",
+     "Mengelola emosi merupakan kemampuan individu dalam menangani perasaan agar dapat terungkap dengan tepat atau selaras, sehingga tercapai keseimbangan dalam diri individu. Menjaga agar emosi yang merisaukan tetap terkendali merupakan kunci menuju kesejahteraan emosi. Emosi berlebihan, yang meningkat dengan intensitas terlampau lama akan mengoyak kestabilan kita (Goleman, 2002 : 77-78). Kemampuan ini mencakup kemampuan untuk menghibur diri sendiri, melepaskan kecemasan, kemurungan atau ketersinggungan dan akibat-akibat yang ditimbulkannya serta kemampuan untuk bangkit dari perasaan-perasaan yang menekan.",
+     "c. Memotivasi Diri Sendiri"
+    ],
+    "sesudah": [
+     "d. Mengenali Emosi Orang Lain",
+     "Kemampuan untuk mengenali emosi orang lain disebut juga empati. Menurut Goleman (2002 :57) kemampuan seseorang untuk mengenali orang lain atau peduli, menunjukkan kemampuan empati seseorang. Individu yang memiliki kemampuan empati lebih mampu menangkap sinyal-sinyal sosial yang tersembunyi yang mengisyaratkan apa-apa yang dibutuhkan orang lain sehingga ia lebih mampu menerima sudut pandang orang lain, peka terhadap perasaan orang lain dan lebih mampu untuk mendengarkan orang lain.",
+     "Rosenthal dalam penelitiannya menunjukkan bahwa orang-orang yang mampu membaca perasaan dan isyarat non verbal lebih mampu menyesuiakan diri secara emosional, lebih populer, lebih mudah beraul, dan lebih peka (Goleman, 2002 : 136). Nowicki, ahli psikologi menjelaskan bahwa anak-anak yang tidak mampu membaca atau mengungkapkan emosi dengan baik akan terus menerus merasa frustasi (Goleman, 2002 : 172). Seseorang yang mampu membaca emosi orang lain juga memiliki kesadaran diri yang tinggi. Semakin mampu terbuka pada emosinya sendiri, mampu mengenal dan mengakui emosinya sendiri, maka orang tersebut mempunyai kemampuan untuk membaca perasaan orang lain."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 193,
+   "teks": "d. Mengenali Emosi Orang Lain",
+   "suara": [
+    "paragraf",
+    "subbab"
+   ],
+   "conf": [
+    0.29,
+    0.48
+   ],
+   "konteks": {
+    "sebelum": [
+     "Mengelola emosi merupakan kemampuan individu dalam menangani perasaan agar dapat terungkap dengan tepat atau selaras, sehingga tercapai keseimbangan dalam diri individu. Menjaga agar emosi yang merisaukan tetap terkendali merupakan kunci menuju kesejahteraan emosi. Emosi berlebihan, yang meningkat dengan intensitas terlampau lama akan mengoyak kestabilan kita (Goleman, 2002 : 77-78). Kemampuan ini mencakup kemampuan untuk menghibur diri sendiri, melepaskan kecemasan, kemurungan atau ketersinggungan dan akibat-akibat yang ditimbulkannya serta kemampuan untuk bangkit dari perasaan-perasaan yang menekan.",
+     "c. Memotivasi Diri Sendiri",
+     "Presatasi harus dilalui dengan dimilikinya motivasi dalam diri individu, yang berarti memiliki ketekunan untuk menahan diri terhadap kepuasan dan mengendalikan dorongan hati, serta mempunyai perasaan motivasi yang positif, yaitu antusianisme, gairah, optimis dan keyakinan diri."
+    ],
+    "sesudah": [
+     "Kemampuan untuk mengenali emosi orang lain disebut juga empati. Menurut Goleman (2002 :57) kemampuan seseorang untuk mengenali orang lain atau peduli, menunjukkan kemampuan empati seseorang. Individu yang memiliki kemampuan empati lebih mampu menangkap sinyal-sinyal sosial yang tersembunyi yang mengisyaratkan apa-apa yang dibutuhkan orang lain sehingga ia lebih mampu menerima sudut pandang orang lain, peka terhadap perasaan orang lain dan lebih mampu untuk mendengarkan orang lain.",
+     "Rosenthal dalam penelitiannya menunjukkan bahwa orang-orang yang mampu membaca perasaan dan isyarat non verbal lebih mampu menyesuiakan diri secara emosional, lebih populer, lebih mudah beraul, dan lebih peka (Goleman, 2002 : 136). Nowicki, ahli psikologi menjelaskan bahwa anak-anak yang tidak mampu membaca atau mengungkapkan emosi dengan baik akan terus menerus merasa frustasi (Goleman, 2002 : 172). Seseorang yang mampu membaca emosi orang lain juga memiliki kesadaran diri yang tinggi. Semakin mampu terbuka pada emosinya sendiri, mampu mengenal dan mengakui emosinya sendiri, maka orang tersebut mempunyai kemampuan untuk membaca perasaan orang lain.",
+     "e. Membina Hubungan"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 195,
+   "teks": "Rosenthal dalam penelitiannya menunjukkan bahwa orang-orang yang mampu membaca perasaan dan isyarat non verbal lebih mampu menyesuiakan diri secara emosional, lebih populer, lebih mudah beraul, dan lebih peka (Goleman, 2002 : 136). Nowicki, ahli psikologi menjelaskan bahwa anak-anak yang tidak mampu membaca atau mengungkapkan emosi dengan baik akan terus menerus merasa frustasi (Goleman, 2002 : 172). Seseorang yang mampu membaca emosi orang lain juga memiliki kesadaran diri yang tinggi. Semakin mampu terbuka pada emosinya sendiri, mampu mengenal dan mengakui emosinya sendiri, maka orang tersebut mempunyai kemampuan untuk membaca perasaan orang lain.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.59
+   ],
+   "konteks": {
+    "sebelum": [
+     "Presatasi harus dilalui dengan dimilikinya motivasi dalam diri individu, yang berarti memiliki ketekunan untuk menahan diri terhadap kepuasan dan mengendalikan dorongan hati, serta mempunyai perasaan motivasi yang positif, yaitu antusianisme, gairah, optimis dan keyakinan diri.",
+     "d. Mengenali Emosi Orang Lain",
+     "Kemampuan untuk mengenali emosi orang lain disebut juga empati. Menurut Goleman (2002 :57) kemampuan seseorang untuk mengenali orang lain atau peduli, menunjukkan kemampuan empati seseorang. Individu yang memiliki kemampuan empati lebih mampu menangkap sinyal-sinyal sosial yang tersembunyi yang mengisyaratkan apa-apa yang dibutuhkan orang lain sehingga ia lebih mampu menerima sudut pandang orang lain, peka terhadap perasaan orang lain dan lebih mampu untuk mendengarkan orang lain."
+    ],
+    "sesudah": [
+     "e. Membina Hubungan",
+     "Kemampuan dalam membina hubungan merupakan suatu keterampilan yang menunjang popularitas, kepemimpinan dan keberhasilan antar pribadi (Goleman, 2002 : 59). Keterampilan dalam berkomunikasi merupakan kemampuan dasar dalam keberhasilan membina hubungan. Individu sulit untuk mendapatkan apa yang diinginkannya dan sulit juga memahami keinginan serta kemauan orang lain.",
+     "Orang-orang yang hebat dalam keterampilan membina hubungan ini akan sukses dalam bidang apapun. Orang berhasil dalam pergaulan karena mampu berkomunikasi dengan lancar pada orang lain. Orang-orang ini populer dalam lingkungannya dan menjadi teman yang menyenangkan karena kemampuannya berkomunikasi (Goleman, 2002 :59). Ramah tamah, baik hati, hormat dan disukai orang lain dapat dijadikan petunjuk positif bagaimana siswa mampu membina hubungan dengan orang lain. Sejauhmana kepribadian siswa berkembang dilihat dari banyaknya hubungan interpersonal yang dilakukannya."
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 196,
+   "teks": "e. Membina Hubungan",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.68
+   ],
+   "konteks": {
+    "sebelum": [
+     "d. Mengenali Emosi Orang Lain",
+     "Kemampuan untuk mengenali emosi orang lain disebut juga empati. Menurut Goleman (2002 :57) kemampuan seseorang untuk mengenali orang lain atau peduli, menunjukkan kemampuan empati seseorang. Individu yang memiliki kemampuan empati lebih mampu menangkap sinyal-sinyal sosial yang tersembunyi yang mengisyaratkan apa-apa yang dibutuhkan orang lain sehingga ia lebih mampu menerima sudut pandang orang lain, peka terhadap perasaan orang lain dan lebih mampu untuk mendengarkan orang lain.",
+     "Rosenthal dalam penelitiannya menunjukkan bahwa orang-orang yang mampu membaca perasaan dan isyarat non verbal lebih mampu menyesuiakan diri secara emosional, lebih populer, lebih mudah beraul, dan lebih peka (Goleman, 2002 : 136). Nowicki, ahli psikologi menjelaskan bahwa anak-anak yang tidak mampu membaca atau mengungkapkan emosi dengan baik akan terus menerus merasa frustasi (Goleman, 2002 : 172). Seseorang yang mampu membaca emosi orang lain juga memiliki kesadaran diri yang tinggi. Semakin mampu terbuka pada emosinya sendiri, mampu mengenal dan mengakui emosinya sendiri, maka orang tersebut mempunyai kemampuan untuk membaca perasaan orang lain."
+    ],
+    "sesudah": [
+     "Kemampuan dalam membina hubungan merupakan suatu keterampilan yang menunjang popularitas, kepemimpinan dan keberhasilan antar pribadi (Goleman, 2002 : 59). Keterampilan dalam berkomunikasi merupakan kemampuan dasar dalam keberhasilan membina hubungan. Individu sulit untuk mendapatkan apa yang diinginkannya dan sulit juga memahami keinginan serta kemauan orang lain.",
+     "Orang-orang yang hebat dalam keterampilan membina hubungan ini akan sukses dalam bidang apapun. Orang berhasil dalam pergaulan karena mampu berkomunikasi dengan lancar pada orang lain. Orang-orang ini populer dalam lingkungannya dan menjadi teman yang menyenangkan karena kemampuannya berkomunikasi (Goleman, 2002 :59). Ramah tamah, baik hati, hormat dan disukai orang lain dapat dijadikan petunjuk positif bagaimana siswa mampu membina hubungan dengan orang lain. Sejauhmana kepribadian siswa berkembang dilihat dari banyaknya hubungan interpersonal yang dilakukannya.",
+     "Berdasarkan uraian tersebut di atas, penulis mengambil komponen-komponen utama dan prinsip-prinsip dasar dari kecerdasan emosional sebagai faktor untuk mengembangkan instrumen kecerdasan emosional"
+    ],
+    "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA"
+   }
+  },
+  {
+   "idx": 317,
+   "teks": "a. Optimis",
+   "suara": [
+    "biasa",
+    "subbab"
+   ],
+   "conf": [
+    0.37,
+    0.71
+   ],
+   "konteks": {
+    "sebelum": [
+     "10",
+     "",
+     "3 Memotivasi diri sendiri"
+    ],
+    "sesudah": [
+     "",
+     "5,17,41,87,90 35,57,61,95,97",
+     "10"
+    ],
+    "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+   }
+  },
+  {
+   "idx": 336,
+   "teks": "a. Dapat bekerja sama",
+   "suara": [
+    "biasa",
+    "subbab"
+   ],
+   "conf": [
+    0.37,
+    0.79
+   ],
+   "konteks": {
+    "sebelum": [
+     "10",
+     "5",
+     "Membina Hubungan"
+    ],
+    "sesudah": [
+     "",
+     "32,53,71,76,88 12,20,37,93,99",
+     "10"
+    ],
+    "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+   }
+  },
+  {
+   "idx": 358,
+   "teks": "b) Item Unfavorable : sangat setuju (1), setuju (2), tidak setuju (3), sangat tidak setuju (4).",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.6
+   ],
+   "konteks": {
+    "sebelum": [
+     "c). Maksud jawaban dengan empat tingkat kategori untuk melihat kecenderungan pendapat responden kearah tidak sesuai, sehingga dapat mengurangi data penelitian yang hilang. (Sutrisno Hadi, 1991 : 19-20).",
+     "Sistem penilaian skala dalam penelitian ini adalah sebagai berikut :",
+     "a) Item Favorable : sangat setuju (4), , setuju (3), tidak setuju (2), sangat tidak setuju (1)"
+    ],
+    "sesudah": [
+     "",
+     "2. Metode Dokumentasi",
+     "Menurut Kartini Kartono (1990 : 73) teknik pemeriksaan dokumen adalah pengumpulan informasi dan data secara langsung sebagai hasil pengumpulan sendiri. Data yang dikumpulkan tersebut adalah bersifat orisinil untuk dapat dipergunakan secara langsung. Teknik pemeriksaan dokumen ini khusus digunakan untuk melakukan pengumpulan data terhadap prestasi belajar."
+    ],
+    "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+   }
+  },
+  {
+   "idx": 371,
+   "teks": "Uji validitas item yaitu pengujian terhadap kualitas item-itemnya yang bertujuan untuk memilih item-item yang benar-benar telah selaras dan sesuai dengan faktor yang ingin diselidiki. Cara perhitungan uji coba validitas item yaitu dengan cara mengorelasikan skor tiap item dengan skor total item.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.67
+   ],
+   "konteks": {
+    "sebelum": [
+     "1. Validitas",
+     "Menurut Sutrisno Hadi (1990 : 102) Validitas adalah seberapa jauh alat ukur dapat mengungkap dengan benar gejala atau sebagian gejala yang hendak diukur, artinya tes tersebut mengukur apa yang seharusnya diukur. Suatu alat ukur dapat dikatakan mempunyai validitas tinggi apabila alat ukur tersebut menjalankan fungsi ukurnya atau memberikan hasil ukur yang sesuai dengan maksud dilakukannya pengukuran tersebut.",
+     "a). Uji validitas item"
+    ],
+    "sesudah": [
+     "b). Uji korelasi antar faktor",
+     "Uji korelasi antar faktor yaitu pengujian antar faktor dengan konstrak yang bertujuan untuk membuktikan bahwa setiap faktor dalam instrumen Skala Kecerdasan Emosional telah benar-benar mengungkap konstrak yang didefinisikan. Adapun cara perhitungan uji validitas faktor adalah dengan mengorelasikan skor tiap faktor dengan skor total faktor item-item yang valid.",
+     "Untuk menghitung analisis item dan korelasi antar faktor digunakan rumus koefisien korelasi product moment dan perhitungannya dibantu dengan program SPSS 11.01 for windows."
+    ],
+    "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+   }
+  },
+  {
+   "idx": 372,
+   "teks": "b). Uji korelasi antar faktor",
+   "suara": [
+    "subbab",
+    "subbab"
+   ],
+   "conf": [
+    0.49,
+    0.57
+   ],
+   "konteks": {
+    "sebelum": [
+     "Menurut Sutrisno Hadi (1990 : 102) Validitas adalah seberapa jauh alat ukur dapat mengungkap dengan benar gejala atau sebagian gejala yang hendak diukur, artinya tes tersebut mengukur apa yang seharusnya diukur. Suatu alat ukur dapat dikatakan mempunyai validitas tinggi apabila alat ukur tersebut menjalankan fungsi ukurnya atau memberikan hasil ukur yang sesuai dengan maksud dilakukannya pengukuran tersebut.",
+     "a). Uji validitas item",
+     "Uji validitas item yaitu pengujian terhadap kualitas item-itemnya yang bertujuan untuk memilih item-item yang benar-benar telah selaras dan sesuai dengan faktor yang ingin diselidiki. Cara perhitungan uji coba validitas item yaitu dengan cara mengorelasikan skor tiap item dengan skor total item."
+    ],
+    "sesudah": [
+     "Uji korelasi antar faktor yaitu pengujian antar faktor dengan konstrak yang bertujuan untuk membuktikan bahwa setiap faktor dalam instrumen Skala Kecerdasan Emosional telah benar-benar mengungkap konstrak yang didefinisikan. Adapun cara perhitungan uji validitas faktor adalah dengan mengorelasikan skor tiap faktor dengan skor total faktor item-item yang valid.",
+     "Untuk menghitung analisis item dan korelasi antar faktor digunakan rumus koefisien korelasi product moment dan perhitungannya dibantu dengan program SPSS 11.01 for windows.",
+     "Rumus :"
+    ],
+    "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+   }
+  },
+  {
+   "idx": 405,
+   "teks": "Fasilitas yang dimiliki selain 20 ruang kelas, juga terdapat 1 perpustakaan, 5 laboratorium (laboratorium bahasa, kimia, fisika, biologi dan komputer), 1 balai kesehatan, 1 ruang audiovisual, 1 ruang pertemuan, 2 lapangan olahraga (indoor dan out door), mesjid, ruang OSIS, dan ruang bimbingan dan konseling. Ekstrakurikuler yang ada berjumlah 28 kegiatan yang dibagi menjadi empat unit kegiatan, yaitu unit kegiatan keilmuan, unit kegiatan keterampilan, unit kegiatan olah raga, dan unit kegiatan kesenian.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.92
+   ],
+   "konteks": {
+    "sebelum": [
+     "Pada tahun 1986, status sekolah PPSP sebagai proyek Departemen P dan K berakhir; selanjutnya oleh Dep. P dan K pengelolaan sekolah-sekolah tersebut diserahkan kepada Kanwil Depdikbud setempat. Sebagai kelanjutan pada tahun 1986, sesuai SK Menteri P dan K RI No.027/U/1986, tanggal 21 Januari 1986, diadakan serah terima pengelolaan sekolah-sekolah eks PPSP IKIP Jakarta (khusus SD, SLTP dan SMU) dari Rektor IKIP Jakarta kepada kepala Kanwil Depdikbud DKI Jakarta dan sesuai SK Menteri P dan K RI No. 0707/0/1086, 0708/0/1986 dan 0709/0/1986 masing-masing tertanggal 10 oktober 1986 berganti nama menjadi SDN Komplek IKIP Jakarta, SLTP 236, dan SMA 81. Adapun TK eks Sekolah Laboratorium Kependidikan IKIP Jakarta tetap berstatus sebagai sekolah swasta, dengan nama TK IKIP Jakarta. Pada tahun ajaran 1992/1993, sesuai SK Dirjen Dikdasmen No. 2689/C/I/1991, SLTP 236 dan SMA 81 memperoleh lokasi baru masing-masing di daerah Cakung dan daerah Kalimalang Cipinang Melayu.",
+     "Sesuai himbauan Kanwil Depdikbud DKI Jakarta, mulai tahun ajaran 1992/1993 Yayasan Pembina IKIP Jakarta membuka SLTP dan SMU Lab School Jakarta sesuai SK Kanwil P dan K DKI No. Kep. 854 P/10I.A1/I/93 DAN No. Kep. 853 A/10I/A1/I93 masing-masing tertanggal 15 Maret 1993. SMU Lab School Jakarta pada saat ini merupakan salah satu sekolah pioneer untuk kelas akselerasi (percepatan), sehingga pendidikan SMU dapat dipersingkat menjadi 2 tahun.",
+     "SMU Lab School memiliki empat kelompok kelas, yaitu : kelas I terdiri dari 6 kelas, kelas II terdiri dari 6 kelas dan kelas III terdiri dari 7 kelas; 3 kelas jurusan IPA, 3 kelas jurusan IPS dan 1 kelas Jurusan Bahasa. Dalam penelitian ini sampel yang digunakan adalah murid kelas II, yang berjumlah 240 orang. Materi yang diajarkan berdasarkan kurikulum Depdikbud dengan waktu belajar dari jam 07.00 hingga 15.30 WIB, dari hari Senin hingga Jum’at.. SMU Lab School diperkuat dengan 60 orang guru pengajar, 3 orang guru BP, serta 20 orang administrasi, 15 staff kebersihan dan 6 orang satpam."
+    ],
+    "sesudah": [
+     "2. Persiapan Penelitian",
+     "Persiapan penelitiani meliputi kegiatan-kegiatan sebagai berikut :",
+     "a. Pengurusan surat permohonan izin pengambilan data dari fakultas untuk melaksanakan penelitian di SMU Lab School Jakarta Timur"
+    ],
+    "judul_bab_terdekat": "BAB IV LAPORAN PELAKSANAAN PENELITIAN"
+   }
+  },
+  {
+   "idx": 420,
+   "teks": "Data yang telah diperoleh pada saat uji coba kemudian dianalisis untuk mengetahui kualitas dari alat ukur tersebut. Untuk perhitungan analisis skala kecerdasan emosional digunakan bantuan komputer dengan program SPSS versi 11.01 for windows .",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.79
+   ],
+   "konteks": {
+    "sebelum": [
+     "2) Untuk menentukan alokasi waktu yang paling layak",
+     "3) Untuk menemukan kelemahan-kelemahan dalam petunjuk atau administrasi tes",
+     "Selain itu. tujuan dari uji coba atau try out adalah untuk menyeleksi item-item manakah yang valid dan reliable agar dapat digunakan dalam penelitian. Uji coba dilaksanakan tanggal 25 April 2003 dengan menggunakan sample sebanyak 50 siswa kelas II SMU Lab School Jakarta Timur."
+    ],
+    "sesudah": [
+     "2.. Analisis validitas instrumen",
+     "Uji validitas dilakukan untuk mengetahui apakah suatu skala psikologi mampu menghasilkan data yang akurat, artinya apakah item-item yang dibuat telah benar-benar mengungkap faktor yang ingin diselidiki. Uji validitas skala kecerdasan emosional dihitung dengan menggunakan rumus Korelasi Product Moment dari Pearson. Dari hasil korelasi antar skor-skor item dengan skor total, maka diperoleh nilai korelasi pada skala kecerdasan emosional berkisar antara 0,320-0,720 dan p berkisar antara 0,000 – 0,008. Berdasarkan pada taraf signifikan 0,05 maka diperoleh",
+     "15 item gugur dan 85 item valid dari 100 item pada skala kecerdasan emosional. Rincian setelah dilakukan uji coba yaitu :"
+    ],
+    "judul_bab_terdekat": "BAB IV LAPORAN PELAKSANAAN PENELITIAN"
+   }
+  },
+  {
+   "idx": 433,
+   "teks": "1.",
+   "suara": [
+    "biasa",
+    "subbab"
+   ],
+   "conf": [
+    0.19,
+    0.83
+   ],
+   "konteks": {
+    "sebelum": [
+     "Nomor Item jumlah Favorable",
+     "Unfavorable",
+     ""
+    ],
+    "sesudah": [
+     "Mengenali Emosi Diri a.Mengenali dan memahami emosi diri sendiri 1*,14,21*,25,39",
+     "",
+     "8 b.Memahami penyebab timbulnya emosi 2,3,38*,46*,72"
+    ],
+    "judul_bab_terdekat": "BAB IV LAPORAN PELAKSANAAN PENELITIAN"
+   }
+  },
+  {
+   "idx": 531,
+   "teks": "Reliabilitas pada skala kecerdasan emosional dihitung dengan menggunakan rumus Alpha Cronbach. Setelah dihitung, maka diperoleh nilai koefisien reliabilitas alpha sebesar 0,9538. hal ini menunjukkan bahwa instrumen skala kecerdasan emosional yang ada memiliki reliabilitas yang sangat baik sehingga memungkinkan atau layak digunakan dalam penelitian.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.57
+   ],
+   "konteks": {
+    "sebelum": [
+     "1.000",
+     "",
+     "4. Reliabilitas Instrumen"
+    ],
+    "sesudah": [
+     "C. Pelaksanaan Penelitian",
+     "Penelitian dilaksanakan dengan menyebarkan skala kecerdasan emosional yang telah disiapkan kepada siswa SMU Lab School sebanyak 150 set sesuai dengan jumlah sample yang dibutuhkan. Penelitian ini dilakukan selama tiga hari, dari hari Senin, tanggal 19 Mei hingga hari Kamis, tanggal 22 Mei 2003. Skala yang telah diisi oleh para siswa kelas II ini langsung dikembalikan kepada penulis. Pada penyebaran skala ini, penulis dibantu oleh guru BK, Ibu Ita. Karena pada saat menyebarkan skala, penulis menggunakan jam pelajaran BK.",
+     "Setelah melakukan penyebaran skala, penulis meminta izin untuk memperoleh data dokumen prestasi belajar siswa kelas II SMU Lab School. Data ini didapat dari koordinator BK, Ibu Ita."
+    ],
+    "judul_bab_terdekat": "BAB IV LAPORAN PELAKSANAAN PENELITIAN"
+   }
+  },
+  {
+   "idx": 534,
+   "teks": "Setelah melakukan penyebaran skala, penulis meminta izin untuk memperoleh data dokumen prestasi belajar siswa kelas II SMU Lab School. Data ini didapat dari koordinator BK, Ibu Ita.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.65
+   ],
+   "konteks": {
+    "sebelum": [
+     "Reliabilitas pada skala kecerdasan emosional dihitung dengan menggunakan rumus Alpha Cronbach. Setelah dihitung, maka diperoleh nilai koefisien reliabilitas alpha sebesar 0,9538. hal ini menunjukkan bahwa instrumen skala kecerdasan emosional yang ada memiliki reliabilitas yang sangat baik sehingga memungkinkan atau layak digunakan dalam penelitian.",
+     "C. Pelaksanaan Penelitian",
+     "Penelitian dilaksanakan dengan menyebarkan skala kecerdasan emosional yang telah disiapkan kepada siswa SMU Lab School sebanyak 150 set sesuai dengan jumlah sample yang dibutuhkan. Penelitian ini dilakukan selama tiga hari, dari hari Senin, tanggal 19 Mei hingga hari Kamis, tanggal 22 Mei 2003. Skala yang telah diisi oleh para siswa kelas II ini langsung dikembalikan kepada penulis. Pada penyebaran skala ini, penulis dibantu oleh guru BK, Ibu Ita. Karena pada saat menyebarkan skala, penulis menggunakan jam pelajaran BK."
+    ],
+    "sesudah": [
+     "",
+     "D. Analisis Data Penelitian",
+     "Dari hasil penelitian diperoleh data mengenai kecerdasan emosional dan prestasi belajar siswa kelas II yang kemudian dianalisis dengan menggunakan rumus korelasi product moment dari Pearson dengan bantuan progaram SPSS versi 11.01 for windows. Berdasarkan hasil analisis data diperoleh nilai koefisien korelasi (r) sebesar 0,248 dengan p = 0,002 pada taraf signifikan 0,05."
+    ],
+    "judul_bab_terdekat": "BAB IV LAPORAN PELAKSANAAN PENELITIAN"
+   }
+  },
+  {
+   "idx": 582,
+   "teks": "Hasil penelitian dari data analisis korelasi product moment menunjukkan korelasi (r) sebesar 0,248 dengan p = 0,002, hal ini menunjukkan adanya korelasi antara kecerdasan emosional dengan prestasi belajar dengan arah hubungan positif. Artinya, jika kecerdasan emosional tinggi, maka prestasi belajar tinggi dan sebaliknya.",
+   "suara": [
+    "subbab"
+   ],
+   "conf": [
+    0.51
+   ],
+   "konteks": {
+    "sebelum": [
+     "Berdasarkan dari latar belakang penelitian ini dan dari teori yang digunakan untuk mengetahui apakah ada hubungan antara kecerdasan emosional dengan prestasi belajar siswa kelas II SMU Lab School Jakarta Timur , maka dapat dibuktikan bahwa ada hubungan antara kecerdasan emosional dengan prestasi belajar.",
+     "Melalui uji statistik yang dilakukan pada dasarnya hasil penelitian sesuai dengan landasan teori yang digunakan pada penelitian. Diketahui bahwa setinggi-tingginya IQ menyumbang sekitar 20% bagi kesuksesan seseorang dan yang 80% sisanya diisi oleh kekuatan lain yang menurut Daniel Goleman salah satunya adalah kecerdasan emosional seseorang .",
+     "Dari hasil skala kecerdasan emosional dengan pernyataan sebanyak 85 item yang disusun berdasarkan skala likert yang dimodifikasi dengan alternatif jawaban yaitu : sangat setuju, setuju, tidak setuju, sangat tidak setuju. Cara penilaian dengan memberikan nilai antara satu sampai empat berdasarkan kriteria pernyataan favorabel dan unfavorabel. Analisis data dengan menggunakan rumus korelasi product moment dari Pearson dengan bantuan program SPSS versi 11.01. Penelitian dilakukan di SMU Lab School Jakarta Timur. Teknik pengambilan sampel menggunakan proporsional random sampling cara undian."
+    ],
+    "sesudah": [
+     "",
+     "B. Pembahasan",
+     "Berdasarkan analisis data penelitian menunjukkan korelasi (rxy) sebesar 0,248 dengan p = 0.002 < 0.05 maka Ha diterima dan Ho ditolak. Hal tersebut menunjukkan bahwa ada hubungan antara kecerdasan emosional dengan prestasi belajar pada siswa kelas II SMU Lab School Jakarta Timur."
+    ],
+    "judul_bab_terdekat": "BAB V KESIMPULAN"
+   }
+  }
+ ],
+ "pendapat_kedua_jml": 40,
+ "pendapat_kedua_antrean": [
+  30,
+  60,
+  80,
+  82,
+  83,
+  85,
+  93,
+  98,
+  103,
+  105,
+  108,
+  109,
+  110,
+  111,
+  113,
+  114,
+  123,
+  128,
+  132,
+  144,
+  168,
+  188,
+  189,
+  190,
+  191,
+  192,
+  193,
+  195,
+  196,
+  317,
+  336,
+  358,
+  371,
+  372,
+  405,
+  420,
+  433,
+  531,
+  534,
+  582
+ ],
+ "goyang_jml": 75,
+ "goyang": [
+  [
+   7,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   8,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   9,
+   [
+    "paragraf",
+    "biasa",
+    "paragraf"
+   ]
+  ],
+  [
+   10,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   11,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   28,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   29,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   31,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   32,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   40,
+   [
+    "paragraf",
+    "biasa",
+    "paragraf"
+   ]
+  ],
+  [
+   47,
+   [
+    "biasa",
+    "bab"
+   ]
+  ],
+  [
+   53,
+   [
+    "subbab",
+    "bab"
+   ]
+  ],
+  [
+   56,
+   [
+    "paragraf",
+    "bab"
+   ]
+  ],
+  [
+   59,
+   [
+    "paragraf",
+    "bab"
+   ]
+  ],
+  [
+   73,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   88,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   89,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   99,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   100,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   108,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   114,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   115,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   116,
+   [
+    "paragraf",
+    "biasa",
+    "paragraf"
+   ]
+  ],
+  [
+   117,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   118,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   119,
+   [
+    "paragraf",
+    "biasa",
+    "paragraf"
+   ]
+  ],
+  [
+   121,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   124,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   129,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   141,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   143,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   144,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   146,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   148,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   155,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   157,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   191,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   193,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   197,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   202,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   204,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   205,
+   [
+    "biasa",
+    "paragraf",
+    "biasa"
+   ]
+  ],
+  [
+   206,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   210,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   211,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   212,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   247,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   248,
+   [
+    "biasa",
+    "paragraf",
+    "biasa"
+   ]
+  ],
+  [
+   253,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   261,
+   [
+    "paragraf",
+    "biasa",
+    "paragraf"
+   ]
+  ],
+  [
+   265,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   280,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   292,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   293,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   316,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   317,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   335,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   336,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   352,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   355,
+   [
+    "paragraf",
+    "biasa",
+    "biasa"
+   ]
+  ],
+  [
+   370,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   389,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   400,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   406,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   414,
+   [
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   415,
+   [
+    "biasa",
+    "paragraf",
+    "subbab"
+   ]
+  ],
+  [
+   433,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   456,
+   [
+    "biasa",
+    "subbab"
+   ]
+  ],
+  [
+   528,
+   [
+    "subbab",
+    "biasa"
+   ]
+  ],
+  [
+   581,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   589,
+   [
+    "subbab",
+    "paragraf"
+   ]
+  ],
+  [
+   597,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   598,
+   [
+    "biasa",
+    "paragraf",
+    "paragraf"
+   ]
+  ],
+  [
+   599,
+   [
+    "biasa",
+    "paragraf",
+    "biasa"
+   ]
+  ],
+  [
+   629,
+   [
+    "biasa",
+    "paragraf",
+    "biasa"
+   ]
+  ]
+ ],
+ "label": {
+  "4": "paragraf",
+  "6": "subbab",
+  "7": "paragraf",
+  "8": "biasa",
+  "9": "paragraf",
+  "10": "biasa",
+  "11": "biasa",
+  "12": "biasa",
+  "14": "paragraf",
+  "15": "paragraf",
+  "16": "biasa",
+  "17": "biasa",
+  "18": "paragraf",
+  "19": "paragraf",
+  "20": "paragraf",
+  "21": "paragraf",
+  "22": "paragraf",
+  "23": "paragraf",
+  "24": "paragraf",
+  "26": "paragraf",
+  "27": "paragraf",
+  "28": "paragraf",
+  "29": "paragraf",
+  "30": "subbab",
+  "31": "subbab",
+  "32": "paragraf",
+  "34": "paragraf",
+  "35": "paragraf",
+  "37": "paragraf",
+  "38": "paragraf",
+  "39": "paragraf",
+  "40": "paragraf",
+  "44": "subbab",
+  "45": "paragraf",
+  "47": "biasa",
+  "48": "biasa",
+  "50": "paragraf",
+  "51": "paragraf",
+  "53": "biasa",
+  "54": "paragraf",
+  "56": "biasa",
+  "57": "biasa",
+  "59": "biasa",
+  "60": "paragraf",
+  "66": "paragraf",
+  "68": "subbab",
+  "69": "paragraf",
+  "70": "paragraf",
+  "71": "paragraf",
+  "72": "biasa",
+  "73": "paragraf",
+  "74": "paragraf",
+  "75": "paragraf",
+  "77": "paragraf",
+  "79": "biasa",
+  "80": "subbab",
+  "81": "paragraf",
+  "82": "subbab",
+  "83": "subbab",
+  "84": "paragraf",
+  "85": "paragraf",
+  "86": "paragraf",
+  "87": "paragraf",
+  "88": "paragraf",
+  "89": "paragraf",
+  "90": "paragraf",
+  "91": "paragraf",
+  "93": "subbab",
+  "94": "paragraf",
+  "95": "paragraf",
+  "98": "subbab",
+  "99": "paragraf",
+  "100": "subbab",
+  "101": "paragraf",
+  "102": "biasa",
+  "103": "paragraf",
+  "104": "biasa",
+  "105": "paragraf",
+  "106": "paragraf",
+  "107": "subbab",
+  "108": "subbab",
+  "109": "paragraf",
+  "110": "subbab",
+  "111": "paragraf",
+  "112": "biasa",
+  "113": "paragraf",
+  "114": "subbab",
+  "115": "paragraf",
+  "116": "paragraf",
+  "117": "paragraf",
+  "118": "biasa",
+  "119": "paragraf",
+  "120": "biasa",
+  "121": "paragraf",
+  "122": "paragraf",
+  "123": "subbab",
+  "124": "biasa",
+  "125": "biasa",
+  "128": "biasa",
+  "129": "paragraf",
+  "130": "subbab",
+  "131": "biasa",
+  "132": "biasa",
+  "133": "paragraf",
+  "135": "subbab",
+  "136": "paragraf",
+  "137": "paragraf",
+  "138": "biasa",
+  "139": "paragraf",
+  "141": "subbab",
+  "142": "biasa",
+  "143": "biasa",
+  "144": "subbab",
+  "145": "paragraf",
+  "146": "biasa",
+  "147": "paragraf",
+  "148": "biasa",
+  "149": "biasa",
+  "150": "biasa",
+  "151": "paragraf",
+  "153": "subbab",
+  "154": "subbab",
+  "155": "paragraf",
+  "156": "biasa",
+  "157": "paragraf",
+  "158": "biasa",
+  "159": "biasa",
+  "160": "biasa",
+  "161": "biasa",
+  "162": "biasa",
+  "163": "biasa",
+  "164": "biasa",
+  "165": "biasa",
+  "166": "paragraf",
+  "167": "paragraf",
+  "168": "subbab",
+  "170": "subbab",
+  "171": "paragraf",
+  "172": "biasa",
+  "173": "biasa",
+  "175": "paragraf",
+  "176": "paragraf",
+  "177": "biasa",
+  "178": "biasa",
+  "179": "paragraf",
+  "180": "paragraf",
+  "181": "paragraf",
+  "182": "paragraf",
+  "183": "paragraf",
+  "185": "subbab",
+  "186": "paragraf",
+  "187": "biasa",
+  "188": "paragraf",
+  "189": "subbab",
+  "190": "paragraf",
+  "191": "subbab",
+  "192": "subbab",
+  "193": "subbab",
+  "194": "paragraf",
+  "195": "paragraf",
+  "196": "subbab",
+  "197": "paragraf",
+  "198": "paragraf",
+  "199": "paragraf",
+  "201": "paragraf",
+  "202": "paragraf",
+  "203": "paragraf",
+  "204": "paragraf",
+  "205": "biasa",
+  "206": "biasa",
+  "207": "biasa",
+  "208": "paragraf",
+  "210": "subbab",
+  "211": "paragraf",
+  "212": "paragraf",
+  "213": "biasa",
+  "244": "paragraf",
+  "246": "paragraf",
+  "247": "paragraf",
+  "248": "paragraf",
+  "249": "subbab",
+  "251": "subbab",
+  "252": "paragraf",
+  "253": "biasa",
+  "255": "subbab",
+  "256": "paragraf",
+  "257": "paragraf",
+  "259": "subbab",
+  "260": "paragraf",
+  "261": "paragraf",
+  "263": "biasa",
+  "264": "biasa",
+  "265": "paragraf",
+  "267": "biasa",
+  "268": "biasa",
+  "269": "biasa",
+  "270": "biasa",
+  "271": "biasa",
+  "272": "biasa",
+  "280": "biasa",
+  "289": "subbab",
+  "290": "paragraf",
+  "291": "paragraf",
+  "292": "subbab",
+  "293": "paragraf",
+  "295": "biasa",
+  "296": "biasa",
+  "297": "biasa",
+  "301": "biasa",
+  "302": "biasa",
+  "303": "biasa",
+  "305": "biasa",
+  "306": "biasa",
+  "307": "biasa",
+  "308": "biasa",
+  "313": "biasa",
+  "316": "subbab",
+  "317": "biasa",
+  "319": "biasa",
+  "324": "biasa",
+  "326": "biasa",
+  "327": "biasa",
+  "332": "biasa",
+  "335": "subbab",
+  "336": "biasa",
+  "338": "biasa",
+  "343": "biasa",
+  "344": "biasa",
+  "350": "biasa",
+  "352": "paragraf",
+  "353": "biasa",
+  "354": "biasa",
+  "355": "biasa",
+  "356": "biasa",
+  "357": "biasa",
+  "358": "biasa",
+  "360": "paragraf",
+  "361": "paragraf",
+  "362": "paragraf",
+  "363": "paragraf",
+  "365": "paragraf",
+  "366": "paragraf",
+  "368": "paragraf",
+  "369": "paragraf",
+  "370": "biasa",
+  "371": "subbab",
+  "372": "biasa",
+  "373": "paragraf",
+  "374": "paragraf",
+  "375": "biasa",
+  "376": "biasa",
+  "377": "biasa",
+  "378": "biasa",
+  "379": "biasa",
+  "380": "biasa",
+  "381": "biasa",
+  "383": "paragraf",
+  "384": "paragraf",
+  "385": "biasa",
+  "386": "biasa",
+  "387": "biasa",
+  "388": "biasa",
+  "389": "biasa",
+  "391": "paragraf",
+  "392": "paragraf",
+  "397": "paragraf",
+  "399": "subbab",
+  "400": "subbab",
+  "401": "paragraf",
+  "402": "paragraf",
+  "403": "paragraf",
+  "404": "biasa",
+  "405": "paragraf",
+  "406": "subbab",
+  "407": "paragraf",
+  "408": "biasa",
+  "409": "biasa",
+  "410": "biasa",
+  "411": "biasa",
+  "413": "subbab",
+  "414": "subbab",
+  "415": "paragraf",
+  "416": "biasa",
+  "417": "biasa",
+  "418": "paragraf",
+  "419": "biasa",
+  "420": "subbab",
+  "421": "subbab",
+  "422": "biasa",
+  "423": "biasa",
+  "425": "biasa",
+  "427": "biasa",
+  "428": "biasa",
+  "429": "biasa",
+  "430": "biasa",
+  "431": "biasa",
+  "433": "subbab",
+  "434": "biasa",
+  "436": "biasa",
+  "437": "biasa",
+  "438": "biasa",
+  "443": "biasa",
+  "447": "subbab",
+  "448": "biasa",
+  "453": "biasa",
+  "456": "subbab",
+  "457": "biasa",
+  "462": "biasa",
+  "466": "subbab",
+  "467": "biasa",
+  "469": "biasa",
+  "474": "biasa",
+  "475": "biasa",
+  "481": "biasa",
+  "483": "biasa",
+  "485": "paragraf",
+  "486": "paragraf",
+  "488": "biasa",
+  "489": "biasa",
+  "490": "biasa",
+  "491": "biasa",
+  "492": "biasa",
+  "493": "biasa",
+  "494": "biasa",
+  "495": "biasa",
+  "496": "biasa",
+  "497": "biasa",
+  "498": "biasa",
+  "499": "biasa",
+  "500": "biasa",
+  "501": "biasa",
+  "502": "biasa",
+  "503": "biasa",
+  "504": "biasa",
+  "505": "biasa",
+  "506": "biasa",
+  "507": "biasa",
+  "508": "biasa",
+  "509": "biasa",
+  "510": "biasa",
+  "511": "biasa",
+  "512": "biasa",
+  "513": "biasa",
+  "514": "biasa",
+  "515": "biasa",
+  "516": "biasa",
+  "517": "biasa",
+  "518": "biasa",
+  "519": "biasa",
+  "520": "biasa",
+  "521": "biasa",
+  "522": "biasa",
+  "523": "biasa",
+  "524": "biasa",
+  "525": "biasa",
+  "526": "biasa",
+  "527": "biasa",
+  "528": "biasa",
+  "530": "subbab",
+  "531": "paragraf",
+  "532": "paragraf",
+  "533": "paragraf",
+  "534": "subbab",
+  "536": "paragraf",
+  "537": "paragraf",
+  "538": "paragraf",
+  "576": "paragraf",
+  "578": "subbab",
+  "579": "paragraf",
+  "580": "paragraf",
+  "581": "paragraf",
+  "582": "paragraf",
+  "584": "subbab",
+  "585": "paragraf",
+  "586": "paragraf",
+  "587": "biasa",
+  "588": "biasa",
+  "589": "paragraf",
+  "591": "subbab",
+  "593": "paragraf",
+  "595": "subbab",
+  "597": "paragraf",
+  "598": "paragraf",
+  "599": "biasa",
+  "629": "paragraf",
+  "631": "biasa",
+  "633": "biasa",
+  "635": "biasa",
+  "637": "biasa",
+  "639": "biasa",
+  "641": "biasa",
+  "643": "biasa",
+  "645": "biasa",
+  "647": "biasa",
+  "649": "biasa",
+  "651": "biasa",
+  "653": "biasa",
+  "655": "biasa",
+  "657": "biasa",
+  "659": "biasa",
+  "661": "biasa",
+  "663": "biasa",
+  "665": "biasa",
+  "667": "biasa",
+  "669": "biasa",
+  "671": "biasa",
+  "673": "biasa"
+ },
+ "gabung": {
+  "0": [
+   "BAB I",
+   "PENDAHULUAN"
+  ],
+  "61": [
+   "BAB II",
+   "TINJAUAN PUSTAKA"
+  ],
+  "241": [
+   "BAB III",
+   "METODE PENELITIAN"
+  ],
+  "394": [
+   "BAB IV",
+   "LAPORAN PELAKSANAAN PENELITIAN"
+  ],
+  "571": [
+   "BAB V",
+   "KESIMPULAN"
+  ]
+ },
+ "sistematika": [
+  47,
+  48,
+  50,
+  51,
+  53,
+  54,
+  56,
+  57,
+  59
+ ],
+ "blok_kira_dari_gabung_bersih": [
+  47,
+  48,
+  50,
+  51,
+  53,
+  54,
+  56,
+  57,
+  59
+ ],
+ "baris": [
+  "BAB I",
+  "PENDAHULUAN",
+  "",
+  "",
+  "Dalam bab ini akan dibahas mengenai latar belakang masalah, rumusan masalah dan pokok bahasan, tujuan penelitian, manfaat penelitian dan sistematika penulisan skripsi.",
+  "",
+  "A. Latar belakang masalah",
+  "Pendidikan adalah suatu usaha atau kegiatan yang dijalankan dengan sengaja, teratur dan berencana dengan maksud mengubah atau mengembangkan perilaku yang diinginkan. Sekolah sebagai lembaga formal merupakan sarana dalam rangka pencapaian tujuan pendidikan tersebut. Melalui sekolah, siswa belajar berbagai macam hal.",
+  "Dalam pendidikan formal, belajar menunjukkan adanya perubahan yang sifatnya positif sehingga pada tahap akhir akan didapat keterampilan, kecakapan dan pengetahuan baru. Hasil dari proses belajar tersebut tercermin dalam prestasi belajarnya. Namun dalam upaya meraih prestasi belajar yang memuaskan dibutuhkan proses belajar.",
+  "Proses belajar yang terjadi pada individu memang merupakan sesuatu yang penting, karena melalui belajar individu mengenal lingkungannya dan menyesuaikan diri dengan lingkungan disekitarnya. Menurut Irwanto (1997 :105) belajar merupakan proses perubahan dari belum mampu menjadi mampu dan terjadi dalam jangka waktu tertentu. Dengan belajar, siswa dapat mewujudkan cita-cita yang diharapkan.",
+  "Belajar akan menghasilkan perubahan-perubahan dalam diri seseorang. Untuk mengetahui sampai seberapa jauh perubahan yang terjadi, perlu adanya penilaian. Begitu juga dengan yang terjadi pada seorang siswa yang mengikuti suatu pendidikan selalu diadakan penilaian dari hasil belajarnya. Penilaian terhadap hasil belajar seorang siswa untuk mengetahui sejauh mana telah mencapai sasaran belajar inilah yang disebut sebagai prestasi belajar.",
+  "Prestasi belajar menurut Yaspir Gandhi Wirawan dalam Murjono (1996 :178) adalah:",
+  "“ Hasil yang dicapai seorang siswa dalam usaha belajarnya sebagaimana dicantumkan di dalam nilai rapornya. Melalui prestasi belajar seorang siswa dapat mengetahui kemajuan-kemajuan yang telah dicapainya dalam belajar.”",
+  "",
+  "Proses belajar di sekolah adalah proses yang sifatnya kompleks dan menyeluruh. Banyak orang yang berpendapat bahwa untuk meraih prestasi yang tinggi dalam belajar, seseorang harus memiliki Intelligence Quotient (IQ) yang tinggi, karena inteligensi merupakan bekal potensial yang akan memudahkan dalam belajar dan pada gilirannya akan menghasilkan prestasi belajar yang optimal. Menurut Binet dalam buku Winkel (1997:529) hakikat inteligensi adalah kemampuan untuk menetapkan dan mempertahankan suatu tujuan, untuk mengadakan penyesuaian dalam rangka mencapai tujuan itu, dan untuk menilai keadaan diri secara kritis dan objektif.",
+  "Kenyataannya, dalam proses belajar mengajar di sekolah sering ditemukan siswa yang tidak dapat meraih prestasi belajar yang setara dengan kemampuan inteligensinya. Ada siswa yang mempunyai kemampuan inteligensi tinggi tetapi memperoleh prestasi belajar yang relatif rendah, namun ada siswa yang walaupun kemampuan inteligensinya relatif rendah, dapat meraih prestasi belajar yang relatif tinggi. Itu sebabnya taraf inteligensi bukan merupakan satu-satunya faktor yang menentukan keberhasilan seseorang, karena ada faktor lain yang mempengaruhi. Menurut Goleman (2000 : 44), kecerdasan intelektual (IQ) hanya menyumbang 20% bagi kesuksesan, sedangkan 80% adalah sumbangan faktor kekuatan-kekuatan lain, diantaranya adalah kecerdasan emosional atau Emotional Quotient (EQ) yakni kemampuan memotivasi diri sendiri, mengatasi frustasi, mengontrol desakan hati, mengatur suasana hati (mood), berempati serta kemampuan bekerja sama.",
+  "Dalam proses belajar siswa, kedua inteligensi itu sangat diperlukan. IQ tidak dapat berfungsi dengan baik tanpa partisipasi penghayatan emosional terhadap mata pelajaran yang disampaikan di sekolah. Namun biasanya kedua inteligensi itu saling melengkapi. Keseimbangan antara IQ dan EQ merupakan kunci keberhasilan belajar siswa di sekolah (Goleman, 2002). Pendidikan di sekolah bukan hanya perlu mengembangkan rational intelligence yaitu model pemahaman yang lazimnya dipahami siswa saja, melainkan juga perlu mengembangkan emotional intelligence siswa .",
+  "Hasil beberapa penelitian di University of Vermont mengenai analisis struktur neurologis otak manusia dan penelitian perilaku oleh LeDoux (1970) menunjukkan bahwa dalam peristiwa penting kehidupan seseorang, EQ selalu mendahului intelegensi rasional. EQ yang baik dapat menentukan keberhasilan individu dalam prestasi belajar membangun kesuksesan karir, mengembangkan hubungan suami-istri yang harmonis dan dapat mengurangi agresivitas, khususnya dalam kalangan remaja",
+  "(Goleman, 2002 : 17).",
+  "Memang harus diakui bahwa mereka yang memiliki IQ rendah dan mengalami keterbelakangan mental akan mengalami kesulitan, bahkan mungkin tidak mampu mengikuti pendidikan formal yang seharusnya sesuai dengan usia mereka. Namun fenomena yang ada menunjukan bahwa tidak sedikit orang dengan IQ tinggi yang berprestasi rendah, dan ada banyak orang dengan IQ sedang yang dapat mengungguli prestasi belajar orang dengan IQ tinggi. Hal ini menunjukan bahwa IQ tidak selalu dapat memperkirakan prestasi belajar seseorang.",
+  "Kemunculan istilah kecerdasan emosional dalam pendidikan, bagi sebagian orang mungkin dianggap sebagai jawaban atas kejanggalan tersebut. Teori Daniel Goleman, sesuai dengan judul bukunya, memberikan definisi baru terhadap kata cerdas. Walaupun EQ merupakan hal yang relatif baru dibandingkan IQ, namun beberapa penelitian telah mengisyaratkan bahwa kecerdasan emosional tidak kalah penting dengan IQ (Goleman, 2002:44).",
+  "Menurut Goleman (2002 : 512), kecerdasan emosional adalah kemampuan seseorang mengatur kehidupan emosinya dengan inteligensi (to manage our emotional life with intelligence); menjaga keselarasan emosi dan pengungkapannya (the appropriateness of emotion and its expression) melalui keterampilan kesadaran diri, pengendalian diri, motivasi diri, empati dan keterampilan sosial.",
+  "Menurut Goleman, khusus pada orang-orang yang murni hanya memiliki kecerdasan akademis tinggi, mereka cenderung memiliki rasa gelisah yang tidak beralasan, terlalu kritis, rewel, cenderung menarik diri, terkesan dingin dan cenderung sulit mengekspresikan kekesalan dan kemarahannya secara tepat. Bila didukung dengan rendahnya taraf kecerdasan emosionalnya, maka orang-orang seperti ini sering menjadi sumber masalah. Karena sifat-sifat di atas, bila seseorang memiliki IQ tinggi namun taraf kecerdasan emosionalnya rendah maka cenderung akan terlihat sebagai orang yang keras kepala, sulit bergaul, mudah frustrasi, tidak mudah percaya kepada orang lain, tidak peka dengan kondisi lingkungan dan cenderung putus asa bila mengalami stress. Kondisi sebaliknya, dialami oleh orang-orang yang memiliki taraf IQ rata-rata namun memiliki kecerdasan emosional yang tinggi.",
+  "Pada penelitian ini, penulis mengunakan sampel pada SMU Lab School Jakarta Timur, yang berada pada peringkat 16 se-DKI, berdasarkan nilai rata-rata nilai ulangan umum murni cawu 2 kelas II tahun ajaran 2001/2002.",
+  "Dalam kaitan pentingnya kecerdasan emosional pada diri siswa sebagai salah satu faktor penting untuk meraih prestasi akademik, maka dalam penyusunan skripsi ini penulis tertarik untuk meneliti :”Hubungan antara Kecerdasan Emosional dengan Prestasi Belajar pada Siswa Kelas II SMU Lab School Jakarta Timur”.",
+  "",
+  "B. Rumusan masalah dan Pokok-pokok Bahasan",
+  "Bertitik tolak dari latar belakang masalah yang telah diuraikan di atas, maka masalah penelitian ini dapat dirumuskan sebagai berikut : “Apakah ada hubungan antara kecerdasan emosional dengan Prestasi belajar pada siswa kelas II SMU di Jakarta?”",
+  "Pada penelitian ini yang menjadi pokok-pokok bahasan adalah sebagai berikut:",
+  "1. Prestasi belajar",
+  "Prestasi belajar adalah hasil belajar yang dicapai oleh seorang siswa dari kegiatan belajar mengajar dalam bidang akademik di sekolah dalam jangka waktu tertentu.",
+  "2. Kecerdasan Emosional",
+  "Kecerdasan emosional adalah kemampuan seseorang untuk memantau dan mengendalikan perasaan sendiri dan orang lain, serta menggunakan perasaan-perasaan itu untuk memandu pikiran dan tindakan ke arah yang positif.",
+  "",
+  "C. Tujuan Penelitian",
+  "Tujuan penelitian dalam penulisan ini adalah untuk mengetahui hubungan antara kecerdasan emosional dengan prestasi belajar pada siswa kelas II SMU Lab School Jakarta Timur.",
+  "",
+  "D. Manfaat Penelitian",
+  "Hasil penelitian ini mempunyai beberapa manfaat, antara lain ialah :",
+  "1. Dari segi teoritis, penelitian ini diharapkan dapat memberikan sumbangan bagi psikologi pendidikan dan memperkaya hasil penelitian yang telah ada dan dapat memberi gambaran mengenai hubungan kecerdasan emosional dengan prestasi belajar.",
+  "2. Dari segi praktis, hasil penelitian ini diharapkan dapat membantu memberikan informasi khususnya kepada para orang tua, konselor sekolah dan guru dalam upaya membimbing dan memotivasi siswa remaja untuk menggali kecerdasan emosional yang dimilikinya.",
+  "",
+  "",
+  "",
+  "E. Sistematika Skripsi",
+  "Sistematika isi dan penulisan skripsi ini antara lain :",
+  "Bab I",
+  ": Pendahuluan",
+  "Berisi tentang latar belakang masalah, perumusan masalah dan pokok-pokok bahasan, tujuan dan manfaat dari penelitian serta sistematika skripsi",
+  "Bab II",
+  ": Tinjauan Pustaka",
+  "Berisi tentang pengertian belajar, pengertian prestasi belajar, faktor-faktor yang mempengaruhi prestasi belajar, pengertian emosi, pengertian kecerdasan emosional, indikator kecerdasan emosional, hubungan kecerdasan emosional dengan prestasi belajar dan hipotesis.",
+  "Bab III",
+  ": Metodologi Penelitian",
+  "Berisi tentang identifikasi variabel penelitian, definisi operasional, populasi dan metode pengambilan sampel, metode pengumpulan data, metode analisis instrumen serta metode analisis data.",
+  "Bab IV",
+  ": Laporan Penelitian",
+  "Berisi tentang laporan pelaksanaan penelitian yang terdiri dari orientasi kancah penelitian, persiapan penelitian, pelaksanaan penelitian serta analisis data penelitian.",
+  "Bab V",
+  ": Penutup",
+  "Berisi tentang pembahasan hasil penelitian, kesimpulan dan saran dari peneliti.",
+  "BAB II",
+  "TINJAUAN PUSTAKA",
+  "",
+  "",
+  "",
+  "Pada bab ini akan diuraikan lebih jauh mengenai teori-teori yang menjelaskan mengenai pengertian belajar dan prestasi belajar, fator-faktor yang mempengaruhi prestasi belajar, pengertian emosi dan kecerdasan emosional, indikator kecerdasan emosional, keterkaitan kecerdasan emosional dengan prestasi belajar",
+  "",
+  "A. Prestasi Belajar",
+  "1. Pengertian Belajar",
+  "Prestasi belajar tidak dapat dipisahkan dari berbuatan belajar, karena belajar merupakan suatu proses, sedangkan prestasi belajar adalah hasil dari proses pembelajaran tersebut.",
+  "Bagi seorang siswa belajar merupakan suatu kewajiban. Berhasil atau tidaknya seorang siswa dalam pendidikan tergantung pada proses belajar yang dialami oleh siswa tersebut.",
+  "Menurtut Logan, dkk (1976) dalam Sia Tjundjing (2001:70) belajar dapat diartikan sebagai perubahan tingkah laku yang relatif menetap sebagai hasil pengalaman dan latihan . Senada dengan hal tersebut, Winkel (1997:193) berpendapat bahwa belajar pada manusia dapat dirumuskan sebagai suatu aktivitas mental atau psikis yang berlangsung dalam interaksi aktif dengan lingkungan, yang menghasilkan perubahan-perubahan dalam pengetahuan dan nilai sikap. Perubahan itu bersifat relatif konstan dan berbekas.",
+  "Belajar tidak hanya dapat dilakukan di sekolah saja, namun dapat dilakukan dimana-mana, seperti di rumah ataupun dilingkungan masyarakat. Irwanto (1997:105) berpendapat bahwa belajar merupakan proses perubahan dari belum mampu menjadi sudah mampu dan terjadi dalam jangka waktu tertentu. Sedangkan menurut Mudzakir (1997:34) belajar adalah suatu usaha atau kegiatan yang bertujuan mengadakan perubahan di dalam diri seseorang, mencakup perubahan tingkah laku, sikap, kebiasaan, ilmu pengetahuan, keterampilan dan sebagainya.",
+  "Di dalam belajar, siswa mengalami sendiri proses dari tidak tahu menjadi tahu, karena itu menurut Cronbach (Sumadi Suryabrata,1998:231) :",
+  "“Belajar yang sebaik-baiknya adalah dengan mengalami dan dalam mengalami itu pelajar mempergunakan pancainderanya. Pancaindera tidak terbatas hanya indera pengelihatan saja, tetapi juga berlaku bagi indera yang lain.”",
+  "",
+  "Belajar dapat dikatakan berhasil jika terjadi perubahan dalam diri siswa, namun tidak semua perubahan perilaku dapat dikatakan belajar karena perubahan tingkah laku akibat belajar memiliki ciri-ciri perwujudan yang khas (Muhibbidin Syah, 2000:116) antara lain :",
+  "",
+  "a. Perubahan Intensional",
+  "Perubahan dalam proses berlajar adalah karena pengalaman atau praktek yang dilakukan secara sengaja dan disadari. Pada ciri ini siswa menyadari bahwa ada perubahan dalam dirinya, seperti penambahan pengetahuan, kebiasaan dan keterampilan.",
+  "b. Perubahan Positif dan aktif",
+  "Positif berarti perubahan tersebut baik dan bermanfaat bagi kehidupan serta sesuai dengan harapan karena memperoleh sesuatu yang baru, yang lebih baik dari sebelumnya. Sedangkan aktif artinya perubahan tersebut terjadi karena adanya usaha dari siswa yang bersangkutan.",
+  "c. Perubahan efektif dan fungsional",
+  "Perubahan dikatakan efektif apabila membawa pengaruh dan manfaat tertentu bagi siswa. Sedangkan perubahan yang fungsional artinya perubahan dalam diri siswa tersebut relatif menetap dan apabila dibutuhkan perubahan tersebut dapat direproduksi dan dimanfaatkan lagi.",
+  "Berdasarkan dari uraian di atas, maka dapat disimpulkan bahwa belajar adalah suatu proses usaha yang dilakukan siswa untuk memperoleh suatu perubahan tingkah laku yang baru secara keseluruhan, secara sengaja, disadari dan perubahan tersebut relatif menetap serta membawa pengaruh dan manfaat yang positif bagi siswa dalam berinteraksi dengan lingkungannya.",
+  "2. Pengertian prestasi belajar",
+  "Untuk mendapatkan suatu prestasi tidaklah semudah yang dibayangkan, karena memerlukan perjuangan dan pengorbanan dengan berbagai tantangan yang harus dihadapi.",
+  "Penilaian terhadap hasil belajar siswa untuk mengetahui sejauhmana ia telah mencapai sasaran belajar inilah yang disebut sebagai prestasi belajar. Seperti yang dikatakan oleh Winkel (1997:168) bahwa proses belajar yang dialami oleh siswa menghasilkan perubahan-perubahan dalam bidang pengetahuan dan pemahaman, dalam bidang nilai, sikap dan keterampilan. Adanya perubahan tersebut tampak dalam prestasi belajar yang dihasilkan oleh siswa terhadap pertanyaan, persoalan atau tugas yang diberikan oleh guru. Melalui prestasi belajar siswa dapat mengetahui kemajuan-kemajuan yang telah dicapainya dalam belajar.",
+  "Sedangkan Marsun dan Martaniah dalam Sia Tjundjing (2000:71) berpendapat bahwa prestasi belajar merupakan hasil kegiatan belajar, yaitu sejauh mana peserta didik menguasai bahan pelajaran yang diajarkan, yang diikuti oleh munculnya perasaan puas bahwa ia telah melakukan sesuatu dengan baik. Hal ini berarti prestasi belajar hanya bisa diketahui jika telah dilakukan penilaian terhadap hasil belajar siswa.",
+  "Menurut Poerwodarminto (Mila Ratnawati, 1996 : 206) yang dimaksud dengan prestasi adalah hasil yang telah dicapai, dilakukan atau dikerjakan oleh seseorang. Sedangkan prestasi belajar itu sendiri diartikan sebagai prestasi yang dicapai oleh seorang siswa pada jangka waktu tertentu dan dicatat dalam buku rapor sekolah.",
+  "Dari beberapa definisi di atas, dapat ditarik kesimpulan bahwa prestasi belajar merupakan hasil usaha belajar yang dicapai seorang siswa berupa suatu kecakapan dari kegiatan belajar bidang akademik di sekolah pada jangka waktu tertentu yang dicatat pada setiap akhir semester di dalam buki laporan yang disebut rapor.",
+  "",
+  "3. Faktor-faktor yang mempengaruhi prestasi belajar.",
+  "Untuk meraih prestasi belajar yang baik, banyak sekali faktor yang perlu diperhatikan, karena di dalam dunia pendidikan tidak sedikit siswa yang mengalami kegagalan. Kadang ada siswa yang memiliki dorongan yang kuat untuk berprestasi dan kesempatan untuk meningkatkan prestasi, tapi dalam kenyataannya prestasi yang dihasilkan di bawah kemampuannya.",
+  "Untuk meraih prestasi belajar yang baik banyak sekali faktor-faktor yang perlu diperhatikan. Menurut Sumadi Suryabrata (1998 : 233) dan Shertzer dan Stone (Winkle, 1997 : 591), secara garis besar faktor-faktor yang mempengaruhi belajar dan prestasi belajar dapat digolongkan menjadi dua bagian, yaitu faktor internal dan faktor eksternal.:",
+  "",
+  "",
+  "a. Faktor internal",
+  "Merupakan faktor yang berasal dari dalam diri siswa yang dapat mempengaruhi prestasi belajar. Faktor ini dapat dibedakan menjadi dua kelompok, yaitu :",
+  "1). Faktor fisiologis",
+  "Dalam hal ini, faktor fisiologis yang dimaksud adalah faktor yang berhubungan dengan kesehatan dan pancaindera",
+  "a) Kesehatan badan",
+  "Untuk dapat menempuh studi yang baik siswa perlu memperhatikan dan memelihara kesehatan tubuhnya. Keadaan fisik yang lemah dapat menjadi penghalang bagi siswa dalam menyelesaikan program studinya. Dalam upaya memelihara kesehatan fisiknya, siswa perlu memperhatikan pola makan dan pola tidur, untuk memperlancar metabolisme dalam tubuhnya. Selain itu, juga untuk memelihara kesehatan bahkan juga dapat meningkatkan ketangkasan fisik dibutuhkan olahraga yang teratur.",
+  "b) Pancaindera",
+  "Berfungsinya pancaindera merupakan syarat dapatnya belajar itu berlangsung dengan baik. Dalam sistem pendidikan dewasa ini di antara pancaindera itu yang paling memegang peranan dalam belajar adalah mata dan telinga. Hal ini penting, karena sebagian besar hal-hal yang dipelajari oleh manusia dipelajari melalui penglihatan dan pendengaran. Dengan demikian, seorang anak yang memiliki cacat fisik atau bahkan cacat mental akan menghambat dirinya didalam menangkap pelajaran, sehingga pada akhirnya akan mempengaruhi prestasi belajarnya di sekolah.",
+  "2) Faktor psikologis",
+  "Ada banyak faktor psikologis yang dapat mempengaruhi prestasi belajar siswa, antara lain adalah :",
+  "a) Intelligensi",
+  "Pada umumnya, prestasi belajar yang ditampilkan siswa mempunyai kaitan yang erat dengan tingkat kecerdasan yang dimiliki siswa. Menurut Binet (Winkle,1997 :529) hakikat inteligensi adalah kemampuan untuk menetapkan dan mempertahankan suatu tujuan, untuk mengadakan suatu penyesuaian dalam rangka mencapai tujuan itu dan untuk menilai keadaan diri secara kritis dan objektif. Taraf inteligensi ini sangat mempengaruhi prestasi belajar seorang siswa, di mana siswa yang memiliki taraf inteligensi tinggi mempunyai peluang lebih besar untuk mencapai prestasi belajar yang lebih tinggi. Sebaliknya, siswa yang memiliki taraf inteligensi yang rendah diperkirakan juga akan memiliki prestasi belajar yang rendah. Namun bukanlah suatu yang tidak mungkin jika siswa dengan taraf inteligensi rendah memiliki prestasi belajar yang tinggi, juga sebaliknya .",
+  "b) Sikap",
+  "Sikap yang pasif, rendah diri dan kurang percaya diri dapat merupakan faktor yang menghambat siswa dalam menampilkan prestasi belajarnya. Menurut Sarlito Wirawan (1997:233) sikap adalah kesiapan seseorang untuk bertindak secara tertentu terhadap hal-hal tertentu. Sikap siswa yang positif terhadap mata pelajaran di sekolah merupakan langkah awal yang baik dalam proses belajar mengajar di sekolah.",
+  "c) Motivasi",
+  "Menurut Irwanto (1997 : 193) motivasi adalah penggerak perilaku. Motivasi belajar adalah pendorong seseorang untuk belajar. Motivasi timbul karena adanya keinginan atau kebutuhan-kebutuhan dalam diri seseorang. Seseorang berhasil dalam belajar karena ia ingin belajar. Sedangkan menurut Winkle (1991 : 39) motivasi belajar adalah keseluruhan daya penggerak di dalam diri siswa yang menimbulkan kegiatan belajar, yang menjamin kelangsungan dari kegiatan belajar dan yang memberikan arah pada kegiatan belajar itu; maka tujuan yang dikehendaki oleh siswa tercapai. Motivasi belajar merupakan faktor psikis yang bersifat non intelektual. Peranannya yang khas ialah dalam hal gairah atau semangat belajar, siswa yang termotivasi kuat akan mempunyai banyak energi untuk melakukan kegiatan belajar.",
+  "b. Faktor eksternal",
+  "Selain faktor-faktor yang ada dalam diri siswa, ada hal-hal lain diluar diri yang dapat mempengaruhi prestasi belajar yang akan diraih, antara lain adalah :",
+  "1). Faktor lingkungan keluarga a) Sosial ekonomi keluarga",
+  "Dengan sosial ekonomi yang memadai, seseorang lebih berkesempatan mendapatkan fasilitas belajar yang lebih baik, mulai dari buku, alat tulis hingga pemilihan sekolah",
+  "b). Pendidikan orang tua",
+  "Orang tua yang telah menempuh jenjang pendidikan tinggi cenderung lebih memperhatikan dan memahami pentingnya pendidikan bagi anak-anaknya, dibandingkan dengan yang mempunyai jenjang pendidikan yang lebih rendah.",
+  "c). Perhatian orang tua dan suasana hubungan antara anggota keluarga",
+  "Dukungan dari keluarga merupakan suatu pemacu semangat berpretasi bagi seseorang. Dukungan dalam hal ini bisa secara langsung, berupa pujian atau nasihat; maupun secara tidak langsung, seperti hubugan keluarga yang harmonis.",
+  "2). Faktor lingkungan sekolah a). Sarana dan prasarana",
+  "Kelengkapan fasilitas sekolah, seperti papan tulis, OHP akan membantu kelancaran proses belajar mengajar di sekolah; selain bentuk ruangan, sirkulasi udara dan lingkungan sekitar sekolah juga dapat mempengaruhi proses belajar mengajar",
+  "b). Kompetensi guru dan siswa",
+  "Kualitas guru dan siswa sangat penting dalam meraih prestasi, kelengkapan sarana dan prasarana tanpa disertai kinerja yang baik dari para penggunanya akan sia-sia belaka. Bila seorang siswa merasa kebutuhannya untuk berprestasi dengan baik di sekolah terpenuhi, misalnya dengan tersedianya fasilitas dan tenaga pendidik yang berkualitas , yang dapat memenihi rasa ingintahuannya, hubungan dengan guru dan teman-temannya berlangsung harmonis, maka siswa akan memperoleh iklim belajar yang menyenangkan. Dengan demikian, ia akan terdorong untuk terus-menerus meningkatkan prestasi belajarnya.",
+  "",
+  "",
+  "c). Kurikulum dan metode mengajar",
+  "Hal ini meliputi materi dan bagaimana cara memberikan materi tersebut kepada siswa. Metrode pembelajaran yang lebih interaktif sangat diperlukan untuk menumbuhkan minat dan peran serta siswa dalam kegiatan pembelajaran. Sarlito Wirawan (1994:122) mengatakan bahwa faktor yang paling penting adalah faktor guru. Jika guru mengajar dengan arif bijaksana, tegas, memiliki disiplin tinggi, luwes dan mampu membuat siswa menjadi senang akan pelajaran, maka prestasi belajar siswa akan cenderung tinggi, palingtidak siswa tersebut tidak bosan dalam mengikuti pelajaran.",
+  "3). Faktor lingkungan masyarakat a). Sosial budaya",
+  "Pandangan masyarakat tentang pentingnya pendidikan akan mempengaruhi kesungguhan pendidik dan peserta didik. Masyarakat yang masih memandang rendah pendidikan akan enggan mengirimkan anaknya ke sekolah dan cenderung memandang rendah pekerjaan guru/pengajar",
+  "b). Partisipasi terhadap pendidikan",
+  "Bila semua pihak telah berpartisipasi dan mendukung kegiatan pendidikan, mulai dari pemerintah (berupa kebijakan dan anggaran) sampai pada masyarakat bawah, setiap orang akan lebih menghargai dan berusaha memajukan pendidikan dan ilmu pengetahuan.",
+  "",
+  "4. Pengukuran prestasi belajar",
+  "Dalam dunia pendidikan, menilai merupakan salah satu kegiatan yang tidak dapat ditinggalkan. Menilai merupakan salah satu proses belajar dan mengajar. Di Indonesia, kegiatan menilai prestasi belajar bidang akademik di sekolah-sekolah dicatat dalam sebuah buku laporan yang disebut rapor. Dalam rapor dapat diketahui sejauhmana prestasi belajar seorang siswa, apakah siswa tersebut berhasil atau gagal dalam suatu mata pelajaran. Didukung oleh pendapat Sumadi Suryabrata (1998 : 296) bahwa rapor merupakan perumusan terakhir yang diberikan oleh guru mengenai kemajuan atau hasil belajar murid-muridnya selama masa tertentu.",
+  "Syaifuddin Azwar (1998 :11) menyebutkan bahwa ada beberapa fungsi penilaian dalam pendidikan, yaitu :",
+  "a. Penilaian berfungsi selektif (fungsi sumatif)",
+  "Fungsi penilaian ini merupakan pengukuran akhir dalam suatu program dan hasilnya dipakai untuk menentukan apakah siswa dapat dinyatakan lulus atau tidak dalam program pendidikan tersebut. Dengan kata lain penilaian berfungsi untuk membantu guru mengadakan seleksi terhadap beberapa siswa, misalnya :",
+  "",
+  "1). Memilih siswa yang akan diterima di sekolah",
+  "2) Memilih siswa untuk dapat naik kelas",
+  "3). Memilih siswa yang seharusnya dapat beasiswa",
+  "b. Penilaian berfungsi diagnostik",
+  "Fungsi penilaian ini selain untuk mengetahui hasil yang dicapai siswa juga mengetahui kelemahan siswa sehingga dengan adanya penilaian, maka guru dapat mengetahui kelemahan dan kelebihan masing-masing siswa. Jika guru dapat mendeteksi kelemahan siswa, maka kelemahan tersebut dapat segera diperbaiki.",
+  "c. Penilaian berfungsi sebagai penempatan (placement)",
+  "Setiap siswa memiliki kemampuan berbeda satu sama lain. Penilaian dilakukan untuk mengetahui di mana seharusnya siswa tersebut ditempatkan sesuai dengan kemampuannya yang telah diperlihatkannya pada prestasi belajar yang telah dicapainya. Sebagai contoh penggunaan nilai rapor SMU kelas II menentukan jurusan studi di kelas III.",
+  "d. Penilaian berfungsi sebagai pengukur keberhasilan (fungsi formatif)",
+  "Penilaian berfungsi untuk mengetahui sejauh mana suatu program dapat diterapkan. Sebagai contoh adalah raport di setiap semester di sekolah-sekolah tingkat dasar dan menegah dapat dipakai untuk mengetahui apakah program pendidikan yang telah diterapkan berhasil diterapkan atau tidak pada siswa tersebut.",
+  "Raport biasanya menggambil nilai dari angka 1 sampai dengan 10, terutama pada siswa SD sampai SMU, tetaapi dalam kenyataan nilai terendah dalam rapor yaitu 4 dan nilai tertinggi 9. Nilai-nilai di bawah 5 berarti tidak baik atau buruk, sedangkan nilai-nilai di atas 5 berarti cukup baik, baik dan sangat baik.",
+  "Dalam penelitian ini pengukuran prestasi belajar menggunakan penilaian sebagai pengukur keberhasilan (fungsi formatif), yaitu nilai-nilai raport pada akhir masa semester I.",
+  "",
+  "B. Kecerdasan Emosional",
+  "1. Pengertian emosi",
+  "Kata emosi berasal dari bahasa latin, yaitu emovere, yang berarti bergerak menjauh. Arti kata ini menyiratkan bahwa kecenderungan bertindak merupakan hal mutlak dalam emosi. Menurut Daniel Goleman (2002 : 411) emosi merujuk pada suatu perasaan dan pikiran yang khas, suatu keadaan biologis dan psikologis dan serangkaian kecenderungan untuk bertindak. Emosi pada dasarnya adalah dorongan untuk bertindak. Biasanya emosi merupakan reaksi terhadap rangsangan dari luar dan dalam diri individu. Sebagai contoh emosi gembira mendorong perubahan suasana hati seseorang, sehingga secara fisiologi terlihat tertawa, emosi sedih mendorong seseorang berperilaku menangis.",
+  "Emosi berkaitan dengan perubahan fisiologis dan berbagai pikiran. Jadi, emosi merupakan salah satu aspek penting dalam kehidupan manusia, karena emosi dapat merupakan motivator perilaku dalam arti meningkatkan, tapi juga dapat mengganggu perilaku intensional manusia. (Prawitasari,1995)",
+  "Beberapa tokoh mengemukakan tentang macam-macam emosi, antara lain Descrates. Menurut Descrates, emosi terbagi atas : Desire (hasrat), hate (benci), Sorrow (sedih/duka), Wonder (heran), Love (cinta) dan Joy (kegembiraan). Sedangkan JB Watson mengemukakan tiga macam emosi, yaitu : fear (ketakutan), Rage(kemarahan), Love (cinta). Daniel Goleman (2002 : 411) mengemukakan beberapa macam emosi yang tidak berbeda jauh dengan kedua tokoh di atas, yaitu :",
+  "a. Amarah : beringas, mengamuk, benci, jengkel, kesal hati",
+  "b. Kesedihan : pedih, sedih, muram, suram, melankolis, mengasihi diri, putus asa",
+  "c. Rasa takut : cemas, gugup, khawatir, was-was, perasaan takut sekali, waspada, tidak tenang, ngeri",
+  "d. Kenikmatan : bahagia, gembira, riang, puas, riang, senang, terhibur, bangga",
+  "e. Cinta : penerimaan, persahabatan, kepercayaan, kebaikan hati, rasa dekat, bakti, hormat, kemesraan, kasih",
+  "f. Terkejut : terkesiap, terkejut",
+  "g. Jengkel : hina, jijik, muak, mual, tidak suka",
+  "h. malu : malu hati, kesal",
+  "Seperti yang telah diuraikan diatas, bahwa semua emosi menurut Goleman pada dasarnya adalah dorongan untuk bertindak. Jadi berbagai macam emosi itu mendorong individu untuk memberikan respon atau bertingkah laku terhadap stimulus yang ada. Dalam the Nicomachea Ethics pembahasan Aristoteles secara filsafat tentang kebajikan, karakter dan hidup yang benar, tantangannya adalah menguasai kehidupan emosional kita dengan kecerdasan. Nafsu, apabila dilatih dengan baik akan memiliki kebijaksanaan; nafsu membimbing pemikiran, nilai, dan kelangsungan hidup kita. Tetapi, nafsu dapat dengan mudah menjadi tak terkendalikan, dan hal itu seringkali terjadi. Menurut Aristoteles, masalahnya bukanlah mengenai emosionalitas, melainkan mengenai keselarasan antara emosi dan cara mengekspresikan (Goleman, 2002 : xvi).",
+  "Menurut Mayer (Goleman, 2002 : 65) orang cenderung menganut gaya-gaya khas dalam menangani dan mengatasi emosi mereka, yaitu : sadar diri, tenggelam dalam permasalahan, dan pasrah. Dengan melihat keadaan itu maka penting bagi setiap individu memiliki kecerdasan emosional agar menjadikan hidup lebih bermakna dan tidak menjadikan hidup yang di jalani menjadi sia-sia.",
+  "Berdasarkan uraian tersebut, dapat disimpulkan bahwa emosi adalah suatu perasaan (afek) yang mendorong individu untuk merespon atau bertingkah laku terhadap stimulus, baik yang berasal dari dalam maupun dari luar dirinya.",
+  "",
+  "2. Pengertian kecerdasan emosional",
+  "Istilah “kecerdasan emosional” pertama kali dilontarkan pada tahun 1990 oleh psikolog Peter Salovey dari Harvard University dan John Mayer dari University of New Hampshire untuk menerangkan kualitas-kualitas emosional yang tampaknya penting bagi keberhasilan.",
+  "Salovey dan Mayer mendefinisikan kecerdasan emosional atau yang sering disebut EQ sebagai :",
+  "“himpunan bagian dari kecerdasan sosial yang melibatkan kemampuan memantau perasaan sosial yang melibatkan kemampuan pada orang lain, memilah-milah semuanya dan menggunakan informasi ini untuk membimbing pikiran dan tindakan.” (Shapiro, 1998:8).",
+  "",
+  "Kecerdasan emosional sangat dipengaruhi oleh lingkungan, tidak bersifat menetap, dapat berubah-ubah setiap saat. Untuk itu peranan lingkungan terutama orang tua pada masa kanak-kanak sangat mempengaruhi dalam pembentukan kecerdasan emosional.",
+  "Keterampilan EQ bukanlah lawan keterampilan IQ atau keterampilan kognitif, namun keduanya berinteraksi secara dinamis, baik pada tingkatan konseptual maupun di dunia nyata. Selain itu, EQ tidak begitu dipengaruhi oleh faktor keturunan. (Shapiro, 1998-10).",
+  "Sebuah model pelopor lain yentang kecerdasan emosional diajukan oleh Bar-On pada tahun 1992 seorang ahli psikologi Israel, yang mendefinisikan kecerdasan emosional sebagai serangkaian kemampuan pribadi, emosi dan sosial yang mempengaruhi kemampuan seseorang untuk berhasil dalam mengatasi tututan dan tekanan lingkungan (Goleman, 2000 :180).",
+  "Gardner dalam bukunya yang berjudul Frame Of Mind (Goleman, 2000 : 50-53) mengatakan bahwa bukan hanya satu jenis kecerdasan yang monolitik yang penting untuk meraih sukses dalam kehidupan, melainkan ada spektrum kecerdasan yang lebar dengan tujuh varietas utama yaitu linguistik, matematika/logika, spasial, kinestetik, musik, interpersonal dan intrapersonal. Kecerdasan ini dinamakan oleh Gardner sebagai kecerdasan pribadi yang oleh Daniel Goleman disebut sebagai kecerdasan emosional.",
+  "Menurut Gardner, kecerdasan pribadi terdiri dari :”kecerdasan antar pribadi yaitu kemampuan untuk memahami orang lain, apa yang memotivasi mereka, bagaimana mereka bekerja, bagaimana bekerja bahu membahu dengan kecerdasan. Sedangkan kecerdasan intra pribadi adalah kemampuan yang korelatif, tetapi terarah ke dalam diri. Kemampuan tersebut adalah kemampuan membentuk suatu model diri sendiri yang teliti dan mengacu pada diri serta kemampuan untuk menggunakan modal tadi sebagai alat untuk menempuh kehidupan secara efektif.” (Goleman, 2002 : 52).",
+  "Dalam rumusan lain, Gardner menyatakan bahwa inti kecerdasan antar pribadi itu mencakup “kemampuan untuk membedakan dan menanggapi dengan tepat suasana hati, temperamen, motivasi dan hasrat orang lain.” Dalam kecerdasan antar pribadi yang merupakan kunci menuju pengetahuan diri, ia mencantumkan “akses menuju perasaan-perasaan diri seseorang dan kemampuan untuk membedakan perasaan-perasaan tersebut serta memanfaatkannya untuk menuntun tingkah laku”. (Goleman, 2002 : 53).",
+  "Berdasarkan kecerdasan yang dinyatakan oleh Gardner tersebut, Salovey (Goleman, 200:57) memilih kecerdasan interpersonal dan kecerdasan intrapersonal untuk dijadikan sebagai dasar untuk mengungkap kecerdasan emosional pada diri individu. Menurutnya kecerdasan emosional adalah kemampuan seseorang untuk mengenali emosi diri, mengelola emosi, memotivasi diri sendiri, mengenali emosi orang lain (empati) dan kemampuan untuk membina hubungan (kerjasama) dengan orang lain.",
+  "Menurut Goleman (2002 : 512), kecerdasan emosional adalah kemampuan seseorang mengatur kehidupan emosinya dengan inteligensi (to manage our emotional life with intelligence); menjaga keselarasan emosi dan pengungkapannya (the appropriateness of emotion and its expression) melalui keterampilan kesadaran diri, pengendalian diri, motivasi diri, empati dan keterampilan sosial.",
+  "Dalam penelitian ini yang dimaksud dengan kecerdasan emosional adalah kemampuan siswa untuk mengenali emosi diri, mengelola emosi diri, memotivasi diri sendiri, mengenali emosi orang lain (empati) dan kemampuan untuk membina hubungan (kerjasama) dengan orang lain.",
+  "",
+  "3. Faktor Kecerdasan Emosional",
+  "Goleman mengutip Salovey (2002:58-59) menempatkan menempatkan kecerdasan pribadi Gardner dalam definisi dasar tentang kecerdasan emosional yang dicetuskannya dan memperluas kemapuan tersebut menjadi lima kemampuan utama, yaitu :",
+  "a. Mengenali Emosi Diri",
+  "Mengenali emosi diri sendiri merupakan suatu kemampuan untuk mengenali perasaan sewaktu perasaan itu terjadi. Kemampuan ini merupakan dasar dari kecerdasan emosional, para ahli psikologi menyebutkan kesadaran diri sebagai metamood, yakni kesadaran seseorang akan emosinya sendiri. Menurut Mayer (Goleman, 2002 : 64) kesadaran diri adalah waspada terhadap suasana hati maupun pikiran tentang suasana hati, bila kurang waspada maka individu menjadi mudah larut dalam aliran emosi dan dikuasai oleh emosi. Kesadaran diri memang belum menjamin penguasaan emosi, namun merupakan salah satu prasyarat penting untuk mengendalikan emosi sehingga individu mudah menguasai emosi.",
+  "b. Mengelola Emosi",
+  "Mengelola emosi merupakan kemampuan individu dalam menangani perasaan agar dapat terungkap dengan tepat atau selaras, sehingga tercapai keseimbangan dalam diri individu. Menjaga agar emosi yang merisaukan tetap terkendali merupakan kunci menuju kesejahteraan emosi. Emosi berlebihan, yang meningkat dengan intensitas terlampau lama akan mengoyak kestabilan kita (Goleman, 2002 : 77-78). Kemampuan ini mencakup kemampuan untuk menghibur diri sendiri, melepaskan kecemasan, kemurungan atau ketersinggungan dan akibat-akibat yang ditimbulkannya serta kemampuan untuk bangkit dari perasaan-perasaan yang menekan.",
+  "c. Memotivasi Diri Sendiri",
+  "Presatasi harus dilalui dengan dimilikinya motivasi dalam diri individu, yang berarti memiliki ketekunan untuk menahan diri terhadap kepuasan dan mengendalikan dorongan hati, serta mempunyai perasaan motivasi yang positif, yaitu antusianisme, gairah, optimis dan keyakinan diri.",
+  "d. Mengenali Emosi Orang Lain",
+  "Kemampuan untuk mengenali emosi orang lain disebut juga empati. Menurut Goleman (2002 :57) kemampuan seseorang untuk mengenali orang lain atau peduli, menunjukkan kemampuan empati seseorang. Individu yang memiliki kemampuan empati lebih mampu menangkap sinyal-sinyal sosial yang tersembunyi yang mengisyaratkan apa-apa yang dibutuhkan orang lain sehingga ia lebih mampu menerima sudut pandang orang lain, peka terhadap perasaan orang lain dan lebih mampu untuk mendengarkan orang lain.",
+  "Rosenthal dalam penelitiannya menunjukkan bahwa orang-orang yang mampu membaca perasaan dan isyarat non verbal lebih mampu menyesuiakan diri secara emosional, lebih populer, lebih mudah beraul, dan lebih peka (Goleman, 2002 : 136). Nowicki, ahli psikologi menjelaskan bahwa anak-anak yang tidak mampu membaca atau mengungkapkan emosi dengan baik akan terus menerus merasa frustasi (Goleman, 2002 : 172). Seseorang yang mampu membaca emosi orang lain juga memiliki kesadaran diri yang tinggi. Semakin mampu terbuka pada emosinya sendiri, mampu mengenal dan mengakui emosinya sendiri, maka orang tersebut mempunyai kemampuan untuk membaca perasaan orang lain.",
+  "e. Membina Hubungan",
+  "Kemampuan dalam membina hubungan merupakan suatu keterampilan yang menunjang popularitas, kepemimpinan dan keberhasilan antar pribadi (Goleman, 2002 : 59). Keterampilan dalam berkomunikasi merupakan kemampuan dasar dalam keberhasilan membina hubungan. Individu sulit untuk mendapatkan apa yang diinginkannya dan sulit juga memahami keinginan serta kemauan orang lain.",
+  "Orang-orang yang hebat dalam keterampilan membina hubungan ini akan sukses dalam bidang apapun. Orang berhasil dalam pergaulan karena mampu berkomunikasi dengan lancar pada orang lain. Orang-orang ini populer dalam lingkungannya dan menjadi teman yang menyenangkan karena kemampuannya berkomunikasi (Goleman, 2002 :59). Ramah tamah, baik hati, hormat dan disukai orang lain dapat dijadikan petunjuk positif bagaimana siswa mampu membina hubungan dengan orang lain. Sejauhmana kepribadian siswa berkembang dilihat dari banyaknya hubungan interpersonal yang dilakukannya.",
+  "Berdasarkan uraian tersebut di atas, penulis mengambil komponen-komponen utama dan prinsip-prinsip dasar dari kecerdasan emosional sebagai faktor untuk mengembangkan instrumen kecerdasan emosional",
+  "",
+  "C. Keterkaitan antara kecerdasan emosional dengan prestasi belajar pada siswa SMU",
+  "Di tengah semakin ketatnya persaingan di dunia pendidikan dewasa ini, merupakan hal yang wajar apabila para siswa sering khawatir akan mengalami kegagalan atau ketidak berhasilan dalam meraih prestasi belajar atau bahkan takut tinggal kelas.",
+  "Banyak usaha yang dilakukan oleh para siswa untuk meraih prestasi belajar agar menjadi yang terbaik seperti mengikuti bimbingan belajar. Usaha semacam itu jelas positif, namun masih ada faktor lain yang tidak kalah pentingnya dalam mencapai keberhasilan selain kecerdasan ataupun kecakapan intelektual, faktor tersebut adalah kecerdasan emosional. Karena kecerdasan intelektual saja tidak memberikan persiapan bagi individu untuk menghadapi gejolak, kesempatan ataupun kesulitan-kesulitan dan kehidupan. Dengan kecerdasan emosional, individu mampu mengetahui dan menanggapi perasaan mereka sendiri dengan baik dan mampu membaca dan menghadapi perasaan-perasaan orang lain dengan efektif. Individu dengan keterampilan emosional yang berkembang baik berarti kemungkinan besar ia akan berhasil dalam kehidupan dan memiliki motivasi untuk berprestasi. Sedangkan individu yang tidak dapat menahan kendali atas kehidupan emosionalnya akan mengalami pertarungan batin yang merusak kemampuannya untuk memusatkan perhatian pada tugas-tugasnya dan memiliki pikiran yang jernih.",
+  "Sebuah laporan dari National Center for Clinical Infant Programs (1992) menyatakan bahwa keberhasilan di sekolah bukan diramalkan oleh kumpulan fakta seorang siswa atau kemampuan dininya untuk membaca, melainkan oleh ukuran-ukuran emosional dan sosial : yakni pada diri sendiri dan mempunyai minat; tahu pola perilaku yang diharapkan orang lain dan bagaimana mengendalikan dorongan hati untuk berbuat nakal; mampu menunggu, mengikuti petunjuk dan mengacu pada guru untuk mencari bantuan; serta mengungkapkan kebutuhan-kebutuhan saat bergaul dengan siswa lain. Hampir semua siswa yang prestasi sekolahnya buruk, menurut laporan tersebut, tidak memiliki satu atau lebih unsur-unsur kecerdasan emosional ini (tanpa memperdulikan apakah mereka juga mempunyai kesulitan-kesulitan kognitif seperti kertidakmampuan belajar). (Goleman, 2002:273).",
+  "Penelitian Walter Mischel (1960) mengenai “marsmallow challenge” di Universitas Stanford menunjukkan anak yang ketika berumur empat tahun mampu menunda dorongan hatinya, setelah lulus sekolah menengah atas, secara akademis lebih kompeten, lebih mampu menyusun gagasan secara nalar, seta memiliki gairah belajar yang lebih tinggi. Mereka memiliki skor yang secara signifikan lebih tinggi pada tes SAT dibanding dengan anak yang tidak mampu menunda dorongan hatinya (dalam Goleman, 2002 : 81).",
+  "Individu yang memiliki tingkat kecerdasan emosional yang lebih baik, dapat menjadi lebih terampil dalam menenangkan dirinya dengan cepat, jarang tertular penyakit, lebih terampil dalam memusatkan perhatian, lebih baik dalam berhubungan dengan orang lain, lebih cakap dalam memahami orang lain dan untuk kerja akademis di sekolah lebih baik (Gottman, 2001:xvii).",
+  "Keterampilan dasar emosional tidak dapat dimiliki secara tiba-tiba, tetapi membutuhkan proses dalam mempelajarinya dan lingkungan yang membentuk kecerdasan emosional tersebut besar pengaruhnya. Hal positif akan diperoleh bila anak diajarkan keterampilan dasar kecerdasan emosional, secara emosional akan lebih cerdas, penuh pengertian, mudah menerima perasaan-perasaan dan lebih banyak pengalaman dalam memecahkan permasalahannya sendiri, sehingga pada saat remaja akan lebih banyak sukses disekolah dan dalam berhubungan dengan rekan-rekan sebaya serta akan terlindung dari resiko-resiko seperti obat-obat terlarang, kenakalan, kekerasan serta seks yang tidak aman (Gottman, 2001 : 250).",
+  "Dari uraian di atas dapat diambil kesimpulan bahwa kecerdasan emosional merupakan salah satu faktor yang penting yang seharusnya dimiliki oleh siswa yang memiliki kebutuhan untuk meraih prestasi belajar yang lebih baik di sekolah..",
+  "",
+  "D. Hipotesis",
+  "Berdasarkan uraian teoritik di atas, maka hipotesis penelitian ini dapat dirumuskan sebagai berikut :",
+  "1. Hipotesis alternatif (Ha) : “Ada hubungan antara kecerdasan emosional dengan Prestasi belajar”",
+  "2. Hipotesis nihil (Ho) : “Tidak ada hubungan antara kecerdasan emosional dengan Prestasi belajar”",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "BAB III",
+  "METODE PENELITIAN",
+  "",
+  "Dalam metode penelitian ini diuraikan mengenai identifikasi variabel penelitian, definisi operasional variabel penelitian, populasi dan metode pengambilan sampel, metode pengumpulan data, metode analisis instrumen serta metode analisis data.",
+  "",
+  "A. Identifikasi variabel penelitian",
+  "Berdasarkan landasan teori yang ada serta rumusan hipotesis penelitian maka yang menjadi variabel dalam penelitian ini adalah :",
+  "1.. Variabel bebas : Kecerdasan Emosional",
+  "2. Variabel terikat : Prestasi Belajar",
+  "",
+  "B. Definisi Operasional",
+  "1. Prestasi belajar adalah hasil belajar dari suatu aktivitas belajar yang dilakukan berdasarkan pengukuran dan penilaian terhadap hasil kegiatan belajar dalam bidang akademik yang diwujudkan berupa angka-angka dalam raport. Pada penelitian ini menggunakan nilai raport kelas 2 semester 1.",
+  "2. Kecerdasan emosional adalah kemampuan seseorang untuk mengenali emosi diri, mengelola emosi, memotivasi diri sendiri, mengenali emosi orang lain (empati) dan kemampuan untuk membina hubungan (kerjasama) dengan orang lain.",
+  "",
+  "C. Populasi dan metode pengambilan sampel",
+  "1. Populasi",
+  "Menurut Sutrisno Hadi (1993 : 70) populasi adalah seluruh penduduk atau individu yang paling sedikit mempunyai satu sifat yang sama. Populasi dalam penelitian ini adalah seluruh siswa kelas II SMU Lab School Jakarta Timur yang berusia antara 16-17 tahun. Berdasarkan data yang diperoleh dari pihak sekolah, jumlah populasi kelas II SMU Lab School Jakarta Timur sebanyak 240 orang.",
+  "",
+  "2. Metode Pengambilan Sampel",
+  "Mengacu pada tabel Morgan maka diperoleh jumlah sampel sebesar 148 orang. Adapun metode pengambilan sampel yang dipakai pada penelitian ini adalah menggunakan teknik proporsional random sampling. Menurut Sutrisno Hadi (1996:223) alasan penulis menggunakan random sampling ini adalah memberikan peluang yang sama bagi setiap anggota populasi untuk dipilih menjadi sampel. Selain hal tersebut, Sutrisno Hadi (1996:223) mengatakan suatu cara disebut random apabila peneliti tidak memilih-milih individu yang akan ditugaskan untuk menjadi sampel penelitian. Teknik random sampling yang dipergunakan adalah dengan cara undian. Langkah pertama adalah dengan memberi nomor urut pada masing-masing sampel, setelah membuat nomor yang dimasukkan kedalam gelas yang berlubang kemudian diambil sebanyak 148 kali. Nomor yang keluar dipergunakan sebagai sampel penelitian. Sedangkan yang dimaksud dengan proporsional adalah dimana tiap-tiap sub populasi mendapat bagian atau kesempatan yang sama untuk menjadi sampel dalam penelitian.",
+  "Menurut M. Nasir (1988:360), untuk prosedur pengambilan sampel dengan metode proporsional random sampling dipergunakan rumus sebagai berikut :",
+  "",
+  "ni = Keterangan : ni : Jumlah sampel per sub populasi Ni : Total sub populasi",
+  "N : Total populasi n : Besarnya sample",
+  "Berdasarkan kriteria sampel di atas maka diperoleh distribusi sampling sebagai berikut :",
+  "Tabel 1 Distribusi sampling Kelas",
+  "2A",
+  "2B",
+  "2C",
+  "2D",
+  "2E",
+  "2F Jumlah Populasi",
+  "40",
+  "42",
+  "40",
+  "38",
+  "42",
+  "38",
+  "240",
+  "Sampel",
+  "25",
+  "26",
+  "25",
+  "23",
+  "26",
+  "23",
+  "148",
+  "",
+  "D. Metode pengambilan data",
+  "Metode yang digunakan dalam pengumpulan data adalah dengan menggunakan metode skala, yaitu suatu metode pengambilan data di mana data-data yang diperlukan dalam penelitian diperoleh melalui pernyataan atau pertanyaan tertulis yang diajukan responden mengenai suatu hal yang disajikan dalam bentuk suatu daftar pertanyaan (Koentjaraningrat, 1994 : 173).",
+  "Dalam penelitian ini penulis menggunakan skala kecerdasan emosional dan metode dokumentasi.",
+  "1. Skala kecerdasan emosional",
+  "Skala kecerdasan emosional terdiri dari aspek mengenali emosi diri, mengelola emosi diri, memotivasi diri sendiri, mengenali emosi orang lain (empati), bekerjasama dengan orang lain (Goleman, 2002 : 57) yang berguna untuk mengukur sejauhmana kecerdasan emosional dipahami siswa kelas II SMU Lab School Jakarta Timur. Penyusunan alat ukur ini untuk lebih jelasnya dijabarkan dalam bentuk Blue Print pada tabel berikut ini :",
+  "Tabel 2 Blue print Skala kecerdasan Emosional No",
+  "Faktor",
+  "Indikator",
+  "Nomor Item jumlah",
+  "",
+  "",
+  "",
+  "Favorable",
+  "Unfavorable 1.",
+  "Mengenali Emosi Diri a.Mengenali dan memahami emosi diri sendiri 1,14,21,25,39",
+  "",
+  "10 b.Memahami penyebab timbulnya emosi",
+  "2,3,38,46,72 28,68,77,83,94",
+  "10 2.",
+  "Mengelola Emosi a) Mengendalikan Emosi 15,22,34,40,51 7,56,62,66,78",
+  "10",
+  "",
+  "",
+  "",
+  "b) Mengekspresikan emosi dengan tepat 4,8,16,47,84 29,69,73,79, 89",
+  "10",
+  "",
+  "3 Memotivasi diri sendiri",
+  "a. Optimis",
+  "",
+  "5,17,41,87,90 35,57,61,95,97",
+  "10",
+  "",
+  "",
+  "",
+  "b. Dorongan berprestasi 9,18,58,74,80 26,30,42,48,70",
+  "10",
+  "4 Mengenali Emosi Orang lain a. Peka terhadap perasaan orang lain",
+  "10,27,31,52,81 19,36,63,85,91",
+  "10",
+  "",
+  "",
+  "",
+  "b. Mendengarkan masalah orang lain 59,75,92,96,98 11,23,43,49,100",
+  "10",
+  "5",
+  "Membina Hubungan",
+  "a. Dapat bekerja sama",
+  "",
+  "32,53,71,76,88 12,20,37,93,99",
+  "10",
+  "",
+  "",
+  "",
+  "b. Dapat berkomunikasi.",
+  "13,24,60,64,86 33,44,50,54,82",
+  "10",
+  "",
+  "",
+  "",
+  "",
+  "TOTAL",
+  "",
+  "100 Skala kecerdasan emosional disusun dengan menggunakan Skala Likert yang dimodifikasi yang terdiri dari 4 alternatif jawaban,dengan alasan :",
+  "a). Kategori indecisided, yaitu mempunyai arti ganda, bisa juga diartikan netral atau ragu-ragu",
+  "b). Dengan tersedianya jawaban di tengah, menimbulkan kecenderungan jawaban di tengah (central tendency effect)",
+  "c). Maksud jawaban dengan empat tingkat kategori untuk melihat kecenderungan pendapat responden kearah tidak sesuai, sehingga dapat mengurangi data penelitian yang hilang. (Sutrisno Hadi, 1991 : 19-20).",
+  "Sistem penilaian skala dalam penelitian ini adalah sebagai berikut :",
+  "a) Item Favorable : sangat setuju (4), , setuju (3), tidak setuju (2), sangat tidak setuju (1)",
+  "b) Item Unfavorable : sangat setuju (1), setuju (2), tidak setuju (3), sangat tidak setuju (4).",
+  "",
+  "2. Metode Dokumentasi",
+  "Menurut Kartini Kartono (1990 : 73) teknik pemeriksaan dokumen adalah pengumpulan informasi dan data secara langsung sebagai hasil pengumpulan sendiri. Data yang dikumpulkan tersebut adalah bersifat orisinil untuk dapat dipergunakan secara langsung. Teknik pemeriksaan dokumen ini khusus digunakan untuk melakukan pengumpulan data terhadap prestasi belajar.",
+  "Adapun teknik pengumpulan data terhadap prestasi belajar ini adalah dengan mengambil data yang sudah tersedia, yaitu nilai IP (indeks prestasi) pada semester satu sebagai subyek penelitian yang merupakan hasil penilaian oleh pihak akademis. Data dari prestasi belajar ini dikumpulkan dengan cara melihat hasil rapor semester I dari seluruh subyek penelitian. Mata pelajaran kelas II yaitu : Pendidikan Agama PPKN, Bahasa dan Sastra Indonesia., Sejarah Nasional dan Sejarah Umum, Bahasa Inggris, Pendidikan Jasmani dan Kesehatan, Matematika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi dan Geografi.",
+  "Penilaian prestasi belajar tersebut merupakan hasil evaluasi dari suatu proses belajar formal yang dinyatakan dalam bentuk kuantitatif (angka) yang terdiri antara 1 sampai 10. Hasil ini dapat dilihat dari nilai rata-rata raport siswa yang diberikan oleh pihak guru dalam setiap masa akhir tertentu (6 bulan) untuk sekolah lanjutan.",
+  "",
+  "E. Metode Analisis Instrumen",
+  "Suatu alat ukur dapat dinyatakan sebagai alat ukur yang baik dan mampu memberikan informasi yang jelas dan akurat apabila telah memenuhi beberapa kriteria yang telah ditentukan oleh para ahli psikometri, yaitu kriteria valid dan reliabel. Oleh karena itu agar kesimpulan tidak keliru dan tidak memberikan gambaran yang jauh berbeda dari keadaan yang sebenarnya diperlukan uji validitas dan reliabilitas dari alat ukur yang digunakan dalam penelitian.",
+  "",
+  "1. Validitas",
+  "Menurut Sutrisno Hadi (1990 : 102) Validitas adalah seberapa jauh alat ukur dapat mengungkap dengan benar gejala atau sebagian gejala yang hendak diukur, artinya tes tersebut mengukur apa yang seharusnya diukur. Suatu alat ukur dapat dikatakan mempunyai validitas tinggi apabila alat ukur tersebut menjalankan fungsi ukurnya atau memberikan hasil ukur yang sesuai dengan maksud dilakukannya pengukuran tersebut.",
+  "a). Uji validitas item",
+  "Uji validitas item yaitu pengujian terhadap kualitas item-itemnya yang bertujuan untuk memilih item-item yang benar-benar telah selaras dan sesuai dengan faktor yang ingin diselidiki. Cara perhitungan uji coba validitas item yaitu dengan cara mengorelasikan skor tiap item dengan skor total item.",
+  "b). Uji korelasi antar faktor",
+  "Uji korelasi antar faktor yaitu pengujian antar faktor dengan konstrak yang bertujuan untuk membuktikan bahwa setiap faktor dalam instrumen Skala Kecerdasan Emosional telah benar-benar mengungkap konstrak yang didefinisikan. Adapun cara perhitungan uji validitas faktor adalah dengan mengorelasikan skor tiap faktor dengan skor total faktor item-item yang valid.",
+  "Untuk menghitung analisis item dan korelasi antar faktor digunakan rumus koefisien korelasi product moment dan perhitungannya dibantu dengan program SPSS 11.01 for windows.",
+  "Rumus :",
+  "rxy Keterangan :",
+  "rxy = koefisien korelasi variabel x dengan variabel y.",
+  "xy = jumlah hasil perkalian antara variabel x dengan variabel y.",
+  "x = jumlah nilai setiap item.",
+  "y = jumlah nilai konstan.",
+  "N = jumlah subyek penelitian.",
+  "",
+  "2. Reliabilitas",
+  "Reliabilitas adalah sejauh mana hasil suatu pengukuran dapat dipercaya, maksudnya apabila dalam beberapa pelaksanaan pengukuran terhadap kelompok yang sama diperoleh hasil yang relatif sama ( Syaifuddin Azwar, 2000 : 3). Dalam penelitian ini, uji reliabilitas dilakukan dengan menggunakan tekhnik Formula Alpha Cronbach dan dengan menggunakan program SPSS 11.01 for windows.",
+  "Rumus :",
+  "α = Keterangan :",
+  "α = koefisien reliabilitas alpha k = jumlah item",
+  "Sj = varians responden untuk item I",
+  "Sx = jumlah varians skor total",
+  "",
+  "F. Metoda Analisis Data",
+  "Analisis data yang digunakan untuk melihat hubungan antara kecerdasan emosional dengn prestasi belajar adalah dengan menggunakan korelasi product moment dari Karl Pearson. Cara penghitungannya dibantu dengan menggunakan program SPSS 11.01 for window.",
+  "",
+  "BAB IV",
+  "LAPORAN PELAKSANAAN PENELITIAN",
+  "",
+  "Pada bab ini dibahas mengenai laporan pelaksanaan penelitian yang terdiri dari orientasi kancah penelitian, pesiapan pelaksanaan penelitian, laporan pelaksanaan penelitian, prosedur analisis instrumen, analisis data dan hasil penelitian.",
+  "",
+  "A. Orientasi kancah Penelitian",
+  "1. Sejarah singkat SMU Lab School Rawamangun Jakarta Timur",
+  "Gedung SMU Lab School terletak di Jl. Pemuda Kompleks UNJ, Rawamangun Jakarta Timur dan berdiri sejak tahun 1968 sesuai SK Direktur Jenderal Perguruan Tinggi No.111 tanggal 20 november 1968 dengan nama Laboratory School yang terdiri dari SMP, SMA dan SPG. Kemudian pada tahun 1969 bergabunglah TK dan SD dari Yayasan Putra Sejahtera ke Lab School. Pada tahun 1974 Lab School mengemban tugas sebagai tempat pelaksanaan Proyek Keterampilan (Proyek TPK) dari Departemen P dan K yang disebut juga Comprehensive School dan sejak tahun 1974 SPG tidak lagi menerima siswa baru. Tahun 1974, Lab School dilanjutkan/ditingkatkan menjadi Proyek Perintis Sekolah Pembangunan (PPSP) yang merupakan salah satu dari 8 proyek yang sama yang bernaung di bawah 8 IKIP di seluruh Indonesia, di bawah koordinasi Balitbang Depdikbud.",
+  "Pada tahun 1986, status sekolah PPSP sebagai proyek Departemen P dan K berakhir; selanjutnya oleh Dep. P dan K pengelolaan sekolah-sekolah tersebut diserahkan kepada Kanwil Depdikbud setempat. Sebagai kelanjutan pada tahun 1986, sesuai SK Menteri P dan K RI No.027/U/1986, tanggal 21 Januari 1986, diadakan serah terima pengelolaan sekolah-sekolah eks PPSP IKIP Jakarta (khusus SD, SLTP dan SMU) dari Rektor IKIP Jakarta kepada kepala Kanwil Depdikbud DKI Jakarta dan sesuai SK Menteri P dan K RI No. 0707/0/1086, 0708/0/1986 dan 0709/0/1986 masing-masing tertanggal 10 oktober 1986 berganti nama menjadi SDN Komplek IKIP Jakarta, SLTP 236, dan SMA 81. Adapun TK eks Sekolah Laboratorium Kependidikan IKIP Jakarta tetap berstatus sebagai sekolah swasta, dengan nama TK IKIP Jakarta. Pada tahun ajaran 1992/1993, sesuai SK Dirjen Dikdasmen No. 2689/C/I/1991, SLTP 236 dan SMA 81 memperoleh lokasi baru masing-masing di daerah Cakung dan daerah Kalimalang Cipinang Melayu.",
+  "Sesuai himbauan Kanwil Depdikbud DKI Jakarta, mulai tahun ajaran 1992/1993 Yayasan Pembina IKIP Jakarta membuka SLTP dan SMU Lab School Jakarta sesuai SK Kanwil P dan K DKI No. Kep. 854 P/10I.A1/I/93 DAN No. Kep. 853 A/10I/A1/I93 masing-masing tertanggal 15 Maret 1993. SMU Lab School Jakarta pada saat ini merupakan salah satu sekolah pioneer untuk kelas akselerasi (percepatan), sehingga pendidikan SMU dapat dipersingkat menjadi 2 tahun.",
+  "SMU Lab School memiliki empat kelompok kelas, yaitu : kelas I terdiri dari 6 kelas, kelas II terdiri dari 6 kelas dan kelas III terdiri dari 7 kelas; 3 kelas jurusan IPA, 3 kelas jurusan IPS dan 1 kelas Jurusan Bahasa. Dalam penelitian ini sampel yang digunakan adalah murid kelas II, yang berjumlah 240 orang. Materi yang diajarkan berdasarkan kurikulum Depdikbud dengan waktu belajar dari jam 07.00 hingga 15.30 WIB, dari hari Senin hingga Jum’at.. SMU Lab School diperkuat dengan 60 orang guru pengajar, 3 orang guru BP, serta 20 orang administrasi, 15 staff kebersihan dan 6 orang satpam.",
+  "Fasilitas yang dimiliki selain 20 ruang kelas, juga terdapat 1 perpustakaan, 5 laboratorium (laboratorium bahasa, kimia, fisika, biologi dan komputer), 1 balai kesehatan, 1 ruang audiovisual, 1 ruang pertemuan, 2 lapangan olahraga (indoor dan out door), mesjid, ruang OSIS, dan ruang bimbingan dan konseling. Ekstrakurikuler yang ada berjumlah 28 kegiatan yang dibagi menjadi empat unit kegiatan, yaitu unit kegiatan keilmuan, unit kegiatan keterampilan, unit kegiatan olah raga, dan unit kegiatan kesenian.",
+  "2. Persiapan Penelitian",
+  "Persiapan penelitiani meliputi kegiatan-kegiatan sebagai berikut :",
+  "a. Pengurusan surat permohonan izin pengambilan data dari fakultas untuk melaksanakan penelitian di SMU Lab School Jakarta Timur",
+  "b. Menghubungi Kepala Sekolah SMU Lab School Jakarta Timur untuk menjajaki kemungkinan pelaksanaan penelitian dengan membawa surat pengantar dari fakultas dan contah kuesioner yang akan digunakan dalam penelitian. Kemudian menemui koordinator BK yang diberi wewenang oleh Kepala Sekolah untuk memantau dan mengatur kegiatan penelitian ini.",
+  "c. Mendiskusikan dengan guru BK mengenai waktu yang tepat dan tata cara pelaksanaan penelitian.",
+  "Berdasarkan surat pengantar dari fakultas Psikologi UPI Y.A.I Jakarta dengan Nomor 185/D/Fak.Psi UPI Y.A.I/IV/2003 yang ditujukan kepada kepala sekolah SMU Lab School Jakarta Timur, maka penulis bertemu dengan kepala sekolah agar diijinkan untuk melakukan penelitian di sekolah tersebut. Kepala sekolah SMU Lab School Jakarta Timur memberi ijin dengan menunjuk wakil kepala sekolah bidang akademik sebagai pembimbing dalam penelitian ini. Kemudian Wakil kepala sekolah menunjuk seorang koordinator BK untuk membantu dalam pelaksaan penelitian.",
+  "",
+  "B. Uji Coba Instrumen Penelitian",
+  "1. Uji Coba",
+  "Sebelum digunakan pada subjek penelitian yang sebenarnya, alat ukur yang digunakan dalam penelitian ini diuji cobakan terlebih dahulu. Mengenai perlunya uji coba, Sutrisno Hadi (1995:166) menjelaskan tujuan diadakannya uji coba alat ukur adalah :",
+  "1) Untuk memperoleh keyakinan tentang alat ukur",
+  "2) Untuk menentukan alokasi waktu yang paling layak",
+  "3) Untuk menemukan kelemahan-kelemahan dalam petunjuk atau administrasi tes",
+  "Selain itu. tujuan dari uji coba atau try out adalah untuk menyeleksi item-item manakah yang valid dan reliable agar dapat digunakan dalam penelitian. Uji coba dilaksanakan tanggal 25 April 2003 dengan menggunakan sample sebanyak 50 siswa kelas II SMU Lab School Jakarta Timur.",
+  "Data yang telah diperoleh pada saat uji coba kemudian dianalisis untuk mengetahui kualitas dari alat ukur tersebut. Untuk perhitungan analisis skala kecerdasan emosional digunakan bantuan komputer dengan program SPSS versi 11.01 for windows .",
+  "2.. Analisis validitas instrumen",
+  "Uji validitas dilakukan untuk mengetahui apakah suatu skala psikologi mampu menghasilkan data yang akurat, artinya apakah item-item yang dibuat telah benar-benar mengungkap faktor yang ingin diselidiki. Uji validitas skala kecerdasan emosional dihitung dengan menggunakan rumus Korelasi Product Moment dari Pearson. Dari hasil korelasi antar skor-skor item dengan skor total, maka diperoleh nilai korelasi pada skala kecerdasan emosional berkisar antara 0,320-0,720 dan p berkisar antara 0,000 – 0,008. Berdasarkan pada taraf signifikan 0,05 maka diperoleh",
+  "15 item gugur dan 85 item valid dari 100 item pada skala kecerdasan emosional. Rincian setelah dilakukan uji coba yaitu :",
+  "Tabel 3",
+  "Distribusi Penyebaran Item Valid dan Gugur Skala Kecerdasan Emosional",
+  "",
+  "No",
+  "Faktor",
+  "Indikator",
+  "Nomor Item jumlah Favorable",
+  "Unfavorable",
+  "",
+  "1.",
+  "Mengenali Emosi Diri a.Mengenali dan memahami emosi diri sendiri 1*,14,21*,25,39",
+  "",
+  "8 b.Memahami penyebab timbulnya emosi 2,3,38*,46*,72",
+  "8 2.",
+  "Mengelola Emosi a. Mengendalikan emosi 15,22,34,40,51* 7,56,62,66,78*",
+  "8",
+  "",
+  "",
+  "",
+  "b. Mengekspresikan emosi dengan tepat 4,8,16,47*,84* 29,69,73,79,89*",
+  "7",
+  "",
+  "3",
+  "Memotivasi diri sendiri",
+  "a. Optimis 5,17,41,87,90 35,57,61,95,97",
+  "10",
+  "",
+  "",
+  "",
+  "b. Dorongan berprestasi 9,18,58,74*,80 26,30,42,48,70",
+  "9",
+  "4",
+  "Mengenali Emosi Orang lain",
+  "a. Peka terhadap perasaan orang lain 10,27,31,52,81 19,36,63,85,91",
+  "10",
+  "",
+  "",
+  "",
+  "b. Mendengarkan masalah orang lain 59,75,92,96,98* 11,23,43*,49,",
+  "100",
+  "8",
+  "5",
+  "Membina Hubungan",
+  "a. Dapat bekerja sama",
+  "",
+  "32,53,71,76*,88 12,20,37,93,99",
+  "9",
+  "",
+  "",
+  "",
+  "b. Dapat berkomunikasi.",
+  "13,24,60*,64,86* 33,44,50,54,82",
+  "8",
+  "",
+  "",
+  "",
+  "",
+  "TOTAL",
+  "",
+  "85 *) item yang gugur",
+  "",
+  "3. Analisis korelasi antar faktor",
+  "Korelasi antar faktor dilakukan dengan mengkorelasikan setiap faktor dengan faktor lainnya dan dengan total faktornya. Berdasarkan hasil korelasi antar faktor, maka terlihat bahwa setiap faktor menunjukkan hubungan yang signifikan dengan totalnya. Hal ini berarti bahwa faktor-faktor pada skala kecerdasan emosional benar-benar mengukur hal yang hendak diukur. Selebihnya dapat dilihat pada tabel korelasi antar faktor di bawah ini :",
+  "Tabel 4 Korelasi Antar Faktor Skala Kecerdasan Emosional Faktor",
+  "F1",
+  "F2",
+  "F3",
+  "F4",
+  "F5 F tot",
+  "1. Mengenali emosi diri 1.000",
+  ".762",
+  ".778",
+  ".545",
+  ".499",
+  ".851",
+  "2. Mengelola emosi .762",
+  "1.000",
+  ".842",
+  ".538",
+  ".509",
+  ".878",
+  "3.Memotivasi diri sendiri .778",
+  ".842",
+  "1.000",
+  ".554",
+  ".552",
+  ".898",
+  "4. Mengenali emosi orang lain .545",
+  ".538",
+  ".554",
+  "1.000",
+  ".754",
+  ".796",
+  "5. Membina hubungan",
+  ".499",
+  ".509",
+  ".552",
+  ".754",
+  "1.000 .778",
+  "Total .851",
+  ".878",
+  ".898",
+  ".796",
+  ".778",
+  "1.000",
+  "",
+  "4. Reliabilitas Instrumen",
+  "Reliabilitas pada skala kecerdasan emosional dihitung dengan menggunakan rumus Alpha Cronbach. Setelah dihitung, maka diperoleh nilai koefisien reliabilitas alpha sebesar 0,9538. hal ini menunjukkan bahwa instrumen skala kecerdasan emosional yang ada memiliki reliabilitas yang sangat baik sehingga memungkinkan atau layak digunakan dalam penelitian.",
+  "C. Pelaksanaan Penelitian",
+  "Penelitian dilaksanakan dengan menyebarkan skala kecerdasan emosional yang telah disiapkan kepada siswa SMU Lab School sebanyak 150 set sesuai dengan jumlah sample yang dibutuhkan. Penelitian ini dilakukan selama tiga hari, dari hari Senin, tanggal 19 Mei hingga hari Kamis, tanggal 22 Mei 2003. Skala yang telah diisi oleh para siswa kelas II ini langsung dikembalikan kepada penulis. Pada penyebaran skala ini, penulis dibantu oleh guru BK, Ibu Ita. Karena pada saat menyebarkan skala, penulis menggunakan jam pelajaran BK.",
+  "Setelah melakukan penyebaran skala, penulis meminta izin untuk memperoleh data dokumen prestasi belajar siswa kelas II SMU Lab School. Data ini didapat dari koordinator BK, Ibu Ita.",
+  "",
+  "D. Analisis Data Penelitian",
+  "Dari hasil penelitian diperoleh data mengenai kecerdasan emosional dan prestasi belajar siswa kelas II yang kemudian dianalisis dengan menggunakan rumus korelasi product moment dari Pearson dengan bantuan progaram SPSS versi 11.01 for windows. Berdasarkan hasil analisis data diperoleh nilai koefisien korelasi (r) sebesar 0,248 dengan p = 0,002 pada taraf signifikan 0,05.",
+  "Tujuan diadakan analisis data adalah untuk menguji hipotesa yang diajukan dalam penelitian ini yaitu melihat ada atau tidaknya hubungan antara kecerdasan emosional dengan prestasi belajar pada siswa kelas II SMU Lab School Jakarta Timur. Berdasarkan data yang ada, karena p = 0,002 (< 0,05) maka dengan demikian hipotesa nihil (Ho) yang berbunyi “Tidak ada hubungan antara kecerdasan emosional dengan prestasi belajar” ditolak, sedangkan hipotesa kerja (Ha) yang berbunyi “Ada hubungan antara kecerdasan emosional dengan prestasi belajar” diterima.",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "BAB V",
+  "KESIMPULAN",
+  "",
+  "",
+  "",
+  "Adapun penulisan Bab V ini dimulai dengan rangkuman hasil penelitian, dilanjutkan dengan Pembahasan serta kesimpulan, dan diakhiri dengan saran-saran.",
+  "",
+  "A. Rangkuman Hasil Penelitian",
+  "Berdasarkan dari latar belakang penelitian ini dan dari teori yang digunakan untuk mengetahui apakah ada hubungan antara kecerdasan emosional dengan prestasi belajar siswa kelas II SMU Lab School Jakarta Timur , maka dapat dibuktikan bahwa ada hubungan antara kecerdasan emosional dengan prestasi belajar.",
+  "Melalui uji statistik yang dilakukan pada dasarnya hasil penelitian sesuai dengan landasan teori yang digunakan pada penelitian. Diketahui bahwa setinggi-tingginya IQ menyumbang sekitar 20% bagi kesuksesan seseorang dan yang 80% sisanya diisi oleh kekuatan lain yang menurut Daniel Goleman salah satunya adalah kecerdasan emosional seseorang .",
+  "Dari hasil skala kecerdasan emosional dengan pernyataan sebanyak 85 item yang disusun berdasarkan skala likert yang dimodifikasi dengan alternatif jawaban yaitu : sangat setuju, setuju, tidak setuju, sangat tidak setuju. Cara penilaian dengan memberikan nilai antara satu sampai empat berdasarkan kriteria pernyataan favorabel dan unfavorabel. Analisis data dengan menggunakan rumus korelasi product moment dari Pearson dengan bantuan program SPSS versi 11.01. Penelitian dilakukan di SMU Lab School Jakarta Timur. Teknik pengambilan sampel menggunakan proporsional random sampling cara undian.",
+  "Hasil penelitian dari data analisis korelasi product moment menunjukkan korelasi (r) sebesar 0,248 dengan p = 0,002, hal ini menunjukkan adanya korelasi antara kecerdasan emosional dengan prestasi belajar dengan arah hubungan positif. Artinya, jika kecerdasan emosional tinggi, maka prestasi belajar tinggi dan sebaliknya.",
+  "",
+  "B. Pembahasan",
+  "Berdasarkan analisis data penelitian menunjukkan korelasi (rxy) sebesar 0,248 dengan p = 0.002 < 0.05 maka Ha diterima dan Ho ditolak. Hal tersebut menunjukkan bahwa ada hubungan antara kecerdasan emosional dengan prestasi belajar pada siswa kelas II SMU Lab School Jakarta Timur.",
+  "Rendahnya peranan kecerdasan emosi terhadap prestasi belajar disebabkan oleh banyaknya faktor yang mempengaruhi prestasi belajar itu sendiri. Prestasi belajar menunjukkan taraf kemampuan siswa dalam mengikuti program balajar dalam waktu tertentu sesuai dengan kurikulum yang telah ditentukan. Tes prestasi belajar yang diukur adalah pengetahuan yang dimiliki siswa (soal hafalan) dan bagaimana menerapkan pengetahuan tersebut untuk menyelesaikan soal-soal yang ada (soal hitungan, analisis masalah). Di tingkat SMU, umumnya soal-soal yang diberikan masih pada tingkat kompetensi recall, tingkat kompetensi aplikasi dan analisis cenderung hanya diterapkan pada mata pelajaran matematika, fisika dan kimia. Prestasi belajar biasanya ditunjukkan dalam bentuk huruf atau angka, yang tinggi rendahnya menunjukkan seberapa jauh siswa telah menguasai bahan yang telah diberikan, tetapi hal tersebut sudah tidak dapat diterima lagi karena hasil rapor tidak hanya menunjukkan seberapa jauh siswa telah menguasai materi pelajaran yang telah diberikan. Presatasi belajar juga dipengaruhi oleh perilaku siswa, kerajinan dan keterampilan atau sikap tertentu yang dimiliki siswa tersebut, yang dapat diukur dengan standar nilai tertentu oleh guru yang bersangkutan agar mendekati nilai rata-rata.",
+  "Perbedaan budaya dalam pengekspresian emosi dalam suatu negara dengan negara lain juga dapat berpengaruh terhadap rendahnya kecerdasan emosi seseorang. Pengekspresian emosi yang dianggap benar di suatu negara mungkin dianggap tidak benar atau tidak pantas di negara lain. Khususnya di Asia, orang dianjurkan memendam dan menyembunyikan perasaan negatif. Dalam penelitian ini, karena belum adanya skala kecerdasan emosional yang baku di Indonesia, maka penulis berusaha membuat sendiri skala kecerdasan emosional sebanyak 100 item berdasarkan faktor-faktor yang diadaptasi dari teori Daniel Goleman yang digunakan di Amerika, yaitu : mengenali emosi diri, mengelola emosi, memotivasi diri sendiri, mengenali emosi orang lain, dan membina hubungan. Dari 100 item tersebut ada 15 item yang gugur. Hal tersebut terlihat pada observasi di lapangan, beberapa subyek merasa kesulitan menentukan pilihan jawaban. mereka merasa ragu-ragu dalam menetapkan pilihan, sehingga ada yang mengatakan mengapa tidak ada pilihan ragu-ragu. Serta karena banyaknya jumlah pernyataan yang harus diisi dalam waktu yang terbatas, merasa bosan sehingga kurang konsentrasi dalam menjawab walau pada akhirnya mereka mampu mengisi seluruh pernyataan tersebut.",
+  "Selain itu, beberapa studi juga menegaskan terpisahnya kecerdasan emosional dari kecerdasan akademis, dan menemukan kecilnya hubungan atau tiadanya hubungan antara nilai tes prestasi akademis atau IQ dan perasaan sejahtera emosional seseorang, sebab orang yang mengalami amarah atau depresi yang hebat masih bisa merasa sejahtera bila mereka mempunyai kompensasi berupa saat-saat menyenangkan atau membahagiakan (Goleman, 2002 :78). Dari hasil survey besar-besaran di Amerika terhadap orang tua dan guru menunjukkan bahwa anak-anak generasi sekarang lebih sering mengalami masalah emosi daripada generasi terdahulu. Rata-rata, anak-anak sekarang tumbuh dalam kesepian dan depresi, lebih mudah marah dan lebih sulit diatur, lebih gugup dan cenderung cemas, lebih impulsif dan agresif. Hal serupa juga terjadi di negara-negara lain. Menurut Dr. Thomas Achenbach, psikolog dari University of Vermont yang melakukan penelitian tersebut di negara lain mengatakan bahwa menurunnya kemampuan-kemampuan dasar pada anak-anak ini tampaknya bersifat mendunia. Tanda-tanda paling jelas mengenai penurunan ini terlihat dari bertambahnya kasus kaum muda yang mengalami masalah-masalah seperti putus asa terhadap masa depan dan keterkucilan, penyalahgunaan obat bius, kriminalitas dan kekerasan, depresi atau masalah makan, kehamilan tidak diinginkan, kenakalan dan putus sekolah (Goleman, 2001 :17). Seperti yang telah dijelaskan dalam bab terdahulu bahwa anak yang mendapatkan pendidikan emosi lebih mampu mengatasi masalah-masalah yang terjadi disekitar mereka dan mampu memenuhi tuntutan akademis di sekolah.",
+  "Kecerdasan emosi itu sendiri tidak diajarkan secara khusus di sekolah dan tidak tercatat dalam dokumen rapor, seperti nilai-nilai pelajaran ataupun keterampilan lainnya sehingga tidak ada sumbangan secara langsung terhadap peningkatan prestasi belajar.",
+  "",
+  "C. Kesimpulan",
+  "",
+  "Berdasarkan hasil analisis data yang telah diuraikan sebelumnya, maka dapat ditarik kesimpulan bahwa ada hubungan antara kecerdasan emosional dengan prestasi belajar pada siswa kelas II SMU Lab School Jakarta Timur.",
+  "",
+  "D. Saran-saran",
+  "",
+  "Berdasarkan hasil penelitian dan pembahasan di atas, maka dapat diajukan saran-saran sebagai berikut :",
+  "1. Untuk mengembangkan dan mengoptimalkan kecerdasan emosional yang berperan dalam keberhasilan siswa baik di sekolah maupun di lingkungan sekitarnya, maka disarankan kepada pihak sekolah terutama guru-guru pengajar agar memasukkan unsur-unsur kecerdasan emosioal dalam menyampaikan materi serta melibatkan emosi siswa dalam proses pembelajaran.",
+  "2. Bagi para meneliti untuk penelitian selanjutnya sebaiknya di dalam pengambilan data tentang prestasi belajar tidak menggunakan seluruh mata pelajaran melainkan difokuskan pada satu atau dua mata pelajaran saja sehingga hasil dari data tersebut sesuai dengan yang diharapkan.",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "",
+  "DAFTAR PUSTAKA",
+  "",
+  "",
+  "Ahmad, Mudzakir. (1997). Psikologi Pendidikan. Bandung : Pustaka Setia.",
+  "",
+  "Goleman, Daniel. (2000). Emitional Intelligence (terjemahan). Jakata : PT Gramedia Pustaka Utama.",
+  "",
+  "Goleman, Daniel. (2000). Working With Emotional Intelligence (terjemahan). Jakarta : PT. Gramedia Pustaka Utama.",
+  "",
+  "Gottman, John. (2001). Kiat-kiat Membesarkan Anak yang Memiliki Kecerdasan Emosional (terjemahan). Jakarta : PT Gramedia Pustaka Utama.",
+  "",
+  "Irwanto. (1997). Psikologi Umum. Jakarta : PT. Gramedia Pustaka Utama.",
+  "",
+  "Mila Ratnawati. (1996). Hubungan antara Persepsi Anak terhadap Suasana Keluarga, Citra Diri, dan Motif Berprestasi dengan Prestasi Belajar pada Siswa Kelas V SD Ta’Miriyah Surabaya. Jurnal Anima Vol XI No. 42.",
+  "",
+  "Moch, Nazir. (1988). Metodologi Penelitian.Cetakan 3. Jakarta :Ghalia Indonesia.",
+  "",
+  "Morgan, Clifford T, King, R.A Weizz, JR, Schopler. J, 1986. Introduction of Psychology, (7th ed), Singapore : Mc Graw Hil Book Company",
+  "",
+  "Muhibbin, Syah. (2000). Psikologi Pendidikan dengan Suatu Pendekatan baru. Bandung : PT. Remaja Rosdakarya.",
+  "",
+  "Nana, Sudjana. (2001). Penilaian Hasil Proses Belajar Mengajar. Cetakan ketujuh. Bandung : PT Remaja Rosdakarya.",
+  "",
+  "Ratna Wilis, D. (1996). Teori-Teori Belajar. Jakarta : Penerbit Erlannga.",
+  "",
+  "Saphiro, Lawrence E. (1998). Mengajarkan Emotional Intelligence Pada Anak. Jakarta : Gramedia.",
+  "",
+  "Sarlito Wirawan. (1997). Psikologi Remaja. Jakarta : PT. RajaGrafindo Persada.",
+  "",
+  "Sia, Tjundjing. (2001). Hubungan Antara IQ, EQ, dan QA dengan Prestasi Studi Pada Siswa SMU. Jurnal Anima Vol.17 no.1",
+  "",
+  "Sri, Lanawati. (1999). Hubungan Antara Emotional Intelligence dan Intelektual Quetion dengan Prestasi Belajar Siswa SMU.Tesis Master : Fakultas Psikologi Universitas Indonesia.",
+  "",
+  "Sumadi, Suryabrata. (1998). Psikologi Pendidikan. Jakarta : PT. Raja Grafindo Persada .",
+  "",
+  "Sumadi, Suryabrata. 1998. Metodologi Penelitian. Cetakan sebelas. Jakarta : PT RajaGrafindo Persada.",
+  "",
+  "Saifuddin, Azwar. (1997). Reliabilitas dan Validitas. Yogyakarta : Pustaka Balajar Offset.",
+  "",
+  "Saifuddin Azwar. (1998). Tes Prestasi Fungsi dan Pengembangan Pengukutan Prestasi balajar. Yogyakarta : Pustaka Pelajar Offset.",
+  "",
+  "Suharsono. (2002). Melejitkan IQ, IE, dan IS. Depok : Inisiasi Press.",
+  "",
+  "Sutrisno Hadi. (2000). Statistik 2. Yogyakarta : Andi Offset.",
+  "",
+  "Syaiful Bakrie D. (1994). Prestasi belajar dan kompetensi guru. Surabaya : Usaha Nasional.",
+  "",
+  "Winkel, WS (1997). Psikologi Pendidikan dan Evaluasi Belajar. Jakarta : Gramedia.",
+  "",
+  "",
+  "",
+  ""
+ ],
+ "bab_label": [],
+ "adjudikasi_v14": [
+  {
+   "idx": 193,
+   "teks": "d. Mengenali Emosi Orang Lain",
+   "label_jev_live": "subbab",
+   "jawaban_agen": {
+    "label": "subbab",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah penomoran huruf yang mengepalai blok penjelasan sendiri.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "putusan": "sepakat (label Jev dipakai)",
+   "label_akhir": "subbab"
+  },
+  {
+   "idx": 60,
+   "teks": "Berisi tentang pembahasan hasil penelitian, kesimpulan dan saran dari peneliti.",
+   "label_jev_live": "paragraf",
+   "jawaban_agen": {
+    "label": "paragraf",
+    "confidence": 0.9,
+    "alasan": "Baris ini adalah kalimat isi yang menjelaskan konten bab sebelumnya.",
+    "model": "google/gemini-2.5-flash",
+    "transport": "openrouter"
+   },
+   "putusan": "sepakat (label Jev dipakai)",
+   "label_akhir": "paragraf"
+  }
+ ]
+}
