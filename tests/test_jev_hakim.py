@@ -1109,8 +1109,8 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v12)',
-        P8.RULE_VERSION == 'jev-peta-v12')
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v13)',
+        P8.RULE_VERSION == 'jev-peta-v13')
     # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
     #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
     #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
@@ -1191,8 +1191,8 @@ def main():
     #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
     #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
     #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
-    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v12)',
-        P8.RULE_VERSION == 'jev-peta-v12')
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v13)',
+        P8.RULE_VERSION == 'jev-peta-v13')
     baris_r23 = [
         'terbagi menjadi beberapa bab antara lain:',
         '1. BAB I PENDAHULUAN',
@@ -1224,11 +1224,11 @@ def main():
     #    gabungan, CHAPTER polos, judul Romawi tanpa kata BAB (berpagar
     #    profil); Lapis 2 pendapat_kedua() hanya untuk baris goyang
     #    (jawaban disuntik, nol Jev di sini); Lapis 3 antrean manusia.
-    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v12)',
-        P8.RULE_VERSION == 'jev-peta-v12')
+    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v13)',
+        P8.RULE_VERSION == 'jev-peta-v13')
     # --- 12f. v12 rantai 3 langkah: mode agen-kedua + pabrik agen kedua ---
-    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v12)',
-        P8.RULE_VERSION == 'jev-peta-v12')
+    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v13)',
+        P8.RULE_VERSION == 'jev-peta-v13')
     # --- 12a. profil_bentuk ---
     teks_romawi = ('I. PENDAHULUAN\nIsi pendahuluan yang cukup panjang dan menjelaskan latar belakang masalah penelitian ini.\n'
                    'II. TINJAUAN PUSTAKA\nIsi tinjauan pustaka yang cukup panjang dan menjelaskan teori yang dipakai dalam penelitian ini.\n'
@@ -1537,6 +1537,151 @@ def main():
             and j.get('label_kedua') == 'subbab'
             for j in r_v12a.get('pendapat_kedua_jawaban', [])),
         str(r_v12a.get('pendapat_kedua_jawaban')))
+    # --- 13a. v13 GATING HAKIM: agen kedua HANYA baris ditandai Hakim ---
+    #    Pola GOYANG-PB yang sama seperti 12d (FakeSatpam): baris penanda
+    #    goyang paragraf/biasa, label menang paragraf.
+    cek('v13-versi: RULE_VERSION jev-peta-v13',
+        P8.RULE_VERSION == 'jev-peta-v13', str(P8.RULE_VERSION))
+
+    def _teks_v13(penanda):
+        return ('BAB I\nPENDAHULUAN\n'
+                'Kalimat %s tentang pemasaran digital dan kinerja bisnis '
+                'usaha kecil di Indonesia yang panjang.\n' % penanda)
+
+    def _fn_rekam(_dipanggil):
+        def _fn(i, t, s, p, k=None):
+            _dipanggil.append(i)
+            return {'label': 'biasa', 'confidence': 0.95}
+        return _fn
+
+    def _hakim_tandai_teks(penanda):
+        def _fn(peta):
+            return {i for i, b in enumerate(peta.get('baris') or [])
+                    if penanda in b}
+        return _fn
+
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.rendah = set()
+    # 13a-1. goyang TANPA tanda Hakim -> agen kedua TIDAK dipanggil.
+    P8._CACHE_PETA.clear()
+    _dipanggil_a = []
+    r_v13a = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13A'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_a),
+        hakim_tandai_fn=lambda peta: set())
+    idx_v13a = next(i for i, b in enumerate(r_v13a['baris'])
+                    if 'GOYANG-PB-V13A' in b)
+    cek('v13-gating: goyang tanpa tanda Hakim -> agen kedua tidak dipanggil',
+        _dipanggil_a == [] and r_v13a.get('pendapat_kedua_jml') == 0
+        and r_v13a['label'].get(idx_v13a) == 'paragraf'
+        and r_v13a.get('hakim_tandai') == [],
+        str((_dipanggil_a, r_v13a.get('pendapat_kedua_jml'),
+             r_v13a['label'].get(idx_v13a), r_v13a.get('hakim_tandai'))))
+    # 13a-2. goyang DITANDAI Hakim -> agen kedua dipanggil, berbalik jalan.
+    P8._CACHE_PETA.clear()
+    _dipanggil_b = []
+    r_v13b = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13B'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_b),
+        hakim_tandai_fn=_hakim_tandai_teks('GOYANG-PB-V13B'))
+    idx_v13b = next(i for i, b in enumerate(r_v13b['baris'])
+                    if 'GOYANG-PB-V13B' in b)
+    cek('v13-gating: goyang ditandai Hakim -> agen kedua dipanggil + berbalik',
+        _dipanggil_b == [idx_v13b]
+        and r_v13b['label'].get(idx_v13b) == 'biasa'
+        and r_v13b.get('pendapat_kedua_berbalik') == [[idx_v13b, 'paragraf', 'biasa']]
+        and r_v13b.get('hakim_tandai') == [idx_v13b],
+        str((_dipanggil_b, r_v13b['label'].get(idx_v13b),
+             r_v13b.get('pendapat_kedua_berbalik'), r_v13b.get('hakim_tandai'))))
+    # 13a-3. fn gerbang mengembalikan None -> gagal tertutup, 0 panggilan.
+    P8._CACHE_PETA.clear()
+    _dipanggil_c = []
+    r_v13c = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13C'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_c),
+        hakim_tandai_fn=lambda peta: None)
+    idx_v13c = next(i for i, b in enumerate(r_v13c['baris'])
+                    if 'GOYANG-PB-V13C' in b)
+    cek('v13-gating: fn gerbang None -> agen kedua tidak dipanggil',
+        _dipanggil_c == [] and r_v13c.get('pendapat_kedua_jml') == 0
+        and r_v13c['label'].get(idx_v13c) == 'paragraf'
+        and r_v13c.get('hakim_tandai') == [],
+        str((_dipanggil_c, r_v13c.get('pendapat_kedua_jml'),
+             r_v13c.get('hakim_tandai'))))
+    # 13a-4. fn gerbang galat -> gagal tertutup + galat tercatat.
+    P8._CACHE_PETA.clear()
+    _dipanggil_d = []
+
+    def _hakim_galat(peta):
+        raise RuntimeError('hakim mati (uji)')
+
+    r_v13d = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13D'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_d),
+        hakim_tandai_fn=_hakim_galat)
+    idx_v13d = next(i for i, b in enumerate(r_v13d['baris'])
+                    if 'GOYANG-PB-V13D' in b)
+    cek('v13-gating: fn gerbang galat -> 0 panggilan + galat tercatat',
+        _dipanggil_d == [] and r_v13d.get('pendapat_kedua_jml') == 0
+        and r_v13d['label'].get(idx_v13d) == 'paragraf'
+        and r_v13d.get('hakim_tandai') == []
+        and r_v13d.get('hakim_tandai_galat') is not None,
+        str((_dipanggil_d, r_v13d.get('hakim_tandai_galat'))))
+    # 13a-5. saklar mati (tanpa pendapat_kedua_fn) -> perilaku v11, gerbang
+    #    tidak dipakai (hakim_tandai None).
+    P8._CACHE_PETA.clear()
+    r_v13e = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13E'), putaran=1,
+        hakim_tandai_fn=_hakim_tandai_teks('GOYANG-PB-V13E'))
+    idx_v13e = next(i for i, b in enumerate(r_v13e['baris'])
+                    if 'GOYANG-PB-V13E' in b)
+    cek('v13-gating: tanpa pendapat_kedua_fn -> perilaku v11, gerbang None',
+        r_v13e.get('pendapat_kedua_jml') == 0
+        and r_v13e['label'].get(idx_v13e) == 'paragraf'
+        and r_v13e.get('hakim_tandai') is None,
+        str((r_v13e.get('pendapat_kedua_jml'),
+             r_v13e['label'].get(idx_v13e), r_v13e.get('hakim_tandai'))))
+    # 13a-6. warisan: tanpa fn gerbang, tiap baris goyang tetap diadili (v12).
+    P8._CACHE_PETA.clear()
+    _dipanggil_f = []
+    r_v13f = P8.petakan_dari_teks(
+        _teks_v13('GOYANG-PB-V13F'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_f))
+    idx_v13f = next(i for i, b in enumerate(r_v13f['baris'])
+                    if 'GOYANG-PB-V13F' in b)
+    cek('v13-gating: tanpa fn gerbang -> warisan v12 (per goyang)',
+        _dipanggil_f == [idx_v13f]
+        and r_v13f['label'].get(idx_v13f) == 'biasa'
+        and r_v13f.get('hakim_tandai') is None,
+        str((_dipanggil_f, r_v13f['label'].get(idx_v13f),
+             r_v13f.get('hakim_tandai'))))
+    # 13a-7. helper tandai_ragu_curiga (unit, tanpa Jev — _TANYA_FN palsu).
+    def _tanya_palsu(bahan, pertanyaan):
+        out = {}
+        for nama in (pertanyaan or {}):
+            out[nama] = {'noul': 0.5}
+        return out
+
+    _tanya_lama = H._TANYA_FN
+    H._TANYA_FN = _tanya_palsu
+    try:
+        _peta_h = {'baris': ['BAB I', 'PENDAHULUAN',
+                             '1.1 Latar Belakang yang panjang sekali dan '
+                             'menjelaskan banyak hal penting di sini.',
+                             'Isi paragraf biasa yang panjang dan menjelaskan '
+                             'banyak hal penting di sini.'],
+                   'label': {0: 'bab', 1: 'bab', 2: 'subbab', 3: 'paragraf'},
+                   'gabung': {0: ['BAB I', 'PENDAHULUAN']},
+                   'sistematika': [], 'p': {0: 0.9, 1: 0.9, 2: 0.8, 3: 0.9}}
+        _tandai = H.tandai_ragu_curiga(_peta_h)
+        cek('v13-hakim: tandai_ragu_curiga kembalikan set idx ragu/curiga',
+            isinstance(_tandai, set) and 2 in _tandai,
+            str(_tandai))
+        cek('v13-hakim: tandai peta tanpa kandidat -> set kosong (bukan galat)',
+            H.tandai_ragu_curiga({'baris': [], 'label': {}, 'gabung': {},
+                                  'sistematika': [], 'p': {}}) == set())
+    finally:
+        H._TANYA_FN = _tanya_lama
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:

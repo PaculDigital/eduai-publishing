@@ -46,7 +46,7 @@ log = logging.getLogger(__name__)
 #    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
 #    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
 #    bentuknya memang begitu (6 entri: Y1, Y2, AD1, AD2, AD3, AG1).
-RULE_VERSION = 'jev-peta-v12'  # v12 (11 Nov 2026): rantai 3 langkah — Lapis 2 disambung ke agen kedua hidup (mode 'agen-kedua': beda → keputusan agen kedua dipakai, kecuali beda soal judul bab → antrean); tanpa fn, perilaku sama persis dengan v11
+RULE_VERSION = 'jev-peta-v13'  # v13 (11 Nov 2026): GATING HAKIM rantai 3 langkah (Gas Bos) — Lapis 2 agen kedua HANYA untuk baris yang Hakim tandai ragu/curiga (bukan per baris goyang); tanpa hakim_tandai_fn, perilaku warisan v12 (per goyang) dipertahankan untuk uji/pelari lama; ATURAN 5 TIDAK diubah (tugas terpisah)
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
@@ -1417,12 +1417,14 @@ def _susun_dari_bersih(bersih, awal=None, akhir=None, nama='', pakai_stitch=None
 
 
 def petakan_dari_teks(teks, awal=None, akhir=None, putaran=None,
-                      pendapat_kedua_fn=None):
+                      pendapat_kedua_fn=None, hakim_tandai_fn=None):
     """PETA 3 TINGKAT dari TEKS LANGSUNG (tanpa fid) — untuk pintu LAYAR.
 
     Dipakai `app/peta3_jev.py::petakan_teks()` ← `versi._deteksi_bagian()`.
     ⚠️ Teks DIANGGAP SUDAH bersih (pemanggil sudah `buang_daftar_isi`).
     Cache: teks sama + aturan sama ⇒ peta lama dipakai (Rp 0, tanpa Jev).
+    `hakim_tandai_fn` (v13): fn(peta_sementara) -> set idx baris yang
+    Hakim tandai ragu/curiga — gerbang Lapis 2 (lihat _petakan_dari_hasil).
     """
     if putaran is None:
         try:
@@ -1432,20 +1434,22 @@ def petakan_dari_teks(teks, awal=None, akhir=None, putaran=None,
     kunci = _kunci_cache(teks or '', putaran)
     # ── v11: bila pendapat kedua disuntik, hasil bergantung pada fn —
     #    jangan pakai/simpan cache (kuncinya tidak memuat fn).
-    if pendapat_kedua_fn is None:
+    #    v13: sama untuk hakim_tandai_fn (hasil bergantung pada gerbang).
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
         dari_cache = _cache_ambil(kunci)
         if dari_cache is not None:
             log.info('[peta3] peta dari cache (sidik %s…)', kunci[0][:8])
             return dari_cache
     d = _susun_dari_bersih(teks or '', awal, akhir, '')
-    hasil = _petakan_dari_hasil(d, putaran, pendapat_kedua_fn)
-    if pendapat_kedua_fn is None:
+    hasil = _petakan_dari_hasil(d, putaran, pendapat_kedua_fn,
+                                hakim_tandai_fn)
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
         _cache_simpan(kunci, hasil)
     return hasil
 
 
 def petakan(fid, awal=None, akhir=None, putaran=None,
-            pendapat_kedua_fn=None):
+            pendapat_kedua_fn=None, hakim_tandai_fn=None):
     if putaran is None:
         try:
             putaran = max(1, int(os.getenv('EDUAI_JEVI_PUTARAN') or '1'))
@@ -1454,18 +1458,21 @@ def petakan(fid, awal=None, akhir=None, putaran=None,
     d = susun(fid, awal, akhir)
     kunci = _kunci_cache(d.get('teks_asal') or '\n'.join(d['baris']), putaran)
     # ── v11: lihat petakan_dari_teks — cache dilewati bila fn disuntik.
-    if pendapat_kedua_fn is None:
+    #    v13: sama untuk hakim_tandai_fn.
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
         dari_cache = _cache_ambil(kunci)
         if dari_cache is not None:
             log.info('[peta3] peta dari cache (fid=%s, sidik %s…)', fid, kunci[0][:8])
             return dari_cache
-    hasil = _petakan_dari_hasil(d, putaran, pendapat_kedua_fn)
-    if pendapat_kedua_fn is None:
+    hasil = _petakan_dari_hasil(d, putaran, pendapat_kedua_fn,
+                                hakim_tandai_fn)
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
         _cache_simpan(kunci, hasil)
     return hasil
 
 
-def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None):
+def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
+                        hakim_tandai_fn=None):
     """INTI `petakan()` — bekerja dari hasil `_susun_dari_bersih()`.
 
     Dipisahkan 14 Okt 2026 (Lapis 5) supaya jalur fid & jalur TEKS memakai
@@ -1689,11 +1696,45 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None):
     #    Konteks lebar (3 baris sebelum/sesudah + judul bab terdekat)
     #    diberikan sebagai argumen ke-5 BILA fn mendeklarasikannya; fn lama
     #    4-arg (mis. lambda uji) tetap dipanggil 4-arg — uji lama tetap lulus.
+    #    ── v13 GATING HAKIM (Gas Bos 11 Nov 2026) ─────────────────────
+    #    Bila `hakim_tandai_fn` disuntik pemanggil — fn(peta_sementara)
+    #    -> set idx baris yang Hakim tandai ragu/curiga (produksi:
+    #    `app.hakim_peta.tandai_ragu_curiga`) — agen kedua HANYA dipanggil
+    #    untuk baris goyang YANG JUGA ditandai Hakim. Baris goyang yang
+    #    tidak ditandai dilewati, label Jev dipakai apa adanya. Peta
+    #    sementara yang diaudit Hakim adalah peta SAAT INI (pra-koreksi
+    #    deterministik): label hasil tanya-ulang, gabung stitch, dan
+    #    sistematika yang dihitung di sini khusus untuk gerbang (D1 di
+    #    bawah tetap menghitung ulang pada tempatnya — tidak diubah).
+    #    Bila fn mengembalikan None / galat ⇒ himpunan kosong + dicatat
+    #    (`hakim_tandai_galat`): Lapis 2 tidak memanggil agen kedua sama
+    #    sekali (gagal tertutup, bukan tebak). Bila fn TIDAK disuntik
+    #    (None): perilaku WARISAN v12 — tiap baris goyang diadili
+    #    (pelari/uji lama tetap jalan; produksi WAJIB menyuntik fn ini).
     pk_jml = 0
     pk_berbalik = []
     pk_antrean = []
     pk_jawaban = []
+    hakim_tandai = None          # v13: None = gerbang tidak dipakai (warisan)
+    hakim_tandai_galat = None    # v13: pesan galat fn gerbang (bila ada)
     if pendapat_kedua_fn is not None and goyang:
+        if hakim_tandai_fn is not None:
+            try:
+                _sist_gerbang = _tandai_sistematika(baris, label, kand)
+            except Exception:
+                _sist_gerbang = set()
+            _peta_sementara = {
+                'baris': baris, 'label': dict(label),
+                'gabung': d.get('gabung') or {},
+                'sistematika': sorted(_sist_gerbang),
+                'p': dict(p_label),
+            }
+            try:
+                _ditandai = hakim_tandai_fn(_peta_sementara)
+                hakim_tandai = sorted(set(_ditandai or []))
+            except Exception as _e:             # gagal tertutup: 0 panggilan
+                hakim_tandai = []
+                hakim_tandai_galat = '%s: %s' % (type(_e).__name__, _e)
         try:
             import inspect as _inspect
             _n_arg_fn = len(_inspect.signature(
@@ -1720,6 +1761,8 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None):
                     'judul_bab_terdekat': judul}
 
         for gi, _votes in list(goyang):
+            if hakim_tandai is not None and gi not in hakim_tandai:
+                continue               # v13: goyang tanpa tanda Hakim dilewati
             label_jev = label.get(gi)
             try:
                 if _n_arg_fn >= 5:
@@ -1915,7 +1958,11 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None):
             # v12 rantai 3 langkah: jejak tiap jawaban agen kedua (label Jev,
             # label agen kedua, putusan, model yang melayani) — untuk audit
             # dan pilot. Kosong bila fn tidak disuntik.
-            'pendapat_kedua_jawaban': pk_jawaban}
+            'pendapat_kedua_jawaban': pk_jawaban,
+            # v13 gating Hakim: idx yang ditandai Hakim (None = gerbang
+            # tidak dipakai, warisan v12); galat fn gerbang (bila ada).
+            'hakim_tandai': hakim_tandai,
+            'hakim_tandai_galat': hakim_tandai_galat}
 
 
 def main():

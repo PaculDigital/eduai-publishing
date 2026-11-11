@@ -344,6 +344,27 @@ def _butuh_tanya_jev(k: dict) -> bool:
     return teks.endswith('.') or 120 < len(teks) <= 300
 
 
+def tandai_ragu_curiga(peta_surveyor: dict) -> set:
+    """GATING RANTAI v13 (Gas Bos 11 Nov 2026) — himpunan idx baris yang
+    Hakim tandai 'ragu'/'curiga' pada peta ini.
+
+    Dipakai Lapis 2 sebagai gerbang: agen kedua HANYA dipanggil untuk
+    baris di himpunan ini (bukan per baris goyang). TIDAK PERNAH melempar:
+    hakim mati / galat / tanpa kandidat ⇒ himpunan kosong (Lapis 2 tidak
+    memanggil agen kedua sama sekali — gagal tertutup, bukan tebak).
+    """
+    try:
+        hasil = periksa_peta(peta_surveyor)
+    except Exception as e:                                  # P1: telan
+        log.warning('[hakim_peta] tandai gagal: %s: %s',
+                    type(e).__name__, e)
+        return set()
+    if not isinstance(hasil, dict) or not hasil.get('ok'):
+        return set()
+    return {int(b['i']) for b in (hasil.get('bagian') or [])
+            if b.get('status') in ('ragu', 'curiga')}
+
+
 def periksa_peta(peta_surveyor: dict) -> dict:
     """Hakim v2 — audit peta surveyor. SELALU mengembalikan dict (P1).
 
