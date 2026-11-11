@@ -1069,6 +1069,156 @@ def main():
         and _hasil_mutu.get('ok') is True)
     J8.MODEL_DEFAULT = 'SATPAM/typesafe/jev-1.14'
 
+    # ── 9. v8-aturan: JOIN B-HURUF-KECIL (stitch deterministik) ─────────
+    #    Terukur 11 Nov 2026: 1.267/1.877 pasangan stitch fid=112 dan
+    #    906/1.431 fid=115 adalah B-huruf-kecil; live 1.14 Jev sendiri
+    #    menggabungkan 98,0% / 97,4% pasangan itu. Aturan ini membuat
+    #    deterministik apa yang Jev hampir selalu lakukan — bukan tebakan
+    #    baru. (RULE_VERSION naik ke v8; cache lama kedaluwarsa otomatis.)
+    from app.sambung_kode import sambung_kode as _sk8
+    from app.sambung_kode import _judul_pendek as _jp8
+    cek('v8-aturan: B huruf kecil = lanjutan ("Ekonomi" + "dan ...")',
+        _sk8('Ekonomi',
+             'dan Industri Nasional (KEIN) bekerja sama untuk mendorong')
+        is True)
+    cek('v8-aturan: B huruf kecil = lanjutan (fragmen satu kata)',
+        _sk8('muslim', 'pada') is True
+        and _sk8('fashion', 'muslim') is True)
+    cek('v8-aturan: B huruf kecil = lanjutan (kalimat terbelah panjang)',
+        _sk8('Manfaat praktis dalam penelitian ini adalah dapat membantu',
+             'wirausahawan membuat keputusan yang lebih tepat mengenai')
+        is True)
+    cek('v8-aturan: B huruf kecil = lanjutan (kata terbelah "Turn"+"around")',
+        _sk8('Strategi Turn', 'around') is None)
+    cek('v8-aturan: A judul pendek ALL-CAPS tetap ditanya Jev',
+        _sk8('KESIMPULAN', 'dari hasil penelitian tersebut') is None)
+    cek('v8-aturan: B penanda butir tetap ditanya Jev ("e. ...")',
+        _sk8('(Mahardhani,2023)', 'e. Positive Word-of-Mouth') is None)
+    cek('v8-aturan: B penanda butir tetap ditanya Jev ("b) ...")',
+        _sk8('63', 'b) Editing Data') is None)
+    cek('v8-aturan: B penanda butir tetap ditanya Jev ("c. ...")',
+        _sk8('b. Rating 2 = Netral', 'c. Rating 3 = Penting') is None)
+    cek('v8-aturan: SKIP lama tetap menang atas JOIN baru (subbab bernomor)',
+        _sk8('1.1 Latar Belakang',
+             'bagian ini menjelaskan tentang') is False)
+    cek('v8-aturan: _judul_pendek kenali judul, bukan fragmen',
+        _jp8('Strategi Turn') is True
+        and _jp8('KESIMPULAN') is True
+        and _jp8('Islam Malang') is True
+        and _jp8('Ekonomi') is False
+        and _jp8('45') is False
+        and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
+    P8 = _muat_peta3()
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v10)',
+        P8.RULE_VERSION == 'jev-peta-v10')
+    # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
+    #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
+    #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
+    #    gabungan yang diperiksa salah (butir/kutipan baru); tidak satu
+    #    pun gabung p>=0,6. R2-2: pemisahan SEMPURNA — 11 gabung-salah
+    #    di-override p<=0,47, 8 gabung-benar dipertahankan p>=0,74.
+    cek('v9-aturan: B dash = butir baru ("pasaran." + "- “AyuMeera")',
+        _sk8('pasaran.”', '- “AyuMeera bisa jadi pilihan utama') is False)
+    cek('v9-aturan: B dash = butir baru (SWOT "Opportunities")',
+        _sk8('Opportunities', '- Tren hijab instan dan simple') is False)
+    cek('v9-aturan: B en-dash = butir baru ("3.4.2 Tahapan")',
+        _sk8('3.4.2 Tahapan', '– Tahapan Analisis Data') is False)
+    cek('v9-aturan: B dash = butir baru (A kata gantung "komunitas")',
+        _sk8('komunitas', '- Pengaruh peran media sosial') is False)
+    cek('v9-aturan: B "-nya" TANPA spasi bukan penanda butir',
+        _sk8('Kalimat belum selesai', '-nya adalah lanjutan') is None)
+    cek('v9-aturan: judul 1 tingkat + ekor kalimat ("2. Manfaat Praktis")',
+        _sk8('2. Manfaat Praktis',
+             'Manfaat praktis dalam penelitian ini adalah dapat membantu')
+        is False)
+    cek('v9-aturan: judul 1 tingkat + ekor kalimat ("2. Wawancara")',
+        _sk8('2. Wawancara',
+             'Wawancara merupakan kegiatan untuk memperoleh penjelasan dan')
+        is False)
+    cek('v9-aturan: judul 1 tingkat + butir ("1. Kekuatan")',
+        _sk8('1. Kekuatan (Strength)',
+             'a. Produk relevan dengan kebutuhan hijabers lokal.') is False)
+    cek('v9-aturan: judul 1 tingkat + butir ("2. Ancaman")',
+        _sk8('2. Ancaman (Threats)', 'a. Harga pesaing lebih murah.')
+        is False)
+    cek('v9-aturan: lanjutan judul 1 tingkat tetap tanya Jev (p 0,94)',
+        _sk8('1. Mendukung Strategi', 'Agresif (Khoironi, 2023)') is None)
+    cek('v9-aturan: lanjutan judul 1 tingkat tetap tanya Jev ("Strategi Turn")',
+        _sk8('3. Mendukung', 'Strategi Turn') is None)
+    cek('v9-aturan: lanjutan judul 1 tingkat tetap tanya Jev (satu kata)',
+        _sk8('2. Mendukung Strategi', 'Diversifikasi') is None)
+    cek('v9-aturan: tahun "2023. ..." BUKAN judul bernomor',
+        _sk8('2023. Penelitian ini menunjukkan',
+             'Hasil penelitian menunjukkan bahwa') is None)
+    cek('v9-aturan: desimal koma "2,5 ..." BUKAN judul bernomor (tetap gabung)',
+        _sk8('2,5 juta responden yang', 'berpartisipasi dalam survei ini')
+        is True)
+    cek('v9-aturan: judul 1 tingkat PANJANG (>8 kata) tetap tanya/gabung',
+        _sk8('1. Membuat tabel matriks IFAS (Internal Startegy Factor '
+             'Analysis Sumary) dan',
+             'membuat keputusan yang lebih tepat') is True)
+    cek('v9-aturan: nomor halaman di depan judul 1 tingkat tetap kena SKIP',
+        _sk8('13 2. Manfaat Praktis',
+             'Manfaat praktis dalam penelitian ini adalah dapat membantu')
+        is False)
+    # NUL: artefak PDF fid=112 (103 NUL di teks bersih) — dibuang di susun.
+    FakeKonversi.mode = 'normal'
+    teks_nul = ('BAB I\nPENDAHULUAN\n'
+                'Kalimat dengan\x00 NUL di tengah dan cukup panjang untuk lolos saringan baris pendek.\n'
+                'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n')
+    d_nul = P._susun_dari_bersih(teks_nul)
+    cek('v8-aturan: byte NUL dibuang dari baris susun',
+        not any('\x00' in b for b in d_nul['baris']),
+        str(d_nul['baris']))
+    # stitch lintas-kosong B-huruf-kecil: diputuskan KODE, tanpa Jev.
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.panggilan.clear()
+    teks_lintas_kecil = ('Kalimat pertama yang belum selesai\n\n'
+                         'dan berlanjut di baris berikut ini.\n'
+                         'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.\n')
+    hasil_lk = P._stitch_baris(teks_lintas_kecil,
+                               tanya_fn=FAKE_SATPAM.tanya_bebas_mutu)
+    cek('v8-aturan: stitch lintas-kosong B-huruf-kecil tersambung',
+        'Kalimat pertama yang belum selesai dan berlanjut di baris berikut ini.'
+        in hasil_lk)
+    cek('v8-aturan: pasangan B-huruf-kecil TIDAK ditanya ke Jev',
+        FAKE_SATPAM.panggilan == [],
+        str(FAKE_SATPAM.panggilan))
+    # ── 11. v10-aturan: DEMOSI BAB TANPA PENGECUALIAN SISTEMATIKA (R2-3) ─
+    #    Terukur live 1.14 (11 Nov 2026, sesi segar v9): 3 judul BAB sampah
+    #    lolos ke daftar bab, semuanya baris deskripsi blok sistematika
+    #    yang dilabeli 'bab' oleh Jev — pengecualian sistematika-lah yang
+    #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
+    #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
+    #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v10)',
+        P8.RULE_VERSION == 'jev-peta-v10')
+    baris_r23 = [
+        'terbagi menjadi beberapa bab antara lain:',
+        '1. BAB I PENDAHULUAN',
+        'bagian ini berisikan latar belakang masalah,',
+        '2. BAB II TINJAUAN PUSTAKA',
+        'bagian ini menjelaskan tentang landasan',
+        '5. BAB V PENUTUP',
+        'pada bab ini penulis akan menjelaskan mengenai kesimpulan penelitian dan saran.',
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali.',
+    ]
+    label_r23 = {1: 'bab', 3: 'bab', 4: 'bab', 5: 'bab', 6: 'bab'}
+    kand_r23 = [(i, baris_r23[i]) for i in range(len(baris_r23))]
+    sist_r23 = {1, 2, 3, 4, 5, 6}
+    _bk, _bg, demosi_r23 = P._koreksi_bab_deterministik(
+        baris_r23, label_r23, kand_r23, sist_r23, {}, set())
+    cek('v10-aturan: deskripsi sistematika "pada bab ini ..." didemosi ke paragraf',
+        label_r23.get(6) == 'paragraf', str(label_r23))
+    cek('v10-aturan: deskripsi sistematika "bagian ini ..." didemosi ke biasa',
+        label_r23.get(4) == 'biasa', str(label_r23))
+    cek('v10-aturan: salinan judul sistematika "1. BAB I ..." tetap bab',
+        label_r23.get(1) == 'bab', str(label_r23))
+    cek('v10-aturan: salinan judul sistematika "5. BAB V ..." tetap bab',
+        label_r23.get(5) == 'bab', str(label_r23))
+    cek('v10-aturan: demosi bab sistematika tercatat',
+        sorted(demosi_r23) == [4, 6], str(demosi_r23))
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))

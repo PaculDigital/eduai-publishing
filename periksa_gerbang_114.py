@@ -42,14 +42,18 @@ def peta_satu_run_81(nama_berkas, kunci_label):
 
 
 def main():
-    baseline = G.muat_baseline()
+    # Baseline 1.14 tersimpan — pemeriksa ini TIDAK memakai baseline kini
+    # (v9): sesi 1.14 memang tidak lolos G2 melawan baseline v9
+    # (pergeseran sistematis aturan R2), jadi baseline yang dipakai
+    # harus baseline 1.14. Uji mandiri TIDAK dipanggil di sini: ia kini
+    # menguji peta v9 melawan baseline v9 (lihat periksa_gerbang_r2.py).
+    baseline = json.load(open(
+        ROOT / 'ground_truth' / 'gerbang_baseline_114.json',
+        encoding='utf-8'))
     print('Baseline model:', baseline.get('model'),
+          '| rule_version: jev-peta-v7',
           '| tanggal:', baseline.get('tanggal'))
     semua_lolos = True
-    print('=== Uji mandiri gerbang (6 kasus) ===')
-    ok_uji = G.uji_mandiri()
-    semua_lolos = semua_lolos and ok_uji
-    print()
     print('=== Gerbang offline per sesi 1.14 tersimpan ===')
     sesi = [
         ('baseline114', peta_baseline114()),
