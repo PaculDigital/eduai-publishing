@@ -1109,8 +1109,8 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v11)',
-        P8.RULE_VERSION == 'jev-peta-v11')
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v12)',
+        P8.RULE_VERSION == 'jev-peta-v12')
     # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
     #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
     #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
@@ -1191,8 +1191,8 @@ def main():
     #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
     #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
     #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
-    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v11)',
-        P8.RULE_VERSION == 'jev-peta-v11')
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v12)',
+        P8.RULE_VERSION == 'jev-peta-v12')
     baris_r23 = [
         'terbagi menjadi beberapa bab antara lain:',
         '1. BAB I PENDAHULUAN',
@@ -1224,8 +1224,11 @@ def main():
     #    gabungan, CHAPTER polos, judul Romawi tanpa kata BAB (berpagar
     #    profil); Lapis 2 pendapat_kedua() hanya untuk baris goyang
     #    (jawaban disuntik, nol Jev di sini); Lapis 3 antrean manusia.
-    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v11)',
-        P8.RULE_VERSION == 'jev-peta-v11')
+    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v12)',
+        P8.RULE_VERSION == 'jev-peta-v12')
+    # --- 12f. v12 rantai 3 langkah: mode agen-kedua + pabrik agen kedua ---
+    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v12)',
+        P8.RULE_VERSION == 'jev-peta-v12')
     # --- 12a. profil_bentuk ---
     teks_romawi = ('I. PENDAHULUAN\nIsi pendahuluan yang cukup panjang dan menjelaskan latar belakang masalah penelitian ini.\n'
                    'II. TINJAUAN PUSTAKA\nIsi tinjauan pustaka yang cukup panjang dan menjelaskan teori yang dipakai dalam penelitian ini.\n'
@@ -1397,6 +1400,143 @@ def main():
         P8.petakan_dari_teks(
             'BAB I\nPENDAHULUAN\nIsi paragraf biasa yang panjang dan menjelaskan banyak hal penting di sini.\n',
             putaran=1).get('antrean_manusia') is False)
+    # --- 12f. v12 RANTAI 3 LANGKAH: mode agen-kedua + pabrik agen kedua ---
+    # 12f-1. mode agen-kedua (unit, tanpa Jev)
+    cek('v12-pk2: agen-kedua sepakat -> tetap',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'paragraf', 'confidence': 0.8},
+                          mode='agen-kedua')['putusan'] == 'tetap')
+    cek('v12-pk2: agen-kedua beda bukan-bab -> berbalik (keputusan agen kedua dipakai)',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'subbab', 'confidence': 0.9},
+                          mode='agen-kedua') == {
+            'idx': 3, 'putusan': 'berbalik', 'label': 'subbab',
+            'alasan': 'agen kedua beda (bukan soal bab), keputusannya dipakai'})
+    cek('v12-pk2: agen-kedua beda soal judul bab (label kedua bab) -> antrean',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'bab', 'confidence': 0.9},
+                          mode='agen-kedua')['putusan'] == 'antrean-manusia')
+    cek('v12-pk2: agen-kedua beda soal judul bab (label Jev bab) -> antrean',
+        P8.pendapat_kedua(3, 'x', ['bab', 'paragraf'], [0.9, 0.6],
+                          {'label': 'paragraf', 'confidence': 0.9},
+                          mode='agen-kedua')['putusan'] == 'antrean-manusia')
+    cek('v12-pk2: agen-kedua tidak yakin -> antrean',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'biasa', 'confidence': 0.4},
+                          mode='agen-kedua')['putusan'] == 'antrean-manusia')
+    cek('v12-pk2: tanpa jawaban kedua -> antrean',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          None, mode='agen-kedua')['putusan'] == 'antrean-manusia')
+    cek('v12-pk2: mode suara lama tetap (label ketiga -> antrean)',
+        P8.pendapat_kedua(3, 'x', ['paragraf', 'biasa'], [0.9, 0.6],
+                          {'label': 'subbab', 'confidence': 0.9})['putusan']
+        == 'antrean-manusia')
+    # 12f-2. modul agen_kedua (unit, tanpa jaringan — penanya palsu)
+    import app.agen_kedua as AK
+    _env_lama = os.environ.get('EDUAI_AGEN_KEDUA_AKTIF')
+    os.environ.pop('EDUAI_AGEN_KEDUA_AKTIF', None)
+    cek('v12-ak: saklar bawaan mati',
+        AK.aktif() is False)
+    cek('v12-ak: pabrik mati -> None (perilaku v11)',
+        AK.buat_pendapat_kedua_fn() is None)
+    os.environ['EDUAI_AGEN_KEDUA_AKTIF'] = '1'
+    cek('v12-ak: saklar nyala bila env 1',
+        AK.aktif() is True)
+
+    def _penanya_palsu(prompt):
+        return (json.dumps({'label': 'biasa', 'confidence': 0.9,
+                            'alasan': 'butir enumerasi'}, ensure_ascii=False),
+                'model-palsu')
+
+    fn_ak = AK.buat_pendapat_kedua_fn(penanya=_penanya_palsu)
+    cek('v12-ak: pabrik nyala -> fn terpanggil',
+        callable(fn_ak) and hasattr(fn_ak, 'log'))
+    jw_ak = fn_ak(5, '2. Manfaat Praktis', ['paragraf', 'biasa'], [0.9, 0.6],
+                  {'sebelum': ['1. Pendahuluan'], 'sesudah': ['Isi.'],
+                   'judul_bab_terdekat': 'BAB I'})
+    cek('v12-ak: fn kembalikan label+confidence agen kedua',
+        jw_ak == {'label': 'biasa', 'confidence': 0.9,
+                  'alasan': 'butir enumerasi', 'model': 'model-palsu'})
+    cek('v12-ak: fn mencatat log keputusan',
+        len(fn_ak.log) == 1 and fn_ak.log[0]['idx'] == 5
+        and fn_ak.log[0]['label_kedua'] == 'biasa')
+
+    def _penanya_galat(prompt):
+        raise RuntimeError('jaringan mati (uji)')
+
+    fn_galat = AK.buat_pendapat_kedua_fn(penanya=_penanya_galat)
+    cek('v12-ak: penanya galat -> None (gagal tertutup, bukan tebakan)',
+        fn_galat(5, 'x', ['paragraf', 'biasa'], [0.9, 0.6]) is None)
+    cek('v12-ak: urai jawaban JSON sah',
+        AK._urai_jawaban(
+            'ini {"label": "subbab", "confidence": 0.8, "alasan": "ok"} akhir')
+        == {'label': 'subbab', 'confidence': 0.8, 'alasan': 'ok'})
+    cek('v12-ak: urai jawaban label tidak sah -> None',
+        AK._urai_jawaban('{"label": "judul", "confidence": 0.9}') is None)
+    cek('v12-ak: urai jawaban bukan JSON -> None',
+        AK._urai_jawaban('tidak ada json di sini') is None)
+    cek('v12-ak: prompt memuat aturan label + konteks lebar',
+        'biasa' in AK._prompt('2. Manfaat',
+                              {'sebelum': ['a'], 'sesudah': ['b'],
+                               'judul_bab_terdekat': 'BAB I'})
+        and 'BARIS YANG DINILAI' in AK._prompt('2. Manfaat', None))
+    if _env_lama is None:
+        os.environ.pop('EDUAI_AGEN_KEDUA_AKTIF', None)
+    else:
+        os.environ['EDUAI_AGEN_KEDUA_AKTIF'] = _env_lama
+    cek('v12-ak: saklar mati lagi sesudah uji -> pabrik None',
+        AK.buat_pendapat_kedua_fn() is None)
+    # 12f-3. kait petakan: mode agen-kedua lewat wiring (FakeSatpam)
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.rendah = set()
+    P8._CACHE_PETA.clear()
+    teks_v12 = ('BAB I\nPENDAHULUAN\n'
+                'Kalimat GOYANG-PB-V12A tentang pemasaran digital dan kinerja bisnis usaha kecil di Indonesia yang panjang.\n')
+    r_v12a = P8.petakan_dari_teks(
+        teks_v12, putaran=1,
+        pendapat_kedua_fn=lambda i, t, s, p: {'label': 'subbab',
+                                              'confidence': 0.9})
+    idx_v12a = next(i for i, b in enumerate(r_v12a['baris'])
+                    if 'GOYANG-PB-V12A' in b)
+    cek('v12-kait: agen kedua label ketiga (bukan soal bab) -> berbalik',
+        r_v12a['label'].get(idx_v12a) == 'subbab'
+        and r_v12a.get('pendapat_kedua_berbalik') == [[idx_v12a, 'paragraf', 'subbab']],
+        str((r_v12a['label'].get(idx_v12a),
+             r_v12a.get('pendapat_kedua_berbalik'))))
+    teks_v12b = teks_v12.replace('GOYANG-PB-V12A', 'GOYANG-PB-V12B')
+    r_v12b = P8.petakan_dari_teks(
+        teks_v12b, putaran=1,
+        pendapat_kedua_fn=lambda i, t, s, p: {'label': 'bab',
+                                              'confidence': 0.95})
+    idx_v12b = next(i for i, b in enumerate(r_v12b['baris'])
+                    if 'GOYANG-PB-V12B' in b)
+    cek('v12-kait: agen kedua beda soal judul bab -> antrean, label tetap',
+        r_v12b['label'].get(idx_v12b) == 'paragraf'
+        and idx_v12b in r_v12b.get('pendapat_kedua_antrean', [])
+        and r_v12b.get('antrean_manusia') is True,
+        str((r_v12b['label'].get(idx_v12b),
+             r_v12b.get('pendapat_kedua_antrean'))))
+    _konteks_diterima = {}
+
+    def _fn_konteks(i, t, s, p, k=None):
+        _konteks_diterima['k'] = k
+        return {'label': 'biasa', 'confidence': 0.9}
+
+    teks_v12c = teks_v12.replace('GOYANG-PB-V12A', 'GOYANG-PB-V12C')
+    P8._CACHE_PETA.clear()
+    r_v12c = P8.petakan_dari_teks(teks_v12c, putaran=1,
+                                  pendapat_kedua_fn=_fn_konteks)
+    cek('v12-kait: fn menerima konteks lebar (sebelum/sesudah/judul bab)',
+        isinstance(_konteks_diterima.get('k'), dict)
+        and 'PENDAHULUAN' in ' '.join(_konteks_diterima['k'].get('sebelum', []))
+        and _konteks_diterima['k'].get('judul_bab_terdekat') == 'BAB I PENDAHULUAN',
+        str(_konteks_diterima.get('k')))
+    cek('v12-kait: jejak jawaban agen kedua tercatat di hasil',
+        any(j.get('idx') == idx_v12a and j.get('putusan') == 'berbalik'
+            and j.get('label_jev') == 'paragraf'
+            and j.get('label_kedua') == 'subbab'
+            for j in r_v12a.get('pendapat_kedua_jawaban', [])),
+        str(r_v12a.get('pendapat_kedua_jawaban')))
 
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:

@@ -1,0 +1,2138 @@
+{
+  "rule_version": "jev-peta-v12",
+  "kelompok": "pilot rantai 3 langkah v12 — fase 1b REKAM (D1)",
+  "cabang": "agen/wulan/optimalkan-jev-hakim-v5",
+  "pelari": "jalankan_rantai3_fase1b.py (petakan + fn perekam, nol agen kedua)",
+  "model_jev_diminta": "typesafe/jev-1.14-20261014",
+  "alasan_dua_fase": "combo 9router 503 2x (pool glm-5.3-flash habis); agen kedua dipanggil fase 2 dari VM lewat OpenRouter",
+  "entri": [
+    {
+      "kode": "D1",
+      "kata_teks_bersih": 9109,
+      "sidik_sebelum": [
+        28,
+        108,
+        235
+      ],
+      "panggilan_jev": 10,
+      "sidik_sesudah": [
+        28,
+        108,
+        235
+      ],
+      "sidik_berubah": false,
+      "kand_jml": 344,
+      "goyang_jml": 73,
+      "pendapat_kedua_jml": 73,
+      "pendapat_kedua_antrean": [
+        3,
+        7,
+        9,
+        12,
+        14,
+        19,
+        20,
+        21,
+        31,
+        33,
+        36,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        46,
+        63,
+        65,
+        66,
+        70,
+        77,
+        80,
+        89,
+        96,
+        97,
+        102,
+        104,
+        110,
+        112,
+        115,
+        122,
+        123,
+        124,
+        130,
+        135,
+        141,
+        150,
+        160,
+        172,
+        180,
+        181,
+        182,
+        184,
+        200,
+        204,
+        205,
+        206,
+        207,
+        243,
+        244,
+        272,
+        278,
+        290,
+        291,
+        294,
+        298,
+        302,
+        304,
+        307,
+        308,
+        309,
+        310,
+        312,
+        317,
+        319,
+        323,
+        325,
+        331,
+        342,
+        351,
+        376
+      ],
+      "rekaman_goyang": [
+        {
+          "idx": 3,
+          "teks": "Pendidikan adalah penentu terbesar perkembangan masa depan bangsa. Makin besar perhatian kita terhadap bidang pendidikan, ditambah lagi dengan ketepatan arah pendidikan yang dicanangkan, niscaya akan membawa bangsa atau daerah tersebut pada tingkat kemajuan yang memadai, sehingga tidak akan tertinggal atau ditinggalkan oleh bangsa lain. Pendidikan di Indonesia dewasa ini masih jauh tertinggal dibanding pendidikan di negara lain. Untuk mengantisipasi hal tersebut salah satu aspek yang perlu diperhatikan adalah materi atau yang biasa disebut kurikulum.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.49,
+            0.56,
+            0.81
+          ],
+          "konteks": {
+            "sebelum": [
+              "BAB I",
+              "PENDAHULUAN",
+              "A. Latar Belakang"
+            ],
+            "sesudah": [
+              "Kurikulum dalam suatu sistem pendidikan merupakan komponen yang penting. Dikatakan demikian karena kurikulum merupakan penuntun dalam proses belajar mengajar (PBM) di sekolah. Oleh karena itu kurikulum selalu dinamis dan senantiasa dipengaruhi oleh perubahan-perubahan dalam faktor-faktor yang mendasarinya. Tujuan pendidikan dapat berubah secara fundamental bila suatu negara yang dijajah menjadi negara yang merdeka, sehingga dengan sendirnya kurikulum pun harus mengalami perubahan yang menyeluruh.",
+              "Kurikulum dapat pula mengalami perubahan bila terdapat pendirian baru mengenai proses belajar mengajar, sehingga timbul berbagai bentuk kurikulum. Perubahan dalam masyarakat, eksplosi ilmu pengetahuan, dan lain-lain mengharuskan adanya perubahan kurikulum. Perubahan-perubahan itu menyebabkan kurikulum yang berlaku tidak lagi relevan, dan ancaman serupa ini akan senantiasa dihadapi setiap kurikulum, betapapun relevannya pada suatu saat.",
+              "Agar pendidikan memiliki relevansi dengan perkembangan zaman, maka perlu sekali praktek pendidikan diarahkan pada pendidikan yang berbasis kompetensi. Artinya praktek pendidikan dapat membekali siswa sejumlah keterampilan (life skill). Dengan life skill, yang tidak semata-mata mengandalkan kemampuan akademik melainkan juga non akademik, siswa dapat memaknai perjalanan hidupnya dengan kearifan."
+            ],
+            "judul_bab_terdekat": "BAB I PENDAHULUAN"
+          }
+        },
+        {
+          "idx": 7,
+          "teks": "Berkaitan dengan life skill, para guru atau pendidik harus dapat menguasai keterampilan tertentu, sehingga para siswa dapat difasilitasi untuk meningkatkan keterampilan dasarnya menjadi suatu keterampilan yang lebih tinggi. Santoso (dalam Qomari Anwar, 2002) mengatakan bahwa tugas penting seorang pendidik atau guru ialah menguasai keterampilan melatih, dan membimbing siswa supaya mau dan mampu secara cermat dan tekun melakukan observasi terhadap berbagai peristiwa atau persoalan yang terjadi di sekelilingnya.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "biasa"
+          ],
+          "conf": [
+            0.45,
+            0.63,
+            0.43
+          ],
+          "konteks": {
+            "sebelum": [
+              "Kurikulum dalam suatu sistem pendidikan merupakan komponen yang penting. Dikatakan demikian karena kurikulum merupakan penuntun dalam proses belajar mengajar (PBM) di sekolah. Oleh karena itu kurikulum selalu dinamis dan senantiasa dipengaruhi oleh perubahan-perubahan dalam faktor-faktor yang mendasarinya. Tujuan pendidikan dapat berubah secara fundamental bila suatu negara yang dijajah menjadi negara yang merdeka, sehingga dengan sendirnya kurikulum pun harus mengalami perubahan yang menyeluruh.",
+              "Kurikulum dapat pula mengalami perubahan bila terdapat pendirian baru mengenai proses belajar mengajar, sehingga timbul berbagai bentuk kurikulum. Perubahan dalam masyarakat, eksplosi ilmu pengetahuan, dan lain-lain mengharuskan adanya perubahan kurikulum. Perubahan-perubahan itu menyebabkan kurikulum yang berlaku tidak lagi relevan, dan ancaman serupa ini akan senantiasa dihadapi setiap kurikulum, betapapun relevannya pada suatu saat.",
+              "Agar pendidikan memiliki relevansi dengan perkembangan zaman, maka perlu sekali praktek pendidikan diarahkan pada pendidikan yang berbasis kompetensi. Artinya praktek pendidikan dapat membekali siswa sejumlah keterampilan (life skill). Dengan life skill, yang tidak semata-mata mengandalkan kemampuan akademik melainkan juga non akademik, siswa dapat memaknai perjalanan hidupnya dengan kearifan."
+            ],
+            "sesudah": [
+              "Dalam rumusan tujuan pembelajaran, life skill didefinisikan sebagai suatu kecakapan mengaplikasikan kemampuan dasar keilmuan atau kejuruan dalam kehidupan sehari-hari, sehingga bermakna dan bermanfaat bagi peningkatan taraf kehidupannya serta harkat dan martabatnya, dan juga memberikan manfaat bagi masyarakat dan lingkungannya (Suderadjat : 2004).",
+              "Sekolah sebagai sebuah masyarakat kecil (mini society) yang merupakan wahana pengembangan peserta didik dituntut untuk menciptakan iklim pembelajaran yang demokratis (democratic instruction) agar terjadi proses belajar mengajar yang menyenangkan (joyfull learning). Dengan iklim yang demikian, pendidikan diharapkan mampu melahirkan calon-calon penerus pembangunan masa depan yang sabar, kompeten, mandiri, kritis, rasional, cerdas, kreatif, dan siap menghadapi berbagi macam tantangan, dengan tetap bertawakal terhadap Sang penciptanya. Untuk kepentingan tersebut diperlukan perubahan yang cukup mendasar dalam sistem pendidikan nasional, yang dipandang oleh berbagai pihak sudah tidak efektif, dan tidak mampu lagi memberikan bekal, serta tidak dapat mempersiapkan peserta didik untuk bersaing dengn bangsa-bangsa lain di dunia. Perubahan mendasar tersebut berkaitan dengan kurikulum, yang dengan sendirinya menuntut dan mempersyaratkan berbagai perubahan pada komponen-komponen pendidikan lain.",
+              "Berbagai pihak menganalisis dan melihat perlunya diterapkan Kurikulum Berbasis Kompetensi (KBK), yang dapat membekali peserta didik dengan berbagai kemampuan yang sesuai dengan tuntutan zaman, guna menjawab tantangan arus globalisasi, berkontribusi pada pembangunan masyarakat dan kesejahteraan sosial, lentur, dan adaptif terhadap berbagai perubahan."
+            ],
+            "judul_bab_terdekat": "BAB I PENDAHULUAN"
+          }
+        },
+        {
+          "idx": 9,
+          "teks": "Sekolah sebagai sebuah masyarakat kecil (mini society) yang merupakan wahana pengembangan peserta didik dituntut untuk menciptakan iklim pembelajaran yang demokratis (democratic instruction) agar terjadi proses belajar mengajar yang menyenangkan (joyfull learning). Dengan iklim yang demikian, pendidikan diharapkan mampu melahirkan calon-calon penerus pembangunan masa depan yang sabar, kompeten, mandiri, kritis, rasional, cerdas, kreatif, dan siap menghadapi berbagi macam tantangan, dengan tetap bertawakal terhadap Sang penciptanya. Untuk kepentingan tersebut diperlukan perubahan yang cukup mendasar dalam sistem pendidikan nasional, yang dipandang oleh berbagai pihak sudah tidak efektif, dan tidak mampu lagi memberikan bekal, serta tidak dapat mempersiapkan peserta didik untuk bersaing dengn bangsa-bangsa lain di dunia. Perubahan mendasar tersebut berkaitan dengan kurikulum, yang dengan sendirinya menuntut dan mempersyaratkan berbagai perubahan pada komponen-komponen pendidikan lain.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.4,
+            0.57,
+            0.36
+          ],
+          "konteks": {
+            "sebelum": [
+              "Agar pendidikan memiliki relevansi dengan perkembangan zaman, maka perlu sekali praktek pendidikan diarahkan pada pendidikan yang berbasis kompetensi. Artinya praktek pendidikan dapat membekali siswa sejumlah keterampilan (life skill). Dengan life skill, yang tidak semata-mata mengandalkan kemampuan akademik melainkan juga non akademik, siswa dapat memaknai perjalanan hidupnya dengan kearifan.",
+              "Berkaitan dengan life skill, para guru atau pendidik harus dapat menguasai keterampilan tertentu, sehingga para siswa dapat difasilitasi untuk meningkatkan keterampilan dasarnya menjadi suatu keterampilan yang lebih tinggi. Santoso (dalam Qomari Anwar, 2002) mengatakan bahwa tugas penting seorang pendidik atau guru ialah menguasai keterampilan melatih, dan membimbing siswa supaya mau dan mampu secara cermat dan tekun melakukan observasi terhadap berbagai peristiwa atau persoalan yang terjadi di sekelilingnya.",
+              "Dalam rumusan tujuan pembelajaran, life skill didefinisikan sebagai suatu kecakapan mengaplikasikan kemampuan dasar keilmuan atau kejuruan dalam kehidupan sehari-hari, sehingga bermakna dan bermanfaat bagi peningkatan taraf kehidupannya serta harkat dan martabatnya, dan juga memberikan manfaat bagi masyarakat dan lingkungannya (Suderadjat : 2004)."
+            ],
+            "sesudah": [
+              "Berbagai pihak menganalisis dan melihat perlunya diterapkan Kurikulum Berbasis Kompetensi (KBK), yang dapat membekali peserta didik dengan berbagai kemampuan yang sesuai dengan tuntutan zaman, guna menjawab tantangan arus globalisasi, berkontribusi pada pembangunan masyarakat dan kesejahteraan sosial, lentur, dan adaptif terhadap berbagai perubahan.",
+              "KBK diharapkan mampu memecahkan berbagai persoalan bangsa, khususnya dalam bidang pendidikan, dengan mempersiapkan peserta didik melalui perencanaan, pelaksanaan, dan evaluasi terhadap sistem pendidikan secara efektif, efisien dan berhasil guna.",
+              "Sejak tahun anggaran 2000/2001 Pusat Kurikulum Balitbang Diknas telah melakukan pengembangan KBK. Mulai tahun ajaran 2001/2002 KBK diimplementasikan secara terbatas dalam bentuk mini piloting di beberapa daerah/sekolah. Daerah yang dijadikan mini piloting yaitu Sidoarjo di Jawa Timur, Bandung di Jawa Barat, Serang di Banten, Daerah Istimewa Yogyakarta dan di DKI Jakarta (Siskandar: 2003). Sementara pemerintah kota Makassar merencanakan untuk memberlakukan KBK pada tahun pelajaran 2003/2004, namun masih banyak sekolah yang belum memberlakukannya, dan pelaksanaannya masih dalam tahap uji coba (Nuryadi: 2004). Berdasarkan informasi yang diperoleh dari salah seorang guru Matematika SMA Negeri 1 Makassar, terdapat beberapa persepsi guru tentang pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar."
+            ],
+            "judul_bab_terdekat": "BAB I PENDAHULUAN"
+          }
+        },
+        {
+          "idx": 12,
+          "teks": "Sejak tahun anggaran 2000/2001 Pusat Kurikulum Balitbang Diknas telah melakukan pengembangan KBK. Mulai tahun ajaran 2001/2002 KBK diimplementasikan secara terbatas dalam bentuk mini piloting di beberapa daerah/sekolah. Daerah yang dijadikan mini piloting yaitu Sidoarjo di Jawa Timur, Bandung di Jawa Barat, Serang di Banten, Daerah Istimewa Yogyakarta dan di DKI Jakarta (Siskandar: 2003). Sementara pemerintah kota Makassar merencanakan untuk memberlakukan KBK pada tahun pelajaran 2003/2004, namun masih banyak sekolah yang belum memberlakukannya, dan pelaksanaannya masih dalam tahap uji coba (Nuryadi: 2004). Berdasarkan informasi yang diperoleh dari salah seorang guru Matematika SMA Negeri 1 Makassar, terdapat beberapa persepsi guru tentang pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.35,
+            0.45,
+            0.35
+          ],
+          "konteks": {
+            "sebelum": [
+              "Sekolah sebagai sebuah masyarakat kecil (mini society) yang merupakan wahana pengembangan peserta didik dituntut untuk menciptakan iklim pembelajaran yang demokratis (democratic instruction) agar terjadi proses belajar mengajar yang menyenangkan (joyfull learning). Dengan iklim yang demikian, pendidikan diharapkan mampu melahirkan calon-calon penerus pembangunan masa depan yang sabar, kompeten, mandiri, kritis, rasional, cerdas, kreatif, dan siap menghadapi berbagi macam tantangan, dengan tetap bertawakal terhadap Sang penciptanya. Untuk kepentingan tersebut diperlukan perubahan yang cukup mendasar dalam sistem pendidikan nasional, yang dipandang oleh berbagai pihak sudah tidak efektif, dan tidak mampu lagi memberikan bekal, serta tidak dapat mempersiapkan peserta didik untuk bersaing dengn bangsa-bangsa lain di dunia. Perubahan mendasar tersebut berkaitan dengan kurikulum, yang dengan sendirinya menuntut dan mempersyaratkan berbagai perubahan pada komponen-komponen pendidikan lain.",
+              "Berbagai pihak menganalisis dan melihat perlunya diterapkan Kurikulum Berbasis Kompetensi (KBK), yang dapat membekali peserta didik dengan berbagai kemampuan yang sesuai dengan tuntutan zaman, guna menjawab tantangan arus globalisasi, berkontribusi pada pembangunan masyarakat dan kesejahteraan sosial, lentur, dan adaptif terhadap berbagai perubahan.",
+              "KBK diharapkan mampu memecahkan berbagai persoalan bangsa, khususnya dalam bidang pendidikan, dengan mempersiapkan peserta didik melalui perencanaan, pelaksanaan, dan evaluasi terhadap sistem pendidikan secara efektif, efisien dan berhasil guna."
+            ],
+            "sesudah": [
+              "",
+              "B. Rumusan Masalah",
+              "Berdasarkan latar belakang masalah di atas, maka rumusan masalah dalam penelitian ini adalah “Bagaimana persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar?”."
+            ],
+            "judul_bab_terdekat": "BAB I PENDAHULUAN"
+          }
+        },
+        {
+          "idx": 14,
+          "teks": "B. Rumusan Masalah",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.49,
+            0.96
+          ],
+          "konteks": {
+            "sebelum": [
+              "KBK diharapkan mampu memecahkan berbagai persoalan bangsa, khususnya dalam bidang pendidikan, dengan mempersiapkan peserta didik melalui perencanaan, pelaksanaan, dan evaluasi terhadap sistem pendidikan secara efektif, efisien dan berhasil guna.",
+              "Sejak tahun anggaran 2000/2001 Pusat Kurikulum Balitbang Diknas telah melakukan pengembangan KBK. Mulai tahun ajaran 2001/2002 KBK diimplementasikan secara terbatas dalam bentuk mini piloting di beberapa daerah/sekolah. Daerah yang dijadikan mini piloting yaitu Sidoarjo di Jawa Timur, Bandung di Jawa Barat, Serang di Banten, Daerah Istimewa Yogyakarta dan di DKI Jakarta (Siskandar: 2003). Sementara pemerintah kota Makassar merencanakan untuk memberlakukan KBK pada tahun pelajaran 2003/2004, namun masih banyak sekolah yang belum memberlakukannya, dan pelaksanaannya masih dalam tahap uji coba (Nuryadi: 2004). Berdasarkan informasi yang diperoleh dari salah seorang guru Matematika SMA Negeri 1 Makassar, terdapat beberapa persepsi guru tentang pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+              ""
+            ],
+            "sesudah": [
+              "Berdasarkan latar belakang masalah di atas, maka rumusan masalah dalam penelitian ini adalah “Bagaimana persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar?”.",
+              "C. Tujuan Penelitian",
+              "Berdasarkan rumusan masalah di atas, maka tujuan yang diharapkan dari penelitian ini adalah untuk mengetahui bagaimana persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar."
+            ],
+            "judul_bab_terdekat": "BAB I PENDAHULUAN"
+          }
+        },
+        {
+          "idx": 19,
+          "teks": "Dengan adanya informasi tentang pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar, maka manfaat yang diharapkan dari penelitian ini adalah sebagai berikut:",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.32,
+            0.85,
+            0.84
+          ],
+          "konteks": {
+            "sebelum": [
+              "C. Tujuan Penelitian",
+              "Berdasarkan rumusan masalah di atas, maka tujuan yang diharapkan dari penelitian ini adalah untuk mengetahui bagaimana persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar.",
+              "D. Manfaat Penelitian"
+            ],
+            "sesudah": [
+              "1. Bagi Kepala Sekolah SMA Negeri 1 Makassar dapat digunakan sebagai informasi sekaligus sebagai acuan dalam pengambilan kebijakan terhadap pelaksanaan KBK di SMA Negeri 1 Makassar pada umumnya dan mata pelajaran matematika pada khususnya.",
+              "2. Bagi para pendidik khususnya guru-guru mata pelajaran matematika di SMA Negeri 1 Makassar dapat dijadikan sebagai acuan dalam meningkatkan kreatifitas mengajarnya.",
+              "3. Bagi penulis sendiri di samping sebagai latihan dalam usaha penyumbangan buah pikiran secara tertulis, juga sebagai bahan pertimbangan dalam mempersiapkan diri untuk terjun ke lapangan."
+            ],
+            "judul_bab_terdekat": "BAB I PENDAHULUAN"
+          }
+        },
+        {
+          "idx": 20,
+          "teks": "1. Bagi Kepala Sekolah SMA Negeri 1 Makassar dapat digunakan sebagai informasi sekaligus sebagai acuan dalam pengambilan kebijakan terhadap pelaksanaan KBK di SMA Negeri 1 Makassar pada umumnya dan mata pelajaran matematika pada khususnya.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.37,
+            0.36,
+            0.68
+          ],
+          "konteks": {
+            "sebelum": [
+              "Berdasarkan rumusan masalah di atas, maka tujuan yang diharapkan dari penelitian ini adalah untuk mengetahui bagaimana persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar.",
+              "D. Manfaat Penelitian",
+              "Dengan adanya informasi tentang pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar, maka manfaat yang diharapkan dari penelitian ini adalah sebagai berikut:"
+            ],
+            "sesudah": [
+              "2. Bagi para pendidik khususnya guru-guru mata pelajaran matematika di SMA Negeri 1 Makassar dapat dijadikan sebagai acuan dalam meningkatkan kreatifitas mengajarnya.",
+              "3. Bagi penulis sendiri di samping sebagai latihan dalam usaha penyumbangan buah pikiran secara tertulis, juga sebagai bahan pertimbangan dalam mempersiapkan diri untuk terjun ke lapangan.",
+              ""
+            ],
+            "judul_bab_terdekat": "BAB I PENDAHULUAN"
+          }
+        },
+        {
+          "idx": 21,
+          "teks": "2. Bagi para pendidik khususnya guru-guru mata pelajaran matematika di SMA Negeri 1 Makassar dapat dijadikan sebagai acuan dalam meningkatkan kreatifitas mengajarnya.",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.39,
+            0.33,
+            0.29
+          ],
+          "konteks": {
+            "sebelum": [
+              "D. Manfaat Penelitian",
+              "Dengan adanya informasi tentang pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar, maka manfaat yang diharapkan dari penelitian ini adalah sebagai berikut:",
+              "1. Bagi Kepala Sekolah SMA Negeri 1 Makassar dapat digunakan sebagai informasi sekaligus sebagai acuan dalam pengambilan kebijakan terhadap pelaksanaan KBK di SMA Negeri 1 Makassar pada umumnya dan mata pelajaran matematika pada khususnya."
+            ],
+            "sesudah": [
+              "3. Bagi penulis sendiri di samping sebagai latihan dalam usaha penyumbangan buah pikiran secara tertulis, juga sebagai bahan pertimbangan dalam mempersiapkan diri untuk terjun ke lapangan.",
+              "",
+              "BAB II"
+            ],
+            "judul_bab_terdekat": "BAB I PENDAHULUAN"
+          }
+        },
+        {
+          "idx": 31,
+          "teks": "Dalam pengembangan kurikulum, masing-masing ahli kurikulum melihat dari sisi yang berbeda-beda, namun pada dasarnya mengarah pada satu tujuan yang sama. “Lazimnya kurikulum dipandang sebagai suatu rencana yang disusun untuk melancarkan proses belajar mengajar di bawah bimbingan dan tanggung jawab lembaga pendidikan beserta stafnya” (Nasution 1999: 5).",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.37,
+            0.35,
+            0.55
+          ],
+          "konteks": {
+            "sebelum": [
+              "1. Pengertian Kurikulum Berbasis Kompetensi",
+              "Istilah kurikulum memiliki berbagai tafsiran yang dirumuskan oleh pakar-pakar kurikulum sejak dulu sampai dewasa ini. Istilah kurikulum berasal dari bahasa Latin, yakni “Curriculae”, artinya jarak yang harus ditempuh oleh seorang pelari. Kurikulum merupakan salah satu alat untuk mencapai tujuan pendidikan dan sekaligus merupakan pedoman dalam pelaksanaan pengajaran di sekolah. Oleh karena itu, kurikulum disusun harus berdasarkan falsafah dan pandangan hidup bangsa.",
+              "Ada beberapa tafsiran mengenai kurikulum yaitu: Pertama, kurikulum memuat isi dan materi pelajaran, artinya kurikulum adalah sejumlah mata ajaran yang harus ditempuh dan dipelajari oleh siswa untuk memperoleh sejumlah pengetahuan. Kedua, kurikulum sebagai rencana pembelajaran, artinya kurikulum adalah suatu program pendidikan yang disediakan untuk membelajarkan siswa. Ketiga, kurikulum sebagai pengalaman belajar, artinya kurikulum lebih ditekankan kepada serangkaian pengalaman belajar."
+            ],
+            "sesudah": [
+              "Soetjipto (1999:148) mengemukakan bahwa kurikulum adalah seperangkat bahan pengalaman belajar siswa dengan segala pedoman pelaksanaannya yang tersususun secara sistematik dan dipedomani oleh sekolah dalam kegiatan mendidik siswanya.",
+              "Kurikulum adalah seperangkat rencana dan pengaturan mengenai tujuan, isi dan bahan pelajaran serta cara yang digunakan sebagai pedoman penyelenggaraan kegiatan pembelajaran untuk mencapai tujuan pendidikan tertentu (Undang-Undang Republik Indonesia No. 20 tahun 2003 tentang sistem pendidikan, 2003: 5)",
+              "Menurut Oemar Hamalik (2003: 22) mengemukakan bahwa “Kurikulum dalam arti luas meliputi komponen-komponen yaitu tujuan pendidikan, tujuan instruksional, alat dan metode instruksional, pemilihan dan pembimbingan siswa, materi program, evaluasi dan staf pelaksanaan”."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 33,
+          "teks": "Kurikulum adalah seperangkat rencana dan pengaturan mengenai tujuan, isi dan bahan pelajaran serta cara yang digunakan sebagai pedoman penyelenggaraan kegiatan pembelajaran untuk mencapai tujuan pendidikan tertentu (Undang-Undang Republik Indonesia No. 20 tahun 2003 tentang sistem pendidikan, 2003: 5)",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.43,
+            0.51,
+            0.55
+          ],
+          "konteks": {
+            "sebelum": [
+              "Ada beberapa tafsiran mengenai kurikulum yaitu: Pertama, kurikulum memuat isi dan materi pelajaran, artinya kurikulum adalah sejumlah mata ajaran yang harus ditempuh dan dipelajari oleh siswa untuk memperoleh sejumlah pengetahuan. Kedua, kurikulum sebagai rencana pembelajaran, artinya kurikulum adalah suatu program pendidikan yang disediakan untuk membelajarkan siswa. Ketiga, kurikulum sebagai pengalaman belajar, artinya kurikulum lebih ditekankan kepada serangkaian pengalaman belajar.",
+              "Dalam pengembangan kurikulum, masing-masing ahli kurikulum melihat dari sisi yang berbeda-beda, namun pada dasarnya mengarah pada satu tujuan yang sama. “Lazimnya kurikulum dipandang sebagai suatu rencana yang disusun untuk melancarkan proses belajar mengajar di bawah bimbingan dan tanggung jawab lembaga pendidikan beserta stafnya” (Nasution 1999: 5).",
+              "Soetjipto (1999:148) mengemukakan bahwa kurikulum adalah seperangkat bahan pengalaman belajar siswa dengan segala pedoman pelaksanaannya yang tersususun secara sistematik dan dipedomani oleh sekolah dalam kegiatan mendidik siswanya."
+            ],
+            "sesudah": [
+              "Menurut Oemar Hamalik (2003: 22) mengemukakan bahwa “Kurikulum dalam arti luas meliputi komponen-komponen yaitu tujuan pendidikan, tujuan instruksional, alat dan metode instruksional, pemilihan dan pembimbingan siswa, materi program, evaluasi dan staf pelaksanaan”.",
+              "Lebih rinci lagi Hilda Taba (S. Nasution ; 2003) mengemukakan bahwa:",
+              "“Pada hakikatnya tiap kurikulum merupakan suatu cara untuk mempersiapkan anak agar berpartisipasi sebagai anggota yang produktif dalam masyarakatnya. Tiap kurikulum, bagaimanapun polanya, selalu mempunyai komponen-komponen tertentu, yakni pernyataan tentang tujuan dan sasaran, seleksi dan organisasi bahan dan isi pelajaran, bentuk dan kegiatan belajar dan mengajar, dan akhirnya evaluasi hasil belajar”"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 36,
+          "teks": "“Pada hakikatnya tiap kurikulum merupakan suatu cara untuk mempersiapkan anak agar berpartisipasi sebagai anggota yang produktif dalam masyarakatnya. Tiap kurikulum, bagaimanapun polanya, selalu mempunyai komponen-komponen tertentu, yakni pernyataan tentang tujuan dan sasaran, seleksi dan organisasi bahan dan isi pelajaran, bentuk dan kegiatan belajar dan mengajar, dan akhirnya evaluasi hasil belajar”",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.39,
+            0.45,
+            0.69
+          ],
+          "konteks": {
+            "sebelum": [
+              "Kurikulum adalah seperangkat rencana dan pengaturan mengenai tujuan, isi dan bahan pelajaran serta cara yang digunakan sebagai pedoman penyelenggaraan kegiatan pembelajaran untuk mencapai tujuan pendidikan tertentu (Undang-Undang Republik Indonesia No. 20 tahun 2003 tentang sistem pendidikan, 2003: 5)",
+              "Menurut Oemar Hamalik (2003: 22) mengemukakan bahwa “Kurikulum dalam arti luas meliputi komponen-komponen yaitu tujuan pendidikan, tujuan instruksional, alat dan metode instruksional, pemilihan dan pembimbingan siswa, materi program, evaluasi dan staf pelaksanaan”.",
+              "Lebih rinci lagi Hilda Taba (S. Nasution ; 2003) mengemukakan bahwa:"
+            ],
+            "sesudah": [
+              "Dari definisi tersebut, dapat disimpulkan bahwa pengertian kurikulum secara luas adalah suatu rencana atau bahan tertulis yang sengaja disusun untuk dijadikan pedoman bagi pelaksanaan pendidikan yang berada di sekolah. Jadi kurikulum tidak hanya merupakan seperangkat mata pelajaran tetapi menyangkut pula bagaimana pelajaran itu diorganisasikan menjadi pengalaman yang berharga bagi siswa.",
+              "Kompetensi merupakan perpaduan dari pengetahuan, keterampilan, nilai dan sikap yang direfleksikan dalam kebiasaan berpikir dan bertindak. Kebiasaan berpikir dan bertindak secara konsisten dan terus menerus memungkinkan seseorang menjadi kompeten, dalam arti memiliki pengetahuan, keterampilan, dan nilai-nilai dasar untuk melakukan sesuatu.",
+              "Kompetensi diartikan sebagai pengetahuan, keterampilan dan kemampuan yang dikuasai oleh seseorang yang telah menjadi bagian dari dirinya, sehingga dapat melakukan perilaku-perilaku kognitif, afektif, dan psikomotorik dengan sebaik-baiknya (Mulyasa, 2004: 38)."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 38,
+          "teks": "Kompetensi merupakan perpaduan dari pengetahuan, keterampilan, nilai dan sikap yang direfleksikan dalam kebiasaan berpikir dan bertindak. Kebiasaan berpikir dan bertindak secara konsisten dan terus menerus memungkinkan seseorang menjadi kompeten, dalam arti memiliki pengetahuan, keterampilan, dan nilai-nilai dasar untuk melakukan sesuatu.",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "paragraf"
+          ],
+          "conf": [
+            0.36,
+            0.39,
+            0.43
+          ],
+          "konteks": {
+            "sebelum": [
+              "Lebih rinci lagi Hilda Taba (S. Nasution ; 2003) mengemukakan bahwa:",
+              "“Pada hakikatnya tiap kurikulum merupakan suatu cara untuk mempersiapkan anak agar berpartisipasi sebagai anggota yang produktif dalam masyarakatnya. Tiap kurikulum, bagaimanapun polanya, selalu mempunyai komponen-komponen tertentu, yakni pernyataan tentang tujuan dan sasaran, seleksi dan organisasi bahan dan isi pelajaran, bentuk dan kegiatan belajar dan mengajar, dan akhirnya evaluasi hasil belajar”",
+              "Dari definisi tersebut, dapat disimpulkan bahwa pengertian kurikulum secara luas adalah suatu rencana atau bahan tertulis yang sengaja disusun untuk dijadikan pedoman bagi pelaksanaan pendidikan yang berada di sekolah. Jadi kurikulum tidak hanya merupakan seperangkat mata pelajaran tetapi menyangkut pula bagaimana pelajaran itu diorganisasikan menjadi pengalaman yang berharga bagi siswa."
+            ],
+            "sesudah": [
+              "Kompetensi diartikan sebagai pengetahuan, keterampilan dan kemampuan yang dikuasai oleh seseorang yang telah menjadi bagian dari dirinya, sehingga dapat melakukan perilaku-perilaku kognitif, afektif, dan psikomotorik dengan sebaik-baiknya (Mulyasa, 2004: 38).",
+              "Sejalan dengan itu, Finc dan Crukinton (Mulyasa, 2004: 38) mengartikan kompetensi sebagai penguasaan terhadap suatu tugas, keterampilan, sikap dan apresiasi yang diperlukan untuk menunjang keberhasilan. Menurut Sudjatmiko (2003) untuk menjadi kompeten dalam bidang tertentu, seseorang harus secara konsisten dan terus menerus menunjukkan kompetensi dalam bidang tersebut dalam cara berpikir dan berperilaku/bertindak sehari-hari.",
+              "Kurikulum Berbasis Kompetensi (KBK) merupakan suatu format yang menetapkan apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan. Rumusan kompetensi dalam KBK adalah suatu pernyataan tentang apa yang diharapkan dapat diketahui, disikapi, atau dilakukan siswa dalam setiap tingkatan kelas dan sekolah dan sekaligus menggambarkan kemajuan siswa yang dicapai secara bertahap dan berkelanjutan untuk menjadi kompeten."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 39,
+          "teks": "Kompetensi diartikan sebagai pengetahuan, keterampilan dan kemampuan yang dikuasai oleh seseorang yang telah menjadi bagian dari dirinya, sehingga dapat melakukan perilaku-perilaku kognitif, afektif, dan psikomotorik dengan sebaik-baiknya (Mulyasa, 2004: 38).",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.32,
+            0.33,
+            0.41
+          ],
+          "konteks": {
+            "sebelum": [
+              "“Pada hakikatnya tiap kurikulum merupakan suatu cara untuk mempersiapkan anak agar berpartisipasi sebagai anggota yang produktif dalam masyarakatnya. Tiap kurikulum, bagaimanapun polanya, selalu mempunyai komponen-komponen tertentu, yakni pernyataan tentang tujuan dan sasaran, seleksi dan organisasi bahan dan isi pelajaran, bentuk dan kegiatan belajar dan mengajar, dan akhirnya evaluasi hasil belajar”",
+              "Dari definisi tersebut, dapat disimpulkan bahwa pengertian kurikulum secara luas adalah suatu rencana atau bahan tertulis yang sengaja disusun untuk dijadikan pedoman bagi pelaksanaan pendidikan yang berada di sekolah. Jadi kurikulum tidak hanya merupakan seperangkat mata pelajaran tetapi menyangkut pula bagaimana pelajaran itu diorganisasikan menjadi pengalaman yang berharga bagi siswa.",
+              "Kompetensi merupakan perpaduan dari pengetahuan, keterampilan, nilai dan sikap yang direfleksikan dalam kebiasaan berpikir dan bertindak. Kebiasaan berpikir dan bertindak secara konsisten dan terus menerus memungkinkan seseorang menjadi kompeten, dalam arti memiliki pengetahuan, keterampilan, dan nilai-nilai dasar untuk melakukan sesuatu."
+            ],
+            "sesudah": [
+              "Sejalan dengan itu, Finc dan Crukinton (Mulyasa, 2004: 38) mengartikan kompetensi sebagai penguasaan terhadap suatu tugas, keterampilan, sikap dan apresiasi yang diperlukan untuk menunjang keberhasilan. Menurut Sudjatmiko (2003) untuk menjadi kompeten dalam bidang tertentu, seseorang harus secara konsisten dan terus menerus menunjukkan kompetensi dalam bidang tersebut dalam cara berpikir dan berperilaku/bertindak sehari-hari.",
+              "Kurikulum Berbasis Kompetensi (KBK) merupakan suatu format yang menetapkan apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan. Rumusan kompetensi dalam KBK adalah suatu pernyataan tentang apa yang diharapkan dapat diketahui, disikapi, atau dilakukan siswa dalam setiap tingkatan kelas dan sekolah dan sekaligus menggambarkan kemajuan siswa yang dicapai secara bertahap dan berkelanjutan untuk menjadi kompeten.",
+              "KBK merupakan pergeseran penekanan dan isi (apa yang tertuang) ke kompetensi (bagaimana harus berpikir, belajar dan melakukan) dalam kurikulum. Oleh karena itu guru dan siswa diharapkan dapat mengetahui apa yang harus dicapai dan sejauh mana efektivitas belajar dicapai."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 40,
+          "teks": "Sejalan dengan itu, Finc dan Crukinton (Mulyasa, 2004: 38) mengartikan kompetensi sebagai penguasaan terhadap suatu tugas, keterampilan, sikap dan apresiasi yang diperlukan untuk menunjang keberhasilan. Menurut Sudjatmiko (2003) untuk menjadi kompeten dalam bidang tertentu, seseorang harus secara konsisten dan terus menerus menunjukkan kompetensi dalam bidang tersebut dalam cara berpikir dan berperilaku/bertindak sehari-hari.",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.44,
+            0.68,
+            0.69
+          ],
+          "konteks": {
+            "sebelum": [
+              "Dari definisi tersebut, dapat disimpulkan bahwa pengertian kurikulum secara luas adalah suatu rencana atau bahan tertulis yang sengaja disusun untuk dijadikan pedoman bagi pelaksanaan pendidikan yang berada di sekolah. Jadi kurikulum tidak hanya merupakan seperangkat mata pelajaran tetapi menyangkut pula bagaimana pelajaran itu diorganisasikan menjadi pengalaman yang berharga bagi siswa.",
+              "Kompetensi merupakan perpaduan dari pengetahuan, keterampilan, nilai dan sikap yang direfleksikan dalam kebiasaan berpikir dan bertindak. Kebiasaan berpikir dan bertindak secara konsisten dan terus menerus memungkinkan seseorang menjadi kompeten, dalam arti memiliki pengetahuan, keterampilan, dan nilai-nilai dasar untuk melakukan sesuatu.",
+              "Kompetensi diartikan sebagai pengetahuan, keterampilan dan kemampuan yang dikuasai oleh seseorang yang telah menjadi bagian dari dirinya, sehingga dapat melakukan perilaku-perilaku kognitif, afektif, dan psikomotorik dengan sebaik-baiknya (Mulyasa, 2004: 38)."
+            ],
+            "sesudah": [
+              "Kurikulum Berbasis Kompetensi (KBK) merupakan suatu format yang menetapkan apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan. Rumusan kompetensi dalam KBK adalah suatu pernyataan tentang apa yang diharapkan dapat diketahui, disikapi, atau dilakukan siswa dalam setiap tingkatan kelas dan sekolah dan sekaligus menggambarkan kemajuan siswa yang dicapai secara bertahap dan berkelanjutan untuk menjadi kompeten.",
+              "KBK merupakan pergeseran penekanan dan isi (apa yang tertuang) ke kompetensi (bagaimana harus berpikir, belajar dan melakukan) dalam kurikulum. Oleh karena itu guru dan siswa diharapkan dapat mengetahui apa yang harus dicapai dan sejauh mana efektivitas belajar dicapai.",
+              "KBK dapat diartikan sebagai suatu konsep kurikulum yang menekankan pada pengembangan kemampuan melakukan (kompetensi) tugas-tugas dengan standar performansi tertentu sehingga hasilnya dapat dirasakan oleh peserta didik berupa penguasaan terhadap seperangkat kompetensi tertentu (Mulyasa, 2004: 39)."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 41,
+          "teks": "Kurikulum Berbasis Kompetensi (KBK) merupakan suatu format yang menetapkan apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan. Rumusan kompetensi dalam KBK adalah suatu pernyataan tentang apa yang diharapkan dapat diketahui, disikapi, atau dilakukan siswa dalam setiap tingkatan kelas dan sekolah dan sekaligus menggambarkan kemajuan siswa yang dicapai secara bertahap dan berkelanjutan untuk menjadi kompeten.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "biasa"
+          ],
+          "conf": [
+            0.35,
+            0.4,
+            0.65
+          ],
+          "konteks": {
+            "sebelum": [
+              "Kompetensi merupakan perpaduan dari pengetahuan, keterampilan, nilai dan sikap yang direfleksikan dalam kebiasaan berpikir dan bertindak. Kebiasaan berpikir dan bertindak secara konsisten dan terus menerus memungkinkan seseorang menjadi kompeten, dalam arti memiliki pengetahuan, keterampilan, dan nilai-nilai dasar untuk melakukan sesuatu.",
+              "Kompetensi diartikan sebagai pengetahuan, keterampilan dan kemampuan yang dikuasai oleh seseorang yang telah menjadi bagian dari dirinya, sehingga dapat melakukan perilaku-perilaku kognitif, afektif, dan psikomotorik dengan sebaik-baiknya (Mulyasa, 2004: 38).",
+              "Sejalan dengan itu, Finc dan Crukinton (Mulyasa, 2004: 38) mengartikan kompetensi sebagai penguasaan terhadap suatu tugas, keterampilan, sikap dan apresiasi yang diperlukan untuk menunjang keberhasilan. Menurut Sudjatmiko (2003) untuk menjadi kompeten dalam bidang tertentu, seseorang harus secara konsisten dan terus menerus menunjukkan kompetensi dalam bidang tersebut dalam cara berpikir dan berperilaku/bertindak sehari-hari."
+            ],
+            "sesudah": [
+              "KBK merupakan pergeseran penekanan dan isi (apa yang tertuang) ke kompetensi (bagaimana harus berpikir, belajar dan melakukan) dalam kurikulum. Oleh karena itu guru dan siswa diharapkan dapat mengetahui apa yang harus dicapai dan sejauh mana efektivitas belajar dicapai.",
+              "KBK dapat diartikan sebagai suatu konsep kurikulum yang menekankan pada pengembangan kemampuan melakukan (kompetensi) tugas-tugas dengan standar performansi tertentu sehingga hasilnya dapat dirasakan oleh peserta didik berupa penguasaan terhadap seperangkat kompetensi tertentu (Mulyasa, 2004: 39).",
+              "Menurut Sudjatmiko (2003), KBK pada dasarnya merupakan format atau standar yang menetapkan kompetensi apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan kelas atau jenjang tertentu agar memiliki kecakapan hidup sesuai dengan tujuan pendidikan nasional. Dengan demikian, kurikulum ini merupakan pergeseran penekanan dari isi (apa yang tertuang) ke kompetensi (bagaimana berpikir, bersikap, belajar dan melakukan)."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 42,
+          "teks": "KBK merupakan pergeseran penekanan dan isi (apa yang tertuang) ke kompetensi (bagaimana harus berpikir, belajar dan melakukan) dalam kurikulum. Oleh karena itu guru dan siswa diharapkan dapat mengetahui apa yang harus dicapai dan sejauh mana efektivitas belajar dicapai.",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.44,
+            0.59,
+            0.52
+          ],
+          "konteks": {
+            "sebelum": [
+              "Kompetensi diartikan sebagai pengetahuan, keterampilan dan kemampuan yang dikuasai oleh seseorang yang telah menjadi bagian dari dirinya, sehingga dapat melakukan perilaku-perilaku kognitif, afektif, dan psikomotorik dengan sebaik-baiknya (Mulyasa, 2004: 38).",
+              "Sejalan dengan itu, Finc dan Crukinton (Mulyasa, 2004: 38) mengartikan kompetensi sebagai penguasaan terhadap suatu tugas, keterampilan, sikap dan apresiasi yang diperlukan untuk menunjang keberhasilan. Menurut Sudjatmiko (2003) untuk menjadi kompeten dalam bidang tertentu, seseorang harus secara konsisten dan terus menerus menunjukkan kompetensi dalam bidang tersebut dalam cara berpikir dan berperilaku/bertindak sehari-hari.",
+              "Kurikulum Berbasis Kompetensi (KBK) merupakan suatu format yang menetapkan apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan. Rumusan kompetensi dalam KBK adalah suatu pernyataan tentang apa yang diharapkan dapat diketahui, disikapi, atau dilakukan siswa dalam setiap tingkatan kelas dan sekolah dan sekaligus menggambarkan kemajuan siswa yang dicapai secara bertahap dan berkelanjutan untuk menjadi kompeten."
+            ],
+            "sesudah": [
+              "KBK dapat diartikan sebagai suatu konsep kurikulum yang menekankan pada pengembangan kemampuan melakukan (kompetensi) tugas-tugas dengan standar performansi tertentu sehingga hasilnya dapat dirasakan oleh peserta didik berupa penguasaan terhadap seperangkat kompetensi tertentu (Mulyasa, 2004: 39).",
+              "Menurut Sudjatmiko (2003), KBK pada dasarnya merupakan format atau standar yang menetapkan kompetensi apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan kelas atau jenjang tertentu agar memiliki kecakapan hidup sesuai dengan tujuan pendidikan nasional. Dengan demikian, kurikulum ini merupakan pergeseran penekanan dari isi (apa yang tertuang) ke kompetensi (bagaimana berpikir, bersikap, belajar dan melakukan).",
+              "Dari beberapa definisi di atas dapat disimpulkan bahwa KBK memfokuskan pada perolehan kompetensi-kompetensi oleh peserta didik karena itu kurikulum ini mencakup sejumlah kompetensi, dan seperangkat tujuan pembelajaran yang dinyatakan sedemikian rupa, sehingga pencapaian dapat diamati dalam bentuk perilaku atau keterampilan peserta didik sebagai suatu kriteria keberhasilan."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 43,
+          "teks": "KBK dapat diartikan sebagai suatu konsep kurikulum yang menekankan pada pengembangan kemampuan melakukan (kompetensi) tugas-tugas dengan standar performansi tertentu sehingga hasilnya dapat dirasakan oleh peserta didik berupa penguasaan terhadap seperangkat kompetensi tertentu (Mulyasa, 2004: 39).",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "paragraf"
+          ],
+          "conf": [
+            0.45,
+            0.4,
+            0.37
+          ],
+          "konteks": {
+            "sebelum": [
+              "Sejalan dengan itu, Finc dan Crukinton (Mulyasa, 2004: 38) mengartikan kompetensi sebagai penguasaan terhadap suatu tugas, keterampilan, sikap dan apresiasi yang diperlukan untuk menunjang keberhasilan. Menurut Sudjatmiko (2003) untuk menjadi kompeten dalam bidang tertentu, seseorang harus secara konsisten dan terus menerus menunjukkan kompetensi dalam bidang tersebut dalam cara berpikir dan berperilaku/bertindak sehari-hari.",
+              "Kurikulum Berbasis Kompetensi (KBK) merupakan suatu format yang menetapkan apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan. Rumusan kompetensi dalam KBK adalah suatu pernyataan tentang apa yang diharapkan dapat diketahui, disikapi, atau dilakukan siswa dalam setiap tingkatan kelas dan sekolah dan sekaligus menggambarkan kemajuan siswa yang dicapai secara bertahap dan berkelanjutan untuk menjadi kompeten.",
+              "KBK merupakan pergeseran penekanan dan isi (apa yang tertuang) ke kompetensi (bagaimana harus berpikir, belajar dan melakukan) dalam kurikulum. Oleh karena itu guru dan siswa diharapkan dapat mengetahui apa yang harus dicapai dan sejauh mana efektivitas belajar dicapai."
+            ],
+            "sesudah": [
+              "Menurut Sudjatmiko (2003), KBK pada dasarnya merupakan format atau standar yang menetapkan kompetensi apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan kelas atau jenjang tertentu agar memiliki kecakapan hidup sesuai dengan tujuan pendidikan nasional. Dengan demikian, kurikulum ini merupakan pergeseran penekanan dari isi (apa yang tertuang) ke kompetensi (bagaimana berpikir, bersikap, belajar dan melakukan).",
+              "Dari beberapa definisi di atas dapat disimpulkan bahwa KBK memfokuskan pada perolehan kompetensi-kompetensi oleh peserta didik karena itu kurikulum ini mencakup sejumlah kompetensi, dan seperangkat tujuan pembelajaran yang dinyatakan sedemikian rupa, sehingga pencapaian dapat diamati dalam bentuk perilaku atau keterampilan peserta didik sebagai suatu kriteria keberhasilan.",
+              "2. Karakteristik Kurikulum Berbasis Kompetensi"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 46,
+          "teks": "2. Karakteristik Kurikulum Berbasis Kompetensi",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.33,
+            0.91
+          ],
+          "konteks": {
+            "sebelum": [
+              "KBK dapat diartikan sebagai suatu konsep kurikulum yang menekankan pada pengembangan kemampuan melakukan (kompetensi) tugas-tugas dengan standar performansi tertentu sehingga hasilnya dapat dirasakan oleh peserta didik berupa penguasaan terhadap seperangkat kompetensi tertentu (Mulyasa, 2004: 39).",
+              "Menurut Sudjatmiko (2003), KBK pada dasarnya merupakan format atau standar yang menetapkan kompetensi apa yang diharapkan dapat dicapai siswa dalam setiap tingkatan kelas atau jenjang tertentu agar memiliki kecakapan hidup sesuai dengan tujuan pendidikan nasional. Dengan demikian, kurikulum ini merupakan pergeseran penekanan dari isi (apa yang tertuang) ke kompetensi (bagaimana berpikir, bersikap, belajar dan melakukan).",
+              "Dari beberapa definisi di atas dapat disimpulkan bahwa KBK memfokuskan pada perolehan kompetensi-kompetensi oleh peserta didik karena itu kurikulum ini mencakup sejumlah kompetensi, dan seperangkat tujuan pembelajaran yang dinyatakan sedemikian rupa, sehingga pencapaian dapat diamati dalam bentuk perilaku atau keterampilan peserta didik sebagai suatu kriteria keberhasilan."
+            ],
+            "sesudah": [
+              "Karakterstik KBK antara lain mencakup seleksi kompetensi yang sesuai, spesifikasi indikator-indikator evaluasi untuk menentukan kesuksesan pencapaian kompetensi, dan pengembangan sistem pembelajaran.",
+              "Depdiknas (2002) yang dikutip oleh Mulyasa (2004) mengemukakan bahwa KBK memiliki karakteristik: (a) menekankan pada ketercapaian kompetensi siswa baik secara individual maupun klaksikal, (b) berorientasi pada hasil belajar (learning outcomes) dan keberagaman, (c) penyampaian dalam pembelajaran menggunakan pendekatan dan metode yang bervariasi, (d) sumber belajar bukan hanya guru, tetapi juga sumber belajar lainnya yang memenuhi unsur edukatif, dan (e) penilaian menekankan pada proses dan hasil belajar dalam upaya penguasaan atau pencapaian suatu kompetensi.",
+              "Mulyasa (2004: 43) mengungkapkan bahwa karakteristik kurikulum berbasis kompetensi, yaitu:"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 63,
+          "teks": "KBK mengusahakan strategi belajar individual personal. Belajar individual adalah belajar berdasarkan tempo belajar peserta didik, sedangkan belajar personal adalah interaksi edukatif berdasarkan keunikan peserta didik: bakat, minat dan kemampuan (personalisasi).",
+          "suara": [
+            "subbab",
+            "paragraf"
+          ],
+          "conf": [
+            0.44,
+            0.64
+          ],
+          "konteks": {
+            "sebelum": [
+              "c. Pengalaman lapangan.",
+              "KBK lebih menekankan pada pengalaman lapangan untuk mengakrabkan hubungan antara guru dengan peserta didik. Keterlibatan anggota tim guru dalam pembelajaran di sekolah memudahkan mereka untuk mengikuti perkembangan yang terjadi selama peserta didik mengikuti pembelajaran. Di samping itu, pengalaman lapangan dapat sistematis melibatkan masyarakat dalam pengembangan program, aktivitas dan evaluasi pembelajaran.",
+              "d. Strategi belajar individual personal."
+            ],
+            "sesudah": [
+              "e. Kemudahan belajar.",
+              "Kemudahan belajar dalam KBK diberikan melalui kombinasi antara pembelajaran individual personal dengan pengalaman lapangan, dan pembelajaran secara tim (team teaching). Hal tersebut dilakukan melalui berbagai saluran komunikasi yang dirancang untuk itu, seperti video, televisi, radio, buletin, jurnal, dan surat kabar.",
+              "f. Belajar tuntas."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 65,
+          "teks": "Kemudahan belajar dalam KBK diberikan melalui kombinasi antara pembelajaran individual personal dengan pengalaman lapangan, dan pembelajaran secara tim (team teaching). Hal tersebut dilakukan melalui berbagai saluran komunikasi yang dirancang untuk itu, seperti video, televisi, radio, buletin, jurnal, dan surat kabar.",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.47,
+            0.43
+          ],
+          "konteks": {
+            "sebelum": [
+              "d. Strategi belajar individual personal.",
+              "KBK mengusahakan strategi belajar individual personal. Belajar individual adalah belajar berdasarkan tempo belajar peserta didik, sedangkan belajar personal adalah interaksi edukatif berdasarkan keunikan peserta didik: bakat, minat dan kemampuan (personalisasi).",
+              "e. Kemudahan belajar."
+            ],
+            "sesudah": [
+              "f. Belajar tuntas.",
+              "Belajar tuntas dalam KBK merupakan strategi pembelajaran yang dapat dilaksanakan di dalam kelas, dengan asumsi bahwa di dalam kondisi yang tepat semua peserta didik akan mampu belajar dengan baik dan memperoleh hasil belajar secara maksimal terhadap seluruh bahan yang dipelajari. Agar semua peserta didik memperoleh hasil belajar secara maksimal, pembelajaran harus dilaksanakan dengan sistimatis.",
+              "3. Pengembangan Kurikulum Berbasis Kompetensi"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 66,
+          "teks": "f. Belajar tuntas.",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.35,
+            0.35
+          ],
+          "konteks": {
+            "sebelum": [
+              "KBK mengusahakan strategi belajar individual personal. Belajar individual adalah belajar berdasarkan tempo belajar peserta didik, sedangkan belajar personal adalah interaksi edukatif berdasarkan keunikan peserta didik: bakat, minat dan kemampuan (personalisasi).",
+              "e. Kemudahan belajar.",
+              "Kemudahan belajar dalam KBK diberikan melalui kombinasi antara pembelajaran individual personal dengan pengalaman lapangan, dan pembelajaran secara tim (team teaching). Hal tersebut dilakukan melalui berbagai saluran komunikasi yang dirancang untuk itu, seperti video, televisi, radio, buletin, jurnal, dan surat kabar."
+            ],
+            "sesudah": [
+              "Belajar tuntas dalam KBK merupakan strategi pembelajaran yang dapat dilaksanakan di dalam kelas, dengan asumsi bahwa di dalam kondisi yang tepat semua peserta didik akan mampu belajar dengan baik dan memperoleh hasil belajar secara maksimal terhadap seluruh bahan yang dipelajari. Agar semua peserta didik memperoleh hasil belajar secara maksimal, pembelajaran harus dilaksanakan dengan sistimatis.",
+              "3. Pengembangan Kurikulum Berbasis Kompetensi",
+              "Pengembangan KBK memfokuskan pada kompetensi tertentu, berupa paduan pengetahuan, keterampilan dan sikap yang dapat didemonstrasikan oleh peserta didik sebagai wujud pemahaman terhadap konsep yang dipelajarinya."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 70,
+          "teks": "a. Tingkat pengembangan kurikulum.",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.49,
+            0.44
+          ],
+          "konteks": {
+            "sebelum": [
+              "Belajar tuntas dalam KBK merupakan strategi pembelajaran yang dapat dilaksanakan di dalam kelas, dengan asumsi bahwa di dalam kondisi yang tepat semua peserta didik akan mampu belajar dengan baik dan memperoleh hasil belajar secara maksimal terhadap seluruh bahan yang dipelajari. Agar semua peserta didik memperoleh hasil belajar secara maksimal, pembelajaran harus dilaksanakan dengan sistimatis.",
+              "3. Pengembangan Kurikulum Berbasis Kompetensi",
+              "Pengembangan KBK memfokuskan pada kompetensi tertentu, berupa paduan pengetahuan, keterampilan dan sikap yang dapat didemonstrasikan oleh peserta didik sebagai wujud pemahaman terhadap konsep yang dipelajarinya."
+            ],
+            "sesudah": [
+              "1) Pengembangan kurikulum tingkat Nasional",
+              "2) Pengembangan kurikulum tingkat lembaga",
+              "3) Pengembangan kurikulum tingkat bidang studi (penyusunan silabus)"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 77,
+          "teks": "4. Landasan Penerapan Kurikulum Berbasis Kompetensi",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.29,
+            0.51
+          ],
+          "konteks": {
+            "sebelum": [
+              "4) Pengembangan kurikulum tingkat satuan bahasan (modul)",
+              "b. Prinsip-prinsip pengembangan Kurikulum Berbasis Kompetensi.",
+              "Sesuai dengan kondisi negara, kebutuhan masyarakat, dan berbagai perkembangan serta perubahan yang berlangsung dewasa ini, maka dalam pengembangan KBK perlu memperhatikan dan mempertimbangkan prinsip-prinsip yaitu: (1) keimanan, nilai dan budi pekerti luhur, (2) penguatan integrasi nasional, (3) keseimbangan etika, logika, estetika, dan kinestetika, (4) kesamaan memperoleh kesempatan, (5) abad pengetahuan dan teknologi informasi,(6) pengembangan keterampilan untuk hidup, (7) belajar sepanjang hayat, (8) berpusat pada anak dengan penilaian yang berkelanjutan dan komperhensif , dan (9) pendekatan menyeluruh dan kemitraan."
+            ],
+            "sesudah": [
+              "Suderadjat (2004) mengatakan bahwa pendidikan adalah proses memanusiakan manusia melalui pembelajaran dalam bentuk aktualisasi potensi peserta didik menjadi suatu kemampuan atau kompetensi. Dalam istilah kompetensi, potensi adalah kemampuan yang masih terpendam, dan dalam istilah potensi, kompetensi adalah potensi yang telah aktual. Sudrajat melanjutkan bahwa potensi seseorang akan berubah menjadi kompetensi melalui proses belajar dan berlatih.",
+              "Kurikulum yang diterapkan di suatu negara tidak terlepas dari kebutuhan bangsa, masyarakat pemakai (Martinis Yamin, 2005: 128–129), maka kurikulum di Indonesia mengacu kepada:",
+              "a. Garis-garis Besar Haluan Negara (GBHN) tahun 1999 yang menegaskan perlunya didiversifikasi kurikulum yang dapat melayani keanekaragaman sumber daya manusia, kemampuan siswa, sarana pembelajaran, dan budaya daerah."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 80,
+          "teks": "a. Garis-garis Besar Haluan Negara (GBHN) tahun 1999 yang menegaskan perlunya didiversifikasi kurikulum yang dapat melayani keanekaragaman sumber daya manusia, kemampuan siswa, sarana pembelajaran, dan budaya daerah.",
+          "suara": [
+            "biasa",
+            "subbab"
+          ],
+          "conf": [
+            0.27,
+            0.27
+          ],
+          "konteks": {
+            "sebelum": [
+              "4. Landasan Penerapan Kurikulum Berbasis Kompetensi",
+              "Suderadjat (2004) mengatakan bahwa pendidikan adalah proses memanusiakan manusia melalui pembelajaran dalam bentuk aktualisasi potensi peserta didik menjadi suatu kemampuan atau kompetensi. Dalam istilah kompetensi, potensi adalah kemampuan yang masih terpendam, dan dalam istilah potensi, kompetensi adalah potensi yang telah aktual. Sudrajat melanjutkan bahwa potensi seseorang akan berubah menjadi kompetensi melalui proses belajar dan berlatih.",
+              "Kurikulum yang diterapkan di suatu negara tidak terlepas dari kebutuhan bangsa, masyarakat pemakai (Martinis Yamin, 2005: 128–129), maka kurikulum di Indonesia mengacu kepada:"
+            ],
+            "sesudah": [
+              "b. Undang-Undang Nomor 22 tahun 1999 (Pasal 4) tentang pemerintahan daerah yang menegaskan adanya kewenangan daerah provinsi, kabupaten, dan kota untuk mengatur dan mengurus kepentingan masyarakat setempat menurut prakarsa sendiri berdasarkan aspirasi masyarakat.",
+              "c. Undang-Undang Sistim Pendidikan Nasional (Sisdiknas) nomor 20 tahun 2003 Bab IX (pasal 35) ayat (1) bahwa standar pendidikan terdiri atas isi, proses, kompetensi lulusan, tenaga kependidikan, sarana dan prasarana, pengelolaan, pembiayaan, dan penilaian pendidikan yang harus ditingkatkan secara berencana dan berkala. Ayat (2) standar nasional pendidikan digunakan sebagai acuan pengembangan kurikulum, tenaga kependidikan, sarana dan prasarana, pengelolaan, pembiayaan. Demikian juga pada Bab X (pasal 36) ayat (2) kurikulum pada semua jenjang dan jenis pendidikan dikembangkan dengan prinsip diversifikasi sesusai dengan satuan pendidikan, potensi, daerah, dan peserta didik.",
+              "5. Implementasi Kurikulum Berbasis Kompetensi"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 89,
+          "teks": "Program tahunan merupakan program umum setiap mata pelajaran untuk setiap kelas, yang dikembangkan oleh guru sebelum tahun ajaran, karena merupakan pedoman bagi pengembangan program-program berikutnya.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.19,
+            0.64,
+            0.72
+          ],
+          "konteks": {
+            "sebelum": [
+              "a. Pengembangan program.",
+              "Pengembangan KBK mencakup pengembangan program tahunan, program semester, program modul (pokok bahasan), program mingguan dan harian, program pengayaan dan remedial, serta program bimbingan dan konseling.",
+              "1) Program tahunan."
+            ],
+            "sesudah": [
+              "2) Program semester.",
+              "Program semester berisikan garis-garis besar mengenai hal-hal yang hendak dilaksanakan dan dicapai dalam semester tersebut.",
+              "3) Program modul (pokok bahasan)."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 96,
+          "teks": "5) Program pengayaan dan remedial",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.4,
+            0.4,
+            0.39
+          ],
+          "konteks": {
+            "sebelum": [
+              "Program modul dikembangkan dari setiap kompetensi dan pokok bahasan yang akan disampaiakan.",
+              "4) Program mingguan dan harian.",
+              "Program mingguan dan harian merupakan penjabaran dari program semester dan program modul yang bertujuan untuk membantu kemajuan belajar peserta didik."
+            ],
+            "sesudah": [
+              "Program pengayaan dan remedial merupakan pelengkap dan penjabaran dari program mingguan dan harian.",
+              "6) Program bimbingan dan konseling.",
+              "Program bimbingan dan konseling merupakan program yang wajib diberikan oleh sekolah kepada peserta didik yang menyangkut pribadi, sosial, belajar dan karier."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 97,
+          "teks": "Program pengayaan dan remedial merupakan pelengkap dan penjabaran dari program mingguan dan harian.",
+          "suara": [
+            "subbab",
+            "paragraf"
+          ],
+          "conf": [
+            0.27,
+            0.52
+          ],
+          "konteks": {
+            "sebelum": [
+              "4) Program mingguan dan harian.",
+              "Program mingguan dan harian merupakan penjabaran dari program semester dan program modul yang bertujuan untuk membantu kemajuan belajar peserta didik.",
+              "5) Program pengayaan dan remedial"
+            ],
+            "sesudah": [
+              "6) Program bimbingan dan konseling.",
+              "Program bimbingan dan konseling merupakan program yang wajib diberikan oleh sekolah kepada peserta didik yang menyangkut pribadi, sosial, belajar dan karier.",
+              "b. Pelaksanaan pembelajaran."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 102,
+          "teks": "c. Evaluasi hasil belajar.",
+          "suara": [
+            "biasa",
+            "subbab"
+          ],
+          "conf": [
+            0.43,
+            0.81
+          ],
+          "konteks": {
+            "sebelum": [
+              "Program bimbingan dan konseling merupakan program yang wajib diberikan oleh sekolah kepada peserta didik yang menyangkut pribadi, sosial, belajar dan karier.",
+              "b. Pelaksanaan pembelajaran.",
+              "Pembelajaran pada hakekatnya adalah proses interaksi antara peserta didik dengan lingkungannya, sehingga terjadi perubahan perilaku ke arah yang lebih baik. Dalam pembelajaran, tugas guru yang paling utama adalah mengkondisikan lingkungan agar menunjang terjadinya perubahan perilaku bagi peserta didik. Oleh karena itu, dalam melakukan pembelajaran guru memerlukan berbagai strategi. Strategi pembelajaran pada KBK hendaknya menggunakan pendekatan dan metode yang bervariatif (konstruktivisme, inquiry, discovery, contextual learning) sehingga: (1) siswa lebih aktif, (2) iklim pembelajaran menyenangkan, (3) fungsi guru bergeser dari pemberi informasi menjadai fasilitator, (4) materi terkait dengan lingkungan siswa, (5) siswa terbiasa mencari informasi dari berbagai sumber, dan (6) menggeser paradigma pembelajaran dari “teaching” menjadi “learning”."
+            ],
+            "sesudah": [
+              "Evaluasi hasil belajar dalam implementasi KBK dilakukan dengan penilaian kelas, tes kemampuan dasar, penilaian akhir satuan pendidikan dan sertifikasi, benchmarking, dan penilaian program.",
+              "Penilaian kelas dilakukan dengan ulangan harian, ulangan umum, dan ujian akhir. Ulangan harian dilakukan setiap selesai proses pembelajaran dalam satuan bahasan atau kompetensi tertentu. Ulangan harian minimal dilakukan tiga kali dalam tiap semester.",
+              "Ulangan umum dilaksanakan setiap akhir semester, dengan bahan yang diujikan yaitu; ulangan umum semester pertama soalnya diambil dari materi semester pertama, ulangan umum semester kedua soalnya merupakan gabungan dari materi semester pertama dan kedua, dengan penekanan pada materi semester kedua."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 104,
+          "teks": "Penilaian kelas dilakukan dengan ulangan harian, ulangan umum, dan ujian akhir. Ulangan harian dilakukan setiap selesai proses pembelajaran dalam satuan bahasan atau kompetensi tertentu. Ulangan harian minimal dilakukan tiga kali dalam tiap semester.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "biasa"
+          ],
+          "conf": [
+            0.49,
+            0.51,
+            0.45
+          ],
+          "konteks": {
+            "sebelum": [
+              "Pembelajaran pada hakekatnya adalah proses interaksi antara peserta didik dengan lingkungannya, sehingga terjadi perubahan perilaku ke arah yang lebih baik. Dalam pembelajaran, tugas guru yang paling utama adalah mengkondisikan lingkungan agar menunjang terjadinya perubahan perilaku bagi peserta didik. Oleh karena itu, dalam melakukan pembelajaran guru memerlukan berbagai strategi. Strategi pembelajaran pada KBK hendaknya menggunakan pendekatan dan metode yang bervariatif (konstruktivisme, inquiry, discovery, contextual learning) sehingga: (1) siswa lebih aktif, (2) iklim pembelajaran menyenangkan, (3) fungsi guru bergeser dari pemberi informasi menjadai fasilitator, (4) materi terkait dengan lingkungan siswa, (5) siswa terbiasa mencari informasi dari berbagai sumber, dan (6) menggeser paradigma pembelajaran dari “teaching” menjadi “learning”.",
+              "c. Evaluasi hasil belajar.",
+              "Evaluasi hasil belajar dalam implementasi KBK dilakukan dengan penilaian kelas, tes kemampuan dasar, penilaian akhir satuan pendidikan dan sertifikasi, benchmarking, dan penilaian program."
+            ],
+            "sesudah": [
+              "Ulangan umum dilaksanakan setiap akhir semester, dengan bahan yang diujikan yaitu; ulangan umum semester pertama soalnya diambil dari materi semester pertama, ulangan umum semester kedua soalnya merupakan gabungan dari materi semester pertama dan kedua, dengan penekanan pada materi semester kedua.",
+              "Ujian akhir dilakukan pada akhir program pendidikan. Bahan-bahan yang diujikan meliputi seluruh materi modul yang telah diberikan, dengan penekanan pada bahan-bahan yang diberikan pada kelas-kelas tinggi. Sementara penilaian kelas dilakukan oleh guru untuk mengetahui kemajuan dan hasil belajar peserta didik, mendiagnosa kesulitan belajar, memberikan umpan balik untuk perbaikan proses pembelajaran, dan penentuan kenaikan kelas.",
+              "Tes kemampuan dasar dilakukan untuk mengetahui kemampuan membaca, menulis dan berhitung yang diperlukan dalam rangka memperbaiki program pembelajaran (program remedial). Tes kemampuan dasar dilakukan pada setiap tahun."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 110,
+          "teks": "Penilaian program dilakukan oleh Departemen Pendidikan Nasional dan Dinas Pendidikan secara kontinu dan berkesinambungan. Penilaian program dilakukan untuk mengetahui kesesuaian kurikulum dengan dasar, fungsi dan tujuan pendidikan nasional, serta kesesuaiannya dengan tuntutan perkembangan masyarakat, dan kemajuan jaman.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "biasa"
+          ],
+          "conf": [
+            0.2,
+            0.39,
+            0.57
+          ],
+          "konteks": {
+            "sebelum": [
+              "Tes kemampuan dasar dilakukan untuk mengetahui kemampuan membaca, menulis dan berhitung yang diperlukan dalam rangka memperbaiki program pembelajaran (program remedial). Tes kemampuan dasar dilakukan pada setiap tahun.",
+              "Penilaian akhir satuan pendidikan dan sertifikasi, dilakukan pada setiap akhir semester dan tahun pelajaran, guna mendapatkan gambaran secara utuh dan menyeluruh mengenai ketuntasan belajar peserta didik dalam satuan waktu tertentu.",
+              "Benchmarking merupakan suatu standar untuk mengukur kinerja yang sedang berjalan, proses, dan hasil untuk mencapai suatu keunggulan yang memuaskan. Ukuran keunggulan dapat ditentukan di tingkat sekolah, daerah, atau nasional. Penilaian dilaksanakan secara berkesinambungan sehingga peserta didik dapat mencapai satuan tahap keunggulan pembelajaran yang sesuai dengan kemampuan usaha dan keuletannya."
+            ],
+            "sesudah": [
+              "6. Peranan Kepala Sekolah dan Guru dalam pengembangan kurikulum",
+              "a. Kepala Sekolah.",
+              "Keberhasilan KBK dengan beberapa indikatornya sangat ditentukan oleh kepala sekolah dalam mengkoordinasikan, menggerakkan, dan menselaraskan semua sumber daya pendidikan yang tersedia. Kepemimpinan kepala sekolah merupakan salah satu faktor yang dapat mendorong sekolah untuk dapat mewujudkan visi, misi, tujuan, dan sasaran sekolah melalui program-program yang dilaksanakan secara terencana dan bertahap. Oleh karena itu, kepala sekolah dituntut memiliki kemampuan manajemen dan kepemimpinan yang tangguh agar mampu mengambil keputusan dan prakarsa untuk meningkatkan mutu sekolah."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 112,
+          "teks": "a. Kepala Sekolah.",
+          "suara": [
+            "biasa",
+            "subbab"
+          ],
+          "conf": [
+            0.45,
+            0.85
+          ],
+          "konteks": {
+            "sebelum": [
+              "Benchmarking merupakan suatu standar untuk mengukur kinerja yang sedang berjalan, proses, dan hasil untuk mencapai suatu keunggulan yang memuaskan. Ukuran keunggulan dapat ditentukan di tingkat sekolah, daerah, atau nasional. Penilaian dilaksanakan secara berkesinambungan sehingga peserta didik dapat mencapai satuan tahap keunggulan pembelajaran yang sesuai dengan kemampuan usaha dan keuletannya.",
+              "Penilaian program dilakukan oleh Departemen Pendidikan Nasional dan Dinas Pendidikan secara kontinu dan berkesinambungan. Penilaian program dilakukan untuk mengetahui kesesuaian kurikulum dengan dasar, fungsi dan tujuan pendidikan nasional, serta kesesuaiannya dengan tuntutan perkembangan masyarakat, dan kemajuan jaman.",
+              "6. Peranan Kepala Sekolah dan Guru dalam pengembangan kurikulum"
+            ],
+            "sesudah": [
+              "Keberhasilan KBK dengan beberapa indikatornya sangat ditentukan oleh kepala sekolah dalam mengkoordinasikan, menggerakkan, dan menselaraskan semua sumber daya pendidikan yang tersedia. Kepemimpinan kepala sekolah merupakan salah satu faktor yang dapat mendorong sekolah untuk dapat mewujudkan visi, misi, tujuan, dan sasaran sekolah melalui program-program yang dilaksanakan secara terencana dan bertahap. Oleh karena itu, kepala sekolah dituntut memiliki kemampuan manajemen dan kepemimpinan yang tangguh agar mampu mengambil keputusan dan prakarsa untuk meningkatkan mutu sekolah.",
+              "Untuk kepentingan tersebut, kepala sekolah harus mampu memobilisasi sumber daya sekolah. Dalam kaitannya dengan perencanaan dan evaluasi program sekolah, pengembangan kurikulum, pembelajaran, pengelolaan ketenagaan, sarana dan sumber belajar, keuangan, pelayanan siswa, hubungan sekolah dengan masyarakat, dan penciptaan iklim sekolah.",
+              "b. Guru."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 115,
+          "teks": "b. Guru.",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.15,
+            0.39
+          ],
+          "konteks": {
+            "sebelum": [
+              "a. Kepala Sekolah.",
+              "Keberhasilan KBK dengan beberapa indikatornya sangat ditentukan oleh kepala sekolah dalam mengkoordinasikan, menggerakkan, dan menselaraskan semua sumber daya pendidikan yang tersedia. Kepemimpinan kepala sekolah merupakan salah satu faktor yang dapat mendorong sekolah untuk dapat mewujudkan visi, misi, tujuan, dan sasaran sekolah melalui program-program yang dilaksanakan secara terencana dan bertahap. Oleh karena itu, kepala sekolah dituntut memiliki kemampuan manajemen dan kepemimpinan yang tangguh agar mampu mengambil keputusan dan prakarsa untuk meningkatkan mutu sekolah.",
+              "Untuk kepentingan tersebut, kepala sekolah harus mampu memobilisasi sumber daya sekolah. Dalam kaitannya dengan perencanaan dan evaluasi program sekolah, pengembangan kurikulum, pembelajaran, pengelolaan ketenagaan, sarana dan sumber belajar, keuangan, pelayanan siswa, hubungan sekolah dengan masyarakat, dan penciptaan iklim sekolah."
+            ],
+            "sesudah": [
+              "Guru merupakan faktor penting yang besar pengaruhnya terhadap keberhasilan penerapan KBK, bahkan sangat menentukan berhasil-tidaknya peserta didik dalam belajar. Berdasarkan hal tersebut, ada beberapa hal yang harus dipahami guru dari peserta didik, antara lain: kemampuan potensi, minat, hoby, sikap, kepribadian, kebiasaan, catatan kesehatan, latar belakang keluarga, dan kegiatannya di sekolah. Moh. Uzer Usman (2001) mengatakan bahwa guru berperan sebagai pengelola proses belajar mengajar.",
+              "Agar implementasi KBK berhasil memperhatikan perbedaan individual, maka guru perlu memperhatikan hal-hal berikut: (1) mengurangi metode ceramah, (2) memberikan tugas yang berbeda bagi setiap peserta didik, (3) mengelompokkan peserta didik berdasarkan kemampuannya, serta disesuaikan dengan mata pelajaran, (4) bahan harus dimodifikasi dan diperkaya, (5) menghindari ragu untuk berhubungan dengan spesialist, bila ada peserta didik yang mempunyai kelainan, (6) menggunakan prosedur yang bervariasi dalam membuat penilaian dan membuat laporan, (7) mengingat bahwa peserta didik tidak berkembang dalam kecepatan yang sama, (8) mengusahakan mengembangkan situasi belajar yang memungkinkan setiap anak bekerja dengan kemampuannya masing-masing pada tiap pelajaran, dan (9) mengusahakan untuk melibatkan peserta didik dalam berbagai kegiatan.",
+              "7. Perbedaan dan keunggulan Kurikulum 2004 dengan Kurikulum 1994"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 122,
+          "teks": "NO",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.21,
+            0.68,
+            0.79
+          ],
+          "konteks": {
+            "sebelum": [
+              "a. Perbedaan KBK dengan Kurikulum 1994.",
+              "Perbedaan Kurikulum Berbasis Kompetensi dengan kurikulum 1994 disajikan dalam tabel berikut ini:",
+              "Tabel 2. 1 Perbedaan Kurikulum Berbasis Kompetensi dengan Kurikulum 1994."
+            ],
+            "sesudah": [
+              "KURIKULUM 1994",
+              "KBK",
+              "1"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 123,
+          "teks": "KURIKULUM 1994",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.48,
+            0.4
+          ],
+          "konteks": {
+            "sebelum": [
+              "Perbedaan Kurikulum Berbasis Kompetensi dengan kurikulum 1994 disajikan dalam tabel berikut ini:",
+              "Tabel 2. 1 Perbedaan Kurikulum Berbasis Kompetensi dengan Kurikulum 1994.",
+              "NO"
+            ],
+            "sesudah": [
+              "KBK",
+              "1",
+              "Penggunaan pendekatan penguasaan ilmu pengetahuan, yang menekankan pada isi, atau materi berupa pengetahuan, pemahaman, aplikasi, analisis, sintesis, dan evaluasi yang diambil dari bidang-bidang ilmu pengetahuan."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 124,
+          "teks": "KBK",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.33,
+            0.61
+          ],
+          "konteks": {
+            "sebelum": [
+              "Tabel 2. 1 Perbedaan Kurikulum Berbasis Kompetensi dengan Kurikulum 1994.",
+              "NO",
+              "KURIKULUM 1994"
+            ],
+            "sesudah": [
+              "1",
+              "Penggunaan pendekatan penguasaan ilmu pengetahuan, yang menekankan pada isi, atau materi berupa pengetahuan, pemahaman, aplikasi, analisis, sintesis, dan evaluasi yang diambil dari bidang-bidang ilmu pengetahuan.",
+              "Penggunaan pendekatan kompetensi yang menekankan pada pemahaman, kemampuan atau kompetensi tertentu di sekolah, yang berkaitan dengan pekerjaan yang ada di masyarakat."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 130,
+          "teks": "Standar akademis yang memperhatikan perbedaan individu, baik kemampuan, kecepatan belajar maupun konteks sosial budaya.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "biasa"
+          ],
+          "conf": [
+            0.49,
+            0.37,
+            0.48
+          ],
+          "konteks": {
+            "sebelum": [
+              "Penggunaan pendekatan kompetensi yang menekankan pada pemahaman, kemampuan atau kompetensi tertentu di sekolah, yang berkaitan dengan pekerjaan yang ada di masyarakat.",
+              "2",
+              "Standar akademis yang diterapkan secara seragam bagi setiap peserta didik."
+            ],
+            "sesudah": [
+              "3",
+              "Berbasis konten, sehingga peserta didik dipandang sebagai kertas putih yang perlu ditulis dengan sejumlah ilmu pengetahuan.",
+              "Berbasis kompetensi, sehingga peserta didik berada dalam proses perkembangan yang berkelanjutan dari seluruh aspek kepribadian, sebagai pemekaran terhadap kompetensi-kompetensi bawaan sesuai dengan kesempatan belajar yang ada dan diberikan oleh lingkungan."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 135,
+          "teks": "Pengembangan kurikulum dilakukan secara sentralisasi sehingga Depdiknas memonopoli pengembangan ide dan konsepsi kurikulum.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.47,
+            0.4,
+            0.44
+          ],
+          "konteks": {
+            "sebelum": [
+              "Berbasis konten, sehingga peserta didik dipandang sebagai kertas putih yang perlu ditulis dengan sejumlah ilmu pengetahuan.",
+              "Berbasis kompetensi, sehingga peserta didik berada dalam proses perkembangan yang berkelanjutan dari seluruh aspek kepribadian, sebagai pemekaran terhadap kompetensi-kompetensi bawaan sesuai dengan kesempatan belajar yang ada dan diberikan oleh lingkungan.",
+              "4"
+            ],
+            "sesudah": [
+              "Pengembangan kurikulum dilakukan secara desentralisasi sehingga pemerintah bersama-sama menentukan standar pendidikan yang dituangkan ke dalam kurikulum.",
+              "5",
+              "Materi yang dikembangkan dan diajarkan di sekolah sering kali tidak sesuai dengan potensi sekolah, kebutuhan dan kemampuan peseta didik, serta kebutuhan masyarakat di sekitar sekolah."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 141,
+          "teks": "Guru merupakan yang menentukan segala sesuatu yang terjadi di dalam kelas.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.49,
+            0.56,
+            0.56
+          ],
+          "konteks": {
+            "sebelum": [
+              "Materi yang dikembangkan dan diajarkan di sekolah sering kali tidak sesuai dengan potensi sekolah, kebutuhan dan kemampuan peseta didik, serta kebutuhan masyarakat di sekitar sekolah.",
+              "Sekolah diberi keleluasaan untuk menyusun dan mengembangkan silabus mata pelajaran sehingga dapat mengakomodasi potensi sekolah, kebutuhan dan kemampuan peserta didik, serta kebutuhan masyarakata sekitar sekolah.",
+              "6"
+            ],
+            "sesudah": [
+              "Guru sebagai fasilitator yang bertugas mengkondisikan lingkungan untuk memberikan kemudahan belajar peserta didik.",
+              "7",
+              "Pengetahuan, keterampuilan, dan sikap dikembangkan melalui latihan, seperti latihan mengerjakan soal."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 150,
+          "teks": "Evaluasi nasional yang tidak dapat menyentuh aspek-aspek kepribadian peserta didik.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "biasa"
+          ],
+          "conf": [
+            0.49,
+            0.49,
+            0.41
+          ],
+          "konteks": {
+            "sebelum": [
+              "Pembelajaran cenderung hanya dilakukan di dalam kelas, atau dibatasi oleh 4 dinding kelas.",
+              "Pembelajaran yang dilakukan mendorong terjadinya kerja sama antara sekolah, masyarakat, dan dunia kerja dalam membentuk komposisi peserta didik.",
+              "9"
+            ],
+            "sesudah": [
+              "Evaluasi berbasis kelas, yang menekankan pada proses dan hasil belajar.",
+              "Sumber: Mulyasa; 2004",
+              "b. Keunggulan KBK."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 160,
+          "teks": "1) Perencanaan. Dalam perencanaan ini tim pengembang silabus mengumpulkan informasi dan reverensi, serta mengidentifikasi sumber belajar termasuk nara sumber yang diperlukan dalam pengembangan silabus.",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "paragraf"
+          ],
+          "conf": [
+            0.43,
+            0.27,
+            0.37
+          ],
+          "konteks": {
+            "sebelum": [
+              "Penyusunan silabus dapat dilakukan dengan melibatkan para ahli atau instansi yang relevan di daerah setempat seperti tokoh masyarakat, instansi pemerintah, instansi swasta termasuk perusahaan dan industri, dan perguruan tinggi. Bantuan dan bimbingan teknisi untuk penyusunan silabus sepanjang diperlukan dapat diberikan oleh pusat kurikulum.",
+              "a. Prosedur pengembangan silabus KBK.",
+              "Untuk memberi kemudahan kepada daerah dan sekolah dalam mengembangkan silabus maka dirasakan perlu menyajikan prosedur pengembangan silabus KBK, yang mencakup perencanaan, pelaksanaan, dan revisi."
+            ],
+            "sesudah": [
+              "2) Pelaksanaan. Pelaksanaan penyusunan silabus dapat dilakukan dengan langkah-langkah yaitu; merumuskan kompetensi dan tujuan pembelajaran, serta menentukan materi pembelajaran yang memuat kompetensi dasar, hasil belajar, dan indikator hasil belajar; menentukan metode dan teknik pembelajaran sesuai dengan model pembelajaran; dan menentukan alat penilaian berbasis kelas sesuai dengan misi KBK.",
+              "3) Revisi. Draft silabus yang telah dikembangkan perlu diuji kelayakannya melalui analisis kualitas silabus, penilaian ahli, dan uji lapangan. Berdasarkan uji kelayakan kemudian dilakukan revisi. Revisi ini pada hakikatnya perlu dilakukan secara kontinyu dan berkesinambungan, sejak awal penyusunan draft sampai silabus tersebut dilaksanakan dalam situasi belajar yang sebenarnya",
+              "b. Peran dan Tanggung Jawab Berbagai Pihak dalam Pengembangan Silabus."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 172,
+          "teks": "James dan James (1976) dalam kamus matematikanya mengatakan bahwa matematika adalah ilmu tentang logika mengenai bentuk, susunan, besaran, dan konsep-konsep yang berhubungan satu dengan yang lainnya dengan jumlah yang banyak yang terbagi ke dalam tiga bidang, yaitu aljabar, analisis dan geometri.",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.36,
+            0.65,
+            0.56
+          ],
+          "konteks": {
+            "sebelum": [
+              "10. Kurikulum Berbasis Kompetensi Mata Pelajaran Matematika",
+              "a. Pengertian matematika.",
+              "Istilah mathematics (Inggris), mathematik (Jerman), mathematique (Perancis), matematico (Itali), matematiceski (Rusia), atau mathematick (Belanda) berasal dari perkataan latin mathematica, yang mulanya diambil dari perkataan Yunani, mathematike, yang berarti “relating to learning”. Perkataan mathematike berhubungan sangat erat dengan sebuah kata lainnya yang serupa, yaitu mathanein yang mengandung arti belajar (berpikir). Jadi berdasarkan etimologis (Elea Tinggih dalam Erman Suherman, 2003:16), perkataan matematika berarti “ilmu pengetahuan yang diperoleh dengan bernalar”."
+            ],
+            "sesudah": [
+              "Johnson dan Rising (1972) dalam bukunya mengatakan bahwa matematika adalah pola pikir, pola mengorganisasikan, pembuktian yang logik, matematika itu adalah bahasa yang menggunakan istilah yang didefinisikan dengan cermat, jelas, dan akurat, representasinya dengan simbol dan padat, lebih berupa bahasa simbol mengenai ide dari pada mengenai bunyi. Sementara Reys, dkk. (1984) mengatakan bahwa matematika adalah telaah tentang pola dan hubungan, suatu jalan atau pola pikir, suatu seni, suatu bahasa, dan suatu alat.",
+              "Berdasarkan pendapat di atas, maka disimpulkan bahwa ciri yang sangat penting dalam matematika adalah disiplin berpikir yang didasarkan pada berpikir logis, konsisten, inovatif dan kreatif.",
+              "b. Fungsi dan tujuan."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 180,
+          "teks": "3) Kemampuan menggunakan matematika sebagai cara bernalar yang dapat dialihgunakan pada setiap keadaan, seperti berpikir kritis, berpikir logis, berpikir sistematis, bersifat objektif, bersifat jujur, bersifat disiplin dalam memandang dan menyelesaikan suatu masalah.",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.43,
+            0.72
+          ],
+          "konteks": {
+            "sebelum": [
+              "Tujuan umum pendidikan matematika ditekankan kepada siswa untuk memiliki:",
+              "1) Kemampuan yang berkaitan dengan matematika yang dapat digunakan dalam memecahkan masalah matematika, pelajaran lain ataupun masalah yang berkaitan dengan kehidupan nyata.",
+              "2) Kemampuan menggunakan matematika sebagai alat komunikasi."
+            ],
+            "sesudah": [
+              "c. Ruang lingkup.",
+              "Standar kompetensi matematika merupakan seperangkat kompetensi matematika yang dibukukan dan harus ditunjukkan oleh siswa pada hasil belajarnya dalam mata pelajaran matematika. Standar ini dirinci dalam komponen kompetensi dasar beserta hasil belajarnya, indikator dan materi pokok untuk setiap aspeknya. Pengorganisasian dan pengelompokan materi pada materi didasarkan menurut disiplin ilmunya atau didasarkan menurut kemahiran atau kecakapan yang hendak dicapai. Aspek atau ruang lingkup materi pada standar kompetensi matematika adalah bilangan, pengukuran dan geometri, aljabar, trigonometri, peluang dan statistik, dan kalkulus.",
+              ""
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 181,
+          "teks": "c. Ruang lingkup.",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.32,
+            0.67
+          ],
+          "konteks": {
+            "sebelum": [
+              "1) Kemampuan yang berkaitan dengan matematika yang dapat digunakan dalam memecahkan masalah matematika, pelajaran lain ataupun masalah yang berkaitan dengan kehidupan nyata.",
+              "2) Kemampuan menggunakan matematika sebagai alat komunikasi.",
+              "3) Kemampuan menggunakan matematika sebagai cara bernalar yang dapat dialihgunakan pada setiap keadaan, seperti berpikir kritis, berpikir logis, berpikir sistematis, bersifat objektif, bersifat jujur, bersifat disiplin dalam memandang dan menyelesaikan suatu masalah."
+            ],
+            "sesudah": [
+              "Standar kompetensi matematika merupakan seperangkat kompetensi matematika yang dibukukan dan harus ditunjukkan oleh siswa pada hasil belajarnya dalam mata pelajaran matematika. Standar ini dirinci dalam komponen kompetensi dasar beserta hasil belajarnya, indikator dan materi pokok untuk setiap aspeknya. Pengorganisasian dan pengelompokan materi pada materi didasarkan menurut disiplin ilmunya atau didasarkan menurut kemahiran atau kecakapan yang hendak dicapai. Aspek atau ruang lingkup materi pada standar kompetensi matematika adalah bilangan, pengukuran dan geometri, aljabar, trigonometri, peluang dan statistik, dan kalkulus.",
+              "",
+              "d. Standar Kompetensi Mata Pelajaran Matematika."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 182,
+          "teks": "Standar kompetensi matematika merupakan seperangkat kompetensi matematika yang dibukukan dan harus ditunjukkan oleh siswa pada hasil belajarnya dalam mata pelajaran matematika. Standar ini dirinci dalam komponen kompetensi dasar beserta hasil belajarnya, indikator dan materi pokok untuk setiap aspeknya. Pengorganisasian dan pengelompokan materi pada materi didasarkan menurut disiplin ilmunya atau didasarkan menurut kemahiran atau kecakapan yang hendak dicapai. Aspek atau ruang lingkup materi pada standar kompetensi matematika adalah bilangan, pengukuran dan geometri, aljabar, trigonometri, peluang dan statistik, dan kalkulus.",
+          "suara": [
+            "subbab",
+            "paragraf"
+          ],
+          "conf": [
+            0.24,
+            0.48
+          ],
+          "konteks": {
+            "sebelum": [
+              "2) Kemampuan menggunakan matematika sebagai alat komunikasi.",
+              "3) Kemampuan menggunakan matematika sebagai cara bernalar yang dapat dialihgunakan pada setiap keadaan, seperti berpikir kritis, berpikir logis, berpikir sistematis, bersifat objektif, bersifat jujur, bersifat disiplin dalam memandang dan menyelesaikan suatu masalah.",
+              "c. Ruang lingkup."
+            ],
+            "sesudah": [
+              "",
+              "d. Standar Kompetensi Mata Pelajaran Matematika.",
+              "Untuk mata pelajaran matematika di SMA, telah dirumuskan sembilan standar kompetensi (Direktorat Pendidikan Menengah Umum, Ditjen. Dikdasmen, Depdiknas; 2003:2) sebagai berikut:"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 184,
+          "teks": "d. Standar Kompetensi Mata Pelajaran Matematika.",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.36,
+            0.71
+          ],
+          "konteks": {
+            "sebelum": [
+              "c. Ruang lingkup.",
+              "Standar kompetensi matematika merupakan seperangkat kompetensi matematika yang dibukukan dan harus ditunjukkan oleh siswa pada hasil belajarnya dalam mata pelajaran matematika. Standar ini dirinci dalam komponen kompetensi dasar beserta hasil belajarnya, indikator dan materi pokok untuk setiap aspeknya. Pengorganisasian dan pengelompokan materi pada materi didasarkan menurut disiplin ilmunya atau didasarkan menurut kemahiran atau kecakapan yang hendak dicapai. Aspek atau ruang lingkup materi pada standar kompetensi matematika adalah bilangan, pengukuran dan geometri, aljabar, trigonometri, peluang dan statistik, dan kalkulus.",
+              ""
+            ],
+            "sesudah": [
+              "Untuk mata pelajaran matematika di SMA, telah dirumuskan sembilan standar kompetensi (Direktorat Pendidikan Menengah Umum, Ditjen. Dikdasmen, Depdiknas; 2003:2) sebagai berikut:",
+              "1) Menggunakan operasi dan sifat serta sifat manipulasi aljabar dalam pemecahan masalah yang berkaitan dengan bentuk pangkat, akar, dan logaritma; persamaan kuadrat dan fungsu kuadrat; sistem persamaan linear-kuadrat; pertidaksamaan satu variabel; logika matematika.",
+              "2) Menggunakan perbandingan fungsi, persamaan, dan identitas persamaan trigonometri dalam pemecahan masalah."
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 200,
+          "teks": "Pelaksanaan KBK menuntut guru untuk lebih profesional dalam merancang ataupun menganalisis semua perangkat-perangkat persiapan proses belajar mengajar, sehingga dapat tercapai tujuan yahng diharapkan. Sebagai tenaga pendidik, guru perlu mendapat perhatian utama di samping kurikulumnya, karena baik buruknya suatu kurikulum bergantung pada aktivitas dan kreativitas guru dalam menjabarkan dan merealisasikan kurikulum tersebut. KBK merupakan kurikulum yang baru dikenal beberapa tahun terakhir ini, sehingga perlu mendapat perhatian dan tanggapan yang serius. Berdasarkan hal tersebut, penulis ingin mengetahui dan mendeskripsikan tentang persepsi guru matematika terhadap pelaksanaan KBK khususnya mata pelajaran matematika di SMA Negeri 1 Makassar. Data yang diperoleh dalam penelitian ini akan dianalisis sehingga menghasilkan suatu kesimpulan.",
+          "suara": [
+            "bab",
+            "paragraf"
+          ],
+          "conf": [
+            0.19,
+            0.76
+          ],
+          "konteks": {
+            "sebelum": [
+              "",
+              "B. Kerangka Berpikir",
+              "Setelah memperhatikan beberapa uraian yang telah disusun di atas, ada beberapa hal yang menjadi landasan berpikir dan selanjutnya mengarahkan penulis untuk merumuskan data sebagai bahan penelitian ini. Adapun landasan berpikir itu adalah: kurikulum merupakan bahan tertulis yang berisi uraian tentang program pendidikan suatu sekolah yang harus dilaksanakan dari tahun ke tahun. Proses KBK dimaksudkan untuk mengembangkan pengetahuan, pemahaman, kemampuan, nilai, sikap, dan minat peserta didik, agar dapat melakukan sesuatu dalam bentuk kamahiran, ketepatan dan keberhasilan dengan penuh tanggung jawab."
+            ],
+            "sesudah": [
+              "BAB III",
+              "METODE PENELITIAN",
+              "A. Variabel dan Desain Penelitian"
+            ],
+            "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+          }
+        },
+        {
+          "idx": 204,
+          "teks": "Inti kegiatan dalam penelitian ini adalah variabel persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar. Oleh karena itu peneliti hanya ingin mengkaji satu variabel atau tidak mengkaji hubungan antara satu variabel dengan variabel yang lain. Penelitian ini merupakan penelitian deskriptif kuantitatif yang menggambarkan persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+          "suara": [
+            "subbab",
+            "paragraf"
+          ],
+          "conf": [
+            0.23,
+            0.51
+          ],
+          "konteks": {
+            "sebelum": [
+              "BAB III",
+              "METODE PENELITIAN",
+              "A. Variabel dan Desain Penelitian"
+            ],
+            "sesudah": [
+              "B. Devinisi Operasional Variabel",
+              "Untuk menghindari terjadinya persepsi atau intepretasi yang berlainan antara penulis dengan pembaca, maka dianggap perlu untuk merumuskan variabel penelitian secara operasional.",
+              "Persepsi guru matematika terhadap pelaksanaan KBK matapelajaran matematika adalah pendapat atau pandangan guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar."
+            ],
+            "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+          }
+        },
+        {
+          "idx": 205,
+          "teks": "B. Devinisi Operasional Variabel",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.24,
+            0.75
+          ],
+          "konteks": {
+            "sebelum": [
+              "METODE PENELITIAN",
+              "A. Variabel dan Desain Penelitian",
+              "Inti kegiatan dalam penelitian ini adalah variabel persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar. Oleh karena itu peneliti hanya ingin mengkaji satu variabel atau tidak mengkaji hubungan antara satu variabel dengan variabel yang lain. Penelitian ini merupakan penelitian deskriptif kuantitatif yang menggambarkan persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar."
+            ],
+            "sesudah": [
+              "Untuk menghindari terjadinya persepsi atau intepretasi yang berlainan antara penulis dengan pembaca, maka dianggap perlu untuk merumuskan variabel penelitian secara operasional.",
+              "Persepsi guru matematika terhadap pelaksanaan KBK matapelajaran matematika adalah pendapat atau pandangan guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+              "C. OBJEK PENELITIAN"
+            ],
+            "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+          }
+        },
+        {
+          "idx": 206,
+          "teks": "Untuk menghindari terjadinya persepsi atau intepretasi yang berlainan antara penulis dengan pembaca, maka dianggap perlu untuk merumuskan variabel penelitian secara operasional.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.36,
+            0.41,
+            0.79
+          ],
+          "konteks": {
+            "sebelum": [
+              "A. Variabel dan Desain Penelitian",
+              "Inti kegiatan dalam penelitian ini adalah variabel persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar. Oleh karena itu peneliti hanya ingin mengkaji satu variabel atau tidak mengkaji hubungan antara satu variabel dengan variabel yang lain. Penelitian ini merupakan penelitian deskriptif kuantitatif yang menggambarkan persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+              "B. Devinisi Operasional Variabel"
+            ],
+            "sesudah": [
+              "Persepsi guru matematika terhadap pelaksanaan KBK matapelajaran matematika adalah pendapat atau pandangan guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+              "C. OBJEK PENELITIAN",
+              "Sesuai dengan rumusan masalah dalam penelitian ini, maka yang menjadi objek dalam penelitian ini adalah guru yaitu seluruh guru matematika yang mengajar di kelas X dan kelas XI sebanyak 5 orang yang ditunjukkan seperti pada tabel berikut ini:"
+            ],
+            "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+          }
+        },
+        {
+          "idx": 207,
+          "teks": "Persepsi guru matematika terhadap pelaksanaan KBK matapelajaran matematika adalah pendapat atau pandangan guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.29,
+            0.43
+          ],
+          "konteks": {
+            "sebelum": [
+              "Inti kegiatan dalam penelitian ini adalah variabel persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika di SMA Negeri 1 Makassar. Oleh karena itu peneliti hanya ingin mengkaji satu variabel atau tidak mengkaji hubungan antara satu variabel dengan variabel yang lain. Penelitian ini merupakan penelitian deskriptif kuantitatif yang menggambarkan persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+              "B. Devinisi Operasional Variabel",
+              "Untuk menghindari terjadinya persepsi atau intepretasi yang berlainan antara penulis dengan pembaca, maka dianggap perlu untuk merumuskan variabel penelitian secara operasional."
+            ],
+            "sesudah": [
+              "C. OBJEK PENELITIAN",
+              "Sesuai dengan rumusan masalah dalam penelitian ini, maka yang menjadi objek dalam penelitian ini adalah guru yaitu seluruh guru matematika yang mengajar di kelas X dan kelas XI sebanyak 5 orang yang ditunjukkan seperti pada tabel berikut ini:",
+              "Tabel 3.1. Keadaan guru matematika kelas X dan kelas XI SMA Negeri 1 Makassar"
+            ],
+            "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+          }
+        },
+        {
+          "idx": 243,
+          "teks": "2. Wawancara",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.36,
+            0.37
+          ],
+          "konteks": {
+            "sebelum": [
+              "Adapun teknik pengumpulan data yang digunakan dalam penelitian ini adalah:",
+              "1. Angket (kuesioner).",
+              "Angket (kuesioner) adalah seperangkat pernyataan yang harus diisi oleh responden untuk mengubah keterangan menjadi data, serta dapat pula digunakan untuk mengungkap pengalaman yang dialami guru dalam melaksanakan KBK. Angket tersebut menggunakan Skala Likert dengan lima alternatif pilihan yaitu Sangat Setuju (SS), Setuju (S), Ragu-ragu (R), Tidak Setuju (TS), dan Sangat Tidak Setuju (STS), dengan skor untuk pernyataan positif (favourable) adalah SS = 5, S = 4, R = 3, TS = 2, dan STS = 1 dan sebaliknya untuk pernyataan negatif (unfavourable)."
+            ],
+            "sesudah": [
+              "Wawancara merupakan kegiatan tanya jawab secara langsung dengan responden untuk memberikan informasi yang dibutuhkan sehubungan dengan permasalahan penelitian. Pedoman wawancara diberikan kepada 2 orang guru, yaitu masing-masing seorang guru dari kelas X dan kelas XI yang dipilih secara acak. Wawancara yang diberikan secara langsung kepada guru dalam bentuk wawancara terbuka yang berisi beberapa pertanyaan tentang persepsi guru matematika terhadap faktor-faktor pendukung pelaksanaan KBK serta hambatan-hambatan yang dihadapi guru matematika dalam pelaksanaan KBK mata pelajaran matematika SMA Negeri 1 Makassar.",
+              "E. TEKNIK ANALISIS DATA",
+              "Teknik analisis data dalam penelitian ini adalah teknik analisis kuantitatif deskriptif. Teknik analisis kuantitatif deskriptif yaitu meliputi tabel persentase dan statistik skor mengenai rata-rata (mean), standar deviasi, variansi, nilai maksimum, nilai minimum, kemiringan (skewness), dan kecembungan (kurtosis) serta pengkategorian karakteristik skor variabel persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar."
+            ],
+            "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+          }
+        },
+        {
+          "idx": 244,
+          "teks": "Wawancara merupakan kegiatan tanya jawab secara langsung dengan responden untuk memberikan informasi yang dibutuhkan sehubungan dengan permasalahan penelitian. Pedoman wawancara diberikan kepada 2 orang guru, yaitu masing-masing seorang guru dari kelas X dan kelas XI yang dipilih secara acak. Wawancara yang diberikan secara langsung kepada guru dalam bentuk wawancara terbuka yang berisi beberapa pertanyaan tentang persepsi guru matematika terhadap faktor-faktor pendukung pelaksanaan KBK serta hambatan-hambatan yang dihadapi guru matematika dalam pelaksanaan KBK mata pelajaran matematika SMA Negeri 1 Makassar.",
+          "suara": [
+            "subbab",
+            "paragraf"
+          ],
+          "conf": [
+            0.4,
+            0.2
+          ],
+          "konteks": {
+            "sebelum": [
+              "1. Angket (kuesioner).",
+              "Angket (kuesioner) adalah seperangkat pernyataan yang harus diisi oleh responden untuk mengubah keterangan menjadi data, serta dapat pula digunakan untuk mengungkap pengalaman yang dialami guru dalam melaksanakan KBK. Angket tersebut menggunakan Skala Likert dengan lima alternatif pilihan yaitu Sangat Setuju (SS), Setuju (S), Ragu-ragu (R), Tidak Setuju (TS), dan Sangat Tidak Setuju (STS), dengan skor untuk pernyataan positif (favourable) adalah SS = 5, S = 4, R = 3, TS = 2, dan STS = 1 dan sebaliknya untuk pernyataan negatif (unfavourable).",
+              "2. Wawancara"
+            ],
+            "sesudah": [
+              "E. TEKNIK ANALISIS DATA",
+              "Teknik analisis data dalam penelitian ini adalah teknik analisis kuantitatif deskriptif. Teknik analisis kuantitatif deskriptif yaitu meliputi tabel persentase dan statistik skor mengenai rata-rata (mean), standar deviasi, variansi, nilai maksimum, nilai minimum, kemiringan (skewness), dan kecembungan (kurtosis) serta pengkategorian karakteristik skor variabel persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+              "Kriteria yang digunakan untuk menentukan kategori skor hasil penelitian adalah skala Lima. Menurut Erman (Nuryadi; 2004: 40), skala Lima adalah suatu pembagian suatu tingkatan yang terdiri atas lima kategori yaitu:"
+            ],
+            "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+          }
+        },
+        {
+          "idx": 272,
+          "teks": "26,86 – 30,00 dikategorikan sangat baik",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.28,
+            0.79,
+            0.73
+          ],
+          "konteks": {
+            "sebelum": [
+              "11,86 – 16,35 dikategorikan buruk",
+              "16,36 – 22,35 dikategorikan sedang",
+              "22,36 – 26,85 dikategorikan baik"
+            ],
+            "sesudah": [
+              "Kategori persepsi guru tentang pelaksanaan KBK tentang sumber dan sarana pendidikan; metode dan strategi belajar mengajar; dan siswa sebagai subjek belajar, di mana jumlah soal sebanyak 5 butir soal dengan skor tertinggi 5 diperoleh skor maksimum idealnya 25. Sehingga kriteria yang digunakan untuk menentukan kategori skor persepsi guru adalah sebagai berikut:",
+              "0 – 9,82 dikategorikan sangat buruk",
+              "9,83 – 13,63 dikategorikan buruk"
+            ],
+            "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+          }
+        },
+        {
+          "idx": 278,
+          "teks": "22,39 – 25,00 dikategorikan sangat baik",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.23,
+            0.76,
+            0.68
+          ],
+          "konteks": {
+            "sebelum": [
+              "9,83 – 13,63 dikategorikan buruk",
+              "13,64 – 18,63 dikategorikan sedang",
+              "18,64 –22,38 dikategorikan baik"
+            ],
+            "sesudah": [
+              "Kategori persepsi guru tentang pelaksanaan KBK tentang evaluasi/penilaian, di mana jumlah soal sebanyak 4 butir soal dengan skor tertinggi 5 diperoleh skor maksimum idealnya 20. Sehingga kriteria yang digunakan untuk menentukan kategori skor persepsi guru adalah sebagai berikut:",
+              "0 – 7,9 dikategorikan sangat buruk",
+              "8,0 – 10,9 dikategorikan buruk"
+            ],
+            "judul_bab_terdekat": "BAB III METODE PENELITIAN"
+          }
+        },
+        {
+          "idx": 290,
+          "teks": "1. Hasil Angket Persepsi Guru Matematika Terhadap Pelaksanaan Kurikulum Berbasis Kompetensi (KBK) Mata Pelajaran Matematika Pada bagian ini disajikan hasil angket yang telah diisi oleh guru mata pelajaran matematika di SMA Negeri 1 Makassar mengenai persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar, seperti disajikan pada lampiran B.",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.43,
+            0.88
+          ],
+          "konteks": {
+            "sebelum": [
+              "",
+              "A. Penyajian Hasil Analisis Data",
+              "Data yang dihasilkan dalam penelitian ini adalah data tentang persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika, faktor-faktor yang mendukung pelaksanaan KBK mata pelajaran matematika, dan hambatan-hambatan yang dihadapi oleh guru matematika dalam pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar."
+            ],
+            "sesudah": [
+              "Jika skor variabel persepsi guru tersebut dikelompokkan ke dalam lima kategori, maka diperoleh distribusi frekuensi dan presentase seperti ditujukan pada Tabel 4.4 pada lampiran B, terlihat bahwa tidak ada persepsi guru yang berada pada kategori sangat buruk, buruk, sedang, maupun sangat baik, tetapi semua (100%) persepsi guru berada pada kategori baik.",
+              "Jika data skor persepsi guru tentang pelaksanaan KBK dianalisis dengan analisis statistik deskriptif untuk tiap indikator, maka digambarkan seperti pada Tabel 4.5 pada lampiran B.",
+              "Tabel 4.5. menggambarkan hasil analisis deskriptif skor persepsi guru matematika tentang kebijakan dalam KBK. Dari 5 orang responden diperoleh skor rata-rata 25,80 dari skor ideal 30, dengan modus 27, skor tertinggi 28 dan skor terendah 23 serta standar deviasi 2,17 yang didukung oleh koefisien kemiringan kurva (skewness) –0,559 dan koefisien kecembungan (kurtosis) –2,368."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 291,
+          "teks": "Jika skor variabel persepsi guru tersebut dikelompokkan ke dalam lima kategori, maka diperoleh distribusi frekuensi dan presentase seperti ditujukan pada Tabel 4.4 pada lampiran B, terlihat bahwa tidak ada persepsi guru yang berada pada kategori sangat buruk, buruk, sedang, maupun sangat baik, tetapi semua (100%) persepsi guru berada pada kategori baik.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.31,
+            0.4,
+            0.52
+          ],
+          "konteks": {
+            "sebelum": [
+              "A. Penyajian Hasil Analisis Data",
+              "Data yang dihasilkan dalam penelitian ini adalah data tentang persepsi guru matematika terhadap pelaksanaan Kurikulum Berbasis Kompetensi (KBK) mata pelajaran matematika, faktor-faktor yang mendukung pelaksanaan KBK mata pelajaran matematika, dan hambatan-hambatan yang dihadapi oleh guru matematika dalam pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar.",
+              "1. Hasil Angket Persepsi Guru Matematika Terhadap Pelaksanaan Kurikulum Berbasis Kompetensi (KBK) Mata Pelajaran Matematika Pada bagian ini disajikan hasil angket yang telah diisi oleh guru mata pelajaran matematika di SMA Negeri 1 Makassar mengenai persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar, seperti disajikan pada lampiran B."
+            ],
+            "sesudah": [
+              "Jika data skor persepsi guru tentang pelaksanaan KBK dianalisis dengan analisis statistik deskriptif untuk tiap indikator, maka digambarkan seperti pada Tabel 4.5 pada lampiran B.",
+              "Tabel 4.5. menggambarkan hasil analisis deskriptif skor persepsi guru matematika tentang kebijakan dalam KBK. Dari 5 orang responden diperoleh skor rata-rata 25,80 dari skor ideal 30, dengan modus 27, skor tertinggi 28 dan skor terendah 23 serta standar deviasi 2,17 yang didukung oleh koefisien kemiringan kurva (skewness) –0,559 dan koefisien kecembungan (kurtosis) –2,368.",
+              "Hasil analisis deskriptif skor persepsi guru matematika tentang sumber dan sarana pendidikan diperoleh bahwa dari 5 orang responden diperoleh skor rata-rata 20,60 dari skor ideal 25, dengan modus 19, skor tertinggi 23 dan skor terendah 19 serta standar deviasi 1,82 yang didukung oleh koefisien kemiringan kurva (skewness) 0,567 dan koefisien kecembungan (kurtosis) -2,231."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 294,
+          "teks": "Hasil analisis deskriptif skor persepsi guru matematika tentang sumber dan sarana pendidikan diperoleh bahwa dari 5 orang responden diperoleh skor rata-rata 20,60 dari skor ideal 25, dengan modus 19, skor tertinggi 23 dan skor terendah 19 serta standar deviasi 1,82 yang didukung oleh koefisien kemiringan kurva (skewness) 0,567 dan koefisien kecembungan (kurtosis) -2,231.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.21,
+            0.45,
+            0.49
+          ],
+          "konteks": {
+            "sebelum": [
+              "Jika skor variabel persepsi guru tersebut dikelompokkan ke dalam lima kategori, maka diperoleh distribusi frekuensi dan presentase seperti ditujukan pada Tabel 4.4 pada lampiran B, terlihat bahwa tidak ada persepsi guru yang berada pada kategori sangat buruk, buruk, sedang, maupun sangat baik, tetapi semua (100%) persepsi guru berada pada kategori baik.",
+              "Jika data skor persepsi guru tentang pelaksanaan KBK dianalisis dengan analisis statistik deskriptif untuk tiap indikator, maka digambarkan seperti pada Tabel 4.5 pada lampiran B.",
+              "Tabel 4.5. menggambarkan hasil analisis deskriptif skor persepsi guru matematika tentang kebijakan dalam KBK. Dari 5 orang responden diperoleh skor rata-rata 25,80 dari skor ideal 30, dengan modus 27, skor tertinggi 28 dan skor terendah 23 serta standar deviasi 2,17 yang didukung oleh koefisien kemiringan kurva (skewness) –0,559 dan koefisien kecembungan (kurtosis) –2,368."
+            ],
+            "sesudah": [
+              "Hasil analisis deskriptif skor persepsi guru matematika tentang metode dan strategi belajar mengajar diperoleh bahwa dari 5 orang responden diperoleh skor rata-rata 21,80 dari skor ideal 25, dengan modus 21 dan 22, skor tertinggi 23 dan skor terendah 21 serta standar deviasi 0,84 yang didukung oleh koefisien kemiringan kurva (skewness) 0,512 dan koefisien kecembungan (kurtosis) adalah –6,12.",
+              "Hasil analisis deskriptif skor persepsi guru matematika tentang siswa sebagai subjek belajar diperoleh bahwa dari 5 orang responden diperoleh skor rata-rata 21,00 dari skor ideal 25, dengan modus 20 dan 22, skor tertinggi 22 dan skor terendah 20 serta standar deviasi 1,00 yang didukung oleh koefisien kemiringan kurva (skewness) adalah 0,00 dan koefisien kecembungan (kurtosis) sebesar –3,00.",
+              "Hasil analisis deskriptif skor persepsi guru matematika tentang evaluasi/peskoran diperoleh bahwa dari 5 orang responden diperoleh skor rata-rata 15,80 dari skor ideal 20, dengan modus 16, skor tertinggi 17 dan skor terendah 14 serta standar deviasi 1,10 yang didukung oleh koefisien kemiringan kurva (skewness) adalah -1,293 dan koefisien kecembungan (kurtosis) sebesar 2,917."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 298,
+          "teks": "2. Hasil Wawancara dengan Guru Matematika Tentang Faktor-Faktor Pendukung dan Faktor-faktor Penghambat Pelaksanaan KBK Mata Pelajaran Matematika",
+          "suara": [
+            "paragraf",
+            "subbab"
+          ],
+          "conf": [
+            0.28,
+            0.75
+          ],
+          "konteks": {
+            "sebelum": [
+              "Hasil analisis deskriptif skor persepsi guru matematika tentang metode dan strategi belajar mengajar diperoleh bahwa dari 5 orang responden diperoleh skor rata-rata 21,80 dari skor ideal 25, dengan modus 21 dan 22, skor tertinggi 23 dan skor terendah 21 serta standar deviasi 0,84 yang didukung oleh koefisien kemiringan kurva (skewness) 0,512 dan koefisien kecembungan (kurtosis) adalah –6,12.",
+              "Hasil analisis deskriptif skor persepsi guru matematika tentang siswa sebagai subjek belajar diperoleh bahwa dari 5 orang responden diperoleh skor rata-rata 21,00 dari skor ideal 25, dengan modus 20 dan 22, skor tertinggi 22 dan skor terendah 20 serta standar deviasi 1,00 yang didukung oleh koefisien kemiringan kurva (skewness) adalah 0,00 dan koefisien kecembungan (kurtosis) sebesar –3,00.",
+              "Hasil analisis deskriptif skor persepsi guru matematika tentang evaluasi/peskoran diperoleh bahwa dari 5 orang responden diperoleh skor rata-rata 15,80 dari skor ideal 20, dengan modus 16, skor tertinggi 17 dan skor terendah 14 serta standar deviasi 1,10 yang didukung oleh koefisien kemiringan kurva (skewness) adalah -1,293 dan koefisien kecembungan (kurtosis) sebesar 2,917."
+            ],
+            "sesudah": [
+              "",
+              "Data yang diperoleh dari hasil wawancara dengan dua orang guru yang mengajar di kelas X dan kelas XI yang diwawancarai secara terpisah yaitu sebagai berikut:",
+              "a. Hasil wawancara dengan guru matematika yang mengajar di kelas X"
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 302,
+          "teks": "1) Kegiatan belajar mengajar",
+          "suara": [
+            "biasa",
+            "subbab"
+          ],
+          "conf": [
+            0.21,
+            0.51
+          ],
+          "konteks": {
+            "sebelum": [
+              "",
+              "Data yang diperoleh dari hasil wawancara dengan dua orang guru yang mengajar di kelas X dan kelas XI yang diwawancarai secara terpisah yaitu sebagai berikut:",
+              "a. Hasil wawancara dengan guru matematika yang mengajar di kelas X"
+            ],
+            "sesudah": [
+              "Faktor pendukung pelaksanaan KBK dari segi kegiatan belajar mengajar adalah siswa memiliki buku pegangan yang sesuai dengan KBK sehingga kegiatan menyalin/dikte diminimalisir dalam kegiatan belajar mengajar. Sedangkan faktor penghambatnya adalah penjabaran materi pelajaran dalam pengembangan kompetensi dan uji kelayakan membutuhkan biaya dan waktu yang cukup.",
+              "2) Siswa sebagai subyek belajar",
+              "Faktor pendukung pelaksanaan KBK dari segi siswa sebagai subyek belajar adalah siswa mempunyai kesadaran tinggi untuk proaktif dan lebih mandiri dalam belajar. Sedangkan faktor penghambatnya adalah masih ada sebagian siswa yang masih mengharapkan pemberitahuan secara langsung atau transfer ilmu dari guru tanpa mau berusaha secara mandiri untuk mengembangkan potensi yang mereka miliki."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 304,
+          "teks": "2) Siswa sebagai subyek belajar",
+          "suara": [
+            "biasa",
+            "subbab"
+          ],
+          "conf": [
+            0.41,
+            0.72
+          ],
+          "konteks": {
+            "sebelum": [
+              "a. Hasil wawancara dengan guru matematika yang mengajar di kelas X",
+              "1) Kegiatan belajar mengajar",
+              "Faktor pendukung pelaksanaan KBK dari segi kegiatan belajar mengajar adalah siswa memiliki buku pegangan yang sesuai dengan KBK sehingga kegiatan menyalin/dikte diminimalisir dalam kegiatan belajar mengajar. Sedangkan faktor penghambatnya adalah penjabaran materi pelajaran dalam pengembangan kompetensi dan uji kelayakan membutuhkan biaya dan waktu yang cukup."
+            ],
+            "sesudah": [
+              "Faktor pendukung pelaksanaan KBK dari segi siswa sebagai subyek belajar adalah siswa mempunyai kesadaran tinggi untuk proaktif dan lebih mandiri dalam belajar. Sedangkan faktor penghambatnya adalah masih ada sebagian siswa yang masih mengharapkan pemberitahuan secara langsung atau transfer ilmu dari guru tanpa mau berusaha secara mandiri untuk mengembangkan potensi yang mereka miliki.",
+              "3) Sarana dan sumber belajar",
+              "Faktor pendukung pelaksanaan KBK dari segi sarana dan sumber belajar adalah laboratorium komputer dan OHP yang sudah tersedia di sekolah. Sedangkan yang menjadi faktor penghambat adalah buku paket dan modul di sekolah masih minim."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 307,
+          "teks": "Faktor pendukung pelaksanaan KBK dari segi sarana dan sumber belajar adalah laboratorium komputer dan OHP yang sudah tersedia di sekolah. Sedangkan yang menjadi faktor penghambat adalah buku paket dan modul di sekolah masih minim.",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.41,
+            0.51
+          ],
+          "konteks": {
+            "sebelum": [
+              "2) Siswa sebagai subyek belajar",
+              "Faktor pendukung pelaksanaan KBK dari segi siswa sebagai subyek belajar adalah siswa mempunyai kesadaran tinggi untuk proaktif dan lebih mandiri dalam belajar. Sedangkan faktor penghambatnya adalah masih ada sebagian siswa yang masih mengharapkan pemberitahuan secara langsung atau transfer ilmu dari guru tanpa mau berusaha secara mandiri untuk mengembangkan potensi yang mereka miliki.",
+              "3) Sarana dan sumber belajar"
+            ],
+            "sesudah": [
+              "4) Alokasi waktu",
+              "Faktor pendukung pelaksanaan KBK dari segi alokasi waktu adalah siswa dituntut untuk belajar di sekolah dan di luar sekolah.",
+              "5) Evaluasi/penilaian"
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 308,
+          "teks": "4) Alokasi waktu",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.47,
+            0.75
+          ],
+          "konteks": {
+            "sebelum": [
+              "Faktor pendukung pelaksanaan KBK dari segi siswa sebagai subyek belajar adalah siswa mempunyai kesadaran tinggi untuk proaktif dan lebih mandiri dalam belajar. Sedangkan faktor penghambatnya adalah masih ada sebagian siswa yang masih mengharapkan pemberitahuan secara langsung atau transfer ilmu dari guru tanpa mau berusaha secara mandiri untuk mengembangkan potensi yang mereka miliki.",
+              "3) Sarana dan sumber belajar",
+              "Faktor pendukung pelaksanaan KBK dari segi sarana dan sumber belajar adalah laboratorium komputer dan OHP yang sudah tersedia di sekolah. Sedangkan yang menjadi faktor penghambat adalah buku paket dan modul di sekolah masih minim."
+            ],
+            "sesudah": [
+              "Faktor pendukung pelaksanaan KBK dari segi alokasi waktu adalah siswa dituntut untuk belajar di sekolah dan di luar sekolah.",
+              "5) Evaluasi/penilaian",
+              "Faktor pendukung pelaksanaan KBK dari segi evaluasi/penilaian adalah dalam melakukan penilaian, guru melakukan penilaian per kompetensi dasar sehingga guru tidak merasa kesulitan dalam menentukan ketuntasan belajar siswa. Selain itu, pelaksanaan program remedial yang dilakukan secara lisan maupun tulisan yang dilakukan pada saat jam pelajaran maupun di luar jam pelajaran. Sedangkan faktor penghambatnya adalah masih ada sebagian siswa cenderung hanya mengikuti pekerjaan temannya dalam mengerjakan tugas untuk suatu kompetensi dasar, sehingga sulit untuk mengetahui ketuntasannya terhadap suatu kompetensi dasar."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 309,
+          "teks": "Faktor pendukung pelaksanaan KBK dari segi alokasi waktu adalah siswa dituntut untuk belajar di sekolah dan di luar sekolah.",
+          "suara": [
+            "subbab",
+            "paragraf"
+          ],
+          "conf": [
+            0.28,
+            0.33
+          ],
+          "konteks": {
+            "sebelum": [
+              "3) Sarana dan sumber belajar",
+              "Faktor pendukung pelaksanaan KBK dari segi sarana dan sumber belajar adalah laboratorium komputer dan OHP yang sudah tersedia di sekolah. Sedangkan yang menjadi faktor penghambat adalah buku paket dan modul di sekolah masih minim.",
+              "4) Alokasi waktu"
+            ],
+            "sesudah": [
+              "5) Evaluasi/penilaian",
+              "Faktor pendukung pelaksanaan KBK dari segi evaluasi/penilaian adalah dalam melakukan penilaian, guru melakukan penilaian per kompetensi dasar sehingga guru tidak merasa kesulitan dalam menentukan ketuntasan belajar siswa. Selain itu, pelaksanaan program remedial yang dilakukan secara lisan maupun tulisan yang dilakukan pada saat jam pelajaran maupun di luar jam pelajaran. Sedangkan faktor penghambatnya adalah masih ada sebagian siswa cenderung hanya mengikuti pekerjaan temannya dalam mengerjakan tugas untuk suatu kompetensi dasar, sehingga sulit untuk mengetahui ketuntasannya terhadap suatu kompetensi dasar.",
+              "b. Hasil wawancara dengan guru matematika yang mengajar di kelas XI 1) Kegiatan belajar mengajar."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 310,
+          "teks": "5) Evaluasi/penilaian",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.43,
+            0.73
+          ],
+          "konteks": {
+            "sebelum": [
+              "Faktor pendukung pelaksanaan KBK dari segi sarana dan sumber belajar adalah laboratorium komputer dan OHP yang sudah tersedia di sekolah. Sedangkan yang menjadi faktor penghambat adalah buku paket dan modul di sekolah masih minim.",
+              "4) Alokasi waktu",
+              "Faktor pendukung pelaksanaan KBK dari segi alokasi waktu adalah siswa dituntut untuk belajar di sekolah dan di luar sekolah."
+            ],
+            "sesudah": [
+              "Faktor pendukung pelaksanaan KBK dari segi evaluasi/penilaian adalah dalam melakukan penilaian, guru melakukan penilaian per kompetensi dasar sehingga guru tidak merasa kesulitan dalam menentukan ketuntasan belajar siswa. Selain itu, pelaksanaan program remedial yang dilakukan secara lisan maupun tulisan yang dilakukan pada saat jam pelajaran maupun di luar jam pelajaran. Sedangkan faktor penghambatnya adalah masih ada sebagian siswa cenderung hanya mengikuti pekerjaan temannya dalam mengerjakan tugas untuk suatu kompetensi dasar, sehingga sulit untuk mengetahui ketuntasannya terhadap suatu kompetensi dasar.",
+              "b. Hasil wawancara dengan guru matematika yang mengajar di kelas XI 1) Kegiatan belajar mengajar.",
+              "Faktor pendukung pelaksanaan KBK dari segi kegiatan belajar mengajar adalah penggunaan strategi pembelajaran yang tidak monoton tetapi lebih bervariasi sesuai kreatifitas guru untuk mengembangkan potensi peserta didik. Sedangkan faktor penghambatnya adalah tidak semua guru yang mengajar pernah mengikuti pelatihan atau seminar tentang KBK sehingga pemahaman guru tentang KBK belum terlalu mendalam."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 312,
+          "teks": "b. Hasil wawancara dengan guru matematika yang mengajar di kelas XI 1) Kegiatan belajar mengajar.",
+          "suara": [
+            "biasa",
+            "subbab"
+          ],
+          "conf": [
+            0.13,
+            0.33
+          ],
+          "konteks": {
+            "sebelum": [
+              "Faktor pendukung pelaksanaan KBK dari segi alokasi waktu adalah siswa dituntut untuk belajar di sekolah dan di luar sekolah.",
+              "5) Evaluasi/penilaian",
+              "Faktor pendukung pelaksanaan KBK dari segi evaluasi/penilaian adalah dalam melakukan penilaian, guru melakukan penilaian per kompetensi dasar sehingga guru tidak merasa kesulitan dalam menentukan ketuntasan belajar siswa. Selain itu, pelaksanaan program remedial yang dilakukan secara lisan maupun tulisan yang dilakukan pada saat jam pelajaran maupun di luar jam pelajaran. Sedangkan faktor penghambatnya adalah masih ada sebagian siswa cenderung hanya mengikuti pekerjaan temannya dalam mengerjakan tugas untuk suatu kompetensi dasar, sehingga sulit untuk mengetahui ketuntasannya terhadap suatu kompetensi dasar."
+            ],
+            "sesudah": [
+              "Faktor pendukung pelaksanaan KBK dari segi kegiatan belajar mengajar adalah penggunaan strategi pembelajaran yang tidak monoton tetapi lebih bervariasi sesuai kreatifitas guru untuk mengembangkan potensi peserta didik. Sedangkan faktor penghambatnya adalah tidak semua guru yang mengajar pernah mengikuti pelatihan atau seminar tentang KBK sehingga pemahaman guru tentang KBK belum terlalu mendalam.",
+              "2) Siswa sebagai subyek belajar.",
+              "Faktor pendukung pelaksanaan KBK dari segi siswa sebagai subyek belajar adalah siswa lebih antusias dalam proses belajar mengajar karena guru memberikan kesempatan kepada siswa untuk menemukan maupun mengembangkan potensi yang dimiliki oleh masing-masing siswa. Sedangkan faktor penghambatnya adalah kondisi siswa yang heterogen sehingga guru harus memperhatikan kondisi masing-masing siswa dalam pembelajaran."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 317,
+          "teks": "Faktor pendukung pelaksanaan KBK dari segi sarana dan sumber belajar adalah laboratorium komputer yang sudah ada serta OHP yang sudah disediakan di setiap ruang kelas. Sedangkan yang menjadi faktor penghambat adalah buku paket matematika di perpustakaan yang masih minim.",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.29,
+            0.44
+          ],
+          "konteks": {
+            "sebelum": [
+              "2) Siswa sebagai subyek belajar.",
+              "Faktor pendukung pelaksanaan KBK dari segi siswa sebagai subyek belajar adalah siswa lebih antusias dalam proses belajar mengajar karena guru memberikan kesempatan kepada siswa untuk menemukan maupun mengembangkan potensi yang dimiliki oleh masing-masing siswa. Sedangkan faktor penghambatnya adalah kondisi siswa yang heterogen sehingga guru harus memperhatikan kondisi masing-masing siswa dalam pembelajaran.",
+              "3) Sarana dan sumber belajar"
+            ],
+            "sesudah": [
+              "4) Alokasi waktu",
+              "Faktor pendukung pelaksanaan KBK dari segi alokasi waktu adalah siswa dituntut untuk belajar mandiri baik pada jam pelajaran maupun di luar jam pelajaran.",
+              "5) Evaluasi/penilaian"
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 319,
+          "teks": "Faktor pendukung pelaksanaan KBK dari segi alokasi waktu adalah siswa dituntut untuk belajar mandiri baik pada jam pelajaran maupun di luar jam pelajaran.",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "conf": [
+            0.29,
+            0.4
+          ],
+          "konteks": {
+            "sebelum": [
+              "3) Sarana dan sumber belajar",
+              "Faktor pendukung pelaksanaan KBK dari segi sarana dan sumber belajar adalah laboratorium komputer yang sudah ada serta OHP yang sudah disediakan di setiap ruang kelas. Sedangkan yang menjadi faktor penghambat adalah buku paket matematika di perpustakaan yang masih minim.",
+              "4) Alokasi waktu"
+            ],
+            "sesudah": [
+              "5) Evaluasi/penilaian",
+              "Faktor pendukung pelaksanaan KBK dari segi evaluasi/penilaian adalah penilaian tidak hanya dari ujian tulisan tetapi juga dari aspek-aspek yang lain seperti keaktifan, penampilan dan lain-lain. Sedangkan faktor penghambatnya adalah jumlah siswa yang banyak dalam satu kelas sehingga guru memerlukan waktu dan tenaga yang cukup untuk melakukan penilaian kepada siswa satu persatu berdasarkan beberapa aspek penilaian.",
+              "B. Pembahasan Hasil Penelitian"
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 323,
+          "teks": "Dari hasil analisis di atas, maka berikut ini akan diuraikan pembahasan penelitian yang sekaligus merupakan jawaban dari rumusan masalah dalam penelitian ini:",
+          "suara": [
+            "subbab",
+            "paragraf"
+          ],
+          "conf": [
+            0.39,
+            0.89
+          ],
+          "konteks": {
+            "sebelum": [
+              "5) Evaluasi/penilaian",
+              "Faktor pendukung pelaksanaan KBK dari segi evaluasi/penilaian adalah penilaian tidak hanya dari ujian tulisan tetapi juga dari aspek-aspek yang lain seperti keaktifan, penampilan dan lain-lain. Sedangkan faktor penghambatnya adalah jumlah siswa yang banyak dalam satu kelas sehingga guru memerlukan waktu dan tenaga yang cukup untuk melakukan penilaian kepada siswa satu persatu berdasarkan beberapa aspek penilaian.",
+              "B. Pembahasan Hasil Penelitian"
+            ],
+            "sesudah": [
+              "1. Persepsi guru matematika terhadap Pelaksanaan Kurikulum Berbasis Kompetensi Mata Pelajaran Matematika",
+              "Tabel 4.2. pada lampiran B merupakan hasil analisis statistik deskriptif skor persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika, yang menunjukkan bahwa dari jumlah sampel 5 orang memperoleh skor rata-rata persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika adalah 105 (kategori baik) dari skor ideal 125 (sangat baik), dengan nilai tertinggi 108 dan nilai terendah 100 serta standar deviasi 3,317. hal ini juga didukung oleh koefisien kemiringan kurva (skewness) sebesar –0,822 yang berarti distribusi skor persepsi guru mempunyai kemiringan negatif, yang menggambarkan bahwa kebanyakan guru mempunyai persepsi baik terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar. selain kemiringan kurva, juga didukung oleh koefisien kecembungan (kurtosis) sebesar 0,140 < 3 yang berarti rata-rata persepsi guru berdistribusi dengan model platikurtik atau mendatar, yang menggambarkan bahwa adanya sebaran frekuensi yang agak tersebar merata pada seluruh interval skor persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar. Sedangkan secara keseluruhan persepsi guru berada pada kategori baik, sehingga dapat dikatakan bahwa persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar adalah baik.",
+              "Jika data skor persepsi guru tentang pelaksanaan KBK dianalisis dengan analisis statistik deskriptif untuk tiap indikator, maka digambarkan seperti pada Tabel 4.5 pada lampiran B."
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 325,
+          "teks": "Tabel 4.2. pada lampiran B merupakan hasil analisis statistik deskriptif skor persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika, yang menunjukkan bahwa dari jumlah sampel 5 orang memperoleh skor rata-rata persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika adalah 105 (kategori baik) dari skor ideal 125 (sangat baik), dengan nilai tertinggi 108 dan nilai terendah 100 serta standar deviasi 3,317. hal ini juga didukung oleh koefisien kemiringan kurva (skewness) sebesar –0,822 yang berarti distribusi skor persepsi guru mempunyai kemiringan negatif, yang menggambarkan bahwa kebanyakan guru mempunyai persepsi baik terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar. selain kemiringan kurva, juga didukung oleh koefisien kecembungan (kurtosis) sebesar 0,140 < 3 yang berarti rata-rata persepsi guru berdistribusi dengan model platikurtik atau mendatar, yang menggambarkan bahwa adanya sebaran frekuensi yang agak tersebar merata pada seluruh interval skor persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar. Sedangkan secara keseluruhan persepsi guru berada pada kategori baik, sehingga dapat dikatakan bahwa persepsi guru matematika terhadap pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar adalah baik.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.41,
+            0.41,
+            0.47
+          ],
+          "konteks": {
+            "sebelum": [
+              "B. Pembahasan Hasil Penelitian",
+              "Dari hasil analisis di atas, maka berikut ini akan diuraikan pembahasan penelitian yang sekaligus merupakan jawaban dari rumusan masalah dalam penelitian ini:",
+              "1. Persepsi guru matematika terhadap Pelaksanaan Kurikulum Berbasis Kompetensi Mata Pelajaran Matematika"
+            ],
+            "sesudah": [
+              "Jika data skor persepsi guru tentang pelaksanaan KBK dianalisis dengan analisis statistik deskriptif untuk tiap indikator, maka digambarkan seperti pada Tabel 4.5 pada lampiran B.",
+              "Tabel 4.5. menggambarkan hasil analisis deskriptif skor persepsi guru matematika tentang kebijakan dalam KBK. Dari 5 orang responden memperoleh skor rata-rata 25,80 (kategori baik) dari skor ideal 30, dengan tertinggi 28 dan skor terendah 23 serta standar deviasi 2,17. Hasil analisis deskriptif skor persepsi guru matematika tentang sumber dan sarana pendidikan diperoleh bahwa dari 5 orang responden memperoleh skor rata-rata 20,60 (kategori baik) dari skor ideal 25, dengan skor tertinggi 23 dan skor terendah 19 serta standar deviasi 1,82. Hasil analisis deskriptif skor persepsi guru matematika tentang metode dan strategi belajar mengajar diperoleh bahwa dari 5 orang responden memperoleh skor rata-rata 21,80 (kategori baik) dari skor ideal 25, dengan skor tertinggi 23 dan skor terendah 21 serta standar deviasi 0,84. Hasil analisis deskriptif skor persepsi guru matematika tentang siswa sebagai subjek belajar diperoleh bahwa dari 5 orang responden memperoleh skor rata-rata 21,00 (kategori baik) dari skor ideal 25, dengan skor tertinggi 22 dan skor terendah 20 serta standar deviasi 1,00. Hasil analisis deskriptif skor persepsi guru matematika tentang evaluasi/peskoran diperoleh bahwa dari 5 orang responden memperoleh skor rata-rata 15,80 (kategori baik) dari skor ideal 20, dengan skor tertinggi 17 dan skor terendah 14 serta standar deviasi 1,10.",
+              "2. Faktor-faktor pendukung pelaksanaan KBK mata pelajaran matematika"
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 331,
+          "teks": "Berdasarkan hasil penelitian terdapat beberapa faktor-faktor yang menghambat pelaksanaan KBK mata pelajaran yaitu; penjabaran materi pelajaran dalam pengembangan kompetensi dan uji kelayakan membutuhkan biaya dan waktu yang cukup, tidak semua guru yang mengajar pernah mengikuti pelatihan atau seminar tentang KBK sehingga pemahaman guru tentang KBK belum terlalu mendalam, di mana dari lima orang guru matematika yang diteliti hanya empat orang guru yang pernah mengikuti penataran atau pelatihan atau seminar tentang KBK; masih ada sebagian siswa yang masih mengharapkan pemberitahuan secara langsung atau transfer ilmu dari guru tanpa mau berusaha secara mandiri untuk mengembangkan potensi yang mereka miliki, kondisi siswa yang heterogen sehingga guru harus memperhatikan kondisi masing-masing siswa dalam pembelajaran; buku paket dan modul yang masih sedikit jumlahnya; terdapat sebagian siswa yang kurang memiliki kesadaran untuk mempergunakan waktu di luar sekolah sehingga penguasaannya terhadap suatu kompetensi dasar terhambat; sebagian siswa cenderung hanya mengikuti pekerjaan temannya dalam mengerjakan tugas untuk suatu kompetensi dasar, sehingga sulit untuk mengetahui ketuntasannya terhadap suatu kompetensi dasar, siswa kurang mampu mengembangkan life skill dalam mengaplikasikan pengetahuan yang dimilikinya, serta jumlah siswa yang banyak dalam satu kelas sehingga guru memerlukan waktu dan tenaga yang cukup untuk melakukan penilaian kepada siswa satu persatu berdasarkan beberapa aspek penilaian.",
+          "suara": [
+            "bab",
+            "paragraf"
+          ],
+          "conf": [
+            0.35,
+            0.63
+          ],
+          "konteks": {
+            "sebelum": [
+              "2. Faktor-faktor pendukung pelaksanaan KBK mata pelajaran matematika",
+              "Berdasarkan hasil penelitian terdapat beberapa faktor-faktor yang mendukung pelaksanaan KBK mata pelajaran matematika yaitu; siswa memiliki buku pegangan sehingga kegiatan menyalin/dikte diminimalisir dalam kegiatan belajar mengajar, dan penggunaan metode dan strategi pembelajaran yang tidak monoton tetapi lebih bervariasi sesuai kreatifitas guru untuk mengembangkan potensi peserta didik; buku pegangan yang dimiliki siswa berupa buku berdasarkan KBK yang harus dimiliki oleh tiap siswa; siswa mempunyai kesadaran tinggi untuk proaktif dan lebih mandiri dalam belajar, serta siswa lebih antusias dalam proses belajar mengajar karena guru memberikan kesempatan kepada siswa untuk menemukan maupun mengembangkan potensi yang dimiliki oleh masing-masing siswa, dalam hal ini siswa lebih antusias baik dalam mengajukan pertanyaan, menjawab pertanyaan, maupun menanggapi suatu masalah; laboratorium komputer yang sudah tersedia serta OHP yang sudah disediakan di setiap ruang kelas; siswa dituntut untuk belajar di sekolah dan di luar sekolah, dan siswa dituntut untuk belajar mandiri baik pada jam pelajaran maupun di luar jam pelajaran; guru melakukan penilaian per kompetensi dasar sehingga guru tidak merasa kesulitan dalam menentukan ketuntasan belajar siswa, pelaksanaan program remedial yang dilakukan secara lisan maupun tulisan yang dilakukan pada saat jam pelajaran maupun di luar jam pelajaran/di rumah, serta penilaian tidak hanya dari ujian tulisan tetapi juga dari aspek-aspek yang lain seperti keaktifan, penampilan dan lain-lain.",
+              "3. Hambatan-hambatan yang dihadapi oleh guru matematika dalam penerapan KBK mata pelajaran matematika"
+            ],
+            "sesudah": [
+              "BAB V",
+              "KESIMPULAN DAN SARAN",
+              "A. Kesimpulan"
+            ],
+            "judul_bab_terdekat": "BAB IV HASIL DAN PEMBAHASAN"
+          }
+        },
+        {
+          "idx": 342,
+          "teks": "3. Hambatan-hambatan yang dihadapi oleh guru matematika dalam pelaksanaan KBK mata pelajaran matematika di SMA Negeri 1 Makassar adalah:",
+          "suara": [
+            "biasa",
+            "subbab"
+          ],
+          "conf": [
+            0.35,
+            0.73
+          ],
+          "konteks": {
+            "sebelum": [
+              "▪ Siswa mempunyai kesadaran tinggi untuk proaktif dan lebih mandiri dalam belajar, serta siswa lebih antusias dalam proses belajar mengajar karena guru memberikan kesempatan kepada siswa untuk menemukan maupun mengembangkan potensi yang dimiliki oleh masing-masing siswa.",
+              "▪ Laboratorium komputer yang sudah tersedia serta OHP yang sudah disediakan di setiap ruang kelas.",
+              "▪ Guru melakukan penilaian per kompetensi dasar sehingga guru tidak merasa kesulitan dalam menentukan ketuntasan belajar siswa, pelaksanaan program remedial yang dilakukan secara lisan maupun tulisan yang dilakukan pada saat jam pelajaran maupun di luar jam pelajaran/di rumah, serta penilaian tidak hanya dari ujian tulisan tetapi juga dari aspek-aspek yang lain seperti keaktifan, penampilan dan lain-lain."
+            ],
+            "sesudah": [
+              "▪ Penjabaran materi pelajaran dalam pengembangan kompetensi dan uji kelayakan membutuhkan biaya dan waktu yang cukup, tidak semua guru yang mengajar pernah mengikuti pelatihan atau seminar tentang KBK sehingga pemahaman guru tentang KBK belum terlalu mendalam.",
+              "▪ Masih ada sebagian siswa yang masih mengharapkan pemberitahuan langsung atau transfer ilmu dari guru tanpa mau berusaha secara mandiri untuk mengembangkan potensi yang mereka miliki, kondisi siswa yang heterogen sehingga guru harus memperhatikan kondisi masing-masing siswa dalam pembelajaran.",
+              "▪ Buku paket dan modul yang masih minim."
+            ],
+            "judul_bab_terdekat": "BAB V KESIMPULAN DAN SARAN"
+          }
+        },
+        {
+          "idx": 351,
+          "teks": "3. Dari pihak sokolah hendaknya memperhatikan kondisi perpustakaan agar memperbanyak buku paket dan modul khususnya untuk mata pelajaran matematika yang sesuai dengan tuntutan KBK.",
+          "suara": [
+            "paragraf",
+            "biasa",
+            "biasa"
+          ],
+          "conf": [
+            0.35,
+            0.25,
+            0.32
+          ],
+          "konteks": {
+            "sebelum": [
+              "B. Saran",
+              "1. Dari pihak kepala sekolah SMA Negeri 1 Makassar hendaknya sosialisasi mengenai KBK kepada guru perlu ditingkatkan baik melalui penataran, pelatihan-pelatihan, atau seminar-seminar tentang pelaksanaan KBK.",
+              "2. Keberhasilan KBK sangat ditentukan oleh beberapa pihak seperti kepala sekolah, guru, dan siswa sehingga diperlukan sikap positif, kesadaran, dan kesiapan untuk menerima model pendekatan baru pada KBK."
+            ],
+            "sesudah": [
+              "4. Untuk wakil kepala sekolah khususnya bidang kesiswaan agar jumlah siswa dalam satu kelas perlu diperhatikan sesuai dengan kapasitas dan kondisi kelas.",
+              "",
+              "DAFTAR PUSTAKA"
+            ],
+            "judul_bab_terdekat": "BAB V KESIMPULAN DAN SARAN"
+          }
+        },
+        {
+          "idx": 376,
+          "teks": "Wahyudin, lahir di Desa Naru Kecamatan Sape Kabupaten Bima, tanggal 22 Agustus 1981, anak kelima pasangan Ayah yang bernama Usman (Alm) dan Ibu yang bernama Hatijah.",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "conf": [
+            0.29,
+            0.56,
+            0.79
+          ],
+          "konteks": {
+            "sebelum": [
+              "Usman, Moh. Uzer. 2001. Menjadi Guru Profesional. Bandung. Remaja Rosadakarya.",
+              "Yamin, Martinis. 2005. Strategi Pembelajaran Berbasis Kompetensi. Jakarta. Gaung Persada.",
+              "RIWAYAT HIDUP"
+            ],
+            "sesudah": [
+              "Penulis mulai memasuki jenjang pendidikan pada tahun 1988 di SDN INP. Na’e Sape dan tamat pada tahun 1994. Pada tahun yang sama melanjutkan pendidikan di SMP Negeri 1 Sape dan tamat pada tahun 1997. Selanjutnya pada tahun yang sama penulis melanjutkan pendidikan di SMA Negeri 1 Sape dan tamat pada tahun 2000.",
+              "Pada tahun yang sama penulis mencoba mengikuti UMPTN, namun tidak lolos sehingga penulis mengambil inisiatif untuk mendaftarkan diri di IAIN Alauddin Makassar pada Fakultas Tarbiyah tepatnya Jurusan Pendidikan Agama Islam (PAI) Strata Satu. Setelah satu tahun menjadi mahasiswa IAIN Alauddin Makassar, penulis mencoba lagi mengikuti UMPTN tahun 2001 dan diterima di Universitas Negeri Makassar pada Fakultas MIPA tepatnya di Jurusan Matematika Program Studi Pendidikan Matematika. Adapun organisasi yang pernah digeluti oleh penulis selama menjadi mahasiswa yaitu MPMJ Jurusan Matematika FMIPA UNM dan SCMM FMIPA UNM.",
+              ""
+            ],
+            "judul_bab_terdekat": "BAB V KESIMPULAN DAN SARAN"
+          }
+        }
+      ],
+      "sistematika": [],
+      "kode_label": {},
+      "koreksi_label": [
+        45,
+        61,
+        65,
+        67,
+        76,
+        82,
+        101,
+        114,
+        157,
+        162,
+        164,
+        168,
+        196,
+        244,
+        289,
+        290,
+        297,
+        305,
+        311,
+        321,
+        327,
+        336,
+        341,
+        347
+      ],
+      "koreksi_spss": [],
+      "koreksi_kecil": [
+        66,
+        70,
+        100,
+        102,
+        112,
+        115,
+        119,
+        181,
+        184,
+        301,
+        312
+      ],
+      "koreksi_batas_paragraf": [
+        50,
+        53,
+        62,
+        64,
+        82,
+        153,
+        158,
+        241
+      ],
+      "bab_kode": [],
+      "nilai_sampel": [
+        {
+          "no": 137,
+          "jenis_sengketa": "goyang_bab",
+          "teks_baris": "Berdasarkan hasil penelitian terdapat beberapa faktor-faktor yang mendukung pelaksanaan KBK mata pelajaran matematika yaitu; siswa memiliki buku pegangan sehingga kegiatan menyalin/dikte diminimalisir dalam kegiatan belajar mengajar, dan penggunaan metode dan strategi pembelajaran yang tidak monoton tetapi lebih bervariasi sesuai kreatifitas guru untuk mengembangkan potensi peserta didik; buku pegangan yang dimiliki siswa berupa buku berdasarkan KBK yang harus dimiliki oleh tiap siswa; siswa mempunyai kesadaran tinggi untuk proaktif dan lebih mandiri dalam belajar, serta siswa lebih antusias dalam proses belajar mengajar karena guru memberikan kesempatan kepada siswa untuk menemukan maupun mengembangkan potensi yang dimiliki oleh masing-masing siswa, dalam hal ini siswa lebih antusias baik dalam mengajukan pertanyaan, menjawab pertanyaan, maupun menanggapi suatu masalah; laboratorium komputer yang sudah tersedia serta OHP yang sudah disediakan di setiap ruang kelas; siswa dituntut untuk belajar di sekolah dan di luar sekolah, dan siswa dituntut untuk belajar mandiri baik pada jam pelajaran maupun di luar jam pelajaran; guru melakukan penilaian per kompetensi dasar sehingga guru tidak merasa kesulitan dalam menentukan ketuntasan belajar siswa, pelaksanaan program remedial yang dilakukan secara lisan maupun tulisan yang dilakukan pada saat jam pelajaran maupun di luar jam pelajaran/di rumah, serta penilaian tidak hanya dari ujian tulisan tetapi juga dari aspek-aspek yang lain seperti keaktifan, penampilan dan lain-lain.",
+          "label_benar": "paragraf",
+          "idx_run": 124,
+          "putusan_fase1b": "goyang",
+          "label_v11_final": "biasa",
+          "label_v11_pra_lapis2": "biasa",
+          "suara": [
+            "subbab",
+            "biasa"
+          ],
+          "v11_final_benar": false
+        },
+        {
+          "no": 141,
+          "jenis_sengketa": "goyang_subbab",
+          "teks_baris": "Pendidikan adalah penentu terbesar perkembangan masa depan bangsa. Makin besar perhatian kita terhadap bidang pendidikan, ditambah lagi dengan ketepatan arah pendidikan yang dicanangkan, niscaya akan membawa bangsa atau daerah tersebut pada tingkat kemajuan yang memadai, sehingga tidak akan tertinggal atau ditinggalkan oleh bangsa lain. Pendidikan di Indonesia dewasa ini masih jauh tertinggal dibanding pendidikan di negara lain. Untuk mengantisipasi hal tersebut salah satu aspek yang perlu diperhatikan adalah materi atau yang biasa disebut kurikulum.",
+          "label_benar": "paragraf",
+          "idx_run": 3,
+          "putusan_fase1b": "goyang",
+          "label_v11_final": "paragraf",
+          "label_v11_pra_lapis2": "paragraf",
+          "suara": [
+            "biasa",
+            "paragraf",
+            "paragraf"
+          ],
+          "v11_final_benar": true
+        },
+        {
+          "no": 142,
+          "jenis_sengketa": "goyang_subbab",
+          "teks_baris": "a. Garis-garis Besar Haluan Negara (GBHN) tahun 1999 yang menegaskan perlunya didiversifikasi kurikulum yang dapat melayani keanekaragaman sumber daya manusia, kemampuan siswa, sarana pembelajaran, dan budaya daerah.",
+          "label_benar": "biasa",
+          "idx_run": 80,
+          "putusan_fase1b": "goyang",
+          "label_v11_final": "biasa",
+          "label_v11_pra_lapis2": "biasa",
+          "suara": [
+            "biasa",
+            "subbab"
+          ],
+          "v11_final_benar": true
+        },
+        {
+          "no": 143,
+          "jenis_sengketa": "goyang_subbab",
+          "teks_baris": "b. Undang-Undang Nomor 22 tahun 1999 (Pasal 4) tentang pemerintahan daerah yang menegaskan adanya kewenangan daerah provinsi, kabupaten, dan kota untuk mengatur dan mengurus kepentingan masyarakat setempat menurut prakarsa sendiri berdasarkan aspirasi masyarakat.",
+          "label_benar": "biasa",
+          "idx_run": 81,
+          "putusan_fase1b": "tidak-goyang-di-run-ini",
+          "label_v11_final": "biasa",
+          "label_v11_pra_lapis2": null,
+          "suara": [
+            "biasa",
+            "biasa"
+          ],
+          "v11_final_benar": true
+        }
+      ],
+      "status": "berhasil"
+    }
+  ],
+  "bukti_model_jev": {
+    "model_dilayani": "typesafe/jev-1.14-20261014",
+    "satpam_penyedia": "openrouter",
+    "satpam_jejak": [
+      {
+        "penyedia": "resmi",
+        "model": "jev-1.14-20261014.0",
+        "hasil": "GAGAL",
+        "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+      },
+      {
+        "penyedia": "openrouter",
+        "model": "typesafe/jev-1.14-20261014",
+        "hasil": "DIPAKAI"
+      }
+    ],
+    "provider": "TypeSafe"
+  },
+  "total_panggilan_jev": 10,
+  "status": "selesai"
+}

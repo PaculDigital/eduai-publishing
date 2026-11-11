@@ -46,7 +46,7 @@ log = logging.getLogger(__name__)
 #    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
 #    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
 #    bentuknya memang begitu (6 entri: Y1, Y2, AD1, AD2, AD3, AG1).
-RULE_VERSION = 'jev-peta-v11'  # v11 (11 Nov 2026): lapisan bentuk Lapis 1-3 (latihan 112 naskah)
+RULE_VERSION = 'jev-peta-v12'  # v12 (11 Nov 2026): rantai 3 langkah — Lapis 2 disambung ke agen kedua hidup (mode 'agen-kedua': beda → keputusan agen kedua dipakai, kecuali beda soal judul bab → antrean); tanpa fn, perilaku sama persis dengan v11
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
@@ -343,14 +343,16 @@ def profil_bentuk(teks):
     }
 
 
-def pendapat_kedua(idx, teks_baris, suara, p, jawaban_kedua=None):
+def pendapat_kedua(idx, teks_baris, suara, p, jawaban_kedua=None,
+                  mode='suara'):
     """LAPIS 2 (v11) — pendapat kedua HANYA untuk baris goyang.
 
     Murni deterministik, NOL panggilan Jev: `jawaban_kedua` DISUNTIK oleh
-    pemanggil (tanya ulang live dengan sudut berbeda, atau model 1.13
-    sebagai pembanding) — fungsi ini tidak pernah memanggil Jev sendiri.
+    pemanggil (agen kedua live, tanya ulang, atau model 1.13 sebagai
+    pembanding) — fungsi ini tidak pernah memanggil Jev sendiri.
     `suara`/`p` = suara + confidence tersimpan dari run.
-    Putusan:
+
+    mode='suara' (bawaan, v11 — adjudikasi suara):
       'bukan-goyang'      — suara tersimpan sepakat (bukan sengketa).
       'tetap'             — pendapat kedua sepakat dengan suara teratas,
                             atau sepakat dengan minoritas tapi kurang yakin.
@@ -359,6 +361,18 @@ def pendapat_kedua(idx, teks_baris, suara, p, jawaban_kedua=None):
       'antrean-manusia'   — tidak ada pendapat kedua, pendapat kedua tidak
                             yakin (confidence < 0,5), atau tiga suara
                             berbeda. Label TIDAK dipaksa.
+
+    mode='agen-kedua' (v12, rantai 3 langkah — Gas Bos 11 Nov 2026):
+    jawaban kedua adalah PEMBACA KEDUA yang independen (baca konteks lebar,
+    suara Jev TIDAK ditunjukkan). Aturan Bos: bila beda, keputusan agen
+    kedua yang dipakai — KECUALI beda soal judul bab.
+      'tetap'             — agen kedua sepakat dengan suara teratas.
+      'berbalik'          — agen kedua beda DAN bukan soal judul bab
+                            (label agen kedua dipakai, apa pun suara lamanya).
+      'antrean-manusia'   — tidak ada jawaban kedua, tidak yakin
+                            (confidence < 0,5), atau beda soal judul bab
+                            (label kedua ATAU label Jev adalah 'bab').
+                            Label TIDAK dipaksa.
     """
     votes = [v for v in (suara or []) if v]
     if len(set(votes)) <= 1:
@@ -391,6 +405,15 @@ def pendapat_kedua(idx, teks_baris, suara, p, jawaban_kedua=None):
     if j == atas:
         return {'idx': idx, 'putusan': 'tetap', 'label': atas,
                 'alasan': 'pendapat kedua sepakat dengan suara teratas'}
+    if mode == 'agen-kedua':
+        # Aturan Bos (rantai 3 langkah): beda → keputusan agen kedua dipakai,
+        # KECUALI beda soal judul bab → manusia yang putuskan.
+        if j == 'bab' or atas == 'bab':
+            return {'idx': idx, 'putusan': 'antrean-manusia', 'label': None,
+                    'alasan': 'beda soal judul bab, manusia yang putuskan'}
+        return {'idx': idx, 'putusan': 'berbalik', 'label': j,
+                'alasan': 'agen kedua beda (bukan soal bab), keputusannya '
+                          'dipakai'}
     if j in set(votes):
         if cj >= atas_c:
             return {'idx': idx, 'putusan': 'berbalik', 'label': j,
@@ -1654,27 +1677,77 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None):
     # ── v11 LAPIS 2 — PENDAPAT KEDUA HANYA UNTUK BARIS GOYANG ──────────
     #    Dijalankan sesudah tanya-ulang v5, sebelum koreksi deterministik.
     #    `pendapat_kedua_fn` disuntik pemanggil: fn(idx, teks_baris, suara,
-    #    p) -> {'label': ..., 'confidence': ...} | None. Fungsi ini TIDAK
-    #    memanggil Jev — jawaban kedua datang dari luar (tanya ulang live
-    #    dengan sudut berbeda, atau model 1.13 sebagai pembanding). Bila
-    #    fn None (bawaan, termasuk semua pemanggil lama): perilaku sama
-    #    persis dengan v10, nol panggilan tambahan. Putusan 'berbalik'
-    #    mengubah label; 'antrean-manusia' TIDAK mengubah label, baris
-    #    dicatat ke antrean untuk manusia.
+    #    p[, konteks]) -> {'label': ..., 'confidence': ...} | None. Fungsi
+    #    ini TIDAK memanggil Jev — jawaban kedua datang dari luar.
+    #    v12 RANTAI 3 LANGKAH (Gas Bos 11 Nov 2026): fn = agen kedua yang
+    #    hidup (`app.agen_kedua.buat_pendapat_kedua_fn()`); putusan memakai
+    #    mode='agen-kedua' (beda → keputusan agen kedua dipakai, kecuali
+    #    beda soal judul bab → antrean manusia). Bila fn None (bawaan,
+    #    termasuk semua pemanggil lama): perilaku sama persis dengan v10,
+    #    nol panggilan tambahan. Putusan 'berbalik' mengubah label;
+    #    'antrean-manusia' TIDAK mengubah label, baris dicatat ke antrean.
+    #    Konteks lebar (3 baris sebelum/sesudah + judul bab terdekat)
+    #    diberikan sebagai argumen ke-5 BILA fn mendeklarasikannya; fn lama
+    #    4-arg (mis. lambda uji) tetap dipanggil 4-arg — uji lama tetap lulus.
     pk_jml = 0
     pk_berbalik = []
     pk_antrean = []
+    pk_jawaban = []
     if pendapat_kedua_fn is not None and goyang:
+        try:
+            import inspect as _inspect
+            _n_arg_fn = len(_inspect.signature(
+                pendapat_kedua_fn).parameters)
+        except Exception:
+            _n_arg_fn = 0
+
+        def _konteks_lebar(gi):
+            sebelum = [baris[k] for k in range(max(0, gi - 3), gi)]
+            sesudah = [baris[k]
+                       for k in range(gi + 1, min(len(baris), gi + 4))]
+            # Judul bab terdekat: judul deterministik di gabung DIDAHULUKAN
+            # (judul bab hasil susun TIDAK masuk dict `label` — hanya baris
+            # kandidat yang ada di sana), lalu label 'bab' dari Jev.
+            judul = None
+            for k in range(gi - 1, -1, -1):
+                if k in (d.get('gabung') or {}):
+                    judul = ' '.join(d['gabung'][k]).strip()
+                    break
+                if label.get(k) == 'bab':
+                    judul = baris[k]
+                    break
+            return {'sebelum': sebelum, 'sesudah': sesudah,
+                    'judul_bab_terdekat': judul}
+
         for gi, _votes in list(goyang):
+            label_jev = label.get(gi)
             try:
-                jw2 = pendapat_kedua_fn(gi, baris[gi],
-                                        list(semua[gi]), list(conf[gi]))
+                if _n_arg_fn >= 5:
+                    jw2 = pendapat_kedua_fn(
+                        gi, baris[gi], list(semua[gi]), list(conf[gi]),
+                        _konteks_lebar(gi))
+                else:
+                    jw2 = pendapat_kedua_fn(gi, baris[gi],
+                                            list(semua[gi]), list(conf[gi]))
             except Exception:
                 jw2 = None
-            put = pendapat_kedua(gi, baris[gi], semua[gi], conf[gi], jw2)
+            put = pendapat_kedua(gi, baris[gi], semua[gi], conf[gi], jw2,
+                                mode='agen-kedua')
             if put['putusan'] == 'bukan-goyang':
                 continue
             pk_jml += 1
+            pk_jawaban.append({
+                'idx': gi, 'label_jev': label_jev,
+                'label_kedua': (jw2 or {}).get('label')
+                               if isinstance(jw2, dict) else None,
+                'confidence': (jw2 or {}).get('confidence')
+                              if isinstance(jw2, dict) else None,
+                'putusan': put['putusan'],
+                'label_akhir': put['label'],
+                'alasan': (jw2 or {}).get('alasan', '')
+                          if isinstance(jw2, dict) else '',
+                'model': (jw2 or {}).get('model', '')
+                         if isinstance(jw2, dict) else ''})
             if put['putusan'] == 'berbalik':
                 pk_berbalik.append([gi, label.get(gi), put['label']])
                 label[gi] = put['label']
@@ -1838,7 +1911,11 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None):
                 (d.get('profil') or {}).get('alasan_antrean') or []),
             'pendapat_kedua_jml': pk_jml,
             'pendapat_kedua_berbalik': pk_berbalik,
-            'pendapat_kedua_antrean': pk_antrean}
+            'pendapat_kedua_antrean': pk_antrean,
+            # v12 rantai 3 langkah: jejak tiap jawaban agen kedua (label Jev,
+            # label agen kedua, putusan, model yang melayani) — untuk audit
+            # dan pilot. Kosong bila fn tidak disuntik.
+            'pendapat_kedua_jawaban': pk_jawaban}
 
 
 def main():

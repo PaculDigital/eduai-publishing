@@ -1,0 +1,333 @@
+"""AGEN KEDUA — pembaca kedua rantai 3 langkah (Jev → Hakim → agen kedua).
+
+Perintah Bos 11 Nov 2026 (Gas): naskah baru live TIDAK boleh butuh admin
+melabeli. Rantai: Jev melabeli → Hakim menandai yang ragu → agen kedua
+membaca baris yang ditandai dengan KONTEKS LEBAR dan memutuskan. Bila agen
+kedua sepakat dengan Jev, label Jev dipakai. Bila beda (bukan soal judul
+bab), keputusan agen kedua yang dipakai. Antrean manusia HANYA untuk yang
+benar-benar buntu: naskah tanpa penanda bab sama sekali, atau agen kedua
+dan Jev beda soal judul bab.
+
+PENTING — agen kedua HARUS beda model/cara baca dari Jev 1.14, supaya tidak
+mengulang salah yang sama:
+  · Jalur UTAMA (pilot + pemakaian dari VM): model instruksi umum lewat
+    jalur OpenRouter langsung, model pin `google/gemini-2.5-flash`
+    (pilihan 11 Nov 2026: murah, JSON andal, 1 juta konteks). Penanya
+    OpenRouter tinggal di `_sketsa/agen_kedua_openrouter.py` (perkakas
+    pilot, BUKAN kode produksi) dan DISUNTIK lewat parameter `penanya` —
+    modul ini tidak pernah memegang kunci OpenRouter.
+  · Jalur PRODUKSI (di dalam container): combo umum 9router yang diatur
+    Bos dari panel (BUKAN Jev — Jev hanya hidup di jembatan systemone).
+    Model yang melayani = apa pun yang combo layani saat itu, DICATAT per
+    panggilan dari balasan (`model` balasan). Belum teruji live dari
+    container dalam tugas ini — wajib uji asap 1 panggilan sebelum saklar
+    dinyalakan di produksi (lihat RANTAI_3_LANGKAH.md).
+  · Pembanding CADANGAN (bukan pilihan utama): Jev 1.13 lewat jalan tol
+    (`tanya_pembanding_113`). Dipakai HANYA bila model umum tidak bisa
+    dipakai live (kredit/akses), dan pemakaiannya DICATAT di hasil
+    (`model` = 1.13), tidak pernah diam-diam.
+
+PAGAR:
+  · Saklar mati `EDUAI_AGEN_KEDUA_AKTIF=0` (bawaan MATI, seperti kill-switch
+    Hakim). Mati ⇒ `buat_pendapat_kedua_fn()` mengembalikan None ⇒ perilaku
+    sama persis dengan v11 (Lapis 2 dilewati, nol panggilan tambahan).
+  · GAGAL = None (bukan label tebakan): jaringan mati, balasan bukan JSON,
+    label di luar 4 sah, confidence bukan angka ⇒ jawaban kedua dianggap
+    tidak ada ⇒ baris masuk antrean manusia (aturan `pendapat_kedua`).
+  · Suara Jev TIDAK ditunjukkan ke agen kedua (jawaban independen — kalau
+    ditunjukkan, agen kedua tinggal meniru). Parameter `suara` diterima
+    demi kesesuaian antarmuka `pendapat_kedua_fn`, tapi tidak masuk prompt.
+  · Modul ini TIDAK PERNAH memanggil Jev kecuali lewat `tanya_pembanding_113`
+    (pembanding cadangan, lewat jalan tol `jev.tanya` — bukan jalur sendiri).
+  · Gerbang jalan tol Jev: modul ini tidak memuat URL endpoint Jev sebagai
+    kode aktif (pola gerbang D1). Jalur produksi memakai `app.config`
+    (ROUTER_BASE/ROUTER_KEY/AI_MODEL) seperti `app.ai`.
+  · Gerbang setelan produksi: payload chat/completions di sini WAJIB memuat
+    `enable_thinking: False` (keputusan Bos 29 Sep 2026, sama seperti
+    `app.ai`) — agen kedua bukan model berpikir.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import os
+import urllib.error
+import urllib.request
+from typing import Any
+
+log = logging.getLogger('agen_kedua')
+
+# ── label sah (sama seperti label manusia) ─────────────────────────────────
+LABEL_SAH = ('bab', 'subbab', 'paragraf', 'biasa')
+
+# ── saklar + setelan (env; bawaan MATI) ─────────────────────────────────────
+#    EDUAI_AGEN_KEDUA_AKTIF=1  → rantai hidup (pabrik mengembalikan fn).
+#    EDUAI_AGEN_KEDUA_TRANSPORT=openrouter|router9 (bawaan router9: jalur
+#    produksi di dalam container). Transport openrouter HANYA lewat penanya
+#    yang disuntik (lihat _sketsa/agen_kedua_openrouter.py) — modul ini
+#    tidak memegang kunci.
+#    EDUAI_AGEN_KEDUA_MODEL  → nama model untuk penanya OpenRouter
+#    (bawaan google/gemini-2.5-flash; penanya yang membacanya).
+MODEL_OPENROUTER_BAWAAN = 'google/gemini-2.5-flash'
+MODEL_OPENROUTER_CADANGAN = 'openai/gpt-4o-mini'
+MODEL_JEV_113 = 'SATPAM/typesafe/jev-1.13'
+BATAS_DETIK = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT') or '60')
+MAKS_TOKEN_JAWAB = 512
+
+# ── log keputusan (in-memory; pabrik menempelkan salinan ke fn.log) ─────────
+LOG_KEPUTUSAN: list[dict[str, Any]] = []
+
+
+def aktif() -> bool:
+    """Saklar mati rantai. Bawaan MATI; nyala hanya bila env = '1'."""
+    return (os.getenv('EDUAI_AGEN_KEDUA_AKTIF') or '0').strip() == '1'
+
+
+def transport() -> str:
+    """Transport agen kedua: 'router9' (produksi, bawaan) atau 'openrouter'."""
+    t = (os.getenv('EDUAI_AGEN_KEDUA_TRANSPORT') or 'router9').strip().lower()
+    return t if t in ('router9', 'openrouter') else 'router9'
+
+
+# ── aturan label manusia (patokan yang SAMA, disalin verbatim ke prompt) ────
+ATURAN_LABEL = (
+    'bab = judul bab (mis. BAB I PENDAHULUAN, CHAPTER II, I. PENDAHULUAN). '
+    'subbab = judul bagian di dalam bab, ATAU penomoran yang MENGEPALAI blok '
+    'penjelasan sendiri (mis. "2.1 Latar Belakang" diikuti uraian). '
+    'paragraf = kalimat isi biasa, TERMASUK kalimat pertama di bawah '
+    'judul/butir. '
+    'biasa = BUKAN ketiganya: penomoran di dalam enumerasi sebaris, salinan '
+    'sistematika/daftar isi, running head (judul bab yang terulang di tengah '
+    'naskah), fragmen tabel, header output (mis. SPSS), sitasi, atau nomor '
+    'halaman.'
+)
+
+
+def _prompt(teks_baris: str, konteks: dict | None) -> str:
+    """Prompt klasifikasi 4 label dengan konteks lebar (Bahasa Indonesia).
+
+    `konteks` (dari wiring Lapis 2): {'sebelum': [...], 'sesudah': [...],
+    'judul_bab_terdekat': str|None}. Bila konteks kosong, hanya barisnya.
+    """
+    ctx = konteks or {}
+    sebelum = [b for b in (ctx.get('sebelum') or []) if (b or '').strip()]
+    sesudah = [b for b in (ctx.get('sesudah') or []) if (b or '').strip()]
+    bab = (ctx.get('judul_bab_terdekat') or '').strip()
+    bagian = [
+        'Kamu membaca satu baris dari sebuah skripsi/tesis berbahasa '
+        'Indonesia (kadang Inggris) dan menentukan jenis baris itu.',
+        'Jawab HANYA dengan JSON: {"label": "...", "confidence": 0.0-1.0, '
+        '"alasan": "..."}. Label HANYA salah satu: bab, subbab, paragraf, '
+        'biasa. Confidence = keyakinanmu 0 sampai 1 (di bawah 0,5 berarti '
+        'kamu tidak yakin). Alasan SATU kalimat pendek.',
+        'Aturan: ' + ATURAN_LABEL,
+    ]
+    if bab:
+        bagian.append('Judul bab terdekat di atas baris ini: ' + bab)
+    if sebelum:
+        bagian.append('Baris SEBELUM baris ini:\n' + '\n'.join(sebelum))
+    bagian.append('BARIS YANG DINILAI:\n' + (teks_baris or '').strip())
+    if sesudah:
+        bagian.append('Baris SESUDAH baris ini:\n' + '\n'.join(sesudah))
+    bagian.append(
+        'Perhatikan: baris yang bentuknya seperti judul TAPI hanya salinan '
+        'daftar isi/sistematika, atau judul bab yang terulang sebagai running '
+        'head, adalah "biasa", BUKAN "bab". Baris penomoran yang hanya butir '
+        'di tengah kalimat adalah "biasa", BUKAN "subbab".')
+    return '\n\n'.join(bagian)
+
+
+def _urai_jawaban(mentah: str) -> dict | None:
+    """Ambil objek JSON pertama dari balasan, validasi label + confidence.
+
+    Gagal (bukan JSON / label tidak sah / confidence bukan angka) ⇒ None
+    (jawaban kedua dianggap tidak ada — baris masuk antrean, bukan ditebak).
+    """
+    if not isinstance(mentah, str) or not mentah.strip():
+        return None
+    try:
+        awal = mentah.find('{')
+        if awal < 0:
+            return None
+        isi = json.JSONDecoder().raw_decode(mentah[awal:])[0]
+    except Exception:
+        return None
+    if not isinstance(isi, dict):
+        return None
+    label = isi.get('label')
+    conf = isi.get('confidence')
+    if label not in LABEL_SAH:
+        return None
+    if not isinstance(conf, (int, float)) or isinstance(conf, bool):
+        return None
+    conf = max(0.0, min(1.0, float(conf)))
+    alasan = isi.get('alasan')
+    return {'label': label, 'confidence': conf,
+            'alasan': alasan if isinstance(alasan, str) else ''}
+
+
+def _urai_balasan_chat(mentah: str) -> tuple[str, str]:
+    """Urai balasan /chat/completions → (konten, model_melayani).
+
+    Menangani bentuk SSE (`data: {...} data: [DONE]`) maupun JSON polos,
+    dengan whitespace di depan (pelajaran 17 Sep 2026).
+    """
+    i = mentah.find('data: [DONE]')
+    body = mentah[:i] if i > 0 else mentah
+    body = body.strip()
+    if body.startswith('data:'):
+        body = body.split('data:', 1)[1].strip()
+    awal = body.find('{')
+    if awal < 0:
+        raise RuntimeError('balasan bukan JSON')
+    j = json.JSONDecoder().raw_decode(body[awal:])[0]
+    ch = (j.get('choices') or [{}])[0]
+    konten = (ch.get('message') or {}).get('content')
+    if not konten:
+        raise RuntimeError('konten kosong dari model')
+    if ch.get('finish_reason') == 'length':
+        raise RuntimeError('jawaban terpotong (finish=length)')
+    return konten, j.get('model') or ''
+
+
+def _panggil_router9(prompt: str) -> tuple[str, str]:
+    """Transport PRODUKSI: combo umum 9router (model diatur Bos dari panel).
+
+    Memakai setelan yang SAMA dengan `app.ai` (ROUTER_BASE/ROUTER_KEY/
+    AI_MODEL dari `app.config`). Model yang melayani dicatat dari balasan.
+    """
+    from app.config import ROUTER_BASE, ROUTER_KEY, AI_MODEL
+
+    body = {
+        'model': AI_MODEL,
+        'messages': [{'role': 'user', 'content': prompt}],
+        'max_tokens': MAKS_TOKEN_JAWAB,
+        'temperature': 0.2,
+        # Keputusan Bos 29 Sep 2026: agen kedua bukan model berpikir.
+        'enable_thinking': False,
+    }
+    header = {'Content-Type': 'application/json'}
+    if ROUTER_KEY:
+        header['Authorization'] = f'Bearer {ROUTER_KEY}'
+    req = urllib.request.Request(
+        ROUTER_BASE.rstrip('/') + '/chat/completions',
+        data=json.dumps(body).encode(), headers=header)
+    try:
+        with urllib.request.urlopen(req, timeout=BATAS_DETIK) as r:
+            mentah = r.read().decode()
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f'combo HTTP {e.code}: {e.read().decode()[:200]}')
+    except Exception as e:
+        raise RuntimeError(f'combo tidak bisa dihubungi: {type(e).__name__}: {e}')
+    return _urai_balasan_chat(mentah)
+
+
+def tanya_agen_kedua(teks_baris: str, konteks: dict | None = None,
+                     suara: list | None = None, penanya=None,
+                     model: str | None = None) -> dict | None:
+    """Tanya agen kedua: label + confidence + alasan, atau None bila gagal.
+
+    `suara` (suara Jev) diterima demi antarmuka, tapi SENGAJA tidak masuk
+    prompt — jawaban kedua harus independen, bukan meniru Jev.
+    `penanya` = callable(prompt) -> (konten, model_melayani) yang disuntik
+    (dipakai pilot OpenRouter + uji offline). Tanpa penanya, dipakai jalur
+    produksi (combo 9router). GAGAL APAPUN ⇒ None (bukan label tebakan).
+    """
+    prompt = _prompt(teks_baris, konteks)
+    try:
+        if penanya is not None:
+            konten, model_layani = penanya(prompt)
+        else:
+            konten, model_layani = _panggil_router9(prompt)
+    except Exception as e:
+        log.warning('[agen_kedua] panggilan gagal: %s', e)
+        return None
+    jawab = _urai_jawaban(konten)
+    if jawab is None:
+        log.warning('[agen_kedua] balasan tidak terbaca: %r', konten[:160])
+        return None
+    jawab['model'] = model_layani or (model or '')
+    jawab['transport'] = 'openrouter' if penanya is not None else 'router9'
+    return jawab
+
+
+def tanya_pembanding_113(teks_baris: str, konteks: dict | None = None) -> dict | None:
+    """Pembanding CADANGAN (bukan pilihan utama): Jev 1.13 lewat jalan tol.
+
+    Dipakai HANYA bila model umum tidak bisa dipakai live (kredit/akses).
+    Pemakaiannya WAJIB dicatat di hasil (`model` = 1.13) — tidak pernah
+    diam-diam. 1.13 pensiun ≈13 Des 2026.
+    """
+    from app import jev
+
+    ctx = konteks or {}
+    bahan = '\n'.join(
+        [b for b in (ctx.get('sebelum') or []) if (b or '').strip()]
+        + [(teks_baris or '').strip()]
+        + [b for b in (ctx.get('sesudah') or []) if (b or '').strip()])
+    pertanyaan = {
+        'label_baris': {
+            'type': 'choice',
+            'instructions': (
+                'Baris tengah di bawah ini jenis apa dalam skripsi? '
+                + ATURAN_LABEL),
+            'criteria': {
+                'bab': 'judul bab',
+                'subbab': 'judul bagian di dalam bab / penomoran yang '
+                          'mengepalai blok penjelasan sendiri',
+                'paragraf': 'kalimat isi biasa',
+                'biasa': 'bukan ketiganya (enumerasi, salinan daftar isi, '
+                         'running head, fragmen tabel, sitasi)'},
+        },
+    }
+    try:
+        jawab = jev.tanya(bahan, pertanyaan, model=MODEL_JEV_113)
+    except Exception as e:
+        log.warning('[agen_kedua] pembanding 1.13 gagal: %s', e)
+        return None
+    if not jawab:
+        return None
+    isi = jawab.get('label_baris') or {}
+    pilihan = isi.get('choice')
+    conf = isi.get('confidence')
+    if pilihan not in LABEL_SAH or not isinstance(conf, (int, float)):
+        return None
+    return {'label': pilihan, 'confidence': max(0.0, min(1.0, float(conf))),
+            'alasan': 'pembanding Jev 1.13 (cadangan)',
+            'model': 'typesafe/jev-1.13', 'transport': 'jev-1.13'}
+
+
+def buat_pendapat_kedua_fn(penanya=None, model: str | None = None):
+    """Pabrik fn Lapis 2: fn(idx, teks_baris, suara, p, konteks=None).
+
+    Saklar MATI ⇒ None (perilaku v11, nol panggilan). Saklar NYALA ⇒ fn
+    yang memanggil agen kedua per baris goyang dan mencatat tiap keputusan
+    ke `fn.log` (list dict) + `LOG_KEPUTUSAN`. `penanya` yang disuntik
+    dipakai sebagai transport; tanpa penanya dipakai combo 9router.
+    """
+    if not aktif():
+        return None
+
+    def fn(idx, teks_baris, suara, p, konteks=None):
+        jawab = tanya_agen_kedua(teks_baris, konteks, suara,
+                                  penanya=penanya, model=model)
+        rekaman = {
+            'idx': idx,
+            'teks': (teks_baris or '')[:160],
+            'suara_jev': list(suara or []),
+            'label_kedua': jawab['label'] if jawab else None,
+            'confidence': jawab['confidence'] if jawab else None,
+            'alasan': jawab['alasan'] if jawab else '',
+            'model': jawab['model'] if jawab else '',
+            'transport': jawab['transport'] if jawab else '',
+        }
+        fn.log.append(rekaman)
+        LOG_KEPUTUSAN.append(rekaman)
+        if jawab is None:
+            return None
+        return {'label': jawab['label'], 'confidence': jawab['confidence'],
+                'alasan': jawab['alasan'], 'model': jawab['model']}
+
+    fn.log = []
+    return fn

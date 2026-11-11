@@ -1,0 +1,34 @@
+{
+  "rule_version": "jev-peta-v12",
+  "kelompok": "pilot rantai 3 langkah v12 (naskah BELAJAR J2+U2)",
+  "cabang": "agen/wulan/optimalkan-jev-hakim-v5",
+  "pelari": "jalankan_rantai3.py (petakan_dari_teks 1 run + agen kedua combo)",
+  "model_jev_diminta": "typesafe/jev-1.14-20261014",
+  "agen_kedua_transport": "router9 (combo produksi)",
+  "catatan_pilot": "Agen kedua HANYA dipanggil untuk 7 baris sampel berlabel; baris goyang lain None -> antrean, label tetap v11. Antrean pilot BUKAN sinyal produksi.",
+  "entri": [],
+  "bukti_model_jev": {
+    "model_dilayani": "typesafe/jev-1.14-20261014",
+    "satpam_penyedia": "openrouter",
+    "satpam_jejak": [
+      {
+        "penyedia": "resmi",
+        "model": "jev-1.14-20261014.0",
+        "hasil": "GAGAL",
+        "sebab": "HTTP 402: {\"detail\":{\"error_type\":\"billing_error\",\"message\":\"Your organization has no available TypeSafe API credits. Please add more credits and/or set up auto-reload at https://console.typesafe.ai/settings/billing\"}}"
+      },
+      {
+        "penyedia": "openrouter",
+        "model": "typesafe/jev-1.14-20261014",
+        "hasil": "DIPAKAI"
+      }
+    ],
+    "provider": "TypeSafe"
+  },
+  "probe_agen_kedua_combo": {
+    "ok": false,
+    "galat": "RuntimeError: combo HTTP 503: {\"error\":{\"message\":\"[openai-compatible-chat-eee0c458-9d96-4f73-9258-03f448ef7f2e/cb/glm-5.3-flash] [503]: {\\\"error\\\":{\\\"message\\\":\\\"no available provider for cb/glm-5.3-flash (all offers exhausted or"
+  },
+  "status": "gagal-transport-router9",
+  "alasan": "transport combo 9router tidak bisa dipakai: RuntimeError: combo HTTP 503: {\"error\":{\"message\":\"[openai-compatible-chat-eee0c458-9d96-4f73-9258-03f448ef7f2e/cb/glm-5.3-flash] [503]: {\\\"error\\\":{\\\"message\\\":\\\"no available provider for cb/glm-5.3-flash (all offers exhausted or — pilot berhenti sebelum Jev dipakai; pakai rencana cadangan dua-fase (rekam + OpenRouter dari VM)"
+}

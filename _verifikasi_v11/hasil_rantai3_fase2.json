@@ -1,0 +1,362 @@
+{
+  "rule_version": "jev-peta-v12",
+  "kelompok": "pilot rantai 3 langkah v12 — fase 2 (J2+U2+D1)",
+  "model_agen_kedua": "google/gemini-2.5-flash",
+  "transport_agen_kedua": "openrouter",
+  "panggilan_agen_kedua": 0,
+  "baris": [
+    {
+      "naskah": "J2",
+      "no": "190",
+      "jenis_sengketa": "goyang_bab",
+      "teks_baris": "TINJAUAN PUSTAKA",
+      "label_benar": "bab",
+      "putusan_fase1b": "tidak-goyang-di-run-ini",
+      "label_v11_final": "bab",
+      "label_v11_pra_lapis2": null,
+      "suara": null,
+      "v11_benar": true,
+      "catatan": "bukan kandidat: judul BAB deterministik (bab_gabung tahap 1 memuat TINJAUAN PUSTAKA); v11 efektif bab = label benar",
+      "label_rantai_final": "bab",
+      "rantai_benar": true
+    },
+    {
+      "naskah": "J2",
+      "no": "191",
+      "jenis_sengketa": "goyang_bab",
+      "teks_baris": "-\tUkuran sangat terbatas untuk kelompok besar.",
+      "label_benar": "biasa",
+      "putusan_fase1b": "tidak-goyang-di-run-ini",
+      "label_v11_final": "subbab",
+      "label_v11_pra_lapis2": null,
+      "suara": [
+        "subbab"
+      ],
+      "v11_benar": false,
+      "label_rantai_final": "subbab",
+      "rantai_benar": false
+    },
+    {
+      "naskah": "J2",
+      "no": "192",
+      "jenis_sengketa": "goyang_bab",
+      "teks_baris": "Didalam pengujian analisis ini, digunakan statistik chi-kuadrat 1 pihak dengan rumus :",
+      "label_benar": "paragraf",
+      "putusan_fase1b": "tidak-goyang-di-run-ini",
+      "label_v11_final": "biasa",
+      "label_v11_pra_lapis2": null,
+      "suara": [
+        "biasa",
+        "biasa"
+      ],
+      "v11_benar": false,
+      "label_rantai_final": "biasa",
+      "rantai_benar": false
+    },
+    {
+      "naskah": "U2",
+      "no": "59",
+      "jenis_sengketa": "goyang_bab",
+      "teks_baris": "===== BAB++siska+baru.doc =====",
+      "label_benar": "biasa",
+      "putusan_fase1b": "tidak-goyang-di-run-ini",
+      "label_v11_final": "biasa",
+      "label_v11_pra_lapis2": null,
+      "suara": null,
+      "v11_benar": true,
+      "catatan": "bukan kandidat: pemisah dokumen, dibuang deterministik v11 (bukan judul bab); konsisten dengan label benar biasa",
+      "label_rantai_final": "biasa",
+      "rantai_benar": true
+    },
+    {
+      "naskah": "U2",
+      "no": "60",
+      "jenis_sengketa": "goyang_bab",
+      "teks_baris": "Sistematika penulisan skripsi ini terdiri dari 5 (lima) bab. Pada masing-masing bab terbagi dalam beberapa sub bab, sehingga mempermuda pembaca untuk mengetahui gambaran secara ringkas mengenai uraian yang dikemukakan dalam tiap bab.",
+      "label_benar": "paragraf",
+      "putusan_fase1b": "goyang",
+      "label_v11_final": "paragraf",
+      "label_v11_pra_lapis2": "paragraf",
+      "suara": [
+        "biasa",
+        "paragraf",
+        "paragraf"
+      ],
+      "v11_benar": true,
+      "suara_rekaman": [
+        "biasa",
+        "paragraf",
+        "paragraf"
+      ],
+      "conf_rekaman": [
+        0.27,
+        0.77,
+        0.45
+      ],
+      "konteks": {
+        "sebelum": [
+          "3. Bahan Hukum Tersier",
+          "Adalah bahan-bahan atau tulisan-tulisan yang dapat menambah penjelasan terhadap bahan hukum primer dan tersier, terdiri dari artikel, kliping, seminar, internet, kamus hukum dan lainnya.",
+          "E. Sistematika Penulisan"
+        ],
+        "sesudah": [
+          "BAB I",
+          ":",
+          "PENDAHULUAN"
+        ],
+        "judul_bab_terdekat": "BAB I PENDAHULUAN"
+      },
+      "label_jev_teratas": "paragraf",
+      "jawaban_agen_kedua": {
+        "label": "paragraf",
+        "confidence": 0.9,
+        "alasan": "Ini adalah kalimat isi biasa yang menjelaskan sistematika penulisan.",
+        "model": "google/gemini-2.5-flash"
+      },
+      "agen_kedua_benar": true,
+      "putusan_rantai": "tetap",
+      "alasan_putusan": "pendapat kedua sepakat dengan suara teratas",
+      "label_rantai_l2": "paragraf",
+      "label_rantai_final": "paragraf",
+      "koreksi_rantai": [],
+      "rantai_benar": true
+    },
+    {
+      "naskah": "U2",
+      "no": "61",
+      "jenis_sengketa": "goyang_bab",
+      "teks_baris": "TINDAK PIDANA PEDOFILIA",
+      "label_benar": "bab",
+      "putusan_fase1b": "tidak-goyang-di-run-ini",
+      "label_v11_final": "bab",
+      "label_v11_pra_lapis2": null,
+      "suara": [
+        "bab",
+        "bab"
+      ],
+      "v11_benar": true,
+      "label_rantai_final": "bab",
+      "rantai_benar": true
+    },
+    {
+      "naskah": "U2",
+      "no": "62",
+      "jenis_sengketa": "goyang_subbab",
+      "teks_baris": "a) Persetubuhan",
+      "label_benar": "subbab",
+      "putusan_fase1b": "goyang",
+      "label_v11_final": "biasa",
+      "label_v11_pra_lapis2": "paragraf",
+      "suara": [
+        "paragraf",
+        "subbab"
+      ],
+      "v11_benar": false,
+      "suara_rekaman": [
+        "paragraf",
+        "subbab"
+      ],
+      "conf_rekaman": [
+        0.4,
+        0.21
+      ],
+      "konteks": {
+        "sebelum": [
+          "B. Sanksi Pidana Pelaku Tindak Pidana Pedofilia",
+          "1. Menurut KUHP",
+          "Sanksi bagi para pelaku pedofilia menurut KUHP terdiri dari :"
+        ],
+        "sesudah": [
+          "Dalam hal persetubuhan, adalah persetubuhan yang dilakukan oleh orang dewasa terhadap wanita diluar perkawinan, dimana pihak korban adalah anak dibawah umur.",
+          "Pasal 287 ayat 1 menyatakan bahwa :",
+          "”barang siapa bersetubuh dengan seorang wanita diluar pernikahan, padahal diketahui atau sepatutnya harus diduga, bahwa umurnya belum lima belas tahun, atau kalau umurnya tidak ternyata , belum mampu kawin diancam dengan pidana penjara paling lama Sembilan tahun.”"
+        ],
+        "judul_bab_terdekat": "BAB III SANKSI PIDANA PELAKU TINDAK PIDANA PHEDOFILIA"
+      },
+      "label_jev_teratas": "paragraf",
+      "jawaban_agen_kedua": {
+        "label": "biasa",
+        "confidence": 0.9,
+        "alasan": "Ini adalah butir dalam daftar, bukan judul bab, subbab, atau paragraf.",
+        "model": "google/gemini-2.5-flash"
+      },
+      "agen_kedua_benar": false,
+      "putusan_rantai": "berbalik",
+      "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+      "label_rantai_l2": "biasa",
+      "label_rantai_final": "biasa",
+      "koreksi_rantai": [],
+      "rantai_benar": false
+    },
+    {
+      "naskah": "D1",
+      "no": 137,
+      "jenis_sengketa": "goyang_bab",
+      "teks_baris": "Berdasarkan hasil penelitian terdapat beberapa faktor-faktor yang mendukung pelaksanaan KBK mata pelajaran matematika yaitu; siswa memiliki buku pegangan sehingga kegiatan menyalin/dikte diminimalisir dalam kegiatan belajar mengajar, dan penggunaan metode dan strategi pembelajaran yang tidak monoton tetapi lebih bervariasi sesuai kreatifitas guru untuk mengembangkan potensi peserta didik; buku pegangan yang dimiliki siswa berupa buku berdasarkan KBK yang harus dimiliki oleh tiap siswa; siswa mempunyai kesadaran tinggi untuk proaktif dan lebih mandiri dalam belajar, serta siswa lebih antusias dalam proses belajar mengajar karena guru memberikan kesempatan kepada siswa untuk menemukan maupun mengembangkan potensi yang dimiliki oleh masing-masing siswa, dalam hal ini siswa lebih antusias baik dalam mengajukan pertanyaan, menjawab pertanyaan, maupun menanggapi suatu masalah; laboratorium komputer yang sudah tersedia serta OHP yang sudah disediakan di setiap ruang kelas; siswa dituntut untuk belajar di sekolah dan di luar sekolah, dan siswa dituntut untuk belajar mandiri baik pada jam pelajaran maupun di luar jam pelajaran; guru melakukan penilaian per kompetensi dasar sehingga guru tidak merasa kesulitan dalam menentukan ketuntasan belajar siswa, pelaksanaan program remedial yang dilakukan secara lisan maupun tulisan yang dilakukan pada saat jam pelajaran maupun di luar jam pelajaran/di rumah, serta penilaian tidak hanya dari ujian tulisan tetapi juga dari aspek-aspek yang lain seperti keaktifan, penampilan dan lain-lain.",
+      "label_benar": "paragraf",
+      "putusan_fase1b": "goyang",
+      "label_v11_final": "biasa",
+      "label_v11_pra_lapis2": "biasa",
+      "suara": [
+        "subbab",
+        "biasa"
+      ],
+      "v11_benar": false,
+      "suara_rekaman": [
+        "subbab",
+        "biasa"
+      ],
+      "conf_rekaman": [
+        0.33,
+        0.61
+      ],
+      "konteks": {
+        "sebelum": [
+          "Tabel 2. 1 Perbedaan Kurikulum Berbasis Kompetensi dengan Kurikulum 1994.",
+          "NO",
+          "KURIKULUM 1994"
+        ],
+        "sesudah": [
+          "1",
+          "Penggunaan pendekatan penguasaan ilmu pengetahuan, yang menekankan pada isi, atau materi berupa pengetahuan, pemahaman, aplikasi, analisis, sintesis, dan evaluasi yang diambil dari bidang-bidang ilmu pengetahuan.",
+          "Penggunaan pendekatan kompetensi yang menekankan pada pemahaman, kemampuan atau kompetensi tertentu di sekolah, yang berkaitan dengan pekerjaan yang ada di masyarakat."
+        ],
+        "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+      },
+      "label_jev_teratas": "biasa",
+      "jawaban_agen_kedua": {
+        "label": "paragraf",
+        "confidence": 0.9,
+        "alasan": "Baris ini adalah kalimat isi yang panjang dan menjelaskan hasil penelitian.",
+        "model": "google/gemini-2.5-flash"
+      },
+      "agen_kedua_benar": true,
+      "putusan_rantai": "berbalik",
+      "alasan_putusan": "agen kedua beda (bukan soal bab), keputusannya dipakai",
+      "label_rantai_l2": "paragraf",
+      "label_rantai_final": "paragraf",
+      "koreksi_rantai": [],
+      "rantai_benar": true
+    },
+    {
+      "naskah": "D1",
+      "no": 141,
+      "jenis_sengketa": "goyang_subbab",
+      "teks_baris": "Pendidikan adalah penentu terbesar perkembangan masa depan bangsa. Makin besar perhatian kita terhadap bidang pendidikan, ditambah lagi dengan ketepatan arah pendidikan yang dicanangkan, niscaya akan membawa bangsa atau daerah tersebut pada tingkat kemajuan yang memadai, sehingga tidak akan tertinggal atau ditinggalkan oleh bangsa lain. Pendidikan di Indonesia dewasa ini masih jauh tertinggal dibanding pendidikan di negara lain. Untuk mengantisipasi hal tersebut salah satu aspek yang perlu diperhatikan adalah materi atau yang biasa disebut kurikulum.",
+      "label_benar": "paragraf",
+      "putusan_fase1b": "goyang",
+      "label_v11_final": "paragraf",
+      "label_v11_pra_lapis2": "paragraf",
+      "suara": [
+        "biasa",
+        "paragraf",
+        "paragraf"
+      ],
+      "v11_benar": true,
+      "suara_rekaman": [
+        "biasa",
+        "paragraf",
+        "paragraf"
+      ],
+      "conf_rekaman": [
+        0.49,
+        0.56,
+        0.81
+      ],
+      "konteks": {
+        "sebelum": [
+          "BAB I",
+          "PENDAHULUAN",
+          "A. Latar Belakang"
+        ],
+        "sesudah": [
+          "Kurikulum dalam suatu sistem pendidikan merupakan komponen yang penting. Dikatakan demikian karena kurikulum merupakan penuntun dalam proses belajar mengajar (PBM) di sekolah. Oleh karena itu kurikulum selalu dinamis dan senantiasa dipengaruhi oleh perubahan-perubahan dalam faktor-faktor yang mendasarinya. Tujuan pendidikan dapat berubah secara fundamental bila suatu negara yang dijajah menjadi negara yang merdeka, sehingga dengan sendirnya kurikulum pun harus mengalami perubahan yang menyeluruh.",
+          "Kurikulum dapat pula mengalami perubahan bila terdapat pendirian baru mengenai proses belajar mengajar, sehingga timbul berbagai bentuk kurikulum. Perubahan dalam masyarakat, eksplosi ilmu pengetahuan, dan lain-lain mengharuskan adanya perubahan kurikulum. Perubahan-perubahan itu menyebabkan kurikulum yang berlaku tidak lagi relevan, dan ancaman serupa ini akan senantiasa dihadapi setiap kurikulum, betapapun relevannya pada suatu saat.",
+          "Agar pendidikan memiliki relevansi dengan perkembangan zaman, maka perlu sekali praktek pendidikan diarahkan pada pendidikan yang berbasis kompetensi. Artinya praktek pendidikan dapat membekali siswa sejumlah keterampilan (life skill). Dengan life skill, yang tidak semata-mata mengandalkan kemampuan akademik melainkan juga non akademik, siswa dapat memaknai perjalanan hidupnya dengan kearifan."
+        ],
+        "judul_bab_terdekat": "BAB I PENDAHULUAN"
+      },
+      "label_jev_teratas": "paragraf",
+      "jawaban_agen_kedua": {
+        "label": "paragraf",
+        "confidence": 0.9,
+        "alasan": "Baris ini adalah kalimat isi biasa yang mengikuti subbab 'A. Latar Belakang'.",
+        "model": "google/gemini-2.5-flash"
+      },
+      "agen_kedua_benar": true,
+      "putusan_rantai": "tetap",
+      "alasan_putusan": "pendapat kedua sepakat dengan suara teratas",
+      "label_rantai_l2": "paragraf",
+      "label_rantai_final": "paragraf",
+      "koreksi_rantai": [],
+      "rantai_benar": true
+    },
+    {
+      "naskah": "D1",
+      "no": 142,
+      "jenis_sengketa": "goyang_subbab",
+      "teks_baris": "a. Garis-garis Besar Haluan Negara (GBHN) tahun 1999 yang menegaskan perlunya didiversifikasi kurikulum yang dapat melayani keanekaragaman sumber daya manusia, kemampuan siswa, sarana pembelajaran, dan budaya daerah.",
+      "label_benar": "biasa",
+      "putusan_fase1b": "goyang",
+      "label_v11_final": "biasa",
+      "label_v11_pra_lapis2": "biasa",
+      "suara": [
+        "biasa",
+        "subbab"
+      ],
+      "v11_benar": true,
+      "suara_rekaman": [
+        "biasa",
+        "subbab"
+      ],
+      "conf_rekaman": [
+        0.27,
+        0.27
+      ],
+      "konteks": {
+        "sebelum": [
+          "4. Landasan Penerapan Kurikulum Berbasis Kompetensi",
+          "Suderadjat (2004) mengatakan bahwa pendidikan adalah proses memanusiakan manusia melalui pembelajaran dalam bentuk aktualisasi potensi peserta didik menjadi suatu kemampuan atau kompetensi. Dalam istilah kompetensi, potensi adalah kemampuan yang masih terpendam, dan dalam istilah potensi, kompetensi adalah potensi yang telah aktual. Sudrajat melanjutkan bahwa potensi seseorang akan berubah menjadi kompetensi melalui proses belajar dan berlatih.",
+          "Kurikulum yang diterapkan di suatu negara tidak terlepas dari kebutuhan bangsa, masyarakat pemakai (Martinis Yamin, 2005: 128–129), maka kurikulum di Indonesia mengacu kepada:"
+        ],
+        "sesudah": [
+          "b. Undang-Undang Nomor 22 tahun 1999 (Pasal 4) tentang pemerintahan daerah yang menegaskan adanya kewenangan daerah provinsi, kabupaten, dan kota untuk mengatur dan mengurus kepentingan masyarakat setempat menurut prakarsa sendiri berdasarkan aspirasi masyarakat.",
+          "c. Undang-Undang Sistim Pendidikan Nasional (Sisdiknas) nomor 20 tahun 2003 Bab IX (pasal 35) ayat (1) bahwa standar pendidikan terdiri atas isi, proses, kompetensi lulusan, tenaga kependidikan, sarana dan prasarana, pengelolaan, pembiayaan, dan penilaian pendidikan yang harus ditingkatkan secara berencana dan berkala. Ayat (2) standar nasional pendidikan digunakan sebagai acuan pengembangan kurikulum, tenaga kependidikan, sarana dan prasarana, pengelolaan, pembiayaan. Demikian juga pada Bab X (pasal 36) ayat (2) kurikulum pada semua jenjang dan jenis pendidikan dikembangkan dengan prinsip diversifikasi sesusai dengan satuan pendidikan, potensi, daerah, dan peserta didik.",
+          "5. Implementasi Kurikulum Berbasis Kompetensi"
+        ],
+        "judul_bab_terdekat": "BAB II TINJAUAN PUSTAKA DAN KERANGKA BERPIKIR"
+      },
+      "label_jev_teratas": "biasa",
+      "jawaban_agen_kedua": {
+        "label": "biasa",
+        "confidence": 0.9,
+        "alasan": "Baris ini adalah butir dalam enumerasi yang merupakan kelanjutan dari kalimat sebelumnya.",
+        "model": "google/gemini-2.5-flash"
+      },
+      "agen_kedua_benar": true,
+      "putusan_rantai": "tetap",
+      "alasan_putusan": "pendapat kedua sepakat dengan suara teratas",
+      "label_rantai_l2": "biasa",
+      "label_rantai_final": "biasa",
+      "koreksi_rantai": [],
+      "rantai_benar": true
+    },
+    {
+      "naskah": "D1",
+      "no": 143,
+      "jenis_sengketa": "goyang_subbab",
+      "teks_baris": "b. Undang-Undang Nomor 22 tahun 1999 (Pasal 4) tentang pemerintahan daerah yang menegaskan adanya kewenangan daerah provinsi, kabupaten, dan kota untuk mengatur dan mengurus kepentingan masyarakat setempat menurut prakarsa sendiri berdasarkan aspirasi masyarakat.",
+      "label_benar": "biasa",
+      "putusan_fase1b": "tidak-goyang-di-run-ini",
+      "label_v11_final": "biasa",
+      "label_v11_pra_lapis2": null,
+      "suara": [
+        "biasa",
+        "biasa"
+      ],
+      "v11_benar": true,
+      "label_rantai_final": "biasa",
+      "rantai_benar": true
+    }
+  ]
+}
