@@ -3,7 +3,7 @@
  "rule_version": "jev-peta-v11",
  "model_diminta": "SATPAM/typesafe/jev-1.14 (bukti jev-1.14.0)",
  "naskah_uji_total": 36,
- "naskah_terverifikasi": 18,
+ "naskah_terverifikasi": 33,
  "naskah_gagal_probe": [
   "AA3",
   "AC2",
@@ -19,12 +19,8 @@
   "W3"
  ],
  "naskah_belum_dicoba": [
-  "A4",
-  "AD3",
   "AJ-1",
-  "AP-3",
-  "G3",
-  "N3"
+  "E3"
  ],
  "per_kode": [
   {
@@ -2875,7 +2871,8 @@
   "konfirmasi_C3_AC2": 2,
   "total": 408,
   "batas": 600,
-  "sisa": 192
+  "sisa": 192,
+  "total_tahap5_semua_kelompok": 660
  },
  "biaya_perkiraan_rp": {
   "metode": "jangkar ukur_biaya_3_naskah + tahap 1: ~Rp10 per panggilan, batas atas chars/4, $0,042/1 jt token, kurs Rp18.100/USD, output gratis, Jev tidak mengembalikan pemakaian token",
@@ -2893,7 +2890,8 @@
   "pilihan_lanjut": [
    "Isi ulang kredit TypeSafe, lalu jalankan 18 naskah sisa dengan probe jev-1.14.0 yang sama.",
    "Atau Boss menyetujui fallback OpenRouter typesafe/jev-1.14-20261014 sebagai setara 1.14 (perlu keputusan eksplisit; bobot belum terbukti identik)."
-  ]
+  ],
+  "status_akhir_kelompok_or": "TypeSafe resmi MASIH 402 di setiap probe kelompok OR (jejak satpam tiap run: resmi jev-1.14.0 GAGAL HTTP 402, openrouter DIPAKAI). Kredit TIDAK terisi lagi selama run; jalur model_override (butir 5) tidak pernah terpicu (0 kali). E3 + AJ-1 tertunda karena anggaran, bukan karena probe."
  },
  "vonis": {
   "ringkas": "v11 TIDAK TERBUKTI menaikkan presisi keseluruhan di naskah uji. Yang terbukti: pembersihan artefak (pemisah/BOM) penuh, judul CHAPTER/Romawi lebih rapi di gabung, sampah bab turun 49->39. Yang tidak terbukti: goyang tidak turun (1411->1414), panggilan tidak turun (299->292), label bergerak dalam rentang noise, sampah bab masih ada di 8 dari 18 naskah.",
@@ -2913,5 +2911,2157 @@
    "antrean manusia: 0 kali terpicu live"
   ],
   "catatan": "Skor teks lawan label manusia TIDAK MUNGKIN dihitung (0 label uji). Vonis di atas memakai agregat + cek deterministik, bukan skor presisi manusia."
+ },
+ "model_diminta_openrouter": "SATPAM/typesafe/jev-1.14 (jatuh ke openrouter typesafe/jev-1.14-20261014 karena TypeSafe 402)",
+ "model_melayani_openrouter": "openrouter/typesafe/jev-1.14-20261014",
+ "naskah_terverifikasi_typesafe": 18,
+ "naskah_terverifikasi_openrouter": 15,
+ "naskah_gagal_probe_openrouter": [],
+ "naskah_duplikat_tidak_dihitung": [
+  "AD3 duplikat berkas Y2 (Y2 sudah terverifikasi di kelompok TypeSafe, 10 panggilan); AD3 tidak dipetakan lagi dan tidak dihitung ganda."
+ ],
+ "naskah_belum_terverifikasi_alasan": {
+  "E3": "anggaran kelompok OR habis (v10 30 panggilan, termahal kedua)",
+  "AJ-1": "anggaran kelompok OR habis (v10 32 panggilan, termahal)",
+  "butuh_tambahan": "~60-66 panggilan Jev lagi untuk E3 + AJ-1 (petakan v10 30+32, ditambah probe + hakim)."
+ },
+ "per_kode_openrouter": [
+  {
+   "kode": "A4",
+   "bidang": "informatika",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 7,
+   "panggilan_v11": 7,
+   "goyang_v10": 28,
+   "goyang_v11": 30,
+   "label_v10": {
+    "subbab": 72,
+    "paragraf": 63,
+    "biasa": 170,
+    "bab": 6
+   },
+   "label_v11": {
+    "subbab": 63,
+    "paragraf": 65,
+    "biasa": 177
+   },
+   "bab_semua_v10": [
+    "﻿BAB III",
+    "ANALISIS DAN PERANCANGAN",
+    "﻿BAB IV",
+    "IMPLEMENTASI DAN PENGUJIAN",
+    "﻿BAB V",
+    "KESIMPULAN",
+    "ANALISIS DAN PERANCANGAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "IMPLEMENTASI DAN PENGUJIAN",
+    "KESIMPULAN",
+    "﻿BAB III",
+    "﻿BAB IV",
+    "﻿BAB V"
+   ],
+   "bab_semua_v11": [
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III ANALISIS DAN PERANCANGAN",
+    "BAB IV IMPLEMENTASI DAN PENGUJIAN",
+    "BAB V KESIMPULAN",
+    "Bab I",
+    "Bab II",
+    "Bab III",
+    "Bab IV",
+    "Bab V"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [],
+   "gabung_v11": {
+    "0": [
+     "Bab I",
+     ""
+    ],
+    "3": [
+     "Bab II",
+     ""
+    ],
+    "6": [
+     "Bab III",
+     ""
+    ],
+    "9": [
+     "Bab IV",
+     ""
+    ],
+    "12": [
+     "Bab V",
+     ""
+    ],
+    "16": [
+     "BAB II",
+     "TINJAUAN PUSTAKA"
+    ],
+    "104": [
+     "BAB III",
+     "ANALISIS DAN PERANCANGAN"
+    ],
+    "424": [
+     "BAB IV",
+     "IMPLEMENTASI DAN PENGUJIAN"
+    ],
+    "763": [
+     "BAB V",
+     "KESIMPULAN"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 3,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 57,
+    "jumlah_ragu": 6,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "63 kandidat judul: 57 sepakat · 6 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "2.1 Pengertian Website.",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Pendekatan ini menghasilkan suatu sistem matematis yang form",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Website yang dibangun membutuhkan perangkat lain sebagai pen",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Aplikasi server mengatur request ke server dan respon dari s",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "– Tahapan.",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "AA3",
+   "bidang": "hukum-tata-negara",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 12,
+   "panggilan_v11": 12,
+   "goyang_v10": 86,
+   "goyang_v11": 84,
+   "label_v10": {
+    "subbab": 45,
+    "paragraf": 85,
+    "biasa": 382,
+    "bab": 4
+   },
+   "label_v11": {
+    "subbab": 45,
+    "paragraf": 92,
+    "biasa": 374,
+    "bab": 4
+   },
+   "bab_semua_v10": [
+    "III. KOMISI PERTANIAN DAN PANGAN",
+    "PERAN DPR DALAM PROSES PENGANGKATAN DUTA BESAR RI SETELAH PERUBAHAN UUD 1945",
+    "TINJAUAN TERHADAP PEMBAGIAN KEKUASAAN DI INDONESIA SETELAH PERUBAHAN UUD 1945",
+    "VII. KOMISI KEPENDUDUKAN DAN KESEJAHTRAAN",
+    "BAB I PENDAHULUAN",
+    "BAB II",
+    "BAB III",
+    "BAB IV PENUTUP"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II",
+    "BAB III",
+    "BAB IV PENUTUP",
+    "IV. KOMISI TRANSPORTASI DAN INFRASTRUKTUR",
+    "PERAN DPR DALAM PROSES PENGANGKATAN DUTA BESAR RI SETELAH PERUBAHAN UUD 1945",
+    "TINJAUAN TERHADAP PEMBAGIAN KEKUASAAN DI INDONESIA SETELAH PERUBAHAN UUD 1945",
+    "VII. KOMISI KEPENDUDUKAN DAN KESEJAHTRAAN"
+   ],
+   "sampah_v10": [
+    "BAB II",
+    "BAB III"
+   ],
+   "sampah_v11": [
+    "BAB II",
+    "BAB III"
+   ],
+   "bab_label_v11": [
+    "TINJAUAN TERHADAP PEMBAGIAN KEKUASAAN DI INDONESIA SETELAH PERUBAHAN UUD 1945",
+    "PERAN DPR DALAM PROSES PENGANGKATAN DUTA BESAR RI SETELAH PERUBAHAN UUD 1945",
+    "IV. KOMISI TRANSPORTASI DAN INFRASTRUKTUR",
+    "VII. KOMISI KEPENDUDUKAN DAN KESEJAHTRAAN"
+   ],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "154": [
+     "BAB II",
+     ""
+    ],
+    "364": [
+     "BAB III",
+     ""
+    ],
+    "506": [
+     "BAB IV",
+     "PENUTUP"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 0,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 29,
+    "jumlah_ragu": 20,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "49 kandidat judul: 29 sepakat · 20 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "Tinjauan yuridis dan politis tentang peran dan kekuasaan DPR",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Mengunakan Studi kepustakaan yaitu (library research) dengan",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Pendekatan yang dipergunakan dalam penelitian ini adalah yur",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Data dalam penelitian ini akan di analisa dengan metode desk",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "1. Kekuasaan MPR Setelah Perubahan UUD 1945.",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "AC2",
+   "bidang": "perhotelan",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 8,
+   "panggilan_v11": 8,
+   "goyang_v10": 51,
+   "goyang_v11": 56,
+   "label_v10": {
+    "subbab": 46,
+    "paragraf": 74,
+    "biasa": 269,
+    "bab": 7
+   },
+   "label_v11": {
+    "subbab": 44,
+    "paragraf": 84,
+    "biasa": 258,
+    "bab": 5
+   },
+   "bab_semua_v10": [
+    "BAB I  : PENDAHULUAN",
+    "BAB II : TINJAUAN PUSTAKA",
+    "BAB III: GAMBARAN UMUM OBJEK  PENELITIAN",
+    "BAB IV: PEMBAHASAN MASALAH",
+    "BAB V : KESIMPULAN DAN SARAN",
+    "GAMBARAN UMUM OBYEK PENELITIAN",
+    "﻿BAB III",
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB IV PEMBAHASAN MASALAH",
+    "BAB V KESIMPULAN DAN SARAN"
+   ],
+   "bab_semua_v11": [
+    "BAB I  : PENDAHULUAN",
+    "BAB I PENDAHULUAN",
+    "BAB II : TINJAUAN PUSTAKA",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III GAMBARAN UMUM OBYEK PENELITIAN",
+    "BAB III: GAMBARAN UMUM OBJEK  PENELITIAN",
+    "BAB IV PEMBAHASAN MASALAH",
+    "BAB IV: PEMBAHASAN MASALAH",
+    "BAB V : KESIMPULAN DAN SARAN",
+    "BAB V KESIMPULAN DAN SARAN"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [
+    "BAB I  : PENDAHULUAN",
+    "BAB II : TINJAUAN PUSTAKA",
+    "BAB III: GAMBARAN UMUM OBJEK  PENELITIAN",
+    "BAB IV: PEMBAHASAN MASALAH",
+    "BAB V : KESIMPULAN DAN SARAN"
+   ],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "61": [
+     "BAB II",
+     "TINJAUAN PUSTAKA"
+    ],
+    "159": [
+     "BAB III",
+     "GAMBARAN UMUM OBYEK PENELITIAN"
+    ],
+    "357": [
+     "BAB IV",
+     "PEMBAHASAN MASALAH"
+    ],
+    "511": [
+     "BAB V",
+     "KESIMPULAN DAN SARAN"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 4,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 33,
+    "jumlah_ragu": 16,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "49 kandidat judul: 33 sepakat · 16 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "1. Penelitian Lapangan.",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Diharapkan hasil kerja yang yang mendekati sasaran dapat men",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "• Siapkah kiat dengan penolakan/keberatan.",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Proses menjual dari seorang sales harus dapat memberi keyaki",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Aston Hotel Sudirman tidak memiliki laundry sendiri namun me",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "AE2",
+   "bidang": "pendidikan-ekonomi",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 23,
+   "panggilan_v11": 23,
+   "goyang_v10": 131,
+   "goyang_v11": 122,
+   "label_v10": {
+    "bab": 2,
+    "subbab": 69,
+    "paragraf": 169,
+    "biasa": 1328
+   },
+   "label_v11": {
+    "subbab": 70,
+    "paragraf": 156,
+    "biasa": 1339
+   },
+   "bab_semua_v10": [
+    "PENDAHULUAN",
+    "﻿ BAB I",
+    "BAB II KAJIAN PUSTAKA",
+    "BAB III METODOLOGI PENELITIAN",
+    "BAB IV HASIL PENELITIAN",
+    "BAB V SIMPULAN, IMPLIKASI DAN SARAN"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II KAJIAN PUSTAKA",
+    "BAB III METODOLOGI PENELITIAN",
+    "BAB IV HASIL PENELITIAN",
+    "BAB V SIMPULAN, IMPLIKASI DAN SARAN"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "75": [
+     "BAB II",
+     "KAJIAN PUSTAKA"
+    ],
+    "399": [
+     "BAB III",
+     "METODOLOGI PENELITIAN"
+    ],
+    "540": [
+     "BAB IV",
+     "HASIL PENELITIAN"
+    ],
+    "933": [
+     "BAB V",
+     "SIMPULAN, IMPLIKASI DAN SARAN"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 1,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 49,
+    "jumlah_ragu": 20,
+    "jumlah_curiga": 1,
+    "jumlah_belum": 0,
+    "alasan": "70 kandidat judul: 49 sepakat · 20 ragu · 1 curiga · 0 belum",
+    "curiga_contoh": [
+     [
+      "(10) Menyusun laporan.",
+      [
+       "awal-sitasi"
+      ]
+     ]
+    ],
+    "ragu_contoh": [
+     [
+      "Siswa kelas VII(E) semester genap SMP Negeri 16 Surakarta ta",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "2. Peranan Metode Pembelajaran Kooperatif Group Investigatio",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Subjek pada penelitian ini adalah siswa kelas VII-E SMP Nege",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Teknik ini dilakukan dengan cara mengamati terhadap objek pe",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Dalam observasi ini, peneliti sama sekali kahadirannya dalam",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "AK-3",
+   "bidang": "Manajemen",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 14,
+   "panggilan_v11": 12,
+   "goyang_v10": 57,
+   "goyang_v11": 75,
+   "label_v10": {
+    "paragraf": 121,
+    "biasa": 346,
+    "subbab": 54
+   },
+   "label_v11": {
+    "paragraf": 121,
+    "biasa": 343,
+    "subbab": 54
+   },
+   "bab_semua_v10": [
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III METODE PENELITIAN",
+    "BAB IV GAMBARAN UMUM PERUSAHAAN",
+    "BAB V HASIL PENELITIAN DAN PEMBAHASAN",
+    "BAB VI PENUTUP"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III METODE PENELITIAN",
+    "BAB IV GAMBARAN UMUM PERUSAHAAN",
+    "BAB V HASIL PENELITIAN DAN PEMBAHASAN",
+    "BAB VI PENUTUP"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "33": [
+     "BAB II",
+     "TINJAUAN PUSTAKA"
+    ],
+    "180": [
+     "BAB III",
+     "METODE PENELITIAN"
+    ],
+    "331": [
+     "BAB IV",
+     "GAMBARAN UMUM PERUSAHAAN"
+    ],
+    "378": [
+     "BAB V",
+     "HASIL PENELITIAN DAN PEMBAHASAN"
+    ],
+    "657": [
+     "BAB VI",
+     "PENUTUP"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 0,
+   "pemisah_jml_profil": 5,
+   "cek_baris": {
+    "pemisah_jml": 5,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 4,
+   "hakim": {
+    "jumlah_sepakat": 50,
+    "jumlah_ragu": 4,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "54 kandidat judul: 50 sepakat · 4 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "Oleh sebab itu perusahaan yang eksis di bidang jasa perlu un",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Apabila pelayanan yang ditawarkan perusahaan sesuai dengan k",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Karena itu dapat dikatakan bahwa loyal mempunyai fanatisme y",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "3. Kuesioner, yaitu dengan cara memberikan daftar pertanyaan",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "AN-1",
+   "bidang": "Hukum",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 12,
+   "panggilan_v11": 10,
+   "goyang_v10": 61,
+   "goyang_v11": 75,
+   "label_v10": {
+    "subbab": 30,
+    "biasa": 225,
+    "paragraf": 115,
+    "bab": 6
+   },
+   "label_v11": {
+    "subbab": 27,
+    "biasa": 204,
+    "paragraf": 132,
+    "bab": 9
+   },
+   "bab_semua_v10": [
+    "BAB I PENDAHULUAN",
+    "BAB II",
+    "BAB III PENAHANAN RUMAH AUNG SAN SUU KYI OLEH",
+    "BAB IV",
+    "BAB V",
+    "Bab I\t   : \tPENDAHULUAN",
+    "Bab II    :\tINSTRUMEN HUKUM HAM INTERNASIONAL DAN NASIONAL YANG BERKAITAN DENGAN PENAHANAN",
+    "Bab III   :\tPENAHANAN RUMAH AUNG SAN SUU KYI OLEH PEMERINTAH MYANMAR",
+    "Bab IV  :       ANALISIS YURIDIS TERHADAP PENAHANAN AUNG SAN SUU KYI OLEH PEMERINTAH MYANMAR MENURUT INTERNATIONAL COVENANT ON CIVIL AND POLITICAL RIGHTS",
+    "INSTRUMEN HUKUM HAM INTERNASIONAL DAN HUKUM NASIONAL YANG BERKAITAN DENGAN PENAHANAN",
+    "Penutup"
+   ],
+   "bab_semua_v11": [
+    "ANALISIS YURIDIS TERHADAP PENAHANAN AUNG SAN SUU KYI OLEH PEMERINTAH MYANMAR MENURUT INTERNATIONAL COVENANT ON CIVIL AND POLITICAL RIGHTS",
+    "BAB I PENDAHULUAN",
+    "BAB II",
+    "BAB III PENAHANAN RUMAH AUNG SAN SUU KYI OLEH",
+    "BAB IV",
+    "BAB V",
+    "Bab I\t   : \tPENDAHULUAN",
+    "Bab II    :\tINSTRUMEN HUKUM HAM INTERNASIONAL DAN NASIONAL YANG BERKAITAN DENGAN PENAHANAN",
+    "Bab III   :\tPENAHANAN RUMAH AUNG SAN SUU KYI OLEH PEMERINTAH MYANMAR",
+    "Bab IV  :       ANALISIS YURIDIS TERHADAP PENAHANAN AUNG SAN SUU KYI OLEH PEMERINTAH MYANMAR MENURUT INTERNATIONAL COVENANT ON CIVIL AND POLITICAL RIGHTS",
+    "Bab V\t  :\tPENUTUP",
+    "INSTRUMEN HUKUM HAM INTERNASIONAL DAN HUKUM NASIONAL YANG BERKAITAN DENGAN PENAHANAN",
+    "PEMERINTAH MYANMAR",
+    "Penutup"
+   ],
+   "sampah_v10": [
+    "BAB II",
+    "BAB IV",
+    "BAB V"
+   ],
+   "sampah_v11": [
+    "BAB II",
+    "BAB IV",
+    "BAB V"
+   ],
+   "bab_label_v11": [
+    "Bab I\t   : \tPENDAHULUAN",
+    "Bab II    :\tINSTRUMEN HUKUM HAM INTERNASIONAL DAN NASIONAL YANG BERKAITAN DENGAN PENAHANAN",
+    "Bab III   :\tPENAHANAN RUMAH AUNG SAN SUU KYI OLEH PEMERINTAH MYANMAR",
+    "Bab IV  :       ANALISIS YURIDIS TERHADAP PENAHANAN AUNG SAN SUU KYI OLEH PEMERINTAH MYANMAR MENURUT INTERNATIONAL COVENANT ON CIVIL AND POLITICAL RIGHTS",
+    "Bab V\t  :\tPENUTUP",
+    "INSTRUMEN HUKUM HAM INTERNASIONAL DAN HUKUM NASIONAL YANG BERKAITAN DENGAN PENAHANAN",
+    "PEMERINTAH MYANMAR",
+    "ANALISIS YURIDIS TERHADAP PENAHANAN AUNG SAN SUU KYI OLEH PEMERINTAH MYANMAR MENURUT INTERNATIONAL COVENANT ON CIVIL AND POLITICAL RIGHTS",
+    "Penutup"
+   ],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "103": [
+     "BAB II",
+     ""
+    ],
+    "249": [
+     "BAB III",
+     "PENAHANAN RUMAH AUNG SAN SUU KYI OLEH"
+    ],
+    "375": [
+     "BAB IV",
+     ""
+    ],
+    "469": [
+     "BAB V",
+     ""
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 0,
+   "pemisah_jml_profil": 4,
+   "cek_baris": {
+    "pemisah_jml": 4,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 3,
+   "hakim": {
+    "jumlah_sepakat": 32,
+    "jumlah_ragu": 3,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "35 kandidat judul: 32 sepakat · 3 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "D. Kumpulan Prinsip untuk Perlindungan Setiap Individu terha",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Sejarahnya, Burma, yang kemudian dikenal sebagai Myanmar, ad",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Pemerintah Myanmar melanggar Prinsip 11 dan Prinsip 37 karen",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "AO-2",
+   "bidang": "Administrasi Negara",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 14,
+   "panggilan_v11": 12,
+   "goyang_v10": 86,
+   "goyang_v11": 89,
+   "label_v10": {
+    "biasa": 333,
+    "subbab": 27,
+    "paragraf": 118
+   },
+   "label_v11": {
+    "subbab": 28,
+    "biasa": 328,
+    "paragraf": 117
+   },
+   "bab_semua_v10": [
+    "BAB 1 PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA DAN KERANGKA PIKIR",
+    "BAB III METODE PENELITIAN",
+    "BAB IV HASIL PENELITIAN DAN PEMBAHASAN",
+    "BAB V KESIMPULAN DAN SARAN"
+   ],
+   "bab_semua_v11": [
+    "BAB 1 PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA DAN KERANGKA PIKIR",
+    "BAB III METODE PENELITIAN",
+    "BAB IV HASIL PENELITIAN DAN PEMBAHASAN",
+    "BAB V KESIMPULAN DAN SARAN"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [],
+   "gabung_v11": {
+    "1": [
+     "BAB 1",
+     "PENDAHULUAN"
+    ],
+    "39": [
+     "BAB II",
+     "TINJAUAN PUSTAKA DAN KERANGKA PIKIR"
+    ],
+    "205": [
+     "BAB III",
+     "METODE PENELITIAN"
+    ],
+    "287": [
+     "BAB IV",
+     "HASIL PENELITIAN DAN PEMBAHASAN"
+    ],
+    "592": [
+     "BAB V",
+     "KESIMPULAN DAN SARAN"
+    ]
+   },
+   "profil_penomonan": "campuran",
+   "bom_jml_profil": 0,
+   "pemisah_jml_profil": 5,
+   "cek_baris": {
+    "pemisah_jml": 5,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 26,
+    "jumlah_ragu": 2,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "28 kandidat judul: 26 sepakat · 2 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "2. Untuk mengetahuai faktor yang mendukung dan menghambat ki",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Karena jumlah populasi yang cukup banyak, maka dalam penelit",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "AP-3",
+   "bidang": "Administrasi Niaga",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 13,
+   "panggilan_v11": 11,
+   "goyang_v10": 56,
+   "goyang_v11": 56,
+   "label_v10": {
+    "paragraf": 90,
+    "biasa": 376,
+    "subbab": 57
+   },
+   "label_v11": {
+    "paragraf": 94,
+    "biasa": 372,
+    "subbab": 55
+   },
+   "bab_semua_v10": [
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III METODOLOGI PENELITIAN",
+    "BAB IV HASIL PENELITIAN DAN PEMBAHASAN",
+    "BAB V KESIMPULAN DAN SARAN"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III METODOLOGI PENELITIAN",
+    "BAB IV HASIL PENELITIAN DAN PEMBAHASAN",
+    "BAB V KESIMPULAN DAN SARAN"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "62": [
+     "BAB II",
+     "TINJAUAN PUSTAKA"
+    ],
+    "252": [
+     "BAB III",
+     "METODOLOGI PENELITIAN"
+    ],
+    "375": [
+     "BAB IV",
+     "HASIL PENELITIAN DAN PEMBAHASAN"
+    ],
+    "1290": [
+     "BAB V",
+     "KESIMPULAN DAN SARAN"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 0,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 49,
+    "jumlah_ragu": 6,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "55 kandidat judul: 49 sepakat · 6 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "1. Penelitian dibatasi pada permasalahan komunikasi interper",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "3. Untuk mengetahui tingkat kinerja pegawai akibat pengaruh ",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Bawahan tentulah berharap agar ide, saran, pendapat, tanggap",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Fungsi komunikasi horizontal/ke samping digunakan oleh dua p",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "- Tindakan, kedua belak pihak yang berkomunikasi melakukan t",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "C4",
+   "bidang": "perbankan-syariah",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 13,
+   "panggilan_v11": 13,
+   "goyang_v10": 72,
+   "goyang_v11": 72,
+   "label_v10": {
+    "bab": 9,
+    "subbab": 68,
+    "paragraf": 145,
+    "biasa": 487
+   },
+   "label_v11": {
+    "paragraf": 137,
+    "biasa": 495,
+    "subbab": 66
+   },
+   "bab_semua_v10": [
+    "﻿BAB I",
+    "﻿BAB II",
+    "KAJIAN PUSTAKA, KERANGKA PEMIKIRAN DAN HIPOTESIS",
+    "﻿BAB III",
+    "METODE PENELITIAN",
+    "﻿BAB IV",
+    "HASIL PENELITIAN DAN PEMBAHASAN",
+    "﻿BAB V",
+    "KESIMPULAN DAN SARAN",
+    "HASIL PENELITIAN DAN PEMBAHASAN",
+    "KAJIAN PUSTAKA, KERANGKA PEMIKIRAN DAN HIPOTESIS",
+    "KESIMPULAN DAN SARAN",
+    "METODE PENELITIAN",
+    "﻿BAB I",
+    "﻿BAB II",
+    "﻿BAB III",
+    "﻿BAB IV",
+    "﻿BAB V"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II KAJIAN PUSTAKA, KERANGKA PEMIKIRAN DAN HIPOTESIS",
+    "BAB III METODE PENELITIAN",
+    "BAB IV HASIL PENELITIAN DAN PEMBAHASAN",
+    "BAB V KESIMPULAN DAN SARAN"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "51": [
+     "BAB II",
+     "KAJIAN PUSTAKA, KERANGKA PEMIKIRAN DAN HIPOTESIS"
+    ],
+    "308": [
+     "BAB III",
+     "METODE PENELITIAN"
+    ],
+    "536": [
+     "BAB IV",
+     "HASIL PENELITIAN DAN PEMBAHASAN"
+    ],
+    "1231": [
+     "BAB V",
+     "KESIMPULAN DAN SARAN"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 5,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 62,
+    "jumlah_ragu": 4,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "66 kandidat judul: 62 sepakat · 4 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "Jenis penelitian yang digunakan digolongkan sebagai peneliti",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Informasi mengenai karakteristik responden dikelompokkan ke ",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "No.",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "No.",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "D3",
+   "bidang": "ekonomi",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 26,
+   "panggilan_v11": 26,
+   "goyang_v10": 119,
+   "goyang_v11": 115,
+   "label_v10": {
+    "bab": 10,
+    "subbab": 61,
+    "paragraf": 214,
+    "biasa": 1095
+   },
+   "label_v11": {
+    "subbab": 59,
+    "paragraf": 222,
+    "biasa": 1090
+   },
+   "bab_semua_v10": [
+    "﻿BAB I",
+    "PENDAHULUAN",
+    "﻿BAB II",
+    "KAJIAN TEORI, KERANGKA KONSEPTUAL DAN HIPOTESIS",
+    "﻿BAB III",
+    "METODOLOGI PENELITIAN",
+    "﻿BAB IV",
+    "TEMUAN PENELITIAN DAN PEMBAHASAN",
+    "﻿BAB V",
+    "KESIMPULAN DAN SARAN",
+    "KAJIAN TEORI, KERANGKA KONSEPTUAL DAN HIPOTESIS",
+    "KESIMPULAN DAN SARAN",
+    "METODOLOGI PENELITIAN",
+    "PENDAHULUAN",
+    "TEMUAN PENELITIAN DAN PEMBAHASAN",
+    "﻿BAB I",
+    "﻿BAB II",
+    "﻿BAB III",
+    "﻿BAB IV",
+    "﻿BAB V"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II KAJIAN TEORI, KERANGKA KONSEPTUAL DAN HIPOTESIS",
+    "BAB III METODOLOGI PENELITIAN",
+    "BAB IV TEMUAN PENELITIAN DAN PEMBAHASAN",
+    "BAB V KESIMPULAN DAN SARAN"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "175": [
+     "BAB II",
+     "KAJIAN TEORI, KERANGKA KONSEPTUAL DAN HIPOTESIS"
+    ],
+    "443": [
+     "BAB III",
+     "METODOLOGI PENELITIAN"
+    ],
+    "564": [
+     "BAB IV",
+     "TEMUAN PENELITIAN DAN PEMBAHASAN"
+    ],
+    "1766": [
+     "BAB V",
+     "KESIMPULAN DAN SARAN"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 5,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 37,
+    "jumlah_ragu": 22,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "59 kandidat judul: 37 sepakat · 22 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "Banyak faktor-faktor yang mempengaruhi permintaan uang kuasi",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Dalam hal ini uang digunakan sebagai alat untuk membeli atau",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Sebagai satuan hitung menunjukkan nilai dari barang dan jasa",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Dengan menyimpan uang berarti kita menyimpan atau menimbun k",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Dengan formulasi tersebut teori Marshall merupakan awal dari",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "G3",
+   "bidang": "psikologi",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 10,
+   "panggilan_v11": 10,
+   "goyang_v10": 73,
+   "goyang_v11": 81,
+   "label_v10": {
+    "paragraf": 149,
+    "subbab": 51,
+    "biasa": 204,
+    "bab": 4
+   },
+   "label_v11": {
+    "paragraf": 152,
+    "subbab": 48,
+    "biasa": 209,
+    "bab": 4
+   },
+   "bab_semua_v10": [
+    ": Pendahuluan",
+    ": Metodologi Penelitian",
+    ": Laporan Penelitian",
+    ": Penutup",
+    ": Laporan Penelitian",
+    ": Metodologi Penelitian",
+    ": Pendahuluan",
+    ": Penutup",
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III METODE PENELITIAN",
+    "BAB IV LAPORAN PELAKSANAAN PENELITIAN",
+    "BAB V KESIMPULAN"
+   ],
+   "bab_semua_v11": [
+    ": Laporan Penelitian",
+    ": Metodologi Penelitian",
+    ": Penutup",
+    ": Tinjauan Pustaka",
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III METODE PENELITIAN",
+    "BAB IV LAPORAN PELAKSANAAN PENELITIAN",
+    "BAB V KESIMPULAN",
+    "Bab I",
+    "Bab II",
+    "Bab III",
+    "Bab IV",
+    "Bab V"
+   ],
+   "sampah_v10": [
+    ": Pendahuluan",
+    ": Metodologi Penelitian",
+    ": Laporan Penelitian",
+    ": Penutup",
+    ": Laporan Penelitian",
+    ": Metodologi Penelitian",
+    ": Pendahuluan",
+    ": Penutup"
+   ],
+   "sampah_v11": [
+    ": Laporan Penelitian",
+    ": Metodologi Penelitian",
+    ": Penutup",
+    ": Tinjauan Pustaka"
+   ],
+   "bab_label_v11": [
+    ": Tinjauan Pustaka",
+    ": Metodologi Penelitian",
+    ": Laporan Penelitian",
+    ": Penutup"
+   ],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "46": [
+     "Bab I",
+     ""
+    ],
+    "49": [
+     "Bab II",
+     ""
+    ],
+    "52": [
+     "Bab III",
+     ""
+    ],
+    "55": [
+     "Bab IV",
+     ""
+    ],
+    "58": [
+     "Bab V",
+     ""
+    ],
+    "61": [
+     "BAB II",
+     "TINJAUAN PUSTAKA"
+    ],
+    "241": [
+     "BAB III",
+     "METODE PENELITIAN"
+    ],
+    "393": [
+     "BAB IV",
+     "LAPORAN PELAKSANAAN PENELITIAN"
+    ],
+    "574": [
+     "BAB V",
+     "KESIMPULAN"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 0,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 2,
+   "hakim": {
+    "jumlah_sepakat": 39,
+    "jumlah_ragu": 13,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "52 kandidat judul: 39 sepakat · 13 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "Prestasi belajar adalah hasil belajar yang dicapai oleh seor",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Kecerdasan emosional adalah kemampuan seseorang untuk memant",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Perubahan dalam proses berlajar adalah karena pengalaman ata",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Positif berarti perubahan tersebut baik dan bermanfaat bagi ",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "3. Faktor-faktor yang mempengaruhi prestasi belajar.",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "M3",
+   "bidang": "Skripsi ESP Syariah",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 12,
+   "panggilan_v11": 12,
+   "goyang_v10": 108,
+   "goyang_v11": 115,
+   "label_v10": {
+    "subbab": 154,
+    "bab": 10,
+    "paragraf": 193,
+    "biasa": 309
+   },
+   "label_v11": {
+    "paragraf": 205,
+    "biasa": 313,
+    "subbab": 137
+   },
+   "bab_semua_v10": [
+    "﻿BAB I",
+    "PENDAHULUAN",
+    "﻿BAB II",
+    "TINJAUAN PUSTAKA",
+    "﻿BAB III",
+    "OBJEK DAN METODE PENELITIAN",
+    "﻿BAB IV",
+    "HASIL DAN PEMBAHASAN",
+    "﻿BAB V",
+    "KESIMPULAN DAN SARAN",
+    "HASIL DAN PEMBAHASAN",
+    "KESIMPULAN DAN SARAN",
+    "OBJEK DAN METODE PENELITIAN",
+    "PENDAHULUAN",
+    "TINJAUAN PUSTAKA",
+    "﻿BAB I",
+    "﻿BAB II",
+    "﻿BAB III",
+    "﻿BAB IV",
+    "﻿BAB V"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III OBJEK DAN METODE PENELITIAN",
+    "BAB IV HASIL DAN PEMBAHASAN",
+    "BAB V KESIMPULAN DAN SARAN"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [],
+   "gabung_v11": {
+    "4": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "143": [
+     "BAB II",
+     "TINJAUAN PUSTAKA"
+    ],
+    "551": [
+     "BAB III",
+     "OBJEK DAN METODE PENELITIAN"
+    ],
+    "762": [
+     "BAB IV",
+     "HASIL DAN PEMBAHASAN"
+    ],
+    "971": [
+     "BAB V",
+     "KESIMPULAN DAN SARAN"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 5,
+   "pemisah_jml_profil": 1,
+   "cek_baris": {
+    "pemisah_jml": 1,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 126,
+    "jumlah_ragu": 11,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "137 kandidat judul: 126 sepakat · 11 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "Seperti yang telah dikemukakan sebelumnya, bank dapat member",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "3. Bank dimungkinkan memberikan bonus kepada pemilik harta s",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "5. Penjual harus menyampaikan semua hal yang berkaitan denga",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Hiwalah adalah pengalihan hutang dari orang yang berhutang k",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "3. Bill discounting. Secara prinsip, bill discounting serupa",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "N3",
+   "bidang": "Skripsi Kebidanan",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 16,
+   "panggilan_v11": 16,
+   "goyang_v10": 55,
+   "goyang_v11": 67,
+   "label_v10": {
+    "subbab": 128,
+    "bab": 1,
+    "biasa": 622,
+    "paragraf": 51
+   },
+   "label_v11": {
+    "subbab": 129,
+    "bab": 1,
+    "biasa": 624,
+    "paragraf": 50
+   },
+   "bab_semua_v10": [
+    "BABA IV HASIL DAN PEBAHASAN",
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III",
+    "BAB III METODE PENELITIAN",
+    "BAB IV HASIL PENELITIAN DAN PEMBAHASAN",
+    "BAB V PENUTUP",
+    "BABA IV HASIL DAN PEBAHASAN"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III",
+    "BAB III METODE PENELITIAN",
+    "BAB IV HASIL PENELITIAN DAN PEMBAHASAN",
+    "BAB V PENUTUP",
+    "BABA IV HASIL DAN PEBAHASAN"
+   ],
+   "sampah_v10": [
+    "BAB III"
+   ],
+   "sampah_v11": [
+    "BAB III"
+   ],
+   "bab_label_v11": [
+    "BABA IV HASIL DAN PEBAHASAN"
+   ],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "26": [
+     "BAB II",
+     "TINJAUAN PUSTAKA"
+    ],
+    "64": [
+     "BAB III",
+     ""
+    ],
+    "133": [
+     "BAB V",
+     "PENUTUP"
+    ],
+    "214": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "309": [
+     "BAB II",
+     "TINJAUAN PUSTAKA"
+    ],
+    "523": [
+     "BAB III",
+     "METODE PENELITIAN"
+    ],
+    "757": [
+     "BAB IV",
+     "HASIL PENELITIAN DAN PEMBAHASAN"
+    ],
+    "901": [
+     "BAB V",
+     "PENUTUP"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 0,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 122,
+    "jumlah_ragu": 8,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0,
+    "alasan": "130 kandidat judul: 122 sepakat · 8 ragu · 0 curiga · 0 belum",
+    "curiga_contoh": [],
+    "ragu_contoh": [
+     [
+      "1.1.",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "1.2.",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "1.3.",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "1.4.",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Menang Wilayah Kerja Puskesmas Pagu Kabupaten Kediri.",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "S2",
+   "bidang": "Ekonomi Pembangunan",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 26,
+   "panggilan_v11": 26,
+   "goyang_v10": 71,
+   "goyang_v11": 75,
+   "label_v10": {
+    "biasa": 1162,
+    "bab": 10,
+    "paragraf": 127,
+    "subbab": 78
+   },
+   "label_v11": {
+    "paragraf": 130,
+    "biasa": 1138,
+    "subbab": 80
+   },
+   "bab_semua_v10": [
+    "﻿BAB I",
+    "PENDAHULUAN",
+    "﻿BAB II",
+    "TINJAUAN PUSTAKA",
+    "﻿BAB III",
+    "OBJEK PENELITIAN",
+    "﻿BAB IV",
+    "HASIL DAN PEMBAHASAN",
+    "﻿BAB V",
+    "KESIMPULAN",
+    "HASIL DAN PEMBAHASAN",
+    "KESIMPULAN",
+    "OBJEK PENELITIAN",
+    "PENDAHULUAN",
+    "TINJAUAN PUSTAKA",
+    "﻿BAB I",
+    "﻿BAB II",
+    "﻿BAB III",
+    "﻿BAB IV",
+    "﻿BAB V"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II TINJAUAN PUSTAKA",
+    "BAB III OBJEK PENELITIAN",
+    "BAB IV HASIL DAN PEMBAHASAN",
+    "BAB V KESIMPULAN"
+   ],
+   "sampah_v10": [],
+   "sampah_v11": [],
+   "bab_label_v11": [],
+   "gabung_v11": {
+    "4": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "234": [
+     "BAB II",
+     "TINJAUAN PUSTAKA"
+    ],
+    "500": [
+     "BAB III",
+     "OBJEK PENELITIAN"
+    ],
+    "831": [
+     "BAB IV",
+     "HASIL DAN PEMBAHASAN"
+    ],
+    "1820": [
+     "BAB V",
+     "KESIMPULAN"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 5,
+   "pemisah_jml_profil": 1,
+   "cek_baris": {
+    "pemisah_jml": 1,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 73,
+    "jumlah_ragu": 5,
+    "jumlah_curiga": 2,
+    "jumlah_belum": 0,
+    "alasan": "80 kandidat judul: 73 sepakat · 5 ragu · 2 curiga · 0 belum",
+    "curiga_contoh": [
+     [
+      "3.1.4 Filipina",
+      [
+       "nomor-loncat"
+      ]
+     ],
+     [
+      "3.2.5 Thailand",
+      [
+       "nomor-loncat"
+      ]
+     ]
+    ],
+    "ragu_contoh": [
+     [
+      "Untuk lebih jelasnya bagan alur proses penelitian ini dapat ",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Persamaan ini memperlihatkan bahwa permintaan uang riil dipe",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Seperti juga negara Asean lainnya, krisis berdampak pada pen",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Perkembangan selama periode 1990-1997 menunjukan pertumbuhan",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Dari hasil uji autokorelasi dengan Breusch-Godfrey test disi",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "kode": "W3",
+   "bidang": "komunikasi",
+   "model_melayani": "typesafe/jev-1.14-20261014",
+   "model_diminta_jalan": "SATPAM/typesafe/jev-1.14",
+   "model_override": null,
+   "panggilan_v10": 21,
+   "panggilan_v11": 21,
+   "goyang_v10": 195,
+   "goyang_v11": 171,
+   "label_v10": {
+    "subbab": 128,
+    "paragraf": 241,
+    "biasa": 975
+   },
+   "label_v11": {
+    "subbab": 136,
+    "biasa": 969,
+    "paragraf": 240,
+    "bab": 1
+   },
+   "bab_semua_v10": [
+    "BAB I PENDAHULUAN",
+    "BAB II",
+    "BAB III METODE PENELITIAN",
+    "BAB IV PEMBAHASAN DAN ANALISIS",
+    "BAB V PENUTUP"
+   ],
+   "bab_semua_v11": [
+    "BAB I PENDAHULUAN",
+    "BAB II",
+    "BAB III METODE PENELITIAN",
+    "BAB IV PEMBAHASAN DAN ANALISIS",
+    "BAB V PENUTUP",
+    "Tinjauan Pustaka"
+   ],
+   "sampah_v10": [
+    "BAB II"
+   ],
+   "sampah_v11": [
+    "BAB II"
+   ],
+   "bab_label_v11": [
+    "Tinjauan Pustaka"
+   ],
+   "gabung_v11": {
+    "0": [
+     "BAB I",
+     "PENDAHULUAN"
+    ],
+    "41": [
+     "BAB II",
+     ""
+    ],
+    "329": [
+     "BAB III",
+     "METODE PENELITIAN"
+    ],
+    "404": [
+     "BAB IV",
+     "PEMBAHASAN DAN ANALISIS"
+    ],
+    "1176": [
+     "BAB V",
+     "PENUTUP"
+    ]
+   },
+   "profil_penomonan": "romawi",
+   "bom_jml_profil": 0,
+   "pemisah_jml_profil": 0,
+   "cek_baris": {
+    "pemisah_jml": 0,
+    "pemisah_bab_jml": 0,
+    "bom_baris_jml": 0,
+    "bom_bab_jml": 0,
+    "bom_gabung_jml": 0,
+    "pemisah_bab_contoh": []
+   },
+   "antrean_manusia": false,
+   "pendapat_kedua_jml": 0,
+   "bab_demosi_jml": 0,
+   "hakim": {
+    "jumlah_sepakat": 94,
+    "jumlah_ragu": 41,
+    "jumlah_curiga": 2,
+    "jumlah_belum": 0,
+    "alasan": "137 kandidat judul: 94 sepakat · 41 ragu · 2 curiga · 0 belum",
+    "curiga_contoh": [
+     [
+      "5. Berapa jumlah karyawan perusahaan ini? Redaksi dan perusa",
+      [
+       "butir-bertanya",
+       "butir-bertanya"
+      ]
+     ],
+     [
+      "10. Berapa jumlah karyawan perusahaan ini? Redaksi dan perus",
+      [
+       "butir-bertanya",
+       "butir-bertanya"
+      ]
+     ]
+    ],
+    "ragu_contoh": [
+     [
+      "Di Makassar ada tiga perusahaan surat kabar yaitu harian Faj",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Strategi apa yang diterapkan oleh surat kabar harian Fajar, ",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Penelitian ini diharapkan dapat memberi masukan yang bermanf",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Komunikasi yang berfungsi untuk menjelaskan fenomena yang te",
+      [
+       "jev-ragu"
+      ]
+     ],
+     [
+      "Menurut Shirley kemampuan internal digambarkan sebagai apa y",
+      [
+       "jev-ragu"
+      ]
+     ]
+    ]
+   }
+  }
+ ],
+ "beda_label_per_baris_grup3_openrouter": {
+  "AA3": {
+   "biasa->None": 42,
+   "None->biasa": 31,
+   "biasa->paragraf": 25,
+   "paragraf->biasa": 23,
+   "None->subbab": 16,
+   "subbab->paragraf": 12,
+   "subbab->biasa": 11,
+   "paragraf->None": 9,
+   "biasa->subbab": 8,
+   "None->paragraf": 5,
+   "paragraf->subbab": 3,
+   "None->bab": 2,
+   "bab->None": 2,
+   "bab->biasa": 2,
+   "subbab->bab": 2,
+   "subbab->None": 2
+  },
+  "AC2": {
+   "biasa->paragraf": 17,
+   "subbab->biasa": 11,
+   "biasa->subbab": 9,
+   "paragraf->biasa": 7,
+   "subbab->paragraf": 4,
+   "paragraf->subbab": 4,
+   "biasa->None": 3,
+   "bab->None": 2
+  },
+  "AE2": {
+   "paragraf->biasa": 34,
+   "biasa->paragraf": 19,
+   "subbab->paragraf": 6,
+   "paragraf->subbab": 4,
+   "biasa->subbab": 3,
+   "bab->None": 2,
+   "biasa->None": 2,
+   "None->biasa": 1
+  },
+  "W3": {
+   "None->biasa": 87,
+   "biasa->None": 68,
+   "biasa->paragraf": 55,
+   "paragraf->biasa": 46,
+   "biasa->subbab": 35,
+   "subbab->None": 28,
+   "subbab->biasa": 19,
+   "paragraf->None": 18,
+   "paragraf->subbab": 17,
+   "None->subbab": 16,
+   "None->paragraf": 13,
+   "subbab->paragraf": 12,
+   "subbab->bab": 1
+  }
+ },
+ "agregat_openrouter_15_naskah": {
+  "panggilan_v10": 227,
+  "panggilan_v11": 219,
+  "goyang_v10": 1249,
+  "goyang_v11": 1283,
+  "sampah_bab_v10": 15,
+  "sampah_bab_v11": 11,
+  "hakim_sepakat": 878,
+  "hakim_ragu": 181,
+  "hakim_curiga": 5,
+  "pendapat_kedua_total": 0,
+  "antrean_jml": 0
+ },
+ "agregat_gabungan_33_naskah": {
+  "panggilan_v10": 526,
+  "panggilan_v11": 511,
+  "goyang_v10": 2660,
+  "goyang_v11": 2697,
+  "sampah_bab_v10": 64,
+  "sampah_bab_v11": 50,
+  "hakim_sepakat": 1982,
+  "hakim_ragu": 365,
+  "hakim_curiga": 10,
+  "pendapat_kedua_total": 0,
+  "antrean_jml": 0,
+  "peringatan_campuran": "Agregat gabungan MENCAMPUR dua ID model: 18 naskah dilayani jev-1.14.0 resmi (TypeSafe) + 15 naskah dilayani openrouter/typesafe/jev-1.14-20261014. Bobot fallback belum terbukti identik dengan jev-1.14.0 resmi, jadi selisih v10-vs-v11 kelompok OR bisa berasal dari model, bukan dari lapisan v11. Pakai agregat per kelompok untuk vonis; agregat gabungan hanya ringkasan."
+ },
+ "klaim_v11_openrouter": {
+  "a_romawi_tanpa_bab": {
+   "vonis": "TERBUKTI SEBAGIAN (lanjutan: kini 3 kasus Romawi)",
+   "bukti": "W3 (profil romawi, pakai kata BAB): gabung v11 memuat 5 judul BAB utuh (BAB I-V) sama seperti v10; label bab Jev tambah 1 (Tinjauan Pustaka, judul BAB II tanpa awalan BAB). AA3: 8 bab_semua di v10 maupun v11; 4 judul Romawi tanpa kata BAB tetap dilabel bab, TAPI 1 dari 4 berganti (v10: III. KOMISI PERTANIAN DAN PANGAN; v11: IV. KOMISI TRANSPORTASI DAN INFRASTRUKTUR) — label Romawi goyang antar versi. Y2 (romawi_tanpa_bab, kelompok TypeSafe) tetap satu-satunya kasus Romawi-tanpa-BAB yang deterministik di gabung.",
+   "naskah": [
+    "W3",
+    "AA3"
+   ]
+  },
+  "b_chapter_inggris": {
+   "vonis": "TIDAK ADA KASUS BARU (T3 satu-satunya, kelompok TypeSafe)",
+   "bukti": "Tidak satu pun dari 15 naskah OR memakai CHAPTER; klaim (b) tidak berubah dari laporan 18 pertama.",
+   "naskah": []
+  },
+  "c_pemisah_bom": {
+   "vonis": "TERBUKTI PENUH (15/15 kelompok OR; 33/33 gabungan)",
+   "bukti": "0 baris pemisah dilabel bab; 0 karakter BOM tersisa di baris maupun gabung (A4 bom profil 3, AC2 4, C4 5, D3 5, M3 5, S2 5, AE2 1 — semuanya bersih di baris hasil). Judul ganda akibat BOM runtuh: C4 18->5, D3 20->5, M3 20->5, S2 20->5 bab_semua.",
+   "naskah": [
+    "A4",
+    "AA3",
+    "AC2",
+    "AE2",
+    "AK-3",
+    "AN-1",
+    "AO-2",
+    "AP-3",
+    "C4",
+    "D3",
+    "G3",
+    "M3",
+    "N3",
+    "S2",
+    "W3"
+   ]
+  },
+  "d_antrean_manusia": {
+   "vonis": "TIDAK TERUJI live (0/15 kelompok OR; 0/33 gabungan)",
+   "bukti": "Tidak satu pun dari 15 naskah OR masuk antrean; aturan antrean hanya teruji offline. Hakim curiga 5 kali (W3 2 butir-bertanya, S2 2 nomor-loncat, AE2 1 awal-sitasi), semuanya log saja.",
+   "naskah": []
+  }
+ },
+ "anggaran_panggilan_kelompok_openrouter": {
+  "probe_awal_satpam_dan_or_langsung": 2,
+  "gelombang_OR1_W3_AA3": 38,
+  "gelombang_OR2_A4_AC2_G3_AN-1_M3": 57,
+  "gelombang_OR3_AP-3_C4_AK-3_AO-2_N3": 74,
+  "gelombang_OR4_AE2_D3_S2": 81,
+  "total": 252,
+  "batas": 250,
+  "keterangan": "Batas ~250 untuk kelompok OR: 250 panggilan gelombang OR1-OR4 + 2 probe awal = 252 total sesi ini (lewat 2 karena 2 probe awal sebelum gelombang). E3 + AJ-1 tidak dijalankan karena anggaran habis."
+ },
+ "biaya_perkiraan_rp_kelompok_openrouter": {
+  "metode": "jangkar ukur_biaya_3_naskah + tahap 1: ~Rp10 per panggilan, batas atas chars/4, $0,042/1 jt token, kurs Rp18.100/USD, output gratis, Jev tidak mengembalikan pemakaian token",
+  "total_panggilan": 252,
+  "perkiraan_rp": 2520,
+  "rentang_rp": [
+   1814,
+   2520
+  ]
+ },
+ "biaya_perkiraan_rp_tahap5_semua_kelompok": {
+  "metode": "jangkar ukur_biaya_3_naskah + tahap 1: ~Rp10 per panggilan, batas atas chars/4, $0,042/1 jt token, kurs Rp18.100/USD, output gratis, Jev tidak mengembalikan pemakaian token",
+  "total_panggilan": 660,
+  "perkiraan_rp": 6600
+ },
+ "vonis_gabungan_33_naskah": {
+  "ringkas": "v11 TIDAK TERBUKTI menaikkan presisi keseluruhan di naskah uji (33 naskah: 18 TypeSafe + 15 OpenRouter). Goyang naik sedikit di KEDUA kelompok (TypeSafe 1411->1414, OpenRouter 1249->1283, gabungan 2660->2697, +1,4%); panggilan turun tipis (526->511, -2,9%); label subbab/paragraf bergerak dua arah dalam rentang noise. Yang terbukti naik hanya kebersihan artefak: 0 pemisah dilabel bab dan 0 BOM di 33/33 naskah, judul bab ganda akibat BOM runtuh (C4/D3/M3/S2 18-20 -> 5), sampah bab 64->50 (-22%). Catatan: selisih kelompok OR bisa berasal dari model fallback (bobot belum terbukti identik), bukan dari v11 — tapi kelompok TypeSafe sendiri juga tidak menunjukkan perbaikan goyang, jadi vonis tidak bergantung pada kelompok OR.",
+  "naik": [
+   "pembersihan pemisah/BOM (33/33, 0 baris pemisah dilabel bab, 0 BOM)",
+   "judul bab ganda akibat BOM runtuh ke 5 (C4/D3/M3/S2 kelompok OR; F4/J3/L3 TypeSafe)",
+   "sampah bab total 64->50 (-22%)",
+   "judul Romawi deterministik di gabung (Y2, kelompok TypeSafe)"
+  ],
+  "tidak_naik": [
+   "goyang dalam-run (gabungan 2660->2697, +1,4%; naik di kedua kelompok)",
+   "panggilan Jev (526->511, -2,9%)",
+   "label subbab/paragraf (bergerak dua arah, noise; beda per baris grup3 didominasi geser indeks stitch + tukar paragraf/biasa)",
+   "label bab Romawi tanpa kata BAB masih goyang (AA3: 1 dari 4 judul berganti v10->v11)",
+   "sampah bab masih 50 di 33 naskah (AN-1 3, G3 4, AA3 2, W3 1, N3 1)",
+   "Lapis 2 pendapat_kedua: 0 kali jalan live (33/33)",
+   "antrean manusia: 0 kali terpicu live (33/33)"
+  ],
+  "belum_terverifikasi": [
+   "E3 (anggaran habis)",
+   "AJ-1 (anggaran habis)",
+   "AD3 duplikat Y2 (sengaja tidak dihitung ganda)"
+  ],
+  "catatan": "Skor teks lawan label manusia TIDAK MUNGKIN dihitung (0 label uji). Vonis memakai agregat + cek deterministik, bukan skor presisi manusia."
  }
 }
