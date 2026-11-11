@@ -1,0 +1,828 @@
+{
+ "naskah": {
+  "A4": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    21,
+    79,
+    128,
+    132,
+    439,
+    656
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 57,
+    "jumlah_ragu": 6,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AA3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    132,
+    136,
+    138,
+    140,
+    186,
+    198,
+    215,
+    269,
+    310,
+    330,
+    367,
+    376,
+    377,
+    393,
+    395,
+    397,
+    399,
+    401,
+    405,
+    417,
+    611
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 29,
+    "jumlah_ragu": 20,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AC2": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    34,
+    39,
+    95,
+    104,
+    205,
+    209,
+    315,
+    341,
+    392,
+    397,
+    408,
+    458,
+    459,
+    461,
+    485,
+    498
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 33,
+    "jumlah_ragu": 16,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AE2": {
+   "curiga_kode": [
+    667
+   ],
+   "tanya_kandidat": [
+    31,
+    322,
+    410,
+    427,
+    429,
+    434,
+    615,
+    645,
+    674,
+    681,
+    693,
+    769,
+    910,
+    940,
+    1085,
+    1096,
+    1407,
+    1414,
+    1727,
+    1734
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 49,
+    "jumlah_ragu": 20,
+    "jumlah_curiga": 1,
+    "jumlah_belum": 0
+   }
+  },
+  "AI-2": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    17,
+    19,
+    29,
+    137,
+    214,
+    216,
+    218,
+    220,
+    222,
+    257,
+    411,
+    413,
+    417,
+    423,
+    537,
+    587,
+    1728,
+    1729
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 117,
+    "jumlah_ragu": 18,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AJ-1": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    86,
+    190,
+    209,
+    270,
+    298,
+    304,
+    465,
+    1185
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 62,
+    "jumlah_ragu": 8,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AK-3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    83,
+    126,
+    162,
+    194
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 50,
+    "jumlah_ragu": 4,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AL-2": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    75,
+    347,
+    919
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 60,
+    "jumlah_ragu": 3,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AM-2": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    42,
+    163,
+    201,
+    242,
+    278,
+    355,
+    362,
+    433,
+    509
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 30,
+    "jumlah_ragu": 9,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AN-1": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    89,
+    160,
+    292,
+    377,
+    411
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 32,
+    "jumlah_ragu": 3,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AO-2": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    31,
+    235
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 26,
+    "jumlah_ragu": 2,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "AP-3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    24,
+    31,
+    141,
+    144,
+    164,
+    461
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 49,
+    "jumlah_ragu": 6,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "B4": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    3,
+    94,
+    125,
+    133,
+    139,
+    212,
+    218,
+    457,
+    481,
+    577,
+    680,
+    1001,
+    1023,
+    1077,
+    1095,
+    1155,
+    1260,
+    1454,
+    1497,
+    1509,
+    1516,
+    1829,
+    1856,
+    1940,
+    2129,
+    2247,
+    2470,
+    3040,
+    3292,
+    3602,
+    3603
+   ],
+   "panggilan_prediksi": 2,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 126,
+    "jumlah_ragu": 31,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "C4": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    314,
+    543,
+    705,
+    770
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 62,
+    "jumlah_ragu": 4,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "D3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    187,
+    195,
+    197,
+    199,
+    234,
+    236,
+    267,
+    295,
+    297,
+    299,
+    340,
+    378,
+    413,
+    449,
+    461,
+    467,
+    503,
+    539,
+    552,
+    1579,
+    1619,
+    1742
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 37,
+    "jumlah_ragu": 22,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "E3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    76,
+    200,
+    230,
+    278,
+    316,
+    359,
+    434
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 37,
+    "jumlah_ragu": 7,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "F4": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    70,
+    154,
+    373,
+    464,
+    537,
+    554
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 43,
+    "jumlah_ragu": 6,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "G3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    30,
+    32,
+    80,
+    82,
+    93,
+    123,
+    168,
+    192,
+    370,
+    419,
+    437,
+    537,
+    592
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 39,
+    "jumlah_ragu": 13,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "H1": {
+   "curiga_kode": [
+    2232
+   ],
+   "tanya_kandidat": [
+    195,
+    198,
+    201,
+    204,
+    207,
+    210,
+    215,
+    218,
+    221,
+    230,
+    233,
+    236,
+    239,
+    242,
+    245,
+    248,
+    322,
+    325,
+    970,
+    1487,
+    1613,
+    1678,
+    1974,
+    2047,
+    2110,
+    3448
+   ],
+   "panggilan_prediksi": 2,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 186,
+    "jumlah_ragu": 26,
+    "jumlah_curiga": 1,
+    "jumlah_belum": 0
+   }
+  },
+  "I4": {
+   "curiga_kode": [],
+   "tanya_kandidat": [],
+   "panggilan_prediksi": 0,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 43,
+    "jumlah_ragu": 0,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "J3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    16,
+    19,
+    52,
+    59,
+    63,
+    69,
+    71,
+    77,
+    83,
+    462
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 28,
+    "jumlah_ragu": 10,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "L3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    33,
+    342
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 92,
+    "jumlah_ragu": 2,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "M3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    199,
+    214,
+    293,
+    365,
+    372,
+    376,
+    470,
+    484,
+    650,
+    697,
+    733
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 126,
+    "jumlah_ragu": 11,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "N3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    2,
+    8,
+    14,
+    20,
+    282,
+    401,
+    470,
+    472
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 122,
+    "jumlah_ragu": 8,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "O3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    6,
+    453,
+    653,
+    796,
+    976,
+    1000,
+    1684
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 43,
+    "jumlah_ragu": 7,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "P2": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    21,
+    93,
+    110,
+    519,
+    598,
+    602
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 53,
+    "jumlah_ragu": 6,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "Q3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [],
+   "panggilan_prediksi": 0,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 32,
+    "jumlah_ragu": 0,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "R3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    39,
+    41,
+    80,
+    82,
+    112,
+    114,
+    132,
+    136,
+    162,
+    219,
+    220,
+    239,
+    298,
+    357,
+    387,
+    397,
+    408,
+    445,
+    449,
+    501,
+    942,
+    995,
+    1031,
+    1033,
+    1048,
+    1051
+   ],
+   "panggilan_prediksi": 2,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 47,
+    "jumlah_ragu": 25,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "S2": {
+   "curiga_kode": [
+    661,
+    778
+   ],
+   "tanya_kandidat": [
+    221,
+    343,
+    766,
+    777,
+    1201
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 73,
+    "jumlah_ragu": 5,
+    "jumlah_curiga": 2,
+    "jumlah_belum": 0
+   }
+  },
+  "T3": {
+   "curiga_kode": [
+    377,
+    449,
+    584
+   ],
+   "tanya_kandidat": [
+    558,
+    602,
+    610,
+    614,
+    619,
+    800
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 90,
+    "jumlah_ragu": 5,
+    "jumlah_curiga": 3,
+    "jumlah_belum": 0
+   }
+  },
+  "U3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    73,
+    84,
+    141,
+    203,
+    236,
+    517,
+    556
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 9,
+    "jumlah_ragu": 6,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "W3": {
+   "curiga_kode": [
+    1316,
+    1478
+   ],
+   "tanya_kandidat": [
+    16,
+    19,
+    34,
+    51,
+    101,
+    105,
+    110,
+    112,
+    118,
+    120,
+    122,
+    124,
+    128,
+    184,
+    278,
+    336,
+    344,
+    487,
+    522,
+    555,
+    579,
+    645,
+    655,
+    679,
+    681,
+    686,
+    697,
+    760,
+    779,
+    783,
+    826,
+    830,
+    884,
+    899,
+    960,
+    1027,
+    1101,
+    1185,
+    1795,
+    1828,
+    1992
+   ],
+   "panggilan_prediksi": 2,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 94,
+    "jumlah_ragu": 41,
+    "jumlah_curiga": 2,
+    "jumlah_belum": 0
+   }
+  },
+  "X3": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    162
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 25,
+    "jumlah_ragu": 1,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "Y2": {
+   "curiga_kode": [],
+   "tanya_kandidat": [
+    155,
+    389,
+    401
+   ],
+   "panggilan_prediksi": 1,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 18,
+    "jumlah_ragu": 3,
+    "jumlah_curiga": 0,
+    "jumlah_belum": 0
+   }
+  },
+  "Z3": {
+   "curiga_kode": [
+    294
+   ],
+   "tanya_kandidat": [
+    30,
+    39,
+    80,
+    97,
+    214,
+    227,
+    326,
+    359,
+    425,
+    434,
+    479,
+    500,
+    521,
+    547,
+    580,
+    587,
+    591,
+    601,
+    609,
+    613,
+    615,
+    618,
+    623,
+    636,
+    638,
+    643
+   ],
+   "panggilan_prediksi": 2,
+   "hakim_tersimpan": {
+    "jumlah_sepakat": 62,
+    "jumlah_ragu": 26,
+    "jumlah_curiga": 1,
+    "jumlah_belum": 0
+   }
+  }
+ },
+ "total_tanya_kandidat": 386,
+ "total_curiga": 10,
+ "total_panggilan_prediksi": 38,
+ "total_ragu_tersimpan": 380
+}
