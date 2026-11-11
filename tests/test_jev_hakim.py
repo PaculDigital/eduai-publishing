@@ -1683,6 +1683,67 @@ def main():
     finally:
         H._TANYA_FN = _tanya_lama
 
+    # --- 13a-8. v13 KOREKSI: suara tunggal + jawaban kedua -> diadili
+    #    (baris ditandai Hakim yang tidak goyang). Tanpa jawaban, tetap
+    #    'bukan-goyang' (kontrak v11 tidak berubah).
+    _pk_tb = P8.pendapat_kedua(3, 'x', ['subbab'], [0.9],
+        {'label': 'biasa', 'confidence': 0.95}, mode='agen-kedua')
+    cek('v13-pk: suara tunggal + jawaban beda (bukan bab) -> berbalik',
+        _pk_tb['putusan'] == 'berbalik' and _pk_tb['label'] == 'biasa',
+        str(_pk_tb))
+    _pk_tt = P8.pendapat_kedua(3, 'x', ['subbab'], [0.9],
+        {'label': 'subbab', 'confidence': 0.95}, mode='agen-kedua')
+    cek('v13-pk: suara tunggal + jawaban sepakat -> tetap',
+        _pk_tt['putusan'] == 'tetap' and _pk_tt['label'] == 'subbab',
+        str(_pk_tt))
+    cek('v13-pk: suara tunggal tanpa jawaban -> bukan-goyang (kontrak v11)',
+        P8.pendapat_kedua(3, 'x', ['subbab'], [0.9])['putusan']
+        == 'bukan-goyang')
+    _pk_tbb = P8.pendapat_kedua(3, 'x', ['subbab'], [0.9],
+        {'label': 'bab', 'confidence': 0.95}, mode='agen-kedua')
+    cek('v13-pk: suara tunggal + jawaban bab -> antrean-manusia',
+        _pk_tbb['putusan'] == 'antrean-manusia', str(_pk_tbb))
+    _pk_trg = P8.pendapat_kedua(3, 'x', ['subbab'], [0.9],
+        {'label': 'biasa', 'confidence': 0.4}, mode='agen-kedua')
+    cek('v13-pk: suara tunggal + jawaban tidak yakin -> antrean-manusia',
+        _pk_trg['putusan'] == 'antrean-manusia', str(_pk_trg))
+    # 13a-9. KOREKSI v13: baris DITANDAI Hakim yang TIDAK goyang -> agen
+    #    kedua tetap dipanggil + berbalik (bukan dilewati seperti v13 awal
+    #    yang hanya mengadili goyang yang ditandai).
+    P8._CACHE_PETA.clear()
+    _dipanggil_i = []
+    r_v13i = P8.petakan_dari_teks(
+        _teks_v13('DITANDAI-V13I'), putaran=1,
+        pendapat_kedua_fn=_fn_rekam(_dipanggil_i),
+        hakim_tandai_fn=_hakim_tandai_teks('DITANDAI-V13I'))
+    idx_v13i = next(i for i, b in enumerate(r_v13i['baris'])
+                    if 'DITANDAI-V13I' in b)
+    cek('v13-gating: ditandai Hakim TIDAK goyang -> agen kedua dipanggil + berbalik',
+        _dipanggil_i == [idx_v13i]
+        and r_v13i['label'].get(idx_v13i) == 'biasa'
+        and r_v13i.get('pendapat_kedua_berbalik')
+        == [[idx_v13i, 'paragraf', 'biasa']]
+        and r_v13i.get('hakim_tandai') == [idx_v13i]
+        and not any(g[0] == idx_v13i for g in r_v13i.get('goyang') or []),
+        str((_dipanggil_i, r_v13i['label'].get(idx_v13i),
+             r_v13i.get('pendapat_kedua_berbalik'), r_v13i.get('hakim_tandai'),
+             r_v13i.get('goyang'))))
+    # 13a-10. Baris ditandai TIDAK goyang + agen kedua gagal (None) ->
+    #    antrean manusia (flag Hakim tidak hilang diam-diam).
+    P8._CACHE_PETA.clear()
+    r_v13j = P8.petakan_dari_teks(
+        _teks_v13('DITANDAI-V13J'), putaran=1,
+        pendapat_kedua_fn=lambda i, t, s, p: None,
+        hakim_tandai_fn=_hakim_tandai_teks('DITANDAI-V13J'))
+    idx_v13j = next(i for i, b in enumerate(r_v13j['baris'])
+                    if 'DITANDAI-V13J' in b)
+    cek('v13-gating: ditandai TIDAK goyang + agen kedua gagal -> antrean',
+        r_v13j.get('pendapat_kedua_antrean') == [idx_v13j]
+        and r_v13j['label'].get(idx_v13j) == 'paragraf'
+        and r_v13j.get('pendapat_kedua_jml') == 1,
+        str((r_v13j.get('pendapat_kedua_antrean'),
+             r_v13j['label'].get(idx_v13j), r_v13j.get('pendapat_kedua_jml'))))
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))

@@ -41,7 +41,8 @@ log = logging.getLogger(__name__)
 #    profil_bentuk() deterministik (Lapis 1), pendapat_kedua() hanya
 #    untuk baris goyang (Lapis 2, jawaban disuntik, nol Jev di sini),
 #    antrean manusia untuk bentuk tak dikenal (Lapis 3, ditandai di
-#    hasil, bukan diam-diam dipetakan). Aturan baru: buang BOM (66/112
+#    hasil, bukan diam-diam dipetakan). v13: pendapat_kedua() JUGA untuk
+#    baris ditandai Hakim yang tidak goyang (suara tunggal Jev). Aturan baru: buang BOM (66/112
 #    teks), buang pemisah gabungan '===== ... =====' (117 baris di 50
 #    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
 #    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
@@ -346,6 +347,12 @@ def profil_bentuk(teks):
 def pendapat_kedua(idx, teks_baris, suara, p, jawaban_kedua=None,
                   mode='suara'):
     """LAPIS 2 (v11) — pendapat kedua HANYA untuk baris goyang.
+    v13 (11 Nov 2026, koreksi gating): JUGA untuk baris yang ditandai
+    Hakim (ragu/curiga) meski tidak goyang — suara Jev-nya tunggal, dan
+    jawaban kedua yang disuntik tetap diadili dengan aturan yang sama
+    (sepakat -> tetap, beda bukan soal bab -> berbalik, beda soal bab /
+    tidak yakin -> antrean). Tanpa jawaban kedua, suara tunggal tetap
+    'bukan-goyang' (tidak ada yang perlu diadili).
 
     Murni deterministik, NOL panggilan Jev: `jawaban_kedua` DISUNTIK oleh
     pemanggil (agen kedua live, tanya ulang, atau model 1.13 sebagai
@@ -353,7 +360,8 @@ def pendapat_kedua(idx, teks_baris, suara, p, jawaban_kedua=None,
     `suara`/`p` = suara + confidence tersimpan dari run.
 
     mode='suara' (bawaan, v11 — adjudikasi suara):
-      'bukan-goyang'      — suara tersimpan sepakat (bukan sengketa).
+      'bukan-goyang'      — suara tersimpan sepakat (bukan sengketa) DAN
+                            tidak ada jawaban kedua yang disuntik.
       'tetap'             — pendapat kedua sepakat dengan suara teratas,
                             atau sepakat dengan minoritas tapi kurang yakin.
       'berbalik'          — pendapat kedua sepakat dengan suara minoritas
@@ -375,7 +383,8 @@ def pendapat_kedua(idx, teks_baris, suara, p, jawaban_kedua=None,
                             Label TIDAK dipaksa.
     """
     votes = [v for v in (suara or []) if v]
-    if len(set(votes)) <= 1:
+    if len(set(votes)) <= 1 and (not jawaban_kedua
+                                 or not jawaban_kedua.get('label')):
         return {'idx': idx, 'putusan': 'bukan-goyang',
                 'label': votes[0] if votes else None,
                 'alasan': 'suara tersimpan sepakat'}
@@ -1699,25 +1708,28 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
     #    ── v13 GATING HAKIM (Gas Bos 11 Nov 2026) ─────────────────────
     #    Bila `hakim_tandai_fn` disuntik pemanggil — fn(peta_sementara)
     #    -> set idx baris yang Hakim tandai ragu/curiga (produksi:
-    #    `app.hakim_peta.tandai_ragu_curiga`) — agen kedua HANYA dipanggil
-    #    untuk baris goyang YANG JUGA ditandai Hakim. Baris goyang yang
-    #    tidak ditandai dilewati, label Jev dipakai apa adanya. Peta
-    #    sementara yang diaudit Hakim adalah peta SAAT INI (pra-koreksi
-    #    deterministik): label hasil tanya-ulang, gabung stitch, dan
-    #    sistematika yang dihitung di sini khusus untuk gerbang (D1 di
-    #    bawah tetap menghitung ulang pada tempatnya — tidak diubah).
-    #    Bila fn mengembalikan None / galat ⇒ himpunan kosong + dicatat
-    #    (`hakim_tandai_galat`): Lapis 2 tidak memanggil agen kedua sama
-    #    sekali (gagal tertutup, bukan tebak). Bila fn TIDAK disuntik
-    #    (None): perilaku WARISAN v12 — tiap baris goyang diadili
-    #    (pelari/uji lama tetap jalan; produksi WAJIB menyuntik fn ini).
+    #    `app.hakim_peta.tandai_ragu_curiga`) — agen kedua dipanggil untuk
+    #    SEMUA baris yang ditandai Hakim, goyang atau tidak (keputusan Bos:
+    #    "bukan per baris goyang"). Baris goyang yang tidak ditandai
+    #    dilewati, label Jev dipakai apa adanya. Baris ditandai yang
+    #    tidak goyang diadili dari suara tunggalnya (label Jev saat ini).
+    #    Peta sementara yang diaudit Hakim adalah peta SAAT INI
+    #    (pra-koreksi deterministik): label hasil tanya-ulang, gabung
+    #    stitch, dan sistematika yang dihitung di sini khusus untuk
+    #    gerbang (D1 di bawah tetap menghitung ulang pada tempatnya —
+    #    tidak diubah). Bila fn mengembalikan None / galat ⇒ himpunan
+    #    kosong + dicatat (`hakim_tandai_galat`): Lapis 2 tidak memanggil
+    #    agen kedua sama sekali (gagal tertutup, bukan tebak). Bila fn
+    #    TIDAK disuntik (None): perilaku WARISAN v12 — tiap baris goyang
+    #    diadili (pelari/uji lama tetap jalan; produksi WAJIB menyuntik
+    #    fn ini).
     pk_jml = 0
     pk_berbalik = []
     pk_antrean = []
     pk_jawaban = []
     hakim_tandai = None          # v13: None = gerbang tidak dipakai (warisan)
     hakim_tandai_galat = None    # v13: pesan galat fn gerbang (bila ada)
-    if pendapat_kedua_fn is not None and goyang:
+    if pendapat_kedua_fn is not None:
         if hakim_tandai_fn is not None:
             try:
                 _sist_gerbang = _tandai_sistematika(baris, label, kand)
@@ -1735,6 +1747,10 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
             except Exception as _e:             # gagal tertutup: 0 panggilan
                 hakim_tandai = []
                 hakim_tandai_galat = '%s: %s' % (type(_e).__name__, _e)
+            _adili = list(hakim_tandai)
+        else:
+            _adili = [gi for gi, _v in goyang]
+        _goyang_set = {gi for gi, _v in goyang}
         try:
             import inspect as _inspect
             _n_arg_fn = len(_inspect.signature(
@@ -1760,22 +1776,35 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
             return {'sebelum': sebelum, 'sesudah': sesudah,
                     'judul_bab_terdekat': judul}
 
-        for gi, _votes in list(goyang):
-            if hakim_tandai is not None and gi not in hakim_tandai:
-                continue               # v13: goyang tanpa tanda Hakim dilewati
+        for gi in _adili:
+            # Suara Jev: dari semua/conf bila ada; baris ditandai yang
+            # tidak goyang dan tidak punya suara tersimpan (label
+            # deterministik) -> suara tunggal dari label saat ini.
+            _suara = list(semua.get(gi) or [label.get(gi)])
+            _conf = list(conf.get(gi) or [p_label.get(gi, 0.5)])
+            if not _suara or _suara[0] is None:
+                continue               # baris tanpa label Jev: tidak diadili
             label_jev = label.get(gi)
             try:
                 if _n_arg_fn >= 5:
                     jw2 = pendapat_kedua_fn(
-                        gi, baris[gi], list(semua[gi]), list(conf[gi]),
+                        gi, baris[gi], list(_suara), list(_conf),
                         _konteks_lebar(gi))
                 else:
                     jw2 = pendapat_kedua_fn(gi, baris[gi],
-                                            list(semua[gi]), list(conf[gi]))
+                                            list(_suara), list(_conf))
             except Exception:
                 jw2 = None
-            put = pendapat_kedua(gi, baris[gi], semua[gi], conf[gi], jw2,
-                                mode='agen-kedua')
+            if jw2 is None and gi not in _goyang_set:
+                # v13: agen kedua gagal pada baris ditandai Hakim yang
+                # tidak goyang — flag Hakim tetap berdiri, masuk antrean
+                # manusia (bukan diam-diam dilewati).
+                put = {'idx': gi, 'putusan': 'antrean-manusia',
+                       'label': None,
+                       'alasan': 'tidak ada pendapat kedua'}
+            else:
+                put = pendapat_kedua(gi, baris[gi], _suara, _conf, jw2,
+                                    mode='agen-kedua')
             if put['putusan'] == 'bukan-goyang':
                 continue
             pk_jml += 1

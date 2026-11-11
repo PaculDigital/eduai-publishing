@@ -98,6 +98,30 @@ Bila 503 lagi, saklar tetap mati dan rantai tidak jalan di produksi.
   lebar (5 argumen bila fn mendukung, kalau tidak 4 argumen supaya lambda
   uji lama tetap jalan), dan merekam `pk_jawaban` (idx, label Jev, label
   kedua, confidence, putusan, label akhir, alasan, model).
+
+## 3b. v13 — Gating Hakim (Gas Bos 11 Nov 2026 12:27 WIB)
+
+Keputusan Bos: agen kedua HANYA untuk baris yang ditandai Hakim
+(ragu/curiga), **bukan per baris goyang**. `RULE_VERSION` v12 →
+`jev-peta-v13`. `app/hakim_peta.py` dapat helper baru
+`tandai_ragu_curiga(peta)` (tidak pernah melempar; hakim mati/galat →
+himpunan kosong, gagal tertutup). `peta3_jev.py` merambatkan parameter
+baru `hakim_tandai_fn` lewat `petakan()` / `petakan_dari_teks()` /
+`_petakan_dari_hasil()`; Hakim mengaudit peta sementara pra-koreksi,
+lalu Lapis 2 mengadili himpunan yang ditandai. Tanpa `hakim_tandai_fn`,
+perilaku warisan v12 (per goyang) dipertahankan untuk uji/pelari lama.
+
+**Koreksi (11 Nov 2026, sebelum pengukuran live):** implementasi v13
+pertama (commit `fb84999`) salah membaca keputusan — ia mengadili
+`goyang ∩ ditandai`. Di 35 naskah uji itu hanya 61 baris (12 dari 252
+baris TSV terpetakan), dan melewatkan 27 baris ditandai Hakim yang tidak
+goyang, termasuk baris curiga kode. Yang benar: himpunan adjudikasi =
+**semua baris ditandai Hakim** (390 baris di 35 naskah: 380 ragu + 10
+curiga; 39 dari 252 baris TSV). Baris ditandai yang tidak goyang diadili
+dari suara tunggalnya (label Jev saat ini); bila agen kedua gagal pada
+baris itu, masuk antrean manusia (flag tidak hilang diam-diam).
+Uji offline: **287 lulus, 0 gagal** (280 lama + 7 baru 13a-8/9/10).
+ATURAN 5 TIDAK diubah (tugas terpisah, butuh Gas sendiri).
   `RULE_VERSION` naik v11 → `jev-peta-v12`.
 - `_sketsa/agen_kedua_openrouter.py` (perkakas pilot, bukan produksi):
   penanya OpenRouter model PINNED `google/gemini-2.5-flash`, cadangan
