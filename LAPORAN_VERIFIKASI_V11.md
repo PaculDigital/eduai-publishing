@@ -246,3 +246,32 @@ Sisa: **tidak ada lagi** — E3 dan AJ-1 terverifikasi di gelombang OR5
 uji; 1 sisanya AD3 duplikat berkas Y2, sengaja tidak dihitung ganda.
 TypeSafe resmi masih 402 di setiap probe OR5; jalur `model_override`
 tetap tidak pernah terpicu.
+
+## Pelabelan naskah uji dan skor presisi (11 Nov 2026, Gas Boss)
+
+279 baris sengketa di 35 naskah uji dilabeli manusia (0 ragu, 0 panggilan
+Jev): `ground_truth/ground_truth_uji112.tsv` + `ringkasan_uji112.md`.
+Label benar: biasa 138, paragraf 75, subbab 45, bab 21.
+
+Akurasi v11 pada baris sengketa saja (bukan presisi keseluruhan peta):
+136/279 (0,4875). Per label: subbab 32/45 (0,7111), paragraf 43/75
+(0,5733), bab 12/21 (0,5714), biasa 49/138 (0,3551). Per kelompok:
+TypeSafe 76/144 (0,5278), OpenRouter 60/135 (0,4444). Per bentuk:
+Romawi 120/247 (0,4858), CHAPTER 2/8, Arab 3/8, campuran 11/16.
+
+Head-to-head adil (subset ketat, 56 baris, 7 naskah grup 3 — satu-satunya
+yang label v10 per barisnya tersimpan): v10 22/56 (0,3929) lawan v11
+29/56 (0,5179). Pasangan berselisih 21 lawan 14, McNemar khi-kuadrat 1,4,
+p sekitar 0,24, tidak signifikan. **Vonis: v11 TIDAK TERBUKTI lebih
+presisi dari v10.** Arahnya menguntungkan v11 di bab dan paragraf, turun
+tipis di biasa pada subset ketat. Subset luas (84 baris, + cocok persis
+judul bab v10): v10 27/84 lawan v11 34/84, tapi bias karena diperkaya
+judul sampah, bukan vonis.
+
+Pola salah terbesar v11: 42 baris biasa dilabeli bab (kebanyakan salinan
+sistematika/daftar isi). 8 baris bab asli tanpa label di `label_penuh`
+v11, tapi kedelapan judulnya ada di `bab_gabung` v11 (celah representasi
+per baris, bukan bab hilang). 20 sengketa bab tidak terlabeli (batas
+8/naskah: Z3 12, T3 4, R3 1, AI-2 1, O3 1, AA3 1).
+Skor lengkap di kunci `skor_presisi_uji112` dan `vonis_presisi_uji112`
+pada `hasil_verifikasi_v11.json` (angka 35 naskah tidak berubah).

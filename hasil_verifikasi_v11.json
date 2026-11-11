@@ -5382,5 +5382,1336 @@
    "tidak ada lagi: 35 dari 36 naskah uji terverifikasi; AD3 duplikat berkas Y2 (sengaja tidak dihitung ganda)"
   ],
   "catatan": "Skor teks lawan label manusia TIDAK MUNGKIN dihitung (0 label uji). Vonis memakai agregat + cek deterministik, bukan skor presisi manusia."
- }
+ },
+ "skor_presisi_uji112": {
+  "n_total": 279,
+  "label_benar": {
+   "biasa": 138,
+   "paragraf": 75,
+   "subbab": 45,
+   "bab": 21
+  },
+  "jenis_sengketa": {
+   "judul_bab_sampah": 35,
+   "goyang_bab": 43,
+   "goyang_paragraf": 24,
+   "goyang_subbab": 87,
+   "hakim_ragu": 21,
+   "hakim_curiga": 10,
+   "beda_bab": 21,
+   "beda_paragraf": 3,
+   "beda_subbab": 6,
+   "deterministik_nomor_polos": 1,
+   "beda_paragraf_biasa": 4,
+   "goyang_paragraf_biasa": 24
+  },
+  "per_kelompok_n": {
+   "typesafe": 144,
+   "openrouter": 135
+  },
+  "per_naskah_n": {
+   "A4": 8,
+   "AA3": 8,
+   "AC2": 8,
+   "AE2": 8,
+   "AI-2": 8,
+   "AJ-1": 8,
+   "AK-3": 8,
+   "AL-2": 8,
+   "AM-2": 8,
+   "AN-1": 8,
+   "AO-2": 8,
+   "AP-3": 8,
+   "B4": 8,
+   "C4": 8,
+   "D3": 8,
+   "E3": 8,
+   "F4": 8,
+   "G3": 8,
+   "H1": 8,
+   "I4": 8,
+   "J3": 8,
+   "L3": 8,
+   "M3": 8,
+   "N3": 8,
+   "O3": 8,
+   "P2": 8,
+   "Q3": 8,
+   "R3": 8,
+   "S2": 7,
+   "T3": 8,
+   "U3": 8,
+   "W3": 8,
+   "X3": 8,
+   "Y2": 8,
+   "Z3": 8
+  },
+  "v11_keseluruhan": {
+   "n": 279,
+   "benar": 136,
+   "akurasi": 0.4875,
+   "n_berlabel": 271,
+   "benar_berlabel": 136,
+   "akurasi_berlabel": 0.5018
+  },
+  "v11_per_label": {
+   "bab": {
+    "n": 21,
+    "benar": 12,
+    "akurasi": 0.5714
+   },
+   "subbab": {
+    "n": 45,
+    "benar": 32,
+    "akurasi": 0.7111
+   },
+   "paragraf": {
+    "n": 75,
+    "benar": 43,
+    "akurasi": 0.5733
+   },
+   "biasa": {
+    "n": 138,
+    "benar": 49,
+    "akurasi": 0.3551
+   }
+  },
+  "v11_per_kelompok": {
+   "typesafe": {
+    "n": 144,
+    "benar": 76,
+    "akurasi": 0.5278,
+    "n_berlabel": 144,
+    "benar_berlabel": 76,
+    "akurasi_berlabel": 0.5278
+   },
+   "openrouter": {
+    "n": 135,
+    "benar": 60,
+    "akurasi": 0.4444,
+    "n_berlabel": 127,
+    "benar_berlabel": 60,
+    "akurasi_berlabel": 0.4724
+   }
+  },
+  "v11_per_bentuk": {
+   "romawi": {
+    "n": 247,
+    "benar": 120,
+    "akurasi": 0.4858,
+    "n_berlabel": 239,
+    "benar_berlabel": 120,
+    "akurasi_berlabel": 0.5021
+   },
+   "chapter": {
+    "n": 8,
+    "benar": 2,
+    "akurasi": 0.25,
+    "n_berlabel": 8,
+    "benar_berlabel": 2,
+    "akurasi_berlabel": 0.25
+   },
+   "arab": {
+    "n": 8,
+    "benar": 3,
+    "akurasi": 0.375,
+    "n_berlabel": 8,
+    "benar_berlabel": 3,
+    "akurasi_berlabel": 0.375
+   },
+   "campuran": {
+    "n": 16,
+    "benar": 11,
+    "akurasi": 0.6875,
+    "n_berlabel": 16,
+    "benar_berlabel": 11,
+    "akurasi_berlabel": 0.6875
+   }
+  },
+  "v11_per_naskah": {
+   "A4": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 8,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5
+   },
+   "AA3": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 6,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.6667
+   },
+   "AC2": {
+    "n": 8,
+    "benar": 3,
+    "akurasi": 0.375,
+    "n_berlabel": 6,
+    "benar_berlabel": 3,
+    "akurasi_berlabel": 0.5
+   },
+   "AE2": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 6,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.6667
+   },
+   "AI-2": {
+    "n": 8,
+    "benar": 1,
+    "akurasi": 0.125,
+    "n_berlabel": 8,
+    "benar_berlabel": 1,
+    "akurasi_berlabel": 0.125
+   },
+   "AJ-1": {
+    "n": 8,
+    "benar": 3,
+    "akurasi": 0.375,
+    "n_berlabel": 8,
+    "benar_berlabel": 3,
+    "akurasi_berlabel": 0.375
+   },
+   "AK-3": {
+    "n": 8,
+    "benar": 2,
+    "akurasi": 0.25,
+    "n_berlabel": 8,
+    "benar_berlabel": 2,
+    "akurasi_berlabel": 0.25
+   },
+   "AL-2": {
+    "n": 8,
+    "benar": 5,
+    "akurasi": 0.625,
+    "n_berlabel": 8,
+    "benar_berlabel": 5,
+    "akurasi_berlabel": 0.625
+   },
+   "AM-2": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 8,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5
+   },
+   "AN-1": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 8,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5
+   },
+   "AO-2": {
+    "n": 8,
+    "benar": 5,
+    "akurasi": 0.625,
+    "n_berlabel": 8,
+    "benar_berlabel": 5,
+    "akurasi_berlabel": 0.625
+   },
+   "AP-3": {
+    "n": 8,
+    "benar": 3,
+    "akurasi": 0.375,
+    "n_berlabel": 8,
+    "benar_berlabel": 3,
+    "akurasi_berlabel": 0.375
+   },
+   "B4": {
+    "n": 8,
+    "benar": 6,
+    "akurasi": 0.75,
+    "n_berlabel": 8,
+    "benar_berlabel": 6,
+    "akurasi_berlabel": 0.75
+   },
+   "C4": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 8,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5
+   },
+   "D3": {
+    "n": 8,
+    "benar": 3,
+    "akurasi": 0.375,
+    "n_berlabel": 8,
+    "benar_berlabel": 3,
+    "akurasi_berlabel": 0.375
+   },
+   "E3": {
+    "n": 8,
+    "benar": 3,
+    "akurasi": 0.375,
+    "n_berlabel": 8,
+    "benar_berlabel": 3,
+    "akurasi_berlabel": 0.375
+   },
+   "F4": {
+    "n": 8,
+    "benar": 6,
+    "akurasi": 0.75,
+    "n_berlabel": 8,
+    "benar_berlabel": 6,
+    "akurasi_berlabel": 0.75
+   },
+   "G3": {
+    "n": 8,
+    "benar": 1,
+    "akurasi": 0.125,
+    "n_berlabel": 8,
+    "benar_berlabel": 1,
+    "akurasi_berlabel": 0.125
+   },
+   "H1": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 8,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5
+   },
+   "I4": {
+    "n": 8,
+    "benar": 5,
+    "akurasi": 0.625,
+    "n_berlabel": 8,
+    "benar_berlabel": 5,
+    "akurasi_berlabel": 0.625
+   },
+   "J3": {
+    "n": 8,
+    "benar": 5,
+    "akurasi": 0.625,
+    "n_berlabel": 8,
+    "benar_berlabel": 5,
+    "akurasi_berlabel": 0.625
+   },
+   "L3": {
+    "n": 8,
+    "benar": 6,
+    "akurasi": 0.75,
+    "n_berlabel": 8,
+    "benar_berlabel": 6,
+    "akurasi_berlabel": 0.75
+   },
+   "M3": {
+    "n": 8,
+    "benar": 5,
+    "akurasi": 0.625,
+    "n_berlabel": 8,
+    "benar_berlabel": 5,
+    "akurasi_berlabel": 0.625
+   },
+   "N3": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 7,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5714
+   },
+   "O3": {
+    "n": 8,
+    "benar": 3,
+    "akurasi": 0.375,
+    "n_berlabel": 8,
+    "benar_berlabel": 3,
+    "akurasi_berlabel": 0.375
+   },
+   "P2": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 8,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5
+   },
+   "Q3": {
+    "n": 8,
+    "benar": 7,
+    "akurasi": 0.875,
+    "n_berlabel": 8,
+    "benar_berlabel": 7,
+    "akurasi_berlabel": 0.875
+   },
+   "R3": {
+    "n": 8,
+    "benar": 1,
+    "akurasi": 0.125,
+    "n_berlabel": 8,
+    "benar_berlabel": 1,
+    "akurasi_berlabel": 0.125
+   },
+   "S2": {
+    "n": 7,
+    "benar": 4,
+    "akurasi": 0.5714,
+    "n_berlabel": 7,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5714
+   },
+   "T3": {
+    "n": 8,
+    "benar": 2,
+    "akurasi": 0.25,
+    "n_berlabel": 8,
+    "benar_berlabel": 2,
+    "akurasi_berlabel": 0.25
+   },
+   "U3": {
+    "n": 8,
+    "benar": 3,
+    "akurasi": 0.375,
+    "n_berlabel": 8,
+    "benar_berlabel": 3,
+    "akurasi_berlabel": 0.375
+   },
+   "W3": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 7,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5714
+   },
+   "X3": {
+    "n": 8,
+    "benar": 4,
+    "akurasi": 0.5,
+    "n_berlabel": 8,
+    "benar_berlabel": 4,
+    "akurasi_berlabel": 0.5
+   },
+   "Y2": {
+    "n": 8,
+    "benar": 5,
+    "akurasi": 0.625,
+    "n_berlabel": 8,
+    "benar_berlabel": 5,
+    "akurasi_berlabel": 0.625
+   },
+   "Z3": {
+    "n": 8,
+    "benar": 5,
+    "akurasi": 0.625,
+    "n_berlabel": 8,
+    "benar_berlabel": 5,
+    "akurasi_berlabel": 0.625
+   }
+  },
+  "head_to_head_ketat_label_penuh_teks": {
+   "n": 56,
+   "v10": {
+    "n": 56,
+    "benar": 22,
+    "akurasi": 0.3929,
+    "n_berlabel": 50,
+    "benar_berlabel": 22,
+    "akurasi_berlabel": 0.44
+   },
+   "v11": {
+    "n": 56,
+    "benar": 29,
+    "akurasi": 0.5179,
+    "n_berlabel": 49,
+    "benar_berlabel": 29,
+    "akurasi_berlabel": 0.5918
+   },
+   "v10_per_label": {
+    "bab": {
+     "n": 14,
+     "benar": 4,
+     "akurasi": 0.2857
+    },
+    "subbab": {
+     "n": 5,
+     "benar": 2,
+     "akurasi": 0.4
+    },
+    "paragraf": {
+     "n": 16,
+     "benar": 6,
+     "akurasi": 0.375
+    },
+    "biasa": {
+     "n": 21,
+     "benar": 10,
+     "akurasi": 0.4762
+    }
+   },
+   "v11_per_label": {
+    "bab": {
+     "n": 14,
+     "benar": 7,
+     "akurasi": 0.5
+    },
+    "subbab": {
+     "n": 5,
+     "benar": 3,
+     "akurasi": 0.6
+    },
+    "paragraf": {
+     "n": 16,
+     "benar": 10,
+     "akurasi": 0.625
+    },
+    "biasa": {
+     "n": 21,
+     "benar": 9,
+     "akurasi": 0.4286
+    }
+   },
+   "naskah": [
+    "AA3",
+    "AC2",
+    "AE2",
+    "W3",
+    "X3",
+    "Y2",
+    "Z3"
+   ],
+   "per_baris": [
+    {
+     "naskah": "X3",
+     "teks": "PENDAHULUAN",
+     "v10": "subbab",
+     "v11": "bab",
+     "benar": "bab"
+    },
+    {
+     "naskah": "X3",
+     "teks": "Di negara berkembang, sampah umumnya ditampung pada lokasi pembuangan dengan men",
+     "v10": "paragraf",
+     "v11": "biasa",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "X3",
+     "teks": "(3.10)",
+     "v10": "subbab",
+     "v11": "paragraf",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "X3",
+     "teks": "C1 P1 P2 C2",
+     "v10": "bab",
+     "v11": "biasa",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "X3",
+     "teks": "METODOLOGI PENELITIAN",
+     "v10": "subbab",
+     "v11": "bab",
+     "benar": "bab"
+    },
+    {
+     "naskah": "X3",
+     "teks": "Penelitian ini akan dilakukan pada bulan Mei sampai Juli 2005 di Tempat Pembuang",
+     "v10": "biasa",
+     "v11": "subbab",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "X3",
+     "teks": "Lintasan V",
+     "v10": "bab",
+     "v11": "biasa",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "X3",
+     "teks": "15.52 - 46.13",
+     "v10": "bab",
+     "v11": "paragraf",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "Z3",
+     "teks": "Bab IV",
+     "v10": "biasa",
+     "v11": "bab",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "Z3",
+     "teks": ": Nilai-Nilai Pancasila, Kepahlawanan dan Patriotisme",
+     "v10": null,
+     "v11": "bab",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "Z3",
+     "teks": "Semester II",
+     "v10": "biasa",
+     "v11": "biasa",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "Z3",
+     "teks": "Dari definisi diatas maka dapat disimpulkan bahwa pembelajaran IPS merupakan syn",
+     "v10": "bab",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "Z3",
+     "teks": "1. Definisi Teknologi Pendidikan",
+     "v10": "bab",
+     "v11": "subbab",
+     "benar": "subbab"
+    },
+    {
+     "naskah": "Z3",
+     "teks": "(10) Pause untuk menghentikan tampilan.",
+     "v10": "biasa",
+     "v11": "subbab",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "Z3",
+     "teks": "BAB IV",
+     "v10": "biasa",
+     "v11": "bab",
+     "benar": "bab"
+    },
+    {
+     "naskah": "Z3",
+     "teks": "HASIL PENELITIAN DAN PEMBAHASAN",
+     "v10": "biasa",
+     "v11": "bab",
+     "benar": "bab"
+    },
+    {
+     "naskah": "Y2",
+     "teks": "Indonesia memiliki kawasan hutan seluas 144 juta hektar dan lebih dari 5 juta he",
+     "v10": "paragraf",
+     "v11": "biasa",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "Y2",
+     "teks": "Penelitian ini bertujuan untuk mengidentifikasi karakteristik tanah gambut areal",
+     "v10": "paragraf",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "Y2",
+     "teks": "A. Tempat dan Waktu",
+     "v10": "paragraf",
+     "v11": "subbab",
+     "benar": "subbab"
+    },
+    {
+     "naskah": "Y2",
+     "teks": "Kegiatan yang dilakukan meliputi persiapan, pelaksanaan kegiatan lapangan, kegia",
+     "v10": "subbab",
+     "v11": "subbab",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "Y2",
+     "teks": "Pada tahap persiapan dilakukan kegiatan yang meliputi studi pustaka dan pengumpu",
+     "v10": "subbab",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "Y2",
+     "teks": "Berdasarkan data curah hujan selama 10 tahun (1997 – 2006) yang diperoleh dari B",
+     "v10": "subbab",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "Y2",
+     "teks": "Sifat tanah",
+     "v10": null,
+     "v11": "subbab",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "Y2",
+     "teks": "6,6-7,5",
+     "v10": "paragraf",
+     "v11": "biasa",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "W3",
+     "teks": "BAB II",
+     "v10": null,
+     "v11": null,
+     "benar": "bab"
+    },
+    {
+     "naskah": "W3",
+     "teks": "Tinjauan Pustaka",
+     "v10": "subbab",
+     "v11": "bab",
+     "benar": "bab"
+    },
+    {
+     "naskah": "W3",
+     "teks": "Sebagai surat kabar daerah yang mempunyai segmentasi kelas menengah ketas, Fajar",
+     "v10": "biasa",
+     "v11": "paragraf",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "W3",
+     "teks": "3. Distribusi",
+     "v10": "biasa",
+     "v11": "subbab",
+     "benar": "subbab"
+    },
+    {
+     "naskah": "W3",
+     "teks": "5. Berapa jumlah karyawan perusahaan ini? Redaksi dan perusahaan?",
+     "v10": null,
+     "v11": "subbab",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "W3",
+     "teks": "6. Kapan perusahaan mulai beroperasi pertama kali?",
+     "v10": null,
+     "v11": "biasa",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "W3",
+     "teks": "10. Berapa jumlah karyawan perusahaan ini? Redaksi dan perusahaan?",
+     "v10": null,
+     "v11": "subbab",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "W3",
+     "teks": "Redaktur, 8 redaktur, 1 redaktu minggu.redaktu daerah 1,",
+     "v10": "biasa",
+     "v11": "biasa",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "AA3",
+     "teks": "BAB II",
+     "v10": "paragraf",
+     "v11": null,
+     "benar": "bab"
+    },
+    {
+     "naskah": "AA3",
+     "teks": "TINJAUAN TERHADAP PEMBAGIAN KEKUASAAN DI INDONESIA SETELAH PERUBAHAN UUD 1945",
+     "v10": "biasa",
+     "v11": "bab",
+     "benar": "bab"
+    },
+    {
+     "naskah": "AA3",
+     "teks": "BAB III",
+     "v10": "paragraf",
+     "v11": null,
+     "benar": "bab"
+    },
+    {
+     "naskah": "AA3",
+     "teks": "PERAN DPR DALAM PROSES PENGANGKATAN DUTA BESAR RI SETELAH PERUBAHAN UUD 1945",
+     "v10": "biasa",
+     "v11": "bab",
+     "benar": "bab"
+    },
+    {
+     "naskah": "AA3",
+     "teks": "1. Subkomisi Pertanian dan Pangan.",
+     "v10": "biasa",
+     "v11": "biasa",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "AA3",
+     "teks": "IV. KOMISI TRANSPORTASI DAN INFRASTRUKTUR",
+     "v10": "subbab",
+     "v11": "bab",
+     "benar": "subbab"
+    },
+    {
+     "naskah": "AA3",
+     "teks": "VII. KOMISI KEPENDUDUKAN DAN KESEJAHTRAAN",
+     "v10": "subbab",
+     "v11": "bab",
+     "benar": "subbab"
+    },
+    {
+     "naskah": "AA3",
+     "teks": "1. Subkomisi Kependudukan.",
+     "v10": "biasa",
+     "v11": "biasa",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "AE2",
+     "teks": "BAB I",
+     "v10": "bab",
+     "v11": null,
+     "benar": "bab"
+    },
+    {
+     "naskah": "AE2",
+     "teks": "PENDAHULUAN",
+     "v10": "bab",
+     "v11": null,
+     "benar": "bab"
+    },
+    {
+     "naskah": "AE2",
+     "teks": "Kegiatan pembelajaran dalam kurikulum 2004 dilakukan untuk memberdayakan semua p",
+     "v10": "paragraf",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "AE2",
+     "teks": "Sebagian besar metode belajar kelompok ini mempunyai beberapa bentuk tujuan kelo",
+     "v10": "paragraf",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "AE2",
+     "teks": "Dalam melaksanakan tugasnya kepala sekolah dapat mendelegasikan kepada wakil kep",
+     "v10": "biasa",
+     "v11": "subbab",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "AE2",
+     "teks": "(10) Menyusun laporan.",
+     "v10": "biasa",
+     "v11": "subbab",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "AE2",
+     "teks": "Guru, karyawan dan peserta didik merupakan komponen utama sekolah untuk mencapai",
+     "v10": "biasa",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "AE2",
+     "teks": "Dalam mata pelajaran ekonomi, siswa dihadapkan pada banyak konsep dan fakta maka",
+     "v10": "biasa",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "AC2",
+     "teks": "BAB II : TINJAUAN PUSTAKA",
+     "v10": "bab",
+     "v11": "bab",
+     "benar": "biasa"
+    },
+    {
+     "naskah": "AC2",
+     "teks": "Pendekatan kepada calon pembeli/konsumen memerlukan persiapan dan perencanaan ya",
+     "v10": "paragraf",
+     "v11": "biasa",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "AC2",
+     "teks": "Dalam ilmu komunikasi juga dikenal beberapa macam tipe komunikasi. Joseph A. DeV",
+     "v10": "biasa",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "AC2",
+     "teks": "BAB III",
+     "v10": "bab",
+     "v11": null,
+     "benar": "bab"
+    },
+    {
+     "naskah": "AC2",
+     "teks": "GAMBARAN UMUM OBYEK PENELITIAN",
+     "v10": "bab",
+     "v11": null,
+     "benar": "bab"
+    },
+    {
+     "naskah": "AC2",
+     "teks": "Aston Hotel Sudirman tidak memiliki laundry sendiri namun memiliki laundry servi",
+     "v10": "subbab",
+     "v11": "subbab",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "AC2",
+     "teks": "Sales kit yang digunakan oleh sales di Aston Hotel dibuat semenarik mungkin dala",
+     "v10": "biasa",
+     "v11": "paragraf",
+     "benar": "paragraf"
+    },
+    {
+     "naskah": "AC2",
+     "teks": "• Menyatakan posisi kita secara tentatif atau sementara waktu. Tampilkan fleksib",
+     "v10": "biasa",
+     "v11": "biasa",
+     "benar": "biasa"
+    }
+   ]
+  },
+  "head_to_head_luas_judul_bab": {
+   "n": 84,
+   "v10": {
+    "n": 84,
+    "benar": 27,
+    "akurasi": 0.3214,
+    "n_berlabel": 84,
+    "benar_berlabel": 27,
+    "akurasi_berlabel": 0.3214
+   },
+   "v11": {
+    "n": 84,
+    "benar": 34,
+    "akurasi": 0.4048,
+    "n_berlabel": 77,
+    "benar_berlabel": 34,
+    "akurasi_berlabel": 0.4416
+   },
+   "v10_per_label": {
+    "bab": {
+     "n": 18,
+     "benar": 9,
+     "akurasi": 0.5
+    },
+    "subbab": {
+     "n": 5,
+     "benar": 2,
+     "akurasi": 0.4
+    },
+    "paragraf": {
+     "n": 16,
+     "benar": 6,
+     "akurasi": 0.375
+    },
+    "biasa": {
+     "n": 45,
+     "benar": 10,
+     "akurasi": 0.2222
+    }
+   },
+   "v11_per_label": {
+    "bab": {
+     "n": 18,
+     "benar": 11,
+     "akurasi": 0.6111
+    },
+    "subbab": {
+     "n": 5,
+     "benar": 3,
+     "akurasi": 0.6
+    },
+    "paragraf": {
+     "n": 16,
+     "benar": 10,
+     "akurasi": 0.625
+    },
+    "biasa": {
+     "n": 45,
+     "benar": 10,
+     "akurasi": 0.2222
+    }
+   }
+  },
+  "matriks_kebingungan_v11": {
+   "bab": {
+    "bab": 12,
+    "subbab": 1,
+    "paragraf": 0,
+    "biasa": 0,
+    "None": 8
+   },
+   "subbab": {
+    "bab": 2,
+    "subbab": 32,
+    "paragraf": 3,
+    "biasa": 8,
+    "None": 0
+   },
+   "paragraf": {
+    "bab": 0,
+    "subbab": 17,
+    "paragraf": 43,
+    "biasa": 15,
+    "None": 0
+   },
+   "biasa": {
+    "bab": 42,
+    "subbab": 26,
+    "paragraf": 21,
+    "biasa": 49,
+    "None": 0
+   }
+  },
+  "sengketa_bab_tidak_terlabeli": {
+   "typesafe": {
+    "Z3": 12,
+    "T3": 4,
+    "R3": 1,
+    "AI-2": 1,
+    "O3": 1
+   },
+   "openrouter": {
+    "AA3": 1
+   },
+   "total": 20,
+   "catatan": "Kebanyakan blok salinan daftar isi (Z3 12, T3 4). Tidak dilabeli tanpa dibaca; bukan bukti apa pun."
+  },
+  "periksa_silang": {
+   "v10_dikoreksi_dari_agen": [
+    [
+     "R3",
+     1,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "R3",
+     2,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "R3",
+     3,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "R3",
+     4,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "R3",
+     5,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "R3",
+     6,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "R3",
+     7,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "H1",
+     67,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "H1",
+     69,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "H1",
+     70,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "T3",
+     75,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "T3",
+     76,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "T3",
+     77,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "T3",
+     79,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "T3",
+     80,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "U3",
+     81,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "AL-2",
+     91,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "O3",
+     97,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "O3",
+     98,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "O3",
+     99,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "O3",
+     100,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "O3",
+     101,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "O3",
+     102,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "P2",
+     111,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "W3",
+     1,
+     "bab",
+     null,
+     "label_penuh_teks"
+    ],
+    [
+     "W3",
+     4,
+     null,
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "W3",
+     8,
+     null,
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AA3",
+     9,
+     "bab",
+     "paragraf",
+     "label_penuh_teks"
+    ],
+    [
+     "AA3",
+     10,
+     null,
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AA3",
+     11,
+     "bab",
+     "paragraf",
+     "label_penuh_teks"
+    ],
+    [
+     "AA3",
+     12,
+     null,
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AA3",
+     13,
+     "bab",
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AA3",
+     16,
+     "bab",
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AE2",
+     19,
+     null,
+     "paragraf",
+     "label_penuh_teks"
+    ],
+    [
+     "AE2",
+     20,
+     null,
+     "paragraf",
+     "label_penuh_teks"
+    ],
+    [
+     "AE2",
+     21,
+     null,
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AE2",
+     22,
+     null,
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AE2",
+     23,
+     "subbab",
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AE2",
+     24,
+     null,
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AC2",
+     25,
+     null,
+     "bab",
+     "label_penuh_teks"
+    ],
+    [
+     "AC2",
+     30,
+     null,
+     "subbab",
+     "label_penuh_teks"
+    ],
+    [
+     "AC2",
+     32,
+     null,
+     "biasa",
+     "label_penuh_teks"
+    ],
+    [
+     "AN-1",
+     51,
+     "bab",
+     null,
+     null
+    ],
+    [
+     "AN-1",
+     52,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "AJ-1",
+     128,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ],
+    [
+     "AJ-1",
+     133,
+     null,
+     "bab",
+     "judul_bab_v10"
+    ]
+   ],
+   "v11_tidak_cocok": [],
+   "idx_v11_tidak_dipulihkan": []
+  },
+  "metode": "Baris sengketa saja (bukan sampel acak): akurasi di sini adalah akurasi pada baris SULIT yang diperselisihkan, bukan presisi keseluruhan peta. label_v10 hanya diketahui di subset ketat (grup 3, metode teks) dan subset luas (+ cocok persis judul bab v10, hanya bisa menghasilkan bab). v11 None = baris tak ada di peta v11 (dihitung salah di akurasi keseluruhan, dipisah di akurasi_berlabel)."
+ },
+ "vonis_presisi_uji112": "v11 TIDAK TERBUKTI lebih presisi dari v10 di naskah uji. Head-to-head adil 56 baris grup 3: v11 29/56 (0,5179) lawan v10 22/56 (0,3929); pasangan berselisih 21 lawan 14, McNemar khi-kuadrat 1,4, p sekitar 0,24, tidak signifikan. v11 naik di bab/paragraf, turun tipis di biasa (subset ketat). Akurasi v11 pada 279 baris sengketa: 136/279 (0,4875); ini akurasi baris sulit, bukan presisi keseluruhan peta. Pola salah terbesar v11: 42 baris biasa dilabeli bab. 8 baris bab asli tanpa label di label_penuh v11 tapi judulnya ada di bab_gabung v11."
 }
