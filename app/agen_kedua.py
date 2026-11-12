@@ -63,10 +63,11 @@ LABEL_SAH = ('bab', 'subbab', 'paragraf', 'biasa')
 
 # ── saklar + setelan (env; bawaan MATI) ─────────────────────────────────────
 #    EDUAI_AGEN_KEDUA_AKTIF=1  → rantai hidup (pabrik mengembalikan fn).
-#    EDUAI_AGEN_KEDUA_TRANSPORT=openrouter|router9 (bawaan router9: jalur
-#    produksi di dalam container). Transport openrouter HANYA lewat penanya
-#    yang disuntik (lihat _sketsa/agen_kedua_openrouter.py) — modul ini
-#    tidak memegang kunci.
+#    EDUAI_AGEN_KEDUA_TRANSPORT=fallback|router9|openrouter (bawaan
+#    fallback: 9router dulu, gagal -> OpenRouter; putusan Bos 12 Nov 2026).
+#    Transport openrouter/fallback memakai EDUAI_FALLBACK_BASE/KEY dari
+#    app.config (sama seperti app.ai) — kunci dibaca dari env, modul ini
+#    tidak memegang kunci. Penanya yang disuntik hanya untuk pilot/uji.
 #    EDUAI_AGEN_KEDUA_MODEL  → nama model untuk penanya OpenRouter
 #    (bawaan google/gemini-2.5-flash; penanya yang membacanya).
 MODEL_OPENROUTER_BAWAAN = 'google/gemini-2.5-flash'
@@ -85,9 +86,13 @@ def aktif() -> bool:
 
 
 def transport() -> str:
-    """Transport agen kedua: 'router9' (produksi, bawaan) atau 'openrouter'."""
-    t = (os.getenv('EDUAI_AGEN_KEDUA_TRANSPORT') or 'router9').strip().lower()
-    return t if t in ('router9', 'openrouter') else 'router9'
+    """Transport agen kedua: 'fallback' (bawaan), 'router9', 'openrouter'.
+
+    fallback = coba combo 9router dulu, gagal -> OpenRouter langsung
+    (putusan Bos 12 Nov 2026).
+    """
+    t = (os.getenv('EDUAI_AGEN_KEDUA_TRANSPORT') or 'fallback').strip().lower()
+    return t if t in ('router9', 'openrouter', 'fallback') else 'fallback'
 
 
 # ── aturan label manusia (patokan yang SAMA, disalin verbatim ke prompt) ────
@@ -257,6 +262,71 @@ def _panggil_router9(prompt: str) -> tuple[str, str]:
     return _urai_balasan_chat(mentah)
 
 
+def _panggil_openrouter(prompt: str) -> tuple[str, str]:
+    """Transport CADANGAN produksi: OpenRouter langsung (fallback).
+
+    Memakai EDUAI_FALLBACK_BASE/KEY dari `app.config` (sama seperti
+    `app.ai` jalur 2) — kunci dibaca dari env, tidak ditulis di kode.
+    Model dari EDUAI_AGEN_KEDUA_MODEL (bawaan google/gemini-2.5-flash).
+    """
+    from app.config import FALLBACK_BASE, FALLBACK_KEY
+
+    model = (os.getenv('EDUAI_AGEN_KEDUA_MODEL')
+             or MODEL_OPENROUTER_BAWAAN).strip()
+    if not FALLBACK_BASE or not FALLBACK_KEY:
+        raise RuntimeError('OpenRouter tidak terpasang '
+                           '(EDUAI_FALLBACK_BASE/KEY kosong)')
+    body = {
+        'model': model,
+        'messages': [{'role': 'user', 'content': prompt}],
+        'max_tokens': MAKS_TOKEN_JAWAB,
+        'temperature': 0.2,
+        # Keputusan Bos 29 Sep 2026: agen kedua bukan model berpikir.
+        'enable_thinking': False,
+        'response_format': {'type': 'json_object'},
+    }
+    header = {'Content-Type': 'application/json',
+              'Authorization': f'Bearer {FALLBACK_KEY}'}
+    req = urllib.request.Request(
+        FALLBACK_BASE.rstrip('/') + '/chat/completions',
+        data=json.dumps(body).encode(), headers=header)
+    try:
+        with urllib.request.urlopen(req, timeout=BATAS_DETIK) as r:
+            mentah = r.read().decode()
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f'OpenRouter HTTP {e.code}: {e.read().decode()[:200]}')
+    except Exception as e:
+        raise RuntimeError(f'OpenRouter tidak bisa dihubungi: {type(e).__name__}: {e}')
+    return _urai_balasan_chat(mentah)
+
+
+def _coba_transport(nama: str, prompt: str) -> dict | None:
+    """Satu percobaan transport -> jawab valid, atau None bila gagal.
+
+    Gagal = tidak bisa dihubungi / HTTP galat / balasan bukan JSON /
+    label tidak sah / model yang melayani adalah Jev (bukan model umum).
+    """
+    try:
+        if nama == 'openrouter':
+            konten, model_layani = _panggil_openrouter(prompt)
+        else:
+            konten, model_layani = _panggil_router9(prompt)
+    except Exception as e:
+        log.warning('[agen_kedua] %s gagal: %s', nama, e)
+        return None
+    if 'jev' in (model_layani or '').lower():
+        log.warning('[agen_kedua] %s melayani model Jev (%s), bukan model umum',
+                    nama, model_layani)
+        return None
+    jawab = _urai_jawaban(konten)
+    if jawab is None:
+        log.warning('[agen_kedua] %s balasan tidak terbaca: %r', nama, konten[:160])
+        return None
+    jawab['model'] = model_layani or ''
+    jawab['transport'] = nama
+    return jawab
+
+
 def tanya_agen_kedua(teks_baris: str, konteks: dict | None = None,
                      suara: list | None = None, penanya=None,
                      model: str | None = None) -> dict | None:
@@ -266,24 +336,33 @@ def tanya_agen_kedua(teks_baris: str, konteks: dict | None = None,
     prompt — jawaban kedua harus independen, bukan meniru Jev.
     `penanya` = callable(prompt) -> (konten, model_melayani) yang disuntik
     (dipakai pilot OpenRouter + uji offline). Tanpa penanya, dipakai jalur
-    produksi (combo 9router). GAGAL APAPUN ⇒ None (bukan label tebakan).
+    produksi: transport dari `transport()` — 'fallback' (bawaan: 9router
+    dulu, gagal -> OpenRouter), 'router9', atau 'openrouter'.
+    GAGAL APAPUN ⇒ None (bukan label tebakan).
     """
     prompt = _prompt(teks_baris, konteks)
-    try:
-        if penanya is not None:
+    if penanya is not None:
+        try:
             konten, model_layani = penanya(prompt)
-        else:
-            konten, model_layani = _panggil_router9(prompt)
-    except Exception as e:
-        log.warning('[agen_kedua] panggilan gagal: %s', e)
-        return None
-    jawab = _urai_jawaban(konten)
-    if jawab is None:
-        log.warning('[agen_kedua] balasan tidak terbaca: %r', konten[:160])
-        return None
-    jawab['model'] = model_layani or (model or '')
-    jawab['transport'] = 'openrouter' if penanya is not None else 'router9'
-    return jawab
+        except Exception as e:
+            log.warning('[agen_kedua] panggilan gagal: %s', e)
+            return None
+        jawab = _urai_jawaban(konten)
+        if jawab is None:
+            log.warning('[agen_kedua] balasan tidak terbaca: %r', konten[:160])
+            return None
+        jawab['model'] = model_layani or (model or '')
+        jawab['transport'] = 'openrouter'
+        return jawab
+    t = transport()
+    urutan = {'router9': ('router9',),
+              'openrouter': ('openrouter',)}.get(
+                  t, ('router9', 'openrouter'))
+    for nama in urutan:
+        jawab = _coba_transport(nama, prompt)
+        if jawab is not None:
+            return jawab
+    return None
 
 
 def tanya_pembanding_113(teks_baris: str, konteks: dict | None = None) -> dict | None:
