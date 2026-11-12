@@ -74,6 +74,10 @@ MODEL_OPENROUTER_BAWAAN = 'google/gemini-2.5-flash'
 MODEL_OPENROUTER_CADANGAN = 'openai/gpt-4o-mini'
 MODEL_JEV_113 = 'SATPAM/typesafe/jev-1.13'
 BATAS_DETIK = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT') or '60')
+# Percobaan pertama di mode fallback (combo 9router) dibatasi singkat
+# supaya tidak menggantung: combo yang providernya mati terbukti
+# timeout 60 dtk (uji asap 12 Nov 2026), bukan gagal cepat.
+BATAS_DETIK_R9 = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT_R9') or '20')
 MAKS_TOKEN_JAWAB = 512
 
 # ── log keputusan (in-memory; pabrik menempelkan salinan ke fn.log) ─────────
@@ -230,7 +234,7 @@ def _urai_balasan_chat(mentah: str) -> tuple[str, str]:
     return konten, j.get('model') or ''
 
 
-def _panggil_router9(prompt: str) -> tuple[str, str]:
+def _panggil_router9(prompt: str, timeout: float | None = None) -> tuple[str, str]:
     """Transport PRODUKSI: combo umum 9router (model diatur Bos dari panel).
 
     Memakai setelan yang SAMA dengan `app.ai` (ROUTER_BASE/ROUTER_KEY/
@@ -253,7 +257,7 @@ def _panggil_router9(prompt: str) -> tuple[str, str]:
         ROUTER_BASE.rstrip('/') + '/chat/completions',
         data=json.dumps(body).encode(), headers=header)
     try:
-        with urllib.request.urlopen(req, timeout=BATAS_DETIK) as r:
+        with urllib.request.urlopen(req, timeout=timeout or BATAS_DETIK) as r:
             mentah = r.read().decode()
     except urllib.error.HTTPError as e:
         raise RuntimeError(f'combo HTTP {e.code}: {e.read().decode()[:200]}')
@@ -262,17 +266,19 @@ def _panggil_router9(prompt: str) -> tuple[str, str]:
     return _urai_balasan_chat(mentah)
 
 
-def _panggil_openrouter(prompt: str) -> tuple[str, str]:
+def _panggil_openrouter(prompt: str, timeout: float | None = None) -> tuple[str, str]:
     """Transport CADANGAN produksi: OpenRouter langsung (fallback).
 
     Memakai EDUAI_FALLBACK_BASE/KEY dari `app.config` (sama seperti
     `app.ai` jalur 2) — kunci dibaca dari env, tidak ditulis di kode.
-    Model dari EDUAI_AGEN_KEDUA_MODEL (bawaan google/gemini-2.5-flash).
+    Model dari EDUAI_AGEN_KEDUA_MODEL_FALLBACK (bawaan 'gemini-3.8-flash',
+    nama TokenHarbor — FALLBACK_BASE adalah tokenharbor.ai, bukan
+    openrouter.ai, jadi nama 'google/...' ditolak 404).
     """
     from app.config import FALLBACK_BASE, FALLBACK_KEY
 
-    model = (os.getenv('EDUAI_AGEN_KEDUA_MODEL')
-             or MODEL_OPENROUTER_BAWAAN).strip()
+    model = (os.getenv('EDUAI_AGEN_KEDUA_MODEL_FALLBACK')
+             or 'gemini-3.8-flash').strip()
     if not FALLBACK_BASE or not FALLBACK_KEY:
         raise RuntimeError('OpenRouter tidak terpasang '
                            '(EDUAI_FALLBACK_BASE/KEY kosong)')
@@ -291,7 +297,7 @@ def _panggil_openrouter(prompt: str) -> tuple[str, str]:
         FALLBACK_BASE.rstrip('/') + '/chat/completions',
         data=json.dumps(body).encode(), headers=header)
     try:
-        with urllib.request.urlopen(req, timeout=BATAS_DETIK) as r:
+        with urllib.request.urlopen(req, timeout=timeout or BATAS_DETIK) as r:
             mentah = r.read().decode()
     except urllib.error.HTTPError as e:
         raise RuntimeError(f'OpenRouter HTTP {e.code}: {e.read().decode()[:200]}')
@@ -310,7 +316,7 @@ def _coba_transport(nama: str, prompt: str) -> dict | None:
         if nama == 'openrouter':
             konten, model_layani = _panggil_openrouter(prompt)
         else:
-            konten, model_layani = _panggil_router9(prompt)
+            konten, model_layani = _panggil_router9(prompt, timeout=BATAS_DETIK_R9)
     except Exception as e:
         log.warning('[agen_kedua] %s gagal: %s', nama, e)
         return None
