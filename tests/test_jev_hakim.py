@@ -2438,6 +2438,290 @@ def main():
     else:
         os.environ['EDUAI_APINEX_KEY'] = _env_apx
 
+    # ── REVISI HEMAT (13 Nov 2026, perintah Bos "baca semua itu boros") ──
+    import app.revisi_hemat as RH
+    import app.peta_jembatan as JB
+    import app.peta3_jev as S3
+
+    _TEKS_RH = (
+        'BAB I\nPENDAHULUAN\n'
+        'Latar belakang penelitian ini membahas pemasaran digital di Indonesia.\n'
+        'Rumusan masalah penelitian ini disusun dalam bentuk pertanyaan penelitian.\n'
+        '1.1 Latar Belakang\n'
+        'Isi paragraf latar belakang yang panjang dan menjelaskan konteks penelitian ini.\n'
+        '1.2 Rumusan Masalah\n'
+        'Pertanyaan penelitian pertama membahas pengaruh pemasaran digital terhadap penjualan.\n'
+        'Pertanyaan penelitian kedua membahas peran media sosial dalam pemasaran.\n'
+        'BAB II\nTINJAUAN PUSTAKA\n'
+        'Teori pemasaran digital menjelaskan konsep dasar pemasaran modern.\n'
+        '2.1 Pemasaran Digital\n'
+        'Definisi pemasaran digital menurut para ahli dibahas pada bagian ini.\n'
+        'Manfaat pemasaran digital bagi usaha kecil dijelaskan dengan contoh nyata.\n'
+    )
+
+    def _petakan_palsu_rh(panggilan):
+        """Petakan PALSU pencatat panggilan (orkestrasi saja, tanpa Jev).
+
+        Label deterministik dari susun nyata: gabung -> 'bab', kode_label
+        -> 'subbab', baris penanda UBAH-LABEL -> 'biasa' (supaya terbukti
+        label baru menimpa label lama di dalam rentang), sisanya 'paragraf'.
+        """
+        def fn(teks_bersih, awal, akhir, pendapat_kedua_fn=None,
+               hakim_tandai_fn=None):
+            panggilan.append((awal, akhir))
+            s = S3.susun_teks(teks_bersih)
+            baris = s['baris']
+            label, p = {}, {}
+            for i in range(awal, akhir):
+                t = baris[i]
+                if i in (s.get('gabung') or {}):
+                    label[i] = 'bab'
+                elif i in (s.get('kode_label') or {}):
+                    label[i] = 'subbab'
+                elif 'UBAH-LABEL' in t:
+                    label[i] = 'biasa'
+                else:
+                    label[i] = 'paragraf'
+                p[i] = 0.9
+            return {'baris': baris,
+                    'kand': [(i, baris[i]) for i in range(awal, akhir)],
+                    'label': label, 'goyang': [], 'p': p,
+                    'gabung': s.get('gabung') or {},
+                    'kode_label': s.get('kode_label') or {},
+                    'sistematika': [], 'boleh_dipakai_fitur': {},
+                    'semua': {i: [label[i]] for i in label}}
+        return fn
+
+    # peta tersimpan (palsu tapi berbentuk penuh) untuk naskah T0
+    _susun0 = S3.susun_teks(_TEKS_RH)
+    _surveyor0 = _petakan_palsu_rh([])(_TEKS_RH, 0, len(_susun0['baris']))
+    _audit0 = H.periksa_peta(_surveyor0)
+    _hasil0 = {'mode': 'peta_awal', 'jumlah': 5, 'daftar': [],
+               'peta_dari': 'jev', 'sidik': RH.sidik_teks(_TEKS_RH),
+               'model': 'peta3_jev'}
+    _peta0 = RH.siapkan_simpan(_hasil0, _surveyor0, _audit0)
+    cek('rh-simpan: sidik per bagian tersimpan, sidik utuh tetap ada',
+        isinstance(_peta0.get('sidik_bagian'), list)
+        and len(_peta0['sidik_bagian']) >= 2
+        and _peta0.get('sidik') == RH.sidik_teks(_TEKS_RH)
+        and isinstance(_peta0.get('peta_surveyor'), dict))
+
+    # RH-1a. naskah tak berubah -> pakai ulang, 0 panggilan Jev
+    _panggilan = []
+    _r = RH.periksa_hemat(_TEKS_RH, _peta0, fn_susun_teks=S3.susun_teks,
+                          fn_petakan_teks=_petakan_palsu_rh(_panggilan),
+                          fn_pendapat_kedua=None)
+    cek('rh-tak-berubah: jalan pakai_ulang, 0 panggilan Jev',
+        _r is not None and _r.get('jalan') == 'pakai_ulang'
+        and _panggilan == []
+        and (_r.get('hasil') or {}).get('dari_simpanan') is True)
+    cek('rh-tak-berubah: hasil identik simpanan, tanpa kunci internal',
+        (_r.get('hasil') or {}).get('sidik') == _peta0.get('sidik')
+        and 'peta_surveyor' not in (_r.get('hasil') or {})
+        and 'sidik_bagian' not in (_r.get('hasil') or {})
+        and 'hakim_bagian' not in (_r.get('hasil') or {}))
+
+    # RH-1b. 1 paragraf diubah -> hanya bagian itu + tetangganya ke Jev
+    _kalimat = ('Pertanyaan penelitian pertama membahas pengaruh pemasaran '
+                'digital terhadap penjualan.')
+    _teks1 = _TEKS_RH.replace(
+        _kalimat,
+        'Pertanyaan penelitian pertama UBAH-LABEL membahas pengaruh '
+        'pemasaran digital terhadap penjualan.')
+    _idx_ubah = next(i for i, t in enumerate(_susun0['baris'])
+                     if 'Pertanyaan penelitian pertama' in t)
+    _bagian0 = _peta0['sidik_bagian']
+    _n_bag = next(n for n, b in enumerate(_bagian0)
+                  if b['awal'] <= _idx_ubah < b['akhir'])
+    _awal_harap = _bagian0[_n_bag - 1]['awal'] if _n_bag > 0 else 0
+    _akhir_harap = (_bagian0[_n_bag + 1]['akhir']
+                    if _n_bag + 1 < len(_bagian0) else len(_susun0['baris']))
+    _panggilan1 = []
+    _audit_jejak = []
+    _periksa_asli = H.periksa_peta
+
+    def _periksa_rekam(peta):
+        _audit_jejak.append(len(peta.get('baris') or []))
+        return _periksa_asli(peta)
+
+    H.periksa_peta = _periksa_rekam
+    try:
+        _r1 = RH.periksa_hemat(_teks1, _peta0, fn_susun_teks=S3.susun_teks,
+                               fn_petakan_teks=_petakan_palsu_rh(_panggilan1),
+                               fn_pendapat_kedua=None)
+    finally:
+        H.periksa_peta = _periksa_asli
+    cek('rh-1-paragraf: jalan hemat, petakan dipanggil tepat 1x',
+        _r1 is not None and _r1.get('jalan') == 'hemat'
+        and len(_panggilan1) == 1, str(_panggilan1))
+    cek('rh-1-paragraf: rentang = bagian berubah + 1 tetangga tiap sisi',
+        _panggilan1 == [(_awal_harap, _akhir_harap)],
+        f'{_panggilan1} vs harap {(_awal_harap, _akhir_harap)}')
+    _simpan1 = (_r1 or {}).get('simpan') or {}
+    _label1 = ((_simpan1.get('peta_surveyor') or {}).get('label') or {})
+    _label0 = ((_peta0.get('peta_surveyor') or {}).get('label') or {})
+    cek('rh-1-paragraf: label di luar rentang dipakai ulang utuh',
+        all(_label1.get(str(i)) == _label0.get(str(i))
+            for i in range(len(_susun0['baris']))
+            if not (_awal_harap <= i < _akhir_harap)))
+    cek('rh-1-paragraf: label di dalam rentang dari petakan baru',
+        _label1.get(str(_idx_ubah)) == 'biasa')
+    cek('rh-1-paragraf: sidik per bagian baru tersimpan',
+        isinstance(_simpan1.get('sidik_bagian'), list)
+        and len(_simpan1['sidik_bagian']) == len(_bagian0))
+    cek('rh-hakim: audit seluruh peta gabungan (bukan hanya rentang)',
+        bool(_audit_jejak)
+        and all(n == len(_susun0['baris']) for n in _audit_jejak),
+        str(_audit_jejak))
+
+    # RH-1c. judul subbab ditambah -> baca penuh
+    _teks2 = _TEKS_RH.replace(
+        'Pertanyaan penelitian kedua membahas peran media sosial dalam pemasaran.\n',
+        'Pertanyaan penelitian kedua membahas peran media sosial dalam pemasaran.\n'
+        '1.3 Metode Penelitian\n'
+        'Metode penelitian ini memakai pendekatan kuantitatif.\n')
+    _rencana2 = RH.rencanakan(_peta0, S3.susun_teks(_teks2)['baris'])
+    cek('rh-subbab-baru: judul subbab ditambah -> baca penuh',
+        _rencana2.get('jalan') == 'penuh', str(_rencana2.get('alasan')))
+    cek('rh-subbab-baru: periksa_hemat kembalikan None (pemanggil baca penuh)',
+        RH.periksa_hemat(_teks2, _peta0, fn_susun_teks=S3.susun_teks,
+                         fn_petakan_teks=_petakan_palsu_rh([]),
+                         fn_pendapat_kedua=None) is None)
+
+    # RH-1d. peta lama tanpa sidik per bagian -> baca penuh, jangan crash
+    cek('rh-legacy: peta tanpa sidik per bagian -> None (baca penuh)',
+        RH.periksa_hemat(_TEKS_RH, {'mode': 'peta_awal', 'daftar': []},
+                         fn_susun_teks=S3.susun_teks,
+                         fn_petakan_teks=_petakan_palsu_rh([])) is None)
+    _legacy2 = dict(_peta0)
+    _legacy2.pop('sidik_bagian', None)
+    cek('rh-legacy: surveyor ada tapi sidik bagian hilang -> None',
+        RH.periksa_hemat(_TEKS_RH, _legacy2, fn_susun_teks=S3.susun_teks,
+                         fn_petakan_teks=_petakan_palsu_rh([])) is None)
+    cek('rh-legacy: peta rusak (bukan JSON) -> None',
+        RH.periksa_hemat(_TEKS_RH, 'bukan-json{{{',
+                         fn_susun_teks=S3.susun_teks,
+                         fn_petakan_teks=_petakan_palsu_rh([])) is None)
+
+    # RH-1e. kunci rentang: bagian hemat = perhalus jembatan (bukan geser)
+    _bagian_rh = RH.bagi_bagian(_susun0['baris'], _susun0.get('gabung') or {},
+                                _susun0.get('kode_label') or {},
+                                _surveyor0['label'],
+                                set(_surveyor0.get('sistematika') or []),
+                                _surveyor0.get('boleh_dipakai_fitur') or {})
+    _jb = JB.dari_surveyor(_surveyor0, _TEKS_RH)
+    _mulai, _rentang_jb = 0, []
+    for _d in (_jb or []):
+        _n = _d['isi_teks'].count('\n') + 1 if _d['isi_teks'] else 0
+        _rentang_jb.append((_mulai, _mulai + _n))
+        _mulai += _n
+    _mulai_rh = [b['awal'] for b in _bagian_rh]
+    cek('rh-rentang: bagian menutup [0, n) tanpa celah',
+        bool(_bagian_rh) and _bagian_rh[0]['awal'] == 0
+        and _bagian_rh[-1]['akhir'] == len(_susun0['baris'])
+        and all(_bagian_rh[k]['akhir'] == _bagian_rh[k + 1]['awal']
+                for k in range(len(_bagian_rh) - 1)))
+    cek('rh-rentang: tiap batas jembatan ada di batas hemat',
+        bool(_rentang_jb)
+        and all(s in _mulai_rh for s, _e in _rentang_jb),
+        f'jembatan {_rentang_jb} vs hemat {_mulai_rh}')
+    cek('rh-rentang: tiap bagian hemat di dalam satu bagian jembatan',
+        all(any(s <= b['awal'] and b['akhir'] <= e for s, e in _rentang_jb)
+            for b in _bagian_rh))
+
+    # RH-1f. ambang struktural (langsung pada deteksi_struktural)
+    _b_lama = ['BAB I', 'Pendahuluan isi.', '1.1 Latar', 'Isi satu.',
+               '1.2 Rumusan', 'Isi dua.', 'BAB II', 'Isi tiga.']
+    _b_kecil = list(_b_lama)
+    _b_kecil[3] = 'Isi satu yang sudah direvisi.'
+    _st0, _ = RH.deteksi_struktural(_b_lama, _b_kecil,
+                                    RH.diff_baris(_b_lama, _b_kecil))
+    cek('rh-struktural: 1 baris berubah -> bukan struktural', _st0 is False)
+    _b_tambah = ['BAB I', 'Pendahuluan isi.', '1.1 Latar', 'Isi satu.',
+                 '1.2 Rumusan', 'Isi dua.', '1.3 Metode', 'Isi baru.',
+                 'BAB II', 'Isi tiga.']
+    _st1, _al1 = RH.deteksi_struktural(_b_lama, _b_tambah,
+                                       RH.diff_baris(_b_lama, _b_tambah))
+    cek('rh-struktural: subbab ditambah -> struktural', _st1 is True)
+    _b_banyak = ['BARU %d' % i for i in range(8)]
+    _st2, _al2 = RH.deteksi_struktural(_b_lama, _b_banyak,
+                                       RH.diff_baris(_b_lama, _b_banyak))
+    cek('rh-struktural: >25% baris berubah -> struktural', _st2 is True)
+    _b_panjang = ['Baris %03d isi paragraf.' % i for i in range(100)]
+    _b_sebar = list(_b_panjang)
+    for _k in range(11):
+        _b_sebar.insert(9 * _k + 5, 'Sisipan %d' % _k)
+    _st3, _al3 = RH.deteksi_struktural(_b_panjang, _b_sebar,
+                                       RH.diff_baris(_b_panjang, _b_sebar))
+    cek('rh-struktural: >10 blok terpisah -> struktural',
+        _st3 is True and 'blok' in _al3, _al3)
+
+    # RH-1g. pemetaan indeks diff (sisipan ikut bagian sebelumnya, dst.)
+    _op = RH.diff_baris(['a', 'b', 'c'], ['a', 'X', 'b', 'c'])
+    cek('rh-diff: sisipan di batas ikut bagian sebelumnya',
+        RH.petakan_rentang(_op, 3, 4, 1, 2) == (2, 3))
+    _op2 = RH.diff_baris(['a', 'b', 'c'], ['a', 'c'])
+    cek('rh-diff: baris terhapus runtuh ke titik hapus',
+        RH.petakan_rentang(_op2, 3, 2, 1, 2) == (1, 1))
+    _op3 = RH.diff_baris(['a', 'b'], ['X', 'a', 'b'])
+    cek('rh-diff: sisipan di awal ikut bagian pertama',
+        RH.petakan_rentang(_op3, 2, 3, 0, 1) == (0, 2))
+
+    # RH-2. REGRESI (wajib): hemat vs baca penuh, surveyor NYATA (FakeSatpam).
+    #    Bila SATU label saja berbeda, itu REGRESI — uji ini harus gagal.
+    _env_agen = os.environ.get('EDUAI_AGEN_KEDUA_AKTIF')
+    os.environ['EDUAI_AGEN_KEDUA_AKTIF'] = '0'
+    try:
+        FAKE_SATPAM.jumlah_choice = 0
+        FAKE_SATPAM.jumlah_noul = 0
+        _penuh0 = P.petakan_dari_teks(_TEKS_RH, putaran=1)
+        _panggilan_penuh0 = FAKE_SATPAM.jumlah_choice
+        cek('rh-regresi: peta penuh T0 jalan',
+            isinstance(_penuh0, dict) and bool((_penuh0.get('label') or {})))
+        _audit_penuh0 = H.periksa_peta(_penuh0)
+        _hasil_penuh0 = {'mode': 'peta_awal', 'jumlah': 0, 'daftar': [],
+                         'peta_dari': 'jev',
+                         'sidik': RH.sidik_teks(_TEKS_RH), 'model': 'peta3_jev'}
+        _peta_penuh0 = RH.siapkan_simpan(_hasil_penuh0, _penuh0, _audit_penuh0)
+        cek('rh-regresi: sidik per bagian tersimpan dari peta nyata',
+            isinstance(_peta_penuh0.get('sidik_bagian'), list)
+            and len(_peta_penuh0['sidik_bagian']) >= 2)
+        FAKE_SATPAM.jumlah_choice = 0
+        _r_ulang = RH.periksa_hemat(_TEKS_RH, _peta_penuh0)
+        cek('rh-regresi: naskah tak berubah (jalur nyata) -> 0 panggilan Jev',
+            _r_ulang is not None and _r_ulang.get('jalan') == 'pakai_ulang'
+            and FAKE_SATPAM.jumlah_choice == 0)
+        FAKE_SATPAM.jumlah_choice = 0
+        _penuh1 = P.petakan_dari_teks(_teks1, putaran=1)
+        _panggilan_penuh1 = FAKE_SATPAM.jumlah_choice
+        FAKE_SATPAM.jumlah_choice = 0
+        _r_hemat1 = RH.periksa_hemat(_teks1, _peta_penuh0)
+        _panggilan_hemat1 = FAKE_SATPAM.jumlah_choice
+        print(f'    [rh-bukti] penuh T1: {_panggilan_penuh1} panggilan Jev '
+              f'(choice); hemat T1: {_panggilan_hemat1} panggilan; '
+              f'hemat {_panggilan_hemat1 * 100 // max(1, _panggilan_penuh1)}% '
+              f'dari penuh')
+        _label_penuh1 = _penuh1.get('label') or {}
+        _label_hemat1 = ({int(k): v for k, v in
+                          ((_r_hemat1 or {}).get('simpan') or {})
+                          .get('peta_surveyor', {}).get('label', {}).items()}
+                         if _r_hemat1 and _r_hemat1.get('simpan') else {})
+        _beda = {i for i in set(_label_penuh1) | set(_label_hemat1)
+                 if _label_penuh1.get(i) != _label_hemat1.get(i)}
+        cek('rh-regresi: label hemat IDENTIK dengan label baca penuh',
+            _r_hemat1 is not None and _r_hemat1.get('jalan') == 'hemat'
+            and not _beda, 'beda di ' + str(sorted(_beda)[:10]))
+        cek('rh-regresi: hemat memanggil Jev lebih sedikit dari baca penuh',
+            0 < _panggilan_hemat1 < _panggilan_penuh1,
+            f'{_panggilan_hemat1} vs {_panggilan_penuh1}')
+        cek('rh-regresi: subbab ditambah (jalur nyata) -> None (baca penuh)',
+            RH.periksa_hemat(_teks2, _peta_penuh0) is None)
+    finally:
+        if _env_agen is None:
+            os.environ.pop('EDUAI_AGEN_KEDUA_AKTIF', None)
+        else:
+            os.environ['EDUAI_AGEN_KEDUA_AKTIF'] = _env_agen
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))

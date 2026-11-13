@@ -4322,10 +4322,15 @@ async def peta_mulai(
                               ProfilDokumen.user_id == u.id).first())
         except Exception:
             prof = None
-        if (prof and prof.peta_sidik == sid and prof.peta_json
-                and mode == 'peta_awal'):
+        if prof and prof.peta_sidik == sid and prof.peta_json:
+            #  REVISI HEMAT (13 Nov 2026): naskah TAK BERUBAH -> pakai peta
+            #  lama apa pun modenya ('peta_awal' maupun 'revisi'), 0 Jev.
+            #  Kunci internal (peta_surveyor/sidik_bagian/hakim_bagian)
+            #  hanya untuk DB — dibuang sebelum dikembalikan ke layar.
             try:
                 simpan = json.loads(prof.peta_json)
+                from . import revisi_hemat as _rh
+                simpan = _rh.buang_kunci_internal(simpan)
                 simpan['ok'] = True
                 simpan['gratis'] = True
                 simpan['dari_simpanan'] = True
@@ -4352,7 +4357,10 @@ async def peta_mulai(
     #     dan 'sehat' JALAN SEPERTI BIASA.
     #   · Gagal periksa ⇒ JANGAN tahan (selalu utamakan jalur normal).
     _mutu_rusak = False
-    if body.get('file_id') and mode == 'peta_awal' and teks.strip():
+    #  (13 Nov 2026, revisi hemat): pagar mutu juga menjaga mode 'revisi' —
+    #  hemat maupun baca penuh sama-sama membakar panggilan Jev, jadi
+    #  naskah rusak tetap dialihkan ke fallback di kedua mode.
+    if body.get('file_id') and mode in ('peta_awal', 'revisi') and teks.strip():
         try:
             from .periksa_mutu import periksa as _periksa_mutu
             _m = _periksa_mutu(teks)
@@ -4364,6 +4372,46 @@ async def peta_mulai(
         except Exception as e:                                    # noqa: BLE001
             log.warning('[peta] periksa mutu dilewati: %s', e)
             _mutu_rusak = False
+
+    # ── REVISI HEMAT (13 Nov 2026, perintah Bos "baca semua itu boros") ──
+    #  Bila naskah ini SUDAH punya peta tersimpan: bandingkan PER BAGIAN,
+    #  petakan ulang HANYA bagian yang berubah + tetangganya, Hakim audit
+    #  SELURUH peta gabungan (gratis). Gagal apa pun -> None -> jalan
+    #  seperti dulu (baca penuh / fallback). Hemat TIDAK PERNAH
+    #  menghentikan produksi (pagar P2 modul revisi_hemat).
+    #  Mode 'revisi' memakai jalur ini (bukan lagi jalur lama tanpa Jev):
+    #  revisi = naskah yang sudah dipetakan lalu diubah — hemat adalah
+    #  cara yang benar untuknya; baca penuh hanya bila struktural atau
+    #  peta lamanya belum punya sidik per bagian.
+    if body.get('file_id') and prof is not None and prof.peta_json \
+            and not _mutu_rusak:
+        _hemat = None
+        try:
+            from . import agen_kedua as _ak2
+            from . import revisi_hemat as _rh
+            _fn_kedua = _ak2.buat_pendapat_kedua_fn()
+            _hemat = _rh.periksa_hemat(teks, prof.peta_json, mode=mode,
+                                        fn_pendapat_kedua=_fn_kedua)
+        except Exception as e:                                # noqa: BLE001
+            log.warning('[peta] revisi hemat dilewati: %s: %s',
+                        type(e).__name__, e)
+            _hemat = None
+        if _hemat is not None:
+            _hasil_hemat = _hemat.get('hasil') or {}
+            if _hemat.get('jalan') == 'hemat' and _hemat.get('simpan'):
+                try:
+                    prof.peta_json = json.dumps(
+                        _hemat['simpan'], ensure_ascii=False)
+                    prof.peta_sidik = sid
+                    from .models import _now as _sekarang_hemat
+                    prof.peta_dibuat = _sekarang_hemat()
+                    db.commit()
+                except Exception as e:
+                    db.rollback()
+                    log.warning('[peta] gagal simpan peta hemat: %s', e)
+            log.info('[peta] jalur=jev-hemat (%s)',
+                     _hasil_hemat.get('peta_alasan', ''))
+            return _hasil_hemat
 
     # ── LAPIS 2 (14 Okt 2026): SURVEYOR JEV = jalur PERTAMA ──────────
     #  Putusan Bos: "Peta3_jev mengganti peta halus" + "peta halus ...
@@ -4377,7 +4425,12 @@ async def peta_mulai(
     _peta_surveyor = None
     if _mutu_rusak:
         _alasan_jalur = 'naskah rusak (pecah per-huruf) — Jev dihemat'
-    if body.get('file_id') and mode == 'peta_awal' and not _mutu_rusak:
+    #  (13 Nov 2026, revisi hemat): mode 'revisi' ikut jalur Jev — hemat
+    #  sudah dicoba di atas; bila hemat mengembalikan None (struktural,
+    #  peta lama tanpa sidik per bagian, atau galat apa pun), baca penuh
+    #  di sini. Jalur lama tanpa Jev untuk 'revisi' TIDAK dipakai lagi:
+    #  revisi tanpa Jev = peta lama yang tidak diperbarui.
+    if body.get('file_id') and mode in ('peta_awal', 'revisi') and not _mutu_rusak:
         try:
             from . import peta3_jev as _s3
             from .peta_jalur import putuskan_jalur as _putus
@@ -4390,7 +4443,7 @@ async def peta_mulai(
             _peta_dari, _alasan_jalur = 'fallback', f'surveyor galat: {type(e).__name__}'
     if _peta_surveyor is None:
         _alasan_jalur = _alasan_jalur or (
-            'bukan peta_awal' if mode != 'peta_awal' else 'tanpa file_id')
+            'tanpa file_id' if not body.get('file_id') else 'tanpa peta')
         log.info('[peta] jalur=%s (%s)', _peta_dari, _alasan_jalur)
 
     # ── jalur JEV: pakai JEMBATAN resmi (peta_jembatan) ──────────────
@@ -4453,7 +4506,20 @@ async def peta_mulai(
                                 file_id=int(body['file_id']), user_id=u.id,
                                 sumber='unggah')
                             db.add(prof)
-                        prof.peta_json = json.dumps(hasil, ensure_ascii=False)
+                        #  REVISI HEMAT (13 Nov 2026): simpan salinan DB
+                        #  yang diperkaya (snapshot surveyor + sidik per
+                        #  bagian + jejak Hakim) supaya revisi berikutnya
+                        #  bisa hemat. `hasil` yang dikembalikan ke layar
+                        #  TETAP ramping (tanpa kunci internal).
+                        _simpan_jev = hasil
+                        try:
+                            from . import revisi_hemat as _rh2
+                            _simpan_jev = _rh2.siapkan_simpan(
+                                hasil, _peta_surveyor,
+                                locals().get('_lap_hakim'))
+                        except Exception as e:
+                            log.warning('[peta] simpan hemat dilewati: %s', e)
+                        prof.peta_json = json.dumps(_simpan_jev, ensure_ascii=False)
                         prof.peta_sidik = sid
                         from .models import _now as _sekarang
                         prof.peta_dibuat = _sekarang()
