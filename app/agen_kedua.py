@@ -78,7 +78,12 @@ BATAS_DETIK = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT') or '60')
 # supaya tidak menggantung: combo yang providernya mati terbukti
 # timeout 60 dtk (uji asap 12 Nov 2026), bukan gagal cepat.
 BATAS_DETIK_R9 = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT_R9') or '20')
-MAKS_TOKEN_JAWAB = 512
+# Batas jawaban 2048 (dulu 512): ukur live 13 Nov 2026 — 12 dari 39
+# panggilan fallback terpotong (finish=length) tepat di 512, model
+# menjawab bertele-tele sebelum JSON-nya. 2048 = 4x ruang; penagihan
+# mengikuti token yang benar dipakai, bukan batasnya. Dipakai KEDUA
+# jalur (combo 9router dan fallback) — keduanya berbagi konstanta ini.
+MAKS_TOKEN_JAWAB = 2048
 
 # ── log keputusan (in-memory; pabrik menempelkan salinan ke fn.log) ─────────
 LOG_KEPUTUSAN: list[dict[str, Any]] = []
@@ -159,10 +164,12 @@ def _prompt(teks_baris: str, konteks: dict | None) -> str:
     bagian = [
         'Kamu membaca satu baris dari sebuah skripsi/tesis berbahasa '
         'Indonesia (kadang Inggris) dan menentukan jenis baris itu.',
-        'Jawab HANYA dengan JSON: {"label": "...", "confidence": 0.0-1.0, '
-        '"alasan": "..."}. Label HANYA salah satu: bab, subbab, paragraf, '
-        'biasa. Confidence = keyakinanmu 0 sampai 1 (di bawah 0,5 berarti '
-        'kamu tidak yakin). Alasan SATU kalimat pendek.',
+        'Jawab HANYA dengan satu objek JSON singkat — tanpa kata lain '
+        'sebelum atau sesudahnya, tanpa penjelasan, tanpa pembuka, tanpa '
+        'uraian: {"label": "...", "confidence": 0.0-1.0, "alasan": "..."}. '
+        'Label HANYA salah satu: bab, subbab, paragraf, biasa. Confidence '
+        '= keyakinanmu 0 sampai 1 (di bawah 0,5 berarti kamu tidak yakin). '
+        'Alasan MAKSIMAL SATU kalimat pendek (maksimal 15 kata).',
         'Aturan: ' + ATURAN_LABEL,
     ]
     if bab:
@@ -178,6 +185,8 @@ def _prompt(teks_baris: str, konteks: dict | None) -> str:
         'head, adalah "biasa", BUKAN "bab". Baris penomoran yang hanya butir '
         'di tengah kalimat adalah "biasa", BUKAN "subbab".')
     bagian.append('Daftar periksa sebelum menjawab "bab": ' + ATURAN_BAB_TAJAM)
+    bagian.append('INGAT: keluaranmu HANYA satu objek JSON singkat. Jangan '
+                  'menulis apa pun selain JSON itu.')
     return '\n\n'.join(bagian)
 
 

@@ -2084,6 +2084,88 @@ def main():
     cek('v15-kepala: salinan di bawah kepala SISTEMATIKA dilewati',
         _ST15.awal_isi_naskah(_t_kepala) == _t_kepala.rindex('\nBAB I\n') + 1)
 
+    # ── v15b: perbaikan jawaban terpotong agen kedua (13 Nov 2026) ──────
+    # Akar (ukur live 279 baris): 12 dari 39 panggilan fallback gagal
+    # karena jawaban terpotong (finish=length) di max_tokens=512 — model
+    # menjawab bertele-tele sebelum JSON-nya, lalu jadi None dan masuk
+    # antrean manusia (1 -> 12). Perbaikan: batas 512 -> 2048 (kedua
+    # jalur berbagi MAKS_TOKEN_JAWAB) + prompt minta HANYA JSON singkat.
+    # Terpotong tetap -> None (aturan lama, bukan tebakan).
+    cek('v15b-maks-token: MAKS_TOKEN_JAWAB 2048 (dulu 512)',
+        AK.MAKS_TOKEN_JAWAB == 2048, str(AK.MAKS_TOKEN_JAWAB))
+    _prompt_b = AK._prompt('2. Manfaat',
+                           {'sebelum': ['a'], 'sesudah': ['b'],
+                            'judul_bab_terdekat': 'BAB I'})
+    cek('v15b-prompt: minta HANYA JSON singkat, tanpa penjelasan/pembuka/uraian',
+        'HANYA dengan satu objek JSON singkat' in _prompt_b
+        and 'tanpa penjelasan' in _prompt_b
+        and 'tanpa pembuka' in _prompt_b
+        and 'tanpa uraian' in _prompt_b
+        and 'INGAT: keluaranmu HANYA satu objek JSON singkat' in _prompt_b,
+        _prompt_b[:200])
+    cek('v15b-prompt: isi keputusan tetap (4 label + confidence + alasan)',
+        'bab, subbab, paragraf, biasa' in _prompt_b
+        and 'confidence' in _prompt_b
+        and 'BARIS YANG DINILAI' in _prompt_b
+        and 'Alasan MAKSIMAL SATU kalimat pendek' in _prompt_b)
+    _awalan = ('Baris ini perlu dibaca dengan hati-hati karena konteksnya '
+               'luas dan butuh pertimbangan matang. ' * 40)
+    _jawab_panjang = (_awalan + '{"label": "paragraf", "confidence": 0.85, '
+                      '"alasan": "kalimat isi biasa"} Demikian penilaiannya.')
+    cek('v15b-panjang: jawaban bertele-tele lengkap tetap terurai',
+        AK._urai_jawaban(_jawab_panjang) == {'label': 'paragraf',
+                                             'confidence': 0.85,
+                                             'alasan': 'kalimat isi biasa'})
+    _alasan_panjang = 'kata ' * 600
+    _jawab_alasan = json.dumps({'label': 'biasa', 'confidence': 0.7,
+                                'alasan': _alasan_panjang.strip()},
+                               ensure_ascii=False)
+    cek('v15b-panjang: JSON alasan sangat panjang tetap terurai',
+        (AK._urai_jawaban(_jawab_alasan) or {}).get('label') == 'biasa')
+
+    def _penanya_panjang(prompt):
+        return (_jawab_panjang, 'model-palsu')
+
+    cek('v15b-panjang: tanya langsung jawaban panjang -> label dipakai',
+        (AK.tanya_agen_kedua('Kalimat isi.',
+                             penanya=_penanya_panjang) or {}).get('label')
+        == 'paragraf')
+    cek('v15b-terpotong: urai JSON terpotong di tengah label -> None',
+        AK._urai_jawaban('{"label": "bia') is None)
+    cek('v15b-terpotong: urai JSON terpotong di tengah alasan -> None',
+        AK._urai_jawaban(
+            '{"label": "biasa", "confidence": 0.9, "alasan": "butir enum')
+        is None)
+    _balasan_panjang = json.dumps(
+        {'choices': [{'message': {'content':
+                                  '{"label": "biasa", "confidence": 0.9}'},
+                      'finish_reason': 'length'}],
+         'model': 'model-palsu'})
+    try:
+        AK._urai_balasan_chat(_balasan_panjang)
+        _terpotong_meledak = False
+    except RuntimeError as _e:
+        _terpotong_meledak = 'terpotong' in str(_e)
+    cek('v15b-terpotong: finish=length -> RuntimeError terpotong',
+        _terpotong_meledak)
+
+    def _penanya_terpotong(prompt):
+        return ('{"label": "biasa", "confidence": 0.9, "alasan": "butir enum',
+                'model-palsu')
+
+    cek('v15b-terpotong: tanya langsung jawaban terpotong -> None',
+        AK.tanya_agen_kedua('2. Manfaat',
+                            penanya=_penanya_terpotong) is None)
+    _env_b = os.environ.get('EDUAI_AGEN_KEDUA_AKTIF')
+    os.environ['EDUAI_AGEN_KEDUA_AKTIF'] = '1'
+    fn_tp = AK.buat_pendapat_kedua_fn(penanya=_penanya_terpotong)
+    cek('v15b-terpotong: pabrik jawaban terpotong -> None (antrean, bukan tebakan)',
+        fn_tp(5, '2. Manfaat', ['paragraf', 'biasa'], [0.9, 0.6]) is None)
+    if _env_b is None:
+        os.environ.pop('EDUAI_AGEN_KEDUA_AKTIF', None)
+    else:
+        os.environ['EDUAI_AGEN_KEDUA_AKTIF'] = _env_b
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))
