@@ -2166,6 +2166,186 @@ def main():
     else:
         os.environ['EDUAI_AGEN_KEDUA_AKTIF'] = _env_b
 
+    # ── v15c: Apinex kaki KEDUA rantai agen kedua (13 Nov 2026) ─────────
+    #    Urutan baru: combo 9router -> Apinex (gratis) -> TokenHarbor.
+    #    Kunci Apinex kosong = kaki dilewati, rantai tetap jalan.
+    import urllib.request as _urlreq
+
+    class _ResponApinex:
+        def __init__(self, badan):
+            self._badan = badan
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return self._badan
+
+    def _balasan_apinex(finish='stop'):
+        return json.dumps(
+            {'choices': [{'message': {'content':
+                                      '{"label": "biasa", "confidence": 0.9, '
+                                      '"alasan": "butir enumerasi"}'},
+                          'finish_reason': finish}],
+             'model': 'free/gemini-3.8-flash'}).encode()
+
+    _tangkap_apx = {}
+
+    def _urlopen_apx(req, timeout=None):
+        _tangkap_apx['url'] = req.full_url
+        _tangkap_apx['data'] = req.data
+        _tangkap_apx['header'] = dict(req.header_items())
+        _tangkap_apx['timeout'] = timeout
+        return _ResponApinex(_balasan_apinex())
+
+    _env_apx = os.environ.get('EDUAI_APINEX_KEY')
+    _env_tr = os.environ.get('EDUAI_AGEN_KEDUA_TRANSPORT')
+    os.environ['EDUAI_APINEX_KEY'] = 'kunci-uji-apinex'
+    _urlopen_asli = _urlreq.urlopen
+    _urlreq.urlopen = _urlopen_apx
+    try:
+        _konten_apx, _model_apx = AK._panggil_apinex('prompt uji')
+        _body_apx = json.loads(_tangkap_apx['data'])
+        cek('v15c-apinex: payload model free/gemini-3.8-flash',
+            _body_apx.get('model') == 'free/gemini-3.8-flash'
+            and _model_apx == 'free/gemini-3.8-flash',
+            str(_body_apx.get('model')))
+        cek('v15c-apinex: payload setelan produksi (2048 + json + tanpa pikir)',
+            _body_apx.get('max_tokens') == 2048
+            and _body_apx.get('temperature') == 0.2
+            and _body_apx.get('enable_thinking') is False
+            and _body_apx.get('response_format') == {'type': 'json_object'},
+            str(_body_apx))
+        cek('v15c-apinex: URL + kunci ke api.apinex.bond',
+            _tangkap_apx['url'].startswith(
+                'https://api.apinex.bond/v1/chat/completions')
+            and _tangkap_apx['header'].get('Authorization')
+            == 'Bearer kunci-uji-apinex',
+            str(_tangkap_apx['url']))
+        cek('v15c-apinex: konten JSON terbaca dari balasan',
+            AK._urai_jawaban(_konten_apx) == {'label': 'biasa',
+                                              'confidence': 0.9,
+                                              'alasan': 'butir enumerasi'})
+    finally:
+        _urlreq.urlopen = _urlopen_asli
+
+    os.environ.pop('EDUAI_APINEX_KEY', None)
+    try:
+        AK._panggil_apinex('prompt uji')
+        _apx_tanpa_kunci = False
+    except RuntimeError as _e:
+        _apx_tanpa_kunci = 'apinex tidak terpasang' in str(_e)
+    cek('v15c-apinex: kunci kosong -> RuntimeError apinex tidak terpasang',
+        _apx_tanpa_kunci)
+    if _env_apx is None:
+        os.environ.pop('EDUAI_APINEX_KEY', None)
+    else:
+        os.environ['EDUAI_APINEX_KEY'] = _env_apx
+
+    # ── rantai 3 kaki (transport dipalsukan di level fungsi) ───────────
+    _urutan = []
+
+    def _r9_gagal(prompt, timeout=None):
+        _urutan.append('router9')
+        raise RuntimeError('combo mati (uji)')
+
+    def _apx_ok(prompt, timeout=None):
+        _urutan.append('apinex')
+        return ('{"label": "subbab", "confidence": 0.8, "alasan": "judul"}',
+                'free/gemini-3.8-flash')
+
+    def _apx_gagal(prompt, timeout=None):
+        _urutan.append('apinex')
+        raise RuntimeError('apinex mati (uji)')
+
+    def _or_ok(prompt, timeout=None):
+        _urutan.append('openrouter')
+        return ('{"label": "paragraf", "confidence": 0.7, "alasan": "isi"}',
+                'gemini-3.8-flash')
+
+    def _or_gagal(prompt, timeout=None):
+        _urutan.append('openrouter')
+        raise RuntimeError('fallback mati (uji)')
+
+    _r9_asli = AK._panggil_router9
+    _apx_asli = AK._panggil_apinex
+    _or_asli = AK._panggil_openrouter
+    os.environ['EDUAI_AGEN_KEDUA_TRANSPORT'] = 'fallback'
+    try:
+        AK._panggil_router9 = _r9_gagal
+        AK._panggil_apinex = _apx_ok
+        AK._panggil_openrouter = _or_ok
+        _urutan.clear()
+        _j1 = AK.tanya_agen_kedua('2. Manfaat')
+        cek('v15c-rantai: combo gagal -> Apinex dipakai (transport apinex)',
+            (_j1 or {}).get('transport') == 'apinex'
+            and (_j1 or {}).get('label') == 'subbab',
+            str(_j1))
+        cek('v15c-rantai: Apinex dicoba SEBELUM TokenHarbor',
+            _urutan == ['router9', 'apinex'], str(_urutan))
+        AK._panggil_apinex = _apx_gagal
+        _urutan.clear()
+        _j2 = AK.tanya_agen_kedua('2. Manfaat')
+        cek('v15c-rantai: Apinex gagal -> jatuh ke TokenHarbor',
+            (_j2 or {}).get('transport') == 'openrouter'
+            and (_j2 or {}).get('label') == 'paragraf',
+            str(_j2))
+        cek('v15c-rantai: urutan 3 kaki router9 -> apinex -> openrouter',
+            _urutan == ['router9', 'apinex', 'openrouter'], str(_urutan))
+        AK._panggil_openrouter = _or_gagal
+        _urutan.clear()
+        cek('v15c-rantai: ketiga kaki gagal -> None (antrean, bukan tebakan)',
+            AK.tanya_agen_kedua('2. Manfaat') is None
+            and _urutan == ['router9', 'apinex', 'openrouter'],
+            str(_urutan))
+    finally:
+        AK._panggil_router9 = _r9_asli
+        AK._panggil_apinex = _apx_asli
+        AK._panggil_openrouter = _or_asli
+
+    # ── kunci kosong di rantai nyata: kaki Apinex dilewati ────────────
+    os.environ.pop('EDUAI_APINEX_KEY', None)
+    AK._panggil_router9 = _r9_gagal
+    AK._panggil_openrouter = _or_ok
+    try:
+        _urutan.clear()
+        _j3 = AK.tanya_agen_kedua('2. Manfaat')
+        cek('v15c-rantai: kunci Apinex kosong -> TokenHarbor tetap menjawab',
+            (_j3 or {}).get('transport') == 'openrouter'
+            and (_j3 or {}).get('label') == 'paragraf',
+            str(_j3))
+    finally:
+        AK._panggil_router9 = _r9_asli
+        AK._panggil_openrouter = _or_asli
+    if _env_apx is None:
+        os.environ.pop('EDUAI_APINEX_KEY', None)
+    else:
+        os.environ['EDUAI_APINEX_KEY'] = _env_apx
+    if _env_tr is None:
+        os.environ.pop('EDUAI_AGEN_KEDUA_TRANSPORT', None)
+    else:
+        os.environ['EDUAI_AGEN_KEDUA_TRANSPORT'] = _env_tr
+
+    # ── Apinex terpotong -> None (lewat _coba_transport nyata) ─────────
+    os.environ['EDUAI_APINEX_KEY'] = 'kunci-uji-apinex'
+
+    def _urlopen_potong(req, timeout=None):
+        return _ResponApinex(_balasan_apinex(finish='length'))
+
+    _urlreq.urlopen = _urlopen_potong
+    try:
+        cek('v15c-terpotong: Apinex finish=length -> None (antrean)',
+            AK._coba_transport('apinex', 'prompt uji') is None)
+    finally:
+        _urlreq.urlopen = _urlopen_asli
+    if _env_apx is None:
+        os.environ.pop('EDUAI_APINEX_KEY', None)
+    else:
+        os.environ['EDUAI_APINEX_KEY'] = _env_apx
+
     print(f'\nHASIL: {len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL: ' + ', '.join(GAGAL))

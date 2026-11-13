@@ -22,6 +22,11 @@ mengulang salah yang sama:
     panggilan dari balasan (`model` balasan). Belum teruji live dari
     container dalam tugas ini — wajib uji asap 1 panggilan sebelum saklar
     dinyalakan di produksi (lihat RANTAI_3_LANGKAH.md).
+  · Rantai PRODUKSI (13 Nov 2026, Gas Bos): combo 9router dulu, gagal ->
+    Apinex (model gratis free/gemini-3.8-flash, kaki KEDUA), gagal ->
+    TokenHarbor (fallback lama, kaki KETIGA), gagal -> None (antrean).
+    Kaki Apinex dilewati bila EDUAI_APINEX_KEY kosong — rantai tetap
+    jalan tanpa kunci itu.
   · Pembanding CADANGAN (bukan pilihan utama): Jev 1.13 lewat jalan tol
     (`tanya_pembanding_113`). Dipakai HANYA bila model umum tidak bisa
     dipakai live (kredit/akses), dan pemakaiannya DICATAT di hasil
@@ -64,10 +69,13 @@ LABEL_SAH = ('bab', 'subbab', 'paragraf', 'biasa')
 # ── saklar + setelan (env; bawaan MATI) ─────────────────────────────────────
 #    EDUAI_AGEN_KEDUA_AKTIF=1  → rantai hidup (pabrik mengembalikan fn).
 #    EDUAI_AGEN_KEDUA_TRANSPORT=fallback|router9|openrouter (bawaan
-#    fallback: 9router dulu, gagal -> OpenRouter; putusan Bos 12 Nov 2026).
+#    fallback: 9router dulu, gagal -> Apinex, gagal -> OpenRouter;
+#    putusan Bos 13 Nov 2026 — Apinex urutan kedua, TokenHarbor ketiga).
 #    Transport openrouter/fallback memakai EDUAI_FALLBACK_BASE/KEY dari
 #    app.config (sama seperti app.ai) — kunci dibaca dari env, modul ini
 #    tidak memegang kunci. Penanya yang disuntik hanya untuk pilot/uji.
+#    Kaki Apinex memakai EDUAI_APINEX_BASE/KEY (env sendiri); kunci
+#    kosong = kaki dilewati, bukan galat.
 #    EDUAI_AGEN_KEDUA_MODEL  → nama model untuk penanya OpenRouter
 #    (bawaan google/gemini-2.5-flash; penanya yang membacanya).
 MODEL_OPENROUTER_BAWAAN = 'google/gemini-2.5-flash'
@@ -81,9 +89,19 @@ BATAS_DETIK_R9 = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT_R9') or '20')
 # Batas jawaban 2048 (dulu 512): ukur live 13 Nov 2026 — 12 dari 39
 # panggilan fallback terpotong (finish=length) tepat di 512, model
 # menjawab bertele-tele sebelum JSON-nya. 2048 = 4x ruang; penagihan
-# mengikuti token yang benar dipakai, bukan batasnya. Dipakai KEDUA
-# jalur (combo 9router dan fallback) — keduanya berbagi konstanta ini.
+# mengikuti token yang benar dipakai, bukan batasnya. Dipakai KETIGA
+# jalur (combo 9router, Apinex, dan fallback) — ketiganya berbagi
+# konstanta ini.
 MAKS_TOKEN_JAWAB = 2048
+
+# Kaki KEDUA rantai (13 Nov 2026, Gas Bos): Apinex, model gratis
+# 'free/gemini-3.8-flash' — model yang SAMA dengan fallback TokenHarbor
+# supaya keputusan konsisten; biaya 0 (jatah harian Apinex, bukan saldo).
+# Base + kunci dari env EDUAI_APINEX_BASE / EDUAI_APINEX_KEY. Kunci
+# kosong = kaki dilewati diam-diam (rantai tetap jalan: combo ->
+# TokenHarbor); deploy tanpa kunci TIDAK BOLEH merusak apa pun.
+APINEX_BASE_BAWAAN = 'https://api.apinex.bond/v1'
+MODEL_APINEX_BAWAAN = 'free/gemini-3.8-flash'
 
 # ── log keputusan (in-memory; pabrik menempelkan salinan ke fn.log) ─────────
 LOG_KEPUTUSAN: list[dict[str, Any]] = []
@@ -97,8 +115,9 @@ def aktif() -> bool:
 def transport() -> str:
     """Transport agen kedua: 'fallback' (bawaan), 'router9', 'openrouter'.
 
-    fallback = coba combo 9router dulu, gagal -> OpenRouter langsung
-    (putusan Bos 12 Nov 2026).
+    fallback = coba combo 9router dulu, gagal -> Apinex, gagal ->
+    OpenRouter/TokenHarbor (putusan Bos 13 Nov 2026: Apinex urutan
+    kedua, TokenHarbor ketiga).
     """
     t = (os.getenv('EDUAI_AGEN_KEDUA_TRANSPORT') or 'fallback').strip().lower()
     return t if t in ('router9', 'openrouter', 'fallback') else 'fallback'
@@ -315,6 +334,46 @@ def _panggil_openrouter(prompt: str, timeout: float | None = None) -> tuple[str,
     return _urai_balasan_chat(mentah)
 
 
+def _panggil_apinex(prompt: str, timeout: float | None = None) -> tuple[str, str]:
+    """Kaki KEDUA rantai produksi: Apinex (model gratis, jatah harian).
+
+    POST {EDUAI_APINEX_BASE}/chat/completions, model 'free/gemini-3.8-flash'
+    — model yang SAMA dengan fallback TokenHarbor supaya keputusan
+    konsisten; biaya 0 (jatah harian Apinex, bukan saldo). Kunci dari env
+    EDUAI_APINEX_KEY; kunci kosong = kaki dilewati (RuntimeError
+    'apinex tidak terpasang'), BUKAN galat yang menghentikan rantai.
+    """
+    base = (os.getenv('EDUAI_APINEX_BASE') or APINEX_BASE_BAWAAN).strip()
+    key = (os.getenv('EDUAI_APINEX_KEY') or '').strip()
+    model = (os.getenv('EDUAI_AGEN_KEDUA_MODEL_APINEX')
+             or MODEL_APINEX_BAWAAN).strip()
+    if not key:
+        raise RuntimeError('apinex tidak terpasang '
+                           '(EDUAI_APINEX_KEY kosong)')
+    body = {
+        'model': model,
+        'messages': [{'role': 'user', 'content': prompt}],
+        'max_tokens': MAKS_TOKEN_JAWAB,
+        'temperature': 0.2,
+        # Keputusan Bos 29 Sep 2026: agen kedua bukan model berpikir.
+        'enable_thinking': False,
+        'response_format': {'type': 'json_object'},
+    }
+    header = {'Content-Type': 'application/json',
+              'Authorization': f'Bearer {key}'}
+    req = urllib.request.Request(
+        base.rstrip('/') + '/chat/completions',
+        data=json.dumps(body).encode(), headers=header)
+    try:
+        with urllib.request.urlopen(req, timeout=timeout or BATAS_DETIK) as r:
+            mentah = r.read().decode()
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f'apinex HTTP {e.code}: {e.read().decode()[:200]}')
+    except Exception as e:
+        raise RuntimeError(f'apinex tidak bisa dihubungi: {type(e).__name__}: {e}')
+    return _urai_balasan_chat(mentah)
+
+
 def _coba_transport(nama: str, prompt: str) -> dict | None:
     """Satu percobaan transport -> jawab valid, atau None bila gagal.
 
@@ -324,6 +383,9 @@ def _coba_transport(nama: str, prompt: str) -> dict | None:
     try:
         if nama == 'openrouter':
             konten, model_layani = _panggil_openrouter(prompt)
+        elif nama == 'apinex':
+            konten, model_layani = _panggil_apinex(prompt,
+                                                   timeout=BATAS_DETIK_R9)
         else:
             konten, model_layani = _panggil_router9(prompt, timeout=BATAS_DETIK_R9)
     except Exception as e:
@@ -352,7 +414,8 @@ def tanya_agen_kedua(teks_baris: str, konteks: dict | None = None,
     `penanya` = callable(prompt) -> (konten, model_melayani) yang disuntik
     (dipakai pilot OpenRouter + uji offline). Tanpa penanya, dipakai jalur
     produksi: transport dari `transport()` — 'fallback' (bawaan: 9router
-    dulu, gagal -> OpenRouter), 'router9', atau 'openrouter'.
+    dulu, gagal -> Apinex, gagal -> OpenRouter), 'router9', atau
+    'openrouter'.
     GAGAL APAPUN ⇒ None (bukan label tebakan).
     """
     prompt = _prompt(teks_baris, konteks)
@@ -372,7 +435,7 @@ def tanya_agen_kedua(teks_baris: str, konteks: dict | None = None,
     t = transport()
     urutan = {'router9': ('router9',),
               'openrouter': ('openrouter',)}.get(
-                  t, ('router9', 'openrouter'))
+                  t, ('router9', 'apinex', 'openrouter'))
     for nama in urutan:
         jawab = _coba_transport(nama, prompt)
         if jawab is not None:
