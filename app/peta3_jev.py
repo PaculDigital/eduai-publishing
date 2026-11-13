@@ -127,7 +127,8 @@ def petakan(fid: int, awal: int | None = None,
 
 
 def petakan_teks(teks: str, awal: int | None = None,
-                 akhir: int | None = None, putaran: int | None = None) -> dict | None:
+                 akhir: int | None = None, putaran: int | None = None,
+                 pendapat_kedua_fn=None, hakim_tandai_fn=None) -> dict | None:
     """PETA dari TEKS LANGSUNG (tanpa fid) — untuk pemakai yang sudah punya teks.
 
     Dipakai pintu LAYAR (Lapis 5): `versi._deteksi_bagian(teks)` sudah memegang
@@ -140,12 +141,19 @@ def petakan_teks(teks: str, awal: int | None = None,
 
     ⚠️ `putaran=None` (14 Okt 2026) ⇒ skrip asli yang memutuskan
     (`EDUAI_JEVI_PUTARAN`, bawaan 1). DULU `=3` eksplisit ⇒ env diabaikan.
+
+    ⚠️ `pendapat_kedua_fn` / `hakim_tandai_fn` (13 Nov 2026, revisi hemat):
+    disuntik oleh `app/revisi_hemat.py` supaya petakan PARSIAL tidak
+    memanggil agen kedua di dalam (ia diadili sekali di akhir, pada peta
+    gabungan). Bila keduanya None, `petakan_dari_teks` membangun rantai
+    otomatisnya sendiri seperti dulu (perilaku lama, tidak berubah).
     """
     m = _muat()
     if m is None:
         return None
     try:
-        return m.petakan_dari_teks(teks, awal, akhir, putaran)
+        return m.petakan_dari_teks(teks, awal, akhir, putaran,
+                                    pendapat_kedua_fn, hakim_tandai_fn)
     except AttributeError:
         #  skrip asli belum punya jalur teks ⇒ jangan mengarang: None saja,
         #  pemanggil memakai fallback (perilaku lama).
@@ -155,3 +163,36 @@ def petakan_teks(teks: str, awal: int | None = None,
         log.warning('[peta3_jev] surveyor gagal memetakan teks: %s: %s',
                     type(e).__name__, e)
         return None
+
+
+def susun_teks(teks: str) -> dict | None:
+    """SUSUN dari TEKS LANGSUNG (tanpa fid) — pembersihan + deterministik.
+
+    Passthrough ke `_susun_dari_bersih` di skrip asli (TIDAK menyalin
+    logika): membersihkan teks, memecah heading, menghitung `baris`,
+    `kand`, `gabung`, `kode_label`, `buang`. TIDAK memanggil Jev
+    (deterministik, gratis) — dipakai `app/revisi_hemat.py` untuk
+    menghitung baris baru + diff, SEBELUM memutuskan baca penuh vs hemat.
+
+    Kembalikan None kalau tidak bisa (pagar P2).
+    """
+    m = _muat()
+    if m is None:
+        return None
+    try:
+        return m._susun_dari_bersih(teks, None, None)
+    except Exception as e:                                   # pagar P2
+        log.warning('[peta3_jev] surveyor gagal menyusun teks: %s: %s',
+                    type(e).__name__, e)
+        return None
+
+
+def modul_surveyor() -> Any | None:
+    """Modul surveyor root apa adanya (untuk fungsi deterministiknya).
+
+    Dipakai `app/revisi_hemat.py` untuk `_deteksi_blok_daftar_isi`,
+    `_demosi_blok_daftar_isi`, `_tandai_sistematika`, dan `pendapat_kedua`
+    — semuanya fungsi yang sudah ada di root, dipakai apa adanya, tidak
+    disalin. None kalau modul tidak bisa dimuat (pagar P2).
+    """
+    return _muat()
