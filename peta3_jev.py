@@ -1754,6 +1754,15 @@ def petakan_dari_teks(teks, awal=None, akhir=None, putaran=None,
         except ValueError:
             putaran = 1
     kunci = _kunci_cache(teks or '', putaran)
+    # ── v15: bila saklar agen kedua NYALA dan pemanggil tidak menyuntik
+    #    fn, bangun rantai otomatis (fallback 9router->OpenRouter, putusan
+    #    Bos 12 Nov 2026). Saklar mati -> fn None (perilaku v10).
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
+        from app import agen_kedua as _ak
+        from app import hakim_peta as _hp
+        pendapat_kedua_fn = _ak.buat_pendapat_kedua_fn()
+        if pendapat_kedua_fn is not None:
+            hakim_tandai_fn = _hp.tandai_ragu_curiga
     # ── v11: bila pendapat kedua disuntik, hasil bergantung pada fn —
     #    jangan pakai/simpan cache (kuncinya tidak memuat fn).
     #    v13: sama untuk hakim_tandai_fn (hasil bergantung pada gerbang).
@@ -1779,6 +1788,15 @@ def petakan(fid, awal=None, akhir=None, putaran=None,
             putaran = 1
     d = susun(fid, awal, akhir)
     kunci = _kunci_cache(d.get('teks_asal') or '\n'.join(d['baris']), putaran)
+    # ── v15: bila saklar agen kedua NYALA dan pemanggil tidak menyuntik
+    #    fn, bangun rantai otomatis (fallback 9router->OpenRouter, putusan
+    #    Bos 12 Nov 2026). Saklar mati -> fn None (perilaku v10).
+    if pendapat_kedua_fn is None and hakim_tandai_fn is None:
+        from app import agen_kedua as _ak
+        from app import hakim_peta as _hp
+        pendapat_kedua_fn = _ak.buat_pendapat_kedua_fn()
+        if pendapat_kedua_fn is not None:
+            hakim_tandai_fn = _hp.tandai_ragu_curiga
     # ── v11: lihat petakan_dari_teks — cache dilewati bila fn disuntik.
     #    v13: sama untuk hakim_tandai_fn.
     if pendapat_kedua_fn is None and hakim_tandai_fn is None:
