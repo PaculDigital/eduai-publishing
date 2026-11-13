@@ -2232,6 +2232,98 @@ def main():
     finally:
         _urlreq.urlopen = _urlopen_asli
 
+    # ── v15d: payload combo HARUS stream:false (bukti live 13 Nov 2026) ──
+    # Tanpa field stream, 9router menganggap permintaan combo sebagai
+    # streaming dan klien non-streaming menerima badan SSE yang tidak
+    # terurai (atau HTTP 410 sesudah sapuan 12 model ~60 detik) — 5 dari
+    # 5 panggilan prompt panjang gagal. Dengan stream:false, combo
+    # menjawab prompt yang sama dalam 1,4-7,9 detik, keputusan terurai.
+    def _balasan_r9(finish='stop'):
+        return json.dumps(
+            {'choices': [{'message': {'content':
+                                      '{"label": "subbab", "confidence": 0.9, '
+                                      '"alasan": "judul bagian"}'},
+                          'finish_reason': finish}],
+             'model': 'free/muse-spark-1.3'}).encode()
+
+    class _ResponR9:
+        def __init__(self, badan):
+            self._badan = badan
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return self._badan
+
+    _tangkap_r9 = {}
+
+    def _urlopen_r9(req, timeout=None):
+        _tangkap_r9['url'] = req.full_url
+        _tangkap_r9['data'] = req.data
+        _tangkap_r9['timeout'] = timeout
+        return _ResponR9(_balasan_r9())
+
+    # app.config menuntut EDUAI_SECRET_KEY + EDUAI_ROUTER_KEY saat
+    # diimpor (dipakai uji saja, bukan kunci asli); direktori data
+    # diarahkan ke /tmp supaya repo tidak kotor.
+    _env_cfg = {k: os.environ.get(k) for k in
+                ('EDUAI_SECRET_KEY', 'EDUAI_ROUTER_KEY',
+                 'EDUAI_DATA_DIR', 'EDUAI_UPLOAD_DIR')}
+    os.environ['EDUAI_SECRET_KEY'] = 'uji-secret'
+    os.environ['EDUAI_ROUTER_KEY'] = 'uji-router-key'
+    os.environ['EDUAI_DATA_DIR'] = '/tmp/uji-eduai-data'
+    os.environ['EDUAI_UPLOAD_DIR'] = '/tmp/uji-eduai-uploads'
+
+    _urlreq.urlopen = _urlopen_r9
+    try:
+        _konten_r9, _model_r9 = AK._panggil_router9('prompt uji')
+        _body_r9 = json.loads(_tangkap_r9['data'])
+        cek('v15d-combo: payload stream:false (9router jawab JSON langsung)',
+            _body_r9.get('stream') is False, str(_body_r9))
+        cek('v15d-combo: payload tetap tanpa pikir (enable_thinking false)',
+            _body_r9.get('enable_thinking') is False
+            and _body_r9.get('max_tokens') == 2048
+            and _body_r9.get('temperature') == 0.2, str(_body_r9))
+        cek('v15d-combo: model combo EduAi + konten JSON terbaca',
+            _body_r9.get('model') == 'EduAi'
+            and AK._urai_jawaban(_konten_r9) == {'label': 'subbab',
+                                                 'confidence': 0.9,
+                                                 'alasan': 'judul bagian'})
+        cek('v15d-combo: URL ke ROUTER_BASE',
+            _tangkap_r9['url'].startswith(
+                'http://172.17.0.1:20128/v1/chat/completions'),
+            str(_tangkap_r9['url']))
+        cek('v15d-combo: balasan SSE lama tetap terurai (pengaman parser)',
+            AK._urai_balasan_chat(
+                'data: ' + _balasan_r9().decode() + '\ndata: [DONE]')[0]
+            == _konten_r9)
+    finally:
+        _urlreq.urlopen = _urlopen_asli
+
+    def _urlopen_r9_potong(req, timeout=None):
+        return _ResponR9(_balasan_r9(finish='length'))
+
+    _urlreq.urlopen = _urlopen_r9_potong
+    try:
+        cek('v15d-combo: finish=length -> None (antrean, bukan tebakan)',
+            AK._coba_transport('router9', 'prompt uji') is None)
+    finally:
+        _urlreq.urlopen = _urlopen_asli
+        for _k, _v in _env_cfg.items():
+            if _v is None:
+                os.environ.pop(_k, None)
+            else:
+                os.environ[_k] = _v
+
+    # Kaki lain TIDAK disentuh perbaikan ini: Apinex tetap tanpa field
+    # stream (sudah bekerja 39/39 di ukur 3 kaki) — cakupan minimal.
+    cek('v15d-cakupan: payload Apinex tidak ditambah stream',
+        'stream' not in _body_apx, str(_body_apx))
+
     os.environ.pop('EDUAI_APINEX_KEY', None)
     try:
         AK._panggil_apinex('prompt uji')
