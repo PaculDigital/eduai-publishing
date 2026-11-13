@@ -277,6 +277,14 @@ def _panggil_router9(prompt: str, timeout: float | None = None) -> tuple[str, st
         'temperature': 0.2,
         # Keputusan Bos 29 Sep 2026: agen kedua bukan model berpikir.
         'enable_thinking': False,
+        # stream: False WAJIB untuk combo 9router (bukti live 13 Nov 2026):
+        # tanpa field ini 9router menganggap permintaan combo sebagai
+        # streaming; klien non-streaming kami menerima badan SSE yang
+        # tidak terurai sebagai satu JSON (atau HTTP 410 sesudah sapuan
+        # 12 model ~60 detik) — 5 dari 5 panggilan prompt panjang gagal.
+        # Dengan stream: False, 9router menjawab JSON langsung dan combo
+        # menjawab prompt yang sama dalam 1,4-7,9 detik, keputusan terurai.
+        'stream': False,
     }
     header = {'Content-Type': 'application/json'}
     if ROUTER_KEY:
