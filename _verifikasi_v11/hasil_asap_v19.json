@@ -1,0 +1,259 @@
+{
+ "uji": "uji asap v19 (R28 penanda bab Arab) di peta PENUH fid=81",
+ "fid": 81,
+ "tanggal": "2026-11-15",
+ "resep": "peta3_jev._v16_terapkan() lewat kode produksi v19 (RULE_VERSION jev-peta-v19, aturan R1-R28) pada 486 baris peta tersimpan, konteks Hakim-status nyata per baris; lintasan B mengubah label awal 159/161/163 jadi biasa (jawaban agen kedua log deploy v16); lintasan C menukar penanda Romawi jadi Arab di konteks judul bab (di luar peta kandidat)",
+ "sumber_peta": {
+  "peta_tersimpan": "peta81_tersimpan.json (ProfilDokumen file_id=81, dibaca BACA-SAJA)",
+  "baris_peta_surveyor": 1874,
+  "jumlah_baris_kandidat": 486,
+  "label_sebelum": {
+   "subbab": 131,
+   "paragraf": 199,
+   "biasa": 156
+  },
+  "baris_goyang": 19,
+  "hakim": {
+   "sepakat": 130,
+   "ragu": 1,
+   "curiga": 0,
+   "belum": 0,
+   "baris_ragu": [
+    "365"
+   ]
+  },
+  "ground_truth": "ground_truth/ground_truth_81.tsv (27 baris)",
+  "batas_bab": [
+   "BAB-I@0",
+   "BAB-II@211",
+   "BAB-III@385",
+   "BAB-IV@607",
+   "BAB-V@833"
+  ]
+ },
+ "panggilan": {
+  "panggilan_jev": 0,
+  "panggilan_llm": 0,
+  "bukti_0_jev_0_llm": [
+   "driver hanya membaca berkas JSON/TSV lokal dan memanggil peta3_jev._v16_terapkan() (regex + hitung panjang)",
+   "tidak ada impor app.jev / app.agen_kedua, tidak ada panggilan HTTP, tidak ada baca DB produksi, tidak ada baca naskah dari DB"
+  ]
+ },
+ "hasil": {
+  "baris_BERUBAH": 5,
+  "persen_baris_berubah": 1.03,
+  "transisi": {
+   "biasa->paragraf": 1,
+   "paragraf->biasa": 2,
+   "subbab->paragraf": 1,
+   "biasa->subbab": 1
+  },
+  "per_bab_berubah": {
+   "BAB-I": 1,
+   "BAB-II": 3,
+   "BAB-V": 1
+  },
+  "label_sesudah": {
+   "subbab": 131,
+   "paragraf": 199,
+   "biasa": 156
+  },
+  "rincian_baris_berubah": [
+   {
+    "no": "20",
+    "bab": "BAB-I",
+    "teks": "Kondisi ini mendorong UMKM untuk memperkuat strategi pemasaran, terutama melalui pemanfaatan media digital, serta menumbuhkan sikap kewirausahaan agar usaha yang dijalankan tidak hanya bertahan, tetap",
+    "label_sebelum": "biasa",
+    "label_sesudah": "paragraf",
+    "aturan": "R12_baris_sangat_panjang",
+    "goyang": false,
+    "hakim_status": null,
+    "hakim_label": null,
+    "label_benar_gt81": null,
+    "punya_penanda_bab": false
+   },
+   {
+    "no": "273",
+    "bab": "BAB-II",
+    "teks": "Menurut Covin & Slevin (1989) dalam (Wales et al., 2023) mengatakan bahwa Orientasi Kewirausahaan adalah sikap perusahaan yang suka berinovasi, berani ambil risiko, dan selalu mencari ide baru untuk m",
+    "label_sebelum": "paragraf",
+    "label_sesudah": "biasa",
+    "aturan": "R20_konektif_lanjutan",
+    "goyang": false,
+    "hakim_status": null,
+    "hakim_label": null,
+    "label_benar_gt81": null,
+    "punya_penanda_bab": false
+   },
+   {
+    "no": "275",
+    "bab": "BAB-II",
+    "teks": "Menurut Kuratko dan Audretsch (2009) dalam (Frans et al., 2020), Orientasi Kewirausahaan adalah konsep yang menggabungkan prinsip kewirausahaan dengan pendekatan manajemen strategis. Konsep ini mendor",
+    "label_sebelum": "paragraf",
+    "label_sesudah": "biasa",
+    "aturan": "R20_konektif_lanjutan",
+    "goyang": false,
+    "hakim_status": null,
+    "hakim_label": null,
+    "label_benar_gt81": "biasa",
+    "punya_penanda_bab": false
+   },
+   {
+    "no": "365",
+    "bab": "BAB-II",
+    "teks": "Hipotesis Kedua: Orientasi Kewirausahaan akan berpengaruh terhadap Keberlanjutan Usaha dimana hipotesis akan didukung oleh:",
+    "label_sebelum": "subbab",
+    "label_sesudah": "paragraf",
+    "aturan": "R4_akhir_kolon",
+    "goyang": true,
+    "hakim_status": "ragu",
+    "hakim_label": "subbab",
+    "label_benar_gt81": null,
+    "punya_penanda_bab": false
+   },
+   {
+    "no": "1077",
+    "bab": "BAB-V",
+    "teks": "Digital Marketing (X1)",
+    "label_sebelum": "biasa",
+    "label_sesudah": "subbab",
+    "aturan": "R7_judul_pendek",
+    "goyang": true,
+    "hakim_status": null,
+    "hakim_label": null,
+    "label_benar_gt81": null,
+    "punya_penanda_bab": false
+   }
+  ]
+ },
+ "tembakan_v19_lintasan_a": {
+  "jumlah": 0,
+  "per_aturan": {},
+  "rincian": [],
+  "catatan": "Tiap tembakan R28 di peta penuh fid=81 harus diperiksa akalnya dari teksnya di atas."
+ },
+ "rincian_vs_hakim_dan_goyang": {
+  "berubah_dan_goyang_baris_sengketa": 2,
+  "berubah_dan_TIDAK_goyang_baris_mudah": 3,
+  "berubah_dan_mudah_rusak_bukan_goyang_dan_hakim_sepakat": 0,
+  "berubah_dan_hakim_SEPAKAT_melawan_hakim": 0,
+  "berubah_dan_hakim_RAGU": 1,
+  "berubah_dan_TIDAK_diaudit_hakim": 4,
+  "berubah_dan_SEJALAN_dengan_hakim": 0,
+  "hakim_sepakat_tidak_diubah": 130,
+  "catatan": "MUDAH = bukan goyang DAN Hakim sepakat. Baris mudah yang berubah = kerusakan: labelnya sudah settled dan disepakati Hakim."
+ },
+ "ground_truth": {
+  "gt_diubah": [
+   "275"
+  ],
+  "gt_menuju_benar": [
+   "275"
+  ],
+  "gt_menjauh_dari_benar": [],
+  "gt_salah_ke_salah": [],
+  "bersih": 1
+ },
+ "pagar_demosi_v6": {
+  "catatan": "Asap ini TIDAK memakai pagar demosi_v6 (peta tersimpan tidak mencatat baris mana yang v6 demosi). Baris yang dipromosi ke subbab diperiksa satu per satu: bila teksnya punya penanda BAB, baris itu PASTI bukan demosi v6.",
+  "naik_ke_subbab": [
+   "1077"
+  ],
+  "naik_ke_subbab_berpenanda_bab": [],
+  "naik_ke_subbab_tanpa_penanda_caveat": [
+   "1077"
+  ]
+ },
+ "lintasan_b_regresi_r18": {
+  "catatan": "Label awal 159/161/163 diubah jadi biasa (jawaban agen kedua log deploy v16, conf 0,9); R18 harus memulihkannya ke paragraf.",
+  "label_awal_diubah": {
+   "159": "biasa",
+   "161": "biasa",
+   "163": "biasa"
+  },
+  "label_sesudah": {
+   "159": "paragraf",
+   "161": "paragraf",
+   "163": "paragraf"
+  },
+  "aturan": {
+   "159": "R18_pertanyaan_penelitian",
+   "161": "R18_pertanyaan_penelitian",
+   "163": "R18_pertanyaan_penelitian"
+  },
+  "pulih_semua_ke_paragraf": true,
+  "baris_BERUBAH": 8,
+  "transisi": {
+   "biasa->paragraf": 4,
+   "paragraf->biasa": 2,
+   "subbab->paragraf": 1,
+   "biasa->subbab": 1
+  },
+  "mudah_rusak": 0,
+  "gt_diubah": [
+   "159",
+   "163",
+   "275"
+  ],
+  "gt_menuju_benar": [
+   "159",
+   "163",
+   "275"
+  ],
+  "gt_menjauh_dari_benar": [],
+  "bersih": 3
+ },
+ "lintasan_c_simulasi_r28": {
+  "catatan": "Judul bab fid=81 bukan baris kandidat, jadi simulasi memakai baris judul itu langsung: label dibalik jadi biasa + penanda Romawi di konteks ditukar jadi Bab N Arab; R28 harus memulihkannya ke bab. Negatif: Bab 13 -> tetap biasa. Baris yang dilewati (bukan judul baku) dicatat di simulasi.",
+  "simulasi": [
+   {
+    "penanda_asli": "BAB I",
+    "penanda_arab": "Bab 1",
+    "judul_idx": "2",
+    "judul": "PENDAHULUAN",
+    "label_sesudah_arab": "bab",
+    "aturan_arab": "R28_penanda_bab_arab",
+    "label_sesudah_bab13": "biasa",
+    "aturan_bab13": null,
+    "pulih": true
+   },
+   {
+    "penanda_asli": "BAB II",
+    "penanda_arab": "Bab 2",
+    "judul_idx": "213",
+    "judul": "TINJAUAN PUSTAKA",
+    "label_sesudah_arab": "bab",
+    "aturan_arab": "R28_penanda_bab_arab",
+    "label_sesudah_bab13": "biasa",
+    "aturan_bab13": null,
+    "pulih": true
+   },
+   {
+    "penanda_asli": "BAB III",
+    "judul_idx": "387",
+    "judul": "METODE PENELITIAN",
+    "dilewati": "bukan judul baku"
+   },
+   {
+    "penanda_asli": "BAB IV",
+    "penanda_arab": "Bab 4",
+    "judul_idx": "609",
+    "judul": "HASIL DAN PEMBAHASAN",
+    "label_sesudah_arab": "bab",
+    "aturan_arab": "R28_penanda_bab_arab",
+    "label_sesudah_bab13": "biasa",
+    "aturan_bab13": null,
+    "pulih": true
+   },
+   {
+    "penanda_asli": "BAB V",
+    "judul_idx": "835",
+    "judul": "PENUTUP",
+    "dilewati": "bukan judul baku"
+   }
+  ],
+  "tembakan_r28_peta_asli": 0
+ },
+ "vonis": "LULUS",
+ "alasan_vonis": "Lintasan A: 0 baris mudah rusak, bersih GT 1, 0 tembakan R28. Lintasan B (regresi R18): 159/161/163 pulih ke paragraf lewat {'159': 'R18_pertanyaan_penelitian', '161': 'R18_pertanyaan_penelitian', '163': 'R18_pertanyaan_penelitian'}, 0 baris mudah rusak. Lintasan C (R28 tukar penanda): BAB I->Bab 1 judul 2 pulih=True; BAB II->Bab 2 judul 213 pulih=True; BAB IV->Bab 4 judul 609 pulih=True"
+}

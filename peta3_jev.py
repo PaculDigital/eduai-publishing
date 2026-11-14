@@ -47,7 +47,7 @@ log = logging.getLogger(__name__)
 #    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
 #    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
 #    bentuknya memang begitu (6 entri: Y1, Y2, AD1, AD2, AD3, AG1).
-RULE_VERSION = 'jev-peta-v18'  # v18 (14 Nov 2026): aturan konteks tetangga R20-R23 (konektif lanjutan, repetisi awal, 'Untuk', temporal) + pengaman agen R24-R26 (butir tanya, awalan 2 kata CAPS, dash hyphen kalimat penuh) + penanda halaman R27; ukur 279 dalam-sampel 255 -> 267 (12 diperbaiki, 0 dirusak). v17 (14 Nov 2026): aturan v16 diterapkan ULANG sesudah Lapis 2 (temuan uji live gelombang 1: agen kedua menimpa 2 promosi R5); penerapan pertama sebelum Hakim/agen kedua tetap seperti v16. v16 (14 Nov 2026): 13 aturan deterministik perketat (R1..R13) sesudah demosi v14, sebelum Hakim/agen kedua; cache lama kedaluwarsa otomatis. v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi, kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
+RULE_VERSION = 'jev-peta-v19'  # v19 (15 Nov 2026): R28 penanda bab Arab 'Bab 1'..'Bab 12' telanjang (cermin R10, zona judul bab); ukur 279 dalam-sampel 267 -> 268 (1 diperbaiki AJ-1:277, 0 dirusak; McNemar lawan v18-sama-konteks b=1 c=0 p=1,0 tidak signifikan — wajar 1 baris). v18 (14 Nov 2026): aturan konteks tetangga R20-R23 (konektif lanjutan, repetisi awal, 'Untuk', temporal) + pengaman agen R24-R26 (butir tanya, awalan 2 kata CAPS, dash hyphen kalimat penuh) + penanda halaman R27; ukur 279 dalam-sampel 255 -> 267 (12 diperbaiki, 0 dirusak). v17 (14 Nov 2026): aturan v16 diterapkan ULANG sesudah Lapis 2 (temuan uji live gelombang 1: agen kedua menimpa 2 promosi R5); penerapan pertama sebelum Hakim/agen kedua tetap seperti v16. v16 (14 Nov 2026): 13 aturan deterministik perketat (R1..R13) sesudah demosi v14, sebelum Hakim/agen kedua; cache lama kedaluwarsa otomatis. v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi, kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
@@ -908,6 +908,16 @@ _V16_RE_BUTIR = re.compile(r'^(?:\d{1,2}\.\s|[a-z]\.\s|\(\d+\)\s)')
 _V16_RE_BUTIR_HURUF = re.compile(r'^[a-z]\.\s')
 _V16_RE_BUTIR_AWAL = re.compile(r'^(?:\d{1,2}\.\s|[a-z]\.\s|\(\d+\)\s|[-\u2013\u2014\u2022\u25e6]\s?)')
 _V16_RE_BAB_TELANJANG = re.compile(r'(?i)^BAB\s+[IVXLC]+\s*$')
+# ── pola aturan baru v19 (15 Nov 2026) ─────────────────────────────────
+#    R28: penanda bab ANGKA ARAB telanjang ('Bab 1'..'Bab 12').
+#    KETAT dengan sengaja (pelajaran v18: R21/R22 v1 terlalu lebar):
+#    seluruh baris HANYA 'Bab N', 1-12 saja, case-insensitive, spasi
+#    bebas. TIDAK kena: 'Bab 5:' (titik dua), 'Bab 5 Kesimpulan'
+#    (judul di baris yang sama), sebutan 'Bab 5' di tengah kalimat
+#    isi, 'Bab 0'/'Bab 13' (di luar 1-12). R11 tetap Romawi saja
+#    (belum terukur untuk Arab; penanda Arab telanjang praktis muncul
+#    sekali per bab, jadi hitung kemunculan R11 hampir tak pernah kena).
+_V19_RE_BAB_ARAB_TELANJANG = re.compile(r'(?i)^BAB\s+(?:[1-9]|1[0-2])\s*$')
 _V16_RE_ROMAWI_BUTIR = re.compile(r'^[IVXLC]+\.\s')
 _V16_RE_BUTIR_ANGKA = re.compile(r'^\(\d+\)\s|^\d+\.\s')
 _V16_RE_KOPULA = re.compile(r'\b(?:adalah|merupakan|yaitu|ialah)\b', re.I)
@@ -1637,6 +1647,36 @@ def _v16_r10_p(row, lab, ctx):
     return _v16_r10_judul_bab_baku(row, lab)
 
 
+def _v19_r28_penanda_bab_arab(row, lab, ctx):
+    """R28 (v19) + pagar yang sama seperti R10. (1) Jangan tembak bila
+    label saat ini 'subbab': subbab bernama baku bukan judul bab.
+    (2) Bila ada konteks tetangga, wajib berada di zona judul bab:
+    baris non-kosong PERTAMA sesudah penanda Arab 'Bab 1'..'Bab 12'
+    telanjang yang jaraknya <= 6 baris mentah di atas. Tanpa konteks,
+    hanya pagar (1) yang berlaku (sama seperti R10). Cermin R10,
+    hanya penandanya Arab — jejak tetap terpisah supaya ukur 279
+    bisa membedakan tembakan R10 (Romawi) dari R28 (Arab)."""
+    if lab == 'subbab':
+        return None
+    if ctx and ctx.get('baris_mentah') is not None \
+            and ctx.get('idx_mentah') is not None:
+        mentah, idx = ctx['baris_mentah'], ctx['idx_mentah']
+        penanda = None
+        for j in range(idx - 1, max(-1, idx - 7), -1):
+            t = (mentah[j] or '').strip()
+            if _V19_RE_BAB_ARAB_TELANJANG.match(t):
+                penanda = j
+                break
+            if t:
+                break  # baris isi lain menghalangi: bukan zona judul bab
+        if penanda is None:
+            return None
+        if any((mentah[k] or '').strip()
+               for k in range(penanda + 1, idx)):
+            return None  # ada baris isi lain di antara penanda dan baris ini
+    return _v16_r10_judul_bab_baku(row, lab)
+
+
 def _v16_r12_p(row, lab, ctx):
     """R12 + kecualikan baris tabel/kuesioner ('|'), baris berumus, dan
     baris yang Hakim sepakati."""
@@ -1669,6 +1709,7 @@ _V16_ATURAN_P = [
     ('R8_butir_dash_en', "diawali dash-en + spasi -> subbab", _v16_bungkus('_v16_r8_butir_dash_en')),
     ('R9_judul_bab_kapital', 'ALL-CAPS >=4 kata -> bab', _v16_bungkus('_v16_r9_judul_bab_kapital')),
     ('R10_judul_bab_baku', "teks persis judul bab baku -> bab HANYA bila label bukan subbab DAN (bila ada konteks) baris non-kosong pertama sesudah penanda BAB X", _v16_r10_p),
+    ('R28_penanda_bab_arab', "penanda Arab 'Bab 1'..'Bab 12' telanjang + judul bab baku di zona judul -> bab (cermin R10, v19)", _v19_r28_penanda_bab_arab),
     ('R11_bab_ganda', "'BAB X' telanjang kemunculan ke-1 -> biasa, ke-2+ -> bab", None),  # ditangani khusus
     ('R12_baris_sangat_panjang', "panjang >=700 + kecualikan berisi '|', rumus, Hakim-sepakat", _v16_r12_p),
     ('R13_butir_kurung_angka', "butir '(N)' pendek <=40 diakhiri titik -> biasa", _v16_bungkus('_v16_r13_butir_kurung_angka')),
@@ -1712,15 +1753,18 @@ _V16_ATURAN_P = [
 #    tanpa syarat label, tapi pagar ini sengaja menahannya pada label
 #    'bab' mentah: demosi v6 di hilir (tanpa penanda BAB) yang
 #    memutuskannya, sama seperti R18/R19.
+#    Aturan v19 MASUK: R28 (cermin R10 — promosi ke 'bab', bukti kuat:
+#    judul baku + penanda BAB telanjang, hanya penandanya Arab).
 _V16_BOLEH_DARI_BAB = frozenset({
     'R2_bab_adalah', 'R9_judul_bab_kapital', 'R10_judul_bab_baku',
+    'R28_penanda_bab_arab',
     'R11_bab_ganda', 'R14_bab_kata_koma', 'R15_angka_saja',
     'R16_caption', 'R17_romawi_kapital',
 })
 
 
 def _v16_terapkan(rows, label_awal, konteks=None):
-    """Terapkan 27 aturan perketat (R1-R19 + R20-R27 v18) pada label_awal {(naskah, no): label}.
+    """Terapkan 28 aturan perketat (R1-R19 + R20-R27 v18 + R28 v19) pada label_awal {(naskah, no): label}.
     konteks: dict {(naskah, no): {'hakim_status', 'baris_mentah',
     'idx_mentah'}} atau None (tanpa konteks -> ctx None per baris).
     Kembalikan (label_akhir, jejak) dengan jejak[(naskah, no)] = nama
@@ -1767,7 +1811,7 @@ def _v16_terapkan(rows, label_awal, konteks=None):
 
 
 def _v16_koreksi_petakan(baris, label, kand, demosi_v6=None):
-    """Adaptor v16 untuk `petakan()`: terapkan 27 aturan pada label Jev
+    """Adaptor v16 untuk `petakan()`: terapkan 28 aturan pada label Jev
     tiap baris kandidat. Konteks per baris: hakim_status=None (Hakim
     jalan belakangan, di Lapis 2), baris_mentah = seluruh baris susun,
     idx_mentah = indeks baris. Kembalikan (diubah, jejak) dengan diubah =
