@@ -47,7 +47,7 @@ log = logging.getLogger(__name__)
 #    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
 #    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
 #    bentuknya memang begitu (6 entri: Y1, Y2, AD1, AD2, AD3, AG1).
-RULE_VERSION = 'jev-peta-v15'  # v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi — kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
+RULE_VERSION = 'jev-peta-v16'  # v16 (14 Nov 2026): 13 aturan deterministik perketat (R1..R13) sesudah demosi v14, sebelum Hakim/agen kedua; cache lama kedaluwarsa otomatis. v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi, kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
@@ -885,6 +885,468 @@ def _tandai_sistematika(baris, label, kand, gabung=None):
     if gabung is not None:
         hasil |= _deteksi_blok_daftar_isi(baris, gabung)
     return hasil
+
+
+# ── v16 (14 Nov 2026): ATURAN DETERMINISTIK PERKETAT (R1..R13) ─────────
+#    Asal: 45 baris yang salah di KEDUA cara (Jev dan agen kedua) pada
+#    279 baris sengketa berlabel. Hanya aturan BERSIH yang disimpan:
+#    memperbaiki lebih banyak daripada merusak, idealnya 0 rusak.
+#    Enam aturan diperketat sesudah uji asap peta penuh fid=81
+#    (asap pertama merusak 2 judul subbab baku, label lapangan kuesioner,
+#    persamaan rumus, dan catatan kaki SPSS): R4, R5, R6, R7, R10, R12.
+#    Uji asap ulang PERKETAT: 3 baris berubah dari 486, 0 baris mudah
+#    rusak, bersih ground truth 0. Skor 279 DALAM-SAMPEL dari v15: 241
+#    (aturan digali dari 279 baris yang sama, jadi bukan angka produksi).
+#    Tiap fungsi aturan: fn(baris_data, label_saat_ini, ctx) -> label
+#    baru atau None. ctx None = tanpa konteks tetangga (ukur 279); dict
+#    bila ada peta penuh: {'hakim_status', 'baris_mentah', 'idx_mentah'}.
+#    Aturan pertama yang cocok menang; aturan yang kena tapi label sudah
+#    sama dicatat sebagai no-op di jejak.
+_V16_KATA_BAB = r'(satu|dua|tiga|empat|lima|enam|tujuh|delapan|sembilan|sepuluh)'
+_V16_RE_BAB_ADALAH = re.compile(r'(?i)^bab\s+' + _V16_KATA_BAB + r'\s+adalah\b')
+_V16_RE_BUTIR = re.compile(r'^(?:\d{1,2}\.\s|[a-z]\.\s|\(\d+\)\s)')
+_V16_RE_BUTIR_HURUF = re.compile(r'^[a-z]\.\s')
+_V16_RE_BUTIR_AWAL = re.compile(r'^(?:\d{1,2}\.\s|[a-z]\.\s|\(\d+\)\s|[-\u2013\u2014\u2022\u25e6]\s?)')
+_V16_RE_BAB_TELANJANG = re.compile(r'(?i)^BAB\s+[IVXLC]+\s*$')
+_V16_RE_ROMAWI_BUTIR = re.compile(r'^[IVXLC]+\.\s')
+_V16_RE_BUTIR_ANGKA = re.compile(r'^\(\d+\)\s|^\d+\.\s')
+_V16_RE_KOPULA = re.compile(r'\b(?:adalah|merupakan|yaitu|ialah)\b', re.I)
+_V16_RE_SITASI = re.compile(r'\(\d{4}\)')
+_V16_JUDUL_BAB_BAKU = {
+    'pendahuluan', 'tinjauan pustaka', 'landasan teori',
+    'metodologi penelitian', 'hasil dan pembahasan',
+    'hasil penelitian dan pembahasan', 'kesimpulan dan saran',
+    'kesimpulan', 'daftar pustaka',
+    'gambaran umum obyek penelitian', 'gambaran umum objek penelitian',
+}
+_V16_TANDA_AKHIR = ('.', '?', '!', ':')
+# Karakter rumus: '=' dan operator/simbol matematika + huruf Yunani.
+# SENGAJA tidak berisi '-' (hyphen), en dash U+2013 (dipakai pada rentang
+# '0 - 6 bulan' yang benarnya subbab), dan elipsis teks.
+_V16_MATH_CHARS = set('=²³¹⁰⁴⁵⁶⁷⁸⁹·−+×÷√∑∫≤≥≠≈∞⋯')
+_V16_GREK_CHARS = set('αβγδεζηθλμπεσφχψω')
+_V16_SPSS_TERMS = (
+    'dependent variable', 'significance correction', 'lilliefors',
+    'cronbach', 'kolmogorov', 'shapiro', 'anova', 'coefficients',
+    'std. deviation', 'std. error', 'n of items', 'r square',
+    'adjusted r', 'bartlett', 'kmo',
+)
+
+
+def _v16_teks(row):
+    return (row.get('teks_baris') or '')
+
+
+def _v16_ada_rumus(s):
+    return any(c in _V16_MATH_CHARS or c in _V16_GREK_CHARS for c in s)
+
+
+def _v16_ada_spss(s):
+    t = s.lower()
+    return any(k in t for k in _V16_SPSS_TERMS)
+
+
+def _v16_ada_sitasi(s):
+    return 'et al.' in s.lower() or bool(_V16_RE_SITASI.search(s))
+
+
+def _v16_hakim_sepakat(ctx):
+    return bool(ctx) and ctx.get('hakim_status') == 'sepakat'
+
+
+def _v16_baris_lapangan_pendek(t):
+    """Calon label lapangan kuesioner: berakhir ':', pendek (<= 30),
+    tanpa kopula, tanpa awalan nomor/butir."""
+    s = (t or '').strip()
+    return (s.endswith(':') and len(s) <= 30
+            and not _V16_RE_KOPULA.search(s)
+            and not _V16_RE_BUTIR_ANGKA.match(s))
+
+
+def _v16_huruf_awal(s):
+    for c in s:
+        if c.isalpha():
+            return c
+    return ''
+
+
+# ── aturan dasar v16 (dipakai apa adanya, kecuali yang diperketat) ──────
+def _v16_r1_none_ke_bab(row, lab):
+    """Baris yang TIDAK ADA di peta v15 (label_v15 None) dan bukan butir
+    angka -> bab. Dikunci pada label_v15 (sifat baris), BUKAN label saat
+    ini, supaya tetap kena bila diterapkan sesudah koreksi lain."""
+    if row.get('label_v15') is None \
+            and not re.match(r'^\d+\.\s', _v16_teks(row)):
+        return 'bab'
+    return None
+
+
+def _v16_r2_bab_adalah(row, lab):
+    """Pola E3: 'Bab dua/tiga/empat/lima adalah ...' = uraian sistematika
+    penulisan (isi Bab I), BUKAN judul bab -> biasa."""
+    if _V16_RE_BAB_ADALAH.match(_v16_teks(row)):
+        return 'biasa'
+    return None
+
+
+def _v16_r3_butir_panjang(row, lab):
+    """Butir bernomor/berhuruf yang PANJANG (>=120 karakter) adalah kalimat
+    isi (paragraf), bukan judul. Butir bullet dikecualikan."""
+    s = _v16_teks(row)
+    if _V16_RE_BUTIR.match(s) and len(s) >= 120:
+        return 'paragraf'
+    return None
+
+
+def _v16_r4_akhir_kolon(row, lab):
+    """Baris berakhir ':' adalah kalimat isi pembuka (paragraf), KECUALI:
+    diawali huruf kecil, mengandung '=', diawali butir angka, mengandung
+    'ayat'."""
+    s = _v16_teks(row)
+    if not s.rstrip().endswith(':'):
+        return None
+    if s[:1].islower():
+        return None
+    if '=' in s:
+        return None
+    if re.match(r'^\d+\.\s', s):
+        return None
+    if 'ayat' in s.lower():
+        return None
+    return 'paragraf'
+
+
+def _v16_r5_lanjutan_judul_kecil(row, lab):
+    """Lanjutan judul yang terbelah ke baris berikut: bukan butir, diawali
+    huruf kecil, pendek (<=65), tanpa tanda akhir, mengandung huruf
+    kapital di tengah (nama/istilah) -> subbab."""
+    s = _v16_teks(row)
+    if _V16_RE_BUTIR_AWAL.match(s):
+        return None
+    if not s[:1].islower():
+        return None
+    if len(s) > 65:
+        return None
+    if s.rstrip().endswith(_V16_TANDA_AKHIR):
+        return None
+    if not re.search(r'\s[A-Z]', s):
+        return None
+    return 'subbab'
+
+
+def _v16_r6_butir_huruf_pendek(row, lab):
+    """Butir huruf tunggal pendek (20-60 karakter, >=2 kata) -> subbab."""
+    s = _v16_teks(row)
+    if _V16_RE_BUTIR_HURUF.match(s) and 20 <= len(s) <= 60:
+        return 'subbab'
+    return None
+
+
+def _v16_r7_judul_pendek(row, lab):
+    """Baris pendek (<=40) tanpa tanda akhir, huruf alfabet pertama
+    kapital, bukan ALL-CAPS, tanpa ':' di mana pun, bukan diawali
+    dash/butir simbol -> subbab. Hanya kena bila (a) diawali butir
+    angka/huruf/kurung-angka, ATAU (b) mengandung kurung '(...)', ATAU
+    (c) >=5 kata dan tidak semua kata berkapital."""
+    s = _v16_teks(row)
+    if len(s) > 40:
+        return None
+    if s.rstrip().endswith(_V16_TANDA_AKHIR):
+        return None
+    if ':' in s:
+        return None
+    if re.match(r'^[-\u2013\u2014\u2022\u25e6]', s):
+        return None
+    awal = _v16_huruf_awal(s)
+    if not awal or not awal.isupper():
+        return None
+    huruf = [c for c in s if c.isalpha()]
+    if huruf and s == s.upper():
+        return None
+    kata = s.split()
+    berbutir = bool(re.match(r'^(?:\d{1,2}\.\s|[a-z]\.\s|\(\d+\)\s)', s))
+    berkurung = '(' in s and ')' in s
+    panjang_campur = len(kata) >= 5 and not all(
+        (not w[0].isalpha()) or w[0].isupper() for w in kata)
+    if not (berbutir or berkurung or panjang_campur):
+        return None
+    return 'subbab'
+
+
+def _v16_r8_butir_dash_en(row, lab):
+    """Baris diawali dash-en (U+2013) + spasi (butir subbab) -> subbab."""
+    if _v16_teks(row).startswith('\u2013 '):
+        return 'subbab'
+    return None
+
+
+def _v16_r9_judul_bab_kapital(row, lab):
+    """Baris ALL-CAPS >=4 kata, tanpa '?', ':', tanpa angka awal, bukan
+    diawali nomor romawi+titik -> bab."""
+    s = _v16_teks(row)
+    huruf = [c for c in s if c.isalpha()]
+    if len(huruf) < 10 or s != s.upper():
+        return None
+    if len(s.split()) < 4:
+        return None
+    if '?' in s or ':' in s:
+        return None
+    if re.match(r'^\d', s):
+        return None
+    if _V16_RE_ROMAWI_BUTIR.match(s):
+        return None
+    return 'bab'
+
+
+def _v16_r10_judul_bab_baku(row, lab):
+    """Baris yang persis sama dengan judul bab baku (daftar) -> bab.
+    Hanya bentuk persis."""
+    s = _v16_teks(row).strip().lower().rstrip('.')
+    if s in _V16_JUDUL_BAB_BAKU:
+        return 'bab'
+    return None
+
+
+def _v16_r12_baris_sangat_panjang(row, lab):
+    """Baris >=700 karakter -> paragraf."""
+    if len(_v16_teks(row)) >= 700:
+        return 'paragraf'
+    return None
+
+
+def _v16_r13_butir_kurung_angka(row, lab):
+    """Butir bernomor kurung '(N)' yang pendek (<=40) dan diakhiri titik
+    -> biasa (butir daftar/catatan, bukan awal paragraf)."""
+    s = _v16_teks(row)
+    if re.match(r'^\(\d+\)\s', s) and len(s) <= 40 \
+            and s.rstrip().endswith('.'):
+        return 'biasa'
+    return None
+
+
+# ── pengetatan v16 (pagar yang ditambahkan sesudah uji asap fid=81) ─────
+def _v16_r4_p(row, lab, ctx):
+    """R4 + tiga pengecualian: (a) baris panjang >= 200 karakter (kalimat
+    isi yang berjalan, bukan judul/pembuka), (b) kalimat bersitasi ('et
+    al.' atau '(YYYY)'), (c) label lapangan pendek yang bergerombol.
+    Tanpa konteks tetangga: label lapangan pendek tidak ditembak
+    (fail-closed; mengorbankan 1 perbaikan dalam-sampel di skor 279)."""
+    s = _v16_teks(row)
+    if not s.rstrip().endswith(':'):
+        return None
+    if s[:1].islower():
+        return None
+    if '=' in s:
+        return None
+    if re.match(r'^\d+\.\s', s):
+        return None
+    if 'ayat' in s.lower():
+        return None
+    if len(s) >= 200:
+        return None
+    if _v16_ada_sitasi(s):
+        return None
+    if _v16_baris_lapangan_pendek(s):
+        if ctx and ctx.get('baris_mentah') is not None \
+                and ctx.get('idx_mentah') is not None:
+            mentah, idx = ctx['baris_mentah'], ctx['idx_mentah']
+            lo, hi = max(0, idx - 12), min(len(mentah), idx + 13)
+            gerombol = sum(1 for j in range(lo, hi) if j != idx
+                           and _v16_baris_lapangan_pendek(mentah[j]))
+            if gerombol >= 1:
+                return None
+        else:
+            return None
+    return 'paragraf'
+
+
+def _v16_r5_p(row, lab, ctx):
+    """R5 + kecualikan baris berumus dan baris yang Hakim sepakati."""
+    if _v16_hakim_sepakat(ctx):
+        return None
+    if _v16_ada_rumus(_v16_teks(row)):
+        return None
+    return _v16_r5_lanjutan_judul_kecil(row, lab)
+
+
+def _v16_r6_p(row, lab, ctx):
+    """R6 + kecualikan baris berisi ':' (label lapangan) dan istilah
+    keluaran SPSS."""
+    if _v16_hakim_sepakat(ctx):
+        return None
+    s = _v16_teks(row)
+    if ':' in s:
+        return None
+    if _v16_ada_spss(s):
+        return None
+    return _v16_r6_butir_huruf_pendek(row, lab)
+
+
+def _v16_r7_p(row, lab, ctx):
+    """R7 + kecualikan rumus, baris tabel ('|'), istilah SPSS, dan baris
+    yang Hakim sepakati."""
+    if _v16_hakim_sepakat(ctx):
+        return None
+    s = _v16_teks(row)
+    if _v16_ada_rumus(s):
+        return None
+    if '|' in s:
+        return None
+    if _v16_ada_spss(s):
+        return None
+    return _v16_r7_judul_pendek(row, lab)
+
+
+def _v16_r10_p(row, lab, ctx):
+    """R10 + dua pagar. (1) Jangan tembak bila label saat ini 'subbab':
+    subbab bernama baku bukan judul bab. (2) Bila ada konteks tetangga,
+    wajib berada di zona judul bab: baris non-kosong PERTAMA sesudah
+    penanda 'BAB X' yang jaraknya <= 6 baris mentah di atas. Tanpa
+    konteks, hanya pagar (1) yang berlaku."""
+    if lab == 'subbab':
+        return None
+    if ctx and ctx.get('baris_mentah') is not None \
+            and ctx.get('idx_mentah') is not None:
+        mentah, idx = ctx['baris_mentah'], ctx['idx_mentah']
+        penanda = None
+        for j in range(idx - 1, max(-1, idx - 7), -1):
+            t = (mentah[j] or '').strip()
+            if _V16_RE_BAB_TELANJANG.match(t):
+                penanda = j
+                break
+            if t:
+                break  # baris isi lain menghalangi: bukan zona judul bab
+        if penanda is None:
+            return None
+        if any((mentah[k] or '').strip()
+               for k in range(penanda + 1, idx)):
+            return None  # ada baris isi lain di antara penanda dan baris ini
+    return _v16_r10_judul_bab_baku(row, lab)
+
+
+def _v16_r12_p(row, lab, ctx):
+    """R12 + kecualikan baris tabel/kuesioner ('|'), baris berumus, dan
+    baris yang Hakim sepakati."""
+    if _v16_hakim_sepakat(ctx):
+        return None
+    s = _v16_teks(row)
+    if '|' in s:
+        return None
+    if _v16_ada_rumus(s):
+        return None
+    return _v16_r12_baris_sangat_panjang(row, lab)
+
+
+def _v16_bungkus(nama_asli):
+    fn = globals()[nama_asli]
+
+    def f(row, lab, ctx):
+        return fn(row, lab)
+    return f
+
+
+_V16_ATURAN_P = [
+    ('R1_none_ke_bab', 'label_v15 None (tak ada di peta) dan bukan butir angka -> bab', _v16_bungkus('_v16_r1_none_ke_bab')),
+    ('R2_bab_adalah', "pola E3 '^Bab <satu..sepuluh> adalah' -> biasa", _v16_bungkus('_v16_r2_bab_adalah')),
+    ('R3_butir_panjang', 'butir bernomor/berhuruf panjang >=120 -> paragraf', _v16_bungkus('_v16_r3_butir_panjang')),
+    ('R4_akhir_kolon', "berakhir ':' + kecualikan panjang >=200 / bersitasi / label lapangan bergerombol", _v16_r4_p),
+    ('R5_lanjutan_judul_kecil', 'v16 + kecualikan rumus dan baris Hakim-sepakat', _v16_r5_p),
+    ('R6_butir_huruf_pendek', "v16 + kecualikan berisi ':' dan istilah keluaran SPSS", _v16_r6_p),
+    ('R7_judul_pendek', "v16 + kecualikan rumus, berisi '|', istilah SPSS, Hakim-sepakat", _v16_r7_p),
+    ('R8_butir_dash_en', "diawali dash-en + spasi -> subbab", _v16_bungkus('_v16_r8_butir_dash_en')),
+    ('R9_judul_bab_kapital', 'ALL-CAPS >=4 kata -> bab', _v16_bungkus('_v16_r9_judul_bab_kapital')),
+    ('R10_judul_bab_baku', "teks persis judul bab baku -> bab HANYA bila label bukan subbab DAN (bila ada konteks) baris non-kosong pertama sesudah penanda BAB X", _v16_r10_p),
+    ('R11_bab_ganda', "'BAB X' telanjang kemunculan ke-1 -> biasa, ke-2+ -> bab", None),  # ditangani khusus
+    ('R12_baris_sangat_panjang', "panjang >=700 + kecualikan berisi '|', rumus, Hakim-sepakat", _v16_r12_p),
+    ('R13_butir_kurung_angka', "butir '(N)' pendek <=40 diakhiri titik -> biasa", _v16_bungkus('_v16_r13_butir_kurung_angka')),
+]
+
+
+# ── pagar label 'bab' (demosi v6 di hilir yang putuskan) ───────────────
+#    Aturan v16 digali dan diukur pada label v15 AKHIR (demosi v6 sudah
+#    jalan): R3, R4, R5, R6, R7, R8, R12, R13 TIDAK PERNAH kena pada
+#    baris berlabel 'bab' di 279 baris (0 kena). Di `petakan()`, aturan
+#    jalan SEBELUM demosi v6, jadi label 'bab' di sini masih mentah
+#    (bisa jadi 'bab' palsu Jev tanpa penanda BAB). Bila R7 menembak
+#    'bab' palsu itu jadi 'subbab', demosi v6 (yang teruji) tidak lagi
+#    melihatnya dan vonis 'biasa'/'paragraf'-nya hilang. Maka hanya
+#    aturan yang mengurus kebab-an yang boleh menyentuh label 'bab':
+#    R2 (sistematika -> biasa), R9/R10 (-> bab), R11 (ganda). R1 tidak
+#    mungkin kena di sini karena mensyaratkan label_v15 None.
+_V16_BOLEH_DARI_BAB = frozenset({
+    'R2_bab_adalah', 'R9_judul_bab_kapital', 'R10_judul_bab_baku',
+    'R11_bab_ganda',
+})
+
+
+def _v16_terapkan(rows, label_awal, konteks=None):
+    """Terapkan 13 aturan perketat pada label_awal {(naskah, no): label}.
+    konteks: dict {(naskah, no): {'hakim_status', 'baris_mentah',
+    'idx_mentah'}} atau None (tanpa konteks -> ctx None per baris).
+    Kembalikan (label_akhir, jejak) dengan jejak[(naskah, no)] = nama
+    aturan pertama yang kena (None bila tak ada aturan kena)."""
+    hitung = {}
+    for r in rows:
+        s = _v16_teks(r).strip()
+        if _V16_RE_BAB_TELANJANG.match(s):
+            k = (r['naskah'], s)
+            hitung[k] = hitung.get(k, 0) + 1
+    urutan_bab, temu = {}, {}
+    for r in sorted(rows, key=lambda x: (x['naskah'], int(x['no']))):
+        s = _v16_teks(r).strip()
+        if _V16_RE_BAB_TELANJANG.match(s):
+            k = (r['naskah'], s)
+            temu[k] = temu.get(k, 0) + 1
+            urutan_bab[(r['naskah'], str(r['no']))] = temu[k]
+    out, jejak = {}, {}
+    for r in rows:
+        k = (r['naskah'], str(r['no']))
+        ctx = konteks.get(k) if konteks else None
+        lab, kena = label_awal[k], None
+        for nama, _pola, fn in _V16_ATURAN_P:
+            if lab == 'bab' and nama not in _V16_BOLEH_DARI_BAB:
+                continue  # label bab mentah: demosi v6 di hilir yang putuskan
+            if nama == 'R11_bab_ganda':
+                if _V16_RE_BAB_TELANJANG.match(_v16_teks(r).strip()) \
+                        and hitung.get((r['naskah'], _v16_teks(r).strip()),
+                                       0) >= 2:
+                    baru = 'biasa' if urutan_bab.get(k, 0) == 1 else 'bab'
+                else:
+                    baru = None
+            else:
+                baru = fn(r, lab, ctx)
+            if baru is not None:
+                if baru != lab:
+                    kena = nama
+                    lab = baru
+                elif kena is None:
+                    kena = nama
+                break
+        out[k], jejak[k] = lab, kena
+    return out, jejak
+
+
+def _v16_koreksi_petakan(baris, label, kand):
+    """Adaptor v16 untuk `petakan()`: terapkan 13 aturan pada label Jev
+    tiap baris kandidat. Konteks per baris: hakim_status=None (Hakim
+    jalan belakangan, di Lapis 2), baris_mentah = seluruh baris susun,
+    idx_mentah = indeks baris. Kembalikan (diubah, jejak) dengan diubah =
+    daftar indeks baris yang labelnya berubah, jejak = {idx: nama aturan}
+    untuk baris yang berubah. Mengubah dict `label` di tempat."""
+    rows = [{'naskah': '', 'no': str(i), 'teks_baris': baris[i],
+             'label_v15': label.get(i)} for i, _t in kand]
+    label_awal = {('', str(i)): label.get(i) for i, _t in kand}
+    konteks = {('', str(i)): {'hakim_status': None, 'baris_mentah': baris,
+                              'idx_mentah': i} for i, _t in kand}
+    akhir, jejak = _v16_terapkan(rows, label_awal, konteks)
+    diubah, jejak_ubah = [], {}
+    for i, _t in kand:
+        baru = akhir[('', str(i))]
+        if baru != label.get(i):
+            label[i] = baru
+            diubah.append(i)
+            jejak_ubah[i] = jejak[('', str(i))]
+    return diubah, jejak_ubah
 
 
 def dibuang(s):
@@ -2035,6 +2497,21 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
         _blok_v14 = sorted(_deteksi_blok_daftar_isi(baris, d.get('gabung') or {}))
     _demosi_blok_daftar_isi(baris, label, kand, set(_blok_v14))
 
+    # ── v16: ATURAN DETERMINISTIK PERKETAT (sesudah v14, sebelum Hakim) ─
+    #    13 aturan dari 45 baris yang salah di kedua cara di 279 baris
+    #    sengketa; 6 aturan diperketat sesudah uji asap peta penuh fid=81
+    #    (3 baris berubah, 0 baris mudah rusak). Jalan pada label Jev di
+    #    sini, SEBELUM Hakim mengaudit peta sementara dan SEBELUM agen
+    #    kedua dipanggil di Lapis 2 di bawah. Konteks per baris di dalam
+    #    `_v16_koreksi_petakan`: hakim_status=None (Hakim jalan
+    #    belakangan), baris_mentah = seluruh baris susun, idx_mentah =
+    #    indeks baris. R1 (label None -> bab) tidak pernah kena di jalur
+    #    ini: tiap baris kandidat selalu punya label Jev; baris tanpa
+    #    label hidup di gabung/buang, bukan di kand. R1 tetap ada di
+    #    perangkat aturan supaya ukur 279 lewat kode produksi mereproduksi
+    #    241 dari v15.
+    _v16_diubah, _v16_jejak = _v16_koreksi_petakan(baris, label, kand)
+
     # ── v11 LAPIS 2 — PENDAPAT KEDUA HANYA UNTUK BARIS GOYANG ──────────
     #    Dijalankan sesudah tanya-ulang v5, sebelum koreksi deterministik.
     #    `pendapat_kedua_fn` disuntik pemanggil: fn(idx, teks_baris, suara,
@@ -2297,6 +2774,8 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
             'p': p_label,                      # S1: confidence Jev per label
             'koreksi_label': koreksi, 'koreksi_spss': koreksi_spss,
             'koreksi_kecil': koreksi_kecil,
+            'koreksi_v16': _v16_diubah,
+            'koreksi_v16_jejak': {str(i): r for i, r in _v16_jejak.items()},
             'sistematika': sorted(sistematika), 'asal': asal, 'boleh_dipakai_fitur': boleh,
             'gabung': d['gabung'], 'buang': d['buang'], 'waktu': waktu, 'gagal': gagal,
             # ── v4: `waktu` HANYA gelombang klasifikasi. Terukur live
