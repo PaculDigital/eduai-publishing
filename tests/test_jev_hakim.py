@@ -2822,6 +2822,127 @@ def main():
         and _jejak_g17.get(3) == 'R9_judul_bab_kapital',
         str((_label_g17, _ubah_g17, _jejak_g17)))
 
+    # ── v17: ATURAN BARU DARI BEDAH 35 BARIS SALAH (14 Nov 2026) ────────
+    #    R14-R19, digali dari 35 baris yang masih salah sesudah v17
+    #    (244/279). Tiap aturan: pola berulang + tandingan diperiksa di
+    #    seluruh 279; pola sekali muncul TIDAK dibuat aturan. Harapan
+    #    ukur 279: 244 + 11 = 255 (R14: 4, R15: 3, R16: 1, R17: 2,
+    #    R19: 1; R18: 0 di 279, +2 GT di asap fid=81 saat agen jawab
+    #    'biasa' seperti log deploy v16).
+    # R14: 'Bab Ketiga, ...' (bukan Pertama) uraian sistematika -> biasa.
+    _r = [_baris16('A', 1, 'Bab Ketiga, metode penelitian, terdiri dari tipe penelitian.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R14: "Bab Ketiga, ..." -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R14_bab_kata_koma',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'Bab Pertama, merupakan bab pendahuluan, terdiri atas latar belakang.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R14: "Bab Pertama, ..." dikecualikan -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Bab Keempat, gambaran umum perusahaan.', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R14: label bab mentah tetap kena (saudara R2) -> biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    # R15: baris hanya angka/simbol -> biasa; nomor bertingkat telanjang
+    # dikecualikan.
+    _r = [_baris16('A', 1, '(3.10)', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R15: nomor persamaan "(3.10)" label bab -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R15_angka_saja',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, '15.52 - 46.13', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R15: rentang angka "15.52 - 46.13" -> biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, '228630', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v17-R15: angka polos "228630" -> biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, '1.1.', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v17-R15: nomor bertingkat "1.1." dikecualikan -> tetap subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, '3.1.', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v17-R15: nomor bertingkat "3.1." dikecualikan -> tetap subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] is None, str((_o, _j)))
+    # R16: keterangan gambar/tabel -> biasa.
+    _r = [_baris16('A', 1, 'Grafik 2.1 Efek Kenaikan Tingkat Suku Bunga Terhadap Mata Uang Domestik', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v17-R16: keterangan "Grafik 2.1 ..." -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R16_caption',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'Tabel 15. Hasil Uji Normalitas dengan One-Sample Kolmogorov-Smirnov.', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R16: keterangan "Tabel 15. ..." sudah biasa -> tetap (no-op)',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R16_caption',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'Grafik tanpa nomor halaman', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R16: "Grafik" tanpa nomor -> tidak kena',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Tabel 4.1 menunjukkan bahwa seluruh item pernyataan memiliki nilai r hitung.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R16-pagar: kalimat isi "Tabel 4.1 menunjukkan bahwa ..." -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Tabel 4.1 di atas menunjukkan bahwa seluruh item pernyataan memiliki nilai.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R16-pagar: kalimat isi mengandung "bahwa" -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    # R17: romawi + judul ALL-CAPS bukan judul bab baku -> subbab.
+    _r = [_baris16('A', 1, 'IV. KOMISI TRANSPORTASI DAN INFRASTRUKTUR', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R17: "IV. KOMISI ..." label bab -> subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] == 'R17_romawi_kapital',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'II. TINJAUAN PUSTAKA', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R17: judul bab baku "II. TINJAUAN PUSTAKA" dikecualikan -> tetap bab',
+        _o[('A', '1')] == 'bab', str(_o))
+    _r = [_baris16('A', 1, 'C. Terorisme dan Perkembangannya', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R17: butir huruf "C." bukan romawi -> tidak kena',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'IV. Komisi Transportasi dan Infrastruktur', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R17: judul Title Case (bukan ALL-CAPS) -> tidak kena, tetap bab',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] is None, str((_o, _j)))
+    # R18: pertanyaan penelitian 'Apakah ...?' -> paragraf.
+    _apakah = ('Apakah Digital Marketing berpengaruh terhadap '
+               'Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di '
+               'Kabupaten Bekasi?')
+    _r = [_baris16('A', 1, _apakah, 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R18: pertanyaan penelitian "Apakah ...?" -> paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] == 'R18_pertanyaan_penelitian',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, _apakah[:-1], 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R18: "Apakah ...?" tanpa tanda tanya -> tidak kena',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, _apakah, 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R18-pagar: label bab mentah tidak kena R18 -> tetap bab',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] is None, str((_o, _j)))
+    # R19: 'ayat' + akhir ':' + pendek <=100 -> subbab; panjang tidak kena.
+    _r = [_baris16('A', 1, 'Landasan Syariah Al \u2013 Qur\u2019an surat Al \u2013 Hadid ayat 11 :', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R19: pengantar ayat pendek berakhir titik-dua -> subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] == 'R19_ayat_kolon_pendek',
+        str((_o, _j)))
+    _ayat_panjang = ('KUHAP tidak pula menjelaskan secara langsung mengenai '
+                     'kedudukan visum et repertum sebagai alat bukti. Perihal '
+                     'apa yang dimaksud dengan alat bukti yang sah, disebutkan '
+                     'dalam Pasal 184 ayat (1) :')
+    _r = [_baris16('A', 1, _ayat_panjang, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R19: kalimat isi panjang berakhir "ayat (1) :" -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Landasan Syariah Al \u2013 Qur\u2019an surat Al \u2013 Hadid ayat 11 :', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R19-pagar: label bab mentah tidak kena R19 -> tetap bab',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] is None, str((_o, _j)))
+
     # ── REVISI HEMAT (13 Nov 2026, perintah Bos "baca semua itu boros") ──
     import app.revisi_hemat as RH
     import app.peta_jembatan as JB
