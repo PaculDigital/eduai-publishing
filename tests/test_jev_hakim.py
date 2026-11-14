@@ -1109,8 +1109,8 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v15)',
-        P8.RULE_VERSION == 'jev-peta-v15')
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v16)',
+        P8.RULE_VERSION == 'jev-peta-v16')
     # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
     #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
     #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
@@ -1191,8 +1191,8 @@ def main():
     #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
     #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
     #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
-    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v15)',
-        P8.RULE_VERSION == 'jev-peta-v15')
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v16)',
+        P8.RULE_VERSION == 'jev-peta-v16')
     baris_r23 = [
         'terbagi menjadi beberapa bab antara lain:',
         '1. BAB I PENDAHULUAN',
@@ -1224,11 +1224,11 @@ def main():
     #    gabungan, CHAPTER polos, judul Romawi tanpa kata BAB (berpagar
     #    profil); Lapis 2 pendapat_kedua() hanya untuk baris goyang
     #    (jawaban disuntik, nol Jev di sini); Lapis 3 antrean manusia.
-    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v15)',
-        P8.RULE_VERSION == 'jev-peta-v15')
+    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v16)',
+        P8.RULE_VERSION == 'jev-peta-v16')
     # --- 12f. v12 rantai 3 langkah: mode agen-kedua + pabrik agen kedua ---
-    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v15)',
-        P8.RULE_VERSION == 'jev-peta-v15')
+    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v16)',
+        P8.RULE_VERSION == 'jev-peta-v16')
     # --- 12a. profil_bentuk ---
     teks_romawi = ('I. PENDAHULUAN\nIsi pendahuluan yang cukup panjang dan menjelaskan latar belakang masalah penelitian ini.\n'
                    'II. TINJAUAN PUSTAKA\nIsi tinjauan pustaka yang cukup panjang dan menjelaskan teori yang dipakai dalam penelitian ini.\n'
@@ -1540,8 +1540,8 @@ def main():
     # --- 13a. v13 GATING HAKIM: agen kedua HANYA baris ditandai Hakim ---
     #    Pola GOYANG-PB yang sama seperti 12d (FakeSatpam): baris penanda
     #    goyang paragraf/biasa, label menang paragraf.
-    cek('v15-versi: RULE_VERSION jev-peta-v15',
-        P8.RULE_VERSION == 'jev-peta-v15', str(P8.RULE_VERSION))
+    cek('v16-versi: RULE_VERSION jev-peta-v16',
+        P8.RULE_VERSION == 'jev-peta-v16', str(P8.RULE_VERSION))
 
     def _teks_v13(penanda):
         return ('BAB I\nPENDAHULUAN\n'
@@ -2437,6 +2437,299 @@ def main():
         os.environ.pop('EDUAI_APINEX_KEY', None)
     else:
         os.environ['EDUAI_APINEX_KEY'] = _env_apx
+
+    # ── v16: ATURAN DETERMINISTIK PERKETAT (14 Nov 2026) ───────────────
+    #    13 aturan dari 45 baris yang salah di kedua cara di 279 baris
+    #    sengketa; 6 aturan diperketat sesudah uji asap peta penuh fid=81
+    #    (3 baris berubah, 0 baris mudah rusak). Skor 279 DALAM-SAMPEL
+    #    dari v15: 241 (bukan angka produksi). Tes di sini memakai
+    #    `_v16_terapkan` produksi langsung, termasuk pagarnya: R10 jangan
+    #    tembak bila label 'subbab' + wajib zona judul bab bila ada
+    #    konteks; R7/R6 kecualikan rumus dan istilah SPSS; R4 kecualikan
+    #    label lapangan kuesioner bergerombol; R5/R12 kecualikan baris
+    #    Hakim-sepakat (pagar Hakim diuji langsung dengan ctx, karena di
+    #    `petakan()` hakim_status selalu None).
+    def _baris16(naskah, no, teks, label_v15='paragraf'):
+        return {'naskah': naskah, 'no': str(no), 'teks_baris': teks,
+                'label_v15': label_v15}
+
+    def _jalan16(daftar, awal, konteks=None):
+        return P._v16_terapkan(daftar, awal, konteks=konteks)
+
+    # R1: label None bukan butir angka -> bab; butir angka dikecualikan.
+    _r = [_baris16('A', 1, 'PENDAHULUAN', None)]
+    _o, _j = _jalan16(_r, {('A', '1'): None})
+    cek('v16-R1: label None bukan butir angka -> bab',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] == 'R1_none_ke_bab',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, '1. Uji t satu arah (Y).', None)]
+    _o, _j = _jalan16(_r, {('A', '1'): None})
+    cek('v16-R1: label None butir angka -> tetap tanpa label',
+        _o[('A', '1')] is None, str(_o))
+
+    # R2: pola E3 'Bab <satu..sepuluh> adalah' -> biasa.
+    _r = [_baris16('E', 1, 'Bab dua adalah uraian sistematika penulisan bab ini.', 'bab')]
+    _o, _j = _jalan16(_r, {('E', '1'): 'bab'})
+    cek('v16-R2: "Bab dua adalah ..." -> biasa',
+        _o[('E', '1')] == 'biasa', str(_o))
+    _r = [_baris16('E', 1, 'Bab dua membahas teori motivasi kerja.', 'bab')]
+    _o, _j = _jalan16(_r, {('E', '1'): 'bab'})
+    cek('v16-R2: "Bab dua membahas ..." tanpa adalah -> tetap bab',
+        _o[('E', '1')] == 'bab', str(_o))
+
+    # R3: butir panjang >=120 -> paragraf; bullet dikecualikan.
+    _r = [_baris16('A', 1, '1. ' + 'x' * 130, 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v16-R3: butir angka panjang -> paragraf',
+        _o[('A', '1')] == 'paragraf', str(_o))
+    _r = [_baris16('A', 1, '\u2022 ' + 'x' * 165, 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R3: butir bullet panjang -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+
+    # R4 perketat: positif, fail-closed tanpa konteks, gerombol, panjang, sitasi.
+    _r = [_baris16('A', 1, 'Rumusan masalah penelitian ini adalah sebagai berikut:', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R4: berakhir titik-dua + kopula -> paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] == 'R4_akhir_kolon',
+        str((_o, _j)))
+    _r = [_baris16('B', 126, 'Rumusan masalah:', 'biasa')]
+    _o, _j = _jalan16(_r, {('B', '126'): 'biasa'})
+    cek('v16-R4: label lapangan pendek tanpa konteks -> fail-closed, tetap',
+        _o[('B', '126')] == 'biasa' and _j[('B', '126')] is None, str((_o, _j)))
+    _mentah4 = ['Nama Usaha:', 'Lokasi Usaha:', 'Lama Usaha Berdiri:',
+                'Isi paragraf biasa yang panjang dan menjelaskan konteks.']
+    _r = [_baris16('C', 5, 'Lokasi Usaha:', 'biasa')]
+    _k4 = {('C', '5'): {'hakim_status': None, 'baris_mentah': _mentah4,
+                        'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('C', '5'): 'biasa'}, konteks=_k4)
+    cek('v16-R4: label lapangan bergerombol (+-12 baris) -> tetap biasa',
+        _o[('C', '5')] == 'biasa' and _j[('C', '5')] is None, str((_o, _j)))
+    _mentah4b = ['Isi paragraf biasa yang panjang dan menjelaskan konteks.',
+                 'Lokasi Usaha:',
+                 'Isi paragraf lain yang panjang dan menjelaskan konteks.']
+    _k4b = {('C', '5'): {'hakim_status': None, 'baris_mentah': _mentah4b,
+                         'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('C', '5'): 'biasa'}, konteks=_k4b)
+    cek('v16-R4: label lapangan tanpa gerombol + ada konteks -> paragraf',
+        _o[('C', '5')] == 'paragraf', str(_o))
+    _r = [_baris16('A', 1, 'Kalimat isi yang berjalan ' + 'x' * 180 + ':', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R4: baris >=200 karakter berakhir titik-dua -> tetap',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, 'Penelitian terdahulu (2020) menunjukkan hal berikut:', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R4: kalimat bersitasi -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+
+    # R5 perketat: positif, rumus, Hakim-sepakat (langsung via fungsi pagar).
+    _r = [_baris16('A', 1, 'dengan PT Shafira sebagai mitra', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R5: lanjutan judul huruf kecil + kapital tengah -> subbab',
+        _o[('A', '1')] == 'subbab', str(_o))
+    _rumus5 = 'n = Z\u00b2 \u00b7 P (1 \u2212 P)'
+    _r = [_baris16('A', 1, _rumus5, 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R5: baris rumus -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _row5 = _baris16('A', 1, 'dengan PT Shafira sebagai mitra', 'biasa')
+    cek('v16-R5-pagar: Hakim sepakat -> None (fungsi pagar langsung)',
+        P._v16_r5_p(_row5, 'biasa', {'hakim_status': 'sepakat'}) is None)
+    cek('v16-R5-pagar: Hakim belum jalan (None) -> subbab',
+        P._v16_r5_p(_row5, 'biasa', {'hakim_status': None}) == 'subbab')
+
+    # R6 perketat: positif, titik-dua, istilah SPSS, Hakim-sepakat.
+    _r = [_baris16('A', 1, 'a. Pendidikan tinggi di daerah', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R6: butir huruf pendek -> subbab',
+        _o[('A', '1')] == 'subbab', str(_o))
+    _r = [_baris16('A', 1, 'a. Dependent Variable: hasil uji', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R6: butir huruf berisi titik-dua -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, 'a. Lilliefors Significance Correction', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R6: catatan kaki SPSS -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _row6 = _baris16('A', 1, 'a. Pendidikan tinggi di daerah', 'biasa')
+    cek('v16-R6-pagar: Hakim sepakat -> None (fungsi pagar langsung)',
+        P._v16_r6_p(_row6, 'biasa', {'hakim_status': 'sepakat'}) is None)
+
+    # R7 perketat: positif, rumus, baris tabel, istilah SPSS, Hakim-sepakat.
+    _r = [_baris16('A', 1, 'Torsi yang mampu dipindahkan sabuk', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R7: judul pendek 5 kata campuran -> subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] == 'R7_judul_pendek',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'Y = a + bX', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R7: persamaan rumus -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, "Cronbach's Alpha | N of Items", 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R7: kepala tabel SPSS berisi pipa -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, 'Reliability Statistics (Cronbach Alpha)', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R7: istilah SPSS berkurung -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _row7 = _baris16('A', 1, 'Torsi yang mampu dipindahkan sabuk', 'biasa')
+    cek('v16-R7-pagar: Hakim sepakat -> None (fungsi pagar langsung)',
+        P._v16_r7_p(_row7, 'biasa', {'hakim_status': 'sepakat'}) is None)
+    cek('v16-R7-pagar: Hakim belum jalan (None) -> subbab',
+        P._v16_r7_p(_row7, 'biasa', {'hakim_status': None}) == 'subbab')
+
+    # R8: dash-en + spasi -> subbab.
+    _r = [_baris16('A', 1, '\u2013 Tahapan Analisis Data', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R8: diawali dash-en + spasi -> subbab',
+        _o[('A', '1')] == 'subbab', str(_o))
+
+    # R9: ALL-CAPS >=4 kata -> bab; 2 kata tidak kena.
+    _r = [_baris16('A', 1, 'HASIL PENELITIAN DAN PEMBAHASAN LAPANGAN', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R9: ALL-CAPS 5 kata -> bab',
+        _o[('A', '1')] == 'bab', str(_o))
+    _r = [_baris16('A', 1, 'JURUSAN KIMIA', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R9: ALL-CAPS 2 kata -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+
+    # R10 perketat: positif tanpa konteks, pagar label subbab, pagar zona.
+    _r = [_baris16('A', 1, 'Landasan Teori', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R10: judul bab baku label biasa tanpa konteks -> bab',
+        _o[('A', '1')] == 'bab', str(_o))
+    _r = [_baris16('A', 1, 'Landasan Teori', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v16-R10-pagar: label subbab -> jangan tembak, tetap subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] is None, str((_o, _j)))
+    _mentah10 = ['BAB II', 'TINJAUAN PUSTAKA',
+                 'Isi tinjauan pustaka yang panjang dan menjelaskan teori.']
+    _r = [_baris16('A', 2, 'TINJAUAN PUSTAKA', 'biasa')]
+    _k10 = {('A', '2'): {'hakim_status': None, 'baris_mentah': _mentah10,
+                         'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('A', '2'): 'biasa'}, konteks=_k10)
+    cek('v16-R10-zona: baris non-kosong pertama sesudah BAB II -> bab',
+        _o[('A', '2')] == 'bab', str(_o))
+    _mentah10b = ['BAB II', 'TINJAUAN PUSTAKA', 'Landasan Teori',
+                  'Isi landasan teori yang panjang dan menjelaskan teori.']
+    _r = [_baris16('A', 3, 'Landasan Teori', 'biasa')]
+    _k10b = {('A', '3'): {'hakim_status': None, 'baris_mentah': _mentah10b,
+                          'idx_mentah': 2}}
+    _o, _j = _jalan16(_r, {('A', '3'): 'biasa'}, konteks=_k10b)
+    cek('v16-R10-zona: baris non-kosong KEDUA sesudah BAB II -> tetap biasa',
+        _o[('A', '3')] == 'biasa' and _j[('A', '3')] is None, str((_o, _j)))
+    _mentah10c = ['Isi paragraf biasa yang panjang dan menjelaskan konteks.',
+                  'Kesimpulan',
+                  'Isi kesimpulan yang panjang dan menutup penelitian ini.']
+    _r = [_baris16('A', 2, 'Kesimpulan', 'biasa')]
+    _k10c = {('A', '2'): {'hakim_status': None, 'baris_mentah': _mentah10c,
+                          'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('A', '2'): 'biasa'}, konteks=_k10c)
+    cek('v16-R10-zona: tanpa penanda BAB di atas -> tetap biasa',
+        _o[('A', '2')] == 'biasa', str(_o))
+
+    # R11: 'BAB X' telanjang ganda: ke-1 biasa, ke-2+ bab; tunggal tetap.
+    _r = [_baris16('H', 69, 'BAB V', 'bab'), _baris16('H', 70, 'BAB V', 'bab')]
+    _o, _j = _jalan16(_r, {('H', '69'): 'bab', ('H', '70'): 'bab'})
+    cek('v16-R11: BAB V ganda -> ke-1 biasa, ke-2 bab',
+        _o[('H', '69')] == 'biasa' and _o[('H', '70')] == 'bab',
+        str(_o))
+    _r = [_baris16('H', 69, 'BAB V', 'bab')]
+    _o, _j = _jalan16(_r, {('H', '69'): 'bab'})
+    cek('v16-R11: BAB V tunggal -> tetap bab',
+        _o[('H', '69')] == 'bab', str(_o))
+
+    # R12 perketat: positif, pipa, rumus, Hakim-sepakat (langsung via fungsi).
+    _r = [_baris16('A', 1, 'x' * 750, 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R12: baris >=700 karakter -> paragraf',
+        _o[('A', '1')] == 'paragraf', str(_o))
+    _r = [_baris16('A', 1, 'A | B ' + 'x' * 750, 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R12: baris panjang berisi pipa -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, 'Y = ' + 'x' * 750, 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-R12: baris panjang berumus -> tetap biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _row12 = _baris16('A', 1, 'x' * 750, 'biasa')
+    cek('v16-R12-pagar: Hakim sepakat -> None (fungsi pagar langsung)',
+        P._v16_r12_p(_row12, 'biasa', {'hakim_status': 'sepakat'}) is None)
+    cek('v16-R12-pagar: Hakim belum jalan (None) -> paragraf',
+        P._v16_r12_p(_row12, 'biasa', {'hakim_status': None}) == 'paragraf')
+
+    # R13: butir kurung angka pendek diakhiri titik -> biasa.
+    _r = [_baris16('A', 1, '(1) Catatan kaki.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v16-R13: butir (N) pendek diakhiri titik -> biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, '(1) ' + 'x' * 50 + '.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v16-R13: butir (N) panjang >40 -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf', str(_o))
+
+    # Urutan: aturan pertama yang cocok menang (R9 sebelum R10).
+    _r = [_baris16('A', 1, 'HASIL PENELITIAN DAN PEMBAHASAN', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-urutan: ALL-CAPS baku -> R9 menang atas R10',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] == 'R9_judul_bab_kapital',
+        str((_o, _j)))
+
+    # Pagar label 'bab': aturan non-bab tidak menyentuh label 'bab'
+    # mentah (demosi v6 di hilir yang putuskan); R7 tetap jalan bila
+    # labelnya bukan 'bab'.
+    _r = [_baris16('A', 1, 'Baris JEV-BAB tanpa titik akhir', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v16-pagar-bab: R7 tidak menembak label bab mentah -> tetap bab',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Baris JEV-BAB tanpa titik akhir', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v16-pagar-bab: teks sama label biasa -> R7 tetap jalan ke subbab',
+        _o[('A', '1')] == 'subbab', str(_o))
+
+    # Integrasi petakan_dari_teks: R7 jalan SESUDAH v14 dan SEBELUM Hakim
+    # dan agen kedua; agen kedua melihat label Jev yang sudah dikoreksi v16.
+    # Pakai P8 (muatan segar: P.RULE_VERSION diubah tes cache jadi
+    # 'jev-peta-v3-stitch' dan tidak dikembalikan).
+    _teks_v16 = (
+        'BAB I\nPENDAHULUAN\n'
+        'Latar belakang penelitian ini membahas pemasaran digital di Indonesia dan kinerja bisnis usaha kecil.\n'
+        'Torsi yang mampu dipindahkan sabuk\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali dan menjelaskan konteks.\n'
+    )
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.rendah = set()
+    P8._CACHE_PETA.clear()
+    _peta16 = P8.petakan_dari_teks(_teks_v16, putaran=1)
+    _idx16 = next(i for i, b in enumerate(_peta16['baris'])
+                  if 'Torsi yang mampu' in b)
+    cek('v16-integrasi: R7 mengubah label Jev paragraf -> subbab',
+        _peta16['label'].get(_idx16) == 'subbab'
+        and _idx16 in (_peta16.get('koreksi_v16') or [])
+        and (_peta16.get('koreksi_v16_jejak') or {}).get(str(_idx16))
+        == 'R7_judul_pendek',
+        str((_peta16['label'].get(_idx16), _peta16.get('koreksi_v16'),
+             _peta16.get('koreksi_v16_jejak'))))
+    cek('v16-integrasi: versi aturan v16 tercatat di peta',
+        _peta16.get('versi_aturan') == 'jev-peta-v16',
+        str(_peta16.get('versi_aturan')))
+    _rekam16 = []
+
+    def _fn16(i, t, s, p, k=None):
+        _rekam16.append((i, t))
+        return {'label': 'subbab', 'confidence': 0.9}
+
+    P8._CACHE_PETA.clear()
+    _peta16b = P8.petakan_dari_teks(
+        _teks_v16, putaran=1, pendapat_kedua_fn=_fn16,
+        hakim_tandai_fn=lambda peta: {_idx16})
+    _jejak16 = [j for j in _peta16b.get('pendapat_kedua_jawaban', [])
+                if j.get('idx') == _idx16]
+    cek('v16-urutan: agen kedua melihat label Jev sesudah v16 (subbab)',
+        bool(_jejak16) and _jejak16[0].get('label_jev') == 'subbab',
+        str(_peta16b.get('pendapat_kedua_jawaban')))
 
     # ── REVISI HEMAT (13 Nov 2026, perintah Bos "baca semua itu boros") ──
     import app.revisi_hemat as RH
