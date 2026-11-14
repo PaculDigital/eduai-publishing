@@ -1109,8 +1109,8 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v17)',
-        P8.RULE_VERSION == 'jev-peta-v17')
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v18)',
+        P8.RULE_VERSION == 'jev-peta-v18')
     # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
     #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
     #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
@@ -1191,8 +1191,8 @@ def main():
     #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
     #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
     #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
-    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v17)',
-        P8.RULE_VERSION == 'jev-peta-v17')
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v18)',
+        P8.RULE_VERSION == 'jev-peta-v18')
     baris_r23 = [
         'terbagi menjadi beberapa bab antara lain:',
         '1. BAB I PENDAHULUAN',
@@ -1224,11 +1224,11 @@ def main():
     #    gabungan, CHAPTER polos, judul Romawi tanpa kata BAB (berpagar
     #    profil); Lapis 2 pendapat_kedua() hanya untuk baris goyang
     #    (jawaban disuntik, nol Jev di sini); Lapis 3 antrean manusia.
-    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v17)',
-        P8.RULE_VERSION == 'jev-peta-v17')
+    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v18)',
+        P8.RULE_VERSION == 'jev-peta-v18')
     # --- 12f. v12 rantai 3 langkah: mode agen-kedua + pabrik agen kedua ---
-    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v17)',
-        P8.RULE_VERSION == 'jev-peta-v17')
+    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v18)',
+        P8.RULE_VERSION == 'jev-peta-v18')
     # --- 12a. profil_bentuk ---
     teks_romawi = ('I. PENDAHULUAN\nIsi pendahuluan yang cukup panjang dan menjelaskan latar belakang masalah penelitian ini.\n'
                    'II. TINJAUAN PUSTAKA\nIsi tinjauan pustaka yang cukup panjang dan menjelaskan teori yang dipakai dalam penelitian ini.\n'
@@ -1540,8 +1540,8 @@ def main():
     # --- 13a. v13 GATING HAKIM: agen kedua HANYA baris ditandai Hakim ---
     #    Pola GOYANG-PB yang sama seperti 12d (FakeSatpam): baris penanda
     #    goyang paragraf/biasa, label menang paragraf.
-    cek('v17-versi: RULE_VERSION jev-peta-v17',
-        P8.RULE_VERSION == 'jev-peta-v17', str(P8.RULE_VERSION))
+    cek('v18-versi: RULE_VERSION jev-peta-v18',
+        P8.RULE_VERSION == 'jev-peta-v18', str(P8.RULE_VERSION))
 
     def _teks_v13(penanda):
         return ('BAB I\nPENDAHULUAN\n'
@@ -2712,8 +2712,8 @@ def main():
         == 'R7_judul_pendek',
         str((_peta16['label'].get(_idx16), _peta16.get('koreksi_v16'),
              _peta16.get('koreksi_v16_jejak'))))
-    cek('v17-integrasi: versi aturan v17 tercatat di peta',
-        _peta16.get('versi_aturan') == 'jev-peta-v17',
+    cek('v18-integrasi: versi aturan v18 tercatat di peta',
+        _peta16.get('versi_aturan') == 'jev-peta-v18',
         str(_peta16.get('versi_aturan')))
     _rekam16 = []
 
@@ -2791,8 +2791,8 @@ def main():
         _peta17b['label'].get(_idx_fix) == 'subbab'
         and _idx_fix not in (_peta17b.get('koreksi_v17') or []),
         str((_peta17b['label'].get(_idx_fix), _peta17b.get('koreksi_v17'))))
-    cek('v17-versi: versi aturan v17 tercatat di peta',
-        _peta17b.get('versi_aturan') == 'jev-peta-v17',
+    cek('v18-versi: versi aturan v18 tercatat di peta',
+        _peta17b.get('versi_aturan') == 'jev-peta-v18',
         str(_peta17b.get('versi_aturan')))
 
     # Pagar v17 (regresi v6.4): baris yang v6 putuskan BUKAN judul bab
@@ -2942,6 +2942,213 @@ def main():
     _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
     cek('v17-R19-pagar: label bab mentah tidak kena R19 -> tetap bab',
         _o[('A', '1')] == 'bab' and _j[('A', '1')] is None, str((_o, _j)))
+
+    # ── v18: ATURAN KONTEKS TETANGGA + PENGAMAN AGEN (14 Nov 2026) ───
+    #    R20-R23 digali dari 10 kalimat isi panjang (GT=biasa,
+    #    rantai=paragraf); R24-R26 pengaman 3 baris yang dirusak agen;
+    #    R27 penanda halaman. Harapan ukur 279: 255 + 12 = 267
+    #    (R20: 5, R21-R27: 1 tiap aturan, 0 rusak).
+    # Pembantu konteks: pendahulu kalimat isi panjang + target.
+    _pendahulu = ('Penelitian ini menggunakan metode kuantitatif dengan '
+                  'pendekatan survei yang dilaksanakan di tiga kota besar.')
+    def _k18(pendahulu, target):
+        return {('A', '1'): {'hakim_status': None,
+                             'baris_mentah': [pendahulu, target],
+                             'idx_mentah': 1}}
+    # R20: konektif lanjutan + pendahulu kalimat isi -> biasa.
+    _t20 = 'Sedangkan hasil penelitian sebelumnya menunjukkan hal yang berbeda dari temuan ini.'
+    _r = [_baris16('A', 1, _t20, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_pendahulu, _t20))
+    cek('v18-R20: "Sedangkan ..." + pendahulu kalimat isi -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R20_konektif_lanjutan',
+        str((_o, _j)))
+    _t20b = 'Karena itu peneliti menyimpulkan bahwa hipotesis pertama dapat diterima.'
+    _r = [_baris16('A', 1, _t20b, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_pendahulu, _t20b))
+    cek('v18-R20: "Karena ..." + pendahulu kalimat isi -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R20_konektif_lanjutan',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, _t20, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v18-R20-pagar: tanpa konteks -> fail-closed, tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, _t20, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18('BAB II', _t20))
+    cek('v18-R20-pagar: pendahulu judul pendek -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _t20c = 'Dari definisi di atas dapat disimpulkan bahwa motivasi kerja berpengaruh positif.'
+    _r = [_baris16('A', 1, _t20c, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_pendahulu, _t20c))
+    cek('v18-R20-pagar: konektif "Dari" TIDAK masuk daftar -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _t20d = 'Menurut para ahli, kepuasan kerja karyawan sangat dipengaruhi oleh lingkungan.'
+    _r = [_baris16('A', 1, _t20d, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_pendahulu, _t20d))
+    cek('v18-R20: "Menurut ..." + pendahulu kalimat isi -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R20_konektif_lanjutan',
+        str((_o, _j)))
+    # R21: 3 kata pertama mengulang frasa DI DALAM pendahulu -> biasa.
+    _p21 = ('Indonesia sebagai salah satu negara yang menganut sistem '
+            'kurs mengambang. Terapresiasinya nilai tukar Dollar Amerika '
+            'Serikat terhadap Rupiah sangat dipengaruhi oleh suku bunga '
+            'acuan bank sentral.')
+    _t21 = 'Terapresiasinya nilai tukar Dollar Amerika Serikat terhadap Rupiah juga dipengaruhi inflasi.'
+    _r = [_baris16('A', 1, _t21, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_p21, _t21))
+    cek('v18-R21: 3 kata pertama mengulang frasa di dalam pendahulu -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R21_repetisi_awal',
+        str((_o, _j)))
+    _p21_awal = ('Terapresiasinya nilai tukar Dollar Amerika Serikat '
+                 'terhadap Rupiah sangat dipengaruhi oleh suku bunga acuan '
+                 'bank sentral.')
+    _r = [_baris16('A', 1, _t21, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_p21_awal, _t21))
+    cek('v18-R21-pagar: frasa di AWAL pendahulu (gema pembuka formulaik) -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _t21d = ('Penelitian yang dilakukan oleh Bangun et al. (2024) dengan '
+             'judul "Embracing the Role of Business Performance" memakai '
+             'metode kuantitatif.')
+    _p21d = ('Penelitian yang dilakukan oleh Munawaroh et al. (2024) '
+             'dengan judul "Unveiling the Link" memakai metode survei '
+             'pada pelaku UMKM.')
+    _r = [_baris16('A', 1, _t21d, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_p21d, _t21d))
+    cek('v18-R21-pagar: entri tinjauan pustaka (frasa pembuka sama) -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _t21b = 'Pada bab ini peneliti menjelaskan latar belakang masalah penelitian secara rinci.'
+    _r = [_baris16('A', 1, _t21b, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_pendahulu, _t21b))
+    cek('v18-R21-pagar: 3 kata pertama TIDAK di pendahulu -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _p21c = ('Pada bab ini peneliti menjelaskan latar belakang masalah '
+             'penelitian yang terjadi di perusahaan tempat penelitian.')
+    _t21c = 'Pada bab ini peneliti menjelaskan metode yang digunakan dalam penelitian ini.'
+    _r = [_baris16('A', 1, _t21c, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_p21c, _t21c))
+    cek('v18-R21-pagar: frasa 3 kata semuanya pendek -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    # R22: 'Untuk ...' tanpa 'di atas'/'tersebut' + pendahulu -> biasa.
+    _t22 = 'Untuk meyakinkan pembaca, peneliti menyajikan data pendukung yang lengkap dan rinci.'
+    _r = [_baris16('A', 1, _t22, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_pendahulu, _t22))
+    cek('v18-R22: "Untuk meyakinkan ..." + pendahulu -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R22_untuk_tanpa_diatas',
+        str((_o, _j)))
+    _t22b = 'Untuk mewujudkan harapan tersebut di atas, peneliti menyusun program kerja yang jelas.'
+    _r = [_baris16('A', 1, _t22b, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_pendahulu, _t22b))
+    cek('v18-R22-pagar: mengandung "tersebut di atas" -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _p22c = ('Untuk mengetahui pengaruh Digital Marketing terhadap Keberlanjutan Usaha '
+             'pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi.')
+    _t22c = ('Untuk mengetahui pengaruh Orientasi Kewirausahaan terhadap Keberlanjutan Usaha '
+             'pada UMKM Kuliner Ayam Bakar di Kabupaten Bekasi.')
+    _r = [_baris16('A', 1, _t22c, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_p22c, _t22c))
+    cek('v18-R22-pagar: pendahulu juga diawali "Untuk" (butir tujuan berikut) -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    # R23: temporal 'Pada tahun/...' + pendahulu (catatan kaki) -> biasa.
+    _p23 = ('Perusahaan didirikan oleh keluarga pendiri yang telah lama '
+            'berkecimpung di bidang perdagangan sejak masa penjajahan.83')
+    _t23 = 'Pada tahun 1989 perusahaan mulai membuka cabang di kota-kota besar di Indonesia.'
+    _r = [_baris16('A', 1, _t23, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18(_p23, _t23))
+    cek('v18-R23: "Pada tahun ..." + pendahulu berakhir catatan kaki -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R23_temporal_tahun',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, _t23, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k18('BAB II', _t23))
+    cek('v18-R23-pagar: pendahulu judul -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    # R24: PENGAMAN AGEN — butir tanya sentence-case -> biasa.
+    _r = [_baris16('A', 1, '2. What do I need?', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v18-R24: "2. What do I need?" (sentence-case) -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R24_butir_tanya_kalimat',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, '3. What Do I Need?', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v18-R24-pagar: kembaran Title Case "3. What Do I Need?" -> tetap subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, '2. Mengapa harga naik begitu cepat?', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v18-R24: butir tanya Indonesia sentence-case -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R24_butir_tanya_kalimat',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, '2. ' + 'x' * 70 + '?', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v18-R24-pagar: butir tanya panjang >60 -> tetap subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] is None, str((_o, _j)))
+    # R25: PENGAMAN AGEN — 2 kata ALL-CAPS + kalimat isi panjang -> biasa.
+    _t25 = 'PEMBAHASAN MASALAH Pada bab ini dijelaskan secara rinci mengenai hasil penelitian yang diperoleh di lapangan.'
+    _r = [_baris16('A', 1, _t25, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v18-R25: "PEMBAHASAN MASALAH Pada bab ini ..." -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R25_awalan_kapital_dua',
+        str((_o, _j)))
+    _t25b = ('DUHAM sebagai sumber hukum acara pidana mengatur tata cara '
+             'penyidikan yang harus dipatuhi oleh penyidik di lapangan.')
+    _r = [_baris16('A', 1, _t25b, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v18-R25-pagar: satu kata CAPS (akronim "DUHAM") -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _t25c = ('KUHAP tidak pula menjelaskan secara langsung mengenai kedudukan '
+             'visum et repertum sebagai alat bukti yang sah di persidangan.')
+    _r = [_baris16('A', 1, _t25c, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v18-R25-pagar: satu kata CAPS (akronim "KUHAP") -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    # R26: PENGAMAN AGEN — butir strip hyphen kalimat penuh -> paragraf.
+    _t26 = '- Tindakan, pencegahan, dan penanganan pelanggaran harus dilakukan secara tegas dan konsisten.'
+    _r = [_baris16('A', 1, _t26, 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v18-R26: butir hyphen kalimat penuh -> paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] == 'R26_dash_hyphen_kalimat',
+        str((_o, _j)))
+    _t26b = '\u2022 ' + 'x' * 165
+    _r = [_baris16('A', 1, _t26b, 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v18-R26-pagar: bullet "•" kalimat panjang -> tetap biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, '- Tindakan singkat.', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v18-R26-pagar: butir hyphen pendek <60 -> tetap biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, _t26, 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v18-R26-pagar: label subbab tidak kena R26 -> tetap subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] is None, str((_o, _j)))
+    # R27: penanda halaman -> biasa.
+    _r = [_baris16('A', 1, 'Halaman 6', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v18-R27: "Halaman 6" -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R27_penanda_halaman',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'Halaman 6 dari 200', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v18-R27-pagar: "Halaman 6 dari 200" bukan penanda telanjang -> tetap subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Halaman 6', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v18-R27-pagar: label bab mentah ditahan pagar -> tetap bab (demosi v6 yang putuskan)',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] is None, str((_o, _j)))
+    # Pembantu konteks: baris kosong dilewati, catatan kaki diabaikan.
+    _k_blank = {('A', '1'): {'hakim_status': None,
+                             'baris_mentah': [_pendahulu, '', '   ', _t20],
+                             'idx_mentah': 3}}
+    _r = [_baris16('A', 1, _t20, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'}, konteks=_k_blank)
+    cek('v18-pembantu: baris kosong di antara pendahulu dan target dilewati -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R20_konektif_lanjutan',
+        str((_o, _j)))
+    cek('v18-pembantu: pendahulu kalimat + catatan kaki dikenali',
+        P._v16_pendahulu_kalimat({'hakim_status': None,
+                                  'baris_mentah': [_p23, _t23],
+                                  'idx_mentah': 1}, footnote=True) == _p23)
+    cek('v18-pembantu: pendahulu kalimat tanpa footnote tidak kenali ".83"',
+        P._v16_pendahulu_kalimat({'hakim_status': None,
+                                  'baris_mentah': [_p23, _t23],
+                                  'idx_mentah': 1}, footnote=False) is None)
 
     # ── REVISI HEMAT (13 Nov 2026, perintah Bos "baca semua itu boros") ──
     import app.revisi_hemat as RH

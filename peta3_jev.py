@@ -47,7 +47,7 @@ log = logging.getLogger(__name__)
 #    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
 #    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
 #    bentuknya memang begitu (6 entri: Y1, Y2, AD1, AD2, AD3, AG1).
-RULE_VERSION = 'jev-peta-v17'  # v17 (14 Nov 2026): aturan v16 diterapkan ULANG sesudah Lapis 2 (temuan uji live gelombang 1: agen kedua menimpa 2 promosi R5); penerapan pertama sebelum Hakim/agen kedua tetap seperti v16. v16 (14 Nov 2026): 13 aturan deterministik perketat (R1..R13) sesudah demosi v14, sebelum Hakim/agen kedua; cache lama kedaluwarsa otomatis. v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi, kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
+RULE_VERSION = 'jev-peta-v18'  # v18 (14 Nov 2026): aturan konteks tetangga R20-R23 (konektif lanjutan, repetisi awal, 'Untuk', temporal) + pengaman agen R24-R26 (butir tanya, awalan 2 kata CAPS, dash hyphen kalimat penuh) + penanda halaman R27; ukur 279 dalam-sampel 255 -> 267 (12 diperbaiki, 0 dirusak). v17 (14 Nov 2026): aturan v16 diterapkan ULANG sesudah Lapis 2 (temuan uji live gelombang 1: agen kedua menimpa 2 promosi R5); penerapan pertama sebelum Hakim/agen kedua tetap seperti v16. v16 (14 Nov 2026): 13 aturan deterministik perketat (R1..R13) sesudah demosi v14, sebelum Hakim/agen kedua; cache lama kedaluwarsa otomatis. v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi, kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
@@ -1262,6 +1262,281 @@ def _v16_r19_ayat_kolon_pendek(row, lab):
     return 'subbab'
 
 
+# ── v18: ATURAN KONTEKS TETANGGA + PENGAMAN AGEN (14 Nov 2026) ─────────
+#    Digali dari 24 baris yang masih salah sesudah v17+aturan baru
+#    (255/279). 10 kalimat isi panjang (GT=biasa, rantai=paragraf)
+#    terbukti lanjutan kalimat bila baris SEBELUMNYA juga kalimat isi
+#    tanpa jeda; pembuka paragraf sejati didahului judul/baris kosong/
+#    butir bernomor. 3 baris dirusak agen (v15 benar, agen membalik
+#    yakin 0,85-0,9) ditutup pengaman deterministik R24-R26: pola itu
+#    TIDAK boleh dibalik agen — aturan berjalan di Lapis 1 DAN
+#    penerapan ulang v17, jadi agen kedua tidak bisa menimpanya.
+#    Tiap aturan: pola berulang + tandingan diperiksa di seluruh 279;
+#    aturan naif 'pendahulu kalimat isi' saja DITOLAK (8 perbaiki /
+#    13 rusak) — hanya varian sempit yang 0 rusak yang dipakai.
+#    Harapan ukur 279: 255 + 12 = 267 (R20: 5, R21: 1, R22: 1, R23: 1,
+#    R24: 1, R25: 1, R26: 1, R27: 1). Sisa 12 baris (judul palsu,
+#    pembuka dikira subbab, kalimat tanpa pola aman) masuk antrean
+#    manusia, BUKAN aturan.
+_V16_KONEKTIF_LANJUTAN = frozenset(
+    ('sedangkan', 'karena', 'yakni', 'yaitu', 'sebelumnya', 'menurut',
+     'sebagai'))
+_V16_RE_TEMPORAL = re.compile(
+    r'^(?:pada)\s+(?:tahun|tanggal|saat|awalnya|masa|periode|bulan)\b',
+    re.I)
+_V16_RE_HALAMAN = re.compile(r'^halaman\s+\d+$', re.I)
+_V16_RE_BUTIR_TANYA = re.compile(r'^\d{1,2}[.)]\s')
+_V16_RE_AWALAN_KAPITAL_DUA = re.compile(
+    r'^((?:[A-Z]{2,}\s+){2,})(?=[A-Z][a-z]|[a-z])')
+_V16_RE_DASH_HYPHEN = re.compile(r'^-\s')
+_V16_AKHIR_KALIMAT = ('.', '?', '!')
+
+
+def _v16_tetangga_nonblank(ctx, arah, maks=3):
+    """Baris non-kosong terdekat ke satu arah dari ctx, urutan dokumen.
+    arah -1 = sebelum, +1 = sesudah. Tanpa konteks (None) atau jendela
+    kosong -> [] (fail-closed, sama seperti R4). Baris kosong DILEWATI
+    — jadi perilaku offline (jendela +-3 non-kosong dari GT) sama
+    dengan produksi (peta penuh, kosong dilewati)."""
+    if not ctx:
+        return []
+    mentah = ctx.get('baris_mentah')
+    idx = ctx.get('idx_mentah')
+    if mentah is None or idx is None:
+        return []
+    out = []
+    j = idx + arah
+    while 0 <= j < len(mentah) and len(out) < maks:
+        t = (mentah[j] or '').strip()
+        if t:
+            out.append(t)
+        j += arah
+    if arah < 0:
+        out.reverse()
+    return out
+
+
+def _v16_pendahulu_kalimat(ctx, footnote=False, beda_awal=None):
+    """Baris non-kosong terdekat SEBELUM baris ini, bila berupa kalimat
+    isi: panjang >=60, bukan butir/judul/ALL-CAPS, tidak berakhir ':',
+    berakhir tanda akhir kalimat ('.', '?', '!'). Bila footnote=True,
+    angka catatan kaki di ujung (mis. '.83') diabaikan saat cek akhir
+    — catatan kaki menempel di ujung kalimat tanpa spasi. Bila
+    beda_awal diisi (satu kata atau frasa), pendahulu TIDAK BOLEH
+    diawali frasa itu: bila pendahulu diawali kata/frasa yang sama
+    dengan target ('Untuk mengetahui ...' sesudah 'Untuk mengetahui
+    ...'), target adalah butir berikut dalam daftar yang sama (mis.
+    butir tujuan penelitian), BUKAN lanjutan kalimat. Tanpa konteks
+    atau pendahulu bukan kalimat isi -> None."""
+    seb = _v16_tetangga_nonblank(ctx, -1, maks=1)
+    if not seb:
+        return None
+    p = seb[-1]
+    if len(p) < 60:
+        return None
+    if _V16_RE_BUTIR_AWAL.match(p):
+        return None
+    if p.endswith(':'):
+        return None
+    huruf = [c for c in p if c.isalpha()]
+    if huruf and p == p.upper():
+        return None
+    if beda_awal:
+        pl = p.strip().lower()
+        ba = beda_awal.lower().strip()
+        if pl == ba or pl.startswith(ba + ' ') or pl.startswith(ba + ','):
+            return None
+    akhir = p.rstrip()
+    if footnote:
+        akhir = re.sub(r'\d{1,3}$', '', akhir)
+    if not akhir.endswith(_V16_AKHIR_KALIMAT):
+        return None
+    return p
+
+
+def _v16_r20_konektif_lanjutan(row, lab, ctx):
+    """Lanjutan kalimat isi: baris 'paragraf' yang diawali konektif
+    lanjutan (sedangkan/karena/yakni/yaitu/sebelumnya/menurut/
+    sebagai) dan didahului kalimat isi -> 'biasa': itu kalimat
+    lanjutan paragraf yang sama, bukan pembuka paragraf baru. 5/0 di
+    279 (W3:147, AK-3:183, AO-2:189, E3:214, C4:226). Daftar
+    konektif SEMPIT: 'dari'/'dalam'/'untuk' sengaja TIDAK masuk —
+    ketiganya merusak pembuka paragraf sejati (Z3:44, U3:83, J3:138,
+    AC2:171). TIDAK ada pagar kembaran di sini: kalimat 'Menurut
+    X ...' memang berurutan dalam satu alur tinjauan (asap fid=81
+    baris 273 lalu 275, GT 275='biasa') — pagar konektif-sama justru
+    membunuh perbaikan 275 yang dikonfirmasi GT. Tanpa konteks ->
+    fail-closed."""
+    if lab != 'paragraf':
+        return None
+    s = _v16_teks(row).strip()
+    if not s or s.endswith(':'):
+        return None
+    kata = s.split(None, 1)[0].lower().rstrip(',')
+    if kata not in _V16_KONEKTIF_LANJUTAN:
+        return None
+    if _v16_pendahulu_kalimat(ctx) is None:
+        return None
+    return 'biasa'
+
+
+def _v16_r21_repetisi_awal(row, lab, ctx):
+    """Pengulangan: 3 kata pertama baris 'paragraf' muncul verbatim
+    (tanpa huruf besar) DI DALAM kalimat isi pendahulu — BUKAN di
+    awal pendahulu — -> 'biasa': baris mengulang frasa dari dalam
+    paragraf sebelumnya (lancaran/restatement), bukan pembuka
+    paragraf baru. Pagar posisi: frasa yang muncul di AWAL
+    pendahulu adalah gema pembuka formulaik ('Penelitian yang
+    dilakukan oleh ...', 'Untuk mengetahui pengaruh ...') — baris
+    berikutnya yang diawali frasa sama adalah pembuka baru (butir
+    tujuan / entri tinjauan pustaka), BUKAN lanjutan; pagar ini
+    menahan 10 tembakan salah di asap fid=81 (baris 171, 173, 309,
+    315, 317, 321, 325, 333, 335, 337). Pagar panjang kata: salah
+    satu dari 3 kata harus >=6 huruf (frasa generik 'dalam
+    penelitian ini' tidak boleh menembak). 1/0 di 279 (D3:207:
+    'Terapresiasinya nilai tukar ...' muncul di tengah pendahulu,
+    posisi 191)."""
+    if lab != 'paragraf':
+        return None
+    s = _v16_teks(row).strip()
+    if not s or s.endswith(':'):
+        return None
+    w = s.split()
+    if len(w) < 3:
+        return None
+    if max(len(x.strip('.,;:')) for x in w[:3]) < 6:
+        return None
+    frasa = ' '.join(w[:3]).lower()
+    p = _v16_pendahulu_kalimat(ctx)
+    if p is None:
+        return None
+    pos = p.lower().find(frasa)
+    if pos <= 0:
+        return None
+    return 'biasa'
+
+
+def _v16_r22_untuk_tanpa_diatas(row, lab, ctx):
+    """'Untuk ...' (tujuan/langkah lanjutan) + pendahulu kalimat isi,
+    tanpa 'di atas'/'tersebut' di baris -> 'biasa'. 1/0 di 279
+    (S2:220). 'Untuk mewujudkan harapan tersebut di atas ...'
+    (J3:138, pembuka paragraf sejati) dikecualikan oleh pagar 'di
+    atas'/'tersebut'. Pagar kembaran: pendahulu yang diawali DUA kata
+    pertama yang sama ('Untuk mengetahui ...' sesudah 'Untuk
+    mengetahui ...') menandakan butir berikut dalam daftar tujuan
+    (asap fid=81 baris 171/173), bukan lanjutan."""
+    if lab != 'paragraf':
+        return None
+    s = _v16_teks(row).strip()
+    if not s.lower().startswith('untuk '):
+        return None
+    if s.endswith(':'):
+        return None
+    sl = s.lower()
+    if 'di atas' in sl or 'tersebut' in sl:
+        return None
+    # Pagar kembaran: pendahulu yang diawali DUA kata pertama yang
+    # sama ('Untuk mengetahui ...' sesudah 'Untuk mengetahui ...')
+    # adalah butir berikut dalam daftar tujuan, bukan lanjutan.
+    _dua = ' '.join(s.split()[:2])
+    if _v16_pendahulu_kalimat(ctx, beda_awal=_dua) is None:
+        return None
+    return 'biasa'
+
+
+def _v16_r23_temporal_tahun(row, lab, ctx):
+    """'Pada tahun/tanggal/saat/awalnya/masa/periode/bulan ...'
+    (lancaran waktu narasi) + pendahulu kalimat isi (angka catatan
+    kaki di ujung diabaikan) -> 'biasa'. 1/0 di 279 (AN-1:200;
+    pendahulu berakhir '.83' catatan kaki). TIDAK ada pagar
+    kembaran di sini: kalimat temporal narasi ('Pada tanggal 5 April
+    1989 ...' lalu 'Pada tahun 1989 ...') memang berurutan dalam
+    satu alur cerita — pagar 'Pada' justru membunuh satu-satunya
+    perbaikan (AN-1:200, pendahulu diawali 'Pada tanggal ...')."""
+    if lab != 'paragraf':
+        return None
+    s = _v16_teks(row).strip()
+    if not s or s.endswith(':'):
+        return None
+    if not _V16_RE_TEMPORAL.match(s):
+        return None
+    if _v16_pendahulu_kalimat(ctx, footnote=True) is None:
+        return None
+    return 'biasa'
+
+
+def _v16_r24_butir_tanya_kalimat(row, lab, ctx):
+    """PENGAMAN AGEN: butir bernomor pendek (<=60 kar) yang berupa
+    pertanyaan kalimat (sentence-case, bukan Title Case) -> 'biasa'.
+    Agen kedua salah mempromosi T3:73 ('2. What do I need?', conf
+    0,85) jadi 'subbab'; kembarannya T3:74 ('3. What Do I Need?',
+    Title Case) benar=subbab dan DIKECUALIKAN oleh pagar Title Case
+    (semua kata diawali huruf besar = bentuk judul). Tipis (n=1
+    lawan n=1) — pola hanya menembak butir tanya bernomor."""
+    if lab != 'subbab':
+        return None
+    s = _v16_teks(row).strip()
+    if not _V16_RE_BUTIR_TANYA.match(s):
+        return None
+    if not s.endswith('?'):
+        return None
+    if len(s) > 60:
+        return None
+    kata = [w.strip('?') for w in s.split()[1:] if w.strip('?')]
+    if not kata:
+        return None
+    if all(w[:1].isupper() for w in kata):
+        return None
+    return 'biasa'
+
+
+def _v16_r25_awalan_kapital_dua(row, lab, ctx):
+    """PENGAMAN AGEN: baris panjang (>=100 kar) yang diawali DUA kata
+    ALL-CAPS lalu kalimat isi -> 'biasa' (fragmen judul yang menempel
+    pada badan kalimat, bukan pembuka paragraf). Agen kedua salah
+    mempromosi AL-2:92 ('PEMBAHASAN MASALAH Pada bab ini dijelaskan
+    ...', conf 0,9) jadi 'paragraf'. Satu kata CAPS saja (akronim,
+    mis. 'DUHAM ...' AN-1:197, 'KUHAP ...' U3:85) dikecualikan.
+    1/0 di 279."""
+    if lab != 'paragraf':
+        return None
+    s = _v16_teks(row).strip()
+    if len(s) < 100:
+        return None
+    if not _V16_RE_AWALAN_KAPITAL_DUA.match(s):
+        return None
+    return 'biasa'
+
+
+def _v16_r26_dash_hyphen_kalimat(row, lab, ctx):
+    """PENGAMAN AGEN: butir strip HYPHEN ('- ') yang berupa kalimat
+    penuh (>=60 kar, berakhir tanda akhir) -> 'paragraf'. Agen kedua
+    salah mendemosi AP-3:268 ('- Tindakan, ...', conf 0,9) jadi
+    'biasa'. Hanya hyphen '-': bullet '•' (AC2:176, benar=biasa)
+    dan en-dash '–' (A4:244, benar=subbab, ditangani R8)
+    dikecualikan. 1/0 di 279."""
+    if lab != 'biasa':
+        return None
+    s = _v16_teks(row).strip()
+    if not _V16_RE_DASH_HYPHEN.match(s):
+        return None
+    if len(s) < 60:
+        return None
+    if not s.endswith(_V16_AKHIR_KALIMAT):
+        return None
+    return 'paragraf'
+
+
+def _v16_r27_penanda_halaman(row, lab, ctx):
+    """Penanda halaman ('Halaman 6') -> 'biasa': nomor halaman bukan
+    judul. 1/0 di 279 (AL-2:94; 'Halaman 5'/'Halaman 7' di tetangga
+    membuktikan pola berulang di naskah)."""
+    s = _v16_teks(row).strip()
+    if _V16_RE_HALAMAN.match(s):
+        return 'biasa'
+    return None
+
+
 # ── pengetatan v16 (pagar yang ditambahkan sesudah uji asap fid=81) ─────
 def _v16_r4_p(row, lab, ctx):
     """R4 + tiga pengecualian: (a) baris panjang >= 200 karakter (kalimat
@@ -1403,6 +1678,14 @@ _V16_ATURAN_P = [
     ('R17_romawi_kapital', "romawi I-XII + judul ALL-CAPS bukan judul bab baku -> subbab", _v16_bungkus('_v16_r17_romawi_kapital')),
     ('R18_pertanyaan_penelitian', "'Apakah ...?' berdiri sendiri satu blok -> paragraf", _v16_bungkus('_v16_r18_pertanyaan_penelitian')),
     ('R19_ayat_kolon_pendek', "mengandung 'ayat' + akhir ':' + pendek <=100 -> subbab", _v16_bungkus('_v16_r19_ayat_kolon_pendek')),
+    ('R20_konektif_lanjutan', "konektif lanjutan + pendahulu kalimat isi -> biasa", _v16_r20_konektif_lanjutan),
+    ('R21_repetisi_awal', "3 kata pertama mengulang pendahulu kalimat isi -> biasa", _v16_r21_repetisi_awal),
+    ('R22_untuk_tanpa_diatas', "'Untuk ...' tanpa 'di atas'/'tersebut' + pendahulu kalimat isi -> biasa", _v16_r22_untuk_tanpa_diatas),
+    ('R23_temporal_tahun', "'Pada tahun/tanggal/saat/...' + pendahulu kalimat isi (catatan kaki diabaikan) -> biasa", _v16_r23_temporal_tahun),
+    ('R24_butir_tanya_kalimat', "PENGAMAN AGEN: butir bernomor tanya sentence-case -> biasa", _v16_r24_butir_tanya_kalimat),
+    ('R25_awalan_kapital_dua', "PENGAMAN AGEN: 2 kata ALL-CAPS + kalimat isi panjang -> biasa", _v16_r25_awalan_kapital_dua),
+    ('R26_dash_hyphen_kalimat', "PENGAMAN AGEN: butir strip hyphen kalimat penuh -> paragraf", _v16_r26_dash_hyphen_kalimat),
+    ('R27_penanda_halaman', "penanda 'Halaman N' -> biasa", _v16_r27_penanda_halaman),
 ]
 
 
@@ -1423,6 +1706,12 @@ _V16_ATURAN_P = [
 #    kebab-an: demosi bab -> subbab). R18/R19 TIDAK masuk: 'Apakah'
 #    berlabel 'bab' tidak pernah terjadi, dan R19 promosi ke 'subbab'
 #    tetap fail-closed pada label 'bab' mentah.
+#    Aturan v18 TIDAK masuk: R20-R23 dan R25 mensyaratkan label
+#    'paragraf', R24 mensyaratkan 'subbab', R26 mensyaratkan 'biasa'
+#    — ketiganya tidak pernah kena label 'bab'. R27 (penanda halaman)
+#    tanpa syarat label, tapi pagar ini sengaja menahannya pada label
+#    'bab' mentah: demosi v6 di hilir (tanpa penanda BAB) yang
+#    memutuskannya, sama seperti R18/R19.
 _V16_BOLEH_DARI_BAB = frozenset({
     'R2_bab_adalah', 'R9_judul_bab_kapital', 'R10_judul_bab_baku',
     'R11_bab_ganda', 'R14_bab_kata_koma', 'R15_angka_saja',
@@ -1431,7 +1720,7 @@ _V16_BOLEH_DARI_BAB = frozenset({
 
 
 def _v16_terapkan(rows, label_awal, konteks=None):
-    """Terapkan 13 aturan perketat pada label_awal {(naskah, no): label}.
+    """Terapkan 27 aturan perketat (R1-R19 + R20-R27 v18) pada label_awal {(naskah, no): label}.
     konteks: dict {(naskah, no): {'hakim_status', 'baris_mentah',
     'idx_mentah'}} atau None (tanpa konteks -> ctx None per baris).
     Kembalikan (label_akhir, jejak) dengan jejak[(naskah, no)] = nama
@@ -1478,7 +1767,7 @@ def _v16_terapkan(rows, label_awal, konteks=None):
 
 
 def _v16_koreksi_petakan(baris, label, kand, demosi_v6=None):
-    """Adaptor v16 untuk `petakan()`: terapkan 13 aturan pada label Jev
+    """Adaptor v16 untuk `petakan()`: terapkan 27 aturan pada label Jev
     tiap baris kandidat. Konteks per baris: hakim_status=None (Hakim
     jalan belakangan, di Lapis 2), baris_mentah = seluruh baris susun,
     idx_mentah = indeks baris. Kembalikan (diubah, jejak) dengan diubah =
