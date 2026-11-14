@@ -1109,8 +1109,8 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v18)',
-        P8.RULE_VERSION == 'jev-peta-v18')
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v19)',
+        P8.RULE_VERSION == 'jev-peta-v19')
     # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
     #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
     #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
@@ -1191,8 +1191,8 @@ def main():
     #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
     #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
     #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
-    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v18)',
-        P8.RULE_VERSION == 'jev-peta-v18')
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v19)',
+        P8.RULE_VERSION == 'jev-peta-v19')
     baris_r23 = [
         'terbagi menjadi beberapa bab antara lain:',
         '1. BAB I PENDAHULUAN',
@@ -1224,11 +1224,11 @@ def main():
     #    gabungan, CHAPTER polos, judul Romawi tanpa kata BAB (berpagar
     #    profil); Lapis 2 pendapat_kedua() hanya untuk baris goyang
     #    (jawaban disuntik, nol Jev di sini); Lapis 3 antrean manusia.
-    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v18)',
-        P8.RULE_VERSION == 'jev-peta-v18')
+    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v19)',
+        P8.RULE_VERSION == 'jev-peta-v19')
     # --- 12f. v12 rantai 3 langkah: mode agen-kedua + pabrik agen kedua ---
-    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v18)',
-        P8.RULE_VERSION == 'jev-peta-v18')
+    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v19)',
+        P8.RULE_VERSION == 'jev-peta-v19')
     # --- 12a. profil_bentuk ---
     teks_romawi = ('I. PENDAHULUAN\nIsi pendahuluan yang cukup panjang dan menjelaskan latar belakang masalah penelitian ini.\n'
                    'II. TINJAUAN PUSTAKA\nIsi tinjauan pustaka yang cukup panjang dan menjelaskan teori yang dipakai dalam penelitian ini.\n'
@@ -1540,8 +1540,8 @@ def main():
     # --- 13a. v13 GATING HAKIM: agen kedua HANYA baris ditandai Hakim ---
     #    Pola GOYANG-PB yang sama seperti 12d (FakeSatpam): baris penanda
     #    goyang paragraf/biasa, label menang paragraf.
-    cek('v18-versi: RULE_VERSION jev-peta-v18',
-        P8.RULE_VERSION == 'jev-peta-v18', str(P8.RULE_VERSION))
+    cek('v19-versi: RULE_VERSION jev-peta-v19',
+        P8.RULE_VERSION == 'jev-peta-v19', str(P8.RULE_VERSION))
 
     def _teks_v13(penanda):
         return ('BAB I\nPENDAHULUAN\n'
@@ -2630,6 +2630,103 @@ def main():
     cek('v16-R10-zona: tanpa penanda BAB di atas -> tetap biasa',
         _o[('A', '2')] == 'biasa', str(_o))
 
+    # R28 (v19) penanda bab Arab: cermin R10, hanya penandanya Arab.
+    # Positif: 'Bab 5' telanjang + judul baku persis seperti AJ-1:277.
+    _mentah28 = ['Bab 5', 'Kesimpulan dan Saran',
+                 'Isi kesimpulan yang panjang dan menutup penelitian ini.']
+    _r = [_baris16('A', 2, 'Kesimpulan dan Saran', 'biasa')]
+    _k28 = {('A', '2'): {'hakim_status': None, 'baris_mentah': _mentah28,
+                         'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('A', '2'): 'biasa'}, konteks=_k28)
+    cek('v19-R28: baris pertama sesudah Bab 5 telanjang -> bab (jejak R28)',
+        _o[('A', '2')] == 'bab' and _j[('A', '2')] == 'R28_penanda_bab_arab',
+        str((_o, _j)))
+    # Varian: kapital 'BAB 12' + batas atas 12.
+    _mentah28b = ['BAB 12', 'Pendahuluan',
+                  'Isi pendahuluan yang panjang dan menjelaskan latar belakang.']
+    _r = [_baris16('A', 2, 'Pendahuluan', 'biasa')]
+    _k28b = {('A', '2'): {'hakim_status': None, 'baris_mentah': _mentah28b,
+                          'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('A', '2'): 'biasa'}, konteks=_k28b)
+    cek('v19-R28: BAB 12 kapital -> bab (jejak R28)',
+        _o[('A', '2')] == 'bab' and _j[('A', '2')] == 'R28_penanda_bab_arab',
+        str((_o, _j)))
+    # Varian: huruf kecil 'bab 1' + batas bawah 1.
+    _mentah28c = ['bab 1', 'Metodologi Penelitian',
+                  'Isi metodologi yang panjang dan menjelaskan metode penelitian.']
+    _r = [_baris16('A', 2, 'Metodologi Penelitian', 'biasa')]
+    _k28c = {('A', '2'): {'hakim_status': None, 'baris_mentah': _mentah28c,
+                          'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('A', '2'): 'biasa'}, konteks=_k28c)
+    cek('v19-R28: bab 1 huruf kecil -> bab (jejak R28)',
+        _o[('A', '2')] == 'bab' and _j[('A', '2')] == 'R28_penanda_bab_arab',
+        str((_o, _j)))
+    # Negatif: sebutan 'Bab 5' di tengah kalimat isi di atas -> bukan penanda.
+    _mentah28d = ['Bab 5 membahas hasil penelitian yang panjang dan rinci.',
+                  'Kesimpulan dan Saran',
+                  'Isi kesimpulan yang panjang dan menutup penelitian ini.']
+    _r = [_baris16('A', 2, 'Kesimpulan dan Saran', 'biasa')]
+    _k28d = {('A', '2'): {'hakim_status': None, 'baris_mentah': _mentah28d,
+                          'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('A', '2'): 'biasa'}, konteks=_k28d)
+    cek('v19-R28-negatif: sebutan Bab 5 di tengah kalimat -> tetap biasa',
+        _o[('A', '2')] == 'biasa' and _j[('A', '2')] is None, str((_o, _j)))
+    # Negatif: 'Bab 5:' bertitik dua (sistematika) di atas -> bukan penanda.
+    _mentah28e = ['Bab 5: Kesimpulan dan Saran',
+                  'Kesimpulan dan Saran',
+                  'Isi kesimpulan yang panjang dan menutup penelitian ini.']
+    _r = [_baris16('A', 2, 'Kesimpulan dan Saran', 'biasa')]
+    _k28e = {('A', '2'): {'hakim_status': None, 'baris_mentah': _mentah28e,
+                          'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('A', '2'): 'biasa'}, konteks=_k28e)
+    cek('v19-R28-negatif: Bab 5 bertitik dua di atas -> tetap biasa',
+        _o[('A', '2')] == 'biasa' and _j[('A', '2')] is None, str((_o, _j)))
+    # Negatif: 'Bab 13' di luar 1-12 di atas -> bukan penanda.
+    _mentah28f = ['Bab 13', 'Kesimpulan dan Saran',
+                  'Isi kesimpulan yang panjang dan menutup penelitian ini.']
+    _r = [_baris16('A', 2, 'Kesimpulan dan Saran', 'biasa')]
+    _k28f = {('A', '2'): {'hakim_status': None, 'baris_mentah': _mentah28f,
+                          'idx_mentah': 1}}
+    _o, _j = _jalan16(_r, {('A', '2'): 'biasa'}, konteks=_k28f)
+    cek('v19-R28-negatif: Bab 13 di luar 1-12 -> tetap biasa',
+        _o[('A', '2')] == 'biasa' and _j[('A', '2')] is None, str((_o, _j)))
+    # Negatif: baris KEDUA sesudah penanda (judul baku lain) -> tetap biasa.
+    _mentah28g = ['Bab 5', 'Kesimpulan dan Saran', 'Landasan Teori',
+                  'Isi landasan teori yang panjang dan menjelaskan teori.']
+    _r = [_baris16('A', 3, 'Landasan Teori', 'biasa')]
+    _k28g = {('A', '3'): {'hakim_status': None, 'baris_mentah': _mentah28g,
+                          'idx_mentah': 2}}
+    _o, _j = _jalan16(_r, {('A', '3'): 'biasa'}, konteks=_k28g)
+    cek('v19-R28-negatif: baris kedua sesudah Bab 5 -> tetap biasa',
+        _o[('A', '3')] == 'biasa' and _j[('A', '3')] is None, str((_o, _j)))
+    # Pagar: label subbab -> jangan tembak (fungsi langsung).
+    _row28 = _baris16('A', 2, 'Kesimpulan dan Saran', 'subbab')
+    cek('v19-R28-pagar: label subbab -> None (fungsi langsung)',
+        P._v19_r28_penanda_bab_arab(_row28, 'subbab', None) is None)
+    cek('v19-R28-fungsi: judul baku tanpa konteks -> bab (fungsi langsung)',
+        P._v19_r28_penanda_bab_arab(_row28, 'biasa', None) == 'bab')
+    # Regex batas: 1 dan 12 kena; 0, 13, 05, titik dua, judul sebaris tidak.
+    _re28 = P._V19_RE_BAB_ARAB_TELANJANG
+    cek('v19-R28-regex: batas 1-12 kena, 0/13/05/titik-dua/judul tidak kena',
+        bool(_re28.match('Bab 1')) and bool(_re28.match('Bab 12'))
+        and bool(_re28.match('BAB 5')) and bool(_re28.match('bab  5'))
+        and not _re28.match('Bab 0') and not _re28.match('Bab 13')
+        and not _re28.match('Bab 05') and not _re28.match('Bab 5:')
+        and not _re28.match('Bab 5 Kesimpulan')
+        and not _re28.match('BAB V'))
+    # Urutan: penanda Romawi tetap diklaim R10, bukan R28.
+    _r = [_baris16('A', 2, 'TINJAUAN PUSTAKA', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '2'): 'biasa'}, konteks=_k10)
+    cek('v19-R28-urutan: penanda Romawi -> jejak R10, bukan R28',
+        _o[('A', '2')] == 'bab' and _j[('A', '2')] == 'R10_judul_bab_baku',
+        str((_o, _j)))
+    # Tetangga berbahaya (AJ-1:272): salinan sistematika 'Bab 2: ...' tetap biasa.
+    _r = [_baris16('AJ-1', 272, 'Bab 2: Tinjauan Kepustakaan', 'biasa')]
+    _o, _j = _jalan16(_r, {('AJ-1', '272'): 'biasa'})
+    cek('v19-R28-sistematika: Bab 2: Tinjauan Kepustakaan -> tetap biasa',
+        _o[('AJ-1', '272')] == 'biasa' and _j[('AJ-1', '272')] is None,
+        str((_o, _j)))
+
     # R11: 'BAB X' telanjang ganda: ke-1 biasa, ke-2+ bab; tunggal tetap.
     _r = [_baris16('H', 69, 'BAB V', 'bab'), _baris16('H', 70, 'BAB V', 'bab')]
     _o, _j = _jalan16(_r, {('H', '69'): 'bab', ('H', '70'): 'bab'})
@@ -2712,8 +2809,8 @@ def main():
         == 'R7_judul_pendek',
         str((_peta16['label'].get(_idx16), _peta16.get('koreksi_v16'),
              _peta16.get('koreksi_v16_jejak'))))
-    cek('v18-integrasi: versi aturan v18 tercatat di peta',
-        _peta16.get('versi_aturan') == 'jev-peta-v18',
+    cek('v19-integrasi: versi aturan v19 tercatat di peta',
+        _peta16.get('versi_aturan') == 'jev-peta-v19',
         str(_peta16.get('versi_aturan')))
     _rekam16 = []
 
@@ -2791,8 +2888,8 @@ def main():
         _peta17b['label'].get(_idx_fix) == 'subbab'
         and _idx_fix not in (_peta17b.get('koreksi_v17') or []),
         str((_peta17b['label'].get(_idx_fix), _peta17b.get('koreksi_v17'))))
-    cek('v18-versi: versi aturan v18 tercatat di peta',
-        _peta17b.get('versi_aturan') == 'jev-peta-v18',
+    cek('v19-versi: versi aturan v19 tercatat di peta',
+        _peta17b.get('versi_aturan') == 'jev-peta-v19',
         str(_peta17b.get('versi_aturan')))
 
     # Pagar v17 (regresi v6.4): baris yang v6 putuskan BUKAN judul bab
