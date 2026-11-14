@@ -47,7 +47,7 @@ log = logging.getLogger(__name__)
 #    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
 #    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
 #    bentuknya memang begitu (6 entri: Y1, Y2, AD1, AD2, AD3, AG1).
-RULE_VERSION = 'jev-peta-v16'  # v16 (14 Nov 2026): 13 aturan deterministik perketat (R1..R13) sesudah demosi v14, sebelum Hakim/agen kedua; cache lama kedaluwarsa otomatis. v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi, kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
+RULE_VERSION = 'jev-peta-v17'  # v17 (14 Nov 2026): aturan v16 diterapkan ULANG sesudah Lapis 2 (temuan uji live gelombang 1: agen kedua menimpa 2 promosi R5); penerapan pertama sebelum Hakim/agen kedua tetap seperti v16. v16 (14 Nov 2026): 13 aturan deterministik perketat (R1..R13) sesudah demosi v14, sebelum Hakim/agen kedua; cache lama kedaluwarsa otomatis. v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi, kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
@@ -912,6 +912,43 @@ _V16_RE_ROMAWI_BUTIR = re.compile(r'^[IVXLC]+\.\s')
 _V16_RE_BUTIR_ANGKA = re.compile(r'^\(\d+\)\s|^\d+\.\s')
 _V16_RE_KOPULA = re.compile(r'\b(?:adalah|merupakan|yaitu|ialah)\b', re.I)
 _V16_RE_SITASI = re.compile(r'\(\d{4}\)')
+# ── pola aturan baru v17 (bedah 35 baris salah, 14 Nov 2026) ────────────
+#    R14: 'Bab Kedua/Ketiga/...,' = uraian sistematika (saudara R2).
+#    'Bab Pertama,' SENGAJA dikecualikan: baris pertama blok sistematika
+#    adalah pembuka paragraf (GT=paragraf, AK-3:177), sisanya lanjutan
+#    (GT=biasa, AK-3:178-182).
+_V16_KATA_BAB_KOMA = (r'(kedua|ketiga|keempat|kelima|keenam|ketujuh|'
+                      r'kedelapan|kesembilan|kesepuluh)')
+_V16_RE_BAB_KATA_KOMA = re.compile(
+    r'(?i)^bab\s+' + _V16_KATA_BAB_KOMA + r'\s*,')
+#    R15: baris hanya angka/simbol. Bentuk nomor bertingkat telanjang
+#    ('1.1.', '3.1.') dikecualikan: itu penanda subbab (GT=subbab di B4,
+#    GT=biasa di H1 — konteks yang putuskan, bukan aturan ini).
+_V16_RE_ANGKA_SAJA = re.compile(r'^[\d\s\.\-\(\)\u2013\u2014,:;/%]+$')
+_V16_RE_NOMOR_BERTINGKAT_TELANJANG = re.compile(
+    r'^\d{1,2}(?:\.\d{1,2})+\.?$')
+#    R16: keterangan gambar/tabel ('Grafik 2.1 ...', 'Tabel 15. ...').
+#    Nomor lengkap dengan titik ('4.1', '15.') supaya sisa teks
+#    sesudah nomor bisa diperiksa kata pertamanya.
+_V16_RE_CAPTION = re.compile(
+    r'(?i)^(grafik|tabel|gambar|figure|table)\s+\d+(?:\.\d+)*\.?')
+#    Verba kalimat yang menandai KALIMAT ISI tentang gambar/tabel
+#    ('Tabel 4.1 menunjukkan bahwa ...'), bukan keterangan.
+_V16_VERBA_KALIMAT = frozenset({
+    'menunjukkan', 'memperlihatkan', 'menjelaskan', 'menggambarkan',
+    'menyajikan', 'menampilkan', 'memuat', 'berisi', 'terlihat',
+    'tampak', 'mengindikasikan', 'membuktikan', 'menyimpulkan',
+    'menyatakan', 'menginformasikan', 'dapat', 'terdapat',
+})
+#    R17: nomor romawi I-XII + titik (daftar ketat — 'C.' huruf butir
+#    BUKAN romawi, jangan kena). Judul baku dikecualikan (itu bab asli).
+_V16_ROMAWI = ('I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX',
+               'X', 'XI', 'XII')
+_V16_RE_ROMAWI = re.compile(
+    r'^(XII|XI|X|VIII|VII|VI|IX|IV|V|III|II|I)\.\s')
+#    R18: pertanyaan penelitian 'Apakah ...?' (berdiri sendiri satu blok
+#    = paragraf; catatan Boss di GT fid=81).
+_V16_RE_APAKAH = re.compile(r'(?i)^apakah\b.*\?\s*$')
 _V16_JUDUL_BAB_BAKU = {
     'pendahuluan', 'tinjauan pustaka', 'landasan teori',
     'metodologi penelitian', 'hasil dan pembahasan',
@@ -1124,6 +1161,107 @@ def _v16_r13_butir_kurung_angka(row, lab):
     return None
 
 
+# ── aturan baru v17 (bedah 35 baris salah simulasi v17, 14 Nov 2026) ───
+#    Digali dari 35 baris yang masih salah sesudah v17 (244/279). Tiap
+#    aturan: pola berulang (>=2 baris di 279) + tandingan diperiksa di
+#    seluruh 279. Pola sekali muncul (mis. 'Halaman 6', fragmen pendek
+#    'Sifat tanah', kalimat isi paragraf-vs-biasa) TIDAK dibuat aturan:
+#    itu wilayah antrean manusia. R18 bukti dari asap fid=81 (0 baris di
+#    279, +2 GT di asap saat agen jawab 'biasa' — log deploy v16).
+def _v16_r14_bab_kata_koma(row, lab):
+    """Saudara R2: 'Bab Ketiga, metode penelitian, ...' = uraian
+    sistematika penulisan, BUKAN judul bab -> biasa. 'Bab Pertama,'
+    dikecualikan (pembuka blok sistematika, GT=paragraf)."""
+    if _V16_RE_BAB_KATA_KOMA.match(_v16_teks(row)):
+        return 'biasa'
+    return None
+
+
+def _v16_r15_angka_saja(row, lab):
+    """Baris yang HANYA berisi angka/simbol (nomor persamaan '(3.10)',
+    rentang '15.52 - 46.13', angka polos '228630') -> biasa. Nomor
+    bertingkat telanjang ('1.1.', '3.1.') dikecualikan: itu penanda
+    subbab/biasa yang hanya konteks bisa putuskan."""
+    s = _v16_teks(row).strip()
+    if not s or not any(c.isdigit() for c in s):
+        return None
+    if not _V16_RE_ANGKA_SAJA.match(s):
+        return None
+    if _V16_RE_NOMOR_BERTINGKAT_TELANJANG.match(s):
+        return None
+    return 'biasa'
+
+
+def _v16_r16_caption(row, lab):
+    """Keterangan gambar/tabel ('Grafik 2.1 Efek ...', 'Tabel 15. Hasil
+    ...') -> biasa. Keterangan adalah frasa nomina (judul), BUKAN
+    kalimat isi. Dua pagar: (a) bila baris mengandung 'bahwa', itu
+    kalimat isi ('Tabel 4.1 menunjukkan bahwa ...'); (b) bila kata
+    pertama sesudah nomor adalah verba kalimat (menunjukkan,
+    memperlihatkan, ...), itu kalimat isi. Tanpa pagar ini R16 salah
+    menembak 6 kalimat isi pembuka paragraf di asap fid=81 (baris 18,
+    641, 663, 673, 683, 695 — semuanya didahului baris kosong)."""
+    s = _v16_teks(row)
+    m = _V16_RE_CAPTION.match(s)
+    if not m:
+        return None
+    if re.search(r'\bbahwa\b', s, re.I):
+        return None
+    sisa = s[m.end():].strip()
+    kata = sisa.split(None, 1)[0].lower().rstrip('.,;:') if sisa else ''
+    if kata in _V16_VERBA_KALIMAT:
+        return None
+    return 'biasa'
+
+
+def _v16_r17_romawi_kapital(row, lab):
+    """Nomor romawi (I-XII) + titik + judul ALL-CAPS yang BUKAN judul
+    bab baku ('IV. KOMISI TRANSPORTASI ...') -> subbab. Bab asli
+    bernomor romawi memakai judul baku ('II. TINJAUAN PUSTAKA') dan
+    dikecualikan. R9 sudah mengecualikan baris romawi dari promosi bab,
+    jadi aturan ini tidak bertabrakan dengannya."""
+    s = _v16_teks(row)
+    m = _V16_RE_ROMAWI.match(s)
+    if not m:
+        return None
+    judul = s[m.end():].strip().lower().rstrip('.')
+    if not judul or judul in _V16_JUDUL_BAB_BAKU:
+        return None
+    huruf = [c for c in s if c.isalpha()]
+    if not huruf or s != s.upper():
+        return None
+    return 'subbab'
+
+
+def _v16_r18_pertanyaan_penelitian(row, lab):
+    """Pertanyaan penelitian 'Apakah ...?' yang berdiri sendiri satu
+    blok -> paragraf (catatan Boss di GT fid=81: baris 159/163).
+    Agen kedua salah menjawab 'biasa' (log deploy v16, conf 0,9);
+    penerapan ulang v17 memulihkannya. Risiko sisa (dicatat): bila
+    pertanyaan itu baris lanjutan paragraf (bukan berdiri sendiri),
+    aturan ini salah promosi — tidak ada kasusnya di data (0 baris
+    'Apakah' di 279, 0 di latih 254)."""
+    if _V16_RE_APAKAH.match(_v16_teks(row).strip()):
+        return 'paragraf'
+    return None
+
+
+def _v16_r19_ayat_kolon_pendek(row, lab):
+    """Baris PENDEK (<=100 karakter) yang mengandung 'ayat' dan berakhir
+    ':' ('Landasan Syariah ... ayat 11 :') -> subbab: itu judul pengantar
+    kutipan, bukan kalimat isi. Kalimat isi panjang yang berakhir
+    'ayat (N) :' (U3:85, 193 karakter) dikecualikan oleh batas panjang
+    dan tetap paragraf (R4 sengaja mengecualikan semua 'ayat')."""
+    s = _v16_teks(row)
+    if 'ayat' not in s.lower():
+        return None
+    if not s.rstrip().endswith(':'):
+        return None
+    if len(s) > 100:
+        return None
+    return 'subbab'
+
+
 # ── pengetatan v16 (pagar yang ditambahkan sesudah uji asap fid=81) ─────
 def _v16_r4_p(row, lab, ctx):
     """R4 + tiga pengecualian: (a) baris panjang >= 200 karakter (kalimat
@@ -1259,6 +1397,12 @@ _V16_ATURAN_P = [
     ('R11_bab_ganda', "'BAB X' telanjang kemunculan ke-1 -> biasa, ke-2+ -> bab", None),  # ditangani khusus
     ('R12_baris_sangat_panjang', "panjang >=700 + kecualikan berisi '|', rumus, Hakim-sepakat", _v16_r12_p),
     ('R13_butir_kurung_angka', "butir '(N)' pendek <=40 diakhiri titik -> biasa", _v16_bungkus('_v16_r13_butir_kurung_angka')),
+    ('R14_bab_kata_koma', "'Bab Ketiga, ...' (bukan Pertama) uraian sistematika -> biasa", _v16_bungkus('_v16_r14_bab_kata_koma')),
+    ('R15_angka_saja', "baris hanya angka/simbol, bukan nomor bertingkat telanjang -> biasa", _v16_bungkus('_v16_r15_angka_saja')),
+    ('R16_caption', "keterangan 'Grafik/Tabel/Gambar N <judul>' -> biasa; BUKAN kalimat isi ('menunjukkan bahwa ...')", _v16_bungkus('_v16_r16_caption')),
+    ('R17_romawi_kapital', "romawi I-XII + judul ALL-CAPS bukan judul bab baku -> subbab", _v16_bungkus('_v16_r17_romawi_kapital')),
+    ('R18_pertanyaan_penelitian', "'Apakah ...?' berdiri sendiri satu blok -> paragraf", _v16_bungkus('_v16_r18_pertanyaan_penelitian')),
+    ('R19_ayat_kolon_pendek', "mengandung 'ayat' + akhir ':' + pendek <=100 -> subbab", _v16_bungkus('_v16_r19_ayat_kolon_pendek')),
 ]
 
 
@@ -1273,9 +1417,16 @@ _V16_ATURAN_P = [
 #    aturan yang mengurus kebab-an yang boleh menyentuh label 'bab':
 #    R2 (sistematika -> biasa), R9/R10 (-> bab), R11 (ganda). R1 tidak
 #    mungkin kena di sini karena mensyaratkan label_v15 None.
+#    Aturan baru v17 yang masuk daftar ini mengikuti logika yang sama:
+#    R14 (sistematika, saudara R2), R15 (angka saja — bukan judul),
+#    R16 (keterangan — bukan judul), R17 (romawi kapital — soal
+#    kebab-an: demosi bab -> subbab). R18/R19 TIDAK masuk: 'Apakah'
+#    berlabel 'bab' tidak pernah terjadi, dan R19 promosi ke 'subbab'
+#    tetap fail-closed pada label 'bab' mentah.
 _V16_BOLEH_DARI_BAB = frozenset({
     'R2_bab_adalah', 'R9_judul_bab_kapital', 'R10_judul_bab_baku',
-    'R11_bab_ganda',
+    'R11_bab_ganda', 'R14_bab_kata_koma', 'R15_angka_saja',
+    'R16_caption', 'R17_romawi_kapital',
 })
 
 
@@ -1326,13 +1477,21 @@ def _v16_terapkan(rows, label_awal, konteks=None):
     return out, jejak
 
 
-def _v16_koreksi_petakan(baris, label, kand):
+def _v16_koreksi_petakan(baris, label, kand, demosi_v6=None):
     """Adaptor v16 untuk `petakan()`: terapkan 13 aturan pada label Jev
     tiap baris kandidat. Konteks per baris: hakim_status=None (Hakim
     jalan belakangan, di Lapis 2), baris_mentah = seluruh baris susun,
     idx_mentah = indeks baris. Kembalikan (diubah, jejak) dengan diubah =
     daftar indeks baris yang labelnya berubah, jejak = {idx: nama aturan}
-    untuk baris yang berubah. Mengubah dict `label` di tempat."""
+    untuk baris yang berubah. Mengubah dict `label` di tempat.
+    demosi_v6 (opsional, hanya dipakai penerapan ulang v17): himpunan
+    indeks baris yang v6 putuskan BUKAN judul bab (bab_demosi +
+    bab_ganda). Pada baris itu, promosi ke 'subbab' TIDAK diterapkan:
+    vonis struktural v6 ("tanpa penanda BAB = bukan judul bab") tidak
+    boleh dibatalkan heuristik judul pendek R5/R6/R7/R8. Promosi ke
+    'bab' (R9/R10/R11, bukti kuat: huruf BESAR, judul baku, penanda
+    BAB telanjang) dan demosi ke 'biasa'/'paragraf' (R2/R3/R4/R12/R13)
+    tetap jalan. Tanpa demosi_v6, perilaku sama seperti v16."""
     rows = [{'naskah': '', 'no': str(i), 'teks_baris': baris[i],
              'label_v15': label.get(i)} for i, _t in kand]
     label_awal = {('', str(i)): label.get(i) for i, _t in kand}
@@ -1343,6 +1502,8 @@ def _v16_koreksi_petakan(baris, label, kand):
     for i, _t in kand:
         baru = akhir[('', str(i))]
         if baru != label.get(i):
+            if demosi_v6 and i in demosi_v6 and baru == 'subbab':
+                continue  # pagar v17: vonis demosi v6 berdiri
             label[i] = baru
             diubah.append(i)
             jejak_ubah[i] = jejak[('', str(i))]
@@ -2765,6 +2926,27 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
     for i in bab_kode:
         asal[i] = 'kode'
 
+    # ── v17: TERAPKAN ULANG ATURAN v16 SESUDAH LAPIS 2 (14 Nov 2026) ────
+    #    Temuan uji live gelombang 1: agen kedua (Lapis 2, conf 0,95)
+    #    menimpa 2 promosi R5 (A4:240, C4:231 — berakhir 'paragraf' dan
+    #    tetap salah, bukan 'subbab' seperti prediksi offline). Ukur
+    #    offline 241/279 menerapkan aturan pada label v15 AKHIR (demosi
+    #    v6 sudah jalan), jadi penerapan ulang di sini memakai label
+    #    AKHIR yang sama: sesudah SEMUA koreksi deterministik pasca-Lapis
+    #    2 (ATURAN 2, SPSS, ATURAN 5, v6 batas, v6 bab deterministik) —
+    #    bila jalan sebelum ATURAN 5, promosi R5 (huruf kecil) langsung
+    #    didemosi lagi ke 'biasa'. Adaptor, konteks (hakim_status=None),
+    #    dan pagar label 'bab' SAMA dengan penerapan pertama; tujuannya
+    #    hanya mengembalikan promosi aturan yang ditimpa agen kedua.
+    #    Jev, Hakim, dan agen kedua tidak diubah.
+    #    Pagar v17: baris yang v6 putuskan BUKAN judul bab (bab_demosi
+    #    + bab_ganda) TIDAK boleh dipromosi lagi ke 'subbab' oleh
+    #    heuristik judul pendek — vonis struktural v6 berdiri (tes v6.4:
+    #    'Baris JEV-BAB tanpa titik akhir' tetap 'biasa'). Promosi ke
+    #    'bab' (R9/R10/R11, bukti kuat) dan demosi tetap jalan.
+    _v17_diubah, _v17_jejak = _v16_koreksi_petakan(
+        baris, label, kand, demosi_v6=set(bab_demosi) | set(bab_ganda))
+
     # ── JEV MATI TOTAL: semua gelombang gagal ⇒ pemanggil WAJIB fallback
     #    (dulu: semua label 'biasa' tanpa jejak ⇒ hakim/pemutus jalur tak
     #    bisa bedakan "peta memang tanpa judul" vs "Jev gagal").
@@ -2776,6 +2958,8 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
             'koreksi_kecil': koreksi_kecil,
             'koreksi_v16': _v16_diubah,
             'koreksi_v16_jejak': {str(i): r for i, r in _v16_jejak.items()},
+            'koreksi_v17': _v17_diubah,
+            'koreksi_v17_jejak': {str(i): r for i, r in _v17_jejak.items()},
             'sistematika': sorted(sistematika), 'asal': asal, 'boleh_dipakai_fitur': boleh,
             'gabung': d['gabung'], 'buang': d['buang'], 'waktu': waktu, 'gagal': gagal,
             # ── v4: `waktu` HANYA gelombang klasifikasi. Terukur live

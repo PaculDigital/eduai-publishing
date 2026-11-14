@@ -1109,8 +1109,8 @@ def main():
         and _jp8('45') is False
         and _jp8('Manfaat praktis dalam penelitian ini adalah') is False)
     P8 = _muat_peta3()
-    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v16)',
-        P8.RULE_VERSION == 'jev-peta-v16')
+    cek('v8-aturan: RULE_VERSION sudah naik dari v8 (kini v17)',
+        P8.RULE_VERSION == 'jev-peta-v17')
     # ── 10. v9-aturan: SKIP B-DASH + SKIP JUDUL BERNOMOR 1 TINGKAT ──────
     #    Terukur live 1.14 (11 Nov 2026, run opt3 tersimpan):
     #    R2-1: Jev gabung B-dash hanya 22-26% (p-med 0,10-0,15), semua
@@ -1191,8 +1191,8 @@ def main():
     #    melindungi mereka (demosi 0 kali jalan di 18 run tersimpan).
     #    Perbaikan: demosi TIDAK lagi melewati sistematika; salinan judul
     #    asli tetap aman karena COCOK _POLA_BAB_NOMOR.
-    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v16)',
-        P8.RULE_VERSION == 'jev-peta-v16')
+    cek('v10-aturan: RULE_VERSION naik dari v9 (kini v17)',
+        P8.RULE_VERSION == 'jev-peta-v17')
     baris_r23 = [
         'terbagi menjadi beberapa bab antara lain:',
         '1. BAB I PENDAHULUAN',
@@ -1224,11 +1224,11 @@ def main():
     #    gabungan, CHAPTER polos, judul Romawi tanpa kata BAB (berpagar
     #    profil); Lapis 2 pendapat_kedua() hanya untuk baris goyang
     #    (jawaban disuntik, nol Jev di sini); Lapis 3 antrean manusia.
-    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v16)',
-        P8.RULE_VERSION == 'jev-peta-v16')
+    cek('v11-aturan: RULE_VERSION naik dari v10 (kini v17)',
+        P8.RULE_VERSION == 'jev-peta-v17')
     # --- 12f. v12 rantai 3 langkah: mode agen-kedua + pabrik agen kedua ---
-    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v16)',
-        P8.RULE_VERSION == 'jev-peta-v16')
+    cek('v12-aturan: RULE_VERSION naik dari v11 (kini v17)',
+        P8.RULE_VERSION == 'jev-peta-v17')
     # --- 12a. profil_bentuk ---
     teks_romawi = ('I. PENDAHULUAN\nIsi pendahuluan yang cukup panjang dan menjelaskan latar belakang masalah penelitian ini.\n'
                    'II. TINJAUAN PUSTAKA\nIsi tinjauan pustaka yang cukup panjang dan menjelaskan teori yang dipakai dalam penelitian ini.\n'
@@ -1540,8 +1540,8 @@ def main():
     # --- 13a. v13 GATING HAKIM: agen kedua HANYA baris ditandai Hakim ---
     #    Pola GOYANG-PB yang sama seperti 12d (FakeSatpam): baris penanda
     #    goyang paragraf/biasa, label menang paragraf.
-    cek('v16-versi: RULE_VERSION jev-peta-v16',
-        P8.RULE_VERSION == 'jev-peta-v16', str(P8.RULE_VERSION))
+    cek('v17-versi: RULE_VERSION jev-peta-v17',
+        P8.RULE_VERSION == 'jev-peta-v17', str(P8.RULE_VERSION))
 
     def _teks_v13(penanda):
         return ('BAB I\nPENDAHULUAN\n'
@@ -2712,8 +2712,8 @@ def main():
         == 'R7_judul_pendek',
         str((_peta16['label'].get(_idx16), _peta16.get('koreksi_v16'),
              _peta16.get('koreksi_v16_jejak'))))
-    cek('v16-integrasi: versi aturan v16 tercatat di peta',
-        _peta16.get('versi_aturan') == 'jev-peta-v16',
+    cek('v17-integrasi: versi aturan v17 tercatat di peta',
+        _peta16.get('versi_aturan') == 'jev-peta-v17',
         str(_peta16.get('versi_aturan')))
     _rekam16 = []
 
@@ -2730,6 +2730,218 @@ def main():
     cek('v16-urutan: agen kedua melihat label Jev sesudah v16 (subbab)',
         bool(_jejak16) and _jejak16[0].get('label_jev') == 'subbab',
         str(_peta16b.get('pendapat_kedua_jawaban')))
+
+    # ── v17: TERAPKAN ULANG ATURAN v16 SESUDAH LAPIS 2 (14 Nov 2026) ────
+    #    Temuan uji live gelombang 1: agen kedua menimpa 2 promosi R5
+    #    (A4:240, C4:231). Di sini mekanisme yang sama direproduksi
+    #    offline: baris R5 dipromosi v16 jadi 'subbab', agen kedua
+    #    membalikkannya (conf 0,95), lalu penerapan ulang v17 di AKHIR
+    #    (sesudah ATURAN 5, v6 batas, v6 bab) mengembalikannya ke
+    #    'subbab' dan mencatatnya di koreksi_v17. Baris kedua membuktikan
+    #    penerapan ulang TIDAK menyentuh perbaikan agen kedua yang benar
+    #    dan tidak kena aturan. FakeSatpam melabel semua baris 'paragraf',
+    #    jadi agen kedua membalik R5 ke 'biasa' (bukan 'paragraf' seperti
+    #    live — suara Jev-nya 'paragraf', bukan 'subbab'); mekanismenya
+    #    sama: putusan agen kedua menimpa promosi aturan.
+    _teks_v17 = (
+        'BAB I\nPENDAHULUAN\n'
+        '1.1 Latar Belakang\n'
+        'dengan PT Shafira sebagai mitra\n'
+        'Hasil penelitian menunjukkan pengaruh yang signifikan terhadap kinerja bisnis\n'
+        'Isi paragraf yang panjang dan tidak terbelah karena sudah panjang sekali dan menjelaskan konteks.\n'
+    )
+    FakeKonversi.mode = 'normal'
+    FAKE_SATPAM.rendah = set()
+    P8._CACHE_PETA.clear()
+    _peta17 = P8.petakan_dari_teks(_teks_v17, putaran=1)
+    _idx_r5 = next(i for i, b in enumerate(_peta17['baris'])
+                   if 'dengan PT Shafira' in b)
+    _idx_fix = next(i for i, b in enumerate(_peta17['baris'])
+                    if 'Hasil penelitian menunjukkan' in b)
+    cek('v17-dasar: tanpa agen kedua, R5 sudah promosi ke subbab',
+        _peta17['label'].get(_idx_r5) == 'subbab'
+        and _idx_r5 in (_peta17.get('koreksi_v16') or []),
+        str((_peta17['label'].get(_idx_r5), _peta17.get('koreksi_v16'))))
+
+    def _fn17(i, t, s, p, k=None):
+        if i == _idx_r5:
+            return {'label': 'biasa', 'confidence': 0.95}
+        if i == _idx_fix:
+            return {'label': 'subbab', 'confidence': 0.9}
+        return {'label': s[0] if s else 'biasa', 'confidence': 0.9}
+
+    P8._CACHE_PETA.clear()
+    _peta17b = P8.petakan_dari_teks(
+        _teks_v17, putaran=1, pendapat_kedua_fn=_fn17,
+        hakim_tandai_fn=lambda peta: {_idx_r5, _idx_fix})
+    _balik17 = [b for b in _peta17b.get('pendapat_kedua_berbalik', [])
+                if b[0] == _idx_r5]
+    cek('v17-balik: agen kedua memang menimpa promosi R5 di Lapis 2',
+        bool(_balik17) and _balik17[0][1] == 'subbab'
+        and _balik17[0][2] == 'biasa',
+        str(_peta17b.get('pendapat_kedua_berbalik')))
+    cek('v17-pulih: penerapan ulang mengembalikan R5 ke subbab',
+        _peta17b['label'].get(_idx_r5) == 'subbab'
+        and _idx_r5 in (_peta17b.get('koreksi_v17') or [])
+        and (_peta17b.get('koreksi_v17_jejak') or {}).get(str(_idx_r5))
+        == 'R5_lanjutan_judul_kecil',
+        str((_peta17b['label'].get(_idx_r5), _peta17b.get('koreksi_v17'),
+             _peta17b.get('koreksi_v17_jejak'))))
+    cek('v17-jaga: perbaikan agen kedua yang benar tetap subbab',
+        _peta17b['label'].get(_idx_fix) == 'subbab'
+        and _idx_fix not in (_peta17b.get('koreksi_v17') or []),
+        str((_peta17b['label'].get(_idx_fix), _peta17b.get('koreksi_v17'))))
+    cek('v17-versi: versi aturan v17 tercatat di peta',
+        _peta17b.get('versi_aturan') == 'jev-peta-v17',
+        str(_peta17b.get('versi_aturan')))
+
+    # Pagar v17 (regresi v6.4): baris yang v6 putuskan BUKAN judul bab
+    #   tidak boleh dipromosi lagi ke 'subbab' oleh penerapan ulang.
+    #   'Baris contoh tanpa titik akhir' kena R7 (judul pendek) — tanpa
+    #   pagar ia jadi 'subbab' (itulah regresi v6.4), dengan pagar ia
+    #   tetap 'biasa'. Promosi ke 'bab' (R9) TIDAK kena pagar.
+    _baris_g17 = ['BAB I', 'PENDAHULUAN', 'Baris contoh tanpa titik akhir',
+                  'TINJAUAN PUSTAKA TENTANG PEMASARAN DIGITAL',
+                  'Isi paragraf yang panjang dan menjelaskan konteks.']
+    _label_g17 = {2: 'biasa', 3: 'biasa'}
+    _kand_g17 = [(2, _baris_g17[2]), (3, _baris_g17[3])]
+    _ubah_g17, _jejak_g17 = P._v16_koreksi_petakan(
+        _baris_g17, _label_g17, _kand_g17, demosi_v6={2, 3})
+    cek('v17-pagar: baris demosi v6 tidak dipromosi R7 ke subbab',
+        _label_g17.get(2) == 'biasa' and _ubah_g17 == [3],
+        str((_label_g17, _ubah_g17, _jejak_g17)))
+    _label_g17b = {2: 'biasa', 3: 'biasa'}
+    _ubah_g17b, _jejak_g17b = P._v16_koreksi_petakan(
+        _baris_g17, _label_g17b, _kand_g17)
+    cek('v17-pagar: tanpa pagar, R7 tetap promosi (kontrol)',
+        _label_g17b.get(2) == 'subbab' and _label_g17b.get(3) == 'bab'
+        and _ubah_g17b == [2, 3],
+        str((_label_g17b, _ubah_g17b, _jejak_g17b)))
+    cek('v17-pagar: promosi ke bab (R9) tidak kena pagar',
+        _label_g17.get(3) == 'bab' and 3 in _ubah_g17
+        and _jejak_g17.get(3) == 'R9_judul_bab_kapital',
+        str((_label_g17, _ubah_g17, _jejak_g17)))
+
+    # ── v17: ATURAN BARU DARI BEDAH 35 BARIS SALAH (14 Nov 2026) ────────
+    #    R14-R19, digali dari 35 baris yang masih salah sesudah v17
+    #    (244/279). Tiap aturan: pola berulang + tandingan diperiksa di
+    #    seluruh 279; pola sekali muncul TIDAK dibuat aturan. Harapan
+    #    ukur 279: 244 + 11 = 255 (R14: 4, R15: 3, R16: 1, R17: 2,
+    #    R19: 1; R18: 0 di 279, +2 GT di asap fid=81 saat agen jawab
+    #    'biasa' seperti log deploy v16).
+    # R14: 'Bab Ketiga, ...' (bukan Pertama) uraian sistematika -> biasa.
+    _r = [_baris16('A', 1, 'Bab Ketiga, metode penelitian, terdiri dari tipe penelitian.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R14: "Bab Ketiga, ..." -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R14_bab_kata_koma',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'Bab Pertama, merupakan bab pendahuluan, terdiri atas latar belakang.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R14: "Bab Pertama, ..." dikecualikan -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Bab Keempat, gambaran umum perusahaan.', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R14: label bab mentah tetap kena (saudara R2) -> biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    # R15: baris hanya angka/simbol -> biasa; nomor bertingkat telanjang
+    # dikecualikan.
+    _r = [_baris16('A', 1, '(3.10)', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R15: nomor persamaan "(3.10)" label bab -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R15_angka_saja',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, '15.52 - 46.13', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R15: rentang angka "15.52 - 46.13" -> biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, '228630', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v17-R15: angka polos "228630" -> biasa',
+        _o[('A', '1')] == 'biasa', str(_o))
+    _r = [_baris16('A', 1, '1.1.', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v17-R15: nomor bertingkat "1.1." dikecualikan -> tetap subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, '3.1.', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v17-R15: nomor bertingkat "3.1." dikecualikan -> tetap subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] is None, str((_o, _j)))
+    # R16: keterangan gambar/tabel -> biasa.
+    _r = [_baris16('A', 1, 'Grafik 2.1 Efek Kenaikan Tingkat Suku Bunga Terhadap Mata Uang Domestik', 'subbab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'subbab'})
+    cek('v17-R16: keterangan "Grafik 2.1 ..." -> biasa',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R16_caption',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'Tabel 15. Hasil Uji Normalitas dengan One-Sample Kolmogorov-Smirnov.', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R16: keterangan "Tabel 15. ..." sudah biasa -> tetap (no-op)',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] == 'R16_caption',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'Grafik tanpa nomor halaman', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R16: "Grafik" tanpa nomor -> tidak kena',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Tabel 4.1 menunjukkan bahwa seluruh item pernyataan memiliki nilai r hitung.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R16-pagar: kalimat isi "Tabel 4.1 menunjukkan bahwa ..." -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Tabel 4.1 di atas menunjukkan bahwa seluruh item pernyataan memiliki nilai.', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R16-pagar: kalimat isi mengandung "bahwa" -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    # R17: romawi + judul ALL-CAPS bukan judul bab baku -> subbab.
+    _r = [_baris16('A', 1, 'IV. KOMISI TRANSPORTASI DAN INFRASTRUKTUR', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R17: "IV. KOMISI ..." label bab -> subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] == 'R17_romawi_kapital',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, 'II. TINJAUAN PUSTAKA', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R17: judul bab baku "II. TINJAUAN PUSTAKA" dikecualikan -> tetap bab',
+        _o[('A', '1')] == 'bab', str(_o))
+    _r = [_baris16('A', 1, 'C. Terorisme dan Perkembangannya', 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R17: butir huruf "C." bukan romawi -> tidak kena',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'IV. Komisi Transportasi dan Infrastruktur', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R17: judul Title Case (bukan ALL-CAPS) -> tidak kena, tetap bab',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] is None, str((_o, _j)))
+    # R18: pertanyaan penelitian 'Apakah ...?' -> paragraf.
+    _apakah = ('Apakah Digital Marketing berpengaruh terhadap '
+               'Keberlanjutan Usaha pada UMKM Kuliner Ayam Bakar di '
+               'Kabupaten Bekasi?')
+    _r = [_baris16('A', 1, _apakah, 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R18: pertanyaan penelitian "Apakah ...?" -> paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] == 'R18_pertanyaan_penelitian',
+        str((_o, _j)))
+    _r = [_baris16('A', 1, _apakah[:-1], 'biasa')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'biasa'})
+    cek('v17-R18: "Apakah ...?" tanpa tanda tanya -> tidak kena',
+        _o[('A', '1')] == 'biasa' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, _apakah, 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R18-pagar: label bab mentah tidak kena R18 -> tetap bab',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] is None, str((_o, _j)))
+    # R19: 'ayat' + akhir ':' + pendek <=100 -> subbab; panjang tidak kena.
+    _r = [_baris16('A', 1, 'Landasan Syariah Al \u2013 Qur\u2019an surat Al \u2013 Hadid ayat 11 :', 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R19: pengantar ayat pendek berakhir titik-dua -> subbab',
+        _o[('A', '1')] == 'subbab' and _j[('A', '1')] == 'R19_ayat_kolon_pendek',
+        str((_o, _j)))
+    _ayat_panjang = ('KUHAP tidak pula menjelaskan secara langsung mengenai '
+                     'kedudukan visum et repertum sebagai alat bukti. Perihal '
+                     'apa yang dimaksud dengan alat bukti yang sah, disebutkan '
+                     'dalam Pasal 184 ayat (1) :')
+    _r = [_baris16('A', 1, _ayat_panjang, 'paragraf')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'paragraf'})
+    cek('v17-R19: kalimat isi panjang berakhir "ayat (1) :" -> tetap paragraf',
+        _o[('A', '1')] == 'paragraf' and _j[('A', '1')] is None, str((_o, _j)))
+    _r = [_baris16('A', 1, 'Landasan Syariah Al \u2013 Qur\u2019an surat Al \u2013 Hadid ayat 11 :', 'bab')]
+    _o, _j = _jalan16(_r, {('A', '1'): 'bab'})
+    cek('v17-R19-pagar: label bab mentah tidak kena R19 -> tetap bab',
+        _o[('A', '1')] == 'bab' and _j[('A', '1')] is None, str((_o, _j)))
 
     # ── REVISI HEMAT (13 Nov 2026, perintah Bos "baca semua itu boros") ──
     import app.revisi_hemat as RH
