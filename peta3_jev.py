@@ -47,7 +47,7 @@ log = logging.getLogger(__name__)
 #    teks, semuanya pagar nama berkas), deteksi CHAPTER polos (4 naskah),
 #    deteksi judul Romawi tanpa kata BAB — HANYA bila profil bilang
 #    bentuknya memang begitu (6 entri: Y1, Y2, AD1, AD2, AD3, AG1).
-RULE_VERSION = 'jev-peta-v16'  # v16 (14 Nov 2026): 13 aturan deterministik perketat (R1..R13) sesudah demosi v14, sebelum Hakim/agen kedua; cache lama kedaluwarsa otomatis. v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi, kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
+RULE_VERSION = 'jev-peta-v17'  # v17 (14 Nov 2026): aturan v16 diterapkan ULANG sesudah Lapis 2 (temuan uji live gelombang 1: agen kedua menimpa 2 promosi R5); penerapan pertama sebelum Hakim/agen kedua tetap seperti v16. v16 (14 Nov 2026): 13 aturan deterministik perketat (R1..R13) sesudah demosi v14, sebelum Hakim/agen kedua; cache lama kedaluwarsa otomatis. v15 (11 Nov 2026): PERBAIKAN BOM di buang_daftar_isi, kupas BOM/zero-width sebelum memutuskan batas BAB I + lewati salinan sistematika sebagai patokan; gating Hakim v13, aturan v14 (demosi blok daftar isi, pengecualian ATURAN 5, prompt agen kedua tajam), saklar EDUAI_AGEN_KEDUA_AKTIF=0 bawaan mati TIDAK berubah
 # R2-1 B-dash -> False + R2-2 judul bernomor 1 tingkat + B awal kalimat
 # -> False (pemisahan terukur sempurna di run 1.14 tersimpan).
 
@@ -1326,13 +1326,21 @@ def _v16_terapkan(rows, label_awal, konteks=None):
     return out, jejak
 
 
-def _v16_koreksi_petakan(baris, label, kand):
+def _v16_koreksi_petakan(baris, label, kand, demosi_v6=None):
     """Adaptor v16 untuk `petakan()`: terapkan 13 aturan pada label Jev
     tiap baris kandidat. Konteks per baris: hakim_status=None (Hakim
     jalan belakangan, di Lapis 2), baris_mentah = seluruh baris susun,
     idx_mentah = indeks baris. Kembalikan (diubah, jejak) dengan diubah =
     daftar indeks baris yang labelnya berubah, jejak = {idx: nama aturan}
-    untuk baris yang berubah. Mengubah dict `label` di tempat."""
+    untuk baris yang berubah. Mengubah dict `label` di tempat.
+    demosi_v6 (opsional, hanya dipakai penerapan ulang v17): himpunan
+    indeks baris yang v6 putuskan BUKAN judul bab (bab_demosi +
+    bab_ganda). Pada baris itu, promosi ke 'subbab' TIDAK diterapkan:
+    vonis struktural v6 ("tanpa penanda BAB = bukan judul bab") tidak
+    boleh dibatalkan heuristik judul pendek R5/R6/R7/R8. Promosi ke
+    'bab' (R9/R10/R11, bukti kuat: huruf BESAR, judul baku, penanda
+    BAB telanjang) dan demosi ke 'biasa'/'paragraf' (R2/R3/R4/R12/R13)
+    tetap jalan. Tanpa demosi_v6, perilaku sama seperti v16."""
     rows = [{'naskah': '', 'no': str(i), 'teks_baris': baris[i],
              'label_v15': label.get(i)} for i, _t in kand]
     label_awal = {('', str(i)): label.get(i) for i, _t in kand}
@@ -1343,6 +1351,8 @@ def _v16_koreksi_petakan(baris, label, kand):
     for i, _t in kand:
         baru = akhir[('', str(i))]
         if baru != label.get(i):
+            if demosi_v6 and i in demosi_v6 and baru == 'subbab':
+                continue  # pagar v17: vonis demosi v6 berdiri
             label[i] = baru
             diubah.append(i)
             jejak_ubah[i] = jejak[('', str(i))]
@@ -2765,6 +2775,27 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
     for i in bab_kode:
         asal[i] = 'kode'
 
+    # ── v17: TERAPKAN ULANG ATURAN v16 SESUDAH LAPIS 2 (14 Nov 2026) ────
+    #    Temuan uji live gelombang 1: agen kedua (Lapis 2, conf 0,95)
+    #    menimpa 2 promosi R5 (A4:240, C4:231 — berakhir 'paragraf' dan
+    #    tetap salah, bukan 'subbab' seperti prediksi offline). Ukur
+    #    offline 241/279 menerapkan aturan pada label v15 AKHIR (demosi
+    #    v6 sudah jalan), jadi penerapan ulang di sini memakai label
+    #    AKHIR yang sama: sesudah SEMUA koreksi deterministik pasca-Lapis
+    #    2 (ATURAN 2, SPSS, ATURAN 5, v6 batas, v6 bab deterministik) —
+    #    bila jalan sebelum ATURAN 5, promosi R5 (huruf kecil) langsung
+    #    didemosi lagi ke 'biasa'. Adaptor, konteks (hakim_status=None),
+    #    dan pagar label 'bab' SAMA dengan penerapan pertama; tujuannya
+    #    hanya mengembalikan promosi aturan yang ditimpa agen kedua.
+    #    Jev, Hakim, dan agen kedua tidak diubah.
+    #    Pagar v17: baris yang v6 putuskan BUKAN judul bab (bab_demosi
+    #    + bab_ganda) TIDAK boleh dipromosi lagi ke 'subbab' oleh
+    #    heuristik judul pendek — vonis struktural v6 berdiri (tes v6.4:
+    #    'Baris JEV-BAB tanpa titik akhir' tetap 'biasa'). Promosi ke
+    #    'bab' (R9/R10/R11, bukti kuat) dan demosi tetap jalan.
+    _v17_diubah, _v17_jejak = _v16_koreksi_petakan(
+        baris, label, kand, demosi_v6=set(bab_demosi) | set(bab_ganda))
+
     # ── JEV MATI TOTAL: semua gelombang gagal ⇒ pemanggil WAJIB fallback
     #    (dulu: semua label 'biasa' tanpa jejak ⇒ hakim/pemutus jalur tak
     #    bisa bedakan "peta memang tanpa judul" vs "Jev gagal").
@@ -2776,6 +2807,8 @@ def _petakan_dari_hasil(d, putaran=None, pendapat_kedua_fn=None,
             'koreksi_kecil': koreksi_kecil,
             'koreksi_v16': _v16_diubah,
             'koreksi_v16_jejak': {str(i): r for i, r in _v16_jejak.items()},
+            'koreksi_v17': _v17_diubah,
+            'koreksi_v17_jejak': {str(i): r for i, r in _v17_jejak.items()},
             'sistematika': sorted(sistematika), 'asal': asal, 'boleh_dipakai_fitur': boleh,
             'gabung': d['gabung'], 'buang': d['buang'], 'waktu': waktu, 'gagal': gagal,
             # ── v4: `waktu` HANYA gelombang klasifikasi. Terukur live
