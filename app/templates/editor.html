@@ -589,7 +589,7 @@ main{flex:1;position:relative;min-height:0;background:#fff}
       {% set ct = r.terbaru %}
       <div class="pai-ct{% if ct.selesai %} selesai{% endif %}">
         <div class="pai-ct-atas">
-          <span class="pai-ct-jenis">{{ ct.jenis|capitalize }}</span>
+          <span class="pai-ct-jenis" title="{{ ct.tooltip_jenis }}">{{ ct.label_jenis }}</span>
           {% if ct.section_judul %}<span class="pai-ct-bab">{{ ct.section_judul }}</span>{% endif %}
           {% if ct.selesai %}<span class="pai-ct-lencana">Selesai</span>
           {% elif ct.dilewati %}<span class="pai-ct-lencana lewati">Dilewati</span>{% endif %}

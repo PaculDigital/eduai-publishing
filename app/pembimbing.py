@@ -699,10 +699,15 @@ def jenis_catatan(c) -> str:
     """Jenis catatan dari kolom yang SUDAH ADA (tanpa kolom baru).
 
     'tandaan'  → ada kutipan persis (teks_asli) = tandaan pada satu kalimat.
+                 Tampil sebagai "Perbaiki Kalimat Naskah" (nama Boss 22:44 WIB).
     'perintah' → ada alamat bagian (section_id) tapi tanpa kutipan =
                  perintah untuk satu Bab/Sub-bab utuh (atau posisi
                  "sesudah X", yang disimpan sebagai section_id bagian itu).
+                 Tampil sebagai "Kalimat Revisi" (nama Boss 22:44 WIB).
     'umum'     → tidak ada keduanya = catatan umum tanpa alamat.
+
+    Nilai kembaliannya tetap 'tandaan'/'perintah'/'umum' (dipakai logika +
+    uji); kata tampilnya ada di LABEL_JENIS / label_jenis_catatan().
 
     Dipakai sidebar tinjau + panel mahasiswa supaya jenisnya tampil tanpa
     menambah kolom/tabel (aturan Boss: perbaiki yang ada, jangan buat baru).
@@ -712,6 +717,32 @@ def jenis_catatan(c) -> str:
     if (getattr(c, 'section_id', '') or '').strip():
         return 'perintah'
     return 'umum'
+
+
+#  Kata tampil jenis catatan (nama Boss 22:44 WIB: "Tandaan" dan
+#  "Perintah" membingungkan, ganti dengan kata yang dipakai pembimbing).
+LABEL_JENIS = {
+    'tandaan': 'Perbaiki Kalimat Naskah',
+    'perintah': 'Kalimat Revisi',
+    'umum': 'Umum',
+}
+
+#  Tooltip penjelas per jenis (Boss 22:45 WIB: ada tooltip biar jelas).
+TOOLTIP_JENIS = {
+    'tandaan': 'Tunjuk satu kalimat persis dari naskah, lalu tulis apa yang harus diperbaiki dari kalimat itu.',
+    'perintah': 'Tulis satu kalimat revisi untuk satu bagian utuh, contoh: perbaiki sub-bab 2.1 atau tambahkan teori.',
+    'umum': 'Catatan umum tanpa alamat bagian dan tanpa kutipan.',
+}
+
+
+def label_jenis_catatan(c) -> str:
+    """Label tampil jenis catatan (nama Boss 22:44 WIB)."""
+    return LABEL_JENIS.get(jenis_catatan(c), 'Umum')
+
+
+def tooltip_jenis_catatan(c) -> str:
+    """Tooltip penjelas jenis catatan (Boss 22:45 WIB)."""
+    return TOOLTIP_JENIS.get(jenis_catatan(c), '')
 
 
 def tandai_selesai(db: Session, bimbingan_id: int, catatan_id: int) -> bool:
@@ -1163,6 +1194,8 @@ def _dict_catatan(c) -> dict:
         'id': c.id,
         'isi': c.isi or '',
         'jenis': jenis_catatan(c),
+        'label_jenis': label_jenis_catatan(c),
+        'tooltip_jenis': tooltip_jenis_catatan(c),
         'section_id': c.section_id or '',
         'section_judul': c.section_judul or '',
         'teks_asli': c.teks_asli or '',

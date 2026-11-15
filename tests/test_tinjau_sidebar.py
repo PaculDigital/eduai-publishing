@@ -12,8 +12,10 @@ Aturan yang diuji (rancangan RENCANA_TINJAU_STABILO.md):
      identitas menampilkan kartu sambutan; dengan identitas mengarahkan
      ke naskah-baca; naskah-baca menampilkan sidebar (daftar + form +
      legenda) TANPA teks naskah di halaman mana pun.
-  2. Dua jenis catatan dari kolom yang sudah ada: Tandaan (kutipan
-     persis) / Perintah (bagian utuh, tanpa kutipan) / Umum.
+  2. Dua jenis catatan dari kolom yang sudah ada: Perbaiki Kalimat Naskah
+     (kutipan persis) / Kalimat Revisi (bagian utuh, tanpa kutipan) / Umum.
+     Nilai dalamnya tetap 'tandaan'/'perintah'/'umum'; yang tampil label
+     baru (nama Boss 22:44 WIB) + tooltip penjelas (Boss 22:45 WIB).
   3. Hakim alamat: alamat bagian palsu dibersihkan (catatan masuk umum),
      alamat nyata dipertahankan, "Sesudah X" diterima bila X nyata.
   4. Kutipan salah masuk tanpa sorotan palsu (cari_sorotan: hilang).
@@ -188,6 +190,31 @@ def main():
     c_umum = P.catat(db, b, 'Catatan umum saja', berkas_id=bk.id)
     cek('jenis: tanpa alamat -> umum',
         P.jenis_catatan(c_umum) == 'umum')
+
+    # ── 2b. Label + tooltip tampil (nama Boss 22:44 WIB, tooltip 22:45 WIB)
+    cek('label: tandaan -> Perbaiki Kalimat Naskah',
+        P.label_jenis_catatan(c_tandaan) == 'Perbaiki Kalimat Naskah')
+    cek('label: perintah -> Kalimat Revisi',
+        P.label_jenis_catatan(c_perintah) == 'Kalimat Revisi')
+    cek('label: umum -> Umum',
+        P.label_jenis_catatan(c_umum) == 'Umum')
+    cek('tooltip: ketiganya tidak kosong',
+        all(P.tooltip_jenis_catatan(c)
+            for c in (c_tandaan, c_perintah, c_umum)))
+    _tpl = (Path(__file__).resolve().parent.parent
+            / 'app' / 'templates' / 'tinjau_baca.html').read_text()
+    cek('template sidebar: label baru + tooltip ada, label lama hilang',
+        'Perbaiki Kalimat Naskah (satu kalimat)' in _tpl
+        and 'Kalimat Revisi (satu bagian)' in _tpl
+        and "title=\"{{ tooltip_jenis['tandaan'] }}\"" in _tpl
+        and "title=\"{{ tooltip_jenis['perintah'] }}\"" in _tpl
+        and 'Posisi Kalimat Revisi' in _tpl
+        and 'Tandaan (satu kalimat)' not in _tpl
+        and 'Perintah (satu bagian)' not in _tpl)
+    _ed = (Path(__file__).resolve().parent.parent
+           / 'app' / 'templates' / 'editor.html').read_text()
+    cek('template editor: lencana pakai label_jenis + tooltip',
+        '{{ ct.label_jenis }}' in _ed and '{{ ct.tooltip_jenis }}' in _ed)
 
     # ── 8. tandai_selesai: pemilik, orang lain, idempoten ──────────────
     cek('tandai_selesai bimbingan benar -> True + hijau + sudah_oke',
@@ -844,8 +871,8 @@ def main():
         in badan_gal)
     cek('penggalan: form manual tetap ada di sidebar',
         'kolom-tulis' in badan_gal
-        and 'Tandaan (satu kalimat)' in badan_gal
-        and 'Perintah (satu bagian)' in badan_gal)
+        and 'Perbaiki Kalimat Naskah (satu kalimat)' in badan_gal
+        and 'Kalimat Revisi (satu bagian)' in badan_gal)
     P.simpan_daftar_pilihan(db, b6.id, bk6.id, 'periksa', [
         {'bagian': '2.2 Teori Perilaku Konsumen',
          'kutipan': KALIMAT_BAB2,

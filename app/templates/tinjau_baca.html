@@ -398,7 +398,7 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
       {% set tunjuk = petunjuk.get(simpul.terbaru.id) %}
       <div class="pt-baris" onclick="bukaBaris(this)">
         <div class="atas">
-          <span class="jenis">{{ (jenis_catatan.get(simpul.terbaru.id, 'umum') or 'umum')|capitalize }}</span>
+          <span class="jenis" title="{{ tooltip_jenis_catatan.get(simpul.terbaru.id, '') }}">{{ label_jenis_catatan.get(simpul.terbaru.id, 'Umum') }}</span>
           {% if simpul.jumlah_ronde > 1 %}
           <span class="perbaikan">perbaikan &times;{{ simpul.jumlah_ronde }}</span>
           {% endif %}
@@ -542,15 +542,15 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
       <form method="post" action="/tinjau/{{ token }}/catatan"
             enctype="multipart/form-data" onsubmit="isiJudulBagian();kunciTombol(this)">
         <div class="pt-jenis">
-          <label><input type="radio" name="jenis" value="tandaan" checked
-                        onchange="aturJenis()"> Tandaan (satu kalimat)</label>
-          <label><input type="radio" name="jenis" value="perintah"
-                        onchange="aturJenis()"> Perintah (satu bagian)</label>
+          <label title="{{ tooltip_jenis['tandaan'] }}"><input type="radio" name="jenis" value="tandaan" checked
+                        onchange="aturJenis()"> Perbaiki Kalimat Naskah (satu kalimat)</label>
+          <label title="{{ tooltip_jenis['perintah'] }}"><input type="radio" name="jenis" value="perintah"
+                        onchange="aturJenis()"> Kalimat Revisi (satu bagian)</label>
         </div>
         <div id="kotak-kutip">
           <label class="pt-label" for="teks-terpilih">Kalimat yang ditandai</label>
           <textarea class="pt-kutip" name="teks_asli" id="teks-terpilih"
-                    placeholder="Salin satu kalimat persis dari naskah, atau kosongkan untuk perintah umum."></textarea>
+                    placeholder="Salin satu kalimat persis dari naskah, atau kosongkan untuk kalimat revisi."></textarea>
         </div>
         <textarea name="isi" placeholder="Tulis catatan untuk mahasiswa..."
                   required></textarea>
@@ -565,7 +565,7 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
         </select>
         <input type="hidden" name="section_judul" id="judul-bagian" value="">
         <div id="kotak-posisi" hidden>
-          <label class="pt-label" for="pilih-posisi">Posisi perintah</label>
+          <label class="pt-label" for="pilih-posisi" title="Kalimat revisi ini berlaku pada bagian yang dipilih, atau sesudah bagian itu.">Posisi Kalimat Revisi</label>
           <select name="posisi" id="pilih-posisi" onchange="isiJudulBagian()">
             <option value="pada">Pada bagian ini</option>
             <option value="sesudah">Sesudah bagian ini</option>
@@ -740,10 +740,11 @@ function namaGambar(inp){
   }
 }
 
-//  ── Form catatan: Tandaan vs Perintah ────────────────────────────────
-//  Tandaan = kutipan persis (kotak kutip tampil), Perintah = satu bagian
-//  utuh (kotak posisi tampil). Judul bagian diisi dari opsi dropdown
-//  (data-label); posisi "sesudah" menambahkan awalan "Sesudah ".
+//  ── Form catatan: Perbaiki Kalimat Naskah vs Kalimat Revisi ────────────────────────────────
+//  Perbaiki Kalimat Naskah = kutipan persis (kotak kutip tampil),
+//  Kalimat Revisi = satu bagian utuh (kotak posisi tampil). Judul bagian
+//  diisi dari opsi dropdown (data-label); posisi "sesudah" menambahkan
+//  awalan "Sesudah ".
 function aturJenis(){
   var pil = document.querySelector('input[name="jenis"]:checked');
   var jenis = pil ? pil.value : 'tandaan';
@@ -768,9 +769,10 @@ function isiJudulBagian(){
 aturJenis();
 
 //  ── Asisten AI (pintu yang SUDAH ADA: POST /kolaborasi/asisten) ───────
-//  Perintah kosong/luas → AI memberi 5 pilihan (GRATIS, tidak ditagih);
-//  halaman dimuat ulang supaya daftar pilihan tampil di panel. Perintah
-//  sempit → alur lama (1 token, usulan langsung jadi catatan).
+//  Kalimat Revisi kosong/luas → AI memberi 5 pilihan (GRATIS, tidak
+//  ditagih); halaman dimuat ulang supaya daftar pilihan tampil di panel.
+//  Kalimat Revisi sempit → alur lama (1 token, usulan langsung jadi
+//  catatan).
 //  Menerima pilihan = 1 Token Revisi per butir (lihat terimaPilihan).
 var btnAsisten = document.getElementById('btn-asisten');
 if(btnAsisten){
