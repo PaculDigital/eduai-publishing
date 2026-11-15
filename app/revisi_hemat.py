@@ -22,6 +22,12 @@ CARA KERJA (ringkas):
     5. Label digabung (lama dipetakan ulang ke indeks baru + label baru),
        demosi v14 diterapkan ulang pada peta gabungan, Hakim mengaudit
        SELURUH peta gabungan, agen kedua HANYA untuk butir BARU ditandai.
+       (15 Nov 2026) Hakim TIDAK sepenuhnya gratis: audit strukturalnya
+       kode (gratis), tapi pertanyaan sempitnya memanggil Jev (maks 2
+       panggilan per audit) — karena itu hemat mengaudit SEKALI saja
+       (dulu dua kali: audit + tandai_ragu_curiga), dan bila saringan
+       deterministik bilang tidak ada label yang bisa berubah, audit
+       LAMA dipakai ulang (0 panggilan) serta Jev dilewati sama sekali.
     6. Hasil gabungan disimpan (peta_json + sidik per bagian + sidik
        seluruh naskah yang baru).
 
@@ -71,6 +77,18 @@ AMBANG_STRUKTURAL_PERSEN = 25   # >25% baris berubah -> baca penuh: hematnya
                                 # risiko efek batas naik; baca penuh lebih aman
 AMBANG_STRUKTURAL_BLOK = 10     # >10 blok berubah terpisah -> baca penuh:
                                 # edit tersebar = naskah hampir baru
+# (15 Nov 2026, perintah Bos 09:15 — optimasi gerbang periksa)
+# Perubahan struktur KECIL yang terlokalisasi TIDAK LAGI memaksa baca penuh:
+# tambah/pindah <= 3 judul sekaligus (dan sinyal (b)/(c) tidak kena) ->
+# hemat (bagian yang kena + tetangga saja). Baca penuh hanya untuk
+# perubahan struktur BESAR. Alasan aman: rentang lama dipetakan ke baru
+# lewat opcode (sisipan ikut bagian sebelumnya), kode_label baru menimpa
+# global, demosi v14 + audit Hakim jalan pada peta gabungan seperti biasa.
+AMBANG_STRUKTURAL_KECIL_JUDUL = 3
+# Baris <= ini karakter dianggap PENDEK (bisa jadi judul — heuristik judul
+# pendek R5; selaras dengan batas 120 kar Hakim `_butuh_tanya_jev`).
+# Saringan lewati-Jev hanya percaya baris PANJANG yang diganti kata-katanya.
+PANJANG_BARIS_PENDEK = 120
 
 LABEL_SAH = ('bab', 'subbab', 'paragraf', 'biasa')
 
@@ -270,6 +288,29 @@ def urutan_judul(baris: list[str]) -> list[str]:
     return keluar
 
 
+def _sinyal_struktural(baris_lama: list[str], baris_baru: list[str],
+                       opcodes) -> dict:
+    """Sinyal mentah perubahan (murni teks, tanpa Jev) — dipakai
+    `deteksi_struktural` dan `struktural_kecil` supaya rumusnya SATU.
+
+    Kembalikan {'judul_berubah', 'beda_judul' (judul tambah+hapus),
+    'berubah' (baris tambah+hapus), 'total', 'blok' (blok berubah)}.
+    """
+    j_lama = urutan_judul(baris_lama)
+    j_baru = urutan_judul(baris_baru)
+    beda_judul = 0
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(
+            None, j_lama, j_baru, autojunk=False).get_opcodes():
+        if tag != 'equal':
+            beda_judul += (i2 - i1) + (j2 - j1)
+    berubah = sum((i2 - i1) + (j2 - j1)
+                  for tag, i1, i2, j1, j2 in opcodes if tag != 'equal')
+    total = max(len(baris_lama), len(baris_baru), 1)
+    blok = sum(1 for tag, *_ in opcodes if tag != 'equal')
+    return {'judul_berubah': j_lama != j_baru, 'beda_judul': beda_judul,
+            'berubah': berubah, 'total': total, 'blok': blok}
+
+
 def deteksi_struktural(baris_lama: list[str], baris_baru: list[str],
                        opcodes) -> tuple[bool, str]:
     """True bila perubahan STRUKTURAL -> baca ulang penuh.
@@ -283,19 +324,192 @@ def deteksi_struktural(baris_lama: list[str], baris_baru: list[str],
       (c) >AMBANG_STRUKTURAL_BLOK blok berubah terpisah — edit tersebar.
     Perubahan kata-kata dalam judul yang sama nomornya BUKAN struktural.
     """
-    if urutan_judul(baris_lama) != urutan_judul(baris_baru):
+    s = _sinyal_struktural(baris_lama, baris_baru, opcodes)
+    if s['judul_berubah']:
         return True, 'urutan nomor judul berubah'
-    berubah = sum((i2 - i1) + (j2 - j1)
-                  for tag, i1, i2, j1, j2 in opcodes if tag != 'equal')
-    total = max(len(baris_lama), len(baris_baru), 1)
-    if berubah * 100 > AMBANG_STRUKTURAL_PERSEN * total:
+    if s['berubah'] * 100 > AMBANG_STRUKTURAL_PERSEN * s['total']:
         return True, ('%d%% baris berubah (>%d%%)'
-                      % (berubah * 100 // total, AMBANG_STRUKTURAL_PERSEN))
-    blok = sum(1 for tag, *_ in opcodes if tag != 'equal')
-    if blok > AMBANG_STRUKTURAL_BLOK:
+                      % (s['berubah'] * 100 // s['total'],
+                         AMBANG_STRUKTURAL_PERSEN))
+    if s['blok'] > AMBANG_STRUKTURAL_BLOK:
         return True, ('%d blok berubah terpisah (>%d)'
-                      % (blok, AMBANG_STRUKTURAL_BLOK))
+                      % (s['blok'], AMBANG_STRUKTURAL_BLOK))
     return False, ''
+
+
+def struktural_kecil(baris_lama: list[str], baris_baru: list[str],
+                     opcodes) -> tuple[bool, str]:
+    """True bila perubahan strukturalnya KECIL dan terlokalisasi -> hemat.
+
+    Kecil = HANYA urutan judul yang berubah, sinyal (b)/(c) TIDAK kena,
+    dan judul yang tambah/hapus/pindah <= AMBANG_STRUKTURAL_KECIL_JUDUL.
+    Contoh: tambah 1 subbab, pindah 1 paragraf berjudul. Aman untuk hemat
+    karena: rentang lama dipetakan ke baru lewat opcode, bagian yang kena
+    + tetangga dipetakan ulang, kode_label baru menimpa global, demosi v14
+    + audit Hakim jalan pada peta gabungan seperti biasa. Perubahan
+    struktur BESAR (banyak judul sekaligus, bab diurut ulang, >25% baris)
+    tetap baca penuh — dan otomatis TIDAK PERNAH membacanya (hanya tombol
+    manual, perintah Bos 09:15).
+    """
+    s = _sinyal_struktural(baris_lama, baris_baru, opcodes)
+    if not s['judul_berubah']:
+        return False, ''
+    if s['beda_judul'] > AMBANG_STRUKTURAL_KECIL_JUDUL:
+        return False, ''
+    if s['berubah'] * 100 > AMBANG_STRUKTURAL_PERSEN * s['total']:
+        return False, ''
+    if s['blok'] > AMBANG_STRUKTURAL_BLOK:
+        return False, ''
+    return True, ('struktural kecil (%d judul berubah)'
+                  % s['beda_judul'])
+
+
+# ── SARINGAN DETERMINISTIK SEBELUM JEV (15 Nov 2026, perintah Bos 09:15) ─
+#  Ganti kata di dalam paragraf panjang TIDAK BISA mengubah label struktur
+#  (BAB/SUB-BAB/PARAGRAF/BIASA) — Jev dilewati sama sekali (0 panggilan).
+#  Konservatif: ragu sedikit pun -> Jev jalan (Rp10, bukan label salah).
+
+_KATA_GANTUNG_LOKAL = ('dan', 'yang', 'di', 'ke', 'dari', 'dengan', 'untuk',
+                       'atau', 'serta', 'maupun', 'adalah', 'ialah', 'yaitu',
+                       'sebagai', 'dalam', 'pada', 'oleh', 'antara', 'hingga',
+                       'sampai', 'karena', 'sehingga', 'namun', 'tetapi')
+
+
+def _kelas_ujung(teks: str) -> str:
+    """'lanjut' bila baris berakhir tanda lanjutan / kata gantung (aturan
+    v6 batas paragraf: baris SESUDAHNYA bisa didemosi) — bila kelas ini
+    berubah, tetangga ikut relevan."""
+    t = (teks or '').strip()
+    if not t:
+        return 'kosong'
+    if t[-1] in (',', ';', '(', '-', '\u2013', '\u2014'):
+        return 'lanjut'
+    kata = t.split()
+    if kata:
+        bersih = re.sub(r'[^a-z]+$', '', kata[-1].lower())
+        if bersih in _KATA_GANTUNG_LOKAL:
+            return 'lanjut'
+    return 'akhir'
+
+
+def _mirip_judul(teks: str) -> bool:
+    """Baris mirip judul bab/subbab (pola yang sama dengan deteksi
+    struktural) — labelnya BISA berubah, jangan lewati Jev."""
+    t = teks or ''
+    return bool(_POLA_BAB.match(t) or _POLA_SUBBAB.match(t))
+
+
+def boleh_lewati_jev(lama, baris_baru, opcodes, susun_baru,
+                     awal: int, akhir: int) -> tuple[bool, str]:
+    """True bila TIDAK ADA satu pun baris berubah di rentang [awal, akhir)
+    yang labelnya BISA berubah — maka Jev boleh dilewati sama sekali
+    (0 panggilan) dan label lama dipakai ulang. Baris berubah relevan
+    (=> Jev tetap jalan) bila SALAH SATU:
+      1. baris tambah/hapus (batas bergeser, tetangga bisa berubah);
+      2. label lama baris itu 'bab'/'subbab' (judul diedit);
+      3. baris baru masuk kode_label/gabung ATAU mirip pola judul
+         (judul baru / pola judul hilang);
+      4. baris lama ATAU baru pendek (<= PANJANG_BARIS_PENDEK kar) —
+         baris pendek bisa jadi judul (heuristik judul pendek R5);
+      5. kelas ujung baris berubah (lanjut/akhir) — baris SESUDAHNYA
+         bisa didemosi aturan v6 batas paragraf.
+    `lama`: peta ternormalisasi (`_normalisasi_peta`); `susun_baru`:
+    susun deterministik teks baru (kode_label/gabung). Hanya dipakai
+    jalur hemat; gagal apa pun di pemanggil -> jalur normal (Jev jalan).
+    """
+    baris_lama = list(lama['baris'])
+    label_lama = lama['label'] or {}
+    kode_baru = (susun_baru or {}).get('kode_label') or {}
+    gabung_baru = (susun_baru or {}).get('gabung') or {}
+    for tag, i1, i2, j1, j2 in opcodes:
+        if tag == 'equal':
+            continue
+        # tambah/hapus baris (atau ganti dengan jumlah baris beda)
+        if tag in ('insert', 'delete') or (i2 - i1) != (j2 - j1):
+            bersinggungan = (j1 < akhir and j2 > awal) \
+                or (j1 == j2 and awal <= j1 < akhir)
+            if bersinggungan:
+                return False, 'baris tambah/hapus di rentang'
+            continue
+        for k in range(j2 - j1):
+            i, j = i1 + k, j1 + k
+            if not (awal <= j < akhir):
+                continue
+            lama_t = baris_lama[i] if 0 <= i < len(baris_lama) else ''
+            baru_t = baris_baru[j] if 0 <= j < len(baris_baru) else ''
+            if (lama_t or '').strip() == (baru_t or '').strip():
+                continue
+            if label_lama.get(i) in ('bab', 'subbab'):
+                return False, 'judul lama diubah'
+            if j in kode_baru or j in gabung_baru or _mirip_judul(baru_t):
+                return False, 'baris baru mirip judul'
+            if _mirip_judul(lama_t):
+                return False, 'pola judul lama hilang'
+            if len((lama_t or '').strip()) <= PANJANG_BARIS_PENDEK \
+                    or len((baru_t or '').strip()) <= PANJANG_BARIS_PENDEK:
+                return False, 'baris berubah pendek (bisa jadi judul)'
+            if _kelas_ujung(lama_t) != _kelas_ujung(baru_t):
+                return False, 'ujung baris berubah (tetangga bisa berubah)'
+    return True, 'ganti kata saja di dalam baris panjang'
+
+
+def _peta_indeks_lengkap(opcodes, n_lama: int) -> dict[int, int]:
+    """Indeks baru tiap baris lama, termasuk baris yang DIGANTI
+    (dipasangkan posisinya — replace sama jumlah baris). Dipakai jalur
+    lewati-Jev: baris yang diganti kata-katanya tetap baris yang sama,
+    label lamanya berlaku untuk baris baru di posisi itu."""
+    peta = _peta_indeks(opcodes, n_lama)
+    for tag, i1, i2, j1, j2 in opcodes:
+        if tag == 'replace' and (i2 - i1) == (j2 - j1):
+            for k in range(i2 - i1):
+                peta[i1 + k] = j1 + k
+    return peta
+
+
+def _audit_pakai_ulang(lama, baris_baru, opcodes,
+                       label_gabung) -> dict | None:
+    """Pakai ulang audit Hakim tersimpan (0 panggilan Jev).
+
+    Sah HANYA bila tiap butir yang dulu ditandai masih ada di tempat yang
+    sama (teks + label sama sesudah pemetaan indeks). Satu saja tidak
+    cocok -> None (pemanggil audit ulang penuh). Dipakai jalur lewati-Jev:
+    tidak ada label yang bisa berubah, jadi vonis Hakim lama tetap benar.
+    `lama`: peta ternormalisasi (membawa 'hakim' + 'hakim_bagian').
+    """
+    hakim_lama = lama.get('hakim') or {}
+    jejak = lama.get('hakim_bagian') or []
+    if not isinstance(hakim_lama, dict) or not jejak:
+        return None
+    peta = _peta_indeks_lengkap(opcodes, len(lama['baris']))
+    bagian = []
+    for b in jejak:
+        if not isinstance(b, dict):
+            return None
+        try:
+            i_lama = int(b.get('i'))
+        except (TypeError, ValueError):
+            return None
+        ni = peta.get(i_lama)
+        if ni is None:
+            return None
+        teks_baru = ' '.join(str(baris_baru[ni]
+                                 if 0 <= ni < len(baris_baru)
+                                 else '').split()).strip()
+        if teks_baru != (b.get('teks') or '').strip():
+            return None
+        if label_gabung.get(ni) != b.get('label'):
+            return None
+        bagian.append({'i': ni, 'label': b.get('label'),
+                       'judul': (b.get('teks') or '')[:60],
+                       'p_info': None, 'status': b.get('status'),
+                       'alasan': []})
+    return {'ok': True, 'keputusan': 'lolos', 'bagian': bagian,
+            'jumlah_sepakat': int(hakim_lama.get('jumlah_sepakat') or 0),
+            'jumlah_ragu': int(hakim_lama.get('jumlah_ragu') or 0),
+            'jumlah_curiga': int(hakim_lama.get('jumlah_curiga') or 0),
+            'jumlah_belum': int(hakim_lama.get('jumlah_belum') or 0),
+            'alasan': ('dipakai ulang dari audit sebelumnya (saringan '
+                       'deterministik: tidak ada label yang bisa berubah)')}
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -375,9 +589,17 @@ def rencanakan(peta_lama, baris_baru: list[str]) -> dict[str, Any]:
         return {'jalan': 'pakai_ulang', 'alasan': 'naskah tidak berubah',
                 'lama': lama}
     struktural, alasan = deteksi_struktural(baris_lama, baris_baru, opcodes)
+    kecil, alasan_kecil = False, ''
     if struktural:
-        return {'jalan': 'penuh', 'alasan': 'struktural: ' + alasan,
-                'lama': lama}
+        # (15 Nov 2026, perintah Bos 09:15) Perubahan struktur KECIL yang
+        # terlokalisasi (mis. tambah 1 subbab) TIDAK LAGI memaksa baca
+        # penuh — hemat saja (bagian yang kena + tetangga). Baca penuh
+        # hanya untuk perubahan struktur BESAR.
+        kecil, alasan_kecil = struktural_kecil(baris_lama, baris_baru,
+                                                opcodes)
+        if not kecil:
+            return {'jalan': 'penuh', 'alasan': 'struktural: ' + alasan,
+                    'lama': lama}
 
     # ── Bagian mana yang berubah? (rentang lama -> baru via opcode) ──────
     n_lama, n_baru = len(baris_lama), len(baris_baru)
@@ -419,8 +641,11 @@ def rencanakan(peta_lama, baris_baru: list[str]) -> dict[str, Any]:
                                for n in berubah_idx],
             'jumlah_bagian': len(lama['bagian']),
             'jumlah_berubah': len(berubah_idx),
+            'struktural_kecil': kecil,
+            'alasan_struktural': alasan_kecil if kecil else '',
             'alasan': ('%d dari %d bagian berubah'
-                       % (len(berubah_idx), len(lama['bagian']))),
+                       % (len(berubah_idx), len(lama['bagian'])))
+                      + ((' (%s)' % alasan_kecil) if kecil else ''),
             'lama': lama}
 
 
@@ -829,28 +1054,67 @@ def periksa_hemat(teks: str, peta_lama, mode: str = 'peta_awal',
         return None
     awal, akhir = int(rencana['awal']), int(rencana['akhir'])
 
-    # ── petakan parsial (Jev HANYA untuk rentang) ─────────────────────────
-    if fn_petakan_teks is None:
-        try:
-            from .peta3_jev import petakan_teks as _petakan_teks
-            fn_petakan_teks = _petakan_teks
-        except Exception:
-            return None
-    try:
-        parsial = fn_petakan_teks(
-            teks_bersih, awal, akhir,
-            pendapat_kedua_fn=None, hakim_tandai_fn=_gerbang_kosong)
-    except Exception as e:                                  # noqa: BLE001
-        log.warning('[revisi_hemat] petakan parsial gagal: %s: %s',
-                    type(e).__name__, e)
-        return None
-    if not isinstance(parsial, dict) or not isinstance(
-            parsial.get('label'), dict):
-        return None
-
-    # ── gabungkan ─────────────────────────────────────────────────────────
+    # ── SARINGAN DETERMINISTIK GRATIS (15 Nov 2026, perintah Bos 09:15) ──
+    #  Ganti kata di dalam paragraf panjang TIDAK BISA mengubah label —
+    #  Jev dilewati sama sekali (0 panggilan), audit Hakim dipakai ulang
+    #  dari simpanan (0 panggilan tanya-Jev), agen kedua tidak dipanggil
+    #  (tidak ada butir baru). Ragu sedikit pun -> jalur normal.
+    #  `opcodes` dihitung sekali di sini, dipakai lagi saat gabung.
     opcodes = diff_baris(lama['baris'], baris_baru)
     n_lama = len(lama['baris'])
+    lewati, alasan_lewati = boleh_lewati_jev(
+        lama, baris_baru, opcodes, susun_baru, awal, akhir)
+    if lewati:
+        log.info('[revisi_hemat] saringan: %s -> Jev dilewati (0 panggilan)',
+                 alasan_lewati)
+
+    # ── petakan parsial (Jev HANYA untuk rentang) ─────────────────────────
+    #  Dilewati bila saringan bilang tidak ada label yang bisa berubah.
+    #  ⚠️ `gabungkan_label` membuang label lama DI DALAM rentang dan
+    #  menunggu label baru dari parsial — karena parsial kosong di jalur
+    #  lewati, label/goyang/p LAMA yang dipetakan ke indeks baru harus
+    #  disuntik sebagai "label baru", kalau tidak baris di rentang
+    #  kehilangan labelnya (bug ketemu uji 15 Nov 2026).
+    parsial = {'label': {}, 'goyang': [], 'p': {}, 'semua': {}}
+    if lewati:
+        # Pemetaan LENGKAP (termasuk baris yang diganti kata-katanya,
+        # dipasangkan posisinya): `_peta_indeks` biasa menganggap baris
+        # yang diganti sebagai terhapus, sehingga baris itu kehilangan
+        # label (bug ketemu uji 15 Nov 2026).
+        _peta_idx = _peta_indeks_lengkap(opcodes, n_lama)
+        parsial['label'] = {
+            ni: lab for i, lab in (lama['label'] or {}).items()
+            if (ni := _peta_idx.get(i)) is not None
+            and awal <= ni < akhir}
+        parsial['goyang'] = [
+            [ni, suara] for i, suara in (lama.get('goyang') or [])
+            if (ni := _peta_idx.get(int(i))) is not None
+            and awal <= ni < akhir]
+        parsial['p'] = {
+            ni: v for k, v in (lama.get('p') or {}).items()
+            if (ni := _peta_idx.get(int(k))) is not None
+            and awal <= ni < akhir}
+    if not lewati:
+        if fn_petakan_teks is None:
+            try:
+                from .peta3_jev import petakan_teks as _petakan_teks
+                fn_petakan_teks = _petakan_teks
+            except Exception:
+                return None
+        try:
+            parsial = fn_petakan_teks(
+                teks_bersih, awal, akhir,
+                pendapat_kedua_fn=None, hakim_tandai_fn=_gerbang_kosong)
+        except Exception as e:                                  # noqa: BLE001
+            log.warning('[revisi_hemat] petakan parsial gagal: %s: %s',
+                        type(e).__name__, e)
+            return None
+        if not isinstance(parsial, dict) or not isinstance(
+                parsial.get('label'), dict):
+            return None
+
+    # ── gabungkan ─────────────────────────────────────────────────────────
+    #  (`opcodes` + `n_lama` sudah dihitung di atas, sebelum saringan.)
     label_gabung = gabungkan_label(
         lama['label'], opcodes, n_lama, parsial.get('label') or {},
         awal, akhir, susun_baru.get('kode_label') or {})
@@ -886,22 +1150,40 @@ def periksa_hemat(teks: str, peta_lama, mode: str = 'peta_awal',
     }
 
     # ── Hakim audit SELURUH peta gabungan (gratis, deterministik) ─────────
-    try:
-        from .hakim_peta import periksa_peta as _periksa
-        audit = _periksa(peta_gabung)
-    except Exception as e:                                  # noqa: BLE001
-        log.warning('[revisi_hemat] audit Hakim gagal: %s: %s',
-                    type(e).__name__, e)
-        return None
+    #  (15 Nov 2026) Bila saringan melewati Jev, audit LAMA dipakai ulang
+    #  (terverifikasi teks+label tiap butir) — audit penuh menanyakan
+    #  Jev lagi untuk judul yang sama (maks 2 panggilan) padahal tidak
+    #  ada yang berubah. Gagal verifikasi -> audit penuh (fail-open aman).
+    audit = None
+    if lewati:
+        audit = _audit_pakai_ulang(lama, baris_baru, opcodes, label_gabung)
+    if audit is None:
+        try:
+            from .hakim_peta import periksa_peta as _periksa
+            audit = _periksa(peta_gabung)
+        except Exception as e:                                  # noqa: BLE001
+            log.warning('[revisi_hemat] audit Hakim gagal: %s: %s',
+                        type(e).__name__, e)
+            return None
 
     # ── Agen kedua HANYA untuk butir BARU ditandai Hakim ──────────────────
     ak = {'jml': 0, 'berbalik': [], 'antrean': [], 'jawaban': []}
     if isinstance(audit, dict) and audit.get('ok'):
-        try:
-            from .hakim_peta import tandai_ragu_curiga as _tandai
-            ditandai = _tandai(peta_gabung) or set()
-        except Exception:
-            ditandai = set()
+        # (15 Nov 2026) `ditandai` diambil dari audit YANG SAMA — dulu
+        # `tandai_ragu_curiga` dipanggil lagi di sini dan mengaudit ulang
+        # SELURUH peta (termasuk tanya-Jev, maks 2 panggilan) untuk hasil
+        # yang sama. Satu audit cukup; jalur lewati-Jev tidak punya butir
+        # baru sehingga agen kedua 0 panggilan.
+        ditandai = set()
+        for b in (audit.get('bagian') or []):
+            if not isinstance(b, dict):
+                continue
+            if b.get('status') not in ('ragu', 'curiga'):
+                continue
+            try:
+                ditandai.add(int(b['i']))
+            except (TypeError, ValueError):
+                continue
         baru = [i for i in sorted(ditandai)
                 if _baru_ditandai(i, peta_gabung, lama)]
         if baru and fn_pendapat_kedua is not None:
@@ -959,6 +1241,8 @@ def periksa_hemat(teks: str, peta_lama, mode: str = 'peta_awal',
         'revisi_hemat': {
             'jalan': 'hemat', 'awal': awal, 'akhir': akhir,
             'bagian_berubah': rencana.get('bagian_berubah') or [],
+            'lewati_jev': bool(lewati),
+            'alasan_saringan': alasan_lewati if lewati else '',
             'agen_kedua_jml': ak.get('jml', 0),
             'agen_kedua_antrean': ak.get('antrean', []),
         },

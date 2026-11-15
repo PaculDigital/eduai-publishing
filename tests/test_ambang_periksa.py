@@ -12,9 +12,17 @@ Yang diuji:
   4. SATU garis awal (perintah Bos 08:41): manual + otomatis berbagi
      penghitung sejak pemeriksaan terakhir; tekan tombol ATAU jalan
      otomatis mengatur ulang; tidak ada perubahan yang diperiksa 2x.
-  5. hemat: teks sama -> 'pakai_ulang', 0 panggilan Jev; 1 bagian berubah
-     -> hanya bagian itu + tetangga yang dipetakan ulang.
+  5. hemat: teks sama -> 'pakai_ulang', 0 panggilan Jev; ganti kata di
+     paragraf panjang -> saringan lewati Jev (0 panggilan); judul diubah
+     -> saringan menolak, Jev jalan.
   6. ringkas_peta + bangun_baris_antrean (murni).
+  7. struktural kecil vs besar (optimasi 15 Nov 2026): tambah 1 subbab
+     -> hemat + otomatis MATI; tambah 5 subbab / >25% baris -> penuh.
+  8. saringan deterministik + audit tunggal: ganti kata saja -> Jev 0x,
+     tanya Hakim 0x, agen kedua 0; hemat non-saringan -> audit 1x.
+  9. batas laju otomatis 24 jam (boleh_otomatis_jalan).
+  10. fail-open perbandingan: gagal membandingkan -> tombol aktif,
+      otomatis tetap mati.
 """
 import hashlib
 import importlib.util
@@ -115,6 +123,27 @@ def peta_tersimpan_dari_baris(lines, rh):
     return rh.siapkan_simpan(hasil, surv, {'bagian': []})
 
 
+def peta_dengan_audit(lines, rh):
+    """Peta tersimpan DENGAN jejak audit Hakim (seperti produksi): semua
+    judul berlabel 'sepakat', supaya jalur lewati-Jev bisa memakai ulang
+    audit lama (tanpa jejak, audit penuh jalan sebagai cadangan)."""
+    surv = surveyor_dari_baris(lines)
+    bagian = [{'i': i, 'label': lab, 'judul': lines[i][:60], 'p_info': None,
+               'status': 'sepakat', 'alasan': []}
+              for i, lab in sorted(surv['label'].items())
+              if lab in ('bab', 'subbab')]
+    audit = {'ok': True, 'keputusan': 'lolos', 'bagian': bagian,
+             'jumlah_sepakat': len(bagian), 'jumlah_ragu': 0,
+             'jumlah_curiga': 0, 'jumlah_belum': 0, 'alasan': 'audit uji'}
+    hasil = {'ok': True, 'gratis': True, 'mode': 'peta_awal', 'jumlah': 1,
+             'daftar': [], 'diam': False, 'pesan': '', 'peta_dari': 'jev',
+             'peta_alasan': '', 'bab_terdeteksi': [],
+             'hakim': {'jumlah_sepakat': len(bagian), 'jumlah_ragu': 0,
+                       'jumlah_curiga': 0, 'jumlah_belum': 0,
+                       'alasan': 'audit uji', 'bagian_curiga': []}}
+    return rh.siapkan_simpan(hasil, surv, audit)
+
+
 def sidik(teks):
     return hashlib.sha256(teks.encode('utf-8')).hexdigest()
 
@@ -133,6 +162,15 @@ def main():
     an = _muat('app.antrean')
     import app.hakim_peta as H
     H._TANYA_FN = lambda bahan, tanya: {k: {'noul': 0.9} for k in tanya}
+    # Pencatat panggilan tanya-Jev Hakim (untuk uji audit tunggal + lewati).
+    tanya_jml = []
+    _tanya_asli = H._TANYA_FN
+
+    def _tanya_hitung(bahan, tanya):
+        tanya_jml.append(len(tanya))
+        return _tanya_asli(bahan, tanya)
+
+    H._TANYA_FN = _tanya_hitung
 
     # ── 1. NORMALISASI ──────────────────────────────────────────────────
     cek('normalisasi: titik di akhir bukan perubahan',
@@ -283,7 +321,22 @@ def main():
     def petakan_palsu(teks_bersih, awal, akhir, pendapat_kedua_fn=None,
                       hakim_tandai_fn=None):
         panggilan.append((awal, akhir))
-        label = {str(i): 'biasa' for i in range(awal, akhir)}
+        # Palsu yang REALISTIS: judul tetap berlabel judul (seperti
+        # pipeline asli: kode_label + Jev melabel judul dengan benar),
+        # paragraf 'biasa'. Palsu yang mengembalikan 'biasa' untuk semua
+        # baris merusak peta gabungan (BAB hilang -> subbab jadi yatim).
+        baris_teks = [b for b in (teks_bersih or '').split('\n')
+                      if b.strip()]
+        label = {}
+        for i in range(awal, akhir):
+            t = baris_teks[i] if 0 <= i < len(baris_teks) else ''
+            if t.startswith('BAB '):
+                label[str(i)] = 'bab'
+            elif t.split(' ')[0][0:1].isdigit() \
+                    and '.' in t.split(' ')[0]:
+                label[str(i)] = 'subbab'
+            else:
+                label[str(i)] = 'biasa'
         return {'label': label, 'goyang': [], 'p': {}, 'semua': {}}
 
     h = rh.periksa_hemat(teks_kecil2, peta_kecil, mode='peta_awal',
@@ -294,6 +347,9 @@ def main():
         h is not None and h.get('jalan') == 'pakai_ulang'
         and len(panggilan) == 0)
     # Ubah 1 baris paragraf di bagian tengah (baris 14 = paragraf bagian 4).
+    # (15 Nov 2026, optimasi) Ganti kata di dalam paragraf PANJANG tidak
+    # bisa mengubah label -> saringan deterministik melewati Jev (0
+    # panggilan), label lama dipakai ulang. Dulu: Jev dipanggil 1x.
     ubah1 = list(kecil)
     ubah1[14] = ' '.join(f'baru14_{j}' for j in range(20))
     panggilan.clear()
@@ -302,16 +358,38 @@ def main():
                          fn_susun_teks=susun_palsu,
                          fn_pendapat_kedua=None)
     ok_hemat = h is not None and h.get('jalan') == 'hemat'
-    cek('hemat: 1 bagian berubah -> jalan hemat, Jev dipanggil 1x',
-        ok_hemat and len(panggilan) == 1)
-    if ok_hemat and panggilan:
-        awal, akhir = panggilan[0]
-        cek('hemat: rentang mencakup baris yang berubah saja + tetangga',
-            awal <= 14 < akhir and (akhir - awal) < len(kecil)
-            and akhir - awal <= 12)
+    cek('hemat: ganti kata di paragraf panjang -> jalan hemat, Jev 0x (saringan)',
+        ok_hemat and len(panggilan) == 0
+        and (h.get('hasil') or {}).get('revisi_hemat', {}).get('lewati_jev')
+        is True)
+    if ok_hemat:
+        label_lama = peta_kecil.get('peta_surveyor', {}).get('label') or {}
+        label_baru = (h.get('simpan') or {}).get(
+            'peta_surveyor', {}).get('label') or {}
+        cek('hemat: label sesudah saringan identik dengan label lama',
+            label_baru == label_lama)
         cek('hemat: hasil menyimpan peta baru + sidik diperbarui',
             bool(h.get('simpan')) and
             h['simpan'].get('sidik_bagian'))
+    # Ubah JUDUL subbab (baris 13 = '1.4 ...', label lama 'subbab'):
+    # saringan MENOLAK (judul diedit -> label bisa berubah) -> Jev jalan.
+    ubah_judul = list(kecil)
+    ubah_judul[13] = '1.4 Judul Bagian Empat'
+    panggilan.clear()
+    h = rh.periksa_hemat('\n'.join(ubah_judul), peta_kecil, mode='peta_awal',
+                         fn_petakan_teks=petakan_palsu,
+                         fn_susun_teks=susun_palsu,
+                         fn_pendapat_kedua=None)
+    ok_hemat = h is not None and h.get('jalan') == 'hemat'
+    cek('hemat: judul subbab diubah -> saringan menolak, Jev dipanggil 1x',
+        ok_hemat and len(panggilan) == 1)
+    if ok_hemat and panggilan:
+        awal, akhir = panggilan[0]
+        # Judul di awal bagian: baris pengganti ikut rentang bagian
+        # SEBELUMNYA juga (peta_posisi: baris lama yang diganti runtuh ke
+        # titik sisipan) -> 2 bagian berubah + tetangga = 16 baris.
+        cek('hemat: rentang mencakup baris yang berubah saja + tetangga',
+            (awal, akhir) == (5, 21) and (akhir - awal) < len(kecil))
 
     # ── 6. RINGKAS PETA + ANTREAN (murni) ───────────────────────────────
     peta_tampil = {
@@ -355,6 +433,187 @@ def main():
         and rows[0]['status_hakim'] == 'ragu')
     cek('antrean: keputusan sah = bab/subbab/paragraf/biasa/lewati',
         an.KEPUTUSAN_SAH == ('bab', 'subbab', 'paragraf', 'biasa', 'lewati'))
+
+    # ── 7. STRUKTURAL KECIL vs BESAR (15 Nov 2026, optimasi) ────────────
+    #    Tambah 1 subbab dulu memaksa baca penuh (~22 panggilan Jev) +
+    #    otomatis ikut jalan. Sekarang: kecil -> hemat, otomatis MATI,
+    #    tombol manual yang memutuskan.
+    lines40 = buat_baris(40)
+    teks40 = '\n'.join(lines40)
+    peta40 = peta_tersimpan_dari_baris(lines40, rh)
+    # 7a. tambah 1 subbab di akhir (1.41 + 1 paragraf panjang).
+    tambah1 = list(lines40) + [
+        '1.41 Judul Bagian Baru',
+        ' '.join(f'baru41_{j}' for j in range(20))]
+    susun_t1 = susun_palsu('\n'.join(tambah1))
+    renc = rh.rencanakan(peta40, susun_t1['baris'])
+    cek('struktural kecil: tambah 1 subbab -> jalan hemat, bukan penuh',
+        renc.get('jalan') == 'hemat' and renc.get('struktural_kecil') is True)
+    d = amb.bandingkan_perubahan(peta40, '\n'.join(tambah1), susun_palsu)
+    cek('struktural kecil: tombol aktif, otomatis MATI',
+        d['berubah_berarti'] and not d['berubah_besar']
+        and d.get('otomatis') is False and d.get('struktural_kecil') is True)
+    g = st.nilai_gerbang(peta_json=peta40, peta_sidik=sidik(teks40),
+                         sidik_kini=sidik('\n'.join(tambah1)),
+                         teks_kini_bersih='\n'.join(tambah1),
+                         fn_susun_teks=susun_palsu)
+    cek('struktural kecil: gerbang bisa periksa, otomatis False',
+        g['bisa_periksa'] and not g['otomatis'])
+    panggilan.clear()
+    h = rh.periksa_hemat('\n'.join(tambah1), peta40, mode='peta_awal',
+                         fn_petakan_teks=petakan_palsu,
+                         fn_susun_teks=susun_palsu,
+                         fn_pendapat_kedua=None)
+    cek('struktural kecil: hemat, Jev dipanggil 1x (bukan baca penuh ~22x)',
+        h is not None and h.get('jalan') == 'hemat'
+        and len(panggilan) == 1)
+    # 7b. tambah 5 subbab sekaligus (>3 judul) -> BESAR -> baca penuh.
+    tambah5 = list(lines40)
+    for s in range(41, 46):
+        tambah5 += [f'1.{s} Judul Bagian Baru {s}',
+                    ' '.join(f'baru{s}_{j}' for j in range(20))]
+    susun_t5 = susun_palsu('\n'.join(tambah5))
+    renc = rh.rencanakan(peta40, susun_t5['baris'])
+    cek('struktural besar: tambah 5 subbab -> jalan penuh',
+        renc.get('jalan') == 'penuh')
+    d = amb.bandingkan_perubahan(peta40, '\n'.join(tambah5), susun_palsu)
+    cek('struktural besar: vonis besar tapi otomatis tetap MATI',
+        d['berubah_besar'] and d.get('otomatis') is False
+        and d.get('struktural') is True)
+    cek('struktural besar: perlu_periksa_otomatis False',
+        amb.perlu_periksa_otomatis(
+            peta40, '\n'.join(tambah5), susun_palsu)[0] is False)
+    g = st.nilai_gerbang(peta_json=peta40, peta_sidik=sidik(teks40),
+                         sidik_kini=sidik('\n'.join(tambah5)),
+                         teks_kini_bersih='\n'.join(tambah5),
+                         fn_susun_teks=susun_palsu)
+    cek('struktural besar: tombol aktif (manual boleh), otomatis False',
+        g['bisa_periksa'] and not g['otomatis'])
+    # 7c. ubah >25% baris (tulis ulang 50 dari 161 baris) -> penuh.
+    ubah_banyak = list(lines40)
+    for i in range(2, 52):
+        ubah_banyak[i] = ' '.join(f'rombak{i}_{j}' for j in range(20))
+    susun_b = susun_palsu('\n'.join(ubah_banyak))
+    renc = rh.rencanakan(peta40, susun_b['baris'])
+    cek('struktural besar: >25% baris berubah -> jalan penuh',
+        renc.get('jalan') == 'penuh')
+
+    # ── 8. SARINGAN DETERMINISTIK + AUDIT TUNGGAL (15 Nov 2026) ─────────
+    #    Fixture 8 bagian dengan SATU judul panjang (120-300 kar) supaya
+    #    Hakim bertanya ke Jev — tanpa itu, tanya-Jev Hakim 0 dan uji
+    #    audit-tunggal tidak bisa membedakan 1x vs 2x.
+    lines8 = buat_baris(8)
+    judul_panjang = ('1.3 Latar Belakang Masalah Penelitian tentang '
+                     'Pengaruh Media Sosial terhadap Minat Beli Konsumen '
+                     'di Kalangan Mahasiswa Manajemen Universitas Pelita '
+                     'Bangsa')
+    lines8[9] = judul_panjang
+    cek('saringan: judul panjang 120-300 kar (Hakim bertanya ke Jev)',
+        120 < len(judul_panjang) <= 300)
+    peta8 = peta_dengan_audit(lines8, rh)
+    # 8a. ganti kata di 1 paragraf panjang -> 0 Jev, 0 tanya-Hakim.
+    ubah_p = list(lines8)
+    ubah_p[14] = ' '.join(f'baru14_{j}' for j in range(20))
+    panggilan.clear()
+    tanya_jml.clear()
+    h = rh.periksa_hemat('\n'.join(ubah_p), peta8, mode='peta_awal',
+                         fn_petakan_teks=petakan_palsu,
+                         fn_susun_teks=susun_palsu,
+                         fn_pendapat_kedua=None)
+    ok8 = h is not None and h.get('jalan') == 'hemat'
+    cek('saringan: ganti kata saja -> Jev 0x, tanya Hakim 0x, agen kedua 0',
+        ok8 and len(panggilan) == 0 and len(tanya_jml) == 0
+        and (h.get('hasil') or {}).get('revisi_hemat', {}).get(
+            'agen_kedua_jml') == 0
+        and (h.get('hasil') or {}).get('revisi_hemat', {}).get(
+            'lewati_jev') is True)
+    if ok8:
+        cek('saringan: jumlah Hakim dipakai ulang dari audit lama',
+            (h.get('hasil') or {}).get('hakim', {}).get('jumlah_sepakat')
+            == 9)
+        label_lama = peta8.get('peta_surveyor', {}).get('label') or {}
+        label_baru = (h.get('simpan') or {}).get(
+            'peta_surveyor', {}).get('label') or {}
+        cek('saringan: label sesudah lewati identik dengan label lama',
+            label_baru == label_lama)
+    # 8b. audit penuh langsung pada peta gabungan bertanya 1x (pembanding:
+    #     tanpa saringan, Hakim bertanya untuk judul panjang itu).
+    tanya_jml.clear()
+    _surv8 = {'baris': list(lines8),
+              'label': {i: ('bab' if b.startswith('BAB ') else
+                            'subbab' if b.split(' ')[0][0].isdigit() else
+                            'biasa')
+                        for i, b in enumerate(lines8)},
+              'goyang': [], 'p': {}, 'gabung': {}, 'sistematika': [],
+              'boleh_dipakai_fitur': {}}
+    _aud = H.periksa_peta(_surv8)
+    cek('saringan: audit penuh bertanya Jev 1x untuk judul panjang',
+        len(tanya_jml) == 1 and _aud.get('ok') is True)
+    # 8c. hemat NON-saringan (ubah judul) -> audit jalan SEKALI (dulu 2x:
+    #     audit + tandai_ragu_curiga).
+    ubah_j = list(lines8)
+    ubah_j[5] = '1.2 Judul Bagian Dua'
+    panggilan.clear()
+    tanya_jml.clear()
+    h = rh.periksa_hemat('\n'.join(ubah_j), peta8, mode='peta_awal',
+                         fn_petakan_teks=petakan_palsu,
+                         fn_susun_teks=susun_palsu,
+                         fn_pendapat_kedua=None)
+    cek('saringan: hemat non-saringan -> Jev 1x, tanya Hakim 1x (bukan 2x)',
+        h is not None and h.get('jalan') == 'hemat'
+        and len(panggilan) == 1 and len(tanya_jml) == 1)
+    # 8d. tambah 1 baris paragraf baru (panjang) -> saringan menolak.
+    tambah_baris = list(lines8)
+    tambah_baris.insert(
+        15, ' '.join(f'sisip15_{j}' for j in range(20)))
+    panggilan.clear()
+    h = rh.periksa_hemat('\n'.join(tambah_baris), peta8, mode='peta_awal',
+                         fn_petakan_teks=petakan_palsu,
+                         fn_susun_teks=susun_palsu,
+                         fn_pendapat_kedua=None)
+    cek('saringan: tambah baris -> saringan menolak, Jev dipanggil 1x',
+        h is not None and h.get('jalan') == 'hemat'
+        and len(panggilan) == 1)
+    # 8e. paragraf dipendekkan (20 kata -> 3 kata) -> saringan menolak.
+    pendek = list(lines8)
+    pendek[14] = 'tiga kata saja'
+    panggilan.clear()
+    h = rh.periksa_hemat('\n'.join(pendek), peta8, mode='peta_awal',
+                         fn_petakan_teks=petakan_palsu,
+                         fn_susun_teks=susun_palsu,
+                         fn_pendapat_kedua=None)
+    cek('saringan: paragraf dipendekkan -> saringan menolak, Jev 1x',
+        h is not None and h.get('jalan') == 'hemat'
+        and len(panggilan) == 1)
+
+    # ── 9. BATAS LAJU OTOMATIS 24 JAM (15 Nov 2026) ─────────────────────
+    from datetime import datetime, timedelta, timezone
+    _kini = datetime.now(timezone.utc)
+    cek('batas laju: belum pernah diperiksa -> boleh',
+        amb.boleh_otomatis_jalan(None)[0] is True)
+    cek('batas laju: 1 jam lalu -> tidak boleh',
+        amb.boleh_otomatis_jalan(_kini - timedelta(hours=1))[0] is False)
+    cek('batas laju: 23 jam lalu -> tidak boleh',
+        amb.boleh_otomatis_jalan(_kini - timedelta(hours=23))[0] is False)
+    cek('batas laju: 25 jam lalu -> boleh',
+        amb.boleh_otomatis_jalan(_kini - timedelta(hours=25))[0] is True)
+    cek('batas laju: waktu naive (dari SQLite) 25 jam lalu -> boleh',
+        amb.boleh_otomatis_jalan(
+            (_kini - timedelta(hours=25)).replace(tzinfo=None))[0] is True)
+    cek('batas laju: konstanta = 24 jam',
+        amb.BATAS_OTOMATIS_JAM == 24)
+
+    # ── 10. FAIL-OPEN PERBANDINGAN (bug: docstring vs kode) ─────────────
+    #     Dulu gagal membandingkan -> tombol MATI (fail-closed), padahal
+    #     docstring bilang fail-open manual. Sekarang: tombol aktif,
+    #     otomatis tetap mati.
+    def _susun_gagal(teks):
+        raise RuntimeError('susun rusak')
+
+    d = amb.bandingkan_perubahan(peta, teks, _susun_gagal)
+    cek('fail-open: gagal membandingkan -> tombol aktif, otomatis mati',
+        d['berubah_berarti'] and not d['berubah_besar']
+        and d.get('otomatis') is False)
 
     print(f'\n{len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:

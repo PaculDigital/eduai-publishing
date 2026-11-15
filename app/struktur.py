@@ -65,12 +65,19 @@ def nilai_gerbang(*, peta_json, peta_sidik: str, sidik_kini: str,
                                   fn_susun_teks)
     berubah = bool(detail['berubah_berarti'])
     besar = bool(detail['berubah_besar'])
+    # (15 Nov 2026, perintah Bos 09:15) Otomatis TIDAK PERNAH membaca ulang
+    # penuh: perubahan struktural (besar ATAU kecil) hanya mengaktifkan
+    # tombol manual ("Periksa Lagi"). Batas laju 24 jam TIDAK di sini
+    # (butuh waktu pemeriksaan terakhir dari DB — dicek endpoint).
+    struktural = bool(detail.get('struktural')
+                      or detail.get('struktural_kecil'))
+    otomatis = besar and not struktural
     return {'keadaan': 'berubah' if berubah else 'sudah',
             'sudah_diperiksa': True,
             'bisa_periksa': berubah,
             'berubah_berarti': berubah,
             'berubah_besar': besar,
-            'otomatis': besar,
+            'otomatis': otomatis,
             'detail': detail}
 
 

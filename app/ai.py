@@ -4694,9 +4694,17 @@ async def peta_status(
     ringkasan = _str_s.ringkas_peta(
         prof.peta_json if prof and prof.peta_json else None,
         menunggu_idx=menunggu_idx)
+    # ── BATAS LAJU OTOMATIS (15 Nov 2026, perintah Bos 09:15) ──────────
+    #  `otomatis` dari gerbang hanya soal UKURAN perubahan; batas 24 jam
+    #  (sekali per naskah, dan tidak jalan bila pemeriksaan terakhir
+    #  kurang dari 24 jam lalu) dicek di sini, dari `peta_dibuat`.
+    from . import ambang_periksa as _amb_s
+    _boleh_oto, _alasan_oto = _amb_s.boleh_otomatis_jalan(
+        prof.peta_dibuat if prof else None)
     return {'ok': True, 'file_id': int(file_id),
             'keadaan': g['keadaan'], 'tombol': tombol,
-            'otomatis': bool(g['otomatis']), 'detail': g['detail'],
+            'otomatis': bool(g['otomatis']) and _boleh_oto,
+            'detail': g['detail'],
             'diperiksa_pada': (prof.peta_dibuat.isoformat()
                                if prof is not None and prof.peta_dibuat
                                else None),
@@ -4749,6 +4757,21 @@ async def peta_otomatis(
     if not g['otomatis']:
         return {'ok': True, 'dijadwalkan': False,
                 'alasan': g['detail'].get('alasan', '')}
+    # ── PAGAR OTOMATIS (15 Nov 2026, perintah Bos 09:15) ───────────────
+    #  Pertahanan berlapis (gerbang di atas sudah mematikan otomatis untuk
+    #  struktural — ini pagar kedua supaya klien lama / panggilan langsung
+    #  tidak bisa memicu baca ulang penuh diam-diam), lalu batas laju:
+    #  sekali per 24 jam per naskah, dan tidak jalan bila pemeriksaan
+    #  terakhir (manual ATAU otomatis) kurang dari 24 jam lalu.
+    if g['detail'].get('struktural') or g['detail'].get('struktural_kecil'):
+        return {'ok': True, 'dijadwalkan': False,
+                'alasan': ('perubahan struktur — hanya tombol manual yang '
+                           'boleh memeriksa ulang')}
+    from . import ambang_periksa as _amb_o
+    _boleh, _alasan_cap = _amb_o.boleh_otomatis_jalan(
+        prof.peta_dibuat if prof else None)
+    if not _boleh:
+        return {'ok': True, 'dijadwalkan': False, 'alasan': _alasan_cap}
     p = proses_mod.mulai(db, user_id=u.id, file_id=fid,
                          komentar=['Pemeriksaan struktur otomatis'])
 
