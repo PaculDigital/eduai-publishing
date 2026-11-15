@@ -2152,6 +2152,12 @@ async def _revisi_kerja(
             for ip in info_potong:
                 _kembalikan_kuota(db, u, ip)
             raise
+    # ── JANGKAR CATATAN (15 Nov 2026): revisi per catatan pembimbing →
+    #    alamat + kutipan persis catatan itu ikut jadi materi komentar,
+    #    supaya AI mahasiswa tidak menebak letaknya. Tanpa catatan_id
+    #    (tempel manual) → komentar tidak berubah sama sekali.
+    komentar = _jangkar_catatan(db, u, body, komentar)
+
     # 4) susun user message (statis + terstruktur — user tidak bisa sisipkan
     #    instruksi lain; komentar dibungkus penanda jelas)
     baris_komentar = '\n'.join(
@@ -3547,6 +3553,46 @@ async def ai_cek_kunci(
         'pesan': ('Dokumen ini sedang direvisi AI. Editing ditahan sementara '
                   'supaya hasil AI tidak bertabrakan dengan editan Anda.'),
     }
+
+
+def _jangkar_catatan(db, u, body, komentar: list) -> list:
+    """Tambahkan alamat + kutipan persis catatan pembimbing ke komentar.
+
+    Dipakai `_revisi_kerja` sesaat sebelum `baris_komentar` dirakit:
+    bila body membawa `catatan_id` milik bimbingan `u` dan catatannya
+    punya kutipan persis (`teks_asli`), satu baris jangkar ditambahkan
+    supaya AI mahasiswa menerima letak persisnya sebagai materi
+    komentar, bukan tebakan. Kepemilikan diperiksa dengan cara yang
+    SAMA seperti `_tandai_catatan_selesai_jika_ada`. Tanpa catatan /
+    bukan milik / tanpa kutipan / gagal apa pun → komentar
+    dikembalikan apa adanya (revisi tidak pernah digagalkan di sini).
+    """
+    try:
+        cid = body.get('catatan_id') if isinstance(body, dict) else None
+        if not cid:
+            return komentar
+        cid = int(cid)
+    except (TypeError, ValueError):
+        return komentar
+    try:
+        from .models import CatatanPembimbing, Pembimbingan
+        c = (db.query(CatatanPembimbing)
+             .filter(CatatanPembimbing.id == cid).one_or_none())
+        if c is None:
+            return komentar
+        b = (db.query(Pembimbingan)
+             .filter(Pembimbingan.id == c.pembimbingan_id).one_or_none())
+        kutip = (c.teks_asli or '').strip()
+        if b is None or b.user_id != u.id or not kutip:
+            return komentar
+        alamat = ((c.section_judul or '').strip()
+                  or (c.section_id or '').strip())
+        baris = (f'[{alamat}] Kutipan: "{kutip}"' if alamat
+                 else f'Kutipan: "{kutip}"')
+        return list(komentar) + [baris]
+    except Exception as e:                                     # noqa: BLE001
+        log.warning('[ai] jangkar catatan gagal: %s', e)
+        return komentar
 
 
 def _tandai_catatan_selesai_jika_ada(db, u, body) -> None:

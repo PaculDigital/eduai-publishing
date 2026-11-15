@@ -32,6 +32,11 @@ Aturan yang diuji (rancangan RENCANA_TINJAU_STABILO.md):
      sempit → alur lama (langsung jadi catatan, 1 token per operasi).
      Periksa dengan AI juga memberi daftar pilihan (gratis), bukan
      langsung catatan.
+  10. Sinkron AI pembimbing vs AI mahasiswa (GAS Bos 17:25 WIB):
+      Asisten memakai format yang sama dengan Periksa (masalah +
+      kutipan + arah perbaikan); revisi per catatan menambahkan
+      alamat + kutipan persis sebagai jangkar komentar (server-side,
+      milik sendiri saja, tanpa menggagalkan revisi).
 """
 import asyncio
 import os
@@ -696,6 +701,95 @@ def main():
             and r_rute_lama.get('dibuat') == 3)
     finally:
         AI._panggil_router = asli_panggil
+
+    # ── 10. Sinkron Asisten vs AI mahasiswa ────────────────────────────
+    import app.asisten as _AS2
+    _jwb_saran = _json.dumps({'usulan': [
+        {'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+         'catatan': 'Kalimat ini terlalu umum.',
+         'saran': 'Tambahkan satu contoh nyata dari lapangan.'}]})
+    _urai = _AS2.urai_usulan(_jwb_saran, ISI_NASKAH)
+    cek('urai_usulan: saran diteruskan (maks 600)',
+        len(_urai) == 1
+        and _urai[0].get('saran') == 'Tambahkan satu contoh nyata dari lapangan.')
+    _urai_lama = _AS2.urai_usulan(_json.dumps({'usulan': [
+        {'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+         'catatan': 'Saran lama.'}]}), ISI_NASKAH)
+    cek('urai_usulan: tanpa saran -> saran kosong (bukan gagal)',
+        len(_urai_lama) == 1 and _urai_lama[0].get('saran') == '')
+
+    _jml_baru = _AS2.simpan_usulan(db, b, [{
+        'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+        'catatan': 'Kalimat ini terlalu umum.',
+        'saran': 'Tambahkan satu contoh nyata dari lapangan.'}])
+    _nt_baru = [c for c in P.daftar_catatan(db, b.id)
+                if 'Tambahkan satu contoh nyata' in c.isi]
+    cek('simpan_usulan + saran -> format Periksa (masalah + kutipan + arah)',
+        _jml_baru == 1 and len(_nt_baru) == 1
+        and _nt_baru[0].isi.startswith('[2.1 Teori Pemasaran]')
+        and 'Kutipan: "' + KALIMAT_TANDAAN + '"' in _nt_baru[0].isi
+        and 'Arah perbaikan: Tambahkan satu contoh nyata dari lapangan.'
+        in _nt_baru[0].isi
+        and _nt_baru[0].teks_asli == KALIMAT_TANDAAN)
+    _jml_lama = _AS2.simpan_usulan(db, b, [{
+        'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+        'catatan': 'Saran lama tanpa arah.'}])
+    _nt_lama = [c for c in P.daftar_catatan(db, b.id)
+                if c.isi == 'Saran lama tanpa arah.']
+    cek('simpan_usulan tanpa saran -> format lama, tetap tersimpan',
+        _jml_lama == 1 and len(_nt_lama) == 1)
+    _jml_salah = _AS2.simpan_usulan(db, b, [{
+        'bab': '2.1 Teori Pemasaran',
+        'kutipan': 'Kalimat yang tidak ada di naskah sama sekali.',
+        'catatan': 'Kutipan salah.',
+        'saran': 'Perbaiki kutipannya.'}])
+    _nt_salah = [c for c in P.daftar_catatan(db, b.id)
+                 if 'Kutipan salah.' in c.isi]
+    cek('simpan_usulan + saran + kutipan salah -> arah ada, kutipan tidak dipalsukan',
+        _jml_salah == 1 and len(_nt_salah) == 1
+        and 'Arah perbaikan: Perbaiki kutipannya.' in _nt_salah[0].isi
+        and 'Kutipan: "' not in _nt_salah[0].isi
+        and not _nt_salah[0].teks_asli)
+    #  Terima pilihan Asisten (sumber asisten) memakai format baru juga.
+    P.simpan_daftar_pilihan(db, b.id, bk.id, 'asisten', [{
+        'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+        'catatan': 'Pilihan bersaran.',
+        'saran': 'Tulis ulang dengan contoh.'}])
+    _terima_saran = _AS2.terima_pilihan(db, b, sup, bk.id, '0')
+    _nt_terima = [c for c in P.daftar_catatan(db, b.id)
+                  if 'Pilihan bersaran.' in c.isi]
+    cek('terima_pilihan Asisten + saran -> catatan format baru',
+        _terima_saran.get('ok') and _terima_saran.get('dibuat') == 1
+        and len(_nt_terima) == 1
+        and 'Arah perbaikan: Tulis ulang dengan contoh.'
+        in _nt_terima[0].isi)
+
+    #  Jangkar catatan di revisi (server-side, milik sendiri saja).
+    _kom = ['Perbaiki kalimat ini']
+    _jangkar = AI._jangkar_catatan(
+        db, mhs, {'catatan_id': c_tandaan.id}, _kom)
+    cek('jangkar: catatan sendiri -> alamat + kutipan ditambahkan',
+        len(_jangkar) == 2 and _jangkar[0] == 'Perbaiki kalimat ini'
+        and _jangkar[1] == '[2.1 \u2014 Teori Pemasaran] Kutipan: "'
+        + KALIMAT_TANDAAN + '"')
+    cek('jangkar: daftar asli tidak diubah',
+        _kom == ['Perbaiki kalimat ini'])
+    _rakit = '\n'.join(
+        f'{i + 1}. {k.strip()}' for i, k in enumerate(_jangkar))
+    cek('jangkar: rakitan baris_komentar memuat kutipan + alamat',
+        '2. [2.1 \u2014 Teori Pemasaran] Kutipan: "' in _rakit
+        and KALIMAT_TANDAAN in _rakit)
+    cek('jangkar: bukan pemilik -> diabaikan',
+        AI._jangkar_catatan(
+            db, sup, {'catatan_id': c_tandaan.id}, _kom) == _kom)
+    cek('jangkar: tanpa kutipan (perintah) -> diabaikan',
+        AI._jangkar_catatan(
+            db, mhs, {'catatan_id': c_perintah.id}, _kom) == _kom)
+    cek('jangkar: id tidak ada / kosong -> diabaikan',
+        AI._jangkar_catatan(db, mhs, {'catatan_id': 999999}, _kom) == _kom
+        and AI._jangkar_catatan(db, mhs, {}, _kom) == _kom
+        and AI._jangkar_catatan(db, mhs, {'catatan_id': 'bukan-angka'},
+                                _kom) == _kom)
 
     print()
     print(f'LULUS {len(LULUS)}  GAGAL {len(GAGAL)}')

@@ -82,12 +82,15 @@ RUBRIK = (
     '4. KEJELASAN: kalimat ambigu, istilah teknis tanpa definisi operasional.\n'
     'ATURAN JAWABAN (mutlak):\n'
     '- Balas HANYA JSON: {"usulan": [{"bab": "...", "kutipan": "...", '
-    '"catatan": "..."}]}\n'
+    '"catatan": "...", "saran": "..."}]}\n'
     f'- Maksimal {USULAN_MAKS} usulan, pilih yang paling penting saja.\n'
     '- "kutipan" = potongan teks ASLI dari draf (persis, 8-15 kata) yang '
     'jadi tempat catatan menempel. Ambil dari draf, jangan karang.\n'
     '- "catatan" = 1-2 kalimat bahasa saran yang hangat, siap dibaca '
     'mahasiswa. Tanpa kata AI/model/sistem.\n'
+    '- "saran" = arah perbaikan 1-2 kalimat, jelas dan konkret '
+    'berdasarkan perbaikan naskah (apa yang harus dilakukan mahasiswa). '
+    'Bukan saran hangat yang samar.\n'
     '- Kalau draf sudah rapi dan tidak ada yang layak ditandai, balas '
     '{"usulan": []} — jangan mencari-cari kesalahan kecil.\n'
     '- Dilarang menambah data, angka, atau rujukan karangan.'
@@ -737,10 +740,12 @@ _RE_JSON = re.compile(r'\{.*\}', re.S)
 
 
 def urai_usulan(jawab: str, naskah: str = '') -> list[dict] | None:
-    """Urai jawaban AI → list usulan {'bab','kutipan','catatan'}.
+    """Urai jawaban AI → list usulan {'bab','kutipan','catatan','saran'}.
 
     Return None = bentuk TIDAK bisa dipercaya (pemanggil kembalikan biaya).
     Return []  = AI jujur bilang draf rapi (hasil sah).
+    `saran` boleh kosong (jawaban AI lama), penyimpanan tetap jalan
+    dengan format lama.
     """
     if not (jawab or '').strip():
         return None
@@ -766,6 +771,7 @@ def urai_usulan(jawab: str, naskah: str = '') -> list[dict] | None:
             'bab': str(x.get('bab') or '').strip()[:80],
             'kutipan': kutipan,
             'catatan': catatan,
+            'saran': str(x.get('saran') or '').strip()[:600],
         })
     #  buang duplikat catatan yang persis sama
     unik, kunci_lama = [], set()
@@ -805,7 +811,22 @@ def simpan_usulan(db: Session, b: Pembimbingan,
             sumber = re.sub(r'\s+', ' ', naskah) if naskah else ''
             if pola and pola.lower() in sumber.lower():
                 teks_asli = u['kutipan']
-        catat(db, b, u['catatan'],
+        #  Format SAMA dengan Periksa (`rapikan_isi`): masalah + kutipan
+        #  + arah perbaikan, supaya AI mahasiswa menerima ketiganya dan
+        #  tidak menebak. Tanpa `saran` (jawaban AI lama / daftar lama)
+        #  → format lama, catatan saja, penyimpanan tetap jalan.
+        _saran = (u.get('saran') or '').strip()
+        if _saran:
+            from . import pembimbing_ai as _PAI      # noqa: PLC0415
+            _isi = _PAI.rapikan_isi({
+                'bagian': (u['bab'] or 'Tinjauan AI')[:200],
+                'soal': u['catatan'],
+                'kutipan': teks_asli,
+                'saran': _saran[:600],
+            })
+        else:
+            _isi = u['catatan']
+        catat(db, b, _isi,
               section_id=rapi_bab(u['bab'] or 'Tinjauan AI')[:80],
               section_judul=(u['bab'] or 'Tinjauan AI')[:200],
               teks_asli=teks_asli,
