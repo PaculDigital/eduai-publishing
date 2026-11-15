@@ -1217,6 +1217,16 @@ class CatatanPembimbing(Base):
     diaktifkan_pada: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     diaktifkan_oleh: Mapped[int] = mapped_column(Integer, default=0)
 
+    #  ═══ AKHIRI REVISI (16 Nov 2026, sidebar sederhana, GAS Bos 00:42 WIB) ═══
+    #  Pembimbing menekan "Akhiri / Selesai Revisi-N" pada satu rantai:
+    #  rantai itu DITUTUP (ditutup = 1 pada KEPALA rantai). Kartunya jadi
+    #  riwayat baca saja: tidak bisa dibalas, tidak bisa dicek lagi,
+    #  tidak bisa diminta lagi. BEDAKAN dari `sudah_oke`: itu selesai
+    #  OTOMATIS sesudah revisi AI mahasiswa (masih bisa dicek pembimbing),
+    #  sedangkan `ditutup` = pembimbing sendiri yang menutup (terkunci).
+    #  DATA LAMA AMAN: default 0 = belum ditutup, tidak ada makna berubah.
+    ditutup: Mapped[int] = mapped_column(Integer, default=0, index=True)
+
     #  SOFT-DELETE: 1 = tidak ditampilkan, TAPI TIDAK PERNAH dibuang.
     #  KENAPA: pembimbing kadang salah tulis; jejaknya harus tetap ada
     #  supaya mahasiswa tidak bisa mengklaim "saya tidak pernah diminta itu".
@@ -1446,6 +1456,10 @@ def _migrasi_kolom() -> None:
             'dilewati_pada': 'DATETIME',
             'diaktifkan_pada': 'DATETIME',
             'diaktifkan_oleh': 'INTEGER DEFAULT 0',
+            # 16 Nov 2026 (sidebar sederhana, GAS Bos 00:42 WIB): rantai
+            # yang diakhiri pembimbing (Akhiri / Selesai). DEFAULT 0
+            # supaya rantai lama tetap berarti "belum ditutup".
+            'ditutup': 'INTEGER DEFAULT 0',
         },
         'versi_dokumen': {
             # 25Sep26 (C10 — bug "gear menghapus naskah"): versi tua ARSIP,

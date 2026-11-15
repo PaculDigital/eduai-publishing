@@ -408,6 +408,17 @@ def tambah_catatan(token: str, isi: str = Form(''), section_id: str = Form(''),
     except ValueError:
         induk = None
 
+    #  ── KUNCI SELESAI (16 Nov 2026, sidebar sederhana, GAS Bos 00:42 WIB)
+    #  Balasan ke rantai yang sudah diakhiri pembimbing DITOLAK (tidak
+    #  disimpan, tidak ada lonceng): kartu itu sudah jadi riwayat baca
+    #  saja. Rantai yang selesai OTOMATIS (sudah_oke) TIDAK tertutup
+    #  oleh ini, pembimbing masih bisa mengeceknya.
+    if induk is not None and P.rantai_tertutup(db, b.id, induk):
+        log.info('[pembimbing] balasan ke rantai tertutup ditolak: %s',
+                 induk)
+        return RedirectResponse(
+            _tujuan_baca(db, token, b, None), status_code=303)
+
     #  ── Berkas & paragraf tempat sorotan menempel (Tahap 3.1) ────────
     #  ⚠️ WAJIB diperiksa: berkas itu harus MILIK bimbingan ini. Tanpa
     #  pemeriksaan ini, pembimbing bisa menempelkan catatan ke naskah
@@ -614,6 +625,46 @@ def aktifkan(token: str, catatan_id: str = Form(''),
     berhasil, pesan = P.aktifkan_lagi(db, b.id, cid, ada.penulis_id)
     log.info('[pembimbing] aktifkan lagi catatan=%s hasil=%s pesan=%s',
              cid, berhasil, pesan)
+    #  Kembali ke EDITOR + SIDEBAR (bukan halaman tinjau lama).
+    return RedirectResponse(
+        _tujuan_baca(db, token, b, ada.berkas_id), status_code=303)
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  AKHIRI REVISI — sisi PEMBIMBING (sidebar sederhana, 16 Nov 2026)
+#
+#  Pembimbing menekan "Akhiri / Selesai Revisi-N": rantai itu DITUTUP
+#  (P.akhiri_rantai). Sesudahnya kartu jadi riwayat baca saja: tombol
+#  Balas/Cek/Minta TIDAK dirender lagi dan balasan DITOLAK server
+#  (penjaga di tambah_catatan + /kolaborasi/balasan). Revisi baru hanya
+#  dari catatan baru. HANYA lewat token pembimbing yang masih hidup.
+# ═══════════════════════════════════════════════════════════════════════
+
+@router.post('/tinjau/{token}/akhiri')
+def akhiri(token: str, catatan_id: str = Form(''),
+           db: Session = Depends(get_db)):
+    """Pembimbing mengakhiri satu rantai revisi."""
+    b, sebab = P.cari_dari_token(db, token)
+    if b is None:
+        return RedirectResponse(f'/tinjau/{token}', status_code=303)
+
+    try:
+        cid = int(catatan_id)
+    except (TypeError, ValueError):
+        return RedirectResponse(f'/tinjau/{token}', status_code=303)
+
+    #  ⚠️ WAJIB diperiksa: catatan itu harus MILIK bimbingan ini.
+    from .models import CatatanPembimbing
+    ada = (db.query(CatatanPembimbing)
+           .filter(CatatanPembimbing.id == cid,
+                   CatatanPembimbing.pembimbingan_id == b.id)
+           .one_or_none())
+    if ada is None:
+        return RedirectResponse(f'/tinjau/{token}', status_code=303)
+
+    berhasil = P.akhiri_rantai(db, b.id, cid)
+    log.info('[pembimbing] akhiri rantai catatan=%s hasil=%s',
+             cid, berhasil)
     #  Kembali ke EDITOR + SIDEBAR (bukan halaman tinjau lama).
     return RedirectResponse(
         _tujuan_baca(db, token, b, ada.berkas_id), status_code=303)

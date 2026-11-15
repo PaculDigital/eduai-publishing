@@ -267,6 +267,9 @@ def naskah_baca(token: str, berkas_id: int, request: Request,
     rantai = P.rangkai(catatan)
     angka = P.ringkas(catatan)
     jenis_catatan = {c.id: P.jenis_catatan(c) for c in catatan}
+    #  Label + tooltip tampil per catatan (nama + tooltip Boss 22:44/22:45 WIB).
+    label_jenis_catatan = {c.id: P.label_jenis_catatan(c) for c in catatan}
+    tooltip_jenis_catatan = {c.id: P.tooltip_jenis_catatan(c) for c in catatan}
     #  Dropdown Bab/Sub-bab sidebar: dari peta Jev tersimpan, jatuh ke
     #  potongan bagian state.petakan() (lihat kelompok_catatan).
     bab_naskah = KC.daftar_bagian_sidebar(db, bk.file_id, teks_naskah)
@@ -343,6 +346,9 @@ def naskah_baca(token: str, berkas_id: int, request: Request,
         'semua_berkas': P.daftar_berkas(db, b.id),
         'catatan': catatan, 'rantai': rantai, 'kelompok': kelompok,
         'jenis_catatan': jenis_catatan,
+        'label_jenis_catatan': label_jenis_catatan,
+        'tooltip_jenis_catatan': tooltip_jenis_catatan,
+        'tooltip_jenis': P.TOOLTIP_JENIS,
         'bab_naskah': bab_naskah, 'petunjuk': petunjuk,
         'sorotan': sorotan_per_catatan, 'angka': angka,
         'ai_aktif': PAI.aktif(), 'ai': ai,

@@ -58,10 +58,10 @@ h1{font-size:21px;margin-bottom:6px}
   {% include '_menu.html' %}
   <h1>Kolaborasi</h1>
   <p class="sub">Naskah mahasiswa yang diundangkan ke Anda untuk ditinjau.</p>
-  {# Aturan 5 (C7): biaya Asisten jujur di layar SEBELUM klik — yang bayar
-     akun ini: trial gratis pertama, sesudahnya 1 Token Revisi dari saldo. #}
-  {% if biaya_asisten and biaya_asisten.pakai_trial %}<p class="sub">Tinjauan AI pertama gratis untuk akun ini.</p>
-  {% elif biaya_asisten %}<p class="sub">Tinjauan AI memakai 1 Token Revisi dari saldomu.</p>{% endif %}
+  {# Biaya Asisten di tombol saja (Boss 22:48 WIB: tidak usah dijelaskan
+     dipotong 1 token, langsung di tombol "Asisten Ai (1 Token)"). Baris
+     trial pertama gratis tetap tampil, itu bukan penjelasan potongan. #}
+  {% if biaya_asisten and biaya_asisten.pakai_trial %}<p class="sub">Tinjauan AI pertama gratis untuk akun ini.</p>{% endif %}
 
   {% if kait == 'ya' %}<div class="pesan ya">Naskah berhasil disambungkan ke akun ini — sekarang selalu muncul di halaman ini.</div>
   {% elif kait == 'tidak' %}<div class="pesan tidak">Link itu tidak bisa disambungkan (mungkin milik email lain atau sudah tidak aktif). Tanyakan ke mahasiswa yang mengundang ya.</div>
@@ -82,7 +82,7 @@ h1{font-size:21px;margin-bottom:6px}
            masuk (C5) tanpa menunggu persetujuan. Tombol hanya bila user
            login. Istilah = "tinjauan" (sama dengan tombol Buka tinjauan). #}
         <button class="tombol ghost" type="button"
-                onclick="mintaTinjau({{ d.b.id }}, this)">Minta AI tinjau naskah</button>
+                onclick="mintaTinjau({{ d.b.id }}, this)">Asisten Ai (1 Token)</button>
       </div>
     </div>
     {% endfor %}
@@ -95,7 +95,7 @@ h1{font-size:21px;margin-bottom:6px}
   {% endif %}
 </main>
 <script>
-//  {{ ikon('sparkles', 16) }} T5.2 — tombol "Minta AI tinjau naskah". Kunci tombol saat berjalan supaya
+//  {{ ikon('sparkles', 16) }} T5.2 — tombol "Asisten Ai (1 Token)". Kunci tombol saat berjalan supaya
 //  tidak dobel-klik (pola "kunci tombol" tinjau.html). Pesan selalu
 //  memberi jalan keluar, tanpa kata menakutkan.
 async function mintaTinjau(id, btn){

@@ -9,9 +9,14 @@
     ⚠️ JANGAN pakai mode='view', terukur 03Okt26 mematikan komentar juga.
        Hak baca diatur di app/onlyoffice.py (parameter `mode_baca`).
 
-    SIDEBAR (15 Nov 2026, GAS Bos): di samping editor ada panel catatan,
-    daftar catatan + form catatan + tombol Asisten AI. Halaman tinjau lama
-    tidak lagi merender teks naskah; yang dibaca adalah editor ini.
+    SIDEBAR SEDERHANA (16 Nov 2026, GAS Bos 00:42 WIB): layar pertama
+    hanya satu kotak tulis + Kirim + History Revisi. AI bersembunyi di
+    balik "Minta AI membantu", kutipan/posisi/lampiran di balik
+    "Tambah detail". Jenis catatan TIDAK ditanya dan TIDAK tampil
+    (dikenali backend dari isi: ada kutipan = Perbaiki Kalimat Naskah,
+    tanpa kutipan = Kalimat Revisi). Tiap rantai dinomori Revisi-1/2/3,
+    status + balasan jadi pill di atas kartu, tombol Akhiri menutup
+    rantai jadi riwayat baca saja (tombol lain TIDAK dirender lagi).
     WARNA: hanya 3 (kuning/hijau/biru) mengikuti halaman tinjau.
     TIDAK ada nama alat/AI di layar. Tidak ada roda gigi/kuota.
 #}
@@ -116,15 +121,6 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
           height:32px;border-radius:50%;cursor:pointer;flex:none;font-size:16px}
 .pt-tutup:hover{background:rgba(255,255,255,.3)}
 .pt-isi{flex:1;overflow-y:auto;padding:0 0 18px}
-.pt-angka{display:flex;gap:14px;padding:12px 16px 0;font-size:12.5px;color:var(--abu);flex-wrap:wrap}
-.pt-angka b{font-size:15px;color:var(--teks);font-weight:700}
-.pt-angka .k b{color:#B8860B}
-.pt-angka .h b{color:#146B2C}
-.pt-legenda{padding:11px 16px;background:#FAFAFB;border-bottom:1px solid var(--garis);
-            font-size:11.5px;color:var(--abu);display:flex;flex-direction:column;gap:5px}
-.pt-legenda span{display:flex;align-items:center;gap:7px}
-.pt-kotak{width:13px;height:13px;border-radius:3px;flex:none}
-.pt-legenda-asli{font-weight:600;color:#3A3844}
 .pt-alat{padding:13px 16px;border-bottom:1px solid var(--garis);display:flex;
          flex-direction:column;gap:9px}
 .pt-alat .pt-biaya{font-size:12px;color:var(--abu);line-height:1.6}
@@ -159,8 +155,6 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
         background:#fff}
 .pt-berkas select:focus,.pt-tulis select:focus,.pt-tulis input:focus,
 .pt-tulis textarea:focus{outline:none;border-color:var(--hijau)}
-.pt-jenis{display:flex;gap:14px;padding:12px 16px 0;font-size:12.5px;flex-wrap:wrap}
-.pt-jenis label{display:flex;align-items:center;gap:6px;cursor:pointer}
 .pt-tulis textarea{width:calc(100% - 32px);margin:7px 16px 0;font-family:inherit;
         font-size:13px;padding:10px 12px;border:1.5px solid var(--garis);
         border-radius:8px;resize:vertical;min-height:64px;color:var(--teks)}
@@ -170,6 +164,34 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
 .pt-tulis small{font-size:11px;color:var(--abu);line-height:1.5}
 .pt-salah{background:#FDECEC;color:#A32B2B;font-size:12px;line-height:1.6;
           border-radius:8px;padding:9px 12px;margin:10px 16px 0}
+
+/*  ── SIDEBAR SEDERHANA (16 Nov 2026, GAS Bos 00:42 WIB) ──────────────
+    Layar pertama: kotak tulis + Kirim + History Revisi. AI dan detail
+    bersembunyi di balik lipatan, jenis catatan tidak ditanya dan tidak
+    tampil. Status + balasan jadi pill di atas tiap kartu. */
+.pt-hint{font-size:12px;color:var(--abu);margin:2px 16px 0;line-height:1.5}
+.pt-hitung{font-size:11px;color:var(--abu);text-align:right;margin:4px 16px 0}
+.pt-lipat-ai,.pt-lipat-detail{margin:10px 16px 0;border:1.5px solid var(--garis);
+        border-radius:10px;overflow:hidden}
+.pt-lipat-ai summary,.pt-lipat-detail summary{cursor:pointer;font-size:13px;
+        font-weight:700;color:var(--hijau-gelap);padding:10px 12px;
+        background:#FAFAFB;list-style:none}
+.pt-lipat-ai summary::-webkit-details-marker,
+.pt-lipat-detail summary::-webkit-details-marker{display:none}
+.pt-lipat-ai summary::after,.pt-lipat-detail summary::after{content:'▾';float:right}
+.pt-lipat-ai[open ] summary::after,.pt-lipat-detail[open ] summary::after{content:'▴'}
+.pt-lipat-ai .pt-alat{border-bottom:none}
+.pt-detail-isi{padding:2px 0 12px}
+.pt-detail-isi .pt-label{margin:12px 0 5px}
+.pt-detail-isi select,.pt-detail-isi input[type=text],
+.pt-detail-isi textarea{width:calc(100% - 0px);margin:0}
+.pt-detail-isi .pilih-gambar{display:block;padding:10px 0 0;font-size:12.5px;color:var(--abu)}
+.pt-detail-judul{font-size:12px;font-weight:700;color:#3A3844;margin:14px 0 2px}
+.pt-tidak-wajib{font-size:11px;font-weight:600;color:var(--abu);background:#F0F0F2;
+        padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pt-label-kecil{font-size:12px;font-weight:600;color:#3A3844;display:block;margin:10px 0 5px}
+.pt-judul-riwayat{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--abu);
+        padding:16px 16px 8px;border-top:1px solid var(--garis);margin-top:14px}
 
 /*  ── daftar catatan per bab (pindahan panel tinjau lama) ────────────── */
 .pt-hampa{padding:34px 20px;text-align:center;color:var(--abu);font-size:12.5px;line-height:1.7}
@@ -189,15 +211,14 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
 .pt-isi-bab > .pt-baris:last-child{border-bottom:0}
 .pt-baris{padding:13px 16px;border-bottom:1px solid #F0F0F2;cursor:pointer}
 .pt-baris:hover{background:#FAFAFB}
-.pt-baris .atas{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
-.pt-baris .jenis{font-size:11px;font-weight:700;color:#146B2C;background:var(--hijau-muda);
-            padding:2px 8px;border-radius:5px}
-.pt-baris .perbaikan{font-size:11px;color:var(--abu);background:#F0F0F2;padding:2px 7px;border-radius:5px}
+.pt-statusbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+.pt-revisi{font-size:12.5px;font-weight:700;color:var(--teks)}
+.pt-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.pt-pill.tunggu{background:var(--kuning);color:#8A6D0B}
+.pt-pill.sudah,.pt-pill.selesai{background:var(--hijau-tanda);color:#146B2C}
+.pt-pill.balasan{background:#F0F0F2;color:var(--abu)}
 .pt-baris .tanda-lampiran{font-size:11px;line-height:1;background:#EEF6F0;
   border:1px solid #D3E7DA;border-radius:5px;padding:2px 6px;cursor:help}
-.pt-baris .warna{width:10px;height:10px;border-radius:50%;margin-left:auto;flex:none}
-.w-kuning{background:var(--kuning-tepi)} .w-hijau{background:var(--hijau-tepi)}
-.w-biru{background:var(--biru-tepi)}
 .pt-baris .isi{font-size:13px;line-height:1.6;color:#3A3844;
             display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pt-baris .detail{display:none;margin-top:10px;font-size:12.5px;color:var(--abu);
@@ -238,6 +259,37 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
   padding:7px 16px;border-radius:70px;border:none;font-family:inherit;cursor:pointer;margin-top:7px}
 .pt-baris .tombol-kecil:hover{background:var(--hijau-gelap)}
 .pt-baris .tombol-kecil:disabled{background:#BFD8C6;cursor:not-allowed}
+
+/*  ── Tombol aksi di rantai terbuka (16 Nov 2026) ──────────────────────
+    Balas / Cek Masih belum benar / Minta dikerjakan ulang - Skip /
+    Akhiri. Tooltip hanya tampil di perangkat berkursor (aturan Bos:
+    ketukan HP tidak boleh tertahan tooltip). */
+.pt-aksi-rantai{margin-top:10px;border-top:1px dashed var(--garis);padding-top:10px}
+.pt-aksi-tombol{display:flex;gap:8px;flex-wrap:wrap}
+.pt-aksi-btn{position:relative;background:#fff;border:1.5px solid var(--hijau);
+  color:var(--hijau-gelap);font-weight:700;font-size:12px;padding:7px 13px;
+  border-radius:70px;cursor:pointer;font-family:inherit}
+.pt-aksi-btn:hover{background:var(--hijau-muda)}
+.pt-aksi-btn.akhiri{background:var(--hijau);border-color:var(--hijau);color:#fff}
+.pt-aksi-btn.akhiri:hover{background:var(--hijau-gelap)}
+.pt-aksi-btn:disabled{background:#BFD8C6;border-color:#BFD8C6;cursor:not-allowed}
+.pt-aksi-btn .tip,.tb-minta .tip{display:none;position:absolute;left:0;
+  bottom:calc(100% + 7px);z-index:20;background:#272530;color:#fff;
+  font-size:11.5px;font-weight:400;line-height:1.5;padding:8px 11px;
+  border-radius:8px;width:230px;max-width:78vw;text-align:left;white-space:normal}
+.tb-minta{position:relative}
+@media (hover:hover) and (pointer:fine){
+  .pt-aksi-btn:hover .tip,.pt-aksi-btn:focus .tip,
+  .tb-minta:hover .tip,.tb-minta:focus .tip{display:block}
+}
+.pt-balas-box{margin-top:10px}
+.pt-balas-mode{font-size:12px;color:var(--abu);margin-bottom:6px}
+.pt-balas-box textarea{width:100%;font-family:inherit;font-size:12.5px;
+  padding:9px 11px;border:1.5px solid var(--garis);border-radius:8px;
+  resize:vertical;min-height:56px;color:var(--teks)}
+.pt-balas-box textarea:focus{outline:none;border-color:var(--hijau)}
+.pt-terkunci{margin-top:10px;background:#F0F0F2;border-radius:8px;
+  padding:9px 11px;font-size:12px;line-height:1.6;color:var(--abu)}
 </style>
 </head>
 <body>
@@ -289,59 +341,103 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
   </div>
 
   <div class="pt-isi">
-    <div class="pt-angka">
-      <span class="k">Perlu ditinjau <b>{{ angka.belum }}</b></span>
-      <span class="h">Sudah oke <b>{{ angka.selesai }}</b></span>
-      <span>Semua <b>{{ angka.total }}</b></span>
-    </div>
 
-    <div class="pt-legenda">
-      <span><i class="pt-kotak" style="background:var(--kuning-tepi)"></i>
-            Kuning, catatan Anda, belum ditindaklanjuti</span>
-      <span><i class="pt-kotak" style="background:var(--hijau-tepi)"></i>
-            Hijau, Anda sudah menyatakan oke</span>
-      <span><i class="pt-kotak" style="background:var(--biru-tepi)"></i>
-            Biru, penanda pribadi mahasiswa</span>
-      <span class="pt-legenda-asli">Tidak tercetak di naskah Asli (hanya penanda revisi)</span>
-    </div>
+    {# ── Tulis catatan baru (layar pertama: kotak + Kirim) ───────────── #}
+    <div class="pt-tulis" id="kolom-tulis">
+      <form method="post" action="/tinjau/{{ token }}/catatan"
+            enctype="multipart/form-data" onsubmit="isiJudulBagian();kunciTombol(this)">
+        <label class="pt-label" for="teks-isi">Tulis catatan</label>
+        <div class="pt-hint">Tulis saja, tidak perlu memilih jenis apa pun.</div>
+        <textarea name="isi" id="teks-isi" placeholder="Tulis catatan untuk mahasiswa..."
+                  required></textarea>
+        <div class="pt-hitung"><span id="hitung-huruf">0</span> huruf</div>
 
-    {# ── Asisten AI (dua pintu yang SUDAH ADA, 1 token PER BUTIR) ──── #}
-    {% if ai_aktif %}
-    <div class="pt-alat">
-      {% if sudah_masuk %}
-      <div class="pt-biaya">
-        {% if biaya_asisten and biaya_asisten.pakai_trial %}
-        Pilihan pertama yang diterima gratis untuk akun ini. Sesudahnya
-        1 Token Revisi per pilihan yang diterima.
-        {% else %}
-        1 Token Revisi per pilihan yang diterima.
+        {# ── Minta AI membantu (lipatan; isinya pintu AI yang SUDAH ADA) #}
+        {% if ai_aktif %}
+        <details class="pt-lipat-ai">
+          <summary>Minta AI membantu</summary>
+          <div class="pt-alat">
+            {% if sudah_masuk %}
+            <input type="text" id="perintah-asisten" class="pt-perintah"
+                   placeholder="Perintah untuk AI (opsional, contoh: perbaiki 2.1)">
+            <div class="pt-biaya">Kosongkan bila mau AI memberi pilihan revisi.</div>
+            <button type="button" class="pt-btn" id="btn-asisten">
+              Asisten Ai (1 Token)
+            </button>
+            <div class="pt-pesan" id="pesan-asisten" hidden></div>
+            {% else %}
+            <div class="pt-biaya">
+              Daftar dulu supaya tokennya tersimpan di akunmu.
+            </div>
+            <a class="pt-btn" href="/daftar?dari=/tinjau/{{ token }}">
+              Daftar dulu untuk memakai Asisten AI
+            </a>
+            {% endif %}
+            <button class="pt-btn kedua" type="submit" form="form-periksa">
+              Periksa dengan AI
+            </button>
+            <div class="pt-biaya">Hasilnya muncul sebagai pilihan revisi di panel ini.</div>
+          </div>
+        </details>
         {% endif %}
-      </div>
-      <input type="text" id="perintah-asisten" class="pt-perintah"
-             placeholder="Perintah untuk AI (opsional, contoh: perbaiki 2.1)">
-      <div class="pt-biaya">Kosongkan bila mau AI memberi pilihan revisi.</div>
-      <button type="button" class="pt-btn" id="btn-asisten">
-        Minta AI meninjau naskah
-      </button>
-      <div class="pt-pesan" id="pesan-asisten" hidden></div>
-      {% else %}
-      <div class="pt-biaya">
-        Setiap pilihan yang diterima memakai 1 Token Revisi. Daftar dulu
-        supaya tokennya tersimpan di akunmu.
-      </div>
-      <a class="pt-btn" href="/daftar?dari=/tinjau/{{ token }}">
-        Daftar dulu untuk memakai Asisten AI
-      </a>
-      {% endif %}
-      <form method="post" action="/tinjau/{{ token }}/periksa-ai">
+
+        {# ── Tambah detail (lipatan; Posisi paling atas, lalu kutipan) ─── #}
+        <details class="pt-lipat-detail">
+          <summary>Tambah detail</summary>
+          <div class="pt-detail-isi">
+            {% if bab_naskah %}
+            <label class="pt-label" for="pilih-bagian">Posisi di naskah</label>
+            <select name="section_id" id="pilih-bagian" onchange="isiJudulBagian()">
+              <option value="" data-label="">Tidak ditentukan, dicari otomatis dari kutipan</option>
+              {% for b in bab_naskah %}
+              <option value="{{ b.section_id }}" data-label="{{ b.label }}">{{ b.label }}{% if b.terperiksa %} &#10003;{% endif %}</option>
+              {% endfor %}
+              <option value="" data-label="Bagian lain">Bagian lain (bukan bab)</option>
+            </select>
+            <input type="hidden" name="section_judul" id="judul-bagian" value="">
+            <label class="pt-label" for="pilih-posisi" title="Catatan ini berlaku pada bagian yang dipilih, atau sesudah bagian itu.">Posisi</label>
+            <select name="posisi" id="pilih-posisi" onchange="isiJudulBagian()">
+              <option value="pada">Pada bagian ini</option>
+              <option value="sesudah">Sesudah bagian ini</option>
+            </select>
+            {% else %}
+            <input type="text" name="section_judul"
+                   placeholder="Bagian mana? (mis. Pasal 3 / halaman 2)">
+            {% endif %}
+            <div class="pt-detail-judul">Kutipan kalimat &amp; lampiran
+              <span class="pt-tidak-wajib">Tidak wajib, boleh kosong</span></div>
+            <label class="pt-label-kecil" for="teks-terpilih">Kutipan kalimat dari naskah yang akan ditandai</label>
+            <textarea class="pt-kutip" name="teks_asli" id="teks-terpilih"
+                      placeholder="Tempel kalimat dari naskah di sini... (boleh kosong)"></textarea>
+            <label class="pt-label-kecil" for="tautan-rujukan">Lampiran / tautan</label>
+            <input type="text" name="tautan" id="tautan-rujukan"
+                   placeholder="Tautan rujukan (opsional)">
+            <label class="pilih-gambar" style="display:block;padding:10px 0 0;font-size:12.5px;color:var(--abu)">
+              <input type="file" name="lampiran" id="pilih-gambar"
+                     onchange="namaGambar(this)">
+              <span id="teks-gambar">Lampirkan gambar / dokumen (opsional)</span>
+            </label>
+            {% if lampiran_ditolak %}
+            <div class="pt-salah">
+              Lampiran tidak terkirim, jenis berkas belum didukung atau terlalu
+              besar (maks 10 MB). Catatan Anda tetap bisa dikirim tanpa lampiran.
+            </div>
+            {% endif %}
+          </div>
+        </details>
+
         <input type="hidden" name="berkas_id" value="{{ berkas.id }}">
-        <button class="pt-btn kedua" type="submit">
-          Periksa dengan AI
-        </button>
+        <div class="pt-aksi">
+          <small>Catatan tidak mengubah naskah mahasiswa.</small>
+          <button class="pt-btn" type="submit">Kirim</button>
+        </div>
       </form>
-      <div class="pt-biaya">Hasilnya muncul sebagai pilihan revisi di panel ini.</div>
+      {% if ai_aktif %}
+      <form id="form-periksa" method="post" action="/tinjau/{{ token }}/periksa-ai">
+        <input type="hidden" name="berkas_id" value="{{ berkas.id }}">
+      </form>
+      {% endif %}
     </div>
-    {% endif %}
 
     {# ── Pilihan revisi dari AI (15 Nov 2026) ───────────────────────── #}
     {% if sudah_masuk and usulan_pilihan and usulan_pilihan.daftar %}
@@ -379,7 +475,8 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
     </div>
     {% endif %}
 
-    {# ── Daftar catatan (pindahan panel tinjau lama) ──────────────────── #}
+    {# ── History Revisi (dulu: Daftar Catatan) ────────────────────────── #}
+    <div class="pt-judul-riwayat">HISTORY REVISI{% if kelompok %} ({{ kelompok|sum(attribute='jumlah') }}){% endif %}</div>
     {% if kelompok %}
       {% for grup in kelompok %}
       <div class="pt-kepala-bab{% if grup.buka %} buka{% endif %}"
@@ -397,16 +494,24 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
       {% for simpul in grup.catatan %}
       {% set tunjuk = petunjuk.get(simpul.terbaru.id) %}
       <div class="pt-baris" onclick="bukaBaris(this)">
-        <div class="atas">
-          <span class="jenis">{{ (jenis_catatan.get(simpul.terbaru.id, 'umum') or 'umum')|capitalize }}</span>
+        <div class="pt-statusbar">
+          <span class="pt-revisi">Revisi-{{ simpul.nomor_revisi }}</span>
+          {% if simpul.kepala.ditutup %}
+          <span class="pt-pill selesai">Selesai</span>
+          {% elif simpul.terbaru.sudah_oke %}
+          <span class="pt-pill sudah">Sudah diperbaiki</span>
+          {% else %}
+          <span class="pt-pill tunggu">Menunggu diperbaiki</span>
+          {% endif %}
           {% if simpul.jumlah_ronde > 1 %}
-          <span class="perbaikan">perbaikan &times;{{ simpul.jumlah_ronde }}</span>
+          <span class="pt-pill balasan">{{ simpul.jumlah_ronde - 1 }} Balasan</span>
+          {% else %}
+          <span class="pt-pill balasan">Belum dibalas</span>
           {% endif %}
           {% if simpul.terbaru.lampiran or simpul.terbaru.tautan %}
           <span class="tanda-lampiran"
                 title="{% if simpul.terbaru.lampiran %}Ada lampiran berkas{% endif %}{% if simpul.terbaru.lampiran and simpul.terbaru.tautan %} + {% endif %}{% if simpul.terbaru.tautan %}Ada tautan rujukan{% endif %}">&#128206;{% if simpul.terbaru.lampiran and simpul.terbaru.tautan %}&#128279;{% endif %}</span>
           {% endif %}
-          <span class="warna w-{{ simpul.terbaru.warna }}"></span>
         </div>
         <div class="isi">{{ simpul.terbaru.isi }}</div>
 
@@ -495,8 +600,18 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
           </div>
           {% endif %}
 
-          {% if loop.first %}
-          <div style="margin-top:9px">
+          {# ── AKSI RANTAI (16 Nov 2026, sidebar sederhana) ──────────
+             Rantai yang sudah diakhiri TIDAK dirender tombol apa pun:
+             kartu jadi riwayat baca saja. Revisi baru hanya dari kotak
+             tulis utama (catatan baru = Revisi baru). #}
+          {% if simpul.kepala.ditutup %}
+          <div class="pt-terkunci">
+            Revisi ini sudah diakhiri, jadi riwayat baca saja. Tidak bisa
+            dibalas atau diubah lagi. Untuk revisi baru, tulis catatan
+            baru di kotak tulis di atas.
+          </div>
+          {% else %}
+          <div class="pt-aksi-rantai" onclick="event.stopPropagation()">
             {% if simpul.kepala.dilewati %}
             <div class="minta-lagi">
               <div class="minta-ket">
@@ -510,18 +625,35 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
                     onsubmit="kunciTombol(this)">
                 <input type="hidden" name="catatan_id"
                        value="{{ simpul.kepala.id }}">
-                <button class="tb-minta" type="submit">
-                  &#8635; Minta lagi ke mahasiswa
-                </button>
+                <button class="tb-minta" type="submit"
+                        title="Mahasiswa melewati (skip) revisi ini, jadi tidak dikerjakan. Klik ini: revisi diminta kembali dan mahasiswa harus mengerjakannya ulang.">Minta dikerjakan ulang - Skip<span class="tip">Mahasiswa melewati (skip) revisi ini, jadi tidak dikerjakan. Klik ini: revisi diminta kembali dan mahasiswa harus mengerjakannya ulang.</span></button>
               </form>
             </div>
             {% endif %}
-            <form method="post" action="/tinjau/{{ token }}/catatan">
+            <div class="pt-aksi-tombol">
+              <button type="button" class="pt-aksi-btn"
+                      onclick="bukaBalasan(this, 'balas', event)">Balas</button>
+              <button type="button" class="pt-aksi-btn"
+                      onclick="bukaBalasan(this, 'cek', event)"
+                      title="Sudah Anda periksa, tapi hasil perbaikan mahasiswa masih belum benar. Klik ini: revisi aktif lagi dan mahasiswa diminta memperbaikinya kembali.">Cek Masih belum benar<span class="tip">Sudah Anda periksa, tapi hasil perbaikan mahasiswa masih belum benar. Klik ini: revisi aktif lagi dan mahasiswa diminta memperbaikinya kembali.</span></button>
+              <form method="post" action="/tinjau/{{ token }}/akhiri"
+                    onsubmit="kunciTombol(this)" style="display:contents">
+                <input type="hidden" name="catatan_id"
+                       value="{{ simpul.kepala.id }}">
+                <button class="pt-aksi-btn akhiri" type="submit"
+                        title="Hasil perbaikan mahasiswa sudah benar. Klik ini untuk mengakhiri Revisi-{{ simpul.nomor_revisi }}: tombol Balas, Cek, dan Minta di kartu ini hilang, kotak balasan ditutup, kartu jadi riwayat baca saja.">Akhiri / Selesai Revisi-{{ simpul.nomor_revisi }}<span class="tip">Hasil perbaikan mahasiswa sudah benar. Klik ini untuk mengakhiri Revisi-{{ simpul.nomor_revisi }}: tombol Balas, Cek, dan Minta di kartu ini hilang, kotak balasan ditutup, kartu jadi riwayat baca saja.</span></button>
+              </form>
+            </div>
+            <form class="pt-balas-box" method="post" action="/tinjau/{{ token }}/catatan"
+                  onsubmit="kunciTombol(this)" hidden>
               <input type="hidden" name="induk_id" value="{{ simpul.terbaru.id }}">
               <input type="hidden" name="section_id" value="{{ simpul.kepala.section_id }}">
               <input type="hidden" name="section_judul" value="{{ simpul.kepala.section_judul }}">
-              <input type="text" name="isi" placeholder="Tandai ulang (masih belum)...">
-              <button class="tombol-kecil" type="submit">Kirim ulang</button>
+              <input type="hidden" name="berkas_id" value="{{ simpul.kepala.berkas_id }}">
+              <div class="pt-balas-mode">Balasan untuk mahasiswa</div>
+              <textarea name="isi" placeholder="Tulis balasan untuk mahasiswa..."
+                        required></textarea>
+              <button class="tombol-kecil" type="submit">Kirim balasan</button>
             </form>
           </div>
           {% endif %}
@@ -536,65 +668,6 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
         Catatan Anda akan muncul di sini, tersusun rapi per bab.
       </div>
     {% endif %}
-
-    {# ── Tulis catatan baru ──────────────────────────────────────────── #}
-    <div class="pt-tulis" id="kolom-tulis">
-      <form method="post" action="/tinjau/{{ token }}/catatan"
-            enctype="multipart/form-data" onsubmit="isiJudulBagian();kunciTombol(this)">
-        <div class="pt-jenis">
-          <label><input type="radio" name="jenis" value="tandaan" checked
-                        onchange="aturJenis()"> Tandaan (satu kalimat)</label>
-          <label><input type="radio" name="jenis" value="perintah"
-                        onchange="aturJenis()"> Perintah (satu bagian)</label>
-        </div>
-        <div id="kotak-kutip">
-          <label class="pt-label" for="teks-terpilih">Kalimat yang ditandai</label>
-          <textarea class="pt-kutip" name="teks_asli" id="teks-terpilih"
-                    placeholder="Salin satu kalimat persis dari naskah, atau kosongkan untuk perintah umum."></textarea>
-        </div>
-        <textarea name="isi" placeholder="Tulis catatan untuk mahasiswa..."
-                  required></textarea>
-        {% if bab_naskah %}
-        <label class="pt-label" for="pilih-bagian">Bagian mana?</label>
-        <select name="section_id" id="pilih-bagian" onchange="isiJudulBagian()">
-          <option value="" data-label="">Bagian mana? (opsional)</option>
-          {% for b in bab_naskah %}
-          <option value="{{ b.section_id }}" data-label="{{ b.label }}">{{ b.label }}{% if b.terperiksa %} &#10003;{% endif %}</option>
-          {% endfor %}
-          <option value="" data-label="Bagian lain">Bagian lain (bukan bab)</option>
-        </select>
-        <input type="hidden" name="section_judul" id="judul-bagian" value="">
-        <div id="kotak-posisi" hidden>
-          <label class="pt-label" for="pilih-posisi">Posisi perintah</label>
-          <select name="posisi" id="pilih-posisi" onchange="isiJudulBagian()">
-            <option value="pada">Pada bagian ini</option>
-            <option value="sesudah">Sesudah bagian ini</option>
-          </select>
-        </div>
-        {% else %}
-        <input type="text" name="section_judul"
-               placeholder="Bagian mana? (mis. Pasal 3 / halaman 2)">
-        {% endif %}
-        <input type="hidden" name="berkas_id" value="{{ berkas.id }}">
-        <input type="text" name="tautan"
-               placeholder="Tautan rujukan (opsional)">
-        <label class="pilih-gambar" style="display:block;padding:10px 16px 0;font-size:12.5px;color:var(--abu)">
-          <input type="file" name="lampiran" id="pilih-gambar"
-                 onchange="namaGambar(this)">
-          <span id="teks-gambar">Lampirkan gambar / dokumen (opsional)</span>
-        </label>
-        {% if lampiran_ditolak %}
-        <div class="pt-salah">
-          Lampiran tidak terkirim, jenis berkas belum didukung atau terlalu
-          besar (maks 10 MB). Catatan Anda tetap bisa dikirim tanpa lampiran.
-        </div>
-        {% endif %}
-        <div class="pt-aksi">
-          <small>Catatan tidak mengubah naskah mahasiswa.</small>
-          <button class="pt-btn" type="submit">Kirim</button>
-        </div>
-      </form>
-    </div>
   </div>
 </aside>
 </div>
@@ -664,7 +737,7 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
 })();
 </script>
 <script>
-//  ── SIDEBAR CATATAN (15 Nov 2026) ─────────────────────────────────────
+//  ── SIDEBAR CATATAN (15 Nov 2026, sederhana 16 Nov 2026) ─────────────
 var panelTinjau = document.getElementById('panel-tinjau');
 function bukaPanelTinjau(buka){
   if(!panelTinjau) return;
@@ -692,6 +765,34 @@ function lipatRonde(btn, ev){
   wadah.hidden = !buka;
   btn.textContent = buka ? 'Sembunyikan ronde sebelumnya'
     : 'Ronde sebelumnya (' + (wadah.dataset.jumlah || '') + ')';
+}
+
+//  ── Balas / Cek di rantai (16 Nov 2026, sidebar sederhana) ──────────
+//  Satu kotak balasan per rantai; "Balas" dan "Cek Masih belum benar"
+//  membuka kotak yang SAMA, bedanya hanya petunjuk isinya. stopPropagation
+//  WAJIB: tombol ada di dalam .pt-baris (cacat uji WA 15 Nov: kotak
+//  "Tandai ulang" tak bisa diklik karena kliknya ikut menutup baris).
+function bukaBalasan(btn, mode, ev){
+  if (ev) { ev.stopPropagation(); }
+  var baris = btn.closest('.pt-baris');
+  if (!baris) { return; }
+  var kotak = baris.querySelector('.pt-balas-box');
+  if (!kotak) { return; }
+  var teks = kotak.querySelector('textarea');
+  var modeEl = kotak.querySelector('.pt-balas-mode');
+  var kirim = kotak.querySelector('button[type=submit]');
+  if (mode === 'cek') {
+    if (modeEl) modeEl.textContent = 'Cek: tulis apa yang masih belum benar, mahasiswa diminta memperbaikinya kembali.';
+    if (teks) teks.placeholder = 'Tulis apa yang masih belum benar...';
+    if (kirim) kirim.textContent = 'Kirim';
+  } else {
+    if (modeEl) modeEl.textContent = 'Balasan untuk mahasiswa';
+    if (teks) teks.placeholder = 'Tulis balasan untuk mahasiswa...';
+    if (kirim) kirim.textContent = 'Kirim balasan';
+  }
+  var akanBuka = kotak.hidden;
+  kotak.hidden = !akanBuka;
+  if (akanBuka && teks) { teks.focus(); }
 }
 
 //  Buka/tutup kelompok bab (hanya satu terbuka).
@@ -740,19 +841,20 @@ function namaGambar(inp){
   }
 }
 
-//  ── Form catatan: Tandaan vs Perintah ────────────────────────────────
-//  Tandaan = kutipan persis (kotak kutip tampil), Perintah = satu bagian
-//  utuh (kotak posisi tampil). Judul bagian diisi dari opsi dropdown
-//  (data-label); posisi "sesudah" menambahkan awalan "Sesudah ".
-function aturJenis(){
-  var pil = document.querySelector('input[name="jenis"]:checked');
-  var jenis = pil ? pil.value : 'tandaan';
-  var kutip = document.getElementById('kotak-kutip');
-  var posisi = document.getElementById('kotak-posisi');
-  if(kutip) kutip.hidden = (jenis !== 'tandaan');
-  if(posisi) posisi.hidden = (jenis !== 'perintah');
-  isiJudulBagian();
+//  Penghitung huruf kotak tulis (sidebar sederhana, 16 Nov 2026).
+var teksIsi = document.getElementById('teks-isi');
+var hitungHuruf = document.getElementById('hitung-huruf');
+if (teksIsi && hitungHuruf) {
+  teksIsi.addEventListener('input', function(){
+    hitungHuruf.textContent = teksIsi.value.length;
+  });
 }
+
+//  ── Form catatan: judul bagian + posisi ──────────────────────────────
+//  Judul bagian diisi dari opsi dropdown (data-label); posisi "sesudah"
+//  menambahkan awalan "Sesudah ". Jenis catatan TIDAK ditanya lagi
+//  (16 Nov 2026): dikenali backend dari isi (ada kutipan = Perbaiki
+//  Kalimat Naskah, tanpa kutipan = Kalimat Revisi).
 function isiJudulBagian(){
   var s = document.getElementById('pilih-bagian');
   var h = document.getElementById('judul-bagian');
@@ -765,12 +867,12 @@ function isiJudulBagian(){
   }
   h.value = label;
 }
-aturJenis();
 
 //  ── Asisten AI (pintu yang SUDAH ADA: POST /kolaborasi/asisten) ───────
-//  Perintah kosong/luas → AI memberi 5 pilihan (GRATIS, tidak ditagih);
-//  halaman dimuat ulang supaya daftar pilihan tampil di panel. Perintah
-//  sempit → alur lama (1 token, usulan langsung jadi catatan).
+//  Kalimat Revisi kosong/luas → AI memberi 5 pilihan (GRATIS, tidak
+//  ditagih); halaman dimuat ulang supaya daftar pilihan tampil di panel.
+//  Kalimat Revisi sempit → alur lama (1 token, usulan langsung jadi
+//  catatan).
 //  Menerima pilihan = 1 Token Revisi per butir (lihat terimaPilihan).
 var btnAsisten = document.getElementById('btn-asisten');
 if(btnAsisten){
@@ -798,6 +900,17 @@ if(btnAsisten){
         if(m){ m.hidden = false; m.textContent = 'Koneksi bermasalah. Coba lagi.'; }
       });
   };
+  //  Enter di perintah AI = jalankan Asisten, bukan kirim catatan
+  //  (kotak ini ada DI DALAM form catatan supaya tampil di atas Kirim).
+  var inpAsisten = document.getElementById('perintah-asisten');
+  if(inpAsisten){
+    inpAsisten.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        btnAsisten.click();
+      }
+    });
+  }
 }
 
 //  ── Terima pilihan revisi (15 Nov 2026) ──────────────────────────────

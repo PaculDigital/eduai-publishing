@@ -12,8 +12,10 @@ Aturan yang diuji (rancangan RENCANA_TINJAU_STABILO.md):
      identitas menampilkan kartu sambutan; dengan identitas mengarahkan
      ke naskah-baca; naskah-baca menampilkan sidebar (daftar + form +
      legenda) TANPA teks naskah di halaman mana pun.
-  2. Dua jenis catatan dari kolom yang sudah ada: Tandaan (kutipan
-     persis) / Perintah (bagian utuh, tanpa kutipan) / Umum.
+  2. Dua jenis catatan dari kolom yang sudah ada: Perbaiki Kalimat Naskah
+     (kutipan persis) / Kalimat Revisi (bagian utuh, tanpa kutipan) / Umum.
+     Nilai dalamnya tetap 'tandaan'/'perintah'/'umum'; yang tampil label
+     baru (nama Boss 22:44 WIB) + tooltip penjelas (Boss 22:45 WIB).
   3. Hakim alamat: alamat bagian palsu dibersihkan (catatan masuk umum),
      alamat nyata dipertahankan, "Sesudah X" diterima bila X nyata.
   4. Kutipan salah masuk tanpa sorotan palsu (cari_sorotan: hilang).
@@ -189,6 +191,52 @@ def main():
     cek('jenis: tanpa alamat -> umum',
         P.jenis_catatan(c_umum) == 'umum')
 
+    # ── 2b. Label + tooltip tampil (nama Boss 22:44 WIB, tooltip 22:45 WIB)
+    cek('label: tandaan -> Perbaiki Kalimat Naskah',
+        P.label_jenis_catatan(c_tandaan) == 'Perbaiki Kalimat Naskah')
+    cek('label: perintah -> Kalimat Revisi',
+        P.label_jenis_catatan(c_perintah) == 'Kalimat Revisi')
+    cek('label: umum -> Umum',
+        P.label_jenis_catatan(c_umum) == 'Umum')
+    cek('tooltip: ketiganya tidak kosong',
+        all(P.tooltip_jenis_catatan(c)
+            for c in (c_tandaan, c_perintah, c_umum)))
+    _tpl = (Path(__file__).resolve().parent.parent
+            / 'app' / 'templates' / 'tinjau_baca.html').read_text()
+    #  Sidebar sederhana (16 Nov 2026, GAS Bos 00:42 WIB): jenis TIDAK
+    #  ditanya dan TIDAK tampil (dikenali backend saja, uji di atas);
+    #  layar pertama hanya kotak tulis + Kirim + History Revisi.
+    cek('template sidebar sederhana: jenis tidak ditanya, tidak tampil',
+        'Perbaiki Kalimat Naskah (satu kalimat)' not in _tpl
+        and 'Kalimat Revisi (satu bagian)' not in _tpl
+        and 'Tandaan (satu kalimat)' not in _tpl
+        and 'Perintah (satu bagian)' not in _tpl
+        and 'name="jenis"' not in _tpl
+        and 'Tulis saja, tidak perlu memilih jenis apa pun.' in _tpl
+        and 'Tambah detail' in _tpl
+        and 'Minta AI membantu' in _tpl
+        and 'Kutipan kalimat dari naskah yang akan ditandai' in _tpl
+        and 'Posisi di naskah' in _tpl
+        and 'HISTORY REVISI' in _tpl)
+    _ed = (Path(__file__).resolve().parent.parent
+           / 'app' / 'templates' / 'editor.html').read_text()
+    cek('template editor sederhana: tanpa lencana jenis, ada pill status',
+        '{{ ct.label_jenis }}' not in _ed
+        and '{{ ct.tooltip_jenis }}' not in _ed
+        and 'History Revisi' in _ed
+        and 'pai-ct-pill' in _ed)
+    cek('tombol Asisten: harga di tombol, tanpa penjelasan potongan',
+        'Asisten Ai (1 Token)' in _tpl
+        and 'Minta AI meninjau naskah' not in _tpl
+        and 'Tinjauan AI memakai 1 Token Revisi' not in _tpl
+        and '1 Token Revisi per pilihan yang diterima.\n' not in _tpl)
+    _kol = (Path(__file__).resolve().parent.parent
+            / 'app' / 'templates' / 'kolaborasi.html').read_text()
+    cek('tombol Asisten kolaborasi: harga di tombol',
+        'Asisten Ai (1 Token)' in _kol
+        and 'Minta AI tinjau naskah' not in _kol
+        and 'Tinjauan AI memakai 1 Token Revisi' not in _kol)
+
     # ── 8. tandai_selesai: pemilik, orang lain, idempoten ──────────────
     cek('tandai_selesai bimbingan benar -> True + hijau + sudah_oke',
         P.tandai_selesai(db, b.id, c_tandaan.id)
@@ -235,9 +283,10 @@ def main():
     cek('naskah-baca dengan identitas -> 200 + sidebar',
         r_baca_tanpa.status_code == 200)
     badan = r_baca_tanpa.body.decode('utf-8', 'ignore')
-    cek('sidebar: judul panel + legenda + dropdown bagian',
+    cek('sidebar: judul panel + History Revisi + dropdown bagian',
         'Catatan Bimbingan' in badan
-        and 'Tidak tercetak di naskah Asli (hanya penanda revisi)' in badan
+        and 'HISTORY REVISI' in badan
+        and 'Tidak tercetak di naskah Asli (hanya penanda revisi)' not in badan
         and '2.1' in badan)
     cek('sidebar: catatan tandaan + perintah tampil',
         'Perbaiki kalimat ini' in badan
@@ -842,10 +891,11 @@ def main():
     cek('penggalan: petunjuk arah lengkap sesudah diterima',
         'Arah perbaikan lengkap terlihat sesudah pilihan diterima'
         in badan_gal)
-    cek('penggalan: form manual tetap ada di sidebar',
+    cek('penggalan: form manual tetap ada di sidebar (sederhana)',
         'kolom-tulis' in badan_gal
-        and 'Tandaan (satu kalimat)' in badan_gal
-        and 'Perintah (satu bagian)' in badan_gal)
+        and 'Tulis saja, tidak perlu memilih jenis apa pun.' in badan_gal
+        and 'Perbaiki Kalimat Naskah (satu kalimat)' not in badan_gal
+        and 'Kalimat Revisi (satu bagian)' not in badan_gal)
     P.simpan_daftar_pilihan(db, b6.id, bk6.id, 'periksa', [
         {'bagian': '2.2 Teori Perilaku Konsumen',
          'kutipan': KALIMAT_BAB2,
