@@ -4701,6 +4701,12 @@ async def peta_status(
     from . import ambang_periksa as _amb_s
     _boleh_oto, _alasan_oto = _amb_s.boleh_otomatis_jalan(
         prof.peta_dibuat if prof else None)
+    # ── KEADAAN PEMERIKSAAN DI LATAR (15 Nov 2026, perintah Bos 11:12) ──
+    #  Layar membaca keadaan dari SERVER (bukan dari halaman): tutup lalu
+    #  buka halaman saat pemeriksaan masih jalan tetap menampilkan
+    #  "Sedang Diperiksa"; bila upaya terakhir gagal, layar berkata jujur.
+    pemeriksaan = _pemeriksaan_terkini(
+        db, u.id, int(file_id), peta_ada=bool(prof and prof.peta_json))
     return {'ok': True, 'file_id': int(file_id),
             'keadaan': g['keadaan'], 'tombol': tombol,
             'otomatis': bool(g['otomatis']) and _boleh_oto,
@@ -4708,7 +4714,8 @@ async def peta_status(
             'diperiksa_pada': (prof.peta_dibuat.isoformat()
                                if prof is not None and prof.peta_dibuat
                                else None),
-            'ringkasan': ringkasan}
+            'ringkasan': ringkasan,
+            'pemeriksaan': pemeriksaan}
 
 
 @router.post('/v1/peta/otomatis')
@@ -4787,6 +4794,131 @@ async def peta_otomatis(
             log.error('[peta] pemeriksaan otomatis %s gagal: %s',
                       p.kode, e)
             proses_mod.tandai_gagal(p.kode, f'{type(e).__name__}: {e}')
+        finally:
+            d2.close()
+
+    proses_mod.jalankan(p.kode, _kerja)
+    return {'ok': True, 'dijadwalkan': True, 'kode': p.kode}
+
+
+def _pesan_gagal_peta(e) -> str:
+    """Pesan gagal yang JUJUR + ramah untuk layar (Bahasa Indonesia).
+
+    Bila galatnya HTTPException dengan detail berisi 'pesan' (mis.
+    'Naskah tidak bisa dibaca.'), pakai pesan itu. Selain itu pakai
+    kalimat umum, layar tidak menampilkan jejak teknis. Alasan mentah
+    tetap tercatat di log pemanggil (log.error).
+    """
+    try:
+        detail = getattr(e, 'detail', None)
+        if isinstance(detail, dict):
+            pesan = str(detail.get('pesan') or '').strip()
+            if pesan:
+                return pesan
+    except Exception:                                        # noqa: BLE001
+        pass
+    return 'Pemeriksaan belum berhasil. Coba lagi sebentar lagi.'
+
+
+def _pemeriksaan_terkini(db, user_id: int, file_id: int,
+                         peta_ada: bool) -> dict:
+    """Keadaan pemeriksaan struktur untuk layar (baca DB, tanpa Jev).
+
+    Dipakai `peta_status`: layar membaca keadaan dari SERVER, jadi tutup
+    lalu buka halaman saat pemeriksaan masih jalan tetap menampilkan
+    "Sedang Diperiksa". Hanya proses dengan komentar 'Pemeriksaan
+    struktur' (manual/otomatis) yang dihitung, revisi yang sedang jalan
+    tidak membuat layar menampilkan "Sedang Diperiksa".
+    """
+    from . import struktur as _str_pk
+    from .models import ProsesAI as _ProsesAI_pk
+    try:
+        semua = (db.query(_ProsesAI_pk)
+                   .filter(_ProsesAI_pk.user_id == int(user_id),
+                           _ProsesAI_pk.file_id == int(file_id))
+                   .order_by(_ProsesAI_pk.id.desc()).limit(20).all())
+    except Exception:                                        # noqa: BLE001
+        return _str_pk.keadaan_pemeriksaan(
+            proses_jalan=None, proses_terakhir=None, peta_ada=peta_ada)
+    jalan = None
+    terakhir = None
+    for p in semua:
+        if not _str_pk.adalah_proses_peta(
+                getattr(p, 'komentar_json', '') or ''):
+            continue
+        d = {'kode': p.kode, 'status': p.status, 'galat': p.galat or ''}
+        if terakhir is None:
+            terakhir = d
+        if p.status in ('menunggu', 'jalan') and jalan is None:
+            jalan = d
+    return _str_pk.keadaan_pemeriksaan(
+        proses_jalan=jalan, proses_terakhir=terakhir, peta_ada=peta_ada)
+
+
+@router.post('/v1/peta/mulai-latar')
+async def peta_mulai_latar(
+    request: Request,
+    u: User = Depends(wajib_login_api),
+    db: Session = Depends(get_db),
+):
+    """TITIP pemeriksaan struktur lalu BALAS CEPAT (15 Nov 2026).
+
+    `peta_mulai` sinkron menunggu peta penuh selesai (jalan segar fid=81
+    terukur 104-115 detik), melewati batas baca Cloudflare 100-125 detik,
+    jadi tekan pertama tampak error 524 padahal pemeriksaan tetap jalan.
+    Endpoint ini HANYA menitipkan pekerjaan ke pekerja latar (`proses`,
+    pola yang SAMA dengan `peta_otomatis`) lalu langsung membalas; halaman
+    membaca keadaan lewat `peta_status` ("Sedang Diperiksa") sampai
+    selesai, lalu menampilkan hasil. `peta_mulai` yang lama TIDAK diubah,
+    dipanggil langsung tetap jalan sinkron seperti dulu.
+
+    Tekan 2x saat jalan: yang kedua DITAHAN sopan (dijadwalkan False,
+    sedang_jalan True), bukan proses kedua, pagar `_proses_berjalan`
+    tetap berlaku.
+    """
+    body = await request.json()
+    if not isinstance(body, dict):
+        body = {}
+    try:
+        fid = int(body.get('file_id') or 0)
+    except (TypeError, ValueError):
+        raise HTTPException(400, detail={'ok': False,
+                                         'pesan': '`file_id` harus angka.'})
+    fb = (db.query(FileBerkas)
+            .filter(FileBerkas.id == fid,
+                    FileBerkas.user_id == u.id).first())
+    if fb is None:
+        raise HTTPException(404, detail={'ok': False,
+                                         'pesan': 'Berkas tidak ditemukan.'})
+    jalan = _proses_berjalan(db, u.id, fid)
+    if jalan:
+        kode_jalan = None
+        try:
+            from . import struktur as _str_ml
+            for _p in jalan:
+                if _str_ml.adalah_proses_peta(
+                        getattr(_p, 'komentar_json', '') or ''):
+                    kode_jalan = _p.kode
+                    break
+        except Exception:                                    # noqa: BLE001
+            kode_jalan = None
+        return {'ok': True, 'dijadwalkan': False, 'sedang_jalan': True,
+                'kode': kode_jalan,
+                'alasan': 'masih ada pemeriksaan berjalan untuk naskah ini'}
+    p = proses_mod.mulai(db, user_id=u.id, file_id=fid,
+                         komentar=['Pemeriksaan struktur'])
+
+    async def _kerja(lapor):
+        d2 = proses_mod._sesi_baru()
+        try:
+            await peta_mulai(
+                _RequestTiruan({'file_id': fid, 'mode': 'peta_awal'}),
+                u, d2)
+            proses_mod.tandai_selesai(
+                p.kode, hasil='Pemeriksaan struktur selesai.')
+        except Exception as e:                            # noqa: BLE001
+            log.error('[peta] pemeriksaan %s gagal: %s', p.kode, e)
+            proses_mod.tandai_gagal(p.kode, _pesan_gagal_peta(e))
         finally:
             d2.close()
 

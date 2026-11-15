@@ -543,6 +543,13 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
 .aksi button.periksa:disabled{background:#d8d2c7;border-color:#d8d2c7;color:#8a8276;
     cursor:default;box-shadow:none}
 .aksi button.periksa.sedang{background:#fff3d6;border-color:#F4A025;color:#8a6d00}
+/* Logo EduAi sebagai penanda loading (15 Nov 2026, perintah Bos 11:13):
+   logo yang SUDAH ADA (/static/logo-96.png), berdenyut halus di samping
+   tulisan "Sedang Diperiksa". Tanpa hiasan tambahan. */
+.aksi button.periksa .logo-muat{height:18px;width:18px;vertical-align:-4px;
+    margin-right:6px;animation:denyut-logo 1.6s ease-in-out infinite}
+@keyframes denyut-logo{0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.55;transform:scale(.92)}}
 .panel-struktur{background:#fff;border:1px solid var(--garis);border-radius:13px;
     padding:16px 18px;margin:-4px 0 11px}
 .panel-struktur h4{font-size:15px;margin-bottom:4px}
@@ -1183,7 +1190,11 @@ function fdPesan(t) {
    Tombol aktif / "Sudah Diperiksa" (nonaktif) ditentukan server lewat
    /api/ai/v1/peta/status — 0 panggilan Jev. Bila naskah berubah melewati
    ambang BESAR, halaman memicu pemeriksaan otomatis diam-diam sekali
-   (POST /api/ai/v1/peta/otomatis). Mahasiswa tidak pernah ditanya apa pun. */
+   (POST /api/ai/v1/peta/otomatis). Mahasiswa tidak pernah ditanya apa pun.
+   LATAR (15 Nov 2026): tekan tombol menitipkan pekerjaan ke
+   POST /api/ai/v1/peta/mulai-latar lalu langsung dibalas, pemeriksaan
+   jalan di latar, layar menampilkan "Sedang Diperiksa" (logo EduAi
+   berdenyut) dan mengecek status berkala sampai selesai. */
 (function () {
   function teks(el) { return (el && el.textContent) || ''; }
   function esc(s) {
@@ -1225,39 +1236,84 @@ function fdPesan(t) {
     panel.innerHTML = html;
     panel.hidden = false;
   }
-  function terapkanStatus(btn, d) {
-    if (!d.ok) { return; }
-    var t = d.tombol || {};
-    btn.textContent = t.label || 'Periksa Struktur';
-    btn.disabled = !t.aktif;
-    btn.classList.toggle('sedang', false);
-    if (d.keadaan !== 'belum') { tampilHasil(btn.dataset.fileId, d); }
-  }
-  function periksaSekarang(btn) {
-    var fid = btn.dataset.fileId;
+  function tampilSedang(btn) {
+    /* Keadaan "Sedang Diperiksa": logo EduAi yang SUDAH ADA (bukan logo
+       baru) berdenyut halus di samping tulisan, penanda loading-nya. */
     btn.disabled = true;
     btn.classList.add('sedang');
-    btn.textContent = 'Pemeriksaan sedang berlangsung';
-    fetch('/api/ai/v1/peta/mulai', {
+    btn.innerHTML = '<img class="logo-muat" src="/static/logo-96.png" alt=""> Sedang Diperiksa';
+  }
+  function tampilTombol(btn, t) {
+    btn.textContent = t.label || 'Periksa Struktur';
+    btn.disabled = !t.aktif;
+    btn.classList.remove('sedang');
+  }
+  function jadwalPoll(btn) {
+    /* Satu timer saja per tombol: cek status berkala sampai selesai. */
+    if (btn._tPoll) { return; }
+    btn._tPoll = setTimeout(function () {
+      btn._tPoll = null;
+      muatStatus(btn);
+    }, 3000);
+  }
+  function hentiPoll(btn) {
+    if (btn._tPoll) { clearTimeout(btn._tPoll); btn._tPoll = null; }
+  }
+  function tampilGagal(fid, pesan) {
+    var panel = document.getElementById('panel-' + fid);
+    if (!panel) return;
+    var div = document.createElement('div');
+    div.className = 'galat';
+    div.textContent = 'Pemeriksaan belum berhasil' +
+      (pesan ? ': ' + pesan : '') + '. Coba lagi sebentar lagi.';
+    panel.insertBefore(div, panel.firstChild);
+    panel.hidden = false;
+  }
+  function terapkanStatus(btn, d) {
+    if (!d.ok) { return; }
+    var pem = d.pemeriksaan || {};
+    if (pem.keadaan === 'jalan') {
+      /* Masih jalan (keadaan dibaca dari server, tutup-buka halaman pun
+         tetap menampilkan ini): tombol nonaktif + logo berdenyut, dan
+         cek lagi sebentar lagi. Pesan gagal lama (bila ada) dibuang
+         karena pemeriksaan baru sedang jalan. Hasil lama tetap tampil. */
+      tampilSedang(btn);
+      var panelJ = document.getElementById('panel-' + btn.dataset.fileId);
+      if (panelJ) { var g = panelJ.querySelector('.galat'); if (g) { g.remove(); } }
+      if (d.keadaan !== 'belum') { tampilHasil(btn.dataset.fileId, d); }
+      jadwalPoll(btn);
+      return;
+    }
+    hentiPoll(btn);
+    tampilTombol(btn, d.tombol || {});
+    if (d.keadaan !== 'belum') { tampilHasil(btn.dataset.fileId, d); }
+    if (pem.keadaan === 'gagal') {
+      /* Jujur: gagal + tombol aktif lagi (tombol sudah diatur di atas),
+         bukan diam atau tampak timeout. Peta lama (bila ada) tetap di
+         bawah pesan gagal. */
+      tampilGagal(btn.dataset.fileId, pem.galat);
+    }
+  }
+  function periksaSekarang(btn) {
+    /* TITIP lalu balas cepat (15 Nov 2026): pemeriksaan jalan di latar,
+       tombol TIDAK menunggu peta selesai, dulu menunggu sinkron sampai
+       115 detik dan tampak timeout di batas Cloudflare. */
+    var fid = btn.dataset.fileId;
+    tampilSedang(btn);
+    fetch('/api/ai/v1/peta/mulai-latar', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({file_id: Number(fid), mode: 'peta_awal'})
     }).then(function (r) { return r.json(); }).then(function (d) {
       if (!d.ok) {
-        var panel = document.getElementById('panel-' + fid);
-        if (panel) {
-          panel.innerHTML = '<div class="galat">Pemeriksaan belum berhasil. Coba lagi sebentar lagi.</div>';
-          panel.hidden = false;
-        }
+        tampilGagal(fid, d.pesan || '');
         muatStatus(btn);
         return;
       }
+      /* dijadwalkan (baru jalan) ATAU sedang_jalan (sudah jalan, ditekan
+         2x), sama-sama: baca keadaan dari server sampai selesai. */
       muatStatus(btn);
     }).catch(function () {
-      var panel = document.getElementById('panel-' + fid);
-      if (panel) {
-        panel.innerHTML = '<div class="galat">Pemeriksaan belum berhasil. Coba lagi sebentar lagi.</div>';
-        panel.hidden = false;
-      }
+      tampilGagal(fid, '');
       muatStatus(btn);
     });
   }
@@ -1267,11 +1323,13 @@ function fdPesan(t) {
       .then(function (r) { return r.json(); })
       .then(function (d) {
         terapkanStatus(btn, d);
-        if (d.ok && d.otomatis) {
+        var pem = d.pemeriksaan || {};
+        if (d.ok && d.otomatis && pem.keadaan !== 'jalan') {
           fetch('/api/ai/v1/peta/otomatis', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({file_id: Number(fid)})
-          }).catch(function () {});
+          }).then(function () { muatStatus(btn); })
+            .catch(function () {});
         }
       }).catch(function () {});
   }
