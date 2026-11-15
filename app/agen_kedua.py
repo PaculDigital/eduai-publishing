@@ -57,6 +57,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 import urllib.error
 import urllib.request
 from typing import Any
@@ -68,12 +69,15 @@ LABEL_SAH = ('bab', 'subbab', 'paragraf', 'biasa')
 
 # ── saklar + setelan (env; bawaan MATI) ─────────────────────────────────────
 #    EDUAI_AGEN_KEDUA_AKTIF=1  → rantai hidup (pabrik mengembalikan fn).
-#    EDUAI_AGEN_KEDUA_TRANSPORT=fallback|router9|openrouter (bawaan
-#    fallback: 9router dulu, gagal -> Apinex, gagal -> OpenRouter;
+#    EDUAI_AGEN_KEDUA_TRANSPORT=fallback|router9|tokenharbor (bawaan
+#    fallback: 9router dulu, gagal -> Apinex, gagal -> TokenHarbor;
 #    putusan Bos 13 Nov 2026 — Apinex urutan kedua, TokenHarbor ketiga).
-#    Transport openrouter/fallback memakai EDUAI_FALLBACK_BASE/KEY dari
-#    app.config (sama seperti app.ai) — kunci dibaca dari env, modul ini
-#    tidak memegang kunci. Penanya yang disuntik hanya untuk pilot/uji.
+#    Nilai lama 'openrouter' tetap diterima sebagai alias kaki TokenHarbor
+#    (kompatibel setelan lama); label yang dipakai rantai dan log selalu
+#    'tokenharbor'. Transport tokenharbor/fallback memakai
+#    EDUAI_FALLBACK_BASE/KEY dari app.config (sama seperti app.ai),
+#    kunci dibaca dari env, modul ini tidak memegang kunci. Penanya yang
+#    disuntik hanya untuk pilot/uji.
 #    Kaki Apinex memakai EDUAI_APINEX_BASE/KEY (env sendiri); kunci
 #    kosong = kaki dilewati, bukan galat.
 #    EDUAI_AGEN_KEDUA_MODEL  → nama model untuk penanya OpenRouter
@@ -82,10 +86,14 @@ MODEL_OPENROUTER_BAWAAN = 'google/gemini-2.5-flash'
 MODEL_OPENROUTER_CADANGAN = 'openai/gpt-4o-mini'
 MODEL_JEV_113 = 'SATPAM/typesafe/jev-1.13'
 BATAS_DETIK = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT') or '60')
-# Percobaan pertama di mode fallback (combo 9router) dibatasi singkat
-# supaya tidak menggantung: combo yang providernya mati terbukti
-# timeout 60 dtk (uji asap 12 Nov 2026), bukan gagal cepat.
-BATAS_DETIK_R9 = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT_R9') or '20')
+# Batas kaki combo 9router + Apinex SAMA dengan BATAS_DETIK (60 dtk).
+# Dulu 20 dtk supaya provider mati gagal cepat, tapi ukur live 15 Nov
+# 2026 membuktikan 20 dtk terlalu pendek: Apinex butuh 27,4 dtk hanya
+# untuk menjawab satu kata "pong", dan 9router butuh 6,84 dtk hanya
+# untuk daftar model, jawaban yang sebenarnya datang dipotong duluan
+# lalu dicatat TimeoutError (pekerjaan 238 macet karenanya). Override
+# lewat env EDUAI_AGEN_KEDUA_TIMEOUT_R9 tetap jalan.
+BATAS_DETIK_R9 = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT_R9') or '60')
 # Batas jawaban 2048 (dulu 512): ukur live 13 Nov 2026 — 12 dari 39
 # panggilan fallback terpotong (finish=length) tepat di 512, model
 # menjawab bertele-tele sebelum JSON-nya. 2048 = 4x ruang; penagihan
@@ -113,14 +121,20 @@ def aktif() -> bool:
 
 
 def transport() -> str:
-    """Transport agen kedua: 'fallback' (bawaan), 'router9', 'openrouter'.
+    """Transport agen kedua: 'fallback' (bawaan), 'router9', 'tokenharbor'.
 
     fallback = coba combo 9router dulu, gagal -> Apinex, gagal ->
-    OpenRouter/TokenHarbor (putusan Bos 13 Nov 2026: Apinex urutan
+    TokenHarbor (putusan Bos 13 Nov 2026: Apinex urutan
     kedua, TokenHarbor ketiga).
+
+    Nilai env lama 'openrouter' tetap diterima sebagai alias kaki
+    TokenHarbor (kompatibel setelan lama); label rantai dan log selalu
+    'tokenharbor'.
     """
     t = (os.getenv('EDUAI_AGEN_KEDUA_TRANSPORT') or 'fallback').strip().lower()
-    return t if t in ('router9', 'openrouter', 'fallback') else 'fallback'
+    if t == 'openrouter':
+        t = 'tokenharbor'
+    return t if t in ('router9', 'tokenharbor', 'fallback') else 'fallback'
 
 
 # ── aturan label manusia (patokan yang SAMA, disalin verbatim ke prompt) ────
@@ -302,21 +316,21 @@ def _panggil_router9(prompt: str, timeout: float | None = None) -> tuple[str, st
     return _urai_balasan_chat(mentah)
 
 
-def _panggil_openrouter(prompt: str, timeout: float | None = None) -> tuple[str, str]:
-    """Transport CADANGAN produksi: OpenRouter langsung (fallback).
+def _panggil_tokenharbor(prompt: str, timeout: float | None = None) -> tuple[str, str]:
+    """Transport CADANGAN produksi: TokenHarbor (fallback).
 
     Memakai EDUAI_FALLBACK_BASE/KEY dari `app.config` (sama seperti
     `app.ai` jalur 2) — kunci dibaca dari env, tidak ditulis di kode.
     Model dari EDUAI_AGEN_KEDUA_MODEL_FALLBACK (bawaan 'gemini-3.8-flash',
-    nama TokenHarbor — FALLBACK_BASE adalah tokenharbor.ai, bukan
-    openrouter.ai, jadi nama 'google/...' ditolak 404).
+    nama TokenHarbor; FALLBACK_BASE adalah tokenharbor.ai, jadi nama
+    model 'google/...' ditolak 404).
     """
     from app.config import FALLBACK_BASE, FALLBACK_KEY
 
     model = (os.getenv('EDUAI_AGEN_KEDUA_MODEL_FALLBACK')
              or 'gemini-3.8-flash').strip()
     if not FALLBACK_BASE or not FALLBACK_KEY:
-        raise RuntimeError('OpenRouter tidak terpasang '
+        raise RuntimeError('TokenHarbor tidak terpasang '
                            '(EDUAI_FALLBACK_BASE/KEY kosong)')
     body = {
         'model': model,
@@ -336,9 +350,9 @@ def _panggil_openrouter(prompt: str, timeout: float | None = None) -> tuple[str,
         with urllib.request.urlopen(req, timeout=timeout or BATAS_DETIK) as r:
             mentah = r.read().decode()
     except urllib.error.HTTPError as e:
-        raise RuntimeError(f'OpenRouter HTTP {e.code}: {e.read().decode()[:200]}')
+        raise RuntimeError(f'TokenHarbor HTTP {e.code}: {e.read().decode()[:200]}')
     except Exception as e:
-        raise RuntimeError(f'OpenRouter tidak bisa dihubungi: {type(e).__name__}: {e}')
+        raise RuntimeError(f'TokenHarbor tidak bisa dihubungi: {type(e).__name__}: {e}')
     return _urai_balasan_chat(mentah)
 
 
@@ -387,10 +401,14 @@ def _coba_transport(nama: str, prompt: str) -> dict | None:
 
     Gagal = tidak bisa dihubungi / HTTP galat / balasan bukan JSON /
     label tidak sah / model yang melayani adalah Jev (bukan model umum).
+    Berhasil dicatat satu baris info (transport + model + detik) supaya
+    rantai terlihat di log; gagal tetap warning seperti sebelumnya.
+    Hanya transport, model, dan detik yang dicatat, bukan isi jawaban.
     """
+    t0 = time.monotonic()
     try:
-        if nama == 'openrouter':
-            konten, model_layani = _panggil_openrouter(prompt)
+        if nama == 'tokenharbor':
+            konten, model_layani = _panggil_tokenharbor(prompt)
         elif nama == 'apinex':
             konten, model_layani = _panggil_apinex(prompt,
                                                    timeout=BATAS_DETIK_R9)
@@ -407,6 +425,8 @@ def _coba_transport(nama: str, prompt: str) -> dict | None:
     if jawab is None:
         log.warning('[agen_kedua] %s balasan tidak terbaca: %r', nama, konten[:160])
         return None
+    log.info('[agen_kedua] %s berhasil: model=%s (%.1f dtk)',
+             nama, model_layani or '?', time.monotonic() - t0)
     jawab['model'] = model_layani or ''
     jawab['transport'] = nama
     return jawab
@@ -422,8 +442,8 @@ def tanya_agen_kedua(teks_baris: str, konteks: dict | None = None,
     `penanya` = callable(prompt) -> (konten, model_melayani) yang disuntik
     (dipakai pilot OpenRouter + uji offline). Tanpa penanya, dipakai jalur
     produksi: transport dari `transport()` — 'fallback' (bawaan: 9router
-    dulu, gagal -> Apinex, gagal -> OpenRouter), 'router9', atau
-    'openrouter'.
+    dulu, gagal -> Apinex, gagal -> TokenHarbor), 'router9', atau
+    'tokenharbor'.
     GAGAL APAPUN ⇒ None (bukan label tebakan).
     """
     prompt = _prompt(teks_baris, konteks)
@@ -438,12 +458,14 @@ def tanya_agen_kedua(teks_baris: str, konteks: dict | None = None,
             log.warning('[agen_kedua] balasan tidak terbaca: %r', konten[:160])
             return None
         jawab['model'] = model_layani or (model or '')
+        # Label 'openrouter' di sini BENAR: penanya adalah pemanggil
+        # OpenRouter pilot yang disuntik, bukan kaki TokenHarbor.
         jawab['transport'] = 'openrouter'
         return jawab
     t = transport()
     urutan = {'router9': ('router9',),
-              'openrouter': ('openrouter',)}.get(
-                  t, ('router9', 'apinex', 'openrouter'))
+              'tokenharbor': ('tokenharbor',)}.get(
+                  t, ('router9', 'apinex', 'tokenharbor'))
     for nama in urutan:
         jawab = _coba_transport(nama, prompt)
         if jawab is not None:

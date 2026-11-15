@@ -2353,23 +2353,23 @@ def main():
         _urutan.append('apinex')
         raise RuntimeError('apinex mati (uji)')
 
-    def _or_ok(prompt, timeout=None):
-        _urutan.append('openrouter')
+    def _th_ok(prompt, timeout=None):
+        _urutan.append('tokenharbor')
         return ('{"label": "paragraf", "confidence": 0.7, "alasan": "isi"}',
                 'gemini-3.8-flash')
 
-    def _or_gagal(prompt, timeout=None):
-        _urutan.append('openrouter')
+    def _th_gagal(prompt, timeout=None):
+        _urutan.append('tokenharbor')
         raise RuntimeError('fallback mati (uji)')
 
     _r9_asli = AK._panggil_router9
     _apx_asli = AK._panggil_apinex
-    _or_asli = AK._panggil_openrouter
+    _th_asli = AK._panggil_tokenharbor
     os.environ['EDUAI_AGEN_KEDUA_TRANSPORT'] = 'fallback'
     try:
         AK._panggil_router9 = _r9_gagal
         AK._panggil_apinex = _apx_ok
-        AK._panggil_openrouter = _or_ok
+        AK._panggil_tokenharbor = _th_ok
         _urutan.clear()
         _j1 = AK.tanya_agen_kedua('2. Manfaat')
         cek('v15c-rantai: combo gagal -> Apinex dipakai (transport apinex)',
@@ -2382,36 +2382,36 @@ def main():
         _urutan.clear()
         _j2 = AK.tanya_agen_kedua('2. Manfaat')
         cek('v15c-rantai: Apinex gagal -> jatuh ke TokenHarbor',
-            (_j2 or {}).get('transport') == 'openrouter'
+            (_j2 or {}).get('transport') == 'tokenharbor'
             and (_j2 or {}).get('label') == 'paragraf',
             str(_j2))
-        cek('v15c-rantai: urutan 3 kaki router9 -> apinex -> openrouter',
-            _urutan == ['router9', 'apinex', 'openrouter'], str(_urutan))
-        AK._panggil_openrouter = _or_gagal
+        cek('v15c-rantai: urutan 3 kaki router9 -> apinex -> tokenharbor',
+            _urutan == ['router9', 'apinex', 'tokenharbor'], str(_urutan))
+        AK._panggil_tokenharbor = _th_gagal
         _urutan.clear()
         cek('v15c-rantai: ketiga kaki gagal -> None (antrean, bukan tebakan)',
             AK.tanya_agen_kedua('2. Manfaat') is None
-            and _urutan == ['router9', 'apinex', 'openrouter'],
+            and _urutan == ['router9', 'apinex', 'tokenharbor'],
             str(_urutan))
     finally:
         AK._panggil_router9 = _r9_asli
         AK._panggil_apinex = _apx_asli
-        AK._panggil_openrouter = _or_asli
+        AK._panggil_tokenharbor = _th_asli
 
     # ── kunci kosong di rantai nyata: kaki Apinex dilewati ────────────
     os.environ.pop('EDUAI_APINEX_KEY', None)
     AK._panggil_router9 = _r9_gagal
-    AK._panggil_openrouter = _or_ok
+    AK._panggil_tokenharbor = _th_ok
     try:
         _urutan.clear()
         _j3 = AK.tanya_agen_kedua('2. Manfaat')
         cek('v15c-rantai: kunci Apinex kosong -> TokenHarbor tetap menjawab',
-            (_j3 or {}).get('transport') == 'openrouter'
+            (_j3 or {}).get('transport') == 'tokenharbor'
             and (_j3 or {}).get('label') == 'paragraf',
             str(_j3))
     finally:
         AK._panggil_router9 = _r9_asli
-        AK._panggil_openrouter = _or_asli
+        AK._panggil_tokenharbor = _th_asli
     if _env_apx is None:
         os.environ.pop('EDUAI_APINEX_KEY', None)
     else:
@@ -2420,6 +2420,96 @@ def main():
         os.environ.pop('EDUAI_AGEN_KEDUA_TRANSPORT', None)
     else:
         os.environ['EDUAI_AGEN_KEDUA_TRANSPORT'] = _env_tr
+
+    # ── kejelasan rantai (15 Nov 2026): berhasil dicatat, nama kaki ───
+    #    (a) percobaan berhasil mencatat log info (transport + model +
+    #    detik); (b) kaki ketiga berlabel 'tokenharbor', bukan 'openrouter';
+    #    (c) kegagalan tetap tercatat warning seperti sebelumnya.
+    import logging as _logging
+
+    class _TangkapLog(_logging.Handler):
+        def __init__(self):
+            super().__init__()
+            self.rekaman = []
+
+        def emit(self, record):
+            self.rekaman.append(record)
+
+    _tangkap = _TangkapLog()
+    _logger_ak = _logging.getLogger('agen_kedua')
+    _level_awal = _logger_ak.level
+    _logger_ak.addHandler(_tangkap)
+    _logger_ak.setLevel(_logging.INFO)
+    _th_asli2 = AK._panggil_tokenharbor
+    _apx_asli2 = AK._panggil_apinex
+    try:
+        AK._panggil_apinex = _apx_ok
+        AK._panggil_tokenharbor = _th_ok
+        _tangkap.rekaman.clear()
+        _jb = AK._coba_transport('apinex', 'prompt uji')
+        _info_ok = [r for r in _tangkap.rekaman
+                    if r.levelno == _logging.INFO
+                    and 'apinex' in r.getMessage()
+                    and 'free/gemini-3.8-flash' in r.getMessage()
+                    and 'dtk' in r.getMessage()]
+        cek('jelas-log: Apinex berhasil -> log info (transport + model + dtk)',
+            (_jb or {}).get('transport') == 'apinex' and len(_info_ok) == 1,
+            str([r.getMessage() for r in _tangkap.rekaman]))
+        _tangkap.rekaman.clear()
+        _jb2 = AK._coba_transport('tokenharbor', 'prompt uji')
+        _info_th = [r for r in _tangkap.rekaman
+                    if r.levelno == _logging.INFO
+                    and 'tokenharbor' in r.getMessage()
+                    and 'gemini-3.8-flash' in r.getMessage()
+                    and 'dtk' in r.getMessage()]
+        cek('jelas-log: TokenHarbor berhasil -> log info (transport + model + dtk)',
+            (_jb2 or {}).get('transport') == 'tokenharbor' and len(_info_th) == 1,
+            str([r.getMessage() for r in _tangkap.rekaman]))
+        AK._panggil_apinex = _apx_gagal
+        _tangkap.rekaman.clear()
+        cek('jelas-log: Apinex gagal -> tetap warning + None',
+            AK._coba_transport('apinex', 'prompt uji') is None
+            and len([r for r in _tangkap.rekaman
+                     if r.levelno == _logging.WARNING
+                     and 'apinex' in r.getMessage()
+                     and 'gagal' in r.getMessage()]) == 1,
+            str([r.getMessage() for r in _tangkap.rekaman]))
+    finally:
+        AK._panggil_tokenharbor = _th_asli2
+        AK._panggil_apinex = _apx_asli2
+        _logger_ak.removeHandler(_tangkap)
+        _logger_ak.setLevel(_level_awal)
+
+    cek('jelas-nama: fungsi kaki ketiga bernama _panggil_tokenharbor',
+        hasattr(AK, '_panggil_tokenharbor')
+        and not hasattr(AK, '_panggil_openrouter'))
+    cek('jelas-nama: docstring kaki ketiga tanpa label openrouter',
+        'openrouter' not in (AK._panggil_tokenharbor.__doc__ or '').lower()
+        and 'TokenHarbor' in (AK._panggil_tokenharbor.__doc__ or ''))
+    _env_tr2 = os.environ.get('EDUAI_AGEN_KEDUA_TRANSPORT')
+    try:
+        os.environ['EDUAI_AGEN_KEDUA_TRANSPORT'] = 'tokenharbor'
+        cek('jelas-nama: transport tokenharbor -> hanya kaki TokenHarbor',
+            AK.transport() == 'tokenharbor')
+        os.environ['EDUAI_AGEN_KEDUA_TRANSPORT'] = 'openrouter'
+        cek('jelas-nama: nilai lama openrouter tetap jalan sebagai alias',
+            AK.transport() == 'tokenharbor')
+        AK._panggil_router9 = _r9_gagal
+        AK._panggil_apinex = _apx_gagal
+        AK._panggil_tokenharbor = _th_ok
+        _urutan.clear()
+        _j4 = AK.tanya_agen_kedua('2. Manfaat')
+        cek('jelas-nama: alias openrouter -> rantai pakai label tokenharbor',
+            (_j4 or {}).get('transport') == 'tokenharbor'
+            and _urutan == ['tokenharbor'], str(_j4))
+    finally:
+        AK._panggil_router9 = _r9_asli
+        AK._panggil_apinex = _apx_asli
+        AK._panggil_tokenharbor = _th_asli
+        if _env_tr2 is None:
+            os.environ.pop('EDUAI_AGEN_KEDUA_TRANSPORT', None)
+        else:
+            os.environ['EDUAI_AGEN_KEDUA_TRANSPORT'] = _env_tr2
 
     # ── Apinex terpotong -> None (lewat _coba_transport nyata) ─────────
     os.environ['EDUAI_APINEX_KEY'] = 'kunci-uji-apinex'
@@ -2431,6 +2521,67 @@ def main():
     try:
         cek('v15c-terpotong: Apinex finish=length -> None (antrean)',
             AK._coba_transport('apinex', 'prompt uji') is None)
+    finally:
+        _urlreq.urlopen = _urlopen_asli
+    if _env_apx is None:
+        os.environ.pop('EDUAI_APINEX_KEY', None)
+    else:
+        os.environ['EDUAI_APINEX_KEY'] = _env_apx
+
+    # ── timeout-60: batas kaki combo + Apinex 20 -> 60 dtk (15 Nov 2026)
+    #    Ukur live: Apinex 27,4 dtk untuk satu kata "pong", 9router
+    #    6,84 dtk hanya daftar model, batas 20 dtk memotong jawaban
+    #    yang sebenarnya datang (pekerjaan 238 macet karenanya).
+    _env_r9 = os.environ.get('EDUAI_AGEN_KEDUA_TIMEOUT_R9')
+    os.environ.pop('EDUAI_AGEN_KEDUA_TIMEOUT_R9', None)
+    importlib.reload(AK)
+    try:
+        cek('timeout-60: BATAS_DETIK_R9 bawaan 60 detik',
+            AK.BATAS_DETIK_R9 == 60)
+        cek('timeout-60: batas kaki sama dengan BATAS_DETIK',
+            AK.BATAS_DETIK_R9 == AK.BATAS_DETIK)
+    finally:
+        if _env_r9 is None:
+            os.environ.pop('EDUAI_AGEN_KEDUA_TIMEOUT_R9', None)
+        else:
+            os.environ['EDUAI_AGEN_KEDUA_TIMEOUT_R9'] = _env_r9
+        importlib.reload(AK)
+    os.environ['EDUAI_AGEN_KEDUA_TIMEOUT_R9'] = '45'
+    importlib.reload(AK)
+    try:
+        cek('timeout-60: override env EDUAI_AGEN_KEDUA_TIMEOUT_R9 dihormati',
+            AK.BATAS_DETIK_R9 == 45)
+    finally:
+        if _env_r9 is None:
+            os.environ.pop('EDUAI_AGEN_KEDUA_TIMEOUT_R9', None)
+        else:
+            os.environ['EDUAI_AGEN_KEDUA_TIMEOUT_R9'] = _env_r9
+        importlib.reload(AK)
+    cek('timeout-60: sesudah pulih, bawaan kembali 60 detik',
+        AK.BATAS_DETIK_R9 == 60)
+
+    # Batas 60 dtk benar dipakai _coba_transport untuk kedua kaki.
+    _tangkap_waktu = {}
+
+    def _urlopen_waktu(req, timeout=None):
+        _tangkap_waktu['timeout'] = timeout
+        if 'apinex' in req.full_url:
+            return _ResponApinex(_balasan_apinex())
+        return _ResponR9(_balasan_r9())
+
+    _urlreq.urlopen = _urlopen_waktu
+    os.environ['EDUAI_APINEX_KEY'] = 'kunci-uji-apinex'
+    try:
+        _j_r9 = AK._coba_transport('router9', 'prompt uji')
+        _w_r9 = _tangkap_waktu.get('timeout')
+        _j_apx = AK._coba_transport('apinex', 'prompt uji')
+        _w_apx = _tangkap_waktu.get('timeout')
+        cek('timeout-60: _coba_transport combo memakai 60 detik',
+            _w_r9 == 60 and (_j_r9 or {}).get('label') == 'subbab',
+            str(_w_r9))
+        cek('timeout-60: _coba_transport Apinex memakai 60 detik',
+            _w_apx == 60 and (_j_apx or {}).get('label') == 'biasa',
+            str(_w_apx))
     finally:
         _urlreq.urlopen = _urlopen_asli
     if _env_apx is None:
