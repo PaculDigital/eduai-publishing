@@ -128,17 +128,40 @@ def potong_biaya(db: Session, pembayar: User) -> dict:
     from . import saldo as _saldo
     sisa_kini = _saldo.sisa(db, pembayar)
     if sisa_kini < HARGA_TOKEN:
+        #  Aturan 5: jalan keluar harus yang BENAR-BENAR bisa dipakai.
+        #  Paket gratis TERKUNCI dari AddOn (config.boleh_beli_addon,
+        #  MASTER_PLAN 4.10) — dulu pesannya tetap menyuruh ke AddOn,
+        #  jalan buntu bagi pembimbing paket gratis.
+        from .config import boleh_beli_addon          # noqa: PLC0415
+        if boleh_beli_addon(pembayar.paket or 'gratis'):
+            jalan = 'Tambah sedikit lewat menu AddOn, atau '
+        else:
+            jalan = ('Tingkatkan paket ke Penulis dulu supaya bisa isi '
+                     'saldo, atau ')
         return {'ok': False, 'pesan': (
             'Asisten tinjauan butuh 1 Token Revisi untuk jalan lagi, dan '
-            'saldomu belum cukup. Tambah sedikit lewat menu AddOn, atau '
-            'lanjut menandai catatan secara manual — dua-duanya jalan.')}
+            'saldomu belum cukup. ' + jalan +
+            'lanjut menandai catatan secara manual, dua-duanya jalan.')}
     _saldo.pakai(db, pembayar, HARGA_TOKEN, sumber='asisten_pembimbing',
                  catatan='Tinjauan AI — Tab Kolaborasi')
     return {'ok': True, 'sumber': 'saldo', 'sisa': sisa_kini - HARGA_TOKEN}
 
 
 def kembalikan_biaya(db: Session, pembayar: User, sumber: str) -> None:
-    """Pagar P2: AI tidak memberi hasil → biaya kembali penuh."""
+    """Pagar P2: AI tidak memberi hasil → biaya kembali penuh.
+
+    Aturan 5: trial 1x seumur akun pun kembali — gagal = trial TIDAK
+    terpakai, pembimbing boleh coba lagi. Dulu cabang trial langsung
+    kembali tanpa mengembalikan apa pun, jadi trial hangus sia-sia
+    padahal AI tidak memberi hasil.
+    """
+    if sumber == 'trial':
+        kunci = KUNCI_TRIAL.format(uid=pembayar.id)
+        baris = db.get(Setelan, kunci)
+        if baris is not None:
+            db.delete(baris)
+            db.commit()
+        return
     if sumber != 'saldo':
         return
     from . import saldo as _saldo
@@ -375,9 +398,20 @@ async def kerjakan(db: Session, b: Pembimbingan, pembayar: User) -> dict:
         detik = round(time.monotonic() - t0, 1)
         log.warning('[asisten] bimbingan %s gagal setelah %.1f dtk: %s',
                     b.id, detik, e)
-        return {'ok': False, 'dibuat': 0, 'detik': detik, 'pesan': (
-            'AI masih sibuk menyelesaikan tinjauan naskah ini. '
-            'Saldo sudah kembali utuh — coba lagi beberapa saat lagi ya.')}
+        #  Aturan 5: pesan kembali harus jujur per sumber biaya. Dulu
+        #  'Saldo sudah kembali utuh' juga muncul untuk trial, padahal
+        #  trial tidak memakai saldo (dan dulu trialnya hangus).
+        if bayar.get('sumber') == 'trial':
+            pesan_gagal = (
+                'AI masih sibuk menyelesaikan tinjauan naskah ini. '
+                'Jatah gratis pertamamu masih tersimpan, coba lagi '
+                'beberapa saat lagi ya.')
+        else:
+            pesan_gagal = (
+                'AI masih sibuk menyelesaikan tinjauan naskah ini. '
+                'Saldo sudah kembali utuh, coba lagi beberapa saat lagi ya.')
+        return {'ok': False, 'dibuat': 0, 'detik': detik,
+                'pesan': pesan_gagal}
     detik = round(time.monotonic() - t0, 1)
     log.info('[asisten] bimbingan %s: %d usulan masuk (%s, %s, %.1f dtk, '
              'biaya=%s, pembayar=%s)', b.id, dibuat, model, info.get('model'),

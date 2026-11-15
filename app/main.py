@@ -155,9 +155,16 @@ async def halaman_kolaborasi(request: Request,
                              db: Session = Depends(get_db)):
     u = _wajib_login_kolab(request, db)
     daftar = _kolaborasi.daftar_untuk(db, u)
+    #  Aturan 5 (C7): biaya Asisten jujur di layar SEBELUM klik — trial
+    #  gratis pertama atau 1 Token Revisi dari saldo akun ini. Dulu
+    #  halaman tidak menyebut biaya sama sekali; kejujuran baru muncul
+    #  sesudah tombol ditekan.
+    from . import asisten as _asisten               # noqa: PLC0415
+    biaya_asisten = _asisten.biaya_untuk(db, u)
     return templates.TemplateResponse('kolaborasi.html', {
         'request': request, 'user': u, 'daftar': daftar,
         'kait': request.query_params.get('kait') or '',
+        'biaya_asisten': biaya_asisten,
     })
 
 

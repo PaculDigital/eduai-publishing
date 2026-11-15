@@ -50,6 +50,16 @@ KALIMAT_SALDO_KOSONG = (
     'Periksa otomatis memakai kuota yang sama seperti fitur lain. Kuota Anda '
     'sedang kosong — isi ulang dulu ya, setelah itu tinggal klik lagi.'
 )
+#  Aturan 5: paket GRATIS tidak bisa isi ulang lewat AddOn (AddOn terkunci,
+#  MASTER_PLAN 4.10) — jalan keluarnya UPGRADE, bukan isi ulang. Dulu
+#  cabang 403 (BUTUH_UPGRADE dari cek_dan_potong) memakai kalimat yang
+#  sama dengan 402, jadi pembimbing gratis disuruh isi ulang yang tidak
+#  bisa dia lakukan.
+KALIMAT_BUTUH_UPGRADE = (
+    'Saldo Token Revisimu habis. Paket Gratis belum bisa menambah saldo, '
+    'upgrade ke paket Penulis dulu ya. Setelah itu token Paket dan AddOn '
+    'masuk ke saldo yang sama.'
+)
 KALIMAT_SEDANG_BEKERJA = (
     'Masih ada pemeriksaan yang berjalan. Mohon tunggu sebentar ya.'
 )
@@ -294,8 +304,11 @@ async def periksa(
             return {'ok': False, 'sebab': 'saldo_kosong', 'jumlah': 0,
                     'pesan': KALIMAT_SALDO_KOSONG}
         if kode == 403:
+            #  Aturan 5: 403 = paket gratis, AddOn terkunci — jalan keluar
+            #  yang benar UPGRADE, bukan isi ulang (dulu pesan 402 dipakai
+            #  juga di sini, jalan buntu bagi pembimbing gratis).
             return {'ok': False, 'sebab': 'belum_berbayar', 'jumlah': 0,
-                    'pesan': KALIMAT_SALDO_KOSONG}
+                    'pesan': KALIMAT_BUTUH_UPGRADE}
         log.warning('[pembimbing-ai] potong kuota gagal: %s', e)
         return {'ok': False, 'sebab': 'kuota_galat', 'jumlah': 0,
                 'pesan': KALIMAT_SALDO_KOSONG}
