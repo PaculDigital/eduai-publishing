@@ -615,6 +615,47 @@ def catat(db: Session, b: Pembimbingan, isi: str, *, section_id: str = '',
     return baris
 
 
+def jenis_catatan(c) -> str:
+    """Jenis catatan dari kolom yang SUDAH ADA (tanpa kolom baru).
+
+    'tandaan'  → ada kutipan persis (teks_asli) = tandaan pada satu kalimat.
+    'perintah' → ada alamat bagian (section_id) tapi tanpa kutipan =
+                 perintah untuk satu Bab/Sub-bab utuh (atau posisi
+                 "sesudah X", yang disimpan sebagai section_id bagian itu).
+    'umum'     → tidak ada keduanya = catatan umum tanpa alamat.
+
+    Dipakai sidebar tinjau + panel mahasiswa supaya jenisnya tampil tanpa
+    menambah kolom/tabel (aturan Boss: perbaiki yang ada, jangan buat baru).
+    """
+    if (getattr(c, 'teks_asli', '') or '').strip():
+        return 'tandaan'
+    if (getattr(c, 'section_id', '') or '').strip():
+        return 'perintah'
+    return 'umum'
+
+
+def tandai_selesai(db: Session, bimbingan_id: int, catatan_id: int) -> bool:
+    """Tandai satu catatan SELESAI (warna hijau + sudah_oke).
+
+    Dipakai hook revisi AI sisi mahasiswa: sesudah revisi AI untuk catatan
+    itu BERHASIL, statusnya otomatis selesai, mahasiswa tidak perlu
+    menandai manual. Kepemilikan diperiksa lewat `pembimbingan_id`:
+    catatan bimbingan lain tidak bisa ditandai lewat sini. Idempoten:
+    sudah selesai sebelumnya → tetap True tanpa menulis ulang.
+    """
+    c = (db.query(CatatanPembimbing)
+         .filter(CatatanPembimbing.id == catatan_id,
+                 CatatanPembimbing.pembimbingan_id == bimbingan_id)
+         .one_or_none())
+    if c is None:
+        return False
+    if c.warna != 'hijau' or c.sudah_oke is None:
+        c.warna = 'hijau'
+        c.sudah_oke = datetime.now()
+        db.commit()
+    return True
+
+
 def daftar_catatan(db: Session, bimbingan_id: int,
                    semuanya: bool = False) -> list[CatatanPembimbing]:
     """Catatan satu bimbingan (terbaru di atas).

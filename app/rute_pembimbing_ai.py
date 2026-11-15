@@ -163,6 +163,7 @@ def _kerja(berkas_id: int, pemakai_id: int, nama_mhs: str, bimbingan_id: int):
 @router.get('/tinjau/{token}/naskah-baca/{berkas_id}',
             response_class=HTMLResponse)
 def naskah_baca(token: str, berkas_id: int, request: Request,
+                ai: str = '', lampiran_ditolak: str = '',
                 db: Session = Depends(get_db)):
     """Buka naskah mahasiswa di OnlyOffice — MODE BACA (putusan D7/D8).
 
@@ -175,9 +176,22 @@ def naskah_baca(token: str, berkas_id: int, request: Request,
 
     ⚠️ Naskah TIDAK disalin ke akun pembimbing (putusan D9). Yang dibaca
     adalah berkas MILIK mahasiswa, langsung.
+
+    SIDEBAR (15 Nov 2026, GAS Bos): halaman ini SEKARANG membawa sidebar
+    catatan di samping editor: daftar catatan + form catatan + tombol
+    Asisten AI. Halaman tinjau lama tidak lagi merender teks naskah;
+    yang dibaca pembimbing adalah editornya langsung. `?ai=` dan
+    `?lampiran_ditolak=` diteruskan dari /tinjau/{token} supaya sidebar
+    menampilkan kabar yang sama.
     """
     b, sebab = P.cari_dari_token(db, token)
     if b is None:
+        return RedirectResponse(f'/tinjau/{token}', status_code=303)
+
+    #  Gerbang identitas: kunjungan pertama WAJIB isi identitas dulu
+    #  (kartu sambutan di /tinjau/{token}); langsung ke editor tanpa
+    #  identitas = melewati gerbang.
+    if not b.identitas:
         return RedirectResponse(f'/tinjau/{token}', status_code=303)
 
     bk = _berkas_sah(db, b.id, berkas_id)
@@ -235,10 +249,89 @@ def naskah_baca(token: str, berkas_id: int, request: Request,
     #  melebihi token tinjau → "sampai expired atau mahasiswa cabut"
     #  (putusan Bos) benar-benar berlaku. httponly → JS tak bisa mencurinya.
     from . import kunci_tinjau as KT                         # noqa: PLC0415
+
+    #  ── SIDEBAR CATATAN (15 Nov 2026) ────────────────────────────────
+    #  Konteks yang DULU dihitung halaman_tinjau untuk panel kanan,
+    #  sekarang dihitung di sini untuk SIDEBAR di samping editor.
+    #  ⚠️ Teks naskah HANYA dipakai di server (untuk petunjuk/sorotan/
+    #  dropdown), TIDAK PERNAH dikirim ke template sebagai teks.
+    from . import kelompok_catatan as KC                     # noqa: PLC0415
+    from . import cari_bagian as CB                          # noqa: PLC0415
+    from .rute_pembimbing import _isi_naskah, _nama_mahasiswa  # noqa: PLC0415
+    teks_naskah = ''
+    try:
+        teks_naskah = _isi_naskah(db, bk)
+    except Exception as e:                                 # noqa: BLE001
+        log.warning('[pembimbing-ai] gagal baca naskah sidebar: %s', e)
+    catatan = P.daftar_catatan(db, b.id)
+    rantai = P.rangkai(catatan)
+    angka = P.ringkas(catatan)
+    jenis_catatan = {c.id: P.jenis_catatan(c) for c in catatan}
+    #  Dropdown Bab/Sub-bab sidebar: dari peta Jev tersimpan, jatuh ke
+    #  potongan bagian state.petakan() (lihat kelompok_catatan).
+    bab_naskah = KC.daftar_bagian_sidebar(db, bk.file_id, teks_naskah)
+    kelompok = KC.kelompokkan(rantai, ada_bab=bool(bab_naskah))
+    #  Petunjuk (kutipan pendek per catatan) + sorotan: dihitung SEKALI di
+    #  server supaya naskah 400rb karakter tidak perlu dikirim ke browser.
+    #  Kalau tidak ketemu, petunjuk tetap None dan template WAJIB memberi
+    #  tahu pembimbing apa adanya, bukan diam-diam tidak bergerak.
+    petunjuk = {}
+    for simpul in (rantai or []):
+        c = simpul.get('terbaru')
+        if c is None:
+            continue
+        try:
+            petunjuk[c.id] = CB.cari_di_banyak(
+                [teks_naskah], c.isi or '',
+                getattr(c, 'teks_asli', '') or '')
+        except Exception as e:                             # noqa: BLE001
+            log.warning('[pembimbing-ai] pencarian bagian gagal: %s', e)
+            petunjuk[c.id] = None
+    sorotan_per_catatan = {}
+    if teks_naskah:
+        try:
+            from . import sorotan as SR                     # noqa: PLC0415
+            for c in catatan:
+                if getattr(c, 'berkas_id', None) not in (None, bk.id):
+                    continue
+                hasil = SR.cari_sorotan(teks_naskah, c.teks_asli or '')
+                hasil['berkas'] = bk.id
+                sorotan_per_catatan[c.id] = hasil
+        except Exception as e:                             # noqa: BLE001
+            log.warning('[pembimbing-ai] gagal periksa sorotan: %s', e)
+            sorotan_per_catatan = {}
+    #  Siapa yang sedang membuka (kalau sudah login): menentukan tombol
+    #  Asisten AI: yang sudah daftar memakai alurnya (1 token dari
+    #  dompetnya), yang belum diarahkan ke /daftar (bukan /masuk).
+    pemakai = None
+    try:
+        from .main import user_dari_request                 # noqa: PLC0415
+        pemakai = user_dari_request(request, db)
+    except Exception:                                      # noqa: BLE001
+        pemakai = None
+    biaya_asisten = None
+    if pemakai is not None:
+        try:
+            from . import asisten as _A                     # noqa: PLC0415
+            biaya_asisten = _A.biaya_untuk(db, pemakai)
+        except Exception:                                  # noqa: BLE001
+            biaya_asisten = None
     resp = _tpl.TemplateResponse('tinjau_baca.html', {
         'request': request, 'cfg': cfg, 'token': token,
         'bimbingan': b, 'berkas': bk, 'nama_berkas': fb.nama,
         'api_js': OO.url_browser(),
+        'nama_mhs': _nama_mahasiswa(db, b.user_id),
+        'nama_pembimbing': _nama_pembimbing(b),
+        'sisa_hari': P.sisa_hari(b),
+        'semua_berkas': P.daftar_berkas(db, b.id),
+        'catatan': catatan, 'rantai': rantai, 'kelompok': kelompok,
+        'jenis_catatan': jenis_catatan,
+        'bab_naskah': bab_naskah, 'petunjuk': petunjuk,
+        'sorotan': sorotan_per_catatan, 'angka': angka,
+        'ai_aktif': PAI.aktif(), 'ai': ai,
+        'lampiran_ditolak': bool(lampiran_ditolak),
+        'sudah_masuk': pemakai is not None,
+        'biaya_asisten': biaya_asisten,
     })
     kedaluwarsa = KT.batas_exp(b.kedaluwarsa)
     resp.set_cookie(

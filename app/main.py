@@ -3615,11 +3615,47 @@ def halaman_edit(fid: int, request: Request, u: User = Depends(wajib_login),
         log.warning('[editor] gagal hitung kuota AI user=%s: %s', u.id, e)
         ringkas_ai = None
 
+    # ── CATATAN PEMBIMBING untuk panel editor (sidebar tinjau, 15 Nov 2026)
+    #  Daftar catatan dari SEMUA bimbingan milik mahasiswa ini yang
+    #  menempel pada berkas ini, supaya mahasiswa bisa klik satu catatan
+    #  lalu "Revisi dengan AI" (1 token, area + tetangga ±1, otomatis
+    #  selesai). Hanya data catatan (alamat + isi + kutipan), BUKAN teks
+    #  naskah. Catatan tanpa alamat berkas (umum) ikut tampil: alamat
+    #  yang dipakai revisi adalah section-nya, bukan berkasnya.
+    catatan_pembimbing = []
+    try:
+        from . import pembimbing as _P                 # noqa: PLC0415
+        from .models import Pembimbingan as _BIM       # noqa: PLC0415
+        for _bim in db.query(_BIM).filter(_BIM.user_id == u.id).all():
+            _bk_ids = {bk.id for bk in _P.daftar_berkas(db, _bim.id)
+                       if bk.file_id == fb.id}
+            for c in _P.daftar_catatan(db, _bim.id, semuanya=True):
+                if (getattr(c, 'berkas_id', None) is not None
+                        and c.berkas_id not in _bk_ids):
+                    continue
+                catatan_pembimbing.append({
+                    'id': c.id,
+                    'isi': c.isi or '',
+                    'jenis': _P.jenis_catatan(c),
+                    'section_id': c.section_id or '',
+                    'section_judul': c.section_judul or '',
+                    'teks_asli': c.teks_asli or '',
+                    'warna': c.warna or 'kuning',
+                    'selesai': bool(c.sudah_oke),
+                    'dilewati': bool(getattr(c, 'dilewati', False)),
+                    'dibuat': (c.dibuat.strftime('%d %b %Y')
+                               if getattr(c, 'dibuat', None) else ''),
+                })
+    except Exception as e:                              # pragma: no cover
+        log.warning('[editor] gagal baca catatan pembimbing: %s', e)
+        catatan_pembimbing = []
+
     return templates.TemplateResponse('editor.html', {
         'request': request, 'user': u, 'berkas': fb, 'cfg': cfg,
         'api_js': onlyoffice.url_browser(), 'tipe': onlyoffice.tipe_dokumen(fb.nama)[1],
         'sesi_aktif': aktif_skrg, 'batas_sesi': MAX_SESI_EDIT,
         'ai_kuota': ringkas_ai,
+        'catatan_pembimbing': catatan_pembimbing,
         'ai_member': _ai_member(db, u),
         'ai_addon': [
             {'jenis': k, **v}
