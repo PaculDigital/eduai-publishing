@@ -46,6 +46,10 @@ Aturan yang diuji (rancangan RENCANA_TINJAU_STABILO.md):
       karangan dibuang SEBELUM daftar tampil (Asisten + Periksa);
       daftar kosong sesudah disaring -> pesan jujur; `simpan_catatan`
       (Periksa) mengosongkan teks_asli bila kutipan tidak ada di naskah.
+  13. Tata letak dorong (Gas Bos 20:02 WIB): panel duduk di dalam alur
+      berdampingan dengan editor (editor menyempit saat panel dibuka,
+      melebar saat ditutup), bukan lapisan fixed di atas editor;
+      isi panel menggulir vertikal; tanpa luapan horizontal.
 """
 import asyncio
 import os
@@ -985,6 +989,39 @@ def main():
         and (_nt_simpan[0].teks_asli or '') == ''
         and 'Kutipan:' not in _nt_simpan[0].isi
         and 'Arah perbaikan: Saran karangan simpan.' in _nt_simpan[0].isi)
+
+    # ── 13. Tata letak dorong (Gas Bos 20:02 WIB) ──────────────────────
+    #    Panel mendorong editor, bukan menumpuk di atasnya (uji live
+    #    19:43-19:56 WIB: iframe OnlyOffice menutupi tombol formulir
+    #    di layar sempit karena panel fixed z-index 70 di atas editor).
+    r_dorong = RAI.naskah_baca(token, bk.id, _ReqPalsu(), '', '', db=db)
+    badan13 = r_dorong.body.decode('utf-8', 'ignore')
+    cek('dorong: pembungkus #tengah ada, editor sebelum panel di dalamnya',
+        '<div id="tengah">' in badan13
+        and badan13.index('<div id="tengah">')
+        < badan13.index('<div id="tempat-editor">')
+        < badan13.index('<aside id="panel-tinjau"')
+        and '</aside>\n</div>' in badan13)
+    cek('dorong: panel dalam alur (relative), BUKAN fixed menumpuk',
+        '#panel-tinjau{position:relative;flex:0 0 404px;' in badan13
+        and '#panel-tinjau{position:fixed' not in badan13)
+    cek('dorong: panel tertutup menciut ke nol (editor melebar lagi)',
+        '#panel-tinjau:not(.buka){flex-basis:0;width:0;opacity:0;'
+        in badan13)
+    cek('dorong: editor fleksibel + wadah tengah flex baris',
+        '#tengah{flex:1 1 auto;display:flex;' in badan13
+        and '#tempat-editor{flex:1 1 auto;position:relative;'
+        'min-height:0;min-width:0}' in badan13)
+    cek('dorong: isi panel menggulir vertikal (roda mouse)',
+        '.pt-isi{flex:1;overflow-y:auto;' in badan13)
+    cek('dorong: tanpa luapan horizontal (pengaman body)',
+        'overflow-x:hidden' in badan13)
+    cek('dorong: panel terbuka saat halaman dibuka + tutup/buka tetap ada',
+        '<aside id="panel-tinjau" class="buka"' in badan13
+        and 'id="btn-catatan"' in badan13
+        and 'id="pt-tutup"' in badan13
+        and "classList.toggle('buka'" in badan13
+        and 'window.innerWidth < 900' in badan13)
 
     print()
     print(f'LULUS {len(LULUS)}  GAGAL {len(GAGAL)}')
