@@ -385,7 +385,7 @@ _NASKAH_BANDING: str = ''
 #  menyebut satu blok "kosong". Konsisten, bukan angka karangan.
 _MIN_HASIL_REVISI = 40
 
-#  C6 (25Sep26): waktu MINIMAL yang disisakan untuk jalur 2 (OpenRouter)
+#  C6 (25Sep26): waktu MINIMAL yang disisakan untuk jalur 2 (TokenHarbor)
 #  supaya ia tetap punya kesempatan menjawab sesudah jalur 1 menyita waktu.
 _MIN_SISA_JALUR2 = 30.0
 
@@ -871,12 +871,12 @@ def _valid(jawab: str, jumlah_komentar: int) -> str | None:
 # ── FALLBACK INTERNAL BERBAYAR (ACC Bos 17Sep26) ─────────────────────────
 # KEKHAWATIRAN BOS (BENAR): fallback 9router hanya ANTAR-provider farming.
 # Kalau 9router down / semua provider farming tumbang SERENTAK, app tak punya
-# jalur → user gagal. Jadi ditambah JALUR KEDUA: OpenRouter langsung.
-# Urutan: (1) 9router/combo `EduAi` → (2) OpenRouter `inclusionai/ling-3.0-flash`.
+# jalur → user gagal. Jadi ditambah JALUR KEDUA: TokenHarbor langsung.
+# Urutan: (1) 9router/combo `EduAi` → (2) TokenHarbor `inclusionai/ling-3.0-flash`.
 def _urai_jawaban(raw: str, model_diminta: str) -> tuple[str, dict]:
     """Urai respons /chat/completions → (konten, info).
 
-    Dipakai BERSAMA oleh jalur 9router maupun fallback OpenRouter supaya
+    Dipakai BERSAMA oleh jalur 9router maupun fallback TokenHarbor supaya
     aturan penjaga (finish=length, konten kosong) TIDAK bisa berbeda.
 
     ⚠️ AKAR BUG 17Sep26 (fallback selalu gagal "Expecting value: line 1
@@ -971,9 +971,9 @@ async def _panggil_9router(user_msg: str, timeout: float,
     return _urai_jawaban(r.text, AI_MODEL)
 
 
-async def _panggil_openrouter(user_msg: str, timeout: float,
+async def _panggil_tokenharbor(user_msg: str, timeout: float,
                               system: str | None = None) -> tuple[str, dict]:
-    """JALUR 2 — FALLBACK berbayar/gratis langsung ke OpenRouter.
+    """JALUR 2: FALLBACK berbayar/gratis langsung ke TokenHarbor.
 
     Dipakai HANYA kalau jalur 1 (9router) gagal. Mencoba model BERLAPIS:
     GRATIS dulu (`:free`), baru berbayar — hemat biaya, tetap ada jaring.
@@ -1022,7 +1022,7 @@ async def _panggil_openrouter(user_msg: str, timeout: float,
             if r.status_code != 200:
                 raise RuntimeError(f'HTTP {r.status_code}: {r.text[:180]}')
             konten, info = _urai_jawaban(r.text, model)
-            info['jalur'] = 'fallback-openrouter'
+            info['jalur'] = 'fallback-tokenharbor'
             info['provider'] = provider
             return konten, info
         except Exception as e:                                 # noqa: BLE001
@@ -1038,7 +1038,7 @@ async def _panggil_openrouter(user_msg: str, timeout: float,
 async def _panggil_router(user_msg: str, timeout: float,
                           system: str | None = None,
                           gambar: list[str] | None = None) -> tuple[str, dict]:
-    """Panggil AI: JALUR 1 (9router) → JALUR 2 (OpenRouter) bila jalur 1 TIDAK
+    """Panggil AI: JALUR 1 (9router) → JALUR 2 (TokenHarbor) bila jalur 1 TIDAK
     memberi jawaban.
 
     `system` (T5.2, 27Sep26): system prompt PENGGUNA — sengaja opsional.
@@ -1104,7 +1104,7 @@ async def _panggil_router(user_msg: str, timeout: float,
     #  Sisa waktu untuk jalur 2: kurangi waktu yang sudah terpakai jalur 1.
     sisa = max(timeout - (time.monotonic() - t0), _MIN_SISA_JALUR2)
     try:
-        konten, info = await _panggil_openrouter(user_msg, sisa, system=system)
+        konten, info = await _panggil_tokenharbor(user_msg, sisa, system=system)
         log.warning('[ai] FALLBACK tokenharbor dipakai (%s, %.0f dtk) — jalur 1 '
                     'tidak selesai: %s', info.get('model'), sisa, galat1)
         #  Pemicu WA #3 (keputusan Bos 27Sep26 + dipersempit 05Okt26):

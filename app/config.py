@@ -134,10 +134,10 @@ AI_TIMEOUT_DETIK = float(os.getenv('EDUAI_AI_TIMEOUT', '420'))
 
 # ══ C6 (25Sep26) — BATAS SABAR jalur 1 sebelum pindah jalur 2 ═══════════
 #  AKAR MASALAH (terbaca dari kode, bukan dugaan):
-#      `_panggil_router()` hanya memindahkan ke jalur 2 (OpenRouter) kalau
+#      `_panggil_router()` hanya memindahkan ke jalur 2 (TokenHarbor) kalau
 #      jalur 1 melempar GALAT. Kalau jalur 1 NYANGKUT (lambat), tidak ada
 #      yang memindahkan → mahasiswa menunggu AI_TIMEOUT_DETIK (420 dtk /
-#      7 MENIT) lalu dapat "Layanan AI tidak tersedia", padahal OpenRouter
+#      7 MENIT) lalu dapat "Layanan AI tidak tersedia", padahal TokenHarbor
 #      sehat dan bisa menjawab.
 #
 #  PAGAR: kalau jalur 1 belum juga menjawab dalam BATAS SABAR, MENYERAH dan
@@ -162,7 +162,9 @@ AI_MAX_KOMENTAR = int(os.getenv('EDUAI_AI_MAX_KOMENTAR', '10'))
 # KENAPA ADA (kekhawatiran Bos, benar): 9router punya fallback ANTAR-provider
 # farming (gratis), TAPI kalau **9router sendiri** down / semua provider
 # farming tumbang bersamaan, app kehilangan jalur → user gagal.
-# Ini = JALUR KEDUA langsung ke OpenRouter (berbayar, murah, andal).
+# Ini = JALUR KEDUA langsung ke TokenHarbor (berbayar, murah, andal).
+# (Dulu OpenRouter; endpoint pindah ke tokenharbor.ai, nama fungsi dan
+# label jalur ikut diganti 15 Nov 2026 supaya tidak menyesatkan.)
 #
 # Model: `inclusionai/ling-3.0-flash` — ctx 262.144 token,
 #   $0,000000021/token masuk · $0,000000063/token keluar (UJI NYATA 17Sep26:
@@ -180,7 +182,7 @@ FALLBACK_AKTIF = bool(FALLBACK_BASE and FALLBACK_KEY)
 
 
 def daftar_fallback() -> list[tuple[str, str]]:
-    """Urutan model fallback OpenRouter → [(model, provider), …].
+    """Urutan model fallback TokenHarbor → [(model, provider), …].
 
     GRATIS dulu, berbayar murah, lalu paling akhir.
     UJI NYATA 17Sep26 (semua patuh format `[PROFIL]`):
@@ -192,7 +194,7 @@ def daftar_fallback() -> list[tuple[str, str]]:
 
     ⚠️ Tiap model boleh punya PROVIDER SENDIRI: `qwen3.7-flash` HANYA dilayani
     `alibaba`; keluarga `ling` dilayani `novita`. Kalau provider dipaksa sama,
-    OpenRouter balas 404 "No allowed providers are available".
+    TokenHarbor balas 404 "No allowed providers are available".
     ⚠️ `qwen3.7-flash` GANTI `openai/gpt-oss-20b` (ACC Bos 17Sep26) karena
     KONTEKS 1.000.000 vs 131.072 token, dengan HARGA SAMA PERSIS.
     """
