@@ -150,13 +150,13 @@ def main():
     # ── 2. Jenis catatan dari kolom yang sudah ada ──────────────────────
     c_tandaan = P.catat(db, b, 'Perbaiki kalimat ini',
                         section_id='2.1',
-                        section_judul='2.1 — Teori Pemasaran',
+                        section_judul='2.1 \u2014 Teori Pemasaran',
                         teks_asli=KALIMAT_TANDAAN, berkas_id=bk.id)
     cek('jenis: kutipan persis -> tandaan',
         P.jenis_catatan(c_tandaan) == 'tandaan')
     c_perintah = P.catat(db, b, 'Tambahkan teori pemasaran dan kutipan artikelnya',
                          section_id='2.1',
-                         section_judul='2.1 — Teori Pemasaran',
+                         section_judul='2.1 \u2014 Teori Pemasaran',
                          berkas_id=bk.id)
     cek('jenis: bagian tanpa kutipan -> perintah',
         P.jenis_catatan(c_perintah) == 'perintah')
@@ -257,7 +257,7 @@ def main():
     # ── 3. tambah_catatan: Hakim alamat ────────────────────────────────
     r_ok = RP.tambah_catatan(token, isi='Perintah baru untuk 2.2',
                              section_id='2.2',
-                             section_judul='2.2 — Teori Perilaku Konsumen',
+                             section_judul='2.2 \u2014 Teori Perilaku Konsumen',
                              teks_asli='', section_teks='', tautan='',
                              induk_id='', berkas_id=str(bk.id),
                              nomor_paragraf='', lampiran=None, db=db)
@@ -271,7 +271,7 @@ def main():
         and P.jenis_catatan(baru[0]) == 'perintah')
     RP.tambah_catatan(token, isi='Alamat palsu',
                       section_id='9.9',
-                      section_judul='9.9 — Bab Palsu',
+                      section_judul='9.9 \u2014 Bab Palsu',
                       teks_asli='', section_teks='', tautan='',
                       induk_id='', berkas_id=str(bk.id),
                       nomor_paragraf='', lampiran=None, db=db)
@@ -283,7 +283,7 @@ def main():
         and P.jenis_catatan(palsu[0]) == 'umum')
     RP.tambah_catatan(token, isi='Perintah sesudah 2.1',
                       section_id='2.1',
-                      section_judul='Sesudah 2.1 — Teori Pemasaran',
+                      section_judul='Sesudah 2.1 \u2014 Teori Pemasaran',
                       teks_asli='', section_teks='', tautan='',
                       induk_id='', berkas_id=str(bk.id),
                       nomor_paragraf='', lampiran=None, db=db)
@@ -296,7 +296,7 @@ def main():
     # ── 4. Kutipan salah: masuk tanpa sorotan palsu ────────────────────
     RP.tambah_catatan(token, isi='Kutipan yang salah',
                       section_id='2.1',
-                      section_judul='2.1 — Teori Pemasaran',
+                      section_judul='2.1 \u2014 Teori Pemasaran',
                       teks_asli='Kalimat yang tidak ada di naskah sama sekali.',
                       section_teks='', tautan='', induk_id='',
                       berkas_id=str(bk.id),
