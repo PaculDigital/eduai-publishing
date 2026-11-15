@@ -177,10 +177,19 @@ main{flex:1;position:relative;min-height:0;background:#fff}
 .pai-ct{border:1px solid var(--garis);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#fff}
 .pai-ct.selesai{opacity:.65}
 .pai-ct-atas{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px}
-.pai-ct-jenis{font-size:11px;font-weight:700;color:#146B2C;background:#E9F6EE;padding:2px 8px;border-radius:5px}
 .pai-ct-bab{font-size:11.5px;font-weight:700;color:#3A3844}
 .pai-ct-lencana{font-size:11px;font-weight:700;color:#146B2C;background:#CFEBD8;padding:2px 8px;border-radius:20px}
 .pai-ct-lencana.lewati{color:#8A6D0B;background:#FFF3B8}
+/*  ── HISTORY REVISI (16 Nov 2026, sidebar sederhana): pill status +
+    balasan di atas kartu; jenis catatan tidak tampil. ─────────────── */
+.pai-ct-statusbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
+.pai-ct-revisi{font-size:12.5px;font-weight:700;color:#272530}
+.pai-ct-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.pai-ct-pill.tunggu{background:#FFF3B8;color:#8A6D0B}
+.pai-ct-pill.sudah,.pai-ct-pill.selesai{background:#CFEBD8;color:#146B2C}
+.pai-ct-pill.balasan{background:#F0F0F2;color:#68666E}
+.pai-ct-terkunci{margin-top:10px;background:#F0F0F2;border-radius:8px;
+  padding:9px 11px;font-size:12px;line-height:1.6;color:#68666E}
 .pai-ct-isi{font-size:13px;line-height:1.6;color:#3A3844;word-break:break-word}
 .pai-ct-kutip{font-size:12px;color:var(--teks-abu);background:#FFFDF0;border-left:3px solid #E8C547;padding:6px 9px;margin-top:6px;border-radius:0 5px 5px 0;word-break:break-word}
 .pai-ct-btn{margin-top:9px;background:var(--hijau);color:#fff;font-weight:700;font-size:12.5px;padding:8px 16px;border-radius:70px;border:none;font-family:inherit;cursor:pointer}
@@ -574,25 +583,40 @@ main{flex:1;position:relative;min-height:0;background:#fff}
 </div>
 {% endif %}
 
-    {# ── CATATAN PEMBIMBING (sidebar tinjau, 15 Nov 2026) ─────────────
+    {# ── HISTORY REVISI (sidebar tinjau 15 Nov 2026, sederhana 16 Nov 2026)
        1 kartu = 1 RANTAI = 1 masalah (bukan 1 ronde). Ronde terbaru
        terbuka, ronde lama terlipat (tombol "Ronde sebelumnya").
        Klik satu catatan → revisi AI untuk catatan itu (1 Token Revisi,
        hanya area itu + tetangga ±1, status otomatis selesai). Tombol
        hanya tampil bila catatan punya alamat bagian yang bisa direvisi
        dan belum selesai. Form "Balas" mengirim balasan mahasiswa ke
-       rantai yang sama (gratis, tanpa kuota). #}
+       rantai yang sama (gratis, tanpa kuota). Rantai yang sudah
+       diakhiri pembimbing (Selesai) jadi riwayat baca saja: tanpa
+       tombol AI, tanpa form Balas. #}
     {% if rantai_pembimbing %}
     <div class="pai-catatan">
-      <h3>Catatan Pembimbing ({{ rantai_pembimbing|length }})</h3>
+      <h3>History Revisi ({{ rantai_pembimbing|length }})</h3>
       {% for r in rantai_pembimbing %}
       {% set ct = r.terbaru %}
       <div class="pai-ct{% if ct.selesai %} selesai{% endif %}">
+        <div class="pai-ct-statusbar">
+          <span class="pai-ct-revisi">Revisi-{{ r.nomor_revisi }}</span>
+          {% if r.ditutup %}
+          <span class="pai-ct-pill selesai">Selesai</span>
+          {% elif ct.selesai %}
+          <span class="pai-ct-pill sudah">Sudah diperbaiki</span>
+          {% else %}
+          <span class="pai-ct-pill tunggu">Menunggu diperbaiki</span>
+          {% endif %}
+          {% if r.lama|length > 0 %}
+          <span class="pai-ct-pill balasan">{{ r.lama|length }} Balasan</span>
+          {% else %}
+          <span class="pai-ct-pill balasan">Belum dibalas</span>
+          {% endif %}
+        </div>
         <div class="pai-ct-atas">
-          <span class="pai-ct-jenis" title="{{ ct.tooltip_jenis }}">{{ ct.label_jenis }}</span>
           {% if ct.section_judul %}<span class="pai-ct-bab">{{ ct.section_judul }}</span>{% endif %}
-          {% if ct.selesai %}<span class="pai-ct-lencana">Selesai</span>
-          {% elif ct.dilewati %}<span class="pai-ct-lencana lewati">Dilewati</span>{% endif %}
+          {% if ct.dilewati %}<span class="pai-ct-lencana lewati">Dilewati</span>{% endif %}
         </div>
         <div class="pai-ct-isi">{{ ct.isi }}</div>
         <div class="pai-ct-penulis">{{ ct.penulis }} &middot; {{ ct.dibuat }}</div>
@@ -612,6 +636,11 @@ main{flex:1;position:relative;min-height:0;background:#fff}
           {% endfor %}
         </div>
         {% endif %}
+        {% if r.ditutup %}
+        <div class="pai-ct-terkunci">
+          Revisi ini sudah diakhiri, jadi riwayat baca saja.
+        </div>
+        {% else %}
         {% if not ct.selesai and ct.section_id %}
         <button type="button" class="pai-ct-btn"
                 data-id="{{ ct.id }}"
@@ -626,6 +655,7 @@ main{flex:1;position:relative;min-height:0;background:#fff}
                     required></textarea>
           <button type="submit" class="pai-ct-balas-btn">Balas</button>
         </form>
+        {% endif %}
       </div>
       {% endfor %}
     </div>

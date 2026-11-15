@@ -426,7 +426,7 @@ def main():
     cek('lipat editor: penulis Mahasiswa + Pembimbing tampil',
         'Mahasiswa' in _html_mhs and 'Pembimbing' in _html_mhs)
     cek('lipat editor: 2 rantai masalah, bukan 1 baris per ronde',
-        'Catatan Pembimbing (2)' in _html_mhs
+        'History Revisi (2)' in _html_mhs
         and _html_mhs.count('class="pai-ct-lipat"') == 1)
 
     #  Rantai 1 ronde -> tidak ada tombol lipat.

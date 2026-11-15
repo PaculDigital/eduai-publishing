@@ -767,6 +767,59 @@ def tandai_selesai(db: Session, bimbingan_id: int, catatan_id: int) -> bool:
     return True
 
 
+def akhiri_rantai(db: Session, bimbingan_id: int, catatan_id: int) -> bool:
+    """Pembimbing mengakhiri satu rantai revisi (tombol Akhiri / Selesai).
+
+    Yang ditutup = KEPALA rantai (tanda `ditutup` = 1). Ronde-ronde di
+    bawahnya ikut terkunci karena penjaga memeriksa kepala. Idempoten:
+    sudah ditutup sebelumnya -> tetap True tanpa menulis ulang.
+    BEDA dari `tandai_selesai`: itu selesai OTOMATIS sesudah revisi AI
+    mahasiswa dan masih bisa dicek pembimbing; yang ini pembimbing
+    sendiri yang menutup dan TIDAK bisa dibuka lagi (revisi baru hanya
+    dari catatan baru). Kepemilikan diperiksa lewat `pembimbingan_id`.
+    """
+    c = (db.query(CatatanPembimbing)
+         .filter(CatatanPembimbing.id == catatan_id,
+                 CatatanPembimbing.pembimbingan_id == bimbingan_id)
+         .one_or_none())
+    if c is None:
+        return False
+    kepala_id = _kepala_rantai(db, c)
+    kepala = (db.query(CatatanPembimbing)
+              .filter(CatatanPembimbing.id == kepala_id,
+                      CatatanPembimbing.pembimbingan_id == bimbingan_id)
+              .one_or_none())
+    if kepala is None:
+        return False
+    if not (kepala.ditutup or 0):
+        kepala.ditutup = 1
+        db.commit()
+    return True
+
+
+def rantai_tertutup(db: Session, bimbingan_id: int, catatan_id: int) -> bool:
+    """True kalau rantai catatan ini sudah diakhiri pembimbing.
+
+    Dipakai penjaga server di jalur balasan (pembimbing + mahasiswa):
+    balasan ke rantai yang sudah ditutup DITOLAK supaya kartu yang
+    sudah jadi riwayat baca saja tidak hidup lagi lewat request
+    yang dibuat-buat. Rantai yang selesai OTOMATIS (`sudah_oke`)
+    TIDAK tertutup oleh ini, pembimbing masih bisa mengeceknya.
+    """
+    c = (db.query(CatatanPembimbing)
+         .filter(CatatanPembimbing.id == catatan_id,
+                 CatatanPembimbing.pembimbingan_id == bimbingan_id)
+         .one_or_none())
+    if c is None:
+        return False
+    kepala_id = _kepala_rantai(db, c)
+    kepala = (db.query(CatatanPembimbing)
+              .filter(CatatanPembimbing.id == kepala_id,
+                      CatatanPembimbing.pembimbingan_id == bimbingan_id)
+              .one_or_none())
+    return bool(kepala is not None and (kepala.ditutup or 0))
+
+
 # ══════════════════════════════════════════════════════════════════════════
 #  DAFTAR PILIHAN REVISI AI (15 Nov 2026, GAS Bos + koreksi harga 16:36)
 #  Pembimbing menekan Asisten AI / Periksa dengan AI tanpa perintah atau
@@ -1181,6 +1234,13 @@ def rangkai(catatan: list[CatatanPembimbing]) -> list[dict]:
         s['anak'].sort(key=lambda x: (x.ronde or 1, x.id))
         s['terbaru'] = s['anak'][-1] if s['anak'] else s['kepala']
     hasil.sort(key=lambda s: s['terbaru'].dibuat, reverse=True)
+    #  ── NOMOR REVISI (16 Nov 2026, sidebar sederhana, GAS Bos 00:42 WIB)
+    #  Rantai TERTUA = Revisi-1, berikutnya Revisi-2, dst. Nomor menempel
+    #  di simpul supaya label kartu sama di sidebar pembimbing dan panel
+    #  mahasiswa; rantai baru (kepala termuda) selalu nomor terbesar.
+    for _i, _s in enumerate(sorted(hasil, key=lambda s: s['kepala'].id or 0),
+                            start=1):
+        _s['nomor_revisi'] = _i
     return hasil
 
 
@@ -1201,6 +1261,7 @@ def _dict_catatan(c) -> dict:
         'teks_asli': c.teks_asli or '',
         'warna': c.warna or 'kuning',
         'selesai': bool(c.sudah_oke),
+        'ditutup': bool(getattr(c, 'ditutup', False)),
         'dilewati': bool(getattr(c, 'dilewati', False)),
         'dibuat': (c.dibuat.strftime('%d %b %Y')
                    if getattr(c, 'dibuat', None) else ''),
@@ -1228,6 +1289,8 @@ def rantai_untuk_editor(db: Session, bimbingan_id: int,
         keluar.append({
             'bimbingan_id': bimbingan_id,
             'jumlah_ronde': s['jumlah_ronde'],
+            'nomor_revisi': s.get('nomor_revisi'),
+            'ditutup': bool(getattr(s['kepala'], 'ditutup', False)),
             'kepala': _dict_catatan(s['kepala']),
             'terbaru': _dict_catatan(s['terbaru']),
             'anak': [_dict_catatan(a) for a in s.get('anak') or []],

@@ -203,6 +203,14 @@ def kolaborasi_balasan(
         return RedirectResponse('/naskah', status_code=303)
     if not (isi or '').strip():
         return _kembali_editor(db, b, induk)
+    #  ── KUNCI SELESAI (16 Nov 2026, sidebar sederhana, GAS Bos 00:42 WIB)
+    #  Balasan ke rantai yang sudah diakhiri pembimbing DITOLAK (tidak
+    #  disimpan): kartu itu sudah jadi riwayat baca saja. Rantai yang
+    #  selesai OTOMATIS (sudah_oke) TIDAK tertutup oleh ini.
+    if P.rantai_tertutup(db, b.id, induk.id):
+        log.warning('[kolaborasi] balasan ke rantai tertutup ditolak: %s',
+                    induk.id)
+        return _kembali_editor(db, b, induk)
     P.catat(db, b, isi,
             section_id=induk.section_id or '',
             section_judul=induk.section_judul or '',
