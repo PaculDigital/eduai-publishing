@@ -126,3 +126,67 @@ def ringkas_peta(peta_json, menunggu_idx: set | None = None) -> dict:
         # 'paragraf'/'biasa' tidak tampil di daftar bab (sesuai rancangan:
         # layar hasil hanya daftar bab/subbab).
     return keluar
+
+
+# ── PEMERIKSAAN DI LATAR (15 Nov 2026, perintah Bos 11:12) ───────────────
+#  Tombol "Periksa Struktur" membalas cepat; pemeriksaannya jalan di latar
+#  memakai pekerja `proses` yang SUDAH ADA (pola `peta_otomatis`), dan
+#  layar membaca keadaan dari server lewat `peta_status`, bukan dari
+#  halaman, jadi tutup-buka halaman saat jalan tetap menampilkan
+#  "Sedang Diperiksa".
+#
+#  MURNI (tanpa DB) supaya gampang diuji: pemanggil yang mengambil baris
+#  proses dari DB, fungsi di sini hanya menilai dict-nya.
+
+#  Komentar proses pemeriksaan struktur (manual MAUPUN otomatis). Komentar
+#  manual: ['Pemeriksaan struktur']; otomatis: ['Pemeriksaan struktur
+#  otomatis'], keduanya diawali teks yang sama, jadi satu penanda cukup.
+KOMENTAR_PETA = 'Pemeriksaan struktur'
+
+
+def adalah_proses_peta(komentar_json) -> bool:
+    """True bila baris proses ini adalah pemeriksaan struktur (manual/otomatis).
+
+    `komentar_json`: isi kolom komentar_json (JSON daftar teks, atau teks
+    mentah bila bukan JSON). Proses lain (mis. revisi) TIDAK cocok, supaya
+    revisi yang sedang jalan tidak membuat layar menampilkan
+    "Sedang Diperiksa".
+    """
+    try:
+        data = json.loads(komentar_json) if isinstance(komentar_json, str) \
+            else komentar_json
+    except Exception:                                       # noqa: BLE001
+        data = None
+    if isinstance(data, list):
+        return any(isinstance(x, str) and x.startswith(KOMENTAR_PETA)
+                   for x in data)
+    if isinstance(data, str):
+        return data.startswith(KOMENTAR_PETA)
+    return isinstance(komentar_json, str) and \
+        KOMENTAR_PETA in komentar_json
+
+
+def keadaan_pemeriksaan(*, proses_jalan, proses_terakhir, peta_ada) -> dict:
+    """Keadaan pemeriksaan struktur untuk layar (murni, tanpa DB).
+
+    `proses_jalan`: dict {'kode', 'status', 'galat'} proses peta yang
+    SEDANG jalan (status 'menunggu'/'jalan'), atau None.
+    `proses_terakhir`: dict yang sama untuk proses peta TERAKHIR (apa pun
+    statusnya, yang terbaru), atau None. Dipakai untuk vonis gagal yang
+    jujur: bila upaya terakhir gagal, layar berkata gagal + tombol aktif
+    lagi, bukan diam. Upaya terakhir yang berhasil menutupi kegagalan lama.
+    `peta_ada`: True bila peta tersimpan ada (peta_json tidak kosong).
+
+    Kembalikan {'keadaan': 'jalan'|'selesai'|'gagal'|'belum',
+    'kode': kode proses (atau None), 'galat': pesan gagal (atau '')}.
+    """
+    if proses_jalan is not None:
+        return {'keadaan': 'jalan', 'kode': proses_jalan.get('kode'),
+                'galat': ''}
+    if proses_terakhir is not None \
+            and proses_terakhir.get('status') == 'gagal':
+        return {'keadaan': 'gagal', 'kode': proses_terakhir.get('kode'),
+                'galat': proses_terakhir.get('galat') or ''}
+    if peta_ada:
+        return {'keadaan': 'selesai', 'kode': None, 'galat': ''}
+    return {'keadaan': 'belum', 'kode': None, 'galat': ''}
