@@ -25,6 +25,13 @@ Aturan yang diuji (rancangan RENCANA_TINJAU_STABILO.md):
   7. Rute penyaji teks lama /tinjau/{token}/naskah/{id} menjawab 410.
   8. Mode baca tetap: konfigurasi editor pembimbing tulis mati,
      komentar hidup (pagar tidak diubah).
+  9. Alur pilihan (GAS Bos 16:32 WIB + koreksi harga 16:36 WIB):
+     perintah kosong/luas → 5 pilihan per round (GRATIS, belum catatan);
+     terima per butir 1 token (trial menanggung pertama); saringan keras
+     (kutipan yang sudah jadi catatan tidak ditawarkan lagi); perintah
+     sempit → alur lama (langsung jadi catatan, 1 token per operasi).
+     Periksa dengan AI juga memberi daftar pilihan (gratis), bukan
+     langsung catatan.
 """
 import asyncio
 import os
@@ -376,6 +383,319 @@ def main():
     AI._tandai_catatan_selesai_jika_ada(db, mhs, {'catatan_id': 999999})
     AI._tandai_catatan_selesai_jika_ada(db, mhs, {})
     cek('hook: id tidak ada / kosong -> diam (tanpa lempar)', True)
+
+    # ── 9. Alur pilihan: perintah kosong/luas → daftar, terima per butir ──
+    import json as _json
+    import app.asisten as AS
+    from app import pembimbing_ai as PAI
+
+    #  9a. Klasifikasi luas (lapisan 1 + lapisan 2, terukur).
+    for _cmd, _luas in [('', True), ('ubah alur', True),
+                        ('perbaiki semuanya', True), ('tolong tinjau', True),
+                        ('tinjau semuanya', True), ('cek naskah', True),
+                        ('perbaiki 2.1', False),
+                        ('perbaiki sub bab 2.1', False),
+                        ('tambahkan teori pemasaran', False),
+                        ('perbaiki bab 2', False)]:
+        cek(f'perintah luas? {(_cmd or "(kosong)")} -> {_luas}',
+            AS._perintah_luas(_cmd) is _luas)
+
+    _panggilan = []
+
+    async def _router_palsu(pesan, *a, **k):
+        _panggilan.append({'pesan': pesan, 'system': k.get('system', '')})
+        isi = _json.dumps({'usulan': [
+            {'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+             'catatan': 'Saran satu.'},
+            {'bab': 'BAB I', 'kutipan': KALIMAT_BAB1, 'catatan': 'Saran dua.'},
+            {'bab': '2.2 Teori Perilaku Konsumen', 'kutipan': KALIMAT_BAB2,
+             'catatan': 'Saran tiga.'},
+            {'bab': '2.3 Teori Keputusan Pembelian',
+             'kutipan': 'Kalimat tengah bab dua yang khas dua tujuh.',
+             'catatan': 'Saran empat.'},
+            {'bab': 'BAB I', 'kutipan': KALIMAT_BAB1, 'catatan': 'Saran lima.'},
+            {'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+             'catatan': 'Saran enam.'},
+            {'bab': '2.2 Teori Perilaku Konsumen', 'kutipan': KALIMAT_BAB2,
+             'catatan': 'Saran tujuh.'},
+            {'bab': 'BAB II',
+             'kutipan': 'Kalimat tengah bab dua yang khas dua tujuh.',
+             'catatan': 'Saran delapan.'},
+        ]})
+        return isi, {'model': 'uji'}
+
+    asli_panggil = AI._panggil_router
+    AI._panggil_router = _router_palsu
+    try:
+        saldo_sup_awal = S.sisa(db, sup)
+        catatan_awal = len(P.daftar_catatan(db, b.id))
+        _panggilan.clear()
+        hasil_pilih = asyncio.run(AS.kerjakan(db, b, sup, perintah=''))
+        cek('perintah kosong -> mode pilih, 5 pilihan (8 - 2 saring - 1 potong)',
+            hasil_pilih.get('ok') and hasil_pilih.get('mode') == 'pilih'
+            and hasil_pilih.get('jumlah') == 5)
+        cek('perintah kosong -> BELUM ada catatan baru',
+            len(P.daftar_catatan(db, b.id)) == catatan_awal)
+        cek('perintah kosong -> pembuatan daftar GRATIS (saldo + trial utuh)',
+            S.sisa(db, sup) == saldo_sup_awal and AS.sisa_trial(db, sup))
+        _sumber, _daftar = P.muat_daftar_pilihan(db, b.id, bk.id)
+        cek('daftar tersimpan: sumber asisten + 5 butir',
+            _sumber == 'asisten' and len(_daftar) == 5)
+        _isi_daftar = [d.get('catatan') for d in _daftar]
+        cek('saringan keras: kutipan yang sudah jadi catatan tidak ditawarkan',
+            'Saran satu.' not in _isi_daftar
+            and 'Saran enam.' not in _isi_daftar)
+        cek('potong 5 per round: butir ke-8 tidak masuk',
+            'Saran delapan.' not in _isi_daftar)
+        cek('prompt pilihan: minta 5 + sudah_ada',
+            'Maksimal 5 usulan' in _panggilan[-1]['system']
+            and 'Catatan yang SUDAH ada' in _panggilan[-1]['pesan'])
+        #  Terima semua (5 butir): trial 1 + 4 saldo. Top up dulu (saldo 3).
+        S.masuk(db, sup, 5, sumber='uji')
+        hasil_terima = AS.terima_pilihan(db, b, sup, bk.id, '0,1,2,3,4')
+        cek('terima semua -> 5 catatan, trial 1 + 4 token (saldo 8 -> 4)',
+            hasil_terima.get('ok') and hasil_terima.get('dibuat') == 5
+            and hasil_terima.get('dipotong') == 4
+            and S.sisa(db, sup) == 4 and not AS.sisa_trial(db, sup))
+        cek('terima semua -> catatan bertambah 5',
+            len(P.daftar_catatan(db, b.id)) == catatan_awal + 5)
+        cek('terima semua -> daftar pilihan habis (dihapus)',
+            P.muat_daftar_pilihan(db, b.id, bk.id) == (None, []))
+    finally:
+        AI._panggil_router = asli_panggil
+
+    #  9b. Pilih sebagian (1 dari 3) + tulis sendiri gratis ─────────────
+    sup_baru = buat_user(db, 'pembimbing-baru@contoh.id')
+    fb2, b2, bk2, token2 = buat_naskah(db, mhs, ISI_NASKAH)
+
+    async def _router_tiga(*a, **k):
+        isi = _json.dumps({'usulan': [
+            {'bab': 'BAB I', 'kutipan': KALIMAT_BAB1, 'catatan': 'Pilihan A.'},
+            {'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+             'catatan': 'Pilihan B.'},
+            {'bab': '2.2 Teori Perilaku Konsumen', 'kutipan': KALIMAT_BAB2,
+             'catatan': 'Pilihan C.'},
+        ]})
+        return isi, {'model': 'uji'}
+
+    AI._panggil_router = _router_tiga
+    try:
+        hasil3 = asyncio.run(AS.kerjakan(db, b2, sup_baru, perintah=''))
+        cek('pilih sebagian: daftar 3 butir', hasil3.get('jumlah') == 3)
+        saldo_baru_awal = S.sisa(db, sup_baru)
+        hasil_terima1 = AS.terima_pilihan(db, b2, sup_baru, bk2.id, '1')
+        cek('pilih 1 dari 3 -> 1 catatan, trial menanggung (dipotong 0)',
+            hasil_terima1.get('ok') and hasil_terima1.get('dibuat') == 1
+            and hasil_terima1.get('dipotong') == 0
+            and S.sisa(db, sup_baru) == saldo_baru_awal
+            and not AS.sisa_trial(db, sup_baru))
+        cek('pilih 1 dari 3 -> hanya 1 catatan baru',
+            len([c for c in P.daftar_catatan(db, b2.id)
+                 if c.isi == 'Pilihan B.']) == 1)
+        _s2, _d2 = P.muat_daftar_pilihan(db, b2.id, bk2.id)
+        cek('pilih 1 dari 3 -> sisa 2 butir tetap di daftar',
+            len(_d2) == 2
+            and [d.get('catatan') for d in _d2] == ['Pilihan A.',
+                                                    'Pilihan C.'])
+        RP.tambah_catatan(token2, isi='Catatan tulis tangan',
+                          section_id='', section_judul='', teks_asli='',
+                          section_teks='', tautan='', induk_id='',
+                          berkas_id=str(bk2.id), nomor_paragraf='',
+                          lampiran=None, db=db)
+        cek('tulis sendiri -> catatan masuk, saldo tidak berubah',
+            any(c.isi == 'Catatan tulis tangan'
+                for c in P.daftar_catatan(db, b2.id))
+            and S.sisa(db, sup_baru) == saldo_baru_awal)
+    finally:
+        AI._panggil_router = asli_panggil
+
+    #  9c. Luas vs sempit pada naskah panjang ────────────────────────────
+    ISI_PANJANG = ISI_NASKAH * 5 + (
+        "BAB III\nPENUTUP\n"
+        "Kalimat akhir yang unik tujuh tujuh tujuh. " * 8 + "\n")
+    fb3, b3, bk3, token3 = buat_naskah(db, mhs, ISI_PANJANG)
+    sup3 = buat_user(db, 'pembimbing-panjang@contoh.id')
+    _panggilan.clear()
+    AI._panggil_router = _router_palsu
+    try:
+        hasil_luas = asyncio.run(
+            AS.kerjakan(db, b3, sup3, perintah='ubah alur'))
+        cek('perintah luas "ubah alur" -> mode pilih',
+            hasil_luas.get('mode') == 'pilih')
+        cek('perintah luas -> AI menerima naskah UTUH (kalimat akhir ada)',
+            'Kalimat akhir yang unik tujuh tujuh tujuh'
+            in _panggilan[-1]['pesan'])
+        cek('perintah luas -> pembuatan daftar gratis',
+            S.sisa(db, sup3) == 3 and AS.sisa_trial(db, sup3))
+        fb4, b4, bk4, token4 = buat_naskah(db, mhs, ISI_PANJANG)
+        sup4 = buat_user(db, 'pembimbing-sempit@contoh.id')
+        _panggilan.clear()
+        hasil_sempit = asyncio.run(
+            AS.kerjakan(db, b4, sup4, perintah='perbaiki 2.1'))
+        cek('perintah sempit "perbaiki 2.1" -> alur lama (langsung jadi catatan)',
+            hasil_sempit.get('mode') is None
+            and hasil_sempit.get('dibuat') == 8)
+        cek('perintah sempit -> 1 token (trial) terpakai',
+            not AS.sisa_trial(db, sup4) and S.sisa(db, sup4) == 3)
+        cek('perintah sempit -> TIDAK ada daftar pilihan',
+            P.muat_daftar_pilihan(db, b4.id, bk4.id) == (None, []))
+        cek('perintah sempit -> AI menerima SATU bagian (kalimat akhir tidak ada)',
+            'Kalimat akhir yang unik tujuh tujuh tujuh'
+            not in _panggilan[-1]['pesan'])
+    finally:
+        AI._panggil_router = asli_panggil
+
+    #  9d. Saldo tidak cukup untuk semua butir -> tolak semua ────────────
+    sup_miskin = buat_user(db, 'miskin@contoh.id', paket='gratis')
+    AS._tandai_trial(db, sup_miskin)
+    S.pakai(db, sup_miskin, S.sisa(db, sup_miskin))
+    fb5, b5, bk5, token5 = buat_naskah(db, mhs, ISI_NASKAH)
+    AI._panggil_router = _router_tiga
+    try:
+        hasil_miskin = asyncio.run(
+            AS.kerjakan(db, b5, sup_miskin, perintah=''))
+        cek('saldo 0: pembuatan daftar tetap jalan (gratis)',
+            hasil_miskin.get('mode') == 'pilih'
+            and hasil_miskin.get('jumlah') == 3)
+        tolak = AS.terima_pilihan(db, b5, sup_miskin, bk5.id, '0,1')
+        cek('saldo 0: terima 2 butir ditolak, 0 catatan, saldo tetap 0',
+            (not tolak.get('ok')) and tolak.get('dibuat', 0) == 0
+            and S.sisa(db, sup_miskin) == 0
+            and len(P.daftar_catatan(db, b5.id)) == 0)
+        cek('saldo 0 gratis: pesan menyebut upgrade Penulis, bukan AddOn',
+            'Penulis' in (tolak.get('pesan') or '')
+            and 'AddOn' not in (tolak.get('pesan') or ''))
+        cek('saldo 0: daftar pilihan tetap utuh sesudah ditolak',
+            len(P.muat_daftar_pilihan(db, b5.id, bk5.id)[1]) == 3)
+        sup_bayar = buat_user(db, 'bayar-pilih@contoh.id', paket='penulis')
+        AS._tandai_trial(db, sup_bayar)
+        S.pakai(db, sup_bayar, S.sisa(db, sup_bayar))
+        tolak_bayar = AS.terima_pilihan(db, b5, sup_bayar, bk5.id, '0,1')
+        cek('saldo 0 berbayar: pesan menyebut AddOn',
+            (not tolak_bayar.get('ok'))
+            and 'AddOn' in (tolak_bayar.get('pesan') or ''))
+    finally:
+        AI._panggil_router = asli_panggil
+
+    #  9e. Periksa dengan AI: daftar gratis, terima per butir ────────────
+    sup_periksa = buat_user(db, 'pembimbing-periksa@contoh.id')
+    fb6, b6, bk6, token6 = buat_naskah(db, mhs, ISI_NASKAH)
+
+    async def _router_periksa(*a, **k):
+        isi = _json.dumps({'catatan': [
+            {'bagian': 'BAB I', 'kutipan': KALIMAT_BAB1,
+             'soal': 'Soal satu.', 'saran': 'Saran satu.'},
+            {'bagian': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+             'soal': 'Soal dua.', 'saran': 'Saran dua.'},
+            {'bagian': '2.2 Teori Perilaku Konsumen', 'kutipan': KALIMAT_BAB2,
+             'soal': 'Soal tiga.', 'saran': 'Saran tiga.'},
+        ]})
+        return isi, {'model': 'uji'}
+
+    AI._panggil_router = _router_periksa
+    try:
+        saldo_p_awal = S.sisa(db, sup_periksa)
+        hasil_periksa = asyncio.run(PAI.periksa(db, bk6, pemakai=sup_periksa,
+                                                nama_mhs='Mahasiswa'))
+        cek('periksa -> mode pilih, 3 pilihan, 0 catatan, saldo + trial utuh',
+            hasil_periksa.get('ok') and hasil_periksa.get('mode') == 'pilih'
+            and hasil_periksa.get('jumlah') == 3
+            and len(P.daftar_catatan(db, b6.id)) == 0
+            and S.sisa(db, sup_periksa) == saldo_p_awal
+            and AS.sisa_trial(db, sup_periksa))
+        _sp, _dp = P.muat_daftar_pilihan(db, b6.id, bk6.id)
+        cek('periksa -> daftar tersimpan sumber periksa',
+            _sp == 'periksa' and len(_dp) == 3)
+        terima_p = AS.terima_pilihan(db, b6, sup_periksa, bk6.id, '0,2')
+        cek('periksa terima 2 -> 2 catatan, trial 1 + 1 token (saldo 3 -> 2)',
+            terima_p.get('ok') and terima_p.get('dibuat') == 2
+            and terima_p.get('dipotong') == 1
+            and S.sisa(db, sup_periksa) == 2
+            and not AS.sisa_trial(db, sup_periksa))
+        _sp2, _dp2 = P.muat_daftar_pilihan(db, b6.id, bk6.id)
+        cek('periksa terima 2 -> sisa 1 butir di daftar',
+            len(_dp2) == 1 and _dp2[0].get('kutipan') == KALIMAT_TANDAAN)
+        hasil_r2 = asyncio.run(PAI.periksa(db, bk6, pemakai=sup_periksa,
+                                           nama_mhs='Mahasiswa'))
+        _sp3, _dp3 = P.muat_daftar_pilihan(db, b6.id, bk6.id)
+        cek('periksa round 2 -> hanya 1 pilihan baru (2 sudah jadi catatan)',
+            hasil_r2.get('jumlah') == 1 and len(_dp3) == 1
+            and _dp3[0].get('kutipan') == KALIMAT_TANDAAN)
+    finally:
+        AI._panggil_router = asli_panggil
+
+    #  9f. Setelan menampung daftar JSON beberapa KB ─────────────────────
+    _besar = [{'bab': f'2.{i} Bagian panjang', 'kutipan': KALIMAT_BAB1,
+               'catatan': ('Catatan panjang ' + str(i) + ' ') * 60}
+              for i in range(5)]
+    P.simpan_daftar_pilihan(db, b6.id, bk6.id, 'asisten', _besar)
+    _sb, _db = P.muat_daftar_pilihan(db, b6.id, bk6.id)
+    cek('setelan: daftar 5 butir (beberapa KB) pulang utuh',
+        _sb == 'asisten' and len(_db) == 5
+        and _db[4].get('catatan', '').startswith('Catatan panjang 4'))
+    P.hapus_daftar_pilihan(db, b6.id, bk6.id)
+    cek('setelan: hapus daftar -> kosong',
+        P.muat_daftar_pilihan(db, b6.id, bk6.id) == (None, []))
+
+    #  9g. Sidebar menampilkan blok pilihan + harga per butir ────────────
+    P.simpan_daftar_pilihan(db, b6.id, bk6.id, 'asisten', [
+        {'bab': 'BAB I', 'kutipan': KALIMAT_BAB1,
+         'catatan': 'Pilihan tampil.'}])
+    RP.simpan_identitas(token6, 'pembimbing-periksa@contoh.id', db=db)
+    import app.main as _M
+    _asli_user = _M.user_dari_request
+    _M.user_dari_request = lambda req, db2: sup_periksa
+    try:
+        r_pilih = RAI.naskah_baca(token6, bk6.id, _ReqPalsu(), '', '', db=db)
+        badan_pilih = r_pilih.body.decode('utf-8', 'ignore')
+    finally:
+        _M.user_dari_request = _asli_user
+    cek('sidebar: blok pilihan tampil (judul + butir + tombol)',
+        'Pilihan revisi dari AI (1)' in badan_pilih
+        and 'Pilihan tampil.' in badan_pilih
+        and 'Terima semua' in badan_pilih
+        and 'Terima yang dipilih' in badan_pilih)
+    cek('sidebar: harga per butir, bukan per daftar',
+        '1 Token Revisi per pilihan yang diterima' in badan_pilih
+        and '1 Token Revisi dari saldomu' not in badan_pilih)
+    cek('sidebar: kolom perintah Asisten tampil',
+        'perintah-asisten' in badan_pilih
+        and 'Perintah untuk AI' in badan_pilih)
+    P.hapus_daftar_pilihan(db, b6.id, bk6.id)
+
+    #  9h. Rute /kolaborasi/asisten: cabang perintah/pilih ───────────────
+    #  ⚠️ Pemanggilan langsung (bukan lewat FastAPI) WAJIB mengisi semua
+    #  param Form secara eksplisit, default Form('') baru diurai FastAPI
+    #  saat request masuk (teruji terpisah dengan TestClient: POST tanpa
+    #  body → perintah=None, pilih='', berkas_id='').
+    RP.simpan_identitas(token2, 'pembimbing-baru@contoh.id', db=db)
+    from app import kolaborasi as K
+    AI._panggil_router = _router_tiga
+    try:
+        r_rute_pilih = asyncio.run(K.kolaborasi_asisten(
+            b2.id, _ReqPalsu(), u=sup_baru, db=db, perintah='',
+            pilih='', berkas_id=''))
+        cek('rute perintah kosong -> mode pilih',
+            r_rute_pilih.get('mode') == 'pilih')
+        _sr, _dr = P.muat_daftar_pilihan(db, b2.id, bk2.id)
+        cek('rute perintah kosong -> daftar baru 2 butir (B sudah jadi catatan)',
+            len(_dr) == 2)
+        saldo_rb = S.sisa(db, sup_baru)
+        r_rute_terima = asyncio.run(K.kolaborasi_asisten(
+            b2.id, _ReqPalsu(), u=sup_baru, db=db, perintah=None, pilih='0',
+            berkas_id=str(bk2.id)))
+        cek('rute pilih=0 -> 1 catatan, 1 token (trial sudah terpakai)',
+            r_rute_terima.get('ok') and r_rute_terima.get('dibuat') == 1
+            and r_rute_terima.get('dipotong') == 1
+            and S.sisa(db, sup_baru) == saldo_rb - 1)
+        r_rute_lama = asyncio.run(K.kolaborasi_asisten(
+            b2.id, _ReqPalsu(), u=sup_baru, db=db, perintah=None,
+            pilih='', berkas_id=''))
+        cek('rute tanpa perintah (kolaborasi.html) -> alur lama',
+            r_rute_lama.get('mode') is None
+            and r_rute_lama.get('dibuat') == 3)
+    finally:
+        AI._panggil_router = asli_panggil
 
     print()
     print(f'LULUS {len(LULUS)}  GAGAL {len(GAGAL)}')

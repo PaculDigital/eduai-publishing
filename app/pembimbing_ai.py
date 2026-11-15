@@ -12,13 +12,17 @@ ATURAN BESAR (mengapa berkas ini ada terpisah)
    CATATAN di tabel `catatan_pembimbing` yang SUDAH ADA (putusan D2).
    Tidak ada tabel baru, tidak ada dokumen baru, tidak ada versi baru.
 
-3. SATU DOMPET (putusan D3): potongan lewat `app/kuota.py::cek_dan_potong`
-   — mesin yang SAMA dengan mahasiswa. Yang memotong = YANG KLIK (putusan C7).
+3. SATU DOMPET (putusan D3): tagihan 1 Token Revisi PER BUTIR yang
+   diterima (koreksi Bos 16:36 WIB), lewat `asisten.potong_biaya`
+   (trial 1x menanggung butir pertama). PEMBUATAN daftar pilihan
+   GRATIS, tidak ditagih. Yang memotong = YANG KLIK (putusan C7).
    Tidak ada jatah/jatahun/dompet kedua.
 
-4. FAIL-SAFE (pagar 1): kalau AI gagal → catatan tidak bertambah, kuota
-   DIKEMBALIKAN, dan pembimbing diberi tahu dengan kalimat hangat + jalan
-   keluar. Jalur lama (catatan manual, lihat naskah) TIDAK terpengaruh.
+4. FAIL-SAFE (pagar 1): kalau AI gagal → daftar pilihan tidak dibuat,
+   dan karena pembuatan daftar GRATIS, tidak ada kuota yang dipakai
+   (tidak ada yang dikembalikan). Kalau penerimaan butir gagal sesudah
+   potong → biaya kembali penuh (pagar P2 di `terima_pilihan`).
+   Jalur lama (catatan manual, lihat naskah) TIDAK terpengaruh.
 
 5. Saklar ON/OFF ada di `app/config.py::PEMBIMBING_AI_AKTIF`.
 ═══════════════════════════════════════════════════════════════════════════
@@ -50,21 +54,12 @@ KALIMAT_SALDO_KOSONG = (
     'Periksa otomatis memakai kuota yang sama seperti fitur lain. Kuota Anda '
     'sedang kosong — isi ulang dulu ya, setelah itu tinggal klik lagi.'
 )
-#  Aturan 5: paket GRATIS tidak bisa isi ulang lewat AddOn (AddOn terkunci,
-#  MASTER_PLAN 4.10) — jalan keluarnya UPGRADE, bukan isi ulang. Dulu
-#  cabang 403 (BUTUH_UPGRADE dari cek_dan_potong) memakai kalimat yang
-#  sama dengan 402, jadi pembimbing gratis disuruh isi ulang yang tidak
-#  bisa dia lakukan.
-KALIMAT_BUTUH_UPGRADE = (
-    'Saldo Token Revisimu habis. Paket Gratis belum bisa menambah saldo, '
-    'upgrade ke paket Penulis dulu ya. Setelah itu token Paket dan AddOn '
-    'masuk ke saldo yang sama.'
-)
 KALIMAT_SEDANG_BEKERJA = (
     'Masih ada pemeriksaan yang berjalan. Mohon tunggu sebentar ya.'
 )
 KALIMAT_SELESAI = (
-    'Pemeriksaan selesai. Hasilnya sudah masuk sebagai catatan di bawah.'
+    'Pemeriksaan selesai. Pilih revisi yang mau dipakai di panel, atau '
+    'tulis sendiri.'
 )
 
 
@@ -102,9 +97,18 @@ def boleh_pakai(db: Session, u: User) -> tuple[bool, str]:
     #  Paket berbayar → lewat aturan biasa (sudah pasti boleh).
     if paket != 'gratis':
         return True, 'berbayar'
-    #  Paket gratis → hanya kalau dia memang PEMILIK saldo (belum habis).
+    #  Paket gratis → hanya kalau dia memang PEMILIK saldo (belum habis)
+    #  ATAU masih punya trial 1x (koreksi harga 16:36 WIB: trial
+    #  menanggung butir pertama yang diterima, jadi trial pun jalan
+    #  masuk, dulu saldo 0 + trial tersisa tetap ditolak).
     from . import saldo as S
     if S.sisa(db, u) <= 0:
+        try:
+            from . import asisten as _A                    # noqa: PLC0415
+            if _A.sisa_trial(db, u):
+                return True, 'gratis_pembimbing'
+        except Exception:                                  # noqa: BLE001
+            pass
         return False, 'saldo_kosong'
     return True, 'gratis_pembimbing'
 
@@ -251,6 +255,28 @@ SYSTEM_PEMBIMBING = (
 )
 
 
+def simpan_catatan(db: Session, bk: BerkasPembimbingan,
+                   daftar: list[dict]) -> int:
+    """Simpan daftar catatan periksa sebagai BARIS CATATAN.
+
+    Mesin yang SAMA dengan langkah 5 `periksa()` yang lama, dipindah ke
+    fungsi bernama supaya penerimaan pilihan (`asisten.terima_pilihan`)
+    memakai jalur simpan yang persis sama (bukan salinan). Dipakai HANYA
+    saat pembimbing MENERIMA butirnya (saat itulah 1 token per butir
+    dipotong, trial menanggung butir pertama).
+    """
+    b = _bimbingan_dari(db, bk)
+    jumlah = 0
+    for c in daftar:
+        P.catat(db, b, rapikan_isi(c),
+                section_judul=(c.get('bagian') or '')[:120],
+                berkas_id=bk.id, teks_asli=(c.get('kutipan') or '')[:300],
+                dari_pembimbing=False)      # ← sumber: mesin, bukan orang
+        jumlah += 1
+    db.commit()
+    return jumlah
+
+
 async def periksa(
     db: Session,
     bk: BerkasPembimbingan,
@@ -259,22 +285,26 @@ async def periksa(
     nama_mhs: str = '',
     lapor=None,
 ) -> dict:
-    """Jalankan pemeriksaan AI → simpan sebagai catatan.
+    """Jalankan pemeriksaan AI → DAFTAR PILIHAN (bukan langsung catatan).
 
-    URUTAN (mengikuti jalur yang sudah ada di app/ai.py):
-      1. Gerbang: saklar → pemakai → saldo (TIDAK memotong dulu)
+    HARGA (koreksi Bos 16:36 WIB): pembuatan daftar GRATIS (tidak
+    ditagih). Tagihan jatuh saat pembimbing MENERIMA butirnya, 1 Token
+    Revisi per butir, trial menanggung butir pertama (lewat
+    `asisten.terima_pilihan`). Karena tidak ada yang dipotong di sini,
+    TIDAK ADA pengembalian kuota.
+
+    URUTAN:
+      1. Gerbang: saklar → pemakai → saldo/trial (TIDAK memotong)
       2. Baca naskah
-      3. Potong kuota 1 (setelah naskah terbaca — jangan potong kalau naskah
-         kosong; mahasiswa/pembimbing tidak boleh dirugikan)
-      4. Panggil model (satu pintu, dengan fallback bawaan)
-      5. Urai → tulis ke `catatan_pembimbing` lewat mesin catatan yang SAMA
-      6. Gagal di langkah mana pun → kuota DIKEMBALIKAN + sebab jujur
+      3. Panggil model (satu pintu, dengan fallback bawaan)
+      4. Urai → SARING KERAS (buang yang kutipannya sudah jadi catatan)
+         → simpan sebagai DAFTAR PILIHAN (Setelan, bukan catatan)
+      5. Gagal di langkah mana pun → sebab jujur (tidak ada kuota yang
+         dipakai, jadi tidak ada yang dikembalikan)
 
-    Kembalikan dict: {ok, sebab, jumlah, pesan}
+    Kembalikan dict: {ok, sebab, jumlah, mode='pilih', pesan}
     """
     from . import ai as AI                       # noqa: PLC0415
-    from . import kuota as K                     # noqa: PLC0415
-    from . import saldo as S                     # noqa: PLC0415
 
     #  ── 1. Gerbang ────────────────────────────────────────────────────────
     boleh, sebab = boleh_pakai(db, pemakai)
@@ -295,27 +325,8 @@ async def periksa(
                 'pesan': 'Naskah ini masih kosong, belum ada yang bisa '
                          'diperiksa. Coba lagi setelah ada isinya ya.'}
 
-    #  ── 3. Potong kuota (SATU kantong, mesin yang SAMA) ───────────────────
+    #  ── 3. Panggil model (satu pintu) ────────────────────────────────────
     try:
-        K.cek_dan_potong(db, pemakai, jenis='revisi')
-    except Exception as e:                                     # noqa: BLE001
-        kode = getattr(e, 'status_code', None)
-        if kode == 402:
-            return {'ok': False, 'sebab': 'saldo_kosong', 'jumlah': 0,
-                    'pesan': KALIMAT_SALDO_KOSONG}
-        if kode == 403:
-            #  Aturan 5: 403 = paket gratis, AddOn terkunci — jalan keluar
-            #  yang benar UPGRADE, bukan isi ulang (dulu pesan 402 dipakai
-            #  juga di sini, jalan buntu bagi pembimbing gratis).
-            return {'ok': False, 'sebab': 'belum_berbayar', 'jumlah': 0,
-                    'pesan': KALIMAT_BUTUH_UPGRADE}
-        log.warning('[pembimbing-ai] potong kuota gagal: %s', e)
-        return {'ok': False, 'sebab': 'kuota_galat', 'jumlah': 0,
-                'pesan': KALIMAT_SALDO_KOSONG}
-
-    #  Setelah ini, SETIAP kegagalan WAJIB mengembalikan kuota.
-    try:
-        #  ── 4. Panggil model (satu pintu) ─────────────────────────────────
         if lapor:
             lapor.tahap('Memeriksa isi naskah')
         judul = getattr(bk, 'judul', '') or ''
@@ -328,38 +339,33 @@ async def periksa(
         log.info('[pembimbing-ai] model=%s panjang_jawab=%s',
                  (info or {}).get('model', '?'), len(jawab or ''))
 
-        #  ── 5. Urai + tulis catatan ───────────────────────────────────────
+        #  ── 4. Urai + saring keras + simpan sebagai DAFTAR PILIHAN ──────
         if lapor:
-            lapor.tahap('Menyusun catatan')
+            lapor.tahap('Menyusun pilihan revisi')
         catatan = urai_catatan(jawab)
         if not catatan:
             raise ValueError('model tidak memberi catatan yang bisa dipakai')
+        b = _bimbingan_dari(db, bk)
+        #  Saringan keras (deterministik, koreksi Bos 16:36 WIB): yang
+        #  kutipannya sudah jadi catatan tidak ditawarkan lagi. Prompt
+        #  `sudah_ada` saja tidak cukup (LLM bisa tetap mengulang).
+        catatan = P.saring_usulan_baru(db, b.id, catatan)[:5]
+        if not catatan:
+            return {'ok': True, 'sebab': 'selesai', 'jumlah': 0,
+                    'mode': 'pilih',
+                    'pesan': 'Semua temuan baru sudah ada sebagai catatan, '
+                             'tidak ada pilihan baru.'}
+        P.simpan_daftar_pilihan(db, b.id, bk.id, 'periksa', catatan)
 
-        jumlah = 0
-        for c in catatan:
-            P.catat(db, _bimbingan_dari(db, bk), rapikan_isi(c),
-                    section_judul=(c.get('bagian') or '')[:120],
-                    berkas_id=bk.id, teks_asli=(c.get('kutipan') or '')[:300],
-                    dari_pembimbing=False)      # ← sumber: mesin, bukan orang
-            jumlah += 1
-        db.commit()
-
-        log.info('[pembimbing-ai] selesai: %s catatan (bimbingan %s, '
-                 'berkas %s)', jumlah, getattr(bk, 'pembimbingan_id', '?'),
+        log.info('[pembimbing-ai] selesai: %s pilihan (bimbingan %s, '
+                 'berkas %s)', len(catatan), getattr(bk, 'pembimbingan_id', '?'),
                  bk.id)
-        return {'ok': True, 'sebab': 'selesai', 'jumlah': jumlah,
-                'pesan': KALIMAT_SELESAI}
+        return {'ok': True, 'sebab': 'selesai', 'jumlah': len(catatan),
+                'mode': 'pilih', 'pesan': KALIMAT_SELESAI}
 
     except Exception as e:                                     # noqa: BLE001
-        #  ── 6. Gagal → kembalikan kuota (fail-safe, pagar 1) ─────────────
+        #  Tidak ada yang dipotong di sini → tidak ada yang dikembalikan.
         log.warning('[pembimbing-ai] pemeriksaan gagal: %s', e)
-        try:
-            #  Pakai mesin pengembalian RESMI (pagar P2) — bukan akal-akalan
-            #  memotong angka negatif. Riwayat saldo jadi jujur & bisa diaudit.
-            S.kembalikan(db, pemakai, 1, sumber='pembimbing_ai_batal',
-                         catatan='pemeriksaan tidak selesai', commit=True)
-        except Exception as e2:                                # noqa: BLE001
-            log.error('[pembimbing-ai] GAGAL kembalikan kuota: %s', e2)
         return {'ok': False, 'sebab': 'ai_gagal', 'jumlah': 0,
                 'pesan': 'Pemeriksaan belum berhasil kali ini, kuota Anda '
                          'tidak terpakai. Bisa dicoba lagi sebentar lagi.'}

@@ -316,6 +316,19 @@ def naskah_baca(token: str, berkas_id: int, request: Request,
             biaya_asisten = _A.biaya_untuk(db, pemakai)
         except Exception:                                  # noqa: BLE001
             biaya_asisten = None
+    #  ── DAFTAR PILIHAN REVISI AI (15 Nov 2026) ───────────────────────
+    #  Pembimbing menekan Asisten AI / Periksa dengan AI tanpa perintah
+    #  atau dengan perintah luas → AI memberi 5 pilihan per round (BUKAN
+    #  catatan). Daftar ini ditampilkan di sidebar untuk dipilih; yang
+    #  diterima jadi catatan (1 token per butir), yang tidak dipilih
+    #  tetap di sini sampai round berikutnya menimpanya.
+    usulan_pilihan = None
+    try:
+        _sumber, _daftar = P.muat_daftar_pilihan(db, b.id, bk.id)
+        if _daftar:
+            usulan_pilihan = {'sumber': _sumber, 'daftar': _daftar}
+    except Exception:                                      # noqa: BLE001
+        usulan_pilihan = None
     resp = _tpl.TemplateResponse('tinjau_baca.html', {
         'request': request, 'cfg': cfg, 'token': token,
         'bimbingan': b, 'berkas': bk, 'nama_berkas': fb.nama,
@@ -332,6 +345,7 @@ def naskah_baca(token: str, berkas_id: int, request: Request,
         'lampiran_ditolak': bool(lampiran_ditolak),
         'sudah_masuk': pemakai is not None,
         'biaya_asisten': biaya_asisten,
+        'usulan_pilihan': usulan_pilihan,
     })
     kedaluwarsa = KT.batas_exp(b.kedaluwarsa)
     resp.set_cookie(

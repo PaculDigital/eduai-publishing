@@ -128,6 +128,20 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
 .pt-btn:disabled{background:#BFD8C6;cursor:not-allowed}
 .pt-btn.kedua{background:#fff;border:1.5px solid var(--hijau);color:var(--hijau-gelap)}
 .pt-btn.kedua:hover{background:var(--hijau-muda)}
+.pt-alat .pt-perintah{width:100%;font-family:inherit;font-size:12.5px;padding:8px 12px;
+        border:1.5px solid var(--garis);border-radius:8px;color:var(--teks);background:#fff}
+.pt-alat .pt-perintah:focus{outline:none;border-color:var(--hijau)}
+
+/*  ── Pilihan revisi dari AI (15 Nov 2026) ──────────────────────────── */
+.pt-pilihan{padding:13px 16px;border-bottom:1px solid var(--garis);background:#FFFDF0}
+.pt-pilihan-judul{font-size:13px;font-weight:700;color:#3A3844;margin-bottom:6px}
+.pt-pilihan-butir{display:flex;gap:9px;padding:9px 10px;margin-top:8px;background:#fff;
+  border:1px solid var(--garis);border-radius:8px;cursor:pointer;font-size:12.5px;line-height:1.55}
+.pt-pilihan-butir input{flex:none;margin-top:2px}
+.pt-pilihan-isi b{display:block;color:#146B2C;font-size:12px}
+.pt-pilihan-kutip{display:block;font-style:italic;color:#4A4429;margin:3px 0}
+.pt-pilihan-aksi{display:flex;gap:8px;margin-top:11px}
+.pt-pilihan-aksi .pt-btn{flex:1;padding:9px 10px;font-size:12.5px}
 .pt-pesan{font-size:12.5px;color:#A32B2B;line-height:1.6}
 .pt-label{font-size:12px;font-weight:700;color:#3A3844;display:block;margin:12px 16px 5px}
 .pt-berkas{padding:0 16px}
@@ -241,7 +255,7 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
 </div>
 
 {% if ai == 'jalan' %}
-<div class="kabar">Pemeriksaan AI sedang berjalan. Hasilnya masuk sebagai catatan di panel ini.</div>
+<div class="kabar">Pemeriksaan AI sedang berjalan. Hasilnya muncul sebagai pilihan revisi di panel ini.</div>
 {% elif ai == 'mati' %}
 <div class="kabar salah">Pemeriksaan AI sedang tidak aktif.</div>
 {% elif ai == 'tidak_ada' %}
@@ -280,25 +294,29 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
       <span class="pt-legenda-asli">Tidak tercetak di naskah Asli (hanya penanda revisi)</span>
     </div>
 
-    {# ── Asisten AI (dua pintu yang SUDAH ADA, 1 token dari yang klik) ── #}
+    {# ── Asisten AI (dua pintu yang SUDAH ADA, 1 token PER BUTIR) ──── #}
     {% if ai_aktif %}
     <div class="pt-alat">
       {% if sudah_masuk %}
       <div class="pt-biaya">
         {% if biaya_asisten and biaya_asisten.pakai_trial %}
-        Tinjauan AI pertama gratis untuk akun ini.
+        Pilihan pertama yang diterima gratis untuk akun ini. Sesudahnya
+        1 Token Revisi per pilihan yang diterima.
         {% else %}
-        Tinjauan AI memakai 1 Token Revisi dari saldomu.
+        1 Token Revisi per pilihan yang diterima.
         {% endif %}
       </div>
+      <input type="text" id="perintah-asisten" class="pt-perintah"
+             placeholder="Perintah untuk AI (opsional, contoh: perbaiki 2.1)">
+      <div class="pt-biaya">Kosongkan bila mau AI memberi pilihan revisi.</div>
       <button type="button" class="pt-btn" id="btn-asisten">
         Minta AI meninjau naskah
       </button>
       <div class="pt-pesan" id="pesan-asisten" hidden></div>
       {% else %}
       <div class="pt-biaya">
-        Asisten AI memakai 1 Token Revisi. Daftar dulu supaya tokennya
-        tersimpan di akunmu.
+        Setiap pilihan yang diterima memakai 1 Token Revisi. Daftar dulu
+        supaya tokennya tersimpan di akunmu.
       </div>
       <a class="pt-btn" href="/daftar?dari=/tinjau/{{ token }}">
         Daftar dulu untuk memakai Asisten AI
@@ -310,7 +328,30 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
           Periksa dengan AI
         </button>
       </form>
-      <div class="pt-biaya">Ringkasan hasil masuk sebagai catatan di panel ini.</div>
+      <div class="pt-biaya">Hasilnya muncul sebagai pilihan revisi di panel ini.</div>
+    </div>
+    {% endif %}
+
+    {# ── Pilihan revisi dari AI (15 Nov 2026) ───────────────────────── #}
+    {% if sudah_masuk and usulan_pilihan and usulan_pilihan.daftar %}
+    <div class="pt-pilihan" id="kotak-pilihan">
+      <div class="pt-pilihan-judul">Pilihan revisi dari AI ({{ usulan_pilihan.daftar|length }})</div>
+      <div class="pt-biaya">Pilih yang mau dipakai jadi catatan. 1 Token Revisi per pilihan yang diterima{% if biaya_asisten and biaya_asisten.pakai_trial %}, pilihan pertamamu gratis{% endif %}. Atau tulis sendiri di bawah.</div>
+      {% for it in usulan_pilihan.daftar %}
+      <label class="pt-pilihan-butir">
+        <input type="checkbox" class="pilihan-centang" value="{{ loop.index0 }}" checked>
+        <span class="pt-pilihan-isi">
+          <b>{% if usulan_pilihan.sumber == 'periksa' %}{{ it.bagian }}{% else %}{{ it.bab }}{% endif %}</b>
+          {% if it.kutipan %}<span class="pt-pilihan-kutip">"{{ it.kutipan }}"</span>{% endif %}
+          <span>{% if usulan_pilihan.sumber == 'periksa' %}{{ it.soal }}{% if it.saran %} {{ it.saran }}{% endif %}{% else %}{{ it.catatan }}{% endif %}</span>
+        </span>
+      </label>
+      {% endfor %}
+      <div class="pt-pilihan-aksi">
+        <button type="button" class="pt-btn" id="btn-terima-pilih">Terima yang dipilih</button>
+        <button type="button" class="pt-btn kedua" id="btn-terima-semua">Terima semua</button>
+      </div>
+      <div class="pt-pesan" id="pesan-pilihan" hidden></div>
     </div>
     {% endif %}
 
@@ -683,15 +724,20 @@ function isiJudulBagian(){
 aturJenis();
 
 //  ── Asisten AI (pintu yang SUDAH ADA: POST /kolaborasi/asisten) ───────
-//  Hasilnya masuk sebagai catatan baru; halaman dimuat ulang supaya
-//  daftar catatan menampilkan usulan AI. 1 token dari yang klik.
+//  Perintah kosong/luas → AI memberi 5 pilihan (GRATIS, tidak ditagih);
+//  halaman dimuat ulang supaya daftar pilihan tampil di panel. Perintah
+//  sempit → alur lama (1 token, usulan langsung jadi catatan).
+//  Menerima pilihan = 1 Token Revisi per butir (lihat terimaPilihan).
 var btnAsisten = document.getElementById('btn-asisten');
 if(btnAsisten){
   btnAsisten.onclick = function(){
     btnAsisten.disabled = true;
     var asli = btnAsisten.textContent;
     btnAsisten.textContent = 'AI sedang meninjau...';
-    fetch('/kolaborasi/asisten/{{ bimbingan.id }}', {method: 'POST'})
+    var data = new FormData();
+    var inp = document.getElementById('perintah-asisten');
+    data.append('perintah', inp ? inp.value : '');
+    fetch('/kolaborasi/asisten/{{ bimbingan.id }}', {method: 'POST', body: data})
       .then(function(r){ return r.json().then(function(d){ return {s: r.status, d: d}; }); })
       .then(function(res){
         if(res.s === 200 && res.d && res.d.ok !== false){
@@ -709,6 +755,49 @@ if(btnAsisten){
       });
   };
 }
+
+//  ── Terima pilihan revisi (15 Nov 2026) ──────────────────────────────
+//  1 Token Revisi per butir yang diterima (trial menanggung pertama).
+//  Yang tidak dipilih tetap di daftar; yang sudah diterima dibuang.
+function terimaPilihan(semua){
+  var kotak = document.querySelectorAll('.pilihan-centang');
+  var pilih = [];
+  kotak.forEach(function(c){
+    if(semua || c.checked) pilih.push(c.value);
+  });
+  var pesan = document.getElementById('pesan-pilihan');
+  if(!pilih.length){
+    if(pesan){ pesan.hidden = false; pesan.textContent = 'Belum ada yang dipilih.'; }
+    return;
+  }
+  var data = new FormData();
+  data.append('pilih', pilih.join(','));
+  data.append('berkas_id', '{{ berkas.id }}');
+  var b1 = document.getElementById('btn-terima-pilih');
+  var b2 = document.getElementById('btn-terima-semua');
+  if(b1) b1.disabled = true;
+  if(b2) b2.disabled = true;
+  fetch('/kolaborasi/asisten/{{ bimbingan.id }}', {method: 'POST', body: data})
+    .then(function(r){ return r.json().then(function(d){ return {s: r.status, d: d}; }); })
+    .then(function(res){
+      if(res.s === 200 && res.d && res.d.ok){
+        window.location.reload();
+      } else {
+        if(b1) b1.disabled = false;
+        if(b2) b2.disabled = false;
+        if(pesan){ pesan.hidden = false; pesan.textContent = (res.d && res.d.pesan) || 'Belum bisa menerima sekarang. Coba lagi.'; }
+      }
+    })
+    .catch(function(){
+      if(b1) b1.disabled = false;
+      if(b2) b2.disabled = false;
+      if(pesan){ pesan.hidden = false; pesan.textContent = 'Koneksi bermasalah. Coba lagi.'; }
+    });
+}
+var btnTerimaPilih = document.getElementById('btn-terima-pilih');
+if(btnTerimaPilih) btnTerimaPilih.onclick = function(){ terimaPilihan(false); };
+var btnTerimaSemua = document.getElementById('btn-terima-semua');
+if(btnTerimaSemua) btnTerimaSemua.onclick = function(){ terimaPilihan(true); };
 </script>
 
 </body>

@@ -26,6 +26,7 @@ TABEL BARU SAJA — tidak ada tabel lama yang disentuh (tiang T2).
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import os
 import secrets
@@ -39,6 +40,7 @@ from .models import (
     CatatanPembimbing,
     Pembimbingan,
     SessionLocal,
+    Setelan,
     User as _User,
 )
 from .config import ARSIP_HARI
@@ -654,6 +656,116 @@ def tandai_selesai(db: Session, bimbingan_id: int, catatan_id: int) -> bool:
         c.sudah_oke = datetime.now()
         db.commit()
     return True
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  DAFTAR PILIHAN REVISI AI (15 Nov 2026, GAS Bos + koreksi harga 16:36)
+#  Pembimbing menekan Asisten AI / Periksa dengan AI tanpa perintah atau
+#  dengan perintah yang terlalu luas → AI memberi DAFTAR PILIHAN (5 per
+#  round), pembimbing memilih mana yang jadi catatan. Daftar ini BUKAN
+#  catatan: belum jadi apa-apa sampai butirnya DITERIMA (1 Token Revisi
+#  per butir, trial menanggung butir pertama).
+#
+#  PENYIMPANAN: tabel `setelan` yang SUDAH ADA (kunci `usulan_pilihan_…`),
+#  pola yang sama dengan `asisten_trial_{uid}` / `asisten_giliran_{id}`.
+#  TIDAK ada tabel baru. ⚠️ `Setelan.nilai` itu String(120) di model,
+#  tapi SQLite TIDAK menegakkan panjang, JSON daftar beberapa KB
+#  tersimpan utuh (teruji di uji sidebar). Kalau DB pindah dari SQLite,
+#  daftar ini butuh tabel sendiri.
+#
+#  YANG TIDAK DIPILIH tidak tersimpan di mana pun: round berikutnya
+#  menimpa baris ini (putusan Bos 16:36 WIB, bila yang tidak dipilih
+#  juga perlu diingat, itu butuh keputusan Boss + penyimpanan baru).
+# ══════════════════════════════════════════════════════════════════════════
+KUNCI_PILIHAN = 'usulan_pilihan_{bimbingan}_{berkas}'
+
+
+def _rapi_kutipan(teks: str) -> str:
+    """Samakan kutipan untuk perbandingan: spasi diringkas, huruf kecil."""
+    import re                                          # noqa: PLC0415
+    return re.sub(r'\s+', ' ', (teks or '')).strip().lower()
+
+
+def simpan_daftar_pilihan(db: Session, bimbingan_id: int, berkas_id: int,
+                          sumber: str, daftar: list[dict]) -> None:
+    """Simpan daftar pilihan mentah (apa adanya dari AI) untuk sidebar.
+
+    `sumber` = 'asisten' | 'periksa' (menentukan mesin simpan saat
+    diterima). Menimpa daftar round sebelumnya untuk berkas ini.
+    """
+    kunci = KUNCI_PILIHAN.format(bimbingan=int(bimbingan_id),
+                                 berkas=int(berkas_id))
+    isi = json.dumps({'sumber': sumber, 'daftar': daftar or []},
+                    ensure_ascii=False)
+    baris = db.get(Setelan, kunci)
+    if baris is None:
+        db.add(Setelan(kunci=kunci, nilai=isi, oleh='pilihan-usulan'))
+    else:
+        baris.nilai = isi
+    db.commit()
+
+
+def muat_daftar_pilihan(db: Session, bimbingan_id: int,
+                        berkas_id: int) -> tuple[str | None, list[dict]]:
+    """Muat daftar pilihan. Return (sumber, daftar); tidak ada / rusak →
+    (None, [])."""
+    kunci = KUNCI_PILIHAN.format(bimbingan=int(bimbingan_id),
+                                 berkas=int(berkas_id))
+    baris = db.get(Setelan, kunci)
+    if baris is None or not (baris.nilai or '').strip():
+        return None, []
+    try:
+        data = json.loads(baris.nilai)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return None, []
+    if not isinstance(data, dict):
+        return None, []
+    daftar = data.get('daftar')
+    if not isinstance(daftar, list):
+        return None, []
+    return (str(data.get('sumber') or '') or None,
+            [x for x in daftar if isinstance(x, dict)])
+
+
+def hapus_daftar_pilihan(db: Session, bimbingan_id: int,
+                         berkas_id: int) -> None:
+    """Hapus daftar pilihan (sesudah semua butir diterima)."""
+    kunci = KUNCI_PILIHAN.format(bimbingan=int(bimbingan_id),
+                                 berkas=int(berkas_id))
+    baris = db.get(Setelan, kunci)
+    if baris is not None:
+        db.delete(baris)
+        db.commit()
+
+
+def daftar_teks_asli(db: Session, bimbingan_id: int) -> set[str]:
+    """Kumpulan kutipan (teks_asli) yang SUDAH menjadi catatan di bimbingan
+    ini, sudah dirapikan, untuk saringan keras pilihan berikutnya."""
+    baris = (db.query(CatatanPembimbing.teks_asli)
+             .filter(CatatanPembimbing.pembimbingan_id == int(bimbingan_id))
+             .all())
+    return {_rapi_kutipan(x[0]) for x in baris if (x[0] or '').strip()}
+
+
+def saring_usulan_baru(db: Session, bimbingan_id: int,
+                       usulan: list[dict]) -> list[dict]:
+    """SARINGAN KERAS (putusan Bos 16:36 WIB): buang usulan yang kutipannya
+    SUDAH ADA sebagai catatan (butir yang sudah dipilih di round
+    sebelumnya). Deterministik, bukan sekadar perintah ke LLM.
+
+    Usulan tanpa kutipan lolos (alamatnya bagian, bukan kalimat, tidak
+    ada yang bisa dicocokkan). Urutan dipertahankan.
+    """
+    sudah = daftar_teks_asli(db, bimbingan_id)
+    if not sudah:
+        return list(usulan or [])
+    keluar = []
+    for u in (usulan or []):
+        kutip = _rapi_kutipan(u.get('kutipan') or '')
+        if kutip and kutip in sudah:
+            continue
+        keluar.append(u)
+    return keluar
 
 
 def daftar_catatan(db: Session, bimbingan_id: int,

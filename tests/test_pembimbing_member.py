@@ -203,10 +203,24 @@ def main():
     cek('cek_dan_potong berbayar saldo 0 -> 402',
         kode_bayar == 402)
 
-    # periksa() dengan cek_dan_potong dimatikan ke 403 / 402.
+    # ── F3 BARU (koreksi harga Bos 16:36 WIB): pembuatan daftar GRATIS ───
+    #  `periksa()` TIDAK LAGI memotong kuota saat membuat daftar (dulu
+    #  cek_dan_potong 402/403 di sini). Dua cek lama di bawah diganti:
+    #  walau cek_dan_potong dimatikan ke 403/402, periksa() TETAP jalan
+    #  (tidak pernah memanggilnya) dan mengembalikan daftar pilihan.
+    #  Tagihan baru jatuh saat butir DITERIMA (1 token per butir), itu
+    #  diuji di test_tinjau_sidebar.py. cek_dan_potong sendiri tetap
+    #  diuji di atas (403 gratis / 402 berbayar), mesinnya tidak berubah.
     sup3 = buat_user(db, 'pembimbing3@contoh.id')
     fb3, b3, bk3, _t3 = buat_naskah(db, mhs, 'Isi bab tiga. ' * 40)
     asli_cek = KU.cek_dan_potong
+    asli_panggil3 = AI._panggil_router
+
+    async def _jawab_periksa(*a, **k):
+        isi = ('{"catatan": [{"bagian": "BAB I", "kutipan": "Isi bab tiga", '
+               '"soal": "Perlu contoh yang lebih jelas.", '
+               '"saran": "Tambahkan satu contoh nyata."}]}')
+        return isi, {'model': 'uji'}
 
     def _naik403(*a, **k):
         raise HTTPException(403, detail='uji')
@@ -214,22 +228,24 @@ def main():
     def _naik402(*a, **k):
         raise HTTPException(402, detail='uji')
 
-    KU.cek_dan_potong = _naik403
-    try:
-        r403 = asyncio.run(PAI.periksa(db, bk3, pemakai=sup3, nama_mhs='Asih'))
-    finally:
-        KU.cek_dan_potong = asli_cek
-    cek('F3: periksa 403 -> pesan upgrade Penulis',
-        (not r403.get('ok')) and r403.get('sebab') == 'belum_berbayar'
-        and 'Penulis' in (r403.get('pesan') or ''))
-    KU.cek_dan_potong = _naik402
-    try:
-        r402 = asyncio.run(PAI.periksa(db, bk3, pemakai=sup3, nama_mhs='Asih'))
-    finally:
-        KU.cek_dan_potong = asli_cek
-    cek('F3: periksa 402 -> pesan isi ulang (bukan upgrade)',
-        (not r402.get('ok')) and r402.get('sebab') == 'saldo_kosong'
-        and 'isi ulang' in (r402.get('pesan') or ''))
+    AI._panggil_router = _jawab_periksa
+    saldo3_awal = S.sisa(db, sup3)
+    for _kode, _naik in (('403', _naik403), ('402', _naik402)):
+        KU.cek_dan_potong = _naik
+        try:
+            r_baru = asyncio.run(
+                PAI.periksa(db, bk3, pemakai=sup3, nama_mhs='Asih'))
+        finally:
+            KU.cek_dan_potong = asli_cek
+        cek(f'F3 baru: periksa abaikan cek_dan_potong {_kode} -> mode pilih, '
+            '0 catatan, saldo utuh',
+            r_baru.get('ok') and r_baru.get('mode') == 'pilih'
+            and r_baru.get('jumlah') == 1
+            and S.sisa(db, sup3) == saldo3_awal
+            and len([c for c in P.daftar_catatan(db, b3.id)]) == 0)
+        #  Bersihkan daftar pilihan supaya putaran berikutnya bersih.
+        P.hapus_daftar_pilihan(db, b3.id, bk3.id)
+    AI._panggil_router = asli_panggil3
 
     # ── F5: biaya_untuk + wiring layar ───────────────────────────────────
     sup4 = buat_user(db, 'pembimbing4@contoh.id')
