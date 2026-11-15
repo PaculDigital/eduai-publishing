@@ -988,6 +988,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
       <div class="aksi">
         {% if e in ['docx','odt','txt','md','markdown','csv','pdf'] %}
         <button class="periksa" type="button" data-periksa data-file-id="{{ f.id }}">Periksa Struktur</button>
+        <button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/pustaka'">Periksa Daftar Pustaka</button>
         {% endif %}
         {% if f.bisa_edit %}
         <a href="/edit/{{ f.id }}" class="edit" title="Edit langsung di browser">

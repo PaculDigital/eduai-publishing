@@ -42,6 +42,8 @@ from typing import Any
 
 import httpx
 
+from .config import DATA_DIR
+
 log = logging.getLogger('eduai.pustaka')
 
 # ── Batas & filter (keputusan Bos: tahun 2019-2026, longgarkan bila <10) ──
@@ -716,7 +718,13 @@ def lengkapi_tautan(artikel: dict) -> dict:
 #  SUMBER 4 — CROSSREF (audit DOI — ANTI-HALUSINASI)
 # ══════════════════════════════════════════════════════════════════════════
 _CACHE_DOI: dict = {}
-_CACHE_DOI_JALAN = '/tmp/.eduai_cache_doi.json'
+# 16Nov26 (Periksa Daftar Pustaka): cache PINDAH dari /tmp ke DATA_DIR.
+# /tmp hilang setiap ganti container (deploy), jadi klaim "DOI yang sudah
+# dicek tidak dicek ulang selamanya" tidak benar. DATA_DIR (/app/data)
+# adalah volume yang bertahan (DB tinggal di sana). Format berkas sama;
+# berkas lama di /tmp dibaca sekali lalu dipindah ke sini.
+_CACHE_DOI_JALAN = str(DATA_DIR / '.eduai_cache_doi.json')
+_CACHE_DOI_LAMA = '/tmp/.eduai_cache_doi.json'
 _CACHE_DOI_SIMPAN = [0]
 
 
@@ -724,14 +732,18 @@ def _cache_doi_muat() -> None:
     """Muat hasil audit DOI yang pernah disimpan (idempoten, tahan berkas rusak)."""
     if _CACHE_DOI:
         return
-    try:
-        import json as _json
-        with open(_CACHE_DOI_JALAN, encoding='utf-8') as f:
-            isi = _json.load(f)
-        if isinstance(isi, dict):
-            _CACHE_DOI.update({str(k): bool(v) for k, v in isi.items()})
-    except Exception:                                         # noqa: BLE001
-        pass
+    for jalan in (_CACHE_DOI_JALAN, _CACHE_DOI_LAMA):
+        try:
+            import json as _json
+            with open(jalan, encoding='utf-8') as f:
+                isi = _json.load(f)
+            if isinstance(isi, dict):
+                _CACHE_DOI.update({str(k): bool(v) for k, v in isi.items()})
+            if jalan != _CACHE_DOI_JALAN and _CACHE_DOI:
+                _cache_doi_tulis()
+            return
+        except Exception:                                      # noqa: BLE001
+            continue
 
 
 def _cache_doi_tulis() -> None:
