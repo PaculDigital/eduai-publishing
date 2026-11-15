@@ -58,6 +58,10 @@ h1{font-size:21px;margin-bottom:6px}
   {% include '_menu.html' %}
   <h1>Kolaborasi</h1>
   <p class="sub">Naskah mahasiswa yang diundangkan ke Anda untuk ditinjau.</p>
+  {# Aturan 5 (C7): biaya Asisten jujur di layar SEBELUM klik — yang bayar
+     akun ini: trial gratis pertama, sesudahnya 1 Token Revisi dari saldo. #}
+  {% if biaya_asisten and biaya_asisten.pakai_trial %}<p class="sub">Tinjauan AI pertama gratis untuk akun ini.</p>
+  {% elif biaya_asisten %}<p class="sub">Tinjauan AI memakai 1 Token Revisi dari saldomu.</p>{% endif %}
 
   {% if kait == 'ya' %}<div class="pesan ya">Naskah berhasil disambungkan ke akun ini — sekarang selalu muncul di halaman ini.</div>
   {% elif kait == 'tidak' %}<div class="pesan tidak">Link itu tidak bisa disambungkan (mungkin milik email lain atau sudah tidak aktif). Tanyakan ke mahasiswa yang mengundang ya.</div>

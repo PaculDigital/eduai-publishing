@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -133,9 +133,20 @@ def _bimbingan_milik(db: Session, bimbingan_id: int, u: User):
 @router.post('/kolaborasi/asisten/{bimbingan_id}')
 async def kolaborasi_asisten(bimbingan_id: int, request: Request,
                              u: User = Depends(wajib_login),
-                             db: Session = Depends(get_db)):
+                             db: Session = Depends(get_db),
+                             perintah: str | None = Form(None),
+                             pilih: str = Form(''),
+                             berkas_id: str = Form('')):
     """Tombol 'Minta AI tinjau naskah' — AI baca naskah, usulan LANGSUNG
     masuk (C5).
+
+    DUA MODE (15 Nov 2026, alur pilihan di sidebar):
+      · `perintah` TIDAK dikirim (halaman Kolaborasi) atau perintah SEMPIT
+        → alur lama: 1 token per operasi, usulan langsung jadi catatan.
+      · `perintah` kosong/luas → alur pilihan: pembuatan daftar GRATIS,
+        AI memberi 5 pilihan per round (disimpan, bukan catatan).
+      · `pilih` terisi ("0,2") → TERIMA pilihan: 1 Token Revisi per butir
+        (trial menanggung butir pertama), tanpa panggilan AI baru.
 
     Keamanan: bimbingan WAJIB milik akun ini (pemilik atau pembimbing
     terkait). Biaya (putusan Bos **C7**, 29Sep26): **yang klik = yang
@@ -152,7 +163,11 @@ async def kolaborasi_asisten(bimbingan_id: int, request: Request,
         return {'ok': False, 'pesan': (
             'Kolaborasi ini bukan milik akunmu, jadi penanya tidak bisa '
             'dijalankan. Buka kolaborasi yang tertera di daftarmu ya.')}
-    hasil = await _asisten.kerjakan(db, b, u)   # C7: pembayar = yang klik
+    if (pilih or '').strip():
+        #  Terima pilihan: tanpa AI baru, 1 token per butir yang dipilih.
+        return _asisten.terima_pilihan(db, b, u, berkas_id, pilih)
+    hasil = await _asisten.kerjakan(db, b, u,
+                                    perintah=perintah)  # C7: pembayar = yang klik
     return hasil
 
 

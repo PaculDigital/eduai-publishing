@@ -30,7 +30,6 @@ from fastapi.responses import (FileResponse, HTMLResponse,
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from . import cari_bagian as CB
 from . import kelompok_catatan as KC
 from . import kolaborasi as kolab
 from . import lampiran_pembimbing as LP
@@ -143,131 +142,46 @@ def halaman_tinjau(token: str, request: Request,
             log.warning('[pembimbing] notifikasi dibuka gagal: %s', e)
 
     berkas = P.daftar_berkas(db, b.id)
-    catatan = P.daftar_catatan(db, b.id)
-    rantai = P.rangkai(catatan)
-    angka = P.ringkas(catatan)
 
-    #  ── TAHAP 2.5b (ACC Bos 24Sep26): ARAHKAN NASKAH KE CATATAN ────────
-    #  Perintah Bos: "saat klik revisi juga langsung menuju halaman revisi
-    #  yang dimaksud, jadi Pembimbing di mudahkan untuk cek revisian naskah."
-    #
-    #  KENAPA DI HITUNG DI SERVER: naskah bisa 400rb karakter. Kalau seluruh
-    #  naskah dikirim ke browser hanya untuk dicari, halaman jadi berat.
-    #  Jadi pencarian dilakukan SEKALI di sini, hasilnya (kutipan pendek)
-    #  yang dikirim ke template.
-    #
-    #  ⚠️ JUJUR: kalau tidak ketemu, `petunjuk[simpul.id]` tetap None dan
-    #  template WAJIB memberi tahu pembimbing apa adanya — bukan diam-diam
-    #  tidak bergerak.
-    naskah_per_berkas = {}
-    for bk in berkas:
-        naskah_per_berkas[bk.id] = _isi_naskah(db, bk)
-    petunjuk = {}
-    for simpul in (rantai or []):
-        c = simpul.get('terbaru')
-        if c is None:
-            continue
-        #  ⚠️ KUNCI memakai `c.id` (catatan terbaru), BUKAN `simpul['id']`.
-        #  `rangkai()` TIDAK menyediakan kunci 'id' di simpul — ia hanya
-        #  memberi kepala/ronde/jumlah_ronde/anak/terbaru. Kesalahan memakai
-        #  simpul.get('id') membuat SEMUA catatan dapat None → seluruh baris
-        #  tampil "Tidak ditemukan bagiannya" padahal bagiannya ADA.
-        #  (Bug nyata 24Sep26, ketemu dari potret+MATA, bukan dari uji teks.)
-        bk_id = getattr(c, 'berkas_id', None)
-        pilih = ([naskah_per_berkas.get(bk_id, '')] if bk_id
-                 else [naskah_per_berkas.get(x.id, '') for x in berkas])
-        try:
-            petunjuk[c.id] = CB.cari_di_banyak(
-                pilih, c.isi or '', getattr(c, 'teks_asli', '') or '')
-        except Exception as e:                                 # noqa: BLE001
-            log.warning('[pembimbing] pencarian bagian gagal: %s', e)
-            petunjuk[c.id] = None
-
-    #  ── TAHAP 3.1 (ACC Bos 24Sep26): PERIKSA SOROTAN SETIAP DIBUKA ─────
-    #  Putusan Bos: "Saat pembimbing BUKA halaman (selalu segar)".
-    #
-    #  KENAPA DIPERIKSA ULANG DAN TIDAK DISIMPAN: mahasiswa bisa mengubah
-    #  naskahnya kapan saja. Kalau keadaan sorotan disimpan dulu (mis.
-    #  'utuh' saat catatan dibuat), lalu mahasiswa menghapus kalimatnya,
-    #  pembimbing akan melihat "menempel" padahal sudah hilang — itu
-    #  MENYESATKAN. Jadi keadaan dihitung dari naskah yang ADA SEKARANG.
-    #
-    #  ATURAN INDUK (keputusan Bos, terkunci): sumber kebenaran = DATABASE.
-    #  Sorotan hilang → catatan TETAP ADA, pembimbing tetap diberi tahu.
-    #  Fungsi `sorotan.cari_sorotan()` TIDAK menyimpan apa pun — hanya baca.
-    sorotan_per_catatan = {}
+    #  ── SIDEBAR TINJAU (15 Nov 2026, GAS Bos 14:52 WIB) ───────────────
+    #  Halaman ini TIDAK LAGI merender teks naskah. Pembimbing langsung
+    #  masuk ke editor OnlyOffice (mode baca) dengan SIDEBAR catatan di
+    #  sampingnya. Render teks dihapus karena membingungkan (keputusan
+    #  Bos 13:57 WIB: "kok hasilnya seperti ini?").
+    #  Yang tersisa di sini: gerbang identitas (kunjungan pertama) +
+    #  kabar jujur kalau belum ada naskah + pengalihan ke editor.
+    if not b.identitas:
+        return _tpl.TemplateResponse('tinjau.html', {
+            'request': request,
+            'token': token,
+            'nama_mhs': _nama_mahasiswa(db, b.user_id),
+            'nama_pembimbing': b.nama,
+            'berkas': berkas,
+            'sudah_isi_identitas': False,
+        })
+    if not berkas:
+        return _tpl.TemplateResponse('tinjau.html', {
+            'request': request,
+            'token': token,
+            'nama_mhs': _nama_mahasiswa(db, b.user_id),
+            'nama_pembimbing': b.nama,
+            'berkas': [],
+            'sudah_isi_identitas': True,
+        })
+    #  Teruskan kabar dari alur lain (?ai=jalan/mati/tidak_ada dari
+    #  Periksa dengan AI, ?lampiran_ditolak=1 dari tambah_catatan) ke
+    #  halaman editor, supaya SIDEBAR bisa menampilkan kabar yang sama.
+    query = ''
     try:
-        from . import sorotan as SR
-        for bk in berkas:
-            naskah_bk = naskah_per_berkas.get(bk.id, '')
-            for c in catatan:
-                if getattr(c, 'berkas_id', None) not in (None, bk.id):
-                    continue
-                kunci = c.id
-                #  Naskah pertama yang punya berita menang; kalau catatan
-                #  tidak menempel ke berkas tertentu, dipakai berkas pertama.
-                if kunci not in sorotan_per_catatan and not naskah_bk:
-                    continue
-                hasil = SR.cari_sorotan(naskah_bk, c.teks_asli or '')
-                #  ⚠️ AKAR BUG 24Sep26 (temuan MATA, bukan uji teks):
-                #  Dulu hasil ini TIDAK memuat `berkas`. Padahal JS di layar
-                #  menuntut `s.berkas` untuk mencocokkan paragraf:
-                #     if (String(s.berkas) !== String(berkas)) return;
-                #  Karena `undefined !== "9"` SELALU benar, SEMUA paragraf
-                #  dilewati → tanda 🟡 TIDAK PERNAH muncul, walau datanya
-                #  lengkap dan HTML-nya `par-ada-catatan` = 2.
-                #  Uji teks lolos (HTML benar), MATA yang menemukan.
-                hasil['berkas'] = bk.id
-                sorotan_per_catatan[kunci] = hasil
-    except Exception as e:                                     # noqa: BLE001
-        #  Sorotan = lapisan bantu. Kalau gagal, halaman pembimbing WAJIB
-        #  tetap terbuka (jangan 500). Catatan tetap tampil.
-        log.warning('[pembimbing] gagal periksa sorotan: %s', e)
-        sorotan_per_catatan = {}
-
-    #  ── TAHAP 2.5 (ACC Bos 24Sep26): KELOMPOKKAN CATATAN PER BAB ──────
-    #  Masalah yang dipecahkan (kata Bos): catatan pembimbing lama-lama
-    #  banyak & panel samping sempit jadi tidak nyaman. Solusinya:
-    #  kelompok per bab, satu bab terbuka (yang paling banyak catatan baru).
-    #
-    #  ⚠️ Kalau naskah TIDAK punya bab (perjanjian, nota, dokumen umum,
-    #  artikel jurnal tanpa kata "BAB") → kelompok PER HARI + kotak ketik
-    #  tetap disediakan. JANGAN sampai pembimbing tidak bisa menulis bab.
-    bab_naskah: list[dict] = []
-    for bk in berkas:
-        try:
-            bab_naskah = KC.daftar_bab_naskah(_isi_naskah(db, bk))
-        except Exception as e:                                 # noqa: BLE001
-            log.warning('[pembimbing] gagal deteksi bab: %s', e)
-            bab_naskah = []
-        if bab_naskah:
-            break          # pakai naskah PERTAMA yang punya bab
-
-    kelompok = KC.kelompokkan(rantai, ada_bab=bool(bab_naskah))
-
-    return _tpl.TemplateResponse('tinjau.html', {
-        'request': request,
-        'token': token,
-        'nama_mhs': _nama_mahasiswa(db, b.user_id),
-        'nama_pembimbing': b.nama,
-        'berkas': berkas,
-        'catatan': catatan,
-        'rantai': rantai,
-        'kelompok': kelompok,
-        'bab_naskah': bab_naskah,
-        'petunjuk': petunjuk,
-        'sorotan': sorotan_per_catatan,
-        'angka': angka,
-        'sisa_hari': P.sisa_hari(b),
-        'sudah_isi_identitas': bool(b.identitas),
-        #  Tahap 2.2: pembimbing diberi tahu kalau gambarnya ditolak,
-        #  supaya tidak diam-diam mengira gambarnya terkirim.
-        'lampiran_ditolak': bool(lampiran_ditolak),
-        #  🆕 03Okt26: alat pembimbing (Buka di editor + Periksa dengan AI).
-        #  Hanya PENANDA TAMPILAN — pagar sebenarnya di rute & modul
-        #  pembimbing_ai (server), bukan di sini.
-        'ai_aktif': _ai_aktif(),
-    })
+        bagian = [f'{k}={v}' for k, v in request.query_params.items()
+                  if k in ('ai', 'lampiran_ditolak')]
+        if bagian:
+            query = '?' + '&'.join(bagian)
+    except Exception:                                      # noqa: BLE001
+        query = ''
+    return RedirectResponse(
+        f'/tinjau/{token}/naskah-baca/{berkas[0].id}{query}',
+        status_code=303)
 
 
 def _ai_aktif() -> bool:
@@ -291,35 +205,38 @@ def _nama_mahasiswa(db: Session, user_id: int) -> str:
     return (getattr(u, 'nama', '') or getattr(u, 'email', '') or 'Mahasiswa')
 
 
+def _tujuan_baca(db: Session, token: str, b, bk_id=None) -> str:
+    """URL editor baca (sidebar tinjau) untuk satu berkas bimbingan.
+
+    Dipakai pengalihan sesudah tambah_catatan / aktifkan / lampiran
+    ditolak: pembimbing kembali ke editor + sidebar, bukan ke halaman
+    tinjau lama. Tanpa berkas → kembali ke `/tinjau/{token}` (yang
+    kemudian mengarahkan sendiri ke berkas pertama).
+    """
+    if bk_id is None:
+        try:
+            semua = P.daftar_berkas(db, b.id)
+            bk_id = semua[0].id if semua else None
+        except Exception:                                      # noqa: BLE001
+            bk_id = None
+    if bk_id is None:
+        return f'/tinjau/{token}'
+    return f'/tinjau/{token}/naskah-baca/{bk_id}'
+
+
 @router.get('/tinjau/{token}/naskah/{berkas_id}', response_class=HTMLResponse)
 def baca_naskah(token: str, berkas_id: int, db: Session = Depends(get_db)):
-    """Baca ISI naskah satu bagian — TEKS POLOS, HANYA BACA.
+    """Rute lama penyaji teks naskah, DIHAPUS (sidebar tinjau, 15 Nov 2026).
 
-    KENAPA teks polos, bukan HTML: (1) halaman pembimbing jadi ringan walau
-    naskahnya besar; (2) isi naskah TIDAK BISA menyuntikkan kode ke halaman
-    (template memakai `textContent`, bukan `innerHTML`).
-
-    ⚠️ HANYA BACA. Rute ini tidak boleh punya efek samping apa pun pada
-    naskah mahasiswa — tidak menyimpan, tidak mengubah versi, tidak
-    memanggil AI.
+    Dulu: halaman tinjau merender teks naskah per bagian dan JS mengambilnya
+    lewat rute ini. Sekarang halaman tinjau TIDAK LAGI menampilkan teks
+    naskah (keputusan Bos 13:57 WIB); pembimbing membaca naskah lewat
+    editor OnlyOffice mode baca + sidebar catatan. Rute ini tidak lagi
+    dipakai template mana pun, dipertahankan sebagai pengingat? TIDAK:
+    dihapus bersih supaya tidak ada jalur tersisa yang menyajikan teks
+    naskah ke pembimbing di luar editor.
     """
-    b, sebab = P.cari_dari_token(db, token)
-    if b is None:
-        return HTMLResponse('', status_code=403)
-
-    #  ⚠️ Pastikan berkas ini MEMANG milik bimbingan ini. Tanpa pemeriksaan
-    #  ini, pembimbing bisa membaca naskah mahasiswa lain hanya dengan
-    #  menebak angka berkas_id.
-    from .models import BerkasPembimbingan
-    bk = (db.query(BerkasPembimbingan)
-          .filter(BerkasPembimbingan.id == berkas_id,
-                  BerkasPembimbingan.pembimbingan_id == b.id)
-          .one_or_none())
-    if bk is None:
-        return HTMLResponse('', status_code=404)
-
-    teks = _isi_naskah(db, bk)
-    return HTMLResponse(teks)
+    return HTMLResponse('', status_code=410)
 
 
 #  ══════════════════════════════════════════════════════════════════════
@@ -506,6 +423,55 @@ def tambah_catatan(token: str, isi: str = Form(''), section_id: str = Form(''),
     except (ValueError, TypeError):
         bk_terpilih = None
 
+    #  ── SIDEBAR TINJAU (15 Nov 2026): PERIKSA ALAMAT (Hakim) ──────────
+    #  Alamat bagian yang diklaim form (section_id / section_judul) WAJIB
+    #  ada di daftar bagian naskah yang sebenarnya. Kalau tidak ada
+    #  (mis. form diutak-atik), alamatnya DIBERSIHKAN, catatan masuk
+    #  sebagai catatan umum, bukan dengan alamat palsu. "Sesudah X"
+    #  diterima kalau X-nya bagian nyata. Balasan rantai (induk_id ada)
+    #  TIDAK diperiksa di sini: alamatnya diwarisi dari kepala rantai,
+    #  yang sudah diperiksa saat kepala dibuat.
+    if not induk and ((section_id or '').strip()
+                       or (section_judul or '').strip()):
+        section_id = (section_id or '').strip()
+        section_judul = (section_judul or '').strip()
+        try:
+            _bk = bk_terpilih
+            if _bk is None:
+                _semua = P.daftar_berkas(db, b.id)
+                _bk = _semua[0] if _semua else None
+            _daftar = []
+            if _bk is not None:
+                #  Daftar yang SAMA dengan dropdown sidebar (peta Jev,
+                #  jatuh ke state.petakan), supaya pilihan dari dropdown
+                #  selalu lolos pemeriksaan ini.
+                _daftar = KC.daftar_bagian_sidebar(
+                    db, _bk.file_id, _isi_naskah(db, _bk))
+            _id_ada = {str(x.get('section_id') or '') for x in _daftar}
+            #  Samakan pemisah label (U+2014 lama / '-' baru) supaya
+            #  halaman lama yang masih terbuka tidak gagal memeriksa.
+            _rapi = lambda s: (s or '').replace('\u2014', '-').replace('\u2013', '-')
+            _label_ada = {_rapi(x.get('label') or '') for x in _daftar}
+            #  Judul kosong = tidak ada klaim judul (hanya id yang diklaim)
+            #  → lolos; yang diperiksa hanya yang diklaim.
+            _judul_ok = (not section_judul
+                         or _rapi(section_judul) in _label_ada
+                         or section_judul == 'Bagian lain'
+                         or (section_judul.startswith('Sesudah ')
+                             and _rapi(section_judul[len('Sesudah '):])
+                             in _label_ada))
+            _id_ok = (not section_id) or (section_id in _id_ada)
+            if not (_judul_ok and _id_ok):
+                log.info('[pembimbing] alamat catatan tidak ada di naskah '
+                         '(id=%s judul=%s) -> disimpan umum',
+                         section_id, section_judul)
+                section_id = ''
+                section_judul = ''
+        except Exception as e:                                 # noqa: BLE001
+            #  Gagal memeriksa = jangan buang catatan pembimbing; biarkan
+            #  apa adanya (layar tetap jujur soal sorotan).
+            log.warning('[pembimbing] gagal periksa alamat catatan: %s', e)
+
     #  `mulai`/`akhir` = posisi kalimat DI DALAM paragraf itu. Dihitung
     #  ULANG di server dari teks_asli (jangan percaya angka dari browser).
     mulai_n, akhir_n = 0, 0
@@ -528,8 +494,9 @@ def tambah_catatan(token: str, isi: str = Form(''), section_id: str = Form(''),
             #  Gambar ditolak → catatannya TETAP lanjut, tapi pembimbing
             #  diberi tahu lewat tanda di halaman (bukan hilang diam-diam).
             log.info('[pembimbing] lampiran ditolak: %s', e)
-            return RedirectResponse(f'/tinjau/{token}?lampiran_ditolak=1',
-                                    status_code=303)
+            return RedirectResponse(
+                f"{_tujuan_baca(db, token, b, bk_terpilih.id if bk_terpilih is not None else None)}?lampiran_ditolak=1",
+                status_code=303)
 
     if ((isi or '').strip() or (tautan or '').strip()
             or nama_disk):
@@ -558,7 +525,11 @@ def tambah_catatan(token: str, isi: str = Form(''), section_id: str = Form(''),
         log.info('[pembimbing] catatan baru di bimbingan %s (bab %s, '
                  'sorotan %s, lampiran %s)', b.id, section_id,
                  'ada' if (teks_asli or '').strip() else '-', nama_disk or '-')
-    return RedirectResponse(f'/tinjau/{token}', status_code=303)
+    #  Kembali ke EDITOR + SIDEBAR (bukan halaman tinjau lama).
+    return RedirectResponse(
+        _tujuan_baca(db, token, b,
+                     bk_terpilih.id if bk_terpilih is not None else None),
+        status_code=303)
 
 
 @router.get('/tinjau/{token}/lampiran/{nama}')
@@ -620,4 +591,6 @@ def aktifkan(token: str, catatan_id: str = Form(''),
     berhasil, pesan = P.aktifkan_lagi(db, b.id, cid, ada.penulis_id)
     log.info('[pembimbing] aktifkan lagi catatan=%s hasil=%s pesan=%s',
              cid, berhasil, pesan)
-    return RedirectResponse(f'/tinjau/{token}', status_code=303)
+    #  Kembali ke EDITOR + SIDEBAR (bukan halaman tinjau lama).
+    return RedirectResponse(
+        _tujuan_baca(db, token, b, ada.berkas_id), status_code=303)

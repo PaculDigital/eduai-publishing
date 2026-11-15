@@ -2152,6 +2152,12 @@ async def _revisi_kerja(
             for ip in info_potong:
                 _kembalikan_kuota(db, u, ip)
             raise
+    # ── JANGKAR CATATAN (15 Nov 2026): revisi per catatan pembimbing →
+    #    alamat + kutipan persis catatan itu ikut jadi materi komentar,
+    #    supaya AI mahasiswa tidak menebak letaknya. Tanpa catatan_id
+    #    (tempel manual) → komentar tidak berubah sama sekali.
+    komentar = _jangkar_catatan(db, u, body, komentar)
+
     # 4) susun user message (statis + terstruktur — user tidak bisa sisipkan
     #    instruksi lain; komentar dibungkus penanda jelas)
     baris_komentar = '\n'.join(
@@ -3549,6 +3555,79 @@ async def ai_cek_kunci(
     }
 
 
+def _jangkar_catatan(db, u, body, komentar: list) -> list:
+    """Tambahkan alamat + kutipan persis catatan pembimbing ke komentar.
+
+    Dipakai `_revisi_kerja` sesaat sebelum `baris_komentar` dirakit:
+    bila body membawa `catatan_id` milik bimbingan `u` dan catatannya
+    punya kutipan persis (`teks_asli`), satu baris jangkar ditambahkan
+    supaya AI mahasiswa menerima letak persisnya sebagai materi
+    komentar, bukan tebakan. Kepemilikan diperiksa dengan cara yang
+    SAMA seperti `_tandai_catatan_selesai_jika_ada`. Tanpa catatan /
+    bukan milik / tanpa kutipan / gagal apa pun → komentar
+    dikembalikan apa adanya (revisi tidak pernah digagalkan di sini).
+    """
+    try:
+        cid = body.get('catatan_id') if isinstance(body, dict) else None
+        if not cid:
+            return komentar
+        cid = int(cid)
+    except (TypeError, ValueError):
+        return komentar
+    try:
+        from .models import CatatanPembimbing, Pembimbingan
+        c = (db.query(CatatanPembimbing)
+             .filter(CatatanPembimbing.id == cid).one_or_none())
+        if c is None:
+            return komentar
+        b = (db.query(Pembimbingan)
+             .filter(Pembimbingan.id == c.pembimbingan_id).one_or_none())
+        kutip = (c.teks_asli or '').strip()
+        if b is None or b.user_id != u.id or not kutip:
+            return komentar
+        alamat = ((c.section_judul or '').strip()
+                  or (c.section_id or '').strip())
+        baris = (f'[{alamat}] Kutipan: "{kutip}"' if alamat
+                 else f'Kutipan: "{kutip}"')
+        return list(komentar) + [baris]
+    except Exception as e:                                     # noqa: BLE001
+        log.warning('[ai] jangkar catatan gagal: %s', e)
+        return komentar
+
+
+def _tandai_catatan_selesai_jika_ada(db, u, body) -> None:
+    """Hook sidebar tinjau (15 Nov 2026): revisi AI untuk satu catatan
+    pembimbing yang BERHASIL → catatan itu otomatis selesai.
+
+    `body` membawa `catatan_id` (opsional, dari panel mahasiswa saat
+    mahasiswa menekan "Revisi dengan AI" pada satu catatan). Kepemilikan
+    diperiksa: catatan harus milik bimbingan yang pemiliknya `u`,
+    catatan orang lain tidak bisa ditandai lewat sini. Tidak pernah
+    menggagalkan revisi: segala kegagalan di sini hanya dicatat log.
+    """
+    try:
+        cid = body.get('catatan_id') if isinstance(body, dict) else None
+        if not cid:
+            return
+        cid = int(cid)
+    except (TypeError, ValueError):
+        return
+    try:
+        from . import pembimbing as _P
+        from .models import CatatanPembimbing, Pembimbingan
+        c = (db.query(CatatanPembimbing)
+             .filter(CatatanPembimbing.id == cid).one_or_none())
+        if c is None:
+            return
+        b = (db.query(Pembimbingan)
+             .filter(Pembimbingan.id == c.pembimbingan_id).one_or_none())
+        if b is None or b.user_id != u.id:
+            return
+        _P.tandai_selesai(db, b.id, cid)
+    except Exception as e:                                     # noqa: BLE001
+        log.warning('[ai] gagal tandai catatan selesai: %s', e)
+
+
 @router.post('/v1/revisi')
 async def ai_revisi(
     request: Request,
@@ -3752,11 +3831,18 @@ async def ai_revisi(
                 hasil.update({'babs': babs, 'token_in': total_in,
                               'token_out': total_out,
                               'token_revisi': total_rev})
+            #  🆕 SIDEBAR TINJAU: semua blok berhasil → catatan yang
+            #  direvisi otomatis selesai (1 panggilan, sesudah semua blok).
+            _tandai_catatan_selesai_jika_ada(db, u, body)
             return hasil
         try:
             #  ⚠️ Request asli sudah .json() → stream habis. Kirim TIRUAN
             #     yang memuat body SAMA (termasuk `lampiran` 27Sep26).
-            return await _revisi_kerja(_RequestTiruan(body), u, db)
+            hasil1 = await _revisi_kerja(_RequestTiruan(body), u, db)
+            #  🆕 SIDEBAR TINJAU: revisi berhasil → catatan yang direvisi
+            #  otomatis selesai.
+            _tandai_catatan_selesai_jika_ada(db, u, body)
+            return hasil1
         except HTTPException:
             for ip in info_potong:
                 _kembalikan_kuota(db, u, ip)
@@ -3836,6 +3922,9 @@ async def ai_revisi(
                     token_out=hasil.get('token_out', 0) or 0,
                     token_revisi=hasil.get('token_revisi', 0) or 0,
                 )
+            #  🆕 SIDEBAR TINJAU: revisi latar berhasil → catatan yang
+            #  direvisi otomatis selesai.
+            _tandai_catatan_selesai_jika_ada(d2, u, body)
         except Exception as e:                                # noqa: BLE001
             log.error('[ai] proses latar belakang %s gagal: %s', p.kode, e)
             proses_mod.tandai_gagal(p.kode, f'{type(e).__name__}: {e}')

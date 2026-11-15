@@ -171,6 +171,21 @@ main{flex:1;position:relative;min-height:0;background:#fff}
 .pai-komentar button{background:none;border:none;color:#B3261E;cursor:pointer;
   font-size:15px;line-height:1;padding:0 2px;flex-shrink:0}
 
+/* ── CATATAN PEMBIMBING (sidebar tinjau, 15 Nov 2026) ──────────────── */
+.pai-catatan{margin-top:14px}
+.pai-catatan h3{font-size:13px;font-weight:700;margin-bottom:8px}
+.pai-ct{border:1px solid var(--garis);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#fff}
+.pai-ct.selesai{opacity:.65}
+.pai-ct-atas{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px}
+.pai-ct-jenis{font-size:11px;font-weight:700;color:#146B2C;background:#E9F6EE;padding:2px 8px;border-radius:5px}
+.pai-ct-bab{font-size:11.5px;font-weight:700;color:#3A3844}
+.pai-ct-lencana{font-size:11px;font-weight:700;color:#146B2C;background:#CFEBD8;padding:2px 8px;border-radius:20px}
+.pai-ct-lencana.lewati{color:#8A6D0B;background:#FFF3B8}
+.pai-ct-isi{font-size:13px;line-height:1.6;color:#3A3844;word-break:break-word}
+.pai-ct-kutip{font-size:12px;color:var(--teks-abu);background:#FFFDF0;border-left:3px solid #E8C547;padding:6px 9px;margin-top:6px;border-radius:0 5px 5px 0;word-break:break-word}
+.pai-ct-btn{margin-top:9px;background:var(--hijau);color:#fff;font-weight:700;font-size:12.5px;padding:8px 16px;border-radius:70px;border:none;font-family:inherit;cursor:pointer}
+.pai-ct-btn:hover{background:var(--hijau-tua)}
+
 /* hasil revisi */
 .pai-hasil{background:#F4F8F5;border:1px solid #DCEAE0;border-radius:12px;padding:13px 14px;
   font-size:12.5px;line-height:1.7;white-space:pre-wrap;max-height:340px;overflow-y:auto;
@@ -551,6 +566,38 @@ main{flex:1;position:relative;min-height:0;background:#fff}
 </div>
 {% endif %}
 
+    {# ── CATATAN PEMBIMBING (sidebar tinjau, 15 Nov 2026) ─────────────
+       Klik satu catatan → revisi AI untuk catatan itu (1 Token Revisi,
+       hanya area itu + tetangga ±1, status otomatis selesai). Tombol
+       hanya tampil bila catatan punya alamat bagian yang bisa direvisi
+       dan belum selesai. #}
+    {% if catatan_pembimbing %}
+    <div class="pai-catatan">
+      <h3>Catatan Pembimbing ({{ catatan_pembimbing|length }})</h3>
+      {% for ct in catatan_pembimbing %}
+      <div class="pai-ct{% if ct.selesai %} selesai{% endif %}">
+        <div class="pai-ct-atas">
+          <span class="pai-ct-jenis">{{ ct.jenis|capitalize }}</span>
+          {% if ct.section_judul %}<span class="pai-ct-bab">{{ ct.section_judul }}</span>{% endif %}
+          {% if ct.selesai %}<span class="pai-ct-lencana">Selesai</span>
+          {% elif ct.dilewati %}<span class="pai-ct-lencana lewati">Dilewati</span>{% endif %}
+        </div>
+        <div class="pai-ct-isi">{{ ct.isi }}</div>
+        {% if ct.teks_asli %}
+        <div class="pai-ct-kutip">&ldquo;{{ ct.teks_asli[:180] }}&rdquo;</div>
+        {% endif %}
+        {% if not ct.selesai and ct.section_id %}
+        <button type="button" class="pai-ct-btn"
+                data-id="{{ ct.id }}"
+                data-bab="{{ ct.section_id|e }}" data-judul="{{ ct.section_judul|e }}">
+          Revisi dengan AI
+        </button>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
     {# ── PEMILIH BAB (ACC Bos 14Sep26) ──
        1 bab = 1 revisi = 1 kuota. Dimuat dari /api/ai/v1/bab saat panel dibuka. #}
     <div class="pai-bab" id="pai-wadah-bab" hidden>
@@ -691,6 +738,12 @@ window.__AI_FILE_ID__ = {{ berkas.id }};
   var btnTulisBab = document.getElementById('pai-tulis-bab');
   var elBabKet    = document.getElementById('pai-bab-ket');
   var komentar = [];
+
+  //  ── SIDEBAR TINJAU (15 Nov 2026): revisi untuk SATU catatan ─────────
+  //  `__CATATAN_ID__` = id catatan yang sedang direvisi; dikirim ke
+  //  /v1/revisi supaya server menandai catatan itu selesai sesudah
+  //  revisi BERHASIL. Dibersihkan sesudah sukses / saat revisi manual.
+  window.__CATATAN_ID__ = null;
 
   // ── PEMILIH BAB (ACC Bos 14Sep26) ─────────────────────────────────
   // 1 bab = 1 revisi = 1 kuota. Server yang mendeteksi bab (JANGAN menebak
@@ -1402,6 +1455,8 @@ window.__AI_FILE_ID__ = {{ berkas.id }};
   }
 
   if (btnJalan) btnJalan.onclick = function () {
+    //  Revisi manual (bukan dari catatan) → putuskan kaitan catatan.
+    window.__CATATAN_ID__ = null;
     if (!komentar.length) { pesan('Tambahkan minimal 1 komentar dulu.', 'gagal'); return; }
     //  belum memilih bagian → tahan dulu: tampilkan bukti / dampingi pilih
     if (belumPilihSendiri() && wadahIzin) { periksaBukti(); return; }
@@ -1735,6 +1790,9 @@ window.__AI_FILE_ID__ = {{ berkas.id }};
         komentar: komentar,
         lampiran: (window.__LAMPIRAN_BAWA__ || []),
         bab: babPilih ? babPilih.label : '',
+        //  🆕 SIDEBAR TINJAU: id catatan yang direvisi (bila ada), server
+        //  menandai catatan itu selesai sesudah revisi BERHASIL.
+        catatan_id: window.__CATATAN_ID__ || null,
         setuju_bagian: setuju === true
       };
       if (pilihanLingkup && pilihanLingkup.jalur === 2) {
@@ -1752,6 +1810,9 @@ window.__AI_FILE_ID__ = {{ berkas.id }};
       .then(function (res) {
         var d = isi(res.d);
         if (res.status === 200 && d.ok) {
+          //  🆕 SIDEBAR TINJAU: revisi berhasil → putuskan kaitan catatan
+          //  (server sudah menandainya selesai).
+          window.__CATATAN_ID__ = null;
           elHasil.textContent = d.jawaban || '';
           wadahHasil.hidden = false;
           segarkanKuota(d.kuota);
@@ -1796,6 +1857,30 @@ window.__AI_FILE_ID__ = {{ berkas.id }};
   };
 
   gambarDaftar();
+
+  //  ── SIDEBAR TINJAU (15 Nov 2026): tombol "Revisi dengan AI" per catatan
+  //  Klik → komentar diisi dari catatan, bagian dipilih dari alamat Jev
+  //  catatan itu, lalu jalan alur hitung-kirim yang SAMA (izin + kuota
+  //  tetap lewat server). `pilihanLingkup` dibersihkan supaya revisi
+  //  tidak memakai pilihan akordeon dari revisi manual sebelumnya.
+  document.querySelectorAll('.pai-ct-btn').forEach(function (bt) {
+    bt.onclick = function () {
+      var wadah = bt.closest('.pai-ct');
+      var isiEl = wadah ? wadah.querySelector('.pai-ct-isi') : null;
+      var teks = isiEl ? isiEl.textContent.trim() : '';
+      if (!teks) { pesan('Catatan ini kosong.', 'gagal'); return; }
+      komentar = [teks];
+      var kotak = document.getElementById('pai-kotak');
+      if (kotak) kotak.value = teks;
+      gambarDaftar();
+      var bab = bt.getAttribute('data-bab') || '';
+      var judul = bt.getAttribute('data-judul') || bab;
+      babPilih = bab ? { label: bab, judul: judul } : null;
+      pilihanLingkup = null;
+      window.__CATATAN_ID__ = bt.getAttribute('data-id') || null;
+      langkahHitung();
+    };
+  });
 
   // ---- cek pustaka OnlyOffice benar-benar termuat ----
   if (typeof DocsAPI === 'undefined') {

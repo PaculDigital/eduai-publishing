@@ -38,6 +38,8 @@ log = logging.getLogger('eduai.asisten')
 #  524 lewat domain — terukur 27Sep26). 40.000 kar ≈ 3-5 bab pertama.
 NASKAH_MAKS = 40_000
 USULAN_MAKS = 8          # pagar: AI tak boleh menagih 50 catatan sekaligus
+PILIHAN_PER_ROUND = 5    # alur PILIHAN (15 Nov 2026, koreksi Bos 16:36):
+                         # AI memberi 5 pilihan per round, bukan 8.
 HARGA_TOKEN = 1          # 1 Token Revisi per operasi (sesudah trial)
 
 #  ── HEMAT TOKEN (15Okt26) ────────────────────────────────────────────────
@@ -80,12 +82,15 @@ RUBRIK = (
     '4. KEJELASAN: kalimat ambigu, istilah teknis tanpa definisi operasional.\n'
     'ATURAN JAWABAN (mutlak):\n'
     '- Balas HANYA JSON: {"usulan": [{"bab": "...", "kutipan": "...", '
-    '"catatan": "..."}]}\n'
+    '"catatan": "...", "saran": "..."}]}\n'
     f'- Maksimal {USULAN_MAKS} usulan, pilih yang paling penting saja.\n'
     '- "kutipan" = potongan teks ASLI dari draf (persis, 8-15 kata) yang '
     'jadi tempat catatan menempel. Ambil dari draf, jangan karang.\n'
     '- "catatan" = 1-2 kalimat bahasa saran yang hangat, siap dibaca '
     'mahasiswa. Tanpa kata AI/model/sistem.\n'
+    '- "saran" = arah perbaikan 1-2 kalimat, jelas dan konkret '
+    'berdasarkan perbaikan naskah (apa yang harus dilakukan mahasiswa). '
+    'Bukan saran hangat yang samar.\n'
     '- Kalau draf sudah rapi dan tidak ada yang layak ditandai, balas '
     '{"usulan": []} — jangan mencari-cari kesalahan kecil.\n'
     '- Dilarang menambah data, angka, atau rujukan karangan.'
@@ -110,39 +115,158 @@ def _tandai_trial(db: Session, pembayar: User) -> None:
 
 
 def biaya_untuk(db: Session, pembayar: User) -> dict:
-    """Beritahu panggilan: pakai trial atau potong saldo."""
+    """Beritahu panggilan: pakai trial atau potong saldo.
+
+    Harga alur PILIHAN (koreksi Bos 16:36 WIB): 1 Token Revisi PER BUTIR
+    yang diterima; 'butuh' di sini = 1 per butir, trial menanggung butir
+    pertama. Alur lama (satu operasi langsung jadi catatan) tetap 1.
+    """
     if sisa_trial(db, pembayar):
         return {'pakai_trial': True, 'butuh': 0}
     return {'pakai_trial': False, 'butuh': HARGA_TOKEN}
 
 
-def potong_biaya(db: Session, pembayar: User) -> dict:
-    """Pagar P1: potong 1 Token Revisi (bila trial sudah terpakai).
+# ══════════════════════════════════════════════════════════════════════════
+#  PERINTAH LUAS, khusus ALUR PILIHAN (15 Nov 2026)
+# ══════════════════════════════════════════════════════════════════════════
+#  Lapisan 1 = yang SUDAH ADA: `_boleh_potong` (alur + cakupan dokumen
+#  lewat `ai._boleh_konteks` / `parser.pilih_pengali`).
+#  Lapisan 2 = contoh Boss yang TIDAK ditangkap lapisan 1 (TERUKUR):
+#    "perbaiki semuanya" → _boleh_konteks True (sempit), SALAH, harus luas.
+#    "tolong tinjau"     → _boleh_konteks True (sempit), SALAH, harus luas.
+#    "tinjau semuanya"   → _boleh_konteks True (sempit), SALAH, harus luas.
+#  Tambahan lapisan 2 (HANYA di sini, parser bersama TIDAK diubah,
+#  harga revisi mahasiswa tidak boleh ikut berubah):
+#    · kata semua/seluruh ("perbaiki semuanya", "tinjau semuanya");
+#    · perintah tanpa sasaran: sesudah buang kata pengisi + kata kerja,
+#      yang tersisa kosong atau hanya kata dokumen ("tolong tinjau",
+#      "cek naskah").
+#  Tetap sempit: "perbaiki 2.1" (ada nomor bagian), "tambahkan teori
+#  pemasaran" (ada topik), "perbaiki bab 2" (ada bab).
+_KATA_SEMUA_PILIHAN = ('semua', 'seluruh', 'keseluruhan')
+_KATA_PENGISI = ('tolong', 'mohon', 'coba', 'ya', 'dong', 'saja', 'aja')
+_KATA_KERJA_PILIHAN = ('tinjau', 'periksa', 'cek', 'lihat', 'review',
+                      'telaah', 'perbaiki', 'tambahkan', 'tambah', 'ubah',
+                      'ganti', 'betulkan', 'revisi')
+_KATA_DOKUMEN_PILIHAN = ('naskah', 'dokumen', 'draf', 'skripsi', 'tulisan',
+                        'karya')
 
-    Return {'ok': True, 'sumber': 'trial'|'saldo', 'sisa': int} ATAU
-    {'ok': False, 'pesan': ...} — pesan RAMAH + jalan keluar.
+
+def _perintah_luas(cmd: str) -> bool:
+    """True kalau perintah ini LUAS (→ alur pilihan, naskah utuh).
+
+    Perintah kosong = luas. Yang sudah ada (`_boleh_potong`) dulu,
+    baru dua pola lapisan 2 di atas.
     """
-    if sisa_trial(db, pembayar):
+    cmd = (cmd or '').strip()
+    if not cmd:
+        return True
+    if not _boleh_potong([cmd]):
+        return True
+    t = cmd.lower()
+    if any(k in t for k in _KATA_SEMUA_PILIHAN):
+        return True
+    kata = [w for w in re.split(r'[^a-z0-9.]+', t)
+            if w and w not in _KATA_PENGISI
+            and w not in _KATA_KERJA_PILIHAN]
+    if not kata:
+        return True
+    if all(w in _KATA_DOKUMEN_PILIHAN for w in kata):
+        return True
+    return False
+
+
+def potong_biaya(db: Session, pembayar: User, jumlah: int = 1) -> dict:
+    """Pagar P1: potong Token Revisi (bila trial sudah terpakai).
+
+    HARGA (koreksi Bos 16:36 WIB): 1 Token Revisi PER BUTIR yang diterima.
+    Trial 1x per akun menanggung butir PERTAMA; sisanya dari saldo.
+    `jumlah=1` = alur lama (satu operasi Asisten langsung jadi catatan)
+    , perilakunya PERSIS seperti sebelum generalisasi (uji F1/F2).
+
+    Cek dulu (jangan potong setengah-setengah): kalau saldo tidak cukup
+    untuk SEMUA butir, tolak dengan pesan ramah + jalan keluar.
+
+    Return {'ok': True, 'sumber': 'trial'|'saldo'|'campur',
+            'dipotong': <yang dipotong dari saldo>, 'sisa': int} ATAU
+    {'ok': False, 'pesan': ...}, pesan RAMAH + jalan keluar.
+    """
+    jumlah = max(1, int(jumlah or 1))
+    pakai_trial = sisa_trial(db, pembayar)
+    butuh = jumlah - (1 if pakai_trial else 0)
+    if butuh > 0:
+        from . import saldo as _saldo
+        sisa_kini = _saldo.sisa(db, pembayar)
+        if sisa_kini < butuh:
+            #  Aturan 5: jalan keluar harus yang BENAR-BENAR bisa dipakai.
+            #  Paket gratis TERKUNCI dari AddOn (config.boleh_beli_addon,
+            #  MASTER_PLAN 4.10), dulu pesannya tetap menyuruh ke AddOn,
+            #  jalan buntu bagi pembimbing paket gratis.
+            from .config import boleh_beli_addon          # noqa: PLC0415
+            if boleh_beli_addon(pembayar.paket or 'gratis'):
+                jalan = 'Tambah sedikit lewat menu AddOn, atau '
+            else:
+                jalan = ('Tingkatkan paket ke Penulis dulu supaya bisa isi '
+                         'saldo, atau ')
+            if jumlah == 1:
+                #  ⚠️ Teks ini PERSIS seperti sebelum generalisasi (uji F2
+                #     menguncinya), jangan ubah satu kata pun.
+                pesan = (
+                    'Asisten tinjauan butuh 1 Token Revisi untuk jalan lagi, dan '
+                    'saldomu belum cukup. ' + jalan +
+                    'lanjut menandai catatan secara manual, dua-duanya jalan.')
+            else:
+                pesan = (
+                    f'Menerima {jumlah} pilihan butuh {jumlah} Token Revisi, '
+                    f'dan saldomu belum cukup untuk semuanya. ' + jalan +
+                    'pilih lebih sedikit, atau lanjut menandai catatan '
+                    'secara manual, dua-duanya jalan.')
+            return {'ok': False, 'pesan': pesan}
+    if pakai_trial:
         _tandai_trial(db, pembayar)
-        return {'ok': True, 'sumber': 'trial', 'sisa': None}
-    from . import saldo as _saldo
-    sisa_kini = _saldo.sisa(db, pembayar)
-    if sisa_kini < HARGA_TOKEN:
-        return {'ok': False, 'pesan': (
-            'Asisten tinjauan butuh 1 Token Revisi untuk jalan lagi, dan '
-            'saldomu belum cukup. Tambah sedikit lewat menu AddOn, atau '
-            'lanjut menandai catatan secara manual — dua-duanya jalan.')}
-    _saldo.pakai(db, pembayar, HARGA_TOKEN, sumber='asisten_pembimbing',
-                 catatan='Tinjauan AI — Tab Kolaborasi')
-    return {'ok': True, 'sumber': 'saldo', 'sisa': sisa_kini - HARGA_TOKEN}
+    sisa_akhir = None
+    if butuh > 0:
+        from . import saldo as _saldo
+        hasil = _saldo.pakai(db, pembayar, butuh, sumber='asisten_pembimbing',
+                             catatan=(f'{jumlah} pilihan diterima'
+                                      if jumlah > 1 else
+                                      'Tinjauan AI, Tab Kolaborasi'))
+        sisa_akhir = hasil.get('sisa')
+    else:
+        from . import saldo as _saldo
+        sisa_akhir = _saldo.sisa(db, pembayar, seed=False)
+    sumber = ('campur' if (pakai_trial and butuh > 0)
+              else ('trial' if pakai_trial else 'saldo'))
+    return {'ok': True, 'sumber': sumber, 'dipotong': butuh,
+            'sisa': sisa_akhir}
 
 
-def kembalikan_biaya(db: Session, pembayar: User, sumber: str) -> None:
-    """Pagar P2: AI tidak memberi hasil → biaya kembali penuh."""
-    if sumber != 'saldo':
+def kembalikan_biaya(db: Session, pembayar: User, sumber: str,
+                     jumlah: int = 1) -> None:
+    """Pagar P2: AI tidak memberi hasil → biaya kembali penuh.
+
+    Aturan 5: trial 1x seumur akun pun kembali — gagal = trial TIDAK
+    terpakai, pembimbing boleh coba lagi. Dulu cabang trial langsung
+    kembali tanpa mengembalikan apa pun, jadi trial hangus sia-sia
+    padahal AI tidak memberi hasil.
+
+    `jumlah` = yang dipotong DARI SALDO (lihat `potong_biaya` → 'dipotong').
+    Alur lama (jumlah=1) perilakunya PERSIS seperti sebelumnya.
+    'campur' = trial + saldo: trial dikembalikan (bendera dihapus) DAN
+    saldo dikembalikan sejumlah `jumlah`.
+    """
+    if sumber == 'trial' or sumber == 'campur':
+        kunci = KUNCI_TRIAL.format(uid=pembayar.id)
+        baris = db.get(Setelan, kunci)
+        if baris is not None:
+            db.delete(baris)
+            db.commit()
+        if sumber == 'trial':
+            return
+    if sumber != 'saldo' and sumber != 'campur':
         return
     from . import saldo as _saldo
-    _saldo.kembalikan(db, pembayar, HARGA_TOKEN,
+    _saldo.kembalikan(db, pembayar, max(0, int(jumlah or 0)),
                       sumber='asisten_kembali',
                       catatan='Tinjauan AI: AI tidak memberi hasil')
 
@@ -155,7 +279,7 @@ def naskah_bimbingan(db: Session, b: Pembimbingan) -> str:
     """Ambil teks naskah UTAMA dari bimbingan (berkas pertama yang berisi).
 
     Memakai mesin baca yang SUDAH ada di rute_pembimbing (`_isi_naskah`)
-    — sama persis dengan yang dilihat pembimbing di layar. Tanpa menulis
+    , sama persis dengan yang dilihat pembimbing di layar. Tanpa menulis
     apa pun ke DB.
     """
     from .rute_pembimbing import _isi_naskah          # noqa: PLC0415
@@ -255,7 +379,8 @@ def _boleh_potong(komentar: list[str]) -> bool:
         return True
 
 
-def _siapkan_kirim(db: Session, b: Pembimbingan, teks: str) -> tuple[str, int]:
+def _siapkan_kirim(db: Session, b: Pembimbingan, teks: str,
+                   perintah: str | None = None) -> tuple[str, int]:
     """Siapkan teks yang DIKIRIM ke AI: bagian terpilih + tetangganya.
 
     Return (teks_kirim, nomor_bagian). GAGAL APA PUN → (teks, -1) = jalur lama
@@ -264,11 +389,23 @@ def _siapkan_kirim(db: Session, b: Pembimbingan, teks: str) -> tuple[str, int]:
     PAGAR: naskah pendek (< KONTEKS_MIN_PECAH) → langsung jalur lama.
     PAGAR 2 (15Okt26): permintaan pembimbing yang menyentuh SELURUH dokumen
     ("ubah alur", "perbaiki benang cerita") → WAJIB naskah utuh.
+
+    PAGAR 3 (15 Nov 2026, alur pilihan): perintah yang DIBERIKAN SEKARANG
+    (bukan dari catatan lama) ikut diperiksa, kosong/luas berarti naskah UTUH.
+    `perintah=None` = pemanggil lama (halaman Kolaborasi) → perilaku lama
+    (gerbang baca catatan) tanpa perubahan.
     """
     try:
         if len(teks) < KONTEKS_MIN_PECAH:
             log.info('[asisten] naskah %d kar < %d → kirim utuh (tak perlu pecah)',
                      len(teks), KONTEKS_MIN_PECAH)
+            return teks, -1
+
+        #  ══ PAGAR 3: perintah kosong/luas → JANGAN dipotong ══
+        if perintah is not None and _perintah_luas(perintah):
+            log.info('[asisten] PAGAR 3: perintah kosong/luas (%r) '
+                     '→ kirim naskah UTUH %d kar',
+                     (perintah or '')[:40], len(teks))
             return teks, -1
 
         #  ══ PAGAR 2: permintaan MENYELURUH → JANGAN dipotong (15Okt26) ══
@@ -329,12 +466,23 @@ def _siapkan_kirim(db: Session, b: Pembimbingan, teks: str) -> tuple[str, int]:
         return teks, -1
 
 
-async def kerjakan(db: Session, b: Pembimbingan, pembayar: User) -> dict:
-    """Jalankan satu operasi Asisten: AI meninjau naskah → usulan LANGSUNG
-    masuk.
+async def kerjakan(db: Session, b: Pembimbingan, pembayar: User,
+                   perintah: str | None = None) -> dict:
+    """Jalankan satu operasi Asisten: AI meninjau naskah → usulan.
+
+    DUA MODE (15 Nov 2026):
+      · `perintah=None` (halaman Kolaborasi) atau perintah SEMPIT
+        ("perbaiki 2.1") → ALUR LAMA: 1 token per operasi, usulan
+        LANGSUNG masuk sebagai catatan.
+      · perintah KOSONG atau LUAS (sidebar) → ALUR PILIHAN: pembuatan
+        daftar GRATIS (tidak ditagih), AI memberi 5 pilihan per round,
+        disimpan sebagai DAFTAR PILIHAN (bukan catatan). Tagihan jatuh
+        saat pembimbing menerima butirnya (1 token per butir, lewat
+        `terima_pilihan`).
 
     Return dict ringkas untuk JSON:
-      {ok, dibuat, sumber, model, detik, pesan}
+      alur lama → {ok, dibuat, sumber, model, detik, pesan}
+      alur pilihan → {ok, mode='pilih', dibuat=0, jumlah, sumber, pesan}
     Pagar: naskah kosong → biaya tidak dipotong sama sekali.
     Biaya (C7): `pembayar` = akun yang MENEKAN TOMBOL — diisi oleh
     rute `/kolaborasi/asisten` dengan `u` (login), BUKAN pemilik naskah.
@@ -346,47 +494,140 @@ async def kerjakan(db: Session, b: Pembimbingan, pembayar: User) -> dict:
             'Naskahnya belum terbaca di sini. Pastikan mahasiswa sudah '
             'menambahkan berkas ke kolaborasi ini, lalu coba lagi ya.')}
 
-    bayar = potong_biaya(db, pembayar)
-    if not bayar.get('ok'):
-        return {'ok': False, 'dibuat': 0, 'pesan': bayar['pesan']}
+    #  ── Mode: pilihan (sidebar, perintah kosong/luas) vs langsung ──
+    mode_pilih = False
+    if perintah is not None:
+        mode_pilih = _perintah_luas(perintah)
+
+    bayar = None
+    if not mode_pilih:
+        bayar = potong_biaya(db, pembayar)
+        if not bayar.get('ok'):
+            return {'ok': False, 'dibuat': 0, 'pesan': bayar['pesan']}
 
     t0 = time.monotonic()
     #  HEMAT TOKEN: kirim BAGIAN + tetangga, bukan naskah utuh (15Okt26).
-    kirim, kunci_bagian = _siapkan_kirim(db, b, teks)
+    kirim, kunci_bagian = _siapkan_kirim(db, b, teks, perintah=perintah)
     hemat = len(teks) - len(kirim)
+    #  Alur pilihan: minta 5 (bukan 8) + pola sudah_ada supaya AI tidak
+    #  mengulang catatan yang sudah ada (pola pembimbing_ai, ditambah
+    #  saringan keras di bawah, perintah LLM saja tidak cukup).
+    rubrik_pakai = RUBRIK
+    tambahan = ''
+    if mode_pilih:
+        rubrik_pakai = RUBRIK.replace(
+            f'Maksimal {USULAN_MAKS} usulan',
+            f'Maksimal {PILIHAN_PER_ROUND} usulan')
+        try:
+            from . import pembimbing_ai as PAI           # noqa: PLC0415
+            from .pembimbing import daftar_berkas as _dfb  # noqa: PLC0415
+            _semua = _dfb(db, b.id)
+            _bk0 = _semua[0] if _semua else None
+            _sudah = (PAI._catatan_isi_sebelumnya(db, _bk0)
+                      if _bk0 is not None else [])
+        except Exception:                              # noqa: BLE001
+            _sudah = []
+        if _sudah:
+            potong = [str(x)[:160] for x in _sudah[:8]]
+            tambahan = (
+                '\nCatatan yang SUDAH ada (jangan diulang, cari yang belum '
+                'tersentuh):\n- ' + '\n- '.join(potong) + '\n')
     user_msg = ('Draf mahasiswa (dapat dipotong di akhir):\n\n'
                 f'{kirim}\n\n'
+                f'{tambahan}'
                 'Berikan tinjauan sesuai aturan jawaban.')
     model, dibuat = '', 0
+    jumlah_pilihan = 0
+    tersaring = 0
+    tersaring_jangkar = 0
     try:
         from . import ai as AI                         # noqa: PLC0415
         konten, info = await AI._panggil_router(user_msg, 120.0,
-                                                system=RUBRIK)
+                                                system=rubrik_pakai)
         model = str(info.get('model') or '')
         usulan = urai_usulan(konten, teks)
         if usulan is None:
             raise RuntimeError('jawaban tidak bisa diurai')
-        dibuat = simpan_usulan(db, b, usulan)
-        if dibuat == 0 and not usulan:
-            # draf rapi = hasil sah, biaya tidak dikembalikan (kerja jalan)
-            log.info('[asisten] bimbingan %s: AI bilang sudah rapi', b.id)
+        if mode_pilih:
+            #  Saringan keras (deterministik) + potong jadi 5 per round.
+            from . import pembimbing as P              # noqa: PLC0415
+            from .pembimbing import daftar_berkas as _dfb  # noqa: PLC0415
+            _semua = _dfb(db, b.id)
+            _bk0 = _semua[0] if _semua else None
+            mentah = len(usulan)
+            disaring = P.saring_usulan_baru(db, b.id, usulan)
+            tersaring = mentah - len(disaring)
+            #  Verifikasi jangkar (putusan Bos 18:48 WIB): buang usulan
+            #  yang mengada-ada (kutipan tidak ada di naskah / bagian
+            #  tidak ada di peta) SEBELUM ditampilkan.
+            nyata = P.saring_usulan_nyata(
+                db, _bk0.id if _bk0 is not None else 0, teks, disaring)
+            tersaring_jangkar = len(disaring) - len(nyata)
+            usulan = nyata[:PILIHAN_PER_ROUND]
+            jumlah_pilihan = len(usulan)
+            if usulan and _bk0 is not None:
+                P.simpan_daftar_pilihan(db, b.id, _bk0.id, 'asisten',
+                                        usulan)
+        else:
+            dibuat = simpan_usulan(db, b, usulan)
+            if dibuat == 0 and not usulan:
+                # draf rapi = hasil sah, biaya tidak dikembalikan (kerja jalan)
+                log.info('[asisten] bimbingan %s: AI bilang sudah rapi', b.id)
     except Exception as e:                             # noqa: BLE001
-        kembalikan_biaya(db, pembayar, bayar.get('sumber', ''))
+        if bayar is not None:
+            kembalikan_biaya(db, pembayar, bayar.get('sumber', ''),
+                             bayar.get('dipotong', 1))
         detik = round(time.monotonic() - t0, 1)
         log.warning('[asisten] bimbingan %s gagal setelah %.1f dtk: %s',
                     b.id, detik, e)
-        return {'ok': False, 'dibuat': 0, 'detik': detik, 'pesan': (
-            'AI masih sibuk menyelesaikan tinjauan naskah ini. '
-            'Saldo sudah kembali utuh — coba lagi beberapa saat lagi ya.')}
+        #  Aturan 5: pesan kembali harus jujur per sumber biaya. Dulu
+        #  'Saldo sudah kembali utuh' juga muncul untuk trial, padahal
+        #  trial tidak memakai saldo (dan dulu trialnya hangus).
+        #  Alur pilihan TIDAK memotong apa pun, jangan klaim pengembalian.
+        if mode_pilih:
+            pesan_gagal = (
+                'AI masih sibuk menyelesaikan tinjauan naskah ini. '
+                'Coba lagi beberapa saat lagi ya.')
+        elif bayar.get('sumber') == 'trial':
+            pesan_gagal = (
+                'AI masih sibuk menyelesaikan tinjauan naskah ini. '
+                'Jatah gratis pertamamu masih tersimpan, coba lagi '
+                'beberapa saat lagi ya.')
+        else:
+            pesan_gagal = (
+                'AI masih sibuk menyelesaikan tinjauan naskah ini. '
+                'Saldo sudah kembali utuh, coba lagi beberapa saat lagi ya.')
+        return {'ok': False, 'dibuat': 0, 'detik': detik,
+                'pesan': pesan_gagal}
     detik = round(time.monotonic() - t0, 1)
+    if mode_pilih:
+        log.info('[asisten] bimbingan %s: %d pilihan disiapkan (%s, %.1f dtk)',
+                 b.id, jumlah_pilihan, model, detik)
+        return {'ok': True, 'mode': 'pilih', 'dibuat': 0,
+                'jumlah': jumlah_pilihan, 'sumber': 'gratis',
+                'model': model, 'detik': detik,
+                'pesan': ((
+                    f'{jumlah_pilihan} pilihan revisi dari AI sudah '
+                    'disiapkan di panel. Pilih yang mau dipakai jadi '
+                    'catatan.'
+                    if jumlah_pilihan else
+                    ('Tidak ada temuan baru yang terverifikasi dari '
+                     'naskah ini.'
+                     if tersaring_jangkar else
+                     ('Semua temuan baru sudah ada sebagai catatan, tidak '
+                      'ada pilihan baru.'
+                      if tersaring else
+                      'AI sudah meninjau naskah ini: drafnya sudah rapi, tidak '
+                      'ada catatan wajib. Silakan lanjut menandai bagian '
+                      'spesifik bila perlu.'))))}
     log.info('[asisten] bimbingan %s: %d usulan masuk (%s, %s, %.1f dtk, '
              'biaya=%s, pembayar=%s)', b.id, dibuat, model, info.get('model'),
              detik, bayar.get('sumber'), getattr(pembayar, 'id', '?'))
     #  C7 — jujur di layar SIAPA yang membayar (token milik yang klik).
     if bayar.get('sumber') == 'trial':
-        ket_biaya = ' — memakai jatah gratis pertama akunmu.'
+        ket_biaya = ', memakai jatah gratis pertama akunmu.'
     else:
-        ket_biaya = (f" — 1 Token Revisi dari saldomu, sisa "
+        ket_biaya = (f", 1 Token Revisi dari saldomu, sisa "
                      f"{bayar.get('sisa')}.")
     return {'ok': True, 'dibuat': dibuat, 'sumber': bayar.get('sumber'),
             'model': model, 'detik': detik,
@@ -402,6 +643,106 @@ async def kerjakan(db: Session, b: Pembimbingan, pembayar: User) -> dict:
                 + ket_biaya)}
 
 
+def terima_pilihan(db: Session, b: Pembimbingan, pembayar: User,
+                   berkas_id, pilih: str) -> dict:
+    """Terima pilihan revisi AI → jadi catatan pembimbing (kuning).
+
+    HARGA (koreksi Bos 16:36 WIB): 1 Token Revisi PER BUTIR yang diterima;
+    trial 1x menanggung butir pertama; tulis manual tetap gratis (tidak
+    lewat sini). Cek dulu (jangan potong setengah-setengah): saldo tidak
+    cukup untuk SEMUA butir → tolak semua dengan pesan ramah.
+    Gagal simpan sesudah potong → biaya kembali penuh (pagar P2).
+
+    `pilih` = indeks dipisah koma ("0,2") dari daftar pilihan yang
+    tersimpan (Setelan). Yang tidak dipilih TETAP di daftar (bisa
+    diterima nanti); yang sudah diterima DIBUANG dari daftar. Daftar
+    kosong → baris dihapus. Yang tidak dipilih TIDAK tersimpan di mana
+    pun selain daftar ini, round berikutnya menimpanya.
+    """
+    from . import pembimbing as P                     # noqa: PLC0415
+    try:
+        bid = int(str(berkas_id or '').strip())
+    except (ValueError, TypeError):
+        return {'ok': False, 'dibuat': 0, 'pesan': (
+            'Berkas pilihan ini tidak ditemukan. Minta tinjauan AI lagi '
+            'untuk pilihan baru ya.')}
+    sumber, daftar = P.muat_daftar_pilihan(db, b.id, bid)
+    if not daftar:
+        return {'ok': False, 'dibuat': 0, 'pesan': (
+            'Daftar pilihan sudah tidak ada. Minta tinjauan AI lagi untuk '
+            'pilihan baru ya.')}
+    try:
+        indeks = sorted({int(x) for x in str(pilih or '').split(',')
+                         if (x or '').strip()})
+    except ValueError:
+        return {'ok': False, 'dibuat': 0, 'pesan': (
+            'Pilihan tidak dikenali. Coba pilih lagi ya.')}
+    dipilih_idx = {i for i in indeks if 0 <= i < len(daftar)}
+    if not dipilih_idx:
+        return {'ok': False, 'dibuat': 0, 'pesan': (
+            'Tidak ada pilihan yang dipilih.')}
+    dipilih = [daftar[i] for i in sorted(dipilih_idx)]
+
+    #  Berkas WAJIB milik bimbingan ini (jangan bisa ditembus dengan
+    #  menebak angka), diperiksa SEBELUM potong apa pun.
+    bk = None
+    if sumber == 'periksa':
+        from .models import BerkasPembimbingan as _BB    # noqa: PLC0415
+        bk = db.get(_BB, bid)
+        if bk is None or bk.pembimbingan_id != b.id:
+            return {'ok': False, 'dibuat': 0, 'pesan': (
+                'Berkas pilihan ini tidak ditemukan. Minta tinjauan AI '
+                'lagi untuk pilihan baru ya.')}
+
+    #  ── Potong per butir (trial menanggung pertama) ──────────────────
+    bayar = potong_biaya(db, pembayar, jumlah=len(dipilih))
+    if not bayar.get('ok'):
+        return {'ok': False, 'dibuat': 0, 'pesan': bayar['pesan']}
+
+    #  ── Simpan lewat mesin yang SUDAH ADA ────────────────────────────
+    try:
+        if sumber == 'periksa':
+            from . import pembimbing_ai as PAI           # noqa: PLC0415
+            jumlah = PAI.simpan_catatan(db, bk, dipilih)
+        else:
+            jumlah = simpan_usulan(db, b, dipilih)
+    except Exception as e:                                # noqa: BLE001
+        kembalikan_biaya(db, pembayar, bayar.get('sumber', ''),
+                         bayar.get('dipotong', 0))
+        log.warning('[asisten] terima pilihan gagal: %s', e)
+        if bayar.get('sumber') == 'trial':
+            pesan_gagal = (
+                'Pilihan belum tersimpan. Jatah gratis pertamamu masih '
+                'tersimpan, coba lagi ya.')
+        elif bayar.get('sumber') == 'campur':
+            pesan_gagal = (
+                'Pilihan belum tersimpan. Jatah gratis dan saldo sudah '
+                'kembali utuh, coba lagi ya.')
+        else:
+            pesan_gagal = (
+                'Pilihan belum tersimpan. Token Revisi sudah kembali '
+                'utuh, coba lagi ya.')
+        return {'ok': False, 'dibuat': 0, 'pesan': pesan_gagal}
+
+    #  ── Buang yang sudah diterima dari daftar ────────────────────────
+    sisa = [d for i, d in enumerate(daftar) if i not in dipilih_idx]
+    if sisa:
+        P.simpan_daftar_pilihan(db, b.id, bid, sumber, sisa)
+    else:
+        P.hapus_daftar_pilihan(db, b.id, bid)
+
+    if bayar.get('sumber') == 'trial':
+        ket = ', memakai jatah gratis pertama akunmu.'
+    elif bayar.get('dipotong', 0) > 0:
+        ket = (f", {bayar['dipotong']} Token Revisi dari saldomu, sisa "
+               f"{bayar.get('sisa')}.")
+    else:
+        ket = ''
+    return {'ok': True, 'dibuat': jumlah, 'dipotong': bayar.get('dipotong', 0),
+            'sisa': bayar.get('sisa'),
+            'pesan': (f'{jumlah} pilihan sudah menjadi catatan.' + ket)}
+
+
 # ══════════════════════════════════════════════════════════════════════════
 # PARSER & PENYIMPANAN
 # ══════════════════════════════════════════════════════════════════════════
@@ -409,10 +750,12 @@ _RE_JSON = re.compile(r'\{.*\}', re.S)
 
 
 def urai_usulan(jawab: str, naskah: str = '') -> list[dict] | None:
-    """Urai jawaban AI → list usulan {'bab','kutipan','catatan'}.
+    """Urai jawaban AI → list usulan {'bab','kutipan','catatan','saran'}.
 
     Return None = bentuk TIDAK bisa dipercaya (pemanggil kembalikan biaya).
     Return []  = AI jujur bilang draf rapi (hasil sah).
+    `saran` boleh kosong (jawaban AI lama), penyimpanan tetap jalan
+    dengan format lama.
     """
     if not (jawab or '').strip():
         return None
@@ -438,6 +781,7 @@ def urai_usulan(jawab: str, naskah: str = '') -> list[dict] | None:
             'bab': str(x.get('bab') or '').strip()[:80],
             'kutipan': kutipan,
             'catatan': catatan,
+            'saran': str(x.get('saran') or '').strip()[:600],
         })
     #  buang duplikat catatan yang persis sama
     unik, kunci_lama = [], set()
@@ -464,20 +808,32 @@ def simpan_usulan(db: Session, b: Pembimbingan,
     """
     if not usulan:
         return 0
-    from .pembimbing import catat, daftar_berkas, rapi_bab   # noqa: PLC0415
+    from .pembimbing import (catat, daftar_berkas,  # noqa: PLC0415
+                             kutipan_ada_di_naskah, rapi_bab)
     berkas_list = daftar_berkas(db, b.id)
     bk = berkas_list[0] if berkas_list else None
     naskah = naskah_bimbingan(db, b)
     jumlah = 0
     for u in usulan:
-        teks_asli = ''
-        if u['kutipan']:
-            #  cari kutipan di naskah (normalisasi spasi ringan)
-            pola = re.sub(r'\s+', ' ', u['kutipan']).strip()
-            sumber = re.sub(r'\s+', ' ', naskah) if naskah else ''
-            if pola and pola.lower() in sumber.lower():
-                teks_asli = u['kutipan']
-        catat(db, b, u['catatan'],
+        #  Kutipan terverifikasi (helper bersama, putusan Bos 18:48 WIB).
+        teks_asli = (u['kutipan'] if kutipan_ada_di_naskah(
+            u.get('kutipan') or '', naskah or '') else '')
+        #  Format SAMA dengan Periksa (`rapikan_isi`): masalah + kutipan
+        #  + arah perbaikan, supaya AI mahasiswa menerima ketiganya dan
+        #  tidak menebak. Tanpa `saran` (jawaban AI lama / daftar lama)
+        #  → format lama, catatan saja, penyimpanan tetap jalan.
+        _saran = (u.get('saran') or '').strip()
+        if _saran:
+            from . import pembimbing_ai as _PAI      # noqa: PLC0415
+            _isi = _PAI.rapikan_isi({
+                'bagian': (u['bab'] or 'Tinjauan AI')[:200],
+                'soal': u['catatan'],
+                'kutipan': teks_asli,
+                'saran': _saran[:600],
+            })
+        else:
+            _isi = u['catatan']
+        catat(db, b, _isi,
               section_id=rapi_bab(u['bab'] or 'Tinjauan AI')[:80],
               section_judul=(u['bab'] or 'Tinjauan AI')[:200],
               teks_asli=teks_asli,

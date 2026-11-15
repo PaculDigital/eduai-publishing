@@ -209,6 +209,93 @@ def daftar_bab_naskah(teks: str, maks: int = 40) -> list[dict]:
     return hasil
 
 
+_RE_PENANDA_BAGIAN = re.compile(
+    r'^(BAB\s+[IVXLC]+|\d+(?:\.\d+)*)\b\s*(.*)$', re.IGNORECASE)
+
+
+def _entri_dari_judul_peta(judul: str, diperiksa: bool) -> dict | None:
+    """Satu baris peta Jev -> entri dropdown (penanda + judul + label).
+
+    `judul` = baris asli peta ('BAB II' / '2.1 Teori Pemasaran' /
+    'BAB II TINJAUAN PUSTAKA'). Penanda diambil dari awal baris
+    ('BAB II' / '2.1'); sisanya jadi judul. Tanpa penanda yang bisa
+    dibaca, seluruh baris dipakai sebagai penanda (tetap alamat nyata
+    dari peta yang sudah diperiksa).
+    """
+    t = ' '.join((judul or '').split()).strip()
+    if not t:
+        return None
+    m = _RE_PENANDA_BAGIAN.match(t)
+    if m:
+        mentah = m.group(1)
+        sid = mentah.upper() if mentah.upper().startswith('BAB') else mentah
+        sisa = (m.group(2) or '').strip()
+        jdl = sisa or sid
+    else:
+        sid, jdl = t, t
+    label = f'{sid} - {jdl}' if jdl.upper() != sid.upper() else sid
+    return {'section_id': sid, 'section_judul': jdl,
+            'label': label, 'terperiksa': bool(diperiksa)}
+
+
+def daftar_bagian_sidebar(db, file_id: int, teks: str,
+                          maks: int = 40) -> list[dict]:
+    """Dropdown Bab/Sub-bab untuk SIDEBAR tinjau (15 Nov 2026).
+
+    SUMBER (sesuai rancangan): peta Jev tersimpan dulu (judul Bab/Sub-bab
+    yang SUDAH diperiksa Hakim); bila peta belum ada (mahasiswa belum
+    tekan "Periksa Struktur"), pakai potongan bagian dari state.petakan()
+    yang SUDAH ADA. Hanya judul, tanpa teks naskah ke layar.
+
+    Return: [{'section_id', 'section_judul', 'label', 'terperiksa'}].
+    `section_id` = penanda bagian ('BAB II' / '2.1'), dipakai alamat
+    catatan + revisi AI. `terperiksa` = True bila judul itu ada di peta
+    Jev dan sudah diperiksa.
+    """
+    #  ── 1. Peta Jev tersimpan (jalur utama) ──
+    try:
+        from . import struktur as ST                         # noqa: PLC0415
+        from .models import ProfilDokumen
+        profil = (db.query(ProfilDokumen)
+                  .filter(ProfilDokumen.file_id == file_id).one_or_none())
+        peta = getattr(profil, 'peta_json', None)
+        if peta:
+            keluar = []
+            for bab in ST.ringkas_peta(peta).get('bab', []):
+                entri = _entri_dari_judul_peta(
+                    bab.get('judul', ''), bab.get('diperiksa', True))
+                if entri:
+                    keluar.append(entri)
+                for sub in bab.get('subbab', []) or []:
+                    teks_sub = (sub.get('teks') if isinstance(sub, dict)
+                                else str(sub))
+                    diperiksa = (sub.get('diperiksa', True)
+                                 if isinstance(sub, dict) else True)
+                    entri = _entri_dari_judul_peta(teks_sub, diperiksa)
+                    if entri:
+                        keluar.append(entri)
+            if keluar:
+                return keluar[:maks]
+    except Exception:                                      # noqa: BLE001
+        pass
+    #  ── 2. Jatuh ke potongan bagian (state.petakan) ──
+    try:
+        from . import state                                  # noqa: PLC0415
+        keluar = []
+        for x in state.petakan(teks):
+            sid = (x.get('section_id') or '').strip()
+            if not sid or sid == '__seluruh__':
+                continue
+            jdl = _rapikan_judul(x.get('section_title') or '')
+            label = (f'{sid} - {jdl}'
+                     if jdl and jdl.upper() != sid.upper() else sid)
+            keluar.append({'section_id': sid, 'section_judul': jdl or sid,
+                           'label': label, 'terperiksa': False})
+        return keluar[:maks]
+    except Exception:                                      # noqa: BLE001
+        return []
+
+
 # ══════════════════════════════════════════════════════════════════════
 # 3. KELOMPOKKAN CATATAN
 # ══════════════════════════════════════════════════════════════════════

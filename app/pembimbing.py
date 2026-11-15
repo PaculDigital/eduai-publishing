@@ -26,6 +26,7 @@ TABEL BARU SAJA — tidak ada tabel lama yang disentuh (tiang T2).
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import os
 import secrets
@@ -39,6 +40,7 @@ from .models import (
     CatatanPembimbing,
     Pembimbingan,
     SessionLocal,
+    Setelan,
     User as _User,
 )
 from .config import ARSIP_HARI
@@ -613,6 +615,310 @@ def catat(db: Session, b: Pembimbingan, isi: str, *, section_id: str = '',
     db.commit()
     db.refresh(baris)
     return baris
+
+
+def jenis_catatan(c) -> str:
+    """Jenis catatan dari kolom yang SUDAH ADA (tanpa kolom baru).
+
+    'tandaan'  → ada kutipan persis (teks_asli) = tandaan pada satu kalimat.
+    'perintah' → ada alamat bagian (section_id) tapi tanpa kutipan =
+                 perintah untuk satu Bab/Sub-bab utuh (atau posisi
+                 "sesudah X", yang disimpan sebagai section_id bagian itu).
+    'umum'     → tidak ada keduanya = catatan umum tanpa alamat.
+
+    Dipakai sidebar tinjau + panel mahasiswa supaya jenisnya tampil tanpa
+    menambah kolom/tabel (aturan Boss: perbaiki yang ada, jangan buat baru).
+    """
+    if (getattr(c, 'teks_asli', '') or '').strip():
+        return 'tandaan'
+    if (getattr(c, 'section_id', '') or '').strip():
+        return 'perintah'
+    return 'umum'
+
+
+def tandai_selesai(db: Session, bimbingan_id: int, catatan_id: int) -> bool:
+    """Tandai satu catatan SELESAI (warna hijau + sudah_oke).
+
+    Dipakai hook revisi AI sisi mahasiswa: sesudah revisi AI untuk catatan
+    itu BERHASIL, statusnya otomatis selesai, mahasiswa tidak perlu
+    menandai manual. Kepemilikan diperiksa lewat `pembimbingan_id`:
+    catatan bimbingan lain tidak bisa ditandai lewat sini. Idempoten:
+    sudah selesai sebelumnya → tetap True tanpa menulis ulang.
+    """
+    c = (db.query(CatatanPembimbing)
+         .filter(CatatanPembimbing.id == catatan_id,
+                 CatatanPembimbing.pembimbingan_id == bimbingan_id)
+         .one_or_none())
+    if c is None:
+        return False
+    if c.warna != 'hijau' or c.sudah_oke is None:
+        c.warna = 'hijau'
+        c.sudah_oke = datetime.now()
+        db.commit()
+    return True
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  DAFTAR PILIHAN REVISI AI (15 Nov 2026, GAS Bos + koreksi harga 16:36)
+#  Pembimbing menekan Asisten AI / Periksa dengan AI tanpa perintah atau
+#  dengan perintah yang terlalu luas → AI memberi DAFTAR PILIHAN (5 per
+#  round), pembimbing memilih mana yang jadi catatan. Daftar ini BUKAN
+#  catatan: belum jadi apa-apa sampai butirnya DITERIMA (1 Token Revisi
+#  per butir, trial menanggung butir pertama).
+#
+#  PENYIMPANAN: tabel `setelan` yang SUDAH ADA (kunci `usulan_pilihan_…`),
+#  pola yang sama dengan `asisten_trial_{uid}` / `asisten_giliran_{id}`.
+#  TIDAK ada tabel baru. ⚠️ `Setelan.nilai` itu String(120) di model,
+#  tapi SQLite TIDAK menegakkan panjang, JSON daftar beberapa KB
+#  tersimpan utuh (teruji di uji sidebar). Kalau DB pindah dari SQLite,
+#  daftar ini butuh tabel sendiri.
+#
+#  YANG TIDAK DIPILIH tidak tersimpan di mana pun: round berikutnya
+#  menimpa baris ini (putusan Bos 16:36 WIB, bila yang tidak dipilih
+#  juga perlu diingat, itu butuh keputusan Boss + penyimpanan baru).
+# ══════════════════════════════════════════════════════════════════════════
+KUNCI_PILIHAN = 'usulan_pilihan_{bimbingan}_{berkas}'
+
+
+def _rapi_kutipan(teks: str) -> str:
+    """Samakan kutipan untuk perbandingan: spasi diringkas, huruf kecil."""
+    import re                                          # noqa: PLC0415
+    return re.sub(r'\s+', ' ', (teks or '')).strip().lower()
+
+
+def simpan_daftar_pilihan(db: Session, bimbingan_id: int, berkas_id: int,
+                          sumber: str, daftar: list[dict]) -> None:
+    """Simpan daftar pilihan mentah (apa adanya dari AI) untuk sidebar.
+
+    `sumber` = 'asisten' | 'periksa' (menentukan mesin simpan saat
+    diterima). Menimpa daftar round sebelumnya untuk berkas ini.
+    """
+    kunci = KUNCI_PILIHAN.format(bimbingan=int(bimbingan_id),
+                                 berkas=int(berkas_id))
+    isi = json.dumps({'sumber': sumber, 'daftar': daftar or []},
+                    ensure_ascii=False)
+    baris = db.get(Setelan, kunci)
+    if baris is None:
+        db.add(Setelan(kunci=kunci, nilai=isi, oleh='pilihan-usulan'))
+    else:
+        baris.nilai = isi
+    db.commit()
+
+
+def muat_daftar_pilihan(db: Session, bimbingan_id: int,
+                        berkas_id: int) -> tuple[str | None, list[dict]]:
+    """Muat daftar pilihan. Return (sumber, daftar); tidak ada / rusak →
+    (None, [])."""
+    kunci = KUNCI_PILIHAN.format(bimbingan=int(bimbingan_id),
+                                 berkas=int(berkas_id))
+    baris = db.get(Setelan, kunci)
+    if baris is None or not (baris.nilai or '').strip():
+        return None, []
+    try:
+        data = json.loads(baris.nilai)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return None, []
+    if not isinstance(data, dict):
+        return None, []
+    daftar = data.get('daftar')
+    if not isinstance(daftar, list):
+        return None, []
+    return (str(data.get('sumber') or '') or None,
+            [x for x in daftar if isinstance(x, dict)])
+
+
+def hapus_daftar_pilihan(db: Session, bimbingan_id: int,
+                         berkas_id: int) -> None:
+    """Hapus daftar pilihan (sesudah semua butir diterima)."""
+    kunci = KUNCI_PILIHAN.format(bimbingan=int(bimbingan_id),
+                                 berkas=int(berkas_id))
+    baris = db.get(Setelan, kunci)
+    if baris is not None:
+        db.delete(baris)
+        db.commit()
+
+
+#  ── PENGGALAN PENASARAN (15 Nov 2026, putusan Bos 18:47 WIB) ─────────
+#  Aturan (deterministik, tanpa AI):
+#  · saran kosong → '' (tidak ada yang ditampilkan).
+#  · saran PANJANG (> 5 kata) → 4 kata pertama + '...', cukup untuk
+#    membuat penasaran, tidak cukup untuk disalin sebagai arahan lengkap.
+#  · saran PENDEK (<= 5 kata) → 4 kata pertama akan membocorkan hampir
+#    semuanya, jadi tampilkan LABEL singkat jenis perbaikannya saja
+#    (tabel kata kunci di bawah), bukan kata-kata sarannya.
+#  · label dicari dari kata kunci pertama yang cocok (urutan tabel);
+#    tidak ada yang cocok → 'Perbaikan naskah'.
+PENGGALAN_KATA = 4
+PENGGALAN_BATAS_PENDEK = 5
+PENGGALAN_LABEL = (
+    (('rujuk', 'sitasi', 'pustaka'), 'Tambah rujukan'),
+    (('teori', 'konsep', 'definisi'), 'Perbaiki teori'),
+    (('struktur', 'alur', 'urutan', 'subbab', 'sub bab'), 'Perbaiki struktur'),
+    (('kalimat', 'bahasa', 'jelas', 'perjelas'), 'Perjelas kalimat'),
+    (('data', 'angka', 'tabel', 'grafik', 'hasil'), 'Perbaiki data'),
+    (('metode', 'sampel', 'instrumen', 'analisis', 'uji'), 'Perbaiki metode'),
+    (('tambah', 'lengkap', 'kurang'), 'Lengkapi bagian'),
+    (('hapus', 'buang', 'ringkas', 'pangkas'), 'Ringkas bagian'),
+    (('contoh', 'ilustrasi'), 'Tambah contoh'),
+)
+
+
+def penggalan_saran(saran: str) -> str:
+    """Turunkan penggalan penasaran dari arah perbaikan (saran).
+
+    Dipakai layar pilihan: pembimbing cukup tahu jenis/arahnya untuk
+    memilih, tapi tidak bisa menyalin arahan lengkapnya. Arah lengkap
+    baru terlihat di catatan sesudah butir diterima.
+    """
+    kata = (saran or '').split()
+    if not kata:
+        return ''
+    if len(kata) <= PENGGALAN_BATAS_PENDEK:
+        rendah = (saran or '').lower()
+        for kunci, label in PENGGALAN_LABEL:
+            if any(k in rendah for k in kunci):
+                return label
+        return 'Perbaikan naskah'
+    return ' '.join(kata[:PENGGALAN_KATA]).rstrip('.') + '...'
+
+
+def kutipan_ada_di_naskah(kutipan: str, naskah: str) -> bool:
+    """True bila kutipan ada di naskah (rapikan spasi, tanpa bedakan
+    huruf besar/kecil). Dipakai bersama oleh saringan jangkar,
+    `simpan_usulan`, dan `simpan_catatan` (putusan Bos 18:48 WIB),
+    satu definisi, tidak boleh berbeda."""
+    pola = _rapi_kutipan(kutipan)
+    if not pola:
+        return False
+    return pola in _rapi_kutipan(naskah or '')
+
+
+def _norm_bagian(teks: str) -> str:
+    """Samakan label bagian untuk perbandingan (huruf kecil, spasi
+    diringkas, pemisah ' - ' jadi spasi)."""
+    return ' '.join((teks or '').lower().replace(' - ', ' ').split())
+
+
+def _kandidat_bagian(db, file_id: int, teks: str) -> set | None:
+    """Kumpulan label bagian yang NYATA di naskah ini.
+
+    Sumber: dropdown sidebar yang sama (`daftar_bagian_sidebar`: peta
+    Jev tersimpan dulu, jatuh ke `state.petakan()`) DITAMBAH peta BAB
+    besar (`state.peta_bab_besar`), karena `petakan()` memakai sub-bab
+    bila ada ≥3, label 'BAB I'/'BAB II' tidak ada di sana padahal nyata
+    di naskah. Satu definisi bagian yang ada, dipakai saringan jangkar.
+
+    Return None bila KEDUA sumber gagal dipanggil (tidak bisa memeriksa);
+    set (bisa kosong) bila sedikitnya satu sumber jalan. Set kosong
+    berarti naskah tanpa struktur yang bisa ditentukan (petakan jatuh
+    ke '__seluruh__'), lapis bagian dilewati pemanggil, hanya kutipan
+    yang diperiksa, supaya pilihan tidak mati untuk draf tanpa bab.
+    """
+    keluar = set()
+    jalan = False
+
+    def _tambah(section_id, section_judul, label=None):
+        for k in (section_id, section_judul, label):
+            if (k or '').strip():
+                keluar.add(_norm_bagian(k))
+        sid = (section_id or '').strip()
+        if sid:
+            keluar.add(_norm_bagian(rapi_bab(sid)))
+            jdl = (section_judul or '').strip()
+            if jdl:
+                keluar.add(_norm_bagian(sid + ' ' + jdl))
+
+    try:
+        from . import kelompok_catatan as KC          # noqa: PLC0415
+        for ent in KC.daftar_bagian_sidebar(db, int(file_id or 0),
+                                            teks or ''):
+            _tambah(ent.get('section_id'), ent.get('section_judul'),
+                    ent.get('label'))
+        jalan = True
+    except Exception:                                 # noqa: BLE001
+        pass
+    try:
+        from . import state as _ST                    # noqa: PLC0415
+        for x in _ST.peta_bab_besar(teks or ''):
+            _tambah(x.get('section_id'), x.get('section_title'))
+        jalan = True
+    except Exception:                                 # noqa: BLE001
+        pass
+    return keluar if jalan else None
+
+
+def _bagian_ada(bab: str, kandidat: set) -> bool:
+    """True bila label bagian butir cocok dengan satu bagian yang nyata
+    (bandingkan label utuh; 'BAB 2' juga cocok dengan 'BAB II' lewat
+    `rapi_bab`). Tanpa label → False (tidak ada alamat)."""
+    t = _norm_bagian(bab)
+    if not t:
+        return False
+    if t in kandidat:
+        return True
+    return _norm_bagian(rapi_bab(bab)) in kandidat
+
+
+def saring_usulan_nyata(db, file_id: int, teks_naskah: str,
+                        usulan: list[dict]) -> list[dict]:
+    """SARINGAN JANGKAR (putusan Bos 18:48 WIB): buang usulan yang
+    mengada-ada, kutipannya tidak ada di naskah ATAU bagiannya tidak
+    ada di peta/potongan bagian. Deterministik, bukan perintah ke LLM.
+
+    · Tanpa kutipan → lolos lapis kutipan (alamatnya bagian, seperti
+      `saring_usulan_baru`); tanpa bagian → dibuang (tidak ada alamat).
+    · Bila TIDAK ADA bagian yang bisa ditentukan (naskah tanpa struktur),
+      lapis bagian dilewati, hanya kutipan yang diperiksa. Bila
+      pemeriksaannya sendiri gagal (kandidat None) → semua dibuang
+      (gagal tertutup: lebih baik tidak menampilkan daripada
+      menampilkan yang karangan).
+    """
+    daftar = usulan or []
+    if not daftar:
+        return []
+    kandidat = _kandidat_bagian(db, file_id, teks_naskah or '')
+    keluar = []
+    for u in daftar:
+        kutip = (u.get('kutipan') or '').strip()
+        if kutip and not kutipan_ada_di_naskah(kutip, teks_naskah or ''):
+            continue
+        if kandidat is None:
+            continue
+        if kandidat and not _bagian_ada(
+                u.get('bab') or u.get('bagian') or '', kandidat):
+            continue
+        keluar.append(u)
+    return keluar
+
+
+def daftar_teks_asli(db: Session, bimbingan_id: int) -> set[str]:
+    """Kumpulan kutipan (teks_asli) yang SUDAH menjadi catatan di bimbingan
+    ini, sudah dirapikan, untuk saringan keras pilihan berikutnya."""
+    baris = (db.query(CatatanPembimbing.teks_asli)
+             .filter(CatatanPembimbing.pembimbingan_id == int(bimbingan_id))
+             .all())
+    return {_rapi_kutipan(x[0]) for x in baris if (x[0] or '').strip()}
+
+
+def saring_usulan_baru(db: Session, bimbingan_id: int,
+                       usulan: list[dict]) -> list[dict]:
+    """SARINGAN KERAS (putusan Bos 16:36 WIB): buang usulan yang kutipannya
+    SUDAH ADA sebagai catatan (butir yang sudah dipilih di round
+    sebelumnya). Deterministik, bukan sekadar perintah ke LLM.
+
+    Usulan tanpa kutipan lolos (alamatnya bagian, bukan kalimat, tidak
+    ada yang bisa dicocokkan). Urutan dipertahankan.
+    """
+    sudah = daftar_teks_asli(db, bimbingan_id)
+    if not sudah:
+        return list(usulan or [])
+    keluar = []
+    for u in (usulan or []):
+        kutip = _rapi_kutipan(u.get('kutipan') or '')
+        if kutip and kutip in sudah:
+            continue
+        keluar.append(u)
+    return keluar
 
 
 def daftar_catatan(db: Session, bimbingan_id: int,
