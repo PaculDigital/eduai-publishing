@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Periksa Daftar Pustaka - EduAi</title>
+<style>
+  :root{
+    --tinta:#2b2621; --tinta2:#6b6259; --kertas:#faf7f2; --kartu:#fff;
+    --garis:#e6dfd4; --hijau:#1f7a5a; --hijau2:#2a9d76;
+    --oranye:#f4a025; --oranye-tua:#d98a12; --merah:#b3402f; --biru:#2d5f9a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--kertas);
+       color:var(--tinta);line-height:1.6;padding:0 0 60px}
+  .nav{background:#14342a;color:#fff;padding:0 24px;height:68px;display:flex;
+       align-items:center;justify-content:space-between}
+  .nav b{font-size:17px;font-weight:600}
+  .nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:14px;margin-left:18px}
+  .nav a:hover{color:#fff}
+  .wadah{max-width:940px;margin:0 auto;padding:0 20px}
+  h1{font-size:26px;margin:28px 0 6px}
+  .sub{color:var(--tinta2);font-size:15px;margin-bottom:24px}
+  .pesan{padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:14px;
+         background:#e8f5ef;border:1px solid #b8e0cd;color:#14543c}
+  .galat{padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:14px;
+         background:#fdecea;border:1px solid #f0b8ae;color:#8c2f20}
+  .info{padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:14px;
+         background:#fff8e6;border:1px solid #f0d9a0;color:#6d4c00}
+  .kartu{background:var(--kartu);border:1px solid var(--garis);border-radius:14px;
+         padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .meta{font-size:13px;color:var(--tinta2);margin-bottom:8px}
+  .meta b{color:var(--tinta)}
+  blockquote{border-left:4px solid var(--oranye);background:#fffaf0;
+         padding:12px 14px;border-radius:0 10px 10px 0;font-size:15px;margin:8px 0;
+         word-break:break-word}
+  blockquote.benar{border-left-color:var(--hijau);background:#eef7f2}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+  .badge.nyata{background:#e8f5ef;color:#14543c}
+  .badge.format{background:#fff3d6;color:#8a6d00}
+  .badge.tidak{background:#fdecea;color:#8c2f20}
+  .badge.lama{background:#eee;color:#555}
+  .badge.takutip{background:#fff3d6;color:#8a6d00}
+  .tombol{border:none;border-radius:10px;padding:12px 18px;font-size:15px;
+         cursor:pointer;background:#f4a025;color:#fff;font-weight:600}
+  .tombol:hover{background:#e08d10}
+  .tombol:disabled{background:#d8d2c7;color:#8a8276;cursor:default}
+  .tombol.kecil{padding:8px 14px;font-size:14px}
+  .tombol.hijau{background:var(--hijau)}
+  .tombol.hijau:hover{background:#18634a}
+  .tombol.abu{background:#eee;color:#444}
+  .tombol.abu:hover{background:#e0e0e0}
+  .tombol.merah{background:#fff;color:var(--merah);border:1px solid #e5b8b0}
+  .tombol.merah:hover{background:#fdecea}
+  .aksi{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .aksi form{display:inline}
+  .ringkas{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+  .angka{background:#f5f1ea;border-radius:10px;padding:10px 14px;font-size:13px}
+  .angka b{display:block;font-size:20px}
+  .masukan{padding:9px 12px;border:1px solid var(--garis);border-radius:10px;
+         font-size:14px;width:260px;max-width:100%}
+  .kecil{font-size:13px;color:var(--tinta2)}
+  .jujur{font-size:13px;color:var(--tinta2);margin-top:24px}
+</style>
+</head>
+<body>
+<div class="nav"><b>EduAi</b><span><a href="/naskah">&larr; Kembali ke Naskah</a></span></div>
+<div class="wadah">
+  <h1>Periksa Daftar Pustaka</h1>
+  <div class="sub">{{ nama }}</div>
+
+  {% if pesan %}<div class="pesan">{{ pesan }}</div>{% endif %}
+  {% if keadaan == 'gagal' and galat %}<div class="galat">Pemeriksaan belum berhasil: {{ galat }}. Coba lagi sebentar lagi.</div>{% endif %}
+
+  {% if keadaan == 'jalan' %}
+  <div class="kartu">
+    <div class="meta"><b>Sedang diperiksa</b></div>
+    <p>Kami sedang memeriksa tiap entri ke sumber (DOI diaudit, judul dicari).
+       Halaman ini memuat ulang sendiri begitu selesai. Tidak memakai AI.</p>
+  </div>
+  {% elif not hasil %}
+  <div class="kartu">
+    <div class="meta"><b>Belum diperiksa</b></div>
+    <p>Pemeriksaan ini menilai tiap entri daftar pustaka: nyata atau tidak
+       (DOI diaudit, judul dicari di OpenAlex, CrossRef, dan Garuda),
+       formatnya sesuai APA 7 atau tidak, serta kecocokan dua arah antara
+       sitasi di badan dan entri di daftar. Entri yang tidak ditemukan
+       <b>bukan berarti palsu</b>: buku lama dan sumber lokal kadang memang
+       tidak ada di database.</p>
+    <p style="margin-top:12px"><button class="tombol" id="tombol-periksa" onclick="mulaiPeriksa()">Periksa Daftar Pustaka</button></p>
+  </div>
+  {% else %}
+  <div class="kartu">
+    <div class="meta">Diperiksa: <b>{{ hasil.diperiksa_pada }}</b>
+      {% if not hasil.ada_pustaka %} &middot; <b>Bagian Daftar Pustaka tidak ditemukan di naskah ini</b>{% endif %}</div>
+    <div class="ringkas">
+      <div class="angka"><b>{{ hasil.ringkasan.total_entri }}</b>entri</div>
+      <div class="angka"><b>{{ hasil.ringkasan.nyata }}</b>nyata</div>
+      <div class="angka"><b>{{ hasil.ringkasan.format_salah }}</b>format salah</div>
+      <div class="angka"><b>{{ hasil.ringkasan.tidak_ditemukan }}</b>tidak ditemukan</div>
+      <div class="angka"><b>{{ hasil.ringkasan.sumber_lama }}</b>sumber lama</div>
+      <div class="angka"><b>{{ hasil.ringkasan.sitasi_tanpa_entri }}</b>sitasi tanpa entri</div>
+      <div class="angka"><b>{{ hasil.ringkasan.entri_tanpa_sitasi }}</b>entri tak dikutip</div>
+    </div>
+    <div class="aksi">
+      <button class="tombol kecil" id="tombol-periksa" onclick="mulaiPeriksa()">Periksa lagi</button>
+      {% set jml_format = hasil.entri | selectattr('vonis', 'equalto', 'format_salah') | selectattr('apa7_benar') | list | length %}
+      {% if jml_format > 0 %}
+      <form method="post" action="/naskah/{{ fid }}/pustaka/aksi">
+        <input type="hidden" name="aksi" value="perbaiki_semua_format">
+        <button class="tombol kecil hijau" type="submit">Perbaiki semua format ({{ jml_format }})</button>
+      </form>
+      {% endif %}
+      {% set jml_kurang = hasil.sitasi_tanpa_entri | selectattr('kandidat') | list | length %}
+      {% if jml_kurang > 0 %}
+      <form method="post" action="/naskah/{{ fid }}/pustaka/aksi">
+        <input type="hidden" name="aksi" value="tambah_semua_yang_kurang">
+        <button class="tombol kecil hijau" type="submit">Tambahkan semua yang kurang ({{ jml_kurang }})</button>
+      </form>
+      {% endif %}
+    </div>
+    <p class="kecil" style="margin-top:10px">Periksa ulang hanya memeriksa entri yang berubah. Bila naskah sedang terbuka di editor, tutup lalu buka lagi supaya perubahan terlihat.</p>
+  </div>
+
+  {% if not hasil.ada_pustaka %}
+  <div class="info">Bagian <b>Daftar Pustaka</b> tidak ditemukan di naskah ini. Semua sitasi di bawah ini belum punya entri. Tulis bagian Daftar Pustaka di akhir naskah, lalu tekan "Periksa lagi".</div>
+  {% endif %}
+
+  {% for e in hasil.entri %}
+  <div class="kartu">
+    <div class="meta">
+      {% if e.vonis == 'nyata' %}<span class="badge nyata">Nyata</span>
+      {% elif e.vonis == 'format_salah' %}<span class="badge format">Format salah</span>
+      {% else %}<span class="badge tidak">Tidak ditemukan</span>{% endif %}
+      {% if e.sumber_lama %}<span class="badge lama">Sumber lama (belum terverifikasi)</span>{% endif %}
+      {% if not e.dikutip %}<span class="badge takutip">Tidak dikutip di badan</span>{% endif %}
+    </div>
+    <blockquote>{{ e.teks }}</blockquote>
+    <div class="kecil">{{ alasan.get(e.alasan, '') }}</div>
+    {% if e.apa7_benar %}
+    <div class="kecil" style="margin-top:6px">Bentuk yang benar (APA 7):</div>
+    <blockquote class="benar">{{ e.apa7_benar }}</blockquote>
+    {% endif %}
+    {% if e.kandidat and e.vonis == 'tidak_ditemukan' %}
+    <div class="kecil" style="margin-top:6px">Yang mirip ({{ e.kandidat.sumber }}): {{ e.kandidat.authors }} ({{ e.kandidat.year }}). {{ e.kandidat.title }}. {{ e.kandidat.journal }}{% if e.kandidat.doi %} {{ e.kandidat.doi }}{% endif %}</div>
+    {% endif %}
+    <div class="aksi">
+      {% if e.vonis == 'format_salah' and e.apa7_benar %}
+      <form method="post" action="/naskah/{{ fid }}/pustaka/aksi">
+        <input type="hidden" name="aksi" value="perbaiki_format">
+        <input type="hidden" name="entri_id" value="{{ e.id }}">
+        <button class="tombol kecil" type="submit">Perbaiki format</button>
+      </form>
+      {% endif %}
+      {% if e.vonis == 'tidak_ditemukan' and e.kandidat %}
+      <form method="post" action="/naskah/{{ fid }}/pustaka/aksi">
+        <input type="hidden" name="aksi" value="pakai_yang_ini">
+        <input type="hidden" name="entri_id" value="{{ e.id }}">
+        <button class="tombol kecil" type="submit">Pakai yang ini</button>
+      </form>
+      {% endif %}
+      {% if e.vonis == 'tidak_ditemukan' and not e.sumber_lama %}
+      <form method="post" action="/naskah/{{ fid }}/pustaka/aksi">
+        <input type="hidden" name="aksi" value="tandai_sumber_lama">
+        <input type="hidden" name="entri_id" value="{{ e.id }}">
+        <button class="tombol kecil abu" type="submit">Tandai sumber lama</button>
+      </form>
+      {% endif %}
+      {% if not e.dikutip or e.vonis == 'tidak_ditemukan' %}
+      <form method="post" action="/naskah/{{ fid }}/pustaka/aksi" onsubmit="return confirm('Hapus entri ini dari daftar pustaka?')">
+        <input type="hidden" name="aksi" value="hapus_dari_daftar">
+        <input type="hidden" name="entri_id" value="{{ e.id }}">
+        <button class="tombol kecil merah" type="submit">Hapus dari daftar</button>
+      </form>
+      {% endif %}
+    </div>
+    {% if e.vonis == 'tidak_ditemukan' and not e.kandidat and not e.sumber_lama %}
+    <p class="kecil" style="margin-top:8px">Perbaiki sendiri entrinya di naskah lalu tekan "Periksa lagi", atau tandai sumber lama, atau hapus dari daftar.</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  {% if hasil.sitasi_tanpa_entri %}
+  <h2 style="font-size:20px;margin:24px 0 12px">Sitasi di badan yang tidak ada di daftar</h2>
+  {% for s in hasil.sitasi_tanpa_entri %}
+  <div class="kartu">
+    <div class="meta"><b>{{ s.raw }}</b></div>
+    {% if s.kandidat %}
+    <div class="kecil">Ditemukan satu karya yang cocok ({{ s.kandidat.sumber }}): {{ s.kandidat.authors }} ({{ s.kandidat.year }}). {{ s.kandidat.title }}. {{ s.kandidat.journal }}{% if s.kandidat.doi %} {{ s.kandidat.doi }}{% endif %}</div>
+    <div class="aksi">
+      <form method="post" action="/naskah/{{ fid }}/pustaka/aksi">
+        <input type="hidden" name="aksi" value="tambah_ke_daftar">
+        <input type="hidden" name="sitasi_author" value="{{ s.author }}">
+        <input type="hidden" name="sitasi_year" value="{{ s.year }}">
+        <input type="hidden" name="doi" value="{{ s.kandidat.doi }}">
+        <button class="tombol kecil" type="submit">Tambahkan ke daftar</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="kecil">Tidak ditemukan satu karya yang pasti cocok. Tempel DOI sumbernya di bawah ini, atau tulis entrinya manual di Daftar Pustaka lalu tekan "Periksa lagi".</div>
+    <div class="aksi">
+      <form method="post" action="/naskah/{{ fid }}/pustaka/aksi">
+        <input type="hidden" name="aksi" value="tambah_ke_daftar">
+        <input type="hidden" name="sitasi_author" value="{{ s.author }}">
+        <input type="hidden" name="sitasi_year" value="{{ s.year }}">
+        <input class="masukan" type="text" name="doi" placeholder="Tempel DOI, contoh: 10.1016/j.heliyon.2020.e04829">
+        <button class="tombol kecil" type="submit">Tambahkan ke daftar</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  <p class="jujur">Pemeriksaan ini tidak memakai AI sama sekali. Entri yang tidak ditemukan bukan berarti palsu: buku lama dan sumber lokal kadang memang tidak ada di database.</p>
+  {% endif %}
+</div>
+<script>
+var FID = {{ fid }};
+var KEADAAN = "{{ keadaan }}";
+function cekStatus() {
+  fetch('/v1/pustaka/status?file_id=' + FID)
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.keadaan && d.keadaan !== 'jalan') { location.reload(); return; }
+      setTimeout(cekStatus, 3000);
+    })
+    .catch(function () { setTimeout(cekStatus, 5000); });
+}
+function mulaiPeriksa() {
+  var b = document.getElementById('tombol-periksa');
+  if (b) { b.disabled = true; b.textContent = 'Sedang diperiksa...'; }
+  fetch('/v1/pustaka/mulai-latar', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({file_id: FID})
+  })
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    if (d.ok) { cekStatus(); }
+    else if (b) { b.disabled = false; b.textContent = 'Periksa Daftar Pustaka'; }
+  })
+  .catch(function () {
+    if (b) { b.disabled = false; b.textContent = 'Periksa Daftar Pustaka'; }
+  });
+}
+if (KEADAAN === 'jalan') { cekStatus(); }
+</script>
+</body>
+</html>

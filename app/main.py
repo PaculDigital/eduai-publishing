@@ -36,6 +36,7 @@ from . import kunci_tinjau as KT           # Kunci pembimbing tanpa akun (03Okt2
 from . import rute_bagikan                 # Bagikan ke pembimbing (23Sep26)
 from . import rute_alur                    # Gerbang besar + 4 langkah (26Sep26)
 from . import rute_jurnal                  # Jurnal & pencarian referensi (06Okt26)
+from . import rute_pustaka                 # Periksa Daftar Pustaka (16Nov26)
 from . import plagiarisme as _plagiarisme  # Uji Plagiarisme (16Okt26)
 from . import buku as _buku  # Publish Buku — 5 kartu jenis buku (17Okt26)
 from . import submit_jurnal as _submit_jurnal  # Submit Artikel Jurnal (16Okt26)
@@ -134,6 +135,9 @@ app.include_router(rute_pembimbing.router)
 #  rute_pembimbing.py ("tidak menyentuh ai.py") tetap utuh.
 rute_pembimbing_ai.pasang(templates)
 app.include_router(rute_pembimbing_ai.router)
+#  Periksa Daftar Pustaka (16Nov26), halaman hasil + aksi per baris.
+rute_pustaka.pasang(templates)
+app.include_router(rute_pustaka.router)
 
 #  🤝 27Sep26 (T5.1 Opsi A, ACC Bos): TAB 2 dasbor — daftar naskah yang
 #  diundangkan KE akun + jembatan kaitkan link undangan → akun.
