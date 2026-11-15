@@ -309,25 +309,16 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
     {% if ai_aktif %}
     <div class="pt-alat">
       {% if sudah_masuk %}
-      <div class="pt-biaya">
-        {% if biaya_asisten and biaya_asisten.pakai_trial %}
-        Pilihan pertama yang diterima gratis untuk akun ini. Sesudahnya
-        1 Token Revisi per pilihan yang diterima.
-        {% else %}
-        1 Token Revisi per pilihan yang diterima.
-        {% endif %}
-      </div>
       <input type="text" id="perintah-asisten" class="pt-perintah"
              placeholder="Perintah untuk AI (opsional, contoh: perbaiki 2.1)">
       <div class="pt-biaya">Kosongkan bila mau AI memberi pilihan revisi.</div>
       <button type="button" class="pt-btn" id="btn-asisten">
-        Minta AI meninjau naskah
+        Asisten Ai (1 Token)
       </button>
       <div class="pt-pesan" id="pesan-asisten" hidden></div>
       {% else %}
       <div class="pt-biaya">
-        Setiap pilihan yang diterima memakai 1 Token Revisi. Daftar dulu
-        supaya tokennya tersimpan di akunmu.
+        Daftar dulu supaya tokennya tersimpan di akunmu.
       </div>
       <a class="pt-btn" href="/daftar?dari=/tinjau/{{ token }}">
         Daftar dulu untuk memakai Asisten AI

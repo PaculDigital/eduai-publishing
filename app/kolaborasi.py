@@ -137,7 +137,7 @@ async def kolaborasi_asisten(bimbingan_id: int, request: Request,
                              perintah: str | None = Form(None),
                              pilih: str = Form(''),
                              berkas_id: str = Form('')):
-    """Tombol 'Minta AI tinjau naskah' — AI baca naskah, usulan LANGSUNG
+    """Tombol 'Asisten Ai (1 Token)' — AI baca naskah, usulan LANGSUNG
     masuk (C5).
 
     DUA MODE (15 Nov 2026, alur pilihan di sidebar):

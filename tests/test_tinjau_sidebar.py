@@ -215,6 +215,17 @@ def main():
            / 'app' / 'templates' / 'editor.html').read_text()
     cek('template editor: lencana pakai label_jenis + tooltip',
         '{{ ct.label_jenis }}' in _ed and '{{ ct.tooltip_jenis }}' in _ed)
+    cek('tombol Asisten: harga di tombol, tanpa penjelasan potongan',
+        'Asisten Ai (1 Token)' in _tpl
+        and 'Minta AI meninjau naskah' not in _tpl
+        and 'Tinjauan AI memakai 1 Token Revisi' not in _tpl
+        and '1 Token Revisi per pilihan yang diterima.\n' not in _tpl)
+    _kol = (Path(__file__).resolve().parent.parent
+            / 'app' / 'templates' / 'kolaborasi.html').read_text()
+    cek('tombol Asisten kolaborasi: harga di tombol',
+        'Asisten Ai (1 Token)' in _kol
+        and 'Minta AI tinjau naskah' not in _kol
+        and 'Tinjauan AI memakai 1 Token Revisi' not in _kol)
 
     # ── 8. tandai_selesai: pemilik, orang lain, idempoten ──────────────
     cek('tandai_selesai bimbingan benar -> True + hijau + sudah_oke',

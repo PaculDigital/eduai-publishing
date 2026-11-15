@@ -20,7 +20,9 @@ Perbaikan yang diuji di sini (branch agen/wulan/selaraskan-pembimbing-member):
   F2. Pesan saldo kurang Asisten bercabang: AddOn bila bisa, upgrade bila gratis.
   F3. periksa() membedakan 402 (isi ulang/AddOn) dan 403 (upgrade Penulis).
   F4. Formulir identitas di tinjau.html mengarahkan email akun EduAi.
-  F5. Biaya Asisten tampil di /kolaborasi SEBELUM klik (trial / 1 token).
+  F5. Harga Asisten di tombol "Asisten Ai (1 Token)" (Boss 22:48 WIB:
+     tidak usah dijelaskan dipotong 1 token); baris trial pertama gratis
+     tetap ada. Logika biaya_untuk tidak berubah.
 """
 import asyncio
 import os
@@ -256,10 +258,11 @@ def main():
     cek('F5: biaya_untuk sesudah trial -> butuh 1 token',
         b4.get('pakai_trial') is False and b4.get('butuh') == 1)
     tpl_kolab = (ROOT / 'app' / 'templates' / 'kolaborasi.html').read_text()
-    cek('F5: kolaborasi.html menampilkan biaya sebelum klik',
+    cek('F5: harga Asisten di tombol, tanpa penjelasan potongan',
         'biaya_asisten' in tpl_kolab
+        and 'Asisten Ai (1 Token)' in tpl_kolab
         and 'Tinjauan AI pertama gratis' in tpl_kolab
-        and '1 Token Revisi dari saldomu' in tpl_kolab)
+        and 'Tinjauan AI memakai 1 Token Revisi' not in tpl_kolab)
     tpl_tinjau = (ROOT / 'app' / 'templates' / 'tinjau.html').read_text()
     cek('F4: tinjau.html mengarahkan email akun EduAi',
         'email yang sama dengan akun EduAi' in tpl_tinjau)
