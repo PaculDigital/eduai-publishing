@@ -185,6 +185,14 @@ main{flex:1;position:relative;min-height:0;background:#fff}
 .pai-ct-kutip{font-size:12px;color:var(--teks-abu);background:#FFFDF0;border-left:3px solid #E8C547;padding:6px 9px;margin-top:6px;border-radius:0 5px 5px 0;word-break:break-word}
 .pai-ct-btn{margin-top:9px;background:var(--hijau);color:#fff;font-weight:700;font-size:12.5px;padding:8px 16px;border-radius:70px;border:none;font-family:inherit;cursor:pointer}
 .pai-ct-btn:hover{background:var(--hijau-tua)}
+.pai-ct-penulis{font-size:11.5px;color:var(--teks-abu);margin-top:4px}
+.pai-ct-lipat{margin-top:8px;background:none;border:none;color:#146B2C;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;padding:0}
+.pai-ct-lama{margin-top:8px;border-top:1px dashed var(--garis);padding-top:8px}
+.pai-ct-ronde{font-size:12.5px;line-height:1.6;color:#3A3844;margin-bottom:8px;word-break:break-word}
+.pai-ct-ronde-atas{font-size:11.5px;color:var(--teks-abu);margin-bottom:2px}
+.pai-ct-balas{margin-top:10px}
+.pai-ct-balas textarea{width:100%;padding:9px 11px;border:1.5px solid var(--garis);border-radius:9px;font-family:inherit;font-size:13px;resize:vertical;box-sizing:border-box}
+.pai-ct-balas-btn{margin-top:7px;background:#fff;border:1.5px solid var(--hijau);color:#146B2C;font-weight:700;font-size:12.5px;padding:7px 16px;border-radius:70px;cursor:pointer;font-family:inherit}
 
 /* hasil revisi */
 .pai-hasil{background:#F4F8F5;border:1px solid #DCEAE0;border-radius:12px;padding:13px 14px;
@@ -567,14 +575,18 @@ main{flex:1;position:relative;min-height:0;background:#fff}
 {% endif %}
 
     {# ── CATATAN PEMBIMBING (sidebar tinjau, 15 Nov 2026) ─────────────
+       1 kartu = 1 RANTAI = 1 masalah (bukan 1 ronde). Ronde terbaru
+       terbuka, ronde lama terlipat (tombol "Ronde sebelumnya").
        Klik satu catatan → revisi AI untuk catatan itu (1 Token Revisi,
        hanya area itu + tetangga ±1, status otomatis selesai). Tombol
        hanya tampil bila catatan punya alamat bagian yang bisa direvisi
-       dan belum selesai. #}
-    {% if catatan_pembimbing %}
+       dan belum selesai. Form "Balas" mengirim balasan mahasiswa ke
+       rantai yang sama (gratis, tanpa kuota). #}
+    {% if rantai_pembimbing %}
     <div class="pai-catatan">
-      <h3>Catatan Pembimbing ({{ catatan_pembimbing|length }})</h3>
-      {% for ct in catatan_pembimbing %}
+      <h3>Catatan Pembimbing ({{ rantai_pembimbing|length }})</h3>
+      {% for r in rantai_pembimbing %}
+      {% set ct = r.terbaru %}
       <div class="pai-ct{% if ct.selesai %} selesai{% endif %}">
         <div class="pai-ct-atas">
           <span class="pai-ct-jenis">{{ ct.jenis|capitalize }}</span>
@@ -583,8 +595,22 @@ main{flex:1;position:relative;min-height:0;background:#fff}
           {% elif ct.dilewati %}<span class="pai-ct-lencana lewati">Dilewati</span>{% endif %}
         </div>
         <div class="pai-ct-isi">{{ ct.isi }}</div>
+        <div class="pai-ct-penulis">{{ ct.penulis }} &middot; {{ ct.dibuat }}</div>
         {% if ct.teks_asli %}
         <div class="pai-ct-kutip">&ldquo;{{ ct.teks_asli[:180] }}&rdquo;</div>
+        {% endif %}
+        {% if r.lama %}
+        <button type="button" class="pai-ct-lipat" onclick="lipatRondeMhs(this)">
+          Ronde sebelumnya ({{ r.lama|length }})
+        </button>
+        <div class="pai-ct-lama" data-jumlah="{{ r.lama|length }}" hidden>
+          {% for a in r.lama %}
+          <div class="pai-ct-ronde">
+            <div class="pai-ct-ronde-atas"><b>{{ a.penulis }}</b> &middot; {{ a.dibuat }}</div>
+            <div>{{ a.isi }}</div>
+          </div>
+          {% endfor %}
+        </div>
         {% endif %}
         {% if not ct.selesai and ct.section_id %}
         <button type="button" class="pai-ct-btn"
@@ -593,6 +619,13 @@ main{flex:1;position:relative;min-height:0;background:#fff}
           Revisi dengan AI
         </button>
         {% endif %}
+        <form method="post" action="/kolaborasi/balasan" class="pai-ct-balas">
+          <input type="hidden" name="bimbingan_id" value="{{ r.bimbingan_id }}">
+          <input type="hidden" name="induk_id" value="{{ ct.id }}">
+          <textarea name="isi" rows="2" placeholder="Balas catatan ini..."
+                    required></textarea>
+          <button type="submit" class="pai-ct-balas-btn">Balas</button>
+        </form>
       </div>
       {% endfor %}
     </div>
@@ -702,6 +735,15 @@ window.__AI_AWAL__ = {{ (ai_kuota or {})|tojson }};
 window.__AI_ADDON__ = {{ ai_addon|tojson }};
 window.__AI_ADDON_TERKUNCI__ = {{ (ai_addon_terkunci or false)|tojson }};
 window.__AI_FILE_ID__ = {{ berkas.id }};
+/* ── RANTAI BALASAN (15 Nov 2026): lipat/buka ronde lama ── */
+function lipatRondeMhs(tombol) {
+  var wadah = tombol.nextElementSibling;
+  if (!wadah) { return; }
+  var buka = wadah.hidden;
+  wadah.hidden = !buka;
+  tombol.textContent = buka ? 'Sembunyikan ronde sebelumnya'
+    : 'Ronde sebelumnya (' + (wadah.dataset.jumlah || '') + ')';
+}
 </script>
 <script>
 (function () {

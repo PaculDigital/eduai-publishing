@@ -79,6 +79,7 @@ def bagikan(
     email: str = Form(''),
     hari: int = Form(30),
     file_id: int = Form(0),
+    wa_balasan: str = Form('1'),
     db: Session = Depends(get_db),
 ):
     """Buat link tinjau baru untuk seorang pembimbing.
@@ -119,7 +120,9 @@ def bagikan(
 
     b, token = P.buat_bimbingan(db, u.id, nama, hari=hari,
                                 wa=wa, email=email,
-                                file_id=fid, judul=judul)
+                                file_id=fid, judul=judul,
+                                wa_balasan=(1 if (wa_balasan or '').strip() == '1'
+                                            else 0))
 
     link = f'{P.BASE_PUBLIK}/tinjau/{token}'
     kirim = P.tautan_kirim(b, token, nama_mhs=u.nama or '', judul=judul)

@@ -1627,6 +1627,9 @@ function kbKeKonfirmasi() {
     (selNaskah && selNaskah.selectedIndex >= 0)
       ? selNaskah.options[selNaskah.selectedIndex].text : 'Semua naskah saya';
   kb('kb-r-hari').textContent = kb('kb-hari').value + ' hari';
+  kb('kb-r-balasan').textContent =
+    (kb('kb-balasan') && kb('kb-balasan').checked)
+      ? 'Nyala (WhatsApp)' : 'Mati';
   kb('kb-tanya-judul').textContent = 'Buat tautan untuk ' + nama + '?';
   kbTampilkan('kb-tahap-konfirmasi');
 }
@@ -1641,6 +1644,8 @@ async function kbBuat() {
     data.append('nama', kb('kb-nama').value.trim());
     data.append('wa', kb('kb-wa').value.trim());
     data.append('hari', kb('kb-hari').value);
+    data.append('wa_balasan',
+                (kb('kb-balasan') && kb('kb-balasan').checked) ? '1' : '0');
     data.append('file_id', kb('kb-naskah').value || '0');
 
     var r = await fetch('/pembimbing/bagikan', { method: 'POST', body: data });
@@ -2318,6 +2323,14 @@ function kbArsipLipat() {
             <option value="7">7 hari</option>
           </select>
         </div>
+        <div class="kb-medan">
+          <label for="kb-balasan" style="display:flex;gap:9px;align-items:flex-start;font-weight:400;line-height:1.5">
+            <input type="checkbox" id="kb-balasan" checked
+                   style="margin-top:3px;flex-shrink:0">
+            <span>Beri tahu pembimbing lewat WhatsApp saat saya membalas
+                  catatannya. Bisa dimatikan kapan saja.</span>
+          </label>
+        </div>
       </div>
       <div class="kb-kaki">
         <button type="button" class="kb-batal" onclick="tutupBagikan()">Batal</button>
@@ -2339,6 +2352,7 @@ function kbArsipLipat() {
           <div><b>WhatsApp</b> <span id="kb-r-wa">—</span></div>
           <div><b>Naskah</b> <span id="kb-r-naskah">—</span></div>
           <div><b>Berlaku</b> <span id="kb-r-hari">—</span></div>
+          <div><b>Notifikasi balasan</b> <span id="kb-r-balasan">—</span></div>
         </div>
         <div class="kb-catatan">
           Pembimbing hanya dapat membaca dan memberi catatan.

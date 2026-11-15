@@ -204,6 +204,8 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
                line-height:1.65;border-top:1px dashed var(--garis);padding-top:9px}
 .pt-baris.buka .detail{display:block}
 .pt-baris.buka .isi{-webkit-line-clamp:unset;display:block}
+.pt-lipat{margin:6px 0 2px;background:none;border:none;color:#146B2C;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;padding:0}
+.pt-lama{border-top:1px dashed #E7E7EA;padding-top:8px;margin-top:4px}
 .pt-baris .alamat{font-size:12px;font-weight:700;color:#146B2C;margin-bottom:6px}
 .detail .teks-asli{background:#FFFDF0;border-left:3px solid var(--kuning-tepi);
                    padding:8px 11px;margin:7px 0;border-radius:0 5px 5px 0;
@@ -412,15 +414,34 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
           <div class="alamat">
             {% if simpul.terbaru.section_judul %}{{ simpul.terbaru.section_judul }}{% elif simpul.terbaru.section_id %}{{ simpul.terbaru.section_id }}{% else %}Catatan umum{% endif %}
           </div>
-          <div><b>Perbaikan {{ simpul.kepala.ronde }}</b>
-            &middot; {{ simpul.kepala.dibuat.strftime('%d %b %Y') }}</div>
-          <div style="margin:3px 0 8px">{{ simpul.kepala.isi }}</div>
+          {# ── RONDE TERBARU: selalu terbuka ────────────────────────── #}
+          <div><b>Perbaikan {{ simpul.terbaru.ronde }}</b>
+            &middot; {{ 'Pembimbing' if simpul.terbaru.dari_pembimbing else 'Mahasiswa' }}
+            &middot; {{ simpul.terbaru.dibuat.strftime('%d %b %Y') }}</div>
+          <div style="margin:3px 0 8px">{{ simpul.terbaru.isi }}</div>
 
-          {% for anak in simpul.anak %}
-          <div><b>Perbaikan {{ anak.ronde }}</b>
-            &middot; {{ anak.dibuat.strftime('%d %b %Y') }}</div>
-          <div style="margin:3px 0 8px">{{ anak.isi }}</div>
-          {% endfor %}
+          {# ── RONDE LAMA (15 Nov 2026): terlipat, ketuk untuk membuka ── #}
+          {% if simpul.jumlah_ronde > 1 %}
+          <button type="button" class="pt-lipat" onclick="lipatRonde(this, event)">
+            Ronde sebelumnya ({{ simpul.jumlah_ronde - 1 }})
+          </button>
+          <div class="pt-lama" data-jumlah="{{ simpul.jumlah_ronde - 1 }}" hidden>
+            {% if simpul.kepala.id != simpul.terbaru.id %}
+            <div><b>Perbaikan {{ simpul.kepala.ronde }}</b>
+              &middot; {{ 'Pembimbing' if simpul.kepala.dari_pembimbing else 'Mahasiswa' }}
+              &middot; {{ simpul.kepala.dibuat.strftime('%d %b %Y') }}</div>
+            <div style="margin:3px 0 8px">{{ simpul.kepala.isi }}</div>
+            {% endif %}
+            {% for anak in simpul.anak %}
+            {% if anak.id != simpul.terbaru.id %}
+            <div><b>Perbaikan {{ anak.ronde }}</b>
+              &middot; {{ 'Pembimbing' if anak.dari_pembimbing else 'Mahasiswa' }}
+              &middot; {{ anak.dibuat.strftime('%d %b %Y') }}</div>
+            <div style="margin:3px 0 8px">{{ anak.isi }}</div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
 
           {% set sor = sorotan.get(simpul.terbaru.id) if sorotan else None %}
           {% if simpul.terbaru.teks_asli %}
@@ -660,6 +681,18 @@ if(window.innerWidth < 900) bukaPanelTinjau(false);
 
 //  Buka/tutup detail baris catatan.
 function bukaBaris(el){ el.classList.toggle('buka'); }
+/* ── RANTAI BALASAN (15 Nov 2026): lipat/buka ronde lama ──────────
+   stopPropagation WAJIB: tombol ada di dalam .pt-baris yang kliknya
+   membuka/menutup baris — tanpa ini, menekan tombol ikut menutup baris. */
+function lipatRonde(btn, ev){
+  if (ev) { ev.stopPropagation(); }
+  var wadah = btn.nextElementSibling;
+  if (!wadah) { return; }
+  var buka = wadah.hidden;
+  wadah.hidden = !buka;
+  btn.textContent = buka ? 'Sembunyikan ronde sebelumnya'
+    : 'Ronde sebelumnya (' + (wadah.dataset.jumlah || '') + ')';
+}
 
 //  Buka/tutup kelompok bab (hanya satu terbuka).
 function bukaBab(el){

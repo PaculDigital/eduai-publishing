@@ -171,6 +171,82 @@ async def kolaborasi_asisten(bimbingan_id: int, request: Request,
     return hasil
 
 
+@router.post('/kolaborasi/balasan')
+def kolaborasi_balasan(
+    bimbingan_id: int = Form(0),
+    induk_id: int = Form(0),
+    isi: str = Form(''),
+    u: User = Depends(wajib_login),
+    db: Session = Depends(get_db),
+):
+    """Mahasiswa membalas satu rantai catatan (15 Nov 2026, GAS Bos 21:56 WIB).
+
+    Balasan menempel ke catatan TERBARU rantai (induk_id) dan mewarisi
+    alamat bagian + berkas dari catatan itu — mahasiswa tidak memilih
+    alamat sendiri (sama seperti balasan pembimbing di jalur token).
+    Penulis ditandai mahasiswa (dari_pembimbing=False, warna biru).
+    Catatan TIDAK kena kuota. Sesudah tersimpan, pembimbing dikabari
+    lewat WA (best-effort, saklar per-tautan) — gagal kirim tidak
+    menggagalkan balasan.
+
+    Keamanan: bimbingan WAJIB milik akun ini (pemilik naskah saja —
+    pembimbing berakun membalas lewat jalur token, bukan di sini);
+    induk WAJIB catatan di bimbingan itu.
+    """
+    from . import pembimbing as P
+    from .models import BerkasPembimbingan, CatatanPembimbing, FileBerkas
+    b = db.get(Pembimbingan, bimbingan_id) if bimbingan_id else None
+    if b is None or b.user_id != u.id or b.dicabut:
+        return RedirectResponse('/naskah', status_code=303)
+    induk = db.get(CatatanPembimbing, induk_id) if induk_id else None
+    if induk is None or induk.pembimbingan_id != b.id:
+        return RedirectResponse('/naskah', status_code=303)
+    if not (isi or '').strip():
+        return _kembali_editor(db, b, induk)
+    P.catat(db, b, isi,
+            section_id=induk.section_id or '',
+            section_judul=induk.section_judul or '',
+            dari_pembimbing=False, induk_id=induk.id,
+            berkas_id=induk.berkas_id)
+    try:
+        _fid = None
+        _judul = 'Naskah'
+        if induk.berkas_id is not None:
+            _bk = db.get(BerkasPembimbingan, induk.berkas_id)
+            if _bk is not None:
+                _fid = _bk.file_id
+        if _fid is None:
+            _semua = P.daftar_berkas(db, b.id)
+            if _semua:
+                _fid = _semua[0].file_id
+        if _fid is not None:
+            _fb = db.get(FileBerkas, _fid)
+            if _fb is not None and (_fb.nama or '').strip():
+                _judul = _fb.nama
+        P.beri_tahu_balasan_pembimbing(db, b, _judul)
+    except Exception as e:                                     # noqa: BLE001
+        log.warning('[kolaborasi] WA balasan ke pembimbing gagal: %s', e)
+    return _kembali_editor(db, b, induk)
+
+
+def _kembali_editor(db: Session, b: Pembimbingan, induk):
+    """Kembali ke editor naskah rantai itu, atau /naskah bila tak ada."""
+    from . import pembimbing as P
+    from .models import BerkasPembimbingan
+    fid = None
+    if induk is not None and getattr(induk, 'berkas_id', None) is not None:
+        bk = db.get(BerkasPembimbingan, induk.berkas_id)
+        if bk is not None:
+            fid = bk.file_id
+    if fid is None:
+        semua = P.daftar_berkas(db, b.id)
+        if semua:
+            fid = semua[0].file_id
+    if fid:
+        return RedirectResponse(f'/edit/{fid}', status_code=303)
+    return RedirectResponse('/naskah', status_code=303)
+
+
 def b_pemilik(db: Session, b: Pembimbingan) -> User:
     """User PEMILIK naskah.
 

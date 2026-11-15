@@ -1817,6 +1817,7 @@ def simpan_setelan_wa(
     pembelian: str = Form(''),
     undangan: str = Form(''),
     revisi: str = Form(''),
+    balasan: str = Form(''),
     db: Session = Depends(get_db),
     u: User = Depends(wajib_login),
 ):
@@ -1834,6 +1835,7 @@ def simpan_setelan_wa(
     wa_mod.atur(db, u.id, 'pembelian', bool(pembelian))
     wa_mod.atur(db, u.id, 'undangan', bool(undangan))
     wa_mod.atur(db, u.id, 'revisi', bool(revisi))
+    wa_mod.atur(db, u.id, 'balasan', bool(balasan))
     db.commit()
     pesan = 'Setelan WhatsApp tersimpan.'
     if nomor:
@@ -3623,32 +3625,29 @@ def halaman_edit(fid: int, request: Request, u: User = Depends(wajib_login),
     #  naskah. Catatan tanpa alamat berkas (umum) ikut tampil: alamat
     #  yang dipakai revisi adalah section-nya, bukan berkasnya.
     catatan_pembimbing = []
+    rantai_pembimbing = []
     try:
         from . import pembimbing as _P                 # noqa: PLC0415
         from .models import Pembimbingan as _BIM       # noqa: PLC0415
         for _bim in db.query(_BIM).filter(_BIM.user_id == u.id).all():
             _bk_ids = {bk.id for bk in _P.daftar_berkas(db, _bim.id)
                        if bk.file_id == fb.id}
-            for c in _P.daftar_catatan(db, _bim.id, semuanya=True):
+            _semua = _P.daftar_catatan(db, _bim.id, semuanya=True)
+            for c in _semua:
                 if (getattr(c, 'berkas_id', None) is not None
                         and c.berkas_id not in _bk_ids):
                     continue
-                catatan_pembimbing.append({
-                    'id': c.id,
-                    'isi': c.isi or '',
-                    'jenis': _P.jenis_catatan(c),
-                    'section_id': c.section_id or '',
-                    'section_judul': c.section_judul or '',
-                    'teks_asli': c.teks_asli or '',
-                    'warna': c.warna or 'kuning',
-                    'selesai': bool(c.sudah_oke),
-                    'dilewati': bool(getattr(c, 'dilewati', False)),
-                    'dibuat': (c.dibuat.strftime('%d %b %Y')
-                               if getattr(c, 'dibuat', None) else ''),
-                })
+                catatan_pembimbing.append(_P._dict_catatan(c))
+            #  ── RANTAI (15 Nov 2026, GAS Bos 21:56 WIB) ─────────────
+            #  1 rantai = 1 masalah, rondenya di dalam (lihat
+            #  pembimbing.rantai_untuk_editor) — rantai tidak boleh
+            #  terbelah antara dua berkas.
+            rantai_pembimbing.extend(
+                _P.rantai_untuk_editor(db, _bim.id, _bk_ids))
     except Exception as e:                              # pragma: no cover
         log.warning('[editor] gagal baca catatan pembimbing: %s', e)
         catatan_pembimbing = []
+        rantai_pembimbing = []
 
     return templates.TemplateResponse('editor.html', {
         'request': request, 'user': u, 'berkas': fb, 'cfg': cfg,
@@ -3656,6 +3655,7 @@ def halaman_edit(fid: int, request: Request, u: User = Depends(wajib_login),
         'sesi_aktif': aktif_skrg, 'batas_sesi': MAX_SESI_EDIT,
         'ai_kuota': ringkas_ai,
         'catatan_pembimbing': catatan_pembimbing,
+        'rantai_pembimbing': rantai_pembimbing,
         'ai_member': _ai_member(db, u),
         'ai_addon': [
             {'jenis': k, **v}

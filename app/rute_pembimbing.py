@@ -522,6 +522,29 @@ def tambah_catatan(token: str, isi: str = Form(''), section_id: str = Form(''),
         except Exception as e:                                 # noqa: BLE001
             log.warning('[pembimbing] notifikasi catatan baru gagal: %s', e)
 
+        #  🔔 WA BALASAN (15 Nov 2026, GAS Bos 21:56 WIB): pembimbing
+        #  MEMBALAS rantai (induk_id ada) → kabari mahasiswa lewat WA
+        #  (saklar 'balasan' di Setelan WA, bawaan NYALA). Best-effort:
+        #  gagal kirim TIDAK menggagalkan balasan. Catatan BARU (tanpa
+        #  induk) tidak lewat jalur ini — lonceng di atas yang berbicara.
+        if induk is not None:
+            try:
+                _fid = (bk_terpilih.file_id
+                        if bk_terpilih is not None else None)
+                if _fid is None:
+                    _semua_bk = P.daftar_berkas(db, b.id)
+                    if _semua_bk:
+                        _fid = _semua_bk[0].file_id
+                _judul = 'Naskah'
+                if _fid is not None:
+                    from .models import FileBerkas as _FB
+                    _fb = db.get(_FB, _fid)
+                    if _fb is not None and (_fb.nama or '').strip():
+                        _judul = _fb.nama
+                P.beri_tahu_balasan_mahasiswa(db, b, _fid, _judul)
+            except Exception as e:                             # noqa: BLE001
+                log.warning('[pembimbing] WA balasan ke mahasiswa gagal: %s', e)
+
         log.info('[pembimbing] catatan baru di bimbingan %s (bab %s, '
                  'sorotan %s, lampiran %s)', b.id, section_id,
                  'ada' if (teks_asli or '').strip() else '-', nama_disk or '-')

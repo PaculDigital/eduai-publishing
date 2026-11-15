@@ -101,7 +101,7 @@ def token_sah(token: str) -> bool:
 def buat_bimbingan(db: Session, user_id: int, nama: str,
                    hari: int = 7, wa: str = '', email: str = '',
                    file_id: int | None = None,
-                   judul: str = '') -> tuple[Pembimbingan, str]:
+                   judul: str = '', wa_balasan: int = 1) -> tuple[Pembimbingan, str]:
     """Buat bimbingan baru. Return (baris, TOKEN MENTAH).
 
     ⚠️ TOKEN MENTAH HANYA ADA DI SINI. Setelah fungsi ini selesai, token
@@ -129,6 +129,7 @@ def buat_bimbingan(db: Session, user_id: int, nama: str,
         nama=nama_bersih,
         wa=bersihkan_wa(wa),
         email=(email or '').strip()[:160],
+        wa_balasan=1 if wa_balasan else 0,
         token_sidik=sidik_token(token),
         hari=hari,
         kedaluwarsa=_sekarang() + timedelta(days=hari),
@@ -228,6 +229,83 @@ def tautan_kirim(b: Pembimbingan, token: str, nama_mhs: str = '',
     if not b.wa:
         return ''
     return f'https://wa.me/{b.wa}?text={quote(pesan)}'
+
+
+def tautan_tinjau_tersimpan(db: Session, bimbingan_id: int) -> str:
+    """Tautan /tinjau/{token} bila token mentahnya masih tersimpan.
+
+    Token mentah HANYA tersimpan di Setelan (kunci kolaborasi_token_<id>)
+    bila pembimbing pernah membuka link sambil login — kalau belum pernah,
+    kembalikan '' (jujur: link tidak bisa dibuat ulang, bukan ditebak).
+    """
+    try:
+        from sqlalchemy import select
+        from .models import Setelan
+        kunci = f'kolaborasi_token_{bimbingan_id}'
+        baris = db.scalars(
+            select(Setelan).where(Setelan.kunci == kunci)).first()
+        if baris and (baris.nilai or '').strip():
+            return f'{BASE_PUBLIK}/tinjau/{baris.nilai.strip()}'
+    except Exception as e:                                 # noqa: BLE001
+        log.warning('[pembimbing] gagal baca token tersimpan %s: %s',
+                    bimbingan_id, e)
+    return ''
+
+
+def beri_tahu_balasan_pembimbing(db: Session, b: Pembimbingan,
+                                 judul: str = '') -> bool:
+    """WA ke pembimbing: mahasiswa membalas catatannya. Best-effort.
+
+    Kirim HANYA bila saklar per-tautan `wa_balasan` menyala DAN nomor WA
+    pembimbing ada. Isi singkat + tautan tinjau bila tersimpan; tanpa isi
+    catatan lengkap. TIDAK PERNAH melempar — gagal kirim = False, balasan
+    tetap tersimpan (pemanggil tidak boleh menggagalkan penyimpanan).
+    """
+    try:
+        if not (getattr(b, 'wa_balasan', 1) or 0):
+            return False
+        nomor = bersihkan_wa(getattr(b, 'wa', '') or '')
+        if not nomor:
+            return False
+        from . import wa as _wa
+        nama = (getattr(b, 'nama', '') or 'Pembimbing').strip()
+        link = tautan_tinjau_tersimpan(db, b.id)
+        pesan = (
+            f'EduAi: Mahasiswa membalas catatan Anda di naskah '
+            f'"{(judul or "Naskah").strip()[:80]}".\n\n'
+            f'Bapak/Ibu {nama}, silakan buka tautan tinjau'
+            + (f':\n{link}' if link else
+               ' yang Anda terima sebelumnya')
+            + '\n\nTerima kasih.')
+        return bool(_wa.kirim(nomor, pesan))
+    except Exception as e:                                 # noqa: BLE001
+        log.warning('[pembimbing] WA balasan ke pembimbing gagal: %s', e)
+        return False
+
+
+def beri_tahu_balasan_mahasiswa(db: Session, b: Pembimbingan,
+                                file_id: int | None,
+                                judul: str = '') -> bool:
+    """WA ke mahasiswa: pembimbing membalas catatannya. Best-effort.
+
+    Lewat kirim_user jenis 'balasan' (saklar di Setelan WA, bawaan NYALA)
+    — kalau mahasiswa mematikan saklarnya atau tidak menyimpan nomor WA,
+    kirim_user mengembalikan False dan penanda di aplikasi (lonceng
+    notifikasi, sudah berbunyi untuk setiap catatan baru) yang berbicara.
+    TIDAK PERNAH melempar.
+    """
+    try:
+        from . import wa as _wa
+        tautan = (f'{BASE_PUBLIK}/edit/{file_id}' if file_id
+                  else f'{BASE_PUBLIK}/naskah')
+        pesan = (
+            f'EduAi: Pembimbing membalas catatan di naskah '
+            f'"{(judul or "Naskah").strip()[:80]}".\n\n'
+            f'Buka:\n{tautan}')
+        return bool(_wa.kirim_user(db, b.user_id, 'balasan', pesan))
+    except Exception as e:                                 # noqa: BLE001
+        log.warning('[pembimbing] WA balasan ke mahasiswa gagal: %s', e)
+        return False
 
 
 def daftar_lengkap(db: Session, user_id: int) -> list[dict]:
@@ -1073,6 +1151,60 @@ def rangkai(catatan: list[CatatanPembimbing]) -> list[dict]:
         s['terbaru'] = s['anak'][-1] if s['anak'] else s['kepala']
     hasil.sort(key=lambda s: s['terbaru'].dibuat, reverse=True)
     return hasil
+
+
+def _dict_catatan(c) -> dict:
+    """Satu catatan jadi dict untuk template (panel editor).
+
+    Label `penulis` WAJIB dari `dari_pembimbing` — balasan mahasiswa
+    (dari_pembimbing=0, warna biru) tidak boleh tampil sebagai pembimbing.
+    """
+    return {
+        'id': c.id,
+        'isi': c.isi or '',
+        'jenis': jenis_catatan(c),
+        'section_id': c.section_id or '',
+        'section_judul': c.section_judul or '',
+        'teks_asli': c.teks_asli or '',
+        'warna': c.warna or 'kuning',
+        'selesai': bool(c.sudah_oke),
+        'dilewati': bool(getattr(c, 'dilewati', False)),
+        'dibuat': (c.dibuat.strftime('%d %b %Y')
+                   if getattr(c, 'dibuat', None) else ''),
+        'penulis': ('Pembimbing' if getattr(c, 'dari_pembimbing', 1)
+                    else 'Mahasiswa'),
+        'ronde': c.ronde or 1,
+    }
+
+
+def rantai_untuk_editor(db: Session, bimbingan_id: int,
+                        bk_ids: set) -> list[dict]:
+    """Rantai catatan satu bimbingan untuk panel editor mahasiswa.
+
+    1 rantai = 1 masalah (kepala + anak + terbaru + lama). Rantai masuk
+    bila ADA anggotanya yang menempel di berkas ini (atau tanpa berkas)
+    — rantai tidak boleh terbelah antara dua berkas.
+    """
+    semua = daftar_catatan(db, bimbingan_id, semuanya=True)
+    keluar = []
+    for s in rangkai(semua):
+        anggota = [s['kepala']] + list(s.get('anak') or [])
+        if not any((getattr(a, 'berkas_id', None) is None
+                    or a.berkas_id in bk_ids) for a in anggota):
+            continue
+        keluar.append({
+            'bimbingan_id': bimbingan_id,
+            'jumlah_ronde': s['jumlah_ronde'],
+            'kepala': _dict_catatan(s['kepala']),
+            'terbaru': _dict_catatan(s['terbaru']),
+            'anak': [_dict_catatan(a) for a in s.get('anak') or []],
+            #  Ronde lama (terlipat di layar): kepala bila bukan terbaru
+            #  + semua anak kecuali yang terakhir.
+            'lama': ([_dict_catatan(s['kepala'])]
+                     if s['kepala'].id != s['terbaru'].id else [])
+                    + [_dict_catatan(a) for a in (s.get('anak') or [])[:-1]],
+        })
+    return keluar
 
 
 def ringkas(catatan: list[CatatanPembimbing]) -> dict:
