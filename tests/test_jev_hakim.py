@@ -3383,19 +3383,38 @@ def main():
         and all(n == len(_susun0['baris']) for n in _audit_jejak),
         str(_audit_jejak))
 
-    # RH-1c. judul subbab ditambah -> baca penuh
+    # RH-1c. judul subbab ditambah (1 judul = struktural KECIL, 15 Nov 2026)
+    #   -> hemat (bukan baca penuh lagi), label IDENTIK dengan baca penuh.
     _teks2 = _TEKS_RH.replace(
         'Pertanyaan penelitian kedua membahas peran media sosial dalam pemasaran.\n',
         'Pertanyaan penelitian kedua membahas peran media sosial dalam pemasaran.\n'
         '1.3 Metode Penelitian\n'
         'Metode penelitian ini memakai pendekatan kuantitatif.\n')
     _rencana2 = RH.rencanakan(_peta0, S3.susun_teks(_teks2)['baris'])
-    cek('rh-subbab-baru: judul subbab ditambah -> baca penuh',
-        _rencana2.get('jalan') == 'penuh', str(_rencana2.get('alasan')))
-    cek('rh-subbab-baru: periksa_hemat kembalikan None (pemanggil baca penuh)',
-        RH.periksa_hemat(_teks2, _peta0, fn_susun_teks=S3.susun_teks,
-                         fn_petakan_teks=_petakan_palsu_rh([]),
-                         fn_pendapat_kedua=None) is None)
+    cek('rh-subbab-baru: 1 judul subbab ditambah -> hemat, bukan penuh',
+        _rencana2.get('jalan') == 'hemat'
+        and _rencana2.get('struktural_kecil') is True,
+        str(_rencana2.get('alasan')))
+    _panggilan2 = []
+    _r2 = RH.periksa_hemat(_teks2, _peta0, fn_susun_teks=S3.susun_teks,
+                           fn_petakan_teks=_petakan_palsu_rh(_panggilan2),
+                           fn_pendapat_kedua=None)
+    _susun2 = S3.susun_teks(_teks2)
+    _penuh2 = _petakan_palsu_rh([])(_teks2, 0, len(_susun2['baris']))
+    _label_hemat2 = ({int(k): v for k, v in
+                      ((_r2 or {}).get('simpan') or {})
+                      .get('peta_surveyor', {}).get('label', {}).items()}
+                     if _r2 and _r2.get('simpan') else {})
+    _label_penuh2 = _penuh2.get('label') or {}
+    _beda2 = {i for i in set(_label_penuh2) | set(_label_hemat2)
+              if _label_penuh2.get(i) != _label_hemat2.get(i)}
+    cek('rh-subbab-baru: hemat jalan, label IDENTIK dengan baca penuh',
+        _r2 is not None and _r2.get('jalan') == 'hemat' and not _beda2,
+        'beda di ' + str(sorted(_beda2)[:10]))
+    cek('rh-subbab-baru: hemat memanggil Jev hanya untuk rentang',
+        _r2 is not None and len(_panggilan2) == 1
+        and _panggilan2[0][1] - _panggilan2[0][0] < len(_susun2['baris']),
+        str(_panggilan2))
 
     # RH-1d. peta lama tanpa sidik per bagian -> baca penuh, jangan crash
     cek('rh-legacy: peta tanpa sidik per bagian -> None (baca penuh)',
@@ -3523,8 +3542,29 @@ def main():
         cek('rh-regresi: hemat memanggil Jev lebih sedikit dari baca penuh',
             0 < _panggilan_hemat1 < _panggilan_penuh1,
             f'{_panggilan_hemat1} vs {_panggilan_penuh1}')
-        cek('rh-regresi: subbab ditambah (jalur nyata) -> None (baca penuh)',
-            RH.periksa_hemat(_teks2, _peta_penuh0) is None)
+        FAKE_SATPAM.jumlah_choice = 0
+        _penuh2 = P.petakan_dari_teks(_teks2, putaran=1)
+        _panggilan_penuh2 = FAKE_SATPAM.jumlah_choice
+        FAKE_SATPAM.jumlah_choice = 0
+        _r_hemat2 = RH.periksa_hemat(_teks2, _peta_penuh0)
+        _panggilan_hemat2 = FAKE_SATPAM.jumlah_choice
+        print(f'    [rh-bukti] penuh T2 (subbab baru): {_panggilan_penuh2} '
+              f'panggilan Jev (choice); hemat T2: {_panggilan_hemat2} '
+              f'panggilan')
+        _label_penuh2 = _penuh2.get('label') or {}
+        _label_hemat2 = ({int(k): v for k, v in
+                          ((_r_hemat2 or {}).get('simpan') or {})
+                          .get('peta_surveyor', {}).get('label', {}).items()}
+                         if _r_hemat2 and _r_hemat2.get('simpan') else {})
+        _beda2 = {i for i in set(_label_penuh2) | set(_label_hemat2)
+                  if _label_penuh2.get(i) != _label_hemat2.get(i)}
+        cek('rh-regresi: subbab ditambah (jalur nyata) -> hemat, label '
+            'IDENTIK dengan baca penuh',
+            _r_hemat2 is not None and _r_hemat2.get('jalan') == 'hemat'
+            and not _beda2, 'beda di ' + str(sorted(_beda2)[:10]))
+        cek('rh-regresi: subbab ditambah hemat lebih murah dari baca penuh',
+            0 < _panggilan_hemat2 < _panggilan_penuh2,
+            f'{_panggilan_hemat2} vs {_panggilan_penuh2}')
     finally:
         if _env_agen is None:
             os.environ.pop('EDUAI_AGEN_KEDUA_AKTIF', None)

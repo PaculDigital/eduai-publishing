@@ -1333,6 +1333,42 @@ class JudulAlternatifLog(Base):
     dibuat: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
 
+class AntreanPeta(Base):
+    """Antrean admin pemeriksaan struktur Jev/Hakim (15 Nov 2026, alur pilot).
+
+    Satu baris = SATU baris naskah yang Hakim tandai ragu/curiga.
+    Mahasiswa TIDAK PERNAH ditanya — yang memutuskan hanya admin (Boss)
+    lewat pilihan ganda BAB / SUB-BAB / PARAGRAF / BIASA + "Lewati".
+    Keputusan admin DIREKAM di sini sebagai ground truth baru (loop
+    belajar): baris + tetangga + label Jev + label akhir + pilihan admin.
+    Tabel BARU, dibuat create_all().
+    """
+
+    __tablename__ = 'antrean_peta'
+    __table_args__ = (
+        UniqueConstraint('file_id', 'peta_sidik', 'baris_idx',
+                         name='uq_antrean_file_sidik_baris'),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    file_id: Mapped[int] = mapped_column(ForeignKey('files.id'), index=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), index=True, nullable=False)
+    peta_sidik: Mapped[str] = mapped_column(String(64), default='', index=True)
+    baris_idx: Mapped[int] = mapped_column(Integer, nullable=False)
+    teks: Mapped[str] = mapped_column(Text, default='')
+    tetangga: Mapped[str] = mapped_column(Text, default='{}')
+    label_jev: Mapped[str] = mapped_column(String(20), default='')
+    label_akhir: Mapped[str] = mapped_column(String(20), default='')
+    status_hakim: Mapped[str] = mapped_column(String(20), default='')
+    alasan: Mapped[str] = mapped_column(Text, default='[]')
+    status: Mapped[str] = mapped_column(String(20), default='menunggu', index=True)
+    keputusan: Mapped[str] = mapped_column(String(20), default='')
+    diputuskan_oleh: Mapped[int] = mapped_column(Integer, default=0)
+    diputuskan_pada: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    dibuat: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    diubah: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
+
+
 def init_db() -> None:
     Base.metadata.create_all(engine)
     _migrasi_kolom()

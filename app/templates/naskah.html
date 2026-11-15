@@ -533,6 +533,26 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
 .aksi a:hover{border-color:var(--hijau);color:var(--hijau)}
 .aksi button.hapus:hover{border-color:#E5484D;color:#E5484D}
 
+/* --- Periksa Struktur (alur pilot Jev/Hakim, 15 Nov 2026) ---
+   Tombol utama: oranye menonjol (ikut .tombol-utama #F4A025), lebih besar
+   dari tombol lain. Keadaan nonaktif: abu-abu, tidak bisa ditekan. */
+.aksi button.periksa{background:#F4A025;border-color:#F4A025;color:#fff;
+    font-size:14px;font-weight:800;padding:10px 20px;
+    box-shadow:0 3px 10px rgba(244,160,37,.45)}
+.aksi button.periksa:hover{background:#e08d10;border-color:#e08d10;color:#fff}
+.aksi button.periksa:disabled{background:#d8d2c7;border-color:#d8d2c7;color:#8a8276;
+    cursor:default;box-shadow:none}
+.aksi button.periksa.sedang{background:#fff3d6;border-color:#F4A025;color:#8a6d00}
+.panel-struktur{background:#fff;border:1px solid var(--garis);border-radius:13px;
+    padding:16px 18px;margin:-4px 0 11px}
+.panel-struktur h4{font-size:15px;margin-bottom:4px}
+.panel-struktur .waktu{font-size:12.5px;color:var(--teks-abu);margin-bottom:10px}
+.panel-struktur ul{margin:4px 0 4px 20px;font-size:14px}
+.panel-struktur li{margin-bottom:4px}
+.panel-struktur .tanda-diperiksa{color:#8a6d00;font-weight:700;font-size:12px}
+.panel-struktur .keterangan{font-size:13px;color:var(--teks-abu);margin-top:8px}
+.panel-struktur .galat{color:#8c2f20;font-size:14px}
+
 /* --- tong sampah (ACC Bos 14Sep26) --- */
 .judul-baris{display:flex;align-items:center;justify-content:space-between;gap:14px;
              flex-wrap:wrap;margin-bottom:16px}
@@ -959,6 +979,9 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
         </div>
       </div>
       <div class="aksi">
+        {% if e in ['docx','odt','txt','md','markdown','csv','pdf'] %}
+        <button class="periksa" type="button" data-periksa data-file-id="{{ f.id }}">Periksa Struktur</button>
+        {% endif %}
         {% if f.bisa_edit %}
         <a href="/edit/{{ f.id }}" class="edit" title="Edit langsung di browser">
           {{ ikon('pencil', 15) }} Edit
@@ -978,6 +1001,9 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
         <button class="hapus" onclick="hapusBerkas({{ f.id }}, '{{ f.nama|e }}')">{{ ikon('trash-2', 15) }} Hapus</button>
       </div>
     </div>
+    {% if e in ['docx','odt','txt','md','markdown','csv','pdf'] %}
+    <div class="panel-struktur" id="panel-{{ f.id }}" hidden></div>
+    {% endif %}
     {% endfor %}
   {% else %}
     <div class="kosong">
@@ -1150,6 +1176,110 @@ function fdPesan(t) {
   if (window.notif) { notif(t, 'galat'); return; }
   alert(t);
 }
+</script>
+
+<script>
+/* ── PERIKSA STRUKTUR (alur pilot Jev/Hakim, 15 Nov 2026) ─────────────
+   Tombol aktif / "Sudah Diperiksa" (nonaktif) ditentukan server lewat
+   /api/ai/v1/peta/status — 0 panggilan Jev. Bila naskah berubah melewati
+   ambang BESAR, halaman memicu pemeriksaan otomatis diam-diam sekali
+   (POST /api/ai/v1/peta/otomatis). Mahasiswa tidak pernah ditanya apa pun. */
+(function () {
+  function teks(el) { return (el && el.textContent) || ''; }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function tampilHasil(fid, d) {
+    var panel = document.getElementById('panel-' + fid);
+    if (!panel) return;
+    var r = d.ringkasan || {bab: []};
+    var html = '<h4>Struktur naskah</h4>';
+    if (d.diperiksa_pada) {
+      html += '<div class="waktu">Terakhir diperiksa: ' + esc(d.diperiksa_pada) + '</div>';
+    }
+    if (r.bab && r.bab.length) {
+      html += '<ul>';
+      r.bab.forEach(function (b) {
+        var tanda = b.diperiksa ? '' : ' <span class="tanda-diperiksa">(sedang diperiksa)</span>';
+        html += '<li><b>' + esc(b.judul || 'Bab') + '</b>' + tanda;
+        if (b.subbab && b.subbab.length) {
+          html += '<ul>';
+          b.subbab.forEach(function (s) {
+            var t2 = s.diperiksa ? '' : ' <span class="tanda-diperiksa">(sedang diperiksa)</span>';
+            html += '<li>' + esc(s.teks) + t2 + '</li>';
+          });
+          html += '</ul>';
+        }
+        html += '</li>';
+      });
+      html += '</ul>';
+    } else {
+      html += '<div class="keterangan">Struktur belum bisa ditampilkan untuk naskah ini.</div>';
+    }
+    var menunggu = (r.jumlah_menunggu || 0);
+    if (menunggu > 0) {
+      html += '<div class="keterangan">' + menunggu +
+        ' baris sedang diperiksa admin. Hasilnya muncul di sini setelah diputuskan.</div>';
+    }
+    panel.innerHTML = html;
+    panel.hidden = false;
+  }
+  function terapkanStatus(btn, d) {
+    if (!d.ok) { return; }
+    var t = d.tombol || {};
+    btn.textContent = t.label || 'Periksa Struktur';
+    btn.disabled = !t.aktif;
+    btn.classList.toggle('sedang', false);
+    if (d.keadaan !== 'belum') { tampilHasil(btn.dataset.fileId, d); }
+  }
+  function periksaSekarang(btn) {
+    var fid = btn.dataset.fileId;
+    btn.disabled = true;
+    btn.classList.add('sedang');
+    btn.textContent = 'Pemeriksaan sedang berlangsung';
+    fetch('/api/ai/v1/peta/mulai', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({file_id: Number(fid), mode: 'peta_awal'})
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.ok) {
+        var panel = document.getElementById('panel-' + fid);
+        if (panel) {
+          panel.innerHTML = '<div class="galat">Pemeriksaan belum berhasil. Coba lagi sebentar lagi.</div>';
+          panel.hidden = false;
+        }
+        muatStatus(btn);
+        return;
+      }
+      muatStatus(btn);
+    }).catch(function () {
+      var panel = document.getElementById('panel-' + fid);
+      if (panel) {
+        panel.innerHTML = '<div class="galat">Pemeriksaan belum berhasil. Coba lagi sebentar lagi.</div>';
+        panel.hidden = false;
+      }
+      muatStatus(btn);
+    });
+  }
+  function muatStatus(btn) {
+    var fid = btn.dataset.fileId;
+    fetch('/api/ai/v1/peta/status?file_id=' + encodeURIComponent(fid))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        terapkanStatus(btn, d);
+        if (d.ok && d.otomatis) {
+          fetch('/api/ai/v1/peta/otomatis', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({file_id: Number(fid)})
+          }).catch(function () {});
+        }
+      }).catch(function () {});
+  }
+  document.querySelectorAll('[data-periksa]').forEach(function (btn) {
+    btn.addEventListener('click', function () { periksaSekarang(btn); });
+    muatStatus(btn);
+  });
+})();
 </script>
 
 <script>

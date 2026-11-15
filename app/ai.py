@@ -4338,6 +4338,32 @@ async def peta_mulai(
             except Exception:
                 pass
 
+    # ── GERBANG AMBANG (15 Nov 2026, perintah Bos 08:37) ─────────────
+    #  Perubahan sepele (tambah titik/spasi/beberapa kata) DIABAIKAN:
+    #  bila peta lama ada tapi perubahan di bawah ambang manual, kembalikan
+    #  peta lama, 0 Jev/agen. Pemeriksaan ulang HANYA bila perubahan
+    #  berarti melewati ambang (nilai di app/ambang_periksa.py).
+    #  Gagal menilai apa pun (fail-open) -> lanjut seperti biasa.
+    if body.get('file_id') and prof is not None and prof.peta_json \
+            and prof.peta_sidik and prof.peta_sidik != sid:
+        try:
+            from . import struktur as _str
+            from . import revisi_hemat as _rh_g
+            from .state import buang_daftar_isi as _buang_g
+            _g = _str.nilai_gerbang(
+                peta_json=prof.peta_json, peta_sidik=prof.peta_sidik,
+                sidik_kini=sid, teks_kini_bersih=_buang_g(teks))
+            if not _g.get('berubah_berarti'):
+                _simpan_lama = _rh_g.buang_kunci_internal(
+                    json.loads(prof.peta_json))
+                _simpan_lama['ok'] = True
+                _simpan_lama['gratis'] = True
+                _simpan_lama['dari_simpanan'] = True
+                _simpan_lama['perubahan_diabaikan'] = True
+                return _simpan_lama
+        except Exception:
+            pass
+
     # ── PAGAR MUTU (14 Okt 2026, putusan Bos "Opsi B") ───────────────
     #  ATURAN: Jev adalah TULANG PUNGGUNG app & biayanya ditanggung Bos
     #  ("makin banyak kandidat makin mahal saya bayar jev", 10 Okt).
@@ -4409,6 +4435,17 @@ async def peta_mulai(
                 except Exception as e:
                     db.rollback()
                     log.warning('[peta] gagal simpan peta hemat: %s', e)
+                else:
+                    #  ANTREAN ADMIN (15 Nov 2026): baris ragu/curiga masuk
+                    #  antrean. Gagal mengisi antrean tidak menggagalkan
+                    #  pemeriksaan (isi_antrean menelan galat -> 0).
+                    try:
+                        from . import antrean as _ant_hemat
+                        _ant_hemat.isi_antrean(
+                            db, file_id=int(body['file_id']), user_id=u.id,
+                            peta_sidik=sid, simpan=_hemat['simpan'])
+                    except Exception:
+                        pass
             log.info('[peta] jalur=jev-hemat (%s)',
                      _hasil_hemat.get('peta_alasan', ''))
             return _hasil_hemat
@@ -4527,6 +4564,18 @@ async def peta_mulai(
                     except Exception as e:
                         db.rollback()
                         log.warning('[peta] gagal simpan peta jev: %s', e)
+                    else:
+                        #  ANTREAN ADMIN (15 Nov 2026): baris ragu/curiga
+                        #  masuk antrean. Gagal mengisi antrean tidak
+                        #  menggagalkan pemeriksaan.
+                        try:
+                            from . import antrean as _ant_jev
+                            _ant_jev.isi_antrean(
+                                db, file_id=int(body['file_id']),
+                                user_id=u.id, peta_sidik=sid,
+                                simpan=_simpan_jev)
+                        except Exception:
+                            pass
                 log.info('[peta] jalur=jev (%s)', _alasan_jalur)
                 return hasil
             log.info('[peta] jembatan kosong ⇒ fallback')
@@ -4594,6 +4643,156 @@ async def peta_mulai(
             log.warning('[peta] gagal simpan peta: %s', e)
 
     return hasil
+
+
+@router.get('/v1/peta/status')
+async def peta_status(
+    file_id: int,
+    u: User = Depends(wajib_login_api),
+    db: Session = Depends(get_db),
+):
+    """Keadaan tombol "Periksa Struktur" untuk satu naskah (15 Nov 2026).
+
+    RINGAN: baca teks + hash + banding sidik/ambang saja — 0 panggilan
+    Jev/agen. Dipanggil halaman naskah saat dibuka, per berkas.
+    `otomatis` = True berarti perubahan sudah melewati ambang BESAR dan
+    halaman boleh memicu pemeriksaan otomatis diam-diam sekali.
+    """
+    fb = (db.query(FileBerkas)
+            .filter(FileBerkas.id == int(file_id),
+                    FileBerkas.user_id == u.id).first())
+    if fb is None:
+        raise HTTPException(404, detail={'ok': False,
+                                         'pesan': 'Berkas tidak ditemukan.'})
+    teks = _teks_dari_berkas(_path_berkas(fb), fb.nama) or ''
+    if not teks.strip():
+        return {'ok': False, 'file_id': int(file_id),
+                'pesan': 'Berkas ini belum bisa dibaca sebagai teks.'}
+    from . import peta_halus as _ph_s
+    from . import struktur as _str_s
+    from .models import AntreanPeta as _AP_s
+    from .state import buang_daftar_isi as _buang_s
+    sid = _ph_s.sidik_naskah(teks)
+    prof = (db.query(ProfilDokumen)
+              .filter(ProfilDokumen.file_id == int(file_id),
+                      ProfilDokumen.user_id == u.id).first())
+    g = _str_s.nilai_gerbang(
+        peta_json=prof.peta_json if prof else None,
+        peta_sidik=prof.peta_sidik if prof else '',
+        sidik_kini=sid, teks_kini_bersih=_buang_s(teks))
+    tombol = _str_s.keadaan_tombol(g['sudah_diperiksa'],
+                                   g['berubah_berarti'])
+    menunggu_idx = set()
+    try:
+        menunggu_idx = {
+            r.baris_idx for r in db.query(_AP_s).filter(
+                _AP_s.file_id == int(file_id),
+                _AP_s.user_id == u.id,
+                _AP_s.status == 'menunggu').all()}
+    except Exception:
+        menunggu_idx = set()
+    ringkasan = _str_s.ringkas_peta(
+        prof.peta_json if prof and prof.peta_json else None,
+        menunggu_idx=menunggu_idx)
+    # ── BATAS LAJU OTOMATIS (15 Nov 2026, perintah Bos 09:15) ──────────
+    #  `otomatis` dari gerbang hanya soal UKURAN perubahan; batas 24 jam
+    #  (sekali per naskah, dan tidak jalan bila pemeriksaan terakhir
+    #  kurang dari 24 jam lalu) dicek di sini, dari `peta_dibuat`.
+    from . import ambang_periksa as _amb_s
+    _boleh_oto, _alasan_oto = _amb_s.boleh_otomatis_jalan(
+        prof.peta_dibuat if prof else None)
+    return {'ok': True, 'file_id': int(file_id),
+            'keadaan': g['keadaan'], 'tombol': tombol,
+            'otomatis': bool(g['otomatis']) and _boleh_oto,
+            'detail': g['detail'],
+            'diperiksa_pada': (prof.peta_dibuat.isoformat()
+                               if prof is not None and prof.peta_dibuat
+                               else None),
+            'ringkasan': ringkasan}
+
+
+@router.post('/v1/peta/otomatis')
+async def peta_otomatis(
+    request: Request,
+    u: User = Depends(wajib_login_api),
+    db: Session = Depends(get_db),
+):
+    """Pemicu pemeriksaan OTOMATIS (15 Nov 2026, perintah Bos 08:40).
+
+    Jalan diam-diam bila naskah berubah melewati ambang BESAR (20% bagian)
+    sejak pemeriksaan terakhir, tanpa mahasiswa menekan apa pun.
+    SEKALI per kumpulan perubahan: sesudah jalan, sidik diperbarui
+    (garis awal tunggal — perintah Bos 08:41), jadi panggilan berikutnya
+    tanpa perubahan baru tidak menjadwalkan apa pun. Pekerjaan jalan di
+    utas latar (`proses`) memakai `peta_mulai` yang SAMA dengan tombol
+    manual — jadi gerbang C2 + ambang dicek ulang di dalam pekerja, dan
+    tidak ada perubahan yang diperiksa dua kali.
+    """
+    body = await request.json()
+    fid = int(body.get('file_id') or 0)
+    fb = (db.query(FileBerkas)
+            .filter(FileBerkas.id == fid,
+                    FileBerkas.user_id == u.id).first())
+    if fb is None:
+        raise HTTPException(404, detail={'ok': False,
+                                         'pesan': 'Berkas tidak ditemukan.'})
+    if _proses_berjalan(db, u.id, fid):
+        return {'ok': True, 'dijadwalkan': False,
+                'alasan': 'masih ada pemeriksaan berjalan untuk naskah ini'}
+    teks = _teks_dari_berkas(_path_berkas(fb), fb.nama) or ''
+    if not teks.strip():
+        return {'ok': False,
+                'pesan': 'Berkas ini belum bisa dibaca sebagai teks.'}
+    from . import peta_halus as _ph_o
+    from . import struktur as _str_o
+    from .state import buang_daftar_isi as _buang_o
+    sid = _ph_o.sidik_naskah(teks)
+    prof = (db.query(ProfilDokumen)
+              .filter(ProfilDokumen.file_id == fid,
+                      ProfilDokumen.user_id == u.id).first())
+    g = _str_o.nilai_gerbang(
+        peta_json=prof.peta_json if prof else None,
+        peta_sidik=prof.peta_sidik if prof else '',
+        sidik_kini=sid, teks_kini_bersih=_buang_o(teks))
+    if not g['otomatis']:
+        return {'ok': True, 'dijadwalkan': False,
+                'alasan': g['detail'].get('alasan', '')}
+    # ── PAGAR OTOMATIS (15 Nov 2026, perintah Bos 09:15) ───────────────
+    #  Pertahanan berlapis (gerbang di atas sudah mematikan otomatis untuk
+    #  struktural — ini pagar kedua supaya klien lama / panggilan langsung
+    #  tidak bisa memicu baca ulang penuh diam-diam), lalu batas laju:
+    #  sekali per 24 jam per naskah, dan tidak jalan bila pemeriksaan
+    #  terakhir (manual ATAU otomatis) kurang dari 24 jam lalu.
+    if g['detail'].get('struktural') or g['detail'].get('struktural_kecil'):
+        return {'ok': True, 'dijadwalkan': False,
+                'alasan': ('perubahan struktur — hanya tombol manual yang '
+                           'boleh memeriksa ulang')}
+    from . import ambang_periksa as _amb_o
+    _boleh, _alasan_cap = _amb_o.boleh_otomatis_jalan(
+        prof.peta_dibuat if prof else None)
+    if not _boleh:
+        return {'ok': True, 'dijadwalkan': False, 'alasan': _alasan_cap}
+    p = proses_mod.mulai(db, user_id=u.id, file_id=fid,
+                         komentar=['Pemeriksaan struktur otomatis'])
+
+    async def _kerja(lapor):
+        d2 = proses_mod._sesi_baru()
+        try:
+            await peta_mulai(
+                _RequestTiruan({'file_id': fid, 'mode': 'peta_awal'}),
+                u, d2)
+            proses_mod.tandai_selesai(
+                p.kode, hasil='Pemeriksaan struktur otomatis selesai.')
+        except Exception as e:                            # noqa: BLE001
+            log.error('[peta] pemeriksaan otomatis %s gagal: %s',
+                      p.kode, e)
+            proses_mod.tandai_gagal(p.kode, f'{type(e).__name__}: {e}')
+        finally:
+            d2.close()
+
+    proses_mod.jalankan(p.kode, _kerja)
+    return {'ok': True, 'dijadwalkan': True, 'kode': p.kode}
+
 
 def _tandai_sudah_ditawarkan(db: Session, body: dict, pilih: list,
                              user_id: int = 0) -> None:

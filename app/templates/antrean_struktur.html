@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Antrean Struktur - EduAi</title>
+<style>
+  :root{
+    --tinta:#2b2621; --tinta2:#6b6259; --kertas:#faf7f2; --kartu:#fff;
+    --garis:#e6dfd4; --hijau:#1f7a5a; --hijau2:#2a9d76;
+    --oranye:#f4a025; --oranye-tua:#d98a12; --merah:#b3402f; --biru:#2d5f9a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--kertas);
+       color:var(--tinta);line-height:1.6;padding:0 0 60px}
+  .nav{background:#14342a;color:#fff;padding:0 24px;height:68px;display:flex;
+       align-items:center;justify-content:space-between}
+  .nav b{font-size:17px;font-weight:600}
+  .nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:14px;margin-left:18px}
+  .nav a:hover{color:#fff}
+  .wadah{max-width:940px;margin:0 auto;padding:0 20px}
+  h1{font-size:26px;margin:28px 0 6px}
+  .sub{color:var(--tinta2);font-size:15px;margin-bottom:24px}
+  .pesan{padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:14px;
+         background:#e8f5ef;border:1px solid #b8e0cd;color:#14543c}
+  .kartu{background:var(--kartu);border:1px solid var(--garis);border-radius:14px;
+         padding:20px 22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .meta{font-size:13px;color:var(--tinta2);margin-bottom:8px}
+  .meta b{color:var(--tinta)}
+  blockquote{border-left:4px solid var(--oranye);background:#fffaf0;
+             padding:12px 14px;border-radius:0 10px 10px 0;font-size:15px;margin:8px 0}
+  .tetangga{font-size:13px;color:var(--tinta2);margin:6px 0}
+  .tetangga span{display:block;padding:2px 0}
+  .mesin{font-size:13px;background:#f5f1ea;border-radius:10px;padding:10px 12px;margin:10px 0}
+  .mesin b{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--tinta2)}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+  .badge.ragu{background:#fff3d6;color:#8a6d00}
+  .badge.curiga{background:#fdecea;color:#8c2f20}
+  .pilihan{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .pilihan button{border:none;border-radius:10px;padding:12px 18px;font-size:15px;
+      font-weight:700;cursor:pointer;font-family:inherit;min-width:96px}
+  .pilihan button.bab{background:var(--hijau);color:#fff}
+  .pilihan button.subbab{background:var(--biru);color:#fff}
+  .pilihan button.paragraf{background:#5b4a8a;color:#fff}
+  .pilihan button.biasa{background:#e6dfd4;color:var(--tinta)}
+  .pilihan button.lewati{background:#fff;border:2px solid var(--garis);color:var(--tinta2)}
+  .pilihan button:hover{filter:brightness(1.08)}
+  .kosong{color:var(--tinta2);font-size:15px;padding:24px;text-align:center}
+  h2{font-size:19px;margin:28px 0 12px}
+  .selesai{opacity:.75}
+  .selesai .vonis{font-size:14px;font-weight:700;color:var(--hijau)}
+</style>
+</head>
+<body>
+<div class="nav"><b>EduAi</b><span><a href="/naskah">Naskah</a><a href="/pengaturan">Pengaturan</a></span></div>
+<div class="wadah">
+  <h1>Antrean Struktur</h1>
+  <p class="sub">Baris naskah yang mesin masih ragukan. Satu ketuk untuk memutuskan, tanpa mengetik. Keputusan tersimpan sebagai bahan belajar mesin.</p>
+  {% if pesan %}<div class="pesan">{{ pesan }}</div>{% endif %}
+
+  {% if menunggu %}
+    <p class="sub"><b>{{ menunggu|length }}</b> baris menunggu keputusan.</p>
+    {% for b in menunggu %}
+    <div class="kartu">
+      <div class="meta"><b>{{ b.nama_file }}</b> &middot; {{ b.nama_mahasiswa }} &middot;
+        <span class="badge {{ b.status_hakim }}">{{ b.status_hakim }}</span></div>
+      <blockquote>{{ b.teks }}</blockquote>
+      <div class="tetangga">
+        {% if b.tetangga.atas %}<span>Sebelum: {{ b.tetangga.atas }}</span>{% endif %}
+        {% if b.tetangga.bawah %}<span>Sesudah: {{ b.tetangga.bawah }}</span>{% endif %}
+      </div>
+      <div class="mesin">
+        <b>Jawaban mesin</b><br>
+        Jev: {{ b.label_jev or '-' }} &middot; Akhir: {{ b.label_akhir or '-' }}
+        {% if b.alasan %}<br>Alasan: {{ b.alasan | join('; ') }}{% endif %}
+      </div>
+      <form class="pilihan" method="post" action="/admin/antrean-struktur/{{ b.id }}/putuskan">
+        <button class="bab" type="submit" name="keputusan" value="bab">BAB</button>
+        <button class="subbab" type="submit" name="keputusan" value="subbab">SUB-BAB</button>
+        <button class="paragraf" type="submit" name="keputusan" value="paragraf">PARAGRAF</button>
+        <button class="biasa" type="submit" name="keputusan" value="biasa">BIASA</button>
+        <button class="lewati" type="submit" name="keputusan" value="lewati">Lewati</button>
+      </form>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="kartu kosong">Tidak ada baris yang menunggu. Antrean bersih.</div>
+  {% endif %}
+
+  {% if selesai %}
+    <h2>Sudah diputuskan (50 terakhir)</h2>
+    {% for b in selesai %}
+    <div class="kartu selesai">
+      <div class="meta"><b>{{ b.nama_file }}</b> &middot; {{ b.nama_mahasiswa }}</div>
+      <blockquote>{{ b.teks }}</blockquote>
+      <div class="vonis">Keputusan: {{ b.keputusan }}</div>
+    </div>
+    {% endfor %}
+  {% endif %}
+</div>
+</body>
+</html>
