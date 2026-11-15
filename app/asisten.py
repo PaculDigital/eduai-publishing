@@ -539,6 +539,7 @@ async def kerjakan(db: Session, b: Pembimbingan, pembayar: User,
     model, dibuat = '', 0
     jumlah_pilihan = 0
     tersaring = 0
+    tersaring_jangkar = 0
     try:
         from . import ai as AI                         # noqa: PLC0415
         konten, info = await AI._panggil_router(user_msg, 120.0,
@@ -556,7 +557,13 @@ async def kerjakan(db: Session, b: Pembimbingan, pembayar: User,
             mentah = len(usulan)
             disaring = P.saring_usulan_baru(db, b.id, usulan)
             tersaring = mentah - len(disaring)
-            usulan = disaring[:PILIHAN_PER_ROUND]
+            #  Verifikasi jangkar (putusan Bos 18:48 WIB): buang usulan
+            #  yang mengada-ada (kutipan tidak ada di naskah / bagian
+            #  tidak ada di peta) SEBELUM ditampilkan.
+            nyata = P.saring_usulan_nyata(
+                db, _bk0.id if _bk0 is not None else 0, teks, disaring)
+            tersaring_jangkar = len(disaring) - len(nyata)
+            usulan = nyata[:PILIHAN_PER_ROUND]
             jumlah_pilihan = len(usulan)
             if usulan and _bk0 is not None:
                 P.simpan_daftar_pilihan(db, b.id, _bk0.id, 'asisten',
@@ -604,12 +611,15 @@ async def kerjakan(db: Session, b: Pembimbingan, pembayar: User,
                     'disiapkan di panel. Pilih yang mau dipakai jadi '
                     'catatan.'
                     if jumlah_pilihan else
-                    ('Semua temuan baru sudah ada sebagai catatan, tidak '
-                     'ada pilihan baru.'
-                     if tersaring else
-                     'AI sudah meninjau naskah ini: drafnya sudah rapi, tidak '
-                     'ada catatan wajib. Silakan lanjut menandai bagian '
-                     'spesifik bila perlu.')))}
+                    ('Tidak ada temuan baru yang terverifikasi dari '
+                     'naskah ini.'
+                     if tersaring_jangkar else
+                     ('Semua temuan baru sudah ada sebagai catatan, tidak '
+                      'ada pilihan baru.'
+                      if tersaring else
+                      'AI sudah meninjau naskah ini: drafnya sudah rapi, tidak '
+                      'ada catatan wajib. Silakan lanjut menandai bagian '
+                      'spesifik bila perlu.'))))}
     log.info('[asisten] bimbingan %s: %d usulan masuk (%s, %s, %.1f dtk, '
              'biaya=%s, pembayar=%s)', b.id, dibuat, model, info.get('model'),
              detik, bayar.get('sumber'), getattr(pembayar, 'id', '?'))
@@ -798,19 +808,16 @@ def simpan_usulan(db: Session, b: Pembimbingan,
     """
     if not usulan:
         return 0
-    from .pembimbing import catat, daftar_berkas, rapi_bab   # noqa: PLC0415
+    from .pembimbing import (catat, daftar_berkas,  # noqa: PLC0415
+                             kutipan_ada_di_naskah, rapi_bab)
     berkas_list = daftar_berkas(db, b.id)
     bk = berkas_list[0] if berkas_list else None
     naskah = naskah_bimbingan(db, b)
     jumlah = 0
     for u in usulan:
-        teks_asli = ''
-        if u['kutipan']:
-            #  cari kutipan di naskah (normalisasi spasi ringan)
-            pola = re.sub(r'\s+', ' ', u['kutipan']).strip()
-            sumber = re.sub(r'\s+', ' ', naskah) if naskah else ''
-            if pola and pola.lower() in sumber.lower():
-                teks_asli = u['kutipan']
+        #  Kutipan terverifikasi (helper bersama, putusan Bos 18:48 WIB).
+        teks_asli = (u['kutipan'] if kutipan_ada_di_naskah(
+            u.get('kutipan') or '', naskah or '') else '')
         #  Format SAMA dengan Periksa (`rapikan_isi`): masalah + kutipan
         #  + arah perbaikan, supaya AI mahasiswa menerima ketiganya dan
         #  tidak menebak. Tanpa `saran` (jawaban AI lama / daftar lama)

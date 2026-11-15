@@ -37,6 +37,15 @@ Aturan yang diuji (rancangan RENCANA_TINJAU_STABILO.md):
       kutipan + arah perbaikan); revisi per catatan menambahkan
       alamat + kutipan persis sebagai jangkar komentar (server-side,
       milik sendiri saja, tanpa menggagalkan revisi).
+  11. Penggalan penasaran (putusan Bos 18:47 WIB, digabung): layar
+      pilihan menampilkan penggalan arah perbaikan (4 kata pertama +
+      '...' bila panjang, label jenis bila pendek), BUKAN arah lengkap;
+      catatan yang diterima tetap memuat arah lengkap; form manual
+      tetap ada di sidebar.
+  12. Verifikasi jangkar (putusan Bos 18:48 WIB): kutipan/bagian
+      karangan dibuang SEBELUM daftar tampil (Asisten + Periksa);
+      daftar kosong sesudah disaring -> pesan jujur; `simpan_catatan`
+      (Periksa) mengosongkan teks_asli bila kutipan tidak ada di naskah.
 """
 import asyncio
 import os
@@ -790,6 +799,192 @@ def main():
         and AI._jangkar_catatan(db, mhs, {}, _kom) == _kom
         and AI._jangkar_catatan(db, mhs, {'catatan_id': 'bukan-angka'},
                                 _kom) == _kom)
+
+    #  11. Penggalan penasaran (putusan Bos 18:47 WIB, digabung) ────────
+    #  Aturan: >5 kata -> 4 kata pertama + '...'; <=5 kata -> label jenis.
+    cek('penggalan: kosong -> kosong',
+        P.penggalan_saran('') == '' and P.penggalan_saran('   ') == '')
+    cek('penggalan: panjang -> 4 kata pertama + ...',
+        P.penggalan_saran(
+            'tambahkan teori pemasaran dan kutipan artikel jurnal terbaru')
+        == 'tambahkan teori pemasaran dan...')
+    cek('penggalan: 6 kata -> 4 kata + ...',
+        P.penggalan_saran('tambahkan teori pemasaran dan kutipan artikel')
+        == 'tambahkan teori pemasaran dan...')
+    cek('penggalan: pendek ber-kata-kunci -> label, bukan kata-katanya',
+        P.penggalan_saran('tambahkan rujukan Kotler') == 'Tambah rujukan'
+        and P.penggalan_saran('perbaiki kalimat yang ambigu saja')
+        == 'Perjelas kalimat'
+        and P.penggalan_saran('tambahkan teori pemasaran dan kutipan')
+        == 'Perbaiki teori')
+    cek('penggalan: pendek tanpa kata kunci -> Perbaikan naskah',
+        P.penggalan_saran('tulis ulang bagian ini') == 'Perbaikan naskah')
+    #  Render: penggalan tampil, saran utuh tidak bocor (Asisten + Periksa).
+    _SARAN_PANJANG = ('tambahkan teori pemasaran dan kutipan artikel '
+                      'jurnal terbaru')
+    P.simpan_daftar_pilihan(db, b6.id, bk6.id, 'asisten', [
+        {'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+         'catatan': 'Pilihan berpenggalan.', 'saran': _SARAN_PANJANG}])
+    _M.user_dari_request = lambda req, db2: sup_periksa
+    try:
+        r_gal = RAI.naskah_baca(token6, bk6.id, _ReqPalsu(), '', '', db=db)
+        badan_gal = r_gal.body.decode('utf-8', 'ignore')
+    finally:
+        _M.user_dari_request = _asli_user
+    cek('penggalan: Asisten tampilkan penggalan, bukan saran utuh',
+        'tambahkan teori pemasaran dan...' in badan_gal
+        and _SARAN_PANJANG not in badan_gal
+        and 'kutipan artikel jurnal terbaru' not in badan_gal)
+    cek('penggalan: petunjuk arah lengkap sesudah diterima',
+        'Arah perbaikan lengkap terlihat sesudah pilihan diterima'
+        in badan_gal)
+    cek('penggalan: form manual tetap ada di sidebar',
+        'kolom-tulis' in badan_gal
+        and 'Tandaan (satu kalimat)' in badan_gal
+        and 'Perintah (satu bagian)' in badan_gal)
+    P.simpan_daftar_pilihan(db, b6.id, bk6.id, 'periksa', [
+        {'bagian': '2.2 Teori Perilaku Konsumen',
+         'kutipan': KALIMAT_BAB2,
+         'soal': 'Soal periksa berpenggalan.',
+         'saran': 'rapikan alur argumen bab ini supaya pembaca mudah '
+                  'mengikuti'}])
+    _M.user_dari_request = lambda req, db2: sup_periksa
+    try:
+        r_gal2 = RAI.naskah_baca(token6, bk6.id, _ReqPalsu(), '', '', db=db)
+        badan_gal2 = r_gal2.body.decode('utf-8', 'ignore')
+    finally:
+        _M.user_dari_request = _asli_user
+    cek('penggalan: Periksa tampilkan penggalan, saran utuh tidak lagi tampil',
+        'rapikan alur argumen bab...' in badan_gal2
+        and 'rapikan alur argumen bab ini supaya pembaca mudah mengikuti'
+        not in badan_gal2
+        and 'supaya pembaca mudah mengikuti' not in badan_gal2)
+    P.simpan_daftar_pilihan(db, b6.id, bk6.id, 'asisten', [
+        {'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+         'catatan': 'Pilihan pendek.', 'saran': 'tambahkan rujukan Kotler'}])
+    _M.user_dari_request = lambda req, db2: sup_periksa
+    try:
+        r_gal3 = RAI.naskah_baca(token6, bk6.id, _ReqPalsu(), '', '', db=db)
+        badan_gal3 = r_gal3.body.decode('utf-8', 'ignore')
+    finally:
+        _M.user_dari_request = _asli_user
+    cek('penggalan: saran pendek -> label saja, kata-kata tidak bocor',
+        'Tambah rujukan' in badan_gal3
+        and 'tambahkan rujukan Kotler' not in badan_gal3)
+    #  Catatan yang diterima tetap memuat arah lengkap.
+    S.masuk(db, sup_periksa, 5, sumber='uji')
+    _terima_gal = AS.terima_pilihan(db, b6, sup_periksa, bk6.id, '0')
+    _nt_gal = [c for c in P.daftar_catatan(db, b6.id)
+               if 'Pilihan pendek.' in c.isi]
+    cek('penggalan: catatan diterima tetap memuat arah lengkap',
+        _terima_gal.get('ok') and _terima_gal.get('dibuat') == 1
+        and len(_nt_gal) == 1
+        and 'Arah perbaikan: tambahkan rujukan Kotler' in _nt_gal[0].isi)
+
+    #  12. Verifikasi jangkar (putusan Bos 18:48 WIB) ───────────────────
+    #  Kutipan/bagian karangan dibuang SEBELUM tampil; yang benar lolos.
+    _KUTIP_PALSU = 'Kalimat karangan yang tidak ada di naskah sama sekali.'
+    _campur = [
+        {'bab': '2.1 Teori Pemasaran', 'kutipan': KALIMAT_TANDAAN,
+         'catatan': 'Benar, lolos.'},
+        {'bab': '2.1 Teori Pemasaran', 'kutipan': _KUTIP_PALSU,
+         'catatan': 'Kutipan karangan.'},
+        {'bab': '9.9 Bab Palsu', 'kutipan': KALIMAT_TANDAAN,
+         'catatan': 'Bagian karangan.'},
+        {'bab': 'BAB I', 'kutipan': KALIMAT_BAB1,
+         'catatan': 'Bab besar, lolos.'},
+        {'bab': '2.2 Teori Perilaku Konsumen', 'kutipan': '',
+         'catatan': 'Tanpa kutipan, bagian nyata, lolos.'},
+        {'bab': 'Tinjauan AI', 'kutipan': KALIMAT_TANDAAN,
+         'catatan': 'Tanpa alamat nyata.'},
+    ]
+    _nyata = P.saring_usulan_nyata(db, bk.id, ISI_NASKAH, _campur)
+    _isi_nyata = [d.get('catatan') for d in _nyata]
+    cek('jangkar: kutipan karangan dibuang',
+        'Kutipan karangan.' not in _isi_nyata)
+    cek('jangkar: bagian karangan dibuang',
+        'Bagian karangan.' not in _isi_nyata)
+    cek('jangkar: tanpa alamat nyata dibuang',
+        'Tanpa alamat nyata.' not in _isi_nyata)
+    cek('jangkar: kutipan + bagian benar lolos',
+        'Benar, lolos.' in _isi_nyata and 'Bab besar, lolos.' in _isi_nyata)
+    cek('jangkar: tanpa kutipan tapi bagian nyata lolos',
+        'Tanpa kutipan, bagian nyata, lolos.' in _isi_nyata)
+    cek('jangkar: kutipan ada di naskah (helper bersama)',
+        P.kutipan_ada_di_naskah(KALIMAT_TANDAAN, ISI_NASKAH)
+        and not P.kutipan_ada_di_naskah(_KUTIP_PALSU, ISI_NASKAH)
+        and not P.kutipan_ada_di_naskah('', ISI_NASKAH))
+    _tanpa_struktur = P.saring_usulan_nyata(
+        db, bk.id, 'Isi bab tiga. ' * 40, [
+            {'bab': 'BAB I', 'kutipan': 'Isi bab tiga',
+             'catatan': 'Draf tanpa bab, lolos.'},
+            {'bab': '2.1 Teori Pemasaran', 'kutipan': _KUTIP_PALSU,
+             'catatan': 'Draf tanpa bab, kutipan palsu.'},
+        ])
+    cek('jangkar: naskah tanpa struktur -> lapis bagian dilewati, kutipan tetap diperiksa',
+        [d.get('catatan') for d in _tanpa_struktur]
+        == ['Draf tanpa bab, lolos.'])
+    #  Alur Asisten: usulan karangan dibuang sebelum tampil.
+    #  ⚠️ Kutipan parsial yang nyata dipakai di sini: keempat kalimat
+    #  penuh naskah uji sudah jadi catatan di bimbingan ini (saringan
+    #  sudah-dipilih akan membuangnya duluan), jadi pakai potongan nyata
+    #  yang belum jadi catatan.
+    _KUTIP_SEBAGIAN = 'bab satu yang khas delapan empat'
+    async def _router_karangan(*a, **k):
+        isi = _json.dumps({'usulan': [
+            {'bab': 'BAB I', 'kutipan': _KUTIP_SEBAGIAN,
+             'catatan': 'Saran benar.', 'saran': 'Perbaiki kalimat ini.'},
+            {'bab': '2.1 Teori Pemasaran', 'kutipan': _KUTIP_PALSU,
+             'catatan': 'Saran karangan.', 'saran': 'Perbaiki yang palsu.'},
+            {'bab': '9.9 Bab Palsu', 'kutipan': _KUTIP_SEBAGIAN,
+             'catatan': 'Saran bagian palsu.', 'saran': 'Perbaiki palsu.'},
+        ]})
+        return isi, {'model': 'uji'}
+    AI._panggil_router = _router_karangan
+    try:
+        _cat_awal = len(P.daftar_catatan(db, b.id))
+        hasil_kar = asyncio.run(AS.kerjakan(db, b, sup, perintah=''))
+        _s_kar, _d_kar = P.muat_daftar_pilihan(db, b.id, bk.id)
+        _isi_kar = [d.get('catatan') for d in _d_kar]
+        cek('jangkar alur Asisten: hanya butir nyata tampil (1 dari 3)',
+            hasil_kar.get('ok') and hasil_kar.get('mode') == 'pilih'
+            and hasil_kar.get('jumlah') == 1
+            and _isi_kar == ['Saran benar.'])
+        cek('jangkar alur Asisten: belum ada catatan baru',
+            len(P.daftar_catatan(db, b.id)) == _cat_awal)
+    finally:
+        AI._panggil_router = asli_panggil
+    #  Alur Periksa: semua karangan -> pesan jujur, tanpa daftar.
+    async def _router_palsu_semua(*a, **k):
+        isi = _json.dumps({'catatan': [
+            {'bagian': '2.1 Teori Pemasaran', 'kutipan': _KUTIP_PALSU,
+             'soal': 'Soal palsu.', 'saran': 'Saran palsu.'},
+            {'bagian': '9.9 Bab Palsu', 'kutipan': KALIMAT_TANDAAN,
+             'soal': 'Soal bagian palsu.', 'saran': 'Saran palsu dua.'},
+        ]})
+        return isi, {'model': 'uji'}
+    AI._panggil_router = _router_palsu_semua
+    try:
+        hasil_palsu = asyncio.run(PAI.periksa(db, bk6, pemakai=sup_periksa,
+                                              nama_mhs='Mahasiswa'))
+        cek('jangkar alur Periksa: semua karangan -> pesan jujur, 0 pilihan',
+            hasil_palsu.get('ok') and hasil_palsu.get('jumlah') == 0
+            and 'Tidak ada temuan baru yang terverifikasi'
+            in (hasil_palsu.get('pesan') or '')
+            and P.muat_daftar_pilihan(db, b6.id, bk6.id) == (None, []))
+    finally:
+        AI._panggil_router = asli_panggil
+    #  Pertahanan kedua: simpan_catatan mengosongkan teks_asli karangan.
+    _jml_simpan = PAI.simpan_catatan(db, bk6, [
+        {'bagian': '2.1 Teori Pemasaran', 'kutipan': _KUTIP_PALSU,
+         'soal': 'Soal karangan simpan.', 'saran': 'Saran karangan simpan.'}])
+    _nt_simpan = [c for c in P.daftar_catatan(db, b6.id)
+                  if 'Soal karangan simpan.' in c.isi]
+    cek('jangkar simpan Periksa: kutipan karangan -> teks_asli kosong',
+        _jml_simpan == 1 and len(_nt_simpan) == 1
+        and (_nt_simpan[0].teks_asli or '') == ''
+        and 'Kutipan:' not in _nt_simpan[0].isi
+        and 'Arah perbaikan: Saran karangan simpan.' in _nt_simpan[0].isi)
 
     print()
     print(f'LULUS {len(LULUS)}  GAGAL {len(GAGAL)}')

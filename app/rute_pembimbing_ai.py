@@ -326,6 +326,10 @@ def naskah_baca(token: str, berkas_id: int, request: Request,
     try:
         _sumber, _daftar = P.muat_daftar_pilihan(db, b.id, bk.id)
         if _daftar:
+            #  Penggalan penasaran (putusan Bos 18:47 WIB): arah lengkap
+            #  tidak tampil di layar pilihan, hanya penggalannya.
+            _daftar = [dict(x, penggalan=P.penggalan_saran(
+                x.get('saran') or '')) for x in _daftar]
             usulan_pilihan = {'sumber': _sumber, 'daftar': _daftar}
     except Exception:                                      # noqa: BLE001
         usulan_pilihan = None

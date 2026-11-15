@@ -738,6 +738,159 @@ def hapus_daftar_pilihan(db: Session, bimbingan_id: int,
         db.commit()
 
 
+#  ── PENGGALAN PENASARAN (15 Nov 2026, putusan Bos 18:47 WIB) ─────────
+#  Aturan (deterministik, tanpa AI):
+#  · saran kosong → '' (tidak ada yang ditampilkan).
+#  · saran PANJANG (> 5 kata) → 4 kata pertama + '...', cukup untuk
+#    membuat penasaran, tidak cukup untuk disalin sebagai arahan lengkap.
+#  · saran PENDEK (<= 5 kata) → 4 kata pertama akan membocorkan hampir
+#    semuanya, jadi tampilkan LABEL singkat jenis perbaikannya saja
+#    (tabel kata kunci di bawah), bukan kata-kata sarannya.
+#  · label dicari dari kata kunci pertama yang cocok (urutan tabel);
+#    tidak ada yang cocok → 'Perbaikan naskah'.
+PENGGALAN_KATA = 4
+PENGGALAN_BATAS_PENDEK = 5
+PENGGALAN_LABEL = (
+    (('rujuk', 'sitasi', 'pustaka'), 'Tambah rujukan'),
+    (('teori', 'konsep', 'definisi'), 'Perbaiki teori'),
+    (('struktur', 'alur', 'urutan', 'subbab', 'sub bab'), 'Perbaiki struktur'),
+    (('kalimat', 'bahasa', 'jelas', 'perjelas'), 'Perjelas kalimat'),
+    (('data', 'angka', 'tabel', 'grafik', 'hasil'), 'Perbaiki data'),
+    (('metode', 'sampel', 'instrumen', 'analisis', 'uji'), 'Perbaiki metode'),
+    (('tambah', 'lengkap', 'kurang'), 'Lengkapi bagian'),
+    (('hapus', 'buang', 'ringkas', 'pangkas'), 'Ringkas bagian'),
+    (('contoh', 'ilustrasi'), 'Tambah contoh'),
+)
+
+
+def penggalan_saran(saran: str) -> str:
+    """Turunkan penggalan penasaran dari arah perbaikan (saran).
+
+    Dipakai layar pilihan: pembimbing cukup tahu jenis/arahnya untuk
+    memilih, tapi tidak bisa menyalin arahan lengkapnya. Arah lengkap
+    baru terlihat di catatan sesudah butir diterima.
+    """
+    kata = (saran or '').split()
+    if not kata:
+        return ''
+    if len(kata) <= PENGGALAN_BATAS_PENDEK:
+        rendah = (saran or '').lower()
+        for kunci, label in PENGGALAN_LABEL:
+            if any(k in rendah for k in kunci):
+                return label
+        return 'Perbaikan naskah'
+    return ' '.join(kata[:PENGGALAN_KATA]).rstrip('.') + '...'
+
+
+def kutipan_ada_di_naskah(kutipan: str, naskah: str) -> bool:
+    """True bila kutipan ada di naskah (rapikan spasi, tanpa bedakan
+    huruf besar/kecil). Dipakai bersama oleh saringan jangkar,
+    `simpan_usulan`, dan `simpan_catatan` (putusan Bos 18:48 WIB),
+    satu definisi, tidak boleh berbeda."""
+    pola = _rapi_kutipan(kutipan)
+    if not pola:
+        return False
+    return pola in _rapi_kutipan(naskah or '')
+
+
+def _norm_bagian(teks: str) -> str:
+    """Samakan label bagian untuk perbandingan (huruf kecil, spasi
+    diringkas, pemisah ' - ' jadi spasi)."""
+    return ' '.join((teks or '').lower().replace(' - ', ' ').split())
+
+
+def _kandidat_bagian(db, file_id: int, teks: str) -> set | None:
+    """Kumpulan label bagian yang NYATA di naskah ini.
+
+    Sumber: dropdown sidebar yang sama (`daftar_bagian_sidebar`: peta
+    Jev tersimpan dulu, jatuh ke `state.petakan()`) DITAMBAH peta BAB
+    besar (`state.peta_bab_besar`), karena `petakan()` memakai sub-bab
+    bila ada ≥3, label 'BAB I'/'BAB II' tidak ada di sana padahal nyata
+    di naskah. Satu definisi bagian yang ada, dipakai saringan jangkar.
+
+    Return None bila KEDUA sumber gagal dipanggil (tidak bisa memeriksa);
+    set (bisa kosong) bila sedikitnya satu sumber jalan. Set kosong
+    berarti naskah tanpa struktur yang bisa ditentukan (petakan jatuh
+    ke '__seluruh__'), lapis bagian dilewati pemanggil, hanya kutipan
+    yang diperiksa, supaya pilihan tidak mati untuk draf tanpa bab.
+    """
+    keluar = set()
+    jalan = False
+
+    def _tambah(section_id, section_judul, label=None):
+        for k in (section_id, section_judul, label):
+            if (k or '').strip():
+                keluar.add(_norm_bagian(k))
+        sid = (section_id or '').strip()
+        if sid:
+            keluar.add(_norm_bagian(rapi_bab(sid)))
+            jdl = (section_judul or '').strip()
+            if jdl:
+                keluar.add(_norm_bagian(sid + ' ' + jdl))
+
+    try:
+        from . import kelompok_catatan as KC          # noqa: PLC0415
+        for ent in KC.daftar_bagian_sidebar(db, int(file_id or 0),
+                                            teks or ''):
+            _tambah(ent.get('section_id'), ent.get('section_judul'),
+                    ent.get('label'))
+        jalan = True
+    except Exception:                                 # noqa: BLE001
+        pass
+    try:
+        from . import state as _ST                    # noqa: PLC0415
+        for x in _ST.peta_bab_besar(teks or ''):
+            _tambah(x.get('section_id'), x.get('section_title'))
+        jalan = True
+    except Exception:                                 # noqa: BLE001
+        pass
+    return keluar if jalan else None
+
+
+def _bagian_ada(bab: str, kandidat: set) -> bool:
+    """True bila label bagian butir cocok dengan satu bagian yang nyata
+    (bandingkan label utuh; 'BAB 2' juga cocok dengan 'BAB II' lewat
+    `rapi_bab`). Tanpa label → False (tidak ada alamat)."""
+    t = _norm_bagian(bab)
+    if not t:
+        return False
+    if t in kandidat:
+        return True
+    return _norm_bagian(rapi_bab(bab)) in kandidat
+
+
+def saring_usulan_nyata(db, file_id: int, teks_naskah: str,
+                        usulan: list[dict]) -> list[dict]:
+    """SARINGAN JANGKAR (putusan Bos 18:48 WIB): buang usulan yang
+    mengada-ada, kutipannya tidak ada di naskah ATAU bagiannya tidak
+    ada di peta/potongan bagian. Deterministik, bukan perintah ke LLM.
+
+    · Tanpa kutipan → lolos lapis kutipan (alamatnya bagian, seperti
+      `saring_usulan_baru`); tanpa bagian → dibuang (tidak ada alamat).
+    · Bila TIDAK ADA bagian yang bisa ditentukan (naskah tanpa struktur),
+      lapis bagian dilewati, hanya kutipan yang diperiksa. Bila
+      pemeriksaannya sendiri gagal (kandidat None) → semua dibuang
+      (gagal tertutup: lebih baik tidak menampilkan daripada
+      menampilkan yang karangan).
+    """
+    daftar = usulan or []
+    if not daftar:
+        return []
+    kandidat = _kandidat_bagian(db, file_id, teks_naskah or '')
+    keluar = []
+    for u in daftar:
+        kutip = (u.get('kutipan') or '').strip()
+        if kutip and not kutipan_ada_di_naskah(kutip, teks_naskah or ''):
+            continue
+        if kandidat is None:
+            continue
+        if kandidat and not _bagian_ada(
+                u.get('bab') or u.get('bagian') or '', kandidat):
+            continue
+        keluar.append(u)
+    return keluar
+
+
 def daftar_teks_asli(db: Session, bimbingan_id: int) -> set[str]:
     """Kumpulan kutipan (teks_asli) yang SUDAH menjadi catatan di bimbingan
     ini, sudah dirapikan, untuk saringan keras pilihan berikutnya."""

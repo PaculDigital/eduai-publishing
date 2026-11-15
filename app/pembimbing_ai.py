@@ -266,11 +266,18 @@ def simpan_catatan(db: Session, bk: BerkasPembimbingan,
     dipotong, trial menanggung butir pertama).
     """
     b = _bimbingan_dari(db, bk)
+    #  Pertahanan kedua (putusan Bos 18:48 WIB, samakan dengan
+    #  `simpan_usulan`): kutipan yang tidak ada di naskah disimpan
+    #  dengan teks_asli kosong DAN tanpa baris Kutipan di isi, catatan
+    #  tetap masuk tanpa sorotan palsu.
+    teks = _teks_naskah(db, bk)
     jumlah = 0
     for c in daftar:
-        P.catat(db, b, rapikan_isi(c),
+        kutip = (c.get('kutipan') or '')[:300]
+        teks_asli = (kutip if P.kutipan_ada_di_naskah(kutip, teks) else '')
+        P.catat(db, b, rapikan_isi({**c, 'kutipan': teks_asli}),
                 section_judul=(c.get('bagian') or '')[:120],
-                berkas_id=bk.id, teks_asli=(c.get('kutipan') or '')[:300],
+                berkas_id=bk.id, teks_asli=teks_asli,
                 dari_pembimbing=False)      # ← sumber: mesin, bukan orang
         jumlah += 1
     db.commit()
@@ -349,12 +356,20 @@ async def periksa(
         #  Saringan keras (deterministik, koreksi Bos 16:36 WIB): yang
         #  kutipannya sudah jadi catatan tidak ditawarkan lagi. Prompt
         #  `sudah_ada` saja tidak cukup (LLM bisa tetap mengulang).
-        catatan = P.saring_usulan_baru(db, b.id, catatan)[:5]
+        catatan = P.saring_usulan_baru(db, b.id, catatan)
         if not catatan:
             return {'ok': True, 'sebab': 'selesai', 'jumlah': 0,
                     'mode': 'pilih',
                     'pesan': 'Semua temuan baru sudah ada sebagai catatan, '
                              'tidak ada pilihan baru.'}
+        #  Verifikasi jangkar (putusan Bos 18:48 WIB): buang yang
+        #  mengada-ada (kutipan / bagian tidak ada di naskah).
+        catatan = P.saring_usulan_nyata(db, bk.id, teks, catatan)[:5]
+        if not catatan:
+            return {'ok': True, 'sebab': 'selesai', 'jumlah': 0,
+                    'mode': 'pilih',
+                    'pesan': 'Tidak ada temuan baru yang terverifikasi '
+                             'dari naskah ini.'}
         P.simpan_daftar_pilihan(db, b.id, bk.id, 'periksa', catatan)
 
         log.info('[pembimbing-ai] selesai: %s pilihan (bimbingan %s, '

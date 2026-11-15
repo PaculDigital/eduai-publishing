@@ -140,6 +140,7 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
 .pt-pilihan-butir input{flex:none;margin-top:2px}
 .pt-pilihan-isi b{display:block;color:#146B2C;font-size:12px}
 .pt-pilihan-kutip{display:block;font-style:italic;color:#4A4429;margin:3px 0}
+.pt-pilihan-penggalan{display:block;color:#146B2C;font-size:12px;margin-top:2px}
 .pt-pilihan-aksi{display:flex;gap:8px;margin-top:11px}
 .pt-pilihan-aksi .pt-btn{flex:1;padding:9px 10px;font-size:12.5px}
 .pt-pesan{font-size:12.5px;color:#A32B2B;line-height:1.6}
@@ -336,14 +337,15 @@ body{font-family:'Poppins',system-ui,sans-serif;color:var(--teks);
     {% if sudah_masuk and usulan_pilihan and usulan_pilihan.daftar %}
     <div class="pt-pilihan" id="kotak-pilihan">
       <div class="pt-pilihan-judul">Pilihan revisi dari AI ({{ usulan_pilihan.daftar|length }})</div>
-      <div class="pt-biaya">Pilih yang mau dipakai jadi catatan. 1 Token Revisi per pilihan yang diterima{% if biaya_asisten and biaya_asisten.pakai_trial %}, pilihan pertamamu gratis{% endif %}. Atau tulis sendiri di bawah.</div>
+      <div class="pt-biaya">Pilih yang mau dipakai jadi catatan. 1 Token Revisi per pilihan yang diterima{% if biaya_asisten and biaya_asisten.pakai_trial %}, pilihan pertamamu gratis{% endif %}. Arah perbaikan lengkap terlihat sesudah pilihan diterima. Atau tulis sendiri di bawah.</div>
       {% for it in usulan_pilihan.daftar %}
       <label class="pt-pilihan-butir">
         <input type="checkbox" class="pilihan-centang" value="{{ loop.index0 }}" checked>
         <span class="pt-pilihan-isi">
           <b>{% if usulan_pilihan.sumber == 'periksa' %}{{ it.bagian }}{% else %}{{ it.bab }}{% endif %}</b>
           {% if it.kutipan %}<span class="pt-pilihan-kutip">"{{ it.kutipan }}"</span>{% endif %}
-          <span>{% if usulan_pilihan.sumber == 'periksa' %}{{ it.soal }}{% if it.saran %} {{ it.saran }}{% endif %}{% else %}{{ it.catatan }}{% endif %}</span>
+          <span>{% if usulan_pilihan.sumber == 'periksa' %}{{ it.soal }}{% else %}{{ it.catatan }}{% endif %}</span>
+          {% if it.penggalan %}<span class="pt-pilihan-penggalan">{{ it.penggalan }}</span>{% endif %}
         </span>
       </label>
       {% endfor %}
