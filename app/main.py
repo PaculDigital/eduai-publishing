@@ -4460,3 +4460,70 @@ def simpan_pengaturan(
     bisa = 1 if (ok1 and ok2) else 0
     return RedirectResponse(f'/pengaturan?pesan={quote(pesan)}&berhasil={bisa}',
                             status_code=303)
+
+
+@app.get('/admin/antrean-struktur', response_class=HTMLResponse)
+def halaman_antrean_struktur(request: Request, pesan: str = '',
+                             db: Session = Depends(get_db),
+                             u: User = Depends(hanya_admin)):
+    """Antrean admin pemeriksaan struktur (15 Nov 2026, alur pilot).
+
+    Ramah HP: kartu per baris meragukan, putuskan lewat pilihan ganda
+    (satu ketuk, tanpa mengetik). Keputusan direkam sebagai ground truth
+    baru (loop belajar).
+    """
+    from .models import AntreanPeta, FileBerkas, User
+    menunggu = (db.query(AntreanPeta)
+                  .filter(AntreanPeta.status == 'menunggu')
+                  .order_by(AntreanPeta.dibuat).all())
+    selesai = (db.query(AntreanPeta)
+                 .filter(AntreanPeta.status != 'menunggu')
+                 .order_by(AntreanPeta.diputuskan_pada.desc())
+                 .limit(50).all())
+    ids_file = {r.file_id for r in menunggu + selesai}
+    ids_user = {r.user_id for r in menunggu + selesai}
+    nama_file = {f.id: f.nama for f in
+                 db.query(FileBerkas).filter(
+                     FileBerkas.id.in_(ids_file)).all()} if ids_file else {}
+    nama_user = {p.id: (p.nama or p.email) for p in
+                 db.query(User).filter(User.id.in_(ids_user)).all()} \
+        if ids_user else {}
+
+    def _butir(r):
+        import json as _json
+        try:
+            tetangga = _json.loads(r.tetangga or '{}')
+        except Exception:                                       # noqa: BLE001
+            tetangga = {}
+        try:
+            alasan = _json.loads(r.alasan or '[]')
+        except Exception:                                       # noqa: BLE001
+            alasan = []
+        return {'id': r.id, 'file_id': r.file_id,
+                'nama_file': nama_file.get(r.file_id, ''),
+                'nama_mahasiswa': nama_user.get(r.user_id, ''),
+                'teks': r.teks, 'tetangga': tetangga,
+                'label_jev': r.label_jev, 'label_akhir': r.label_akhir,
+                'status_hakim': r.status_hakim, 'alasan': alasan,
+                'status': r.status, 'keputusan': r.keputusan,
+                'dibuat': r.dibuat, 'diputuskan_pada': r.diputuskan_pada}
+
+    return templates.TemplateResponse('antrean_struktur.html', {
+        'request': request, 'u': u, 'pesan': pesan,
+        'menunggu': [_butir(r) for r in menunggu],
+        'selesai': [_butir(r) for r in selesai]})
+
+
+@app.post('/admin/antrean-struktur/{antrean_id}/putuskan')
+def putuskan_antrean_struktur(antrean_id: int,
+                              keputusan: str = Form(''),
+                              db: Session = Depends(get_db),
+                              u: User = Depends(hanya_admin)):
+    """Rekam satu keputusan admin atas baris antrean."""
+    from urllib.parse import quote
+    from . import antrean as _ant
+    hasil = _ant.putuskan(db, antrean_id=int(antrean_id),
+                          keputusan=keputusan, admin_id=u.id)
+    return RedirectResponse(
+        f'/admin/antrean-struktur?pesan={quote(hasil.get("pesan", ""))}',
+        status_code=303)
