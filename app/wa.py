@@ -33,7 +33,12 @@ def _tabel(db):
     """Pastikan tabel setelan_wa ada (migrasi ringan, idempoten).
 
     Kolom `wa` = nomor WA user sendiri (format bebas — dirapikan
-    bersihkan_wa() saat kirim). Kolom pembelian/undangan/revisi = switch.
+    bersihkan_wa() saat kirim). Kolom pembelian/undangan/revisi/balasan
+    = switch.
+
+    ⚠️ `create_all` TIDAK menambah kolom ke tabel yang sudah ada, jadi
+    kolom baru ditambah lewat PRAGMA + ALTER TABLE idempoten (pola yang
+    sama dengan _migrasi_kolom di app/models.py).
     """
     db.execute(__import__('sqlalchemy').text(
         'CREATE TABLE IF NOT EXISTS setelan_wa ('
@@ -41,25 +46,43 @@ def _tabel(db):
         'wa TEXT DEFAULT \'\', '
         'pembelian INTEGER DEFAULT 1, '
         'undangan INTEGER DEFAULT 1, '
-        'revisi INTEGER DEFAULT 0)'))
+        'revisi INTEGER DEFAULT 0, '
+        'balasan INTEGER DEFAULT 1)'))
+    _tambah_kolom(db, 'setelan_wa', 'balasan', 'INTEGER DEFAULT 1')
+
+
+def _tambah_kolom(db, tabel: str, nama: str, tipe: str) -> None:
+    """Tambah satu kolom bila belum ada (idempoten, aman data lama)."""
+    try:
+        ada = {r[1] for r in db.execute(
+            __import__('sqlalchemy').text(
+                f'PRAGMA table_info({tabel})'))}
+        if ada and nama not in ada:
+            db.execute(__import__('sqlalchemy').text(
+                f'ALTER TABLE {tabel} ADD COLUMN {nama} {tipe}'))
+            log.info('[wa] %s.%s ditambahkan', tabel, nama)
+    except Exception as e:                                 # noqa: BLE001
+        log.warning('[wa] gagal tambah kolom %s.%s: %s', tabel, nama, e)
 
 
 def setelan(db, user_id: int) -> dict:
     _tabel(db)
     r = db.execute(__import__('sqlalchemy').text(
-        'SELECT wa, pembelian, undangan, revisi FROM setelan_wa '
+        'SELECT wa, pembelian, undangan, revisi, balasan FROM setelan_wa '
         'WHERE user_id=:u'), {'u': user_id}).first()
     if not r:
         return {'wa': '', 'pembelian': True, 'undangan': True,
-                'revisi': False}
+                'revisi': False, 'balasan': True}
     return {'wa': r[0] or '', 'pembelian': bool(r[1]),
-            'undangan': bool(r[2]), 'revisi': bool(r[3])}
+            'undangan': bool(r[2]), 'revisi': bool(r[3]),
+            'balasan': bool(r[4]) if len(r) > 4 else True}
 
 
 def atur(db, user_id: int, kunci: str, nilai) -> None:
     _tabel(db)
     kolom = {'pembelian': 'pembelian', 'undangan': 'undangan',
-             'revisi': 'revisi', 'wa': 'wa'}[kunci]
+             'revisi': 'revisi', 'balasan': 'balasan',
+             'wa': 'wa'}[kunci]
     nilai_sql = str(nilai)[:24] if kunci == 'wa' else (1 if nilai else 0)
     db.execute(__import__('sqlalchemy').text(
         f'INSERT INTO setelan_wa (user_id, {kolom}) VALUES (:u, :n) '

@@ -148,6 +148,19 @@ input[type=text]:focus{border-color:var(--hijau)}
           <span class="geser"></span>
         </label>
       </div>
+
+      <div class="saklar-baris">
+        <div class="saklar-teks">
+          <b>Balasan catatan</b>
+          <span>Notifikasi ketika pembimbing membalas catatan Anda.
+                Aktif secara bawaan.</span>
+        </div>
+        <label class="saklar">
+          <input type="checkbox" name="balasan" value="1"
+                 {% if sw.balasan %}checked{% endif %}>
+          <span class="geser"></span>
+        </label>
+      </div>
     </div>
 
     <button type="submit" class="tombol">Simpan setelan</button>

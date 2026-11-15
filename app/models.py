@@ -1060,6 +1060,12 @@ class Pembimbingan(Base):
     #  ditampilkan ke pembimbing lain.
     wa: Mapped[str] = mapped_column(String(24), default='')
     email: Mapped[str] = mapped_column(String(160), default='')
+    #  15 Nov 2026 (rantai balasan, GAS Bos 21:56 WIB): saklar per-bimbingan
+    #  untuk notifikasi WA balasan ke pembimbing. 1 = kirim WA saat
+    #  mahasiswa membalas, 0 = diam. Bawaan 1 (keputusan Bos: "Nyala").
+    #  Pembimbing tanpa akun tidak punya setelan sendiri, jadi saklarnya
+    #  ikut tautan ini; mahasiswa yang mengaturnya saat membuat tautan.
+    wa_balasan: Mapped[int] = mapped_column(Integer, default=1)
     #  Sidik SHA-256 token link. Token mentah TIDAK PERNAH disimpan.
     token_sidik: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     #  Masa berlaku (7/30 hari) — dipakai halaman untuk menampilkan sisa waktu.
@@ -1421,6 +1427,10 @@ def _migrasi_kolom() -> None:
             # perilaku lama tidak berubah sama sekali.
             'terkunci_pada': 'DATETIME',
             'terkunci_oleh': 'INTEGER DEFAULT 0',
+            # 15 Nov 2026 (rantai balasan, GAS Bos 21:56 WIB): saklar
+            # notifikasi WA balasan ke pembimbing, per tautan. DEFAULT 1
+            # (nyala, keputusan Bos) supaya tautan lama ikut menyala.
+            'wa_balasan': 'INTEGER DEFAULT 1',
         },
         'catatan_pembimbing': {
             # 24Sep26 (Tahap 2.2 lampiran gambar): nama berkas di disk +
