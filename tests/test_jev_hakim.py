@@ -2438,6 +2438,67 @@ def main():
     else:
         os.environ['EDUAI_APINEX_KEY'] = _env_apx
 
+    # ── timeout-60: batas kaki combo + Apinex 20 -> 60 dtk (15 Nov 2026)
+    #    Ukur live: Apinex 27,4 dtk untuk satu kata "pong", 9router
+    #    6,84 dtk hanya daftar model, batas 20 dtk memotong jawaban
+    #    yang sebenarnya datang (pekerjaan 238 macet karenanya).
+    _env_r9 = os.environ.get('EDUAI_AGEN_KEDUA_TIMEOUT_R9')
+    os.environ.pop('EDUAI_AGEN_KEDUA_TIMEOUT_R9', None)
+    importlib.reload(AK)
+    try:
+        cek('timeout-60: BATAS_DETIK_R9 bawaan 60 detik',
+            AK.BATAS_DETIK_R9 == 60)
+        cek('timeout-60: batas kaki sama dengan BATAS_DETIK',
+            AK.BATAS_DETIK_R9 == AK.BATAS_DETIK)
+    finally:
+        if _env_r9 is None:
+            os.environ.pop('EDUAI_AGEN_KEDUA_TIMEOUT_R9', None)
+        else:
+            os.environ['EDUAI_AGEN_KEDUA_TIMEOUT_R9'] = _env_r9
+        importlib.reload(AK)
+    os.environ['EDUAI_AGEN_KEDUA_TIMEOUT_R9'] = '45'
+    importlib.reload(AK)
+    try:
+        cek('timeout-60: override env EDUAI_AGEN_KEDUA_TIMEOUT_R9 dihormati',
+            AK.BATAS_DETIK_R9 == 45)
+    finally:
+        if _env_r9 is None:
+            os.environ.pop('EDUAI_AGEN_KEDUA_TIMEOUT_R9', None)
+        else:
+            os.environ['EDUAI_AGEN_KEDUA_TIMEOUT_R9'] = _env_r9
+        importlib.reload(AK)
+    cek('timeout-60: sesudah pulih, bawaan kembali 60 detik',
+        AK.BATAS_DETIK_R9 == 60)
+
+    # Batas 60 dtk benar dipakai _coba_transport untuk kedua kaki.
+    _tangkap_waktu = {}
+
+    def _urlopen_waktu(req, timeout=None):
+        _tangkap_waktu['timeout'] = timeout
+        if 'apinex' in req.full_url:
+            return _ResponApinex(_balasan_apinex())
+        return _ResponR9(_balasan_r9())
+
+    _urlreq.urlopen = _urlopen_waktu
+    os.environ['EDUAI_APINEX_KEY'] = 'kunci-uji-apinex'
+    try:
+        _j_r9 = AK._coba_transport('router9', 'prompt uji')
+        _w_r9 = _tangkap_waktu.get('timeout')
+        _j_apx = AK._coba_transport('apinex', 'prompt uji')
+        _w_apx = _tangkap_waktu.get('timeout')
+        cek('timeout-60: _coba_transport combo memakai 60 detik',
+            _w_r9 == 60 and (_j_r9 or {}).get('label') == 'subbab',
+            str(_w_r9))
+        cek('timeout-60: _coba_transport Apinex memakai 60 detik',
+            _w_apx == 60 and (_j_apx or {}).get('label') == 'biasa',
+            str(_w_apx))
+    finally:
+        _urlreq.urlopen = _urlopen_asli
+    if _env_apx is None:
+        os.environ.pop('EDUAI_APINEX_KEY', None)
+    else:
+        os.environ['EDUAI_APINEX_KEY'] = _env_apx
+
     # ── v16: ATURAN DETERMINISTIK PERKETAT (14 Nov 2026) ───────────────
     #    13 aturan dari 45 baris yang salah di kedua cara di 279 baris
     #    sengketa; 6 aturan diperketat sesudah uji asap peta penuh fid=81

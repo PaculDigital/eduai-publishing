@@ -82,10 +82,14 @@ MODEL_OPENROUTER_BAWAAN = 'google/gemini-2.5-flash'
 MODEL_OPENROUTER_CADANGAN = 'openai/gpt-4o-mini'
 MODEL_JEV_113 = 'SATPAM/typesafe/jev-1.13'
 BATAS_DETIK = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT') or '60')
-# Percobaan pertama di mode fallback (combo 9router) dibatasi singkat
-# supaya tidak menggantung: combo yang providernya mati terbukti
-# timeout 60 dtk (uji asap 12 Nov 2026), bukan gagal cepat.
-BATAS_DETIK_R9 = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT_R9') or '20')
+# Batas kaki combo 9router + Apinex SAMA dengan BATAS_DETIK (60 dtk).
+# Dulu 20 dtk supaya provider mati gagal cepat, tapi ukur live 15 Nov
+# 2026 membuktikan 20 dtk terlalu pendek: Apinex butuh 27,4 dtk hanya
+# untuk menjawab satu kata "pong", dan 9router butuh 6,84 dtk hanya
+# untuk daftar model, jawaban yang sebenarnya datang dipotong duluan
+# lalu dicatat TimeoutError (pekerjaan 238 macet karenanya). Override
+# lewat env EDUAI_AGEN_KEDUA_TIMEOUT_R9 tetap jalan.
+BATAS_DETIK_R9 = float(os.getenv('EDUAI_AGEN_KEDUA_TIMEOUT_R9') or '60')
 # Batas jawaban 2048 (dulu 512): ukur live 13 Nov 2026 — 12 dari 39
 # panggilan fallback terpotong (finish=length) tepat di 512, model
 # menjawab bertele-tele sebelum JSON-nya. 2048 = 4x ruang; penagihan
