@@ -578,7 +578,7 @@ def jalankan():
     teks_per = _teks_docx(docx2)
     cek('docx: perbarui nomor daftar mengisi nomor nyata dari render',
         r_per.get('ok') and r_per.get('diperbarui', 0) >= 2
-        and 'BAB I\t4' in teks_per,
+        and 'BAB I\t1' in teks_per and 'BAB II\t2' in teks_per,
         str(r_per) + ' | ' + teks_per[:400])
     import app.sidecar_buku as _sc
     _sc_asli = _sc.teks_halaman
@@ -595,6 +595,303 @@ def jalankan():
     cek('docx: tanpa render, nomor tidak dikarang (jujur gagal)',
         r_gagal.get('ok') is False and 'tidak tersedia' in r_gagal.get('sebab', ''),
         str(r_gagal))
+
+    # ── 12b. Regresi 4 cacat uji live 16 Nov 2026 (file 126 = buku) ───
+    import copy as _copy
+    import re as _re
+    import zipfile as _zf2
+    from datetime import datetime as _dt, timedelta as _td
+    from app.pustaka_periksa import _RE_P as _RP2, _teks_par_xml as _TPX2
+    _tpl_ba = Path(ROOT, 'app', 'templates', 'bagian_awal.html').read_text()
+    _naskah_tpl = Path(ROOT, 'app', 'templates', 'naskah.html').read_text()
+
+    def _par_xml(jalur):
+        """Daftar teks paragraf SESUNGGUHNYA dari XML (termasuk yang kosong).
+
+        _teks_dari_docx membuang paragraf kosong dan menggabung dengan
+        '\\n\\n', jadi tidak bisa dipakai untuk menghitung paragraf.
+        """
+        with _zf2.ZipFile(jalur) as z:
+            _doc = z.read('word/document.xml').decode('utf-8')
+        return [_TPX2(m.group(0)) for m in _RP2.finditer(_doc)]
+
+    def _buat_buku(jalur):
+        d = _Docx()
+        for t in [
+            'PEMASARAN DIGITAL',
+            'Strategi, Perilaku Konsumen, dan Kinerja Bisnis di Era Ekonomi Digital',
+            'Oleh: Uji Buku', '2026',
+            'Hak cipta dilindungi undang-undang',
+            'Diterbitkan oleh Penerbit Uji',
+            'Cetakan pertama, 2026',
+            'DAFTAR ISI',
+            'BAB 1 Pendahuluan',
+            'BAB 2 Tinjauan Pustaka',
+            '1.1 Latar Belakang',
+            'BAB 3 Metode Penelitian',
+            'BAB 4 Hasil Penelitian dan Pembahasan',
+            'BAB 5 Penutup',
+            'KATA PENGANTAR',
+            'Buku referensi ini disusun untuk menjawab satu pertanyaan sentral yang mendesak dalam diskursus manajemen.',
+            'Penulis mengucapkan terima kasih kepada semua pihak.',
+            'BAB 1', 'PENDAHULUAN', '1.1 Latar Belakang',
+            'Isi latar belakang penelitian ini.',
+            'Tabel 1.1 Jenis Data',
+            'BAB 2', 'TINJAUAN PUSTAKA', '2.1 Teori tentang Variabel Y',
+            'Isi teori.',
+            'Gambar 2.1 Model Penelitian',
+            'BAB 3', 'METODE PENELITIAN', '3.1 Jenis dan Desain Penelitian',
+            'Isi metode.',
+            'BAB 4', 'HASIL PENELITIAN DAN PEMBAHASAN', '4.1 Hasil Uji',
+            'Hasil uji menunjukkan pengaruh positif.',
+            'BAB 5', 'PENUTUP', '5.1 Simpulan', 'Simpulan penelitian ini.',
+            'Lampiran 1 Kuesioner',
+            'INDEKS SUBJEK', 'INDEKS NAMA', 'DAFTAR SINGKATAN',
+            'TENTANG PENULIS',
+        ]:
+            d.add_paragraph(t)
+        d.save(str(jalur))
+        return jalur
+
+    _BARIS_BUKU = ['BAB 1', 'PENDAHULUAN', '1.1 Latar Belakang',
+                   'BAB 2', 'TINJAUAN PUSTAKA', '2.1 Teori tentang Variabel Y',
+                   'BAB 3', 'METODE PENELITIAN', '3.1 Jenis dan Desain Penelitian',
+                   'BAB 4', 'HASIL PENELITIAN DAN PEMBAHASAN', '4.1 Hasil Uji',
+                   'BAB 5', 'PENUTUP', '5.1 Simpulan']
+    _LABEL_BUKU = {str(i): ('subbab' if t[:1].isdigit() and '.' in t.split()[0]
+                            else 'bab')
+                   for i, t in enumerate(_BARIS_BUKU)}
+    PETA_BUKU = {'peta_surveyor': {
+        'baris': _BARIS_BUKU, 'label': _LABEL_BUKU,
+        'hakim': {'jumlah_ragu': 0, 'jumlah_curiga': 0}}}
+    _DATA_BUKU = {'nama': 'Mahasiswa Uji', 'nim': '0000000000',
+                  'prodi': 'Manajemen', 'fakultas': 'Ekonomi dan Bisnis',
+                  'kota': 'Bekasi', 'tahun': '2026', 'judul': 'Pemasaran Digital',
+                  'pembimbing_nama': 'Dosen Uji', 'pembimbing_gelar': 'S.E., M.M.',
+                  'pembimbing_nip': '', 'penguji1_nama': '', 'penguji2_nama': '',
+                  'kaprodi_nama': 'Kaprodi Uji, S.E., M.M.', 'kaprodi_nip': '',
+                  'dekan_nama': 'Dekan Uji, S.E., M.M.', 'dekan_nip': '',
+                  'rektor_nama': '', 'rektor_nip': '',
+                  'tanggal_sidang': '16 November 2026'}
+
+    def _hitung_judul(teks, kata):
+        return sum(1 for t in teks if t.strip().upper() == kata)
+
+    docx_buku = Path(TMP) / 'buku.docx'
+    _buat_buku(docx_buku)
+    _spans_b = _RBA._xml_spans(docx_buku)
+    _teks_b = [t for t, _ in _spans_b]
+    cek('regresi buku: judul bab angka Arab dikenali dari teks',
+        BA.bab_dari_teks('\n'.join(_teks_b)) == {1, 2, 3, 4, 5},
+        str(BA.bab_dari_teks('\n'.join(_teks_b))))
+    cek('regresi buku: teks dan peta sepakat soal bab (pesan kartu selaras)',
+        BA.bab_dari_teks('\n'.join(_teks_b)) == BA.bab_dari_peta(PETA_BUKU))
+    cek('regresi buku: indeks Bab I menunjuk badan, bukan daftar isi buku',
+        BA.cari_indeks_bab1(_teks_b) == 17,
+        str(BA.cari_indeks_bab1(_teks_b)))
+    _baca_b = BA.baca_bagian_awal(_teks_b)
+    _ren_b = BA.rencana_update(_DATA_BUKU, {}, _baca_b, {}, 'final')
+    _baru_b = _RBA._bangun_bagian_baru(
+        _ren_b, _baca_b, _spans_b, _DATA_BUKU, 'final', PETA_BUKU, _teks_b,
+        ['Kata pengantar draf AI.'], None)
+    _tulis_b = BA.tulis_bagian_awal(docx_buku, _baru_b)
+    _teks_b1 = _teks_docx(docx_buku)
+    _par_b1 = _par_xml(docx_buku)
+    cek('regresi cacat 1: tempel berhasil, badan buku utuh',
+        _tulis_b.get('ok') and 'Isi latar belakang penelitian ini.' in _teks_b1
+        and 'Simpulan penelitian ini.' in _teks_b1, str(_tulis_b))
+    cek('regresi cacat 1: sesudah tempel tiap seksi depan tepat satu',
+        all(_hitung_judul(_par_b1, k) == 1 for k in
+            ('KATA PENGANTAR', 'DAFTAR ISI', 'ABSTRACT', 'ABSTRAK')),
+        str({k: _hitung_judul(_par_b1, k) for k in
+             ('KATA PENGANTAR', 'DAFTAR ISI', 'ABSTRACT', 'ABSTRAK')}))
+    _xml_b1 = _xml_docx(docx_buku)
+    _sect_b1 = _re.findall(r'<w:sectPr.*?</w:sectPr>', _xml_b1, _re.S)
+    cek('regresi cacat 2: tepat dua pemutus (Romawi depan, Arab badan, mulai 1)',
+        len(_sect_b1) == 2
+        and 'lowerRoman' in _sect_b1[0] and 'decimal' in _sect_b1[1]
+        and 'w:start="1"' in _sect_b1[0] and 'w:start="1"' in _sect_b1[1],
+        str(len(_sect_b1)))
+    cek('regresi cacat 2: pemutus depan memakai footer yang sama dengan badan',
+        len(_sect_b1) == 2
+        and (lambda m: (m.group(1) if m else None))(
+            _re.search(r'footerReference[^>]*r:id="([^"]+)"', _sect_b1[0]))
+        == (lambda m: (m.group(1) if m else None))(
+            _re.search(r'footerReference[^>]*r:id="([^"]+)"', _sect_b1[1])),
+        # Fixture ini tanpa footer (python-docx), jadi keduanya None;
+        # kasus footer nyata dibuktikan repro render (keduanya rIdFooter1).
+        str(_sect_b1[0][:200] if _sect_b1 else ''))
+    cek('regresi cacat 1: tiap seksi depan mulai di halaman baru (13 jeda)',
+        _xml_b1.count('<w:br w:type="page"/>') == 13,
+        str(_xml_b1.count('<w:br w:type="page"/>')))
+    _idx_daftar = [_par_b1.index(k) for k in
+                   ('DAFTAR ISI', 'DAFTAR TABEL', 'DAFTAR GAMBAR',
+                    'DAFTAR LAMPIRAN')]
+    cek('regresi cacat 3: urutan daftar ikut Pedoman (Isi, Tabel, Gambar, Lampiran)',
+        _idx_daftar == sorted(_idx_daftar), str(_idx_daftar))
+    _i_abs = _par_b1.index('ABSTRACT')
+    _i_abr = _par_b1.index('ABSTRAK')
+    cek('regresi cacat 4: halaman abstract berisi judul + kolom (bukan kosong)',
+        _par_b1[_i_abs + 2] == 'Pemasaran Digital'
+        and _par_b1[_i_abr + 2] == 'Mahasiswa Uji'
+        and _par_b1[_i_abr + 3] == 'Pemasaran Digital',
+        str(_par_b1[_i_abs:_i_abs + 5]) + ' | '
+        + str(_par_b1[_i_abr:_i_abr + 5]))
+    cek('regresi cacat 4: draf abstrak yang belum diterima tidak masuk naskah',
+        'Buku referensi ini disusun' in _teks_b1
+        and 'Kata pengantar draf AI.' not in _teks_b1
+        and _par_b1[_i_abs + 4] == '' and _par_b1[_i_abr + 5] == '')
+    cek('regresi (a): sampul terdeteksi sesudah tempel',
+        'sampul' in BA.baca_bagian_awal(_par_b1).get('bagian', {}),
+        str(sorted(BA.baca_bagian_awal(_par_b1).get('bagian', {}).keys())))
+    cek('regresi: isi buku (sampul, copyright, indeks, Tentang Penulis) utuh',
+        'Hak cipta dilindungi undang-undang' in _teks_b1
+        and 'INDEKS SUBJEK' in _teks_b1 and 'TENTANG PENULIS' in _teks_b1,
+        _teks_b1[:200])
+
+    # Perbarui: ubah NIP pembimbing, rencana dari sidik pasca-tempel.
+    _DATA_B2 = dict(_DATA_BUKU, pembimbing_nip='198501012010011001')
+    _spans_b2 = _RBA._xml_spans(docx_buku)
+    _teks_b2 = [t for t, _ in _spans_b2]
+    _baca_b2 = BA.baca_bagian_awal(_teks_b2)
+    _ren_b2 = BA.rencana_update(_DATA_B2, _DATA_BUKU, _baca_b2, {}, 'final')
+    _baru_b2 = _RBA._bangun_bagian_baru(
+        _ren_b2, _baca_b2, _spans_b2, _DATA_B2, 'final', PETA_BUKU, _teks_b2,
+        None, None)
+    _tulis_b2 = BA.tulis_bagian_awal(docx_buku, _baru_b2)
+    _teks_b3 = _teks_docx(docx_buku)
+    _par_b3 = _par_xml(docx_buku)
+    cek('regresi cacat 1: sesudah perbarui tiap seksi depan tetap satu',
+        _tulis_b2.get('ok') and all(_hitung_judul(_par_b3, k) == 1 for k in
+                                    ('KATA PENGANTAR', 'DAFTAR ISI',
+                                     'ABSTRACT', 'ABSTRAK')),
+        str(_tulis_b2) + ' | ' + str(
+            {k: _hitung_judul(_par_b3, k) for k in
+             ('KATA PENGANTAR', 'DAFTAR ISI', 'ABSTRACT', 'ABSTRAK')}))
+    cek('regresi cacat 1: jumlah paragraf stabil sesudah perbarui (tidak membengkak)',
+        len(_par_b3) == len(_par_b1), f'{len(_par_b1)} -> {len(_par_b3)}')
+    _xml_b3 = _xml_docx(docx_buku)
+    cek('regresi cacat 1: jeda halaman tetap 13 sesudah perbarui (idempotent)',
+        _xml_b3.count('<w:br w:type="page"/>') == 13,
+        str(_xml_b3.count('<w:br w:type="page"/>')))
+    cek('regresi cacat 2: sesudah perbarui tetap dua pemutus',
+        len(_re.findall(r'<w:sectPr.*?</w:sectPr>', _xml_b3, _re.S)) == 2)
+    cek('regresi cacat 1: entri daftar tidak ganda sesudah perbarui',
+        _par_b3.count('Tabel 1.1 Jenis Data') == 2
+        and _par_b3.count('Gambar 2.1 Model Penelitian') == 2
+        and _par_b3.count('Lampiran 1 Kuesioner') == 2,
+        str({k: _par_b3.count(k) for k in
+             ('Tabel 1.1 Jenis Data', 'Gambar 2.1 Model Penelitian',
+              'Lampiran 1 Kuesioner')}))
+    cek('regresi: NIP baru masuk Persetujuan sesudah perbarui',
+        'NIP : 198501012010011001' in _teks_b3)
+    cek('regresi cacat 3: entri daftar tabel/gambar dapat nomor dari render',
+        BA.perbarui_nomor_daftar(
+            docx_buku, halaman_render=[
+                'Sampul', 'KATA PENGANTAR', 'DAFTAR ISI',
+                'BAB 1\nPENDAHULUAN\nTabel 1.1 Jenis Data',
+                'BAB 2\nTINJAUAN PUSTAKA\nGambar 2.1 Model Penelitian',
+                'BAB 3\nMETODE PENELITIAN\nLampiran 1 Kuesioner']).get('ok')
+        and 'Tabel 1.1 Jenis Data\t1' in _teks_docx(docx_buku)
+        and 'Gambar 2.1 Model Penelitian\t2' in _teks_docx(docx_buku))
+
+    # Nomor footer dari render: Romawi depan, Arab badan dari 1, None bila tak ada.
+    _render_nomor = ['Sampul\nFakultas Ekonomi',
+                     'KATA PENGANTAR\nIsi pengantar.',
+                     'DAFTAR ISI\nBAB 1\nPENDAHULUAN\n1.1 Latar Belakang',
+                     'BAB 1\nPENDAHULUAN\nIsi bab satu.',
+                     'BAB 2\nTINJAUAN PUSTAKA\nIsi teori.']
+    cek('regresi cacat 3: nomor footer depan Romawi (pengantar ii, isi iii)',
+        BA.nomor_footer_dari_render(_render_nomor, 'KATA PENGANTAR') == 'ii'
+        and BA.nomor_footer_dari_render(_render_nomor, 'DAFTAR ISI') == 'iii',
+        str(BA.nomor_footer_dari_render(_render_nomor, 'KATA PENGANTAR')))
+    cek('regresi cacat 3: nomor footer badan Arab mulai 1 di Bab I',
+        BA.nomor_footer_dari_render(_render_nomor, 'BAB 1') == 1
+        and BA.nomor_footer_dari_render(_render_nomor, 'BAB 2') == 2
+        and BA.nomor_footer_dari_render(_render_nomor, 'PENDAHULUAN') == 1)
+    cek('regresi cacat 3: nomor footer tak ketemu -> None (tidak dikarang)',
+        BA.nomor_footer_dari_render(_render_nomor, 'BAB IV HASIL') is None)
+
+    # Peringatan usang: tidak menyala sesudah pembuatan ulang, menyala bila berubah.
+    _waktu_tulis = _dt.fromtimestamp(Path(docx_buku).stat().st_mtime)
+    _hasil_usang = {'ditempel': True,
+                    'sidik_daftar': BA.sidik_daftar(PETA_BUKU, _par_b3),
+                    'diubah_pada': _waktu_tulis}
+    cek('regresi cacat 3: peringatan usang TIDAK muncul sesudah pembuatan ulang',
+        BA.daftar_usang(_hasil_usang, PETA_BUKU, _par_b3, _waktu_tulis) is False)
+    _peta_ubah = _copy.deepcopy(PETA_BUKU)
+    _peta_ubah['peta_surveyor']['baris'] = list(_BARIS_BUKU) + ['BAB 6', 'SARAN']
+    _peta_ubah['peta_surveyor']['label'] = dict(_LABEL_BUKU)
+    _peta_ubah['peta_surveyor']['label'][str(len(_BARIS_BUKU))] = 'bab'
+    _peta_ubah['peta_surveyor']['label'][str(len(_BARIS_BUKU) + 1)] = 'bab'
+    cek('regresi cacat 3: peringatan usang menyala bila peta berubah',
+        BA.daftar_usang(_hasil_usang, _peta_ubah, _par_b3, _waktu_tulis) is True)
+    cek('regresi cacat 3: peringatan usang menyala bila berkas berubah sesudah tulis',
+        BA.daftar_usang(_hasil_usang, PETA_BUKU, _par_b3,
+                        _waktu_tulis + _td(hours=1)) is True)
+
+    # Gagal tertutup: Bab I tidak ada -> tempel ditolak, berkas tidak berubah.
+    docx_tanpa_bab = Path(TMP) / 'tanpa_bab.docx'
+    d_tb = _Docx()
+    for t in ['DAFTAR ISI', 'KATA PENGANTAR', 'Isi pengantar.']:
+        d_tb.add_paragraph(t)
+    d_tb.save(str(docx_tanpa_bab))
+    _teks_tb_sebelum = _teks_docx(docx_tanpa_bab)
+    _tulis_tb = BA.tulis_bagian_awal(docx_tanpa_bab, [
+        {'kunci': k, 'judul': j, 'baris': b, 'xml': None, 'ppr': ''}
+        for k, j, b in BA.susun_bagian(
+            {'nama': 'Siti Aminah', 'judul': 'Judul Saya'}, 'proposal',
+            {'daftar_isi': BA.entri_daftar_isi(PETA_BAB123)})])
+    cek('regresi cacat 1: tanpa Bab I, tempel ditolak supaya tidak mengganda',
+        _tulis_tb.get('ok') is False
+        and _teks_docx(docx_tanpa_bab) == _teks_tb_sebelum,
+        str(_tulis_tb))
+
+    # Daftar lampiran kosong ditulis jujur, bukan halaman kosong.
+    _susun_kosong = BA.susun_bagian(
+        {'nama': 'Siti Aminah', 'judul': 'Judul Saya'}, 'proposal',
+        {'daftar_isi': BA.entri_daftar_isi(PETA_BAB123),
+         'daftar_tabel': [], 'daftar_gambar': [], 'daftar_lampiran': []})
+    _baris_lamp = [b for k, _j, b in _susun_kosong if k == 'daftar_lampiran'][0]
+    cek('regresi cacat 3: lampiran kosong ditandai "Belum ada lampiran."',
+        BA.BARIS_BELUM_ADA_LAMPIRAN in _baris_lamp, str(_baris_lamp))
+
+    # Catatan tambahan (a-e) dari uji yang sama.
+    cek('regresi (d): nama pembimbing berupa email dikosongkan (bukan nama)',
+        BA.bersihkan_data({'pembimbing_nama': 'uji-buku@bikinaja.id'}
+                          ).get('pembimbing_nama') == '')
+    cek('regresi (e): struk tempel dan perbarui menghitung baris yang sama',
+        BA.hitung_baris_isi(['KATA PENGANTAR', '', 'Isi pengantar.',
+                             '', 'Paragraf kedua.']) == 3
+        and BA.hitung_baris_isi(['KATA PENGANTAR', '', 'Isi pengantar.',
+                                 '', 'Paragraf kedua.'])
+        == BA.hitung_baris_isi(['KATA PENGANTAR', '', 'Isi pengantar.',
+                                '', 'Paragraf kedua.']))
+    _aksi_awal = _naskah_tpl.index('.aksi{')
+    _aksi_akhir = _naskah_tpl.index('}', _aksi_awal)
+    cek('regresi (c): baris tombol kartu membungkus di layar sempit (flex-wrap)',
+        'flex-wrap:wrap' in _naskah_tpl[_aksi_awal:_aksi_akhir],
+        _naskah_tpl[_aksi_awal:_aksi_akhir])
+
+    # ── 12c. Penyederhanaan layar (Boss 16 Nov 2026 16:07 WIB) ────────
+    cek('sederhana: ringkasan layar pertama tepat 5 kelompok',
+        [g['kelompok'] for g in BA.ringkas_kelompok({}, [], 'proposal')] ==
+        ['tentang', 'pembimbing', 'penguji', 'pimpinan', 'daftar'])
+    cek('sederhana: wajib sekarang 4 kolom, boleh nanti 18 kolom, semua 22 terjangkau',
+        len(BA.WAJIB_SEKARANG) == 4 and len(BA.BOLEH_NANTI) == 18
+        and set(BA.WAJIB_SEKARANG) | set(BA.BOLEH_NANTI) ==
+        set(BA.KUNCI_FORM) | {'judul'})
+    cek('sederhana: kolom boleh nanti di balik Tambah detail (tertutup dulu)',
+        '  <details>\n  <summary>Tambah detail (boleh nanti)</summary>' in _tpl_ba
+        and _tpl_ba.index('Wajib sekarang')
+        < _tpl_ba.index('Tambah detail (boleh nanti)')
+        < _tpl_ba.index('kunci not in wajib'))
+    cek('sederhana: formulir tertutup dulu bila belum ada rencana',
+        '<details class="kotak" {% if rencana %}open{% endif %}>' in _tpl_ba)
+    cek('sederhana: ringkasan 5 kelompok tampil di layar pertama',
+        '<h2>Ringkasan</h2>' in _tpl_ba and '{% for g in ringkasan %}' in _tpl_ba)
+    cek('sederhana: semua kolom tetap dirender lewat loop kolom',
+        'name="{{ kunci }}"' in _tpl_ba and 'name="judul"' in _tpl_ba)
 
     # ── 13. Setelan round-trip ────────────────────────────────────────
     from app.models import Base, Setelan, User, FileBerkas, ProfilDokumen
