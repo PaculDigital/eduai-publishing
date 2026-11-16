@@ -750,7 +750,8 @@ def jalankan():
     _i_abs = _par_b1.index('ABSTRACT')
     _i_abr = _par_b1.index('ABSTRAK')
     cek('regresi cacat 4: halaman abstract berisi judul + kolom (bukan kosong)',
-        _par_b1[_i_abs + 2] == 'Pemasaran Digital'
+        _par_b1[_i_abs + 2] == 'Mahasiswa Uji'
+        and _par_b1[_i_abs + 3] == 'Pemasaran Digital'
         and _par_b1[_i_abr + 2] == 'Mahasiswa Uji'
         and _par_b1[_i_abr + 3] == 'Pemasaran Digital',
         str(_par_b1[_i_abs:_i_abs + 5]) + ' | '
@@ -758,7 +759,8 @@ def jalankan():
     cek('regresi cacat 4: draf abstrak yang belum diterima tidak masuk naskah',
         'Buku referensi ini disusun' in _teks_b1
         and 'Kata pengantar draf AI.' not in _teks_b1
-        and _par_b1[_i_abs + 4] == '' and _par_b1[_i_abr + 5] == '')
+        and _par_b1[_i_abs + 4] == 'ABSTRAK'
+        and _par_b1[_i_abr + 4] == 'BAB 1')
     cek('regresi (a): sampul terdeteksi sesudah tempel',
         'sampul' in BA.baca_bagian_awal(_par_b1).get('bagian', {}),
         str(sorted(BA.baca_bagian_awal(_par_b1).get('bagian', {}).keys())))
@@ -864,6 +866,82 @@ def jalankan():
                 'BAB 3\nMETODE PENELITIAN\nLampiran 1 Kuesioner']).get('ok')
         and 'Tabel 1.1 Jenis Data\t1' in _teks_docx(docx_buku)
         and 'Gambar 2.1 Model Penelitian\t2' in _teks_docx(docx_buku))
+
+    # ── 12d. Regresi perbaikan Perbarui #3 (16 Nov 2026) ────────────
+    # (a) Daftar Isi buatan: satu baris per bab. Penanda telanjang
+    # ('BAB 1') + judul polos ('PENDAHULUAN') bergabung jadi satu
+    # entri ('BAB 1. PENDAHULUAN'), bukan dua baris.
+    _entri_buku = BA.entri_daftar_isi(
+        PETA_BUKU, paragraf_badan=_BARIS_BUKU)
+    _judul_entri = [e['judul'] for e in _entri_buku]
+    cek('regresi 12d: Daftar Isi satu baris per bab (tanpa ganda)',
+        _judul_entri.count('BAB 1. PENDAHULUAN') == 1
+        and 'BAB 1' not in _judul_entri
+        and 'PENDAHULUAN' not in _judul_entri
+        and _judul_entri.count('BAB 5. PENUTUP') == 1,
+        str(_judul_entri))
+    # (b) Pencari Bab I menunjuk badan, bukan entri Daftar Isi.
+    _idx_b3 = BA.cari_indeks_bab1(_par_b3)
+    cek('regresi 12d: pencari Bab I menunjuk badan, bukan Daftar Isi',
+        _idx_b3 is not None
+        and _par_b3[_idx_b3] == 'BAB 1'
+        and _par_b3[_idx_b3 + 1] == 'PENDAHULUAN'
+        and _idx_b3 > _par_b3.index('ABSTRAK'),
+        str(_idx_b3))
+    # (c) Nomor daftar: judul seksi tidak tertimpa nomor, judul ganda
+    # ('Ringkasan Bab' tiap bab) bernomor berurutan sesuai halamannya.
+    _docx_dup = Path(TMP) / 'daftar_dup.docx'
+    _d_dup = _Docx()
+    for _t in ['KATA PENGANTAR', 'Isi pengantar.',
+               'DAFTAR ISI', '', 'KATA PENGANTAR',
+               'BAB 1. PENDAHULUAN', 'Ringkasan Bab',
+               'BAB 2. TINJAUAN PUSTAKA', 'Ringkasan Bab',
+               'DAFTAR TABEL', '', 'Tabel 1.1 Jenis Data',
+               'BAB 1', 'PENDAHULUAN', 'Isi bab satu.', 'Ringkasan Bab',
+               'BAB 2', 'TINJAUAN PUSTAKA', 'Isi teori.', 'Ringkasan Bab']:
+        _d_dup.add_paragraph(_t)
+    _d_dup.save(str(_docx_dup))
+    _render_dup = ['Sampul', 'KATA PENGANTAR\nIsi pengantar.',
+                   'DAFTAR ISI\nKATA PENGANTAR\nBAB 1. PENDAHULUAN',
+                   'BAB 1\nPENDAHULUAN\nIsi bab satu.\nTabel 1.1 Jenis Data',
+                   'Ringkasan Bab\nAkhir bab satu.',
+                   'BAB 2\nTINJAUAN PUSTAKA\nIsi teori.',
+                   'Ringkasan Bab\nAkhir bab dua.']
+    _r_dup = BA.perbarui_nomor_daftar(
+        _docx_dup, halaman_render=_render_dup)
+    _par_dup = _par_xml(_docx_dup)
+    cek('regresi 12d: nomor daftar tidak menimpa judul seksi',
+        _r_dup.get('ok') and _par_dup[0] == 'KATA PENGANTAR'
+        and _par_dup[3] == 'KATA PENGANTAR\tii',
+        str(_r_dup) + ' | ' + str(_par_dup[:8]))
+    cek('regresi 12d: judul ganda bernomor berurutan (bukan satu nomor)',
+        _par_dup[5] == 'Ringkasan Bab\t2'
+        and _par_dup[7] == 'Ringkasan Bab\t4'
+        and _par_dup[4] == 'BAB 1. PENDAHULUAN\t1'
+        and _par_dup[6] == 'BAB 2. TINJAUAN PUSTAKA\t3',
+        str(_par_dup[3:9]))
+    cek('regresi 12d: judul badan tidak ikut bernomor daftar',
+        _par_dup[13] == 'Ringkasan Bab' and _par_dup[17] == 'Ringkasan Bab',
+        str(_par_dup[10:]))
+    # (d) Format paragraf yang dipakai ulang tidak membawa pemutus
+    # bagian (sectPr): pemutus depan hanya dua, footer merata.
+    _xml_sect = ('<w:p><w:pPr><w:rPr><w:b/></w:rPr>'
+                 '<w:sectPr><w:pgSz w:w="12240"/></w:sectPr></w:pPr>'
+                 '<w:r><w:t>Isi.</w:t></w:r></w:p>')
+    cek('regresi 12d: ppr yang dipakai ulang tidak membawa pemutus bagian',
+        'sectPr' not in BA._ppr_dari_xml(_xml_sect),
+        BA._ppr_dari_xml(_xml_sect)[:200])
+    # (e) Nama tercantum di kedua halaman abstrak (Inggris + Indonesia).
+    _susun_abs = BA.susun_bagian(
+        {'nama': 'Mahasiswa Uji', 'judul': 'Pemasaran Digital'}, 'final',
+        {'daftar_isi': [], 'daftar_tabel': [], 'daftar_gambar': [],
+         'daftar_lampiran': []})
+    _abs_en = [b for k, _j, b in _susun_abs if k == 'abstract'][0]
+    _abs_id = [b for k, _j, b in _susun_abs if k == 'abstrak'][0]
+    cek('regresi 12d: nama tercantum di kedua halaman abstrak',
+        'Mahasiswa Uji' in _abs_en and 'Mahasiswa Uji' in _abs_id
+        and _abs_en[-1] != '' and _abs_id[-1] != '',
+        str(_abs_en) + ' | ' + str(_abs_id))
 
     # Nomor footer dari render: Romawi depan, Arab badan dari 1, None bila tak ada.
     _render_nomor = ['Sampul\nFakultas Ekonomi',

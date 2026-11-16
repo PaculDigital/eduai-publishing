@@ -319,19 +319,19 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
     dipertahankan bersama sampul tidak ditulis dua kali: baris judul
     sudah di dalam XML sampul.
     """
-    from .pustaka_periksa import _RE_PPR
+    # Keterangan hanya dipindai dari badan (mulai Bab I): baris di daftar
+    # lama ikut terpindai bila seluruh dokumen dibaca, lalu entri ganda
+    # saat Perbarui. Badan dipakai juga untuk melengkapi entri Daftar Isi
+    # (bab yang peta lewatkan).
+    _idx_bab1 = BA.cari_indeks_bab1(paragraf or [])
+    _badan = (paragraf or [])[_idx_bab1:] \
+        if _idx_bab1 is not None else (paragraf or [])
     susun = BA.susun_bagian(data, tahap, {
-        'daftar_isi': BA.entri_daftar_isi(peta),
+        'daftar_isi': BA.entri_daftar_isi(peta, paragraf_badan=_badan),
         'daftar_tabel': [],
         'daftar_gambar': [],
         'daftar_lampiran': [],
     }, kata_pengantar=kata_pengantar, abstrak=abstrak)
-    # Keterangan hanya dipindai dari badan (mulai Bab I): baris di daftar
-    # lama ikut terpindai bila seluruh dokumen dibaca, lalu entri ganda
-    # saat Perbarui.
-    _idx_bab1 = BA.cari_indeks_bab1(paragraf or [])
-    _badan = (paragraf or [])[_idx_bab1:] \
-        if _idx_bab1 is not None else (paragraf or [])
     ket = BA.entri_daftar_keterangan(_badan)
     for kunci in ('daftar_tabel', 'daftar_gambar', 'daftar_lampiran'):
         for item in susun:
@@ -348,11 +348,13 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
     indeks = baca.get('indeks', {}) or {}
 
     def _ppr(kunci):
+        # BA._ppr_dari_xml membuang sectPr (pemutus bagian tidak pernah
+        # ikut format paragraf yang dipakai ulang).
         for i in indeks.get(kunci, []) or []:
             if 0 <= i < len(spans):
-                m = _RE_PPR.search(spans[i][1])
-                if m:
-                    return m.group(0)
+                ppr = BA._ppr_dari_xml(spans[i][1])
+                if ppr:
+                    return ppr
         return ''
 
     keluar = []
@@ -367,6 +369,43 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
             xml = [spans[i][1] for i in indeks[kunci]
                    if 0 <= i < len(spans)]
             if xml:
+                # Halaman form yang isinya diawali versi buatan form
+                # kini lalu mengulang bloknya (salinan lama di dalam
+                # salinan pertama) dipangkas ke versi buatan form:
+                # ekor ulang itu salinan basi, bukan edit mahasiswa
+                # (bentuknya sama dengan versi buatan form; edit tangan
+                # yang mengubah label/teks tidak cocok dan tidak
+                # dipangkas, tetap utuh).
+                if kunci in BA.DATA_FORM and kunci not in ('sampul', 'judul'):
+                    _judul_susun, _baris_susun = susun_map.get(
+                        kunci, (label, []))
+                    _isi_kini = (baca.get('bagian', {}) or {}).get(kunci, [])
+                    if _baris_susun and len(_baris_susun) > 1 \
+                            and len(_isi_kini) > len(_baris_susun) - 1 \
+                            and BA._awalan_bentuk_form(
+                                _isi_kini, _baris_susun[1:]):
+                        xml = xml[:len(_baris_susun)]
+                # Kolom nama di halaman abstrak: halaman lama (sebelum
+                # perbaikan) yang dipertahankan bisa kehilangan baris
+                # nama di ABSTRACT (pembangun lama tidak menulisnya,
+                # hanya di ABSTRAK). Nama adalah kolom form, bukan
+                # tulisan mahasiswa: bila belum ada di halaman itu,
+                # sisipkan sesudah judul halaman (tidak menimpa apa pun).
+                if kunci in ('abstract', 'abstrak'):
+                    _nama = ' '.join(
+                        str((data or {}).get('nama', '') or '').split())
+                    _isi_k = (baca.get('bagian', {}) or {}).get(kunci, [])
+                    if _nama and not any(
+                            ' '.join(str(x or '').split()).strip() == _nama
+                            for x in _isi_k):
+                        _teks_xml = [BA._teks_dari_xml(x) for x in xml]
+                        _sisip = 2 if len(xml) > 1 and not (
+                            _teks_xml[1] or '').strip() else 1
+                        _ppr_nama = BA._ppr_dari_xml(
+                            xml[_sisip - 1]) if xml else ''
+                        xml = xml[:_sisip] + [
+                            BA._xml_paragraf(_nama, _ppr_nama)] \
+                            + xml[_sisip:]
                 keluar.append({'kunci': kunci, 'judul': label, 'baris': [],
                                'xml': xml, 'ppr': ''})
                 if kunci == 'sampul':
@@ -380,10 +419,29 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
                        'xml': None, 'ppr': _ppr(kunci)})
     # Blok tambahan: sesudah seksi yang mendahuluinya (tempat asal).
     tambahan = []
+    tambahan_dibuang: list[int] = []
+    _asal_list = baca.get('tambahan_asal', []) or []
+    _tambahan_baris = baca.get('tambahan', []) or []
     for i, blok_idx in enumerate(baca.get('tambahan_indeks', []) or []):
         xml = [spans[j][1] for j in blok_idx if 0 <= j < len(spans)]
         if not xml or not blok_idx:
             continue
+        # Salinan basi halaman form (dipindah baca ke tambahan saat
+        # dedup): isinya sama bentuk dengan halaman buatan form kini
+        # (hanya nilainya bisa beda; judul tidak dibandingkan karena
+        # bergantung tahap proposal/final), jadi dibuang, bukan
+        # dipertahankan sebagai blok kedua. Isi yang bentuknya beda
+        # (tulisan mahasiswa) tetap dipertahankan.
+        asal = _asal_list[i] if i < len(_asal_list) else None
+        if asal in BA.DATA_FORM and asal not in ('sampul', 'judul'):
+            _judul_s, _baris_s = susun_map.get(asal, ('', []))
+            _blok_baris = _tambahan_baris[i] \
+                if i < len(_tambahan_baris) else []
+            if _baris_s and len(_baris_s) > 1 and len(_blok_baris) > 1 \
+                    and BA._sama_bentuk_form(_blok_baris[1:],
+                                             _baris_s[1:]):
+                tambahan_dibuang.append(i)
+                continue
         awal = blok_idx[0]
         sesudah = None
         posisi = None
@@ -411,6 +469,10 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
             jadi.append(blok)
     for blok in jadi:
         blok.pop('_sesudah', None)
+    # Catat blok tambahan yang dibuang (salinan basi halaman form) supaya
+    # struk di pekerja tidak menampilkannya sebagai 'dipertahankan'.
+    if tambahan_dibuang:
+        rencana['_tambahan_dibuang'] = tambahan_dibuang
     return jadi
 
 
@@ -525,12 +587,22 @@ def _buat_kerja_tempel(p, fid, u, jumlah, rencana):
             # Sidik per bagian sesudah tulis (untuk rencana update berikut).
             spans_baru = _xml_spans(path)
             baca_baru = BA.baca_bagian_awal([t for t, _ in spans_baru])
+            # Duplikat yang dibuang Perbarui ini (judul seksi sebelum vs
+            # sesudah tulis): bukti penyembuhan berkas tercemar.
+            _sebelum = BA.hitung_judul_depan(paragraf)
+            _sesudah = BA.hitung_judul_depan([t for t, _ in spans_baru])
+            duplikat_dibuang = {
+                k: _sebelum[k] - _sesudah.get(k, 0)
+                for k in _sebelum if _sebelum[k] > _sesudah.get(k, 0)}
             sidik = {k: BA.sidik_bagian(v)
                      for k, v in baca_baru.get('bagian', {}).items()}
             struk = {
                 'dipertahankan': [
                     f"{d['label']} ({BA.hitung_baris_isi(baca_baru.get('bagian', {}).get(d['kunci']) or [])} baris)"
-                    for d in rencana.get('dipertahankan', [])],
+                    for d in rencana.get('dipertahankan', [])
+                    if str(d.get('kunci', '')) not in {
+                        f'tambahan_{i}' for i in
+                        (rencana.get('_tambahan_dibuang', []) or [])}],
                 'dibuat_ulang': [d['label']
                                  for d in rencana.get('dibuat_ulang', [])],
                 'berubah': [d['label']
@@ -544,7 +616,8 @@ def _buat_kerja_tempel(p, fid, u, jumlah, rencana):
                 'diperiksa_pada': datetime.now(timezone.utc).isoformat(),
                 'diubah_pada': (fb2.diubah or '').isoformat()
                 if hasattr(fb2.diubah, 'isoformat') else str(fb2.diubah or ''),
-                'butuh_render': butuh_render, 'struk': struk})
+                'butuh_render': butuh_render, 'struk': struk,
+                'duplikat_dibuang': duplikat_dibuang})
             proses_mod.tandai_selesai(
                 p.kode, hasil='Bagian Awal selesai ditempel.')
         except Exception as e:                                  # noqa: BLE001

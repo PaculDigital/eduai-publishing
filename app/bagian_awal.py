@@ -670,16 +670,33 @@ def cari_indeks_bab1(paragraf: list[str]) -> int | None:
     tanpa merusak Perbarui (daftar buatan berisi entri telanjang).
     """
     di_daftar = False
+    kini = None
     maks = 0
     ada_entri_berjudul = False
+    ada_nomor_di_daftar = False
+    _urutan_idx = {k: i for i, (k, _) in enumerate(URUTAN)}
     for i, teks in enumerate(paragraf or []):
         s = ' '.join(str(teks or '').split()).strip()
         if not s:
             continue
         kunci = _kunci_dari_judul(s)
         if kunci is not None:
+            # Entri daftar yang namanya sama dengan judul seksi
+            # ('KATA PENGANTAR' sebagai entri pertama Daftar Isi)
+            # adalah ISI daftar, bukan seksi baru: aturan P1 yang sama
+            # dengan baca_bagian_awal, hanya sebelum entri bernomor
+            # pertama. Tanpa ini, pencari keluar dari blok daftar di
+            # entri itu lalu salah menunjuk entri bab berikutnya
+            # ('BAB 1. PENDAHULUAN') sebagai badan, dan Perbarui
+            # mengganda (cacat tes regresi 12d, 16 Nov 2026).
+            if kini in TURUNAN and not ada_nomor_di_daftar \
+                    and _urutan_idx.get(kunci, 99) \
+                    <= _urutan_idx.get(kini, 99):
+                continue
+            kini = kunci
             di_daftar = (kunci == 'daftar_isi')
             ada_entri_berjudul = False
+            ada_nomor_di_daftar = False
             continue
         if _POLAA_TOC.search(s) and not di_daftar:
             continue
@@ -692,7 +709,10 @@ def cari_indeks_bab1(paragraf: list[str]) -> int | None:
                     ada_entri_berjudul = True
             n = _nomor_bab(s)
             if n is None:
+                if re.match(r'^\d+\.\d+\b', s):
+                    ada_nomor_di_daftar = True
                 continue
+            ada_nomor_di_daftar = True
             if n <= maks:
                 return i
             maks = max(maks, n)
@@ -732,6 +752,106 @@ def _mirip_sampul(baris: list[str]) -> bool:
     return any(_MIRIP_SAMPUL.search(b) for b in isi)
 
 
+def _blok_kemunculan(paragraf, indeks_kunci, kunci):
+    """Pisah indeks satu seksi jadi blok per kemunculan judulnya.
+
+    Return [(judul_idx | None, [isi_idx, ...]), ...]. Blok pertama
+    dimulai di judul pertama (atau di awal bila tanpa judul, mis.
+    sampul); blok berikut dimulai tiap kali judul seksi yang sama
+    muncul lagi (salinan). Isi = indeks sesudah judul sampai judul
+    berikut (atau akhir indeks seksi itu).
+    """
+    blok = []
+    kini_judul = None
+    kini_isi: list[int] = []
+    for i in (indeks_kunci or []):
+        if _kunci_dari_judul(paragraf[i]) == kunci:
+            if kini_judul is not None or kini_isi:
+                blok.append((kini_judul, kini_isi))
+            kini_judul = i
+            kini_isi = []
+        else:
+            kini_isi.append(i)
+    blok.append((kini_judul, kini_isi))
+    return blok
+
+
+def _teks_normal_blok(paragraf, idxs) -> str:
+    """Teks ternormalisasi satu blok (untuk banding identik)."""
+    return '\n'.join(' '.join(str(paragraf[i] or '').split()).strip()
+                     for i in (idxs or []))
+
+
+def _tanpa_penanda_bab(teks: str) -> str:
+    """Judul tanpa penanda bab di depan ('BAB 1. Lanskap' -> 'lanskap')."""
+    s = _normalisasi_cari(teks)
+    s = re.sub(r'^bab\s+(?:[ivx]+|\d+)[\s.]*', '', s)
+    return s
+
+
+def _salinan_daftar_lama(paragraf, isi_idx, judul_daftar) -> bool:
+    """Apakah blok ini salinan daftar lama (entri yang sama)?
+
+    `judul_daftar`: himpunan judul entri daftar kini (tanpa penanda,
+    ternormalisasi, tanpa nomor halaman). Blok dihitung salinan bila
+    punya >= 3 baris isi dan >= 80% baris isinya ada di himpunan itu
+    (salinan Daftar Isi lama yang tersedot ke dalam seksi lain).
+    """
+    isi = [' '.join(str(paragraf[i] or '').split()).strip().split('\t')[0]
+           for i in (isi_idx or [])]
+    isi = [s for s in isi if s]
+    if len(isi) < 3:
+        return False
+    cocok = sum(1 for s in isi if _tanpa_penanda_bab(s) in judul_daftar)
+    return cocok * 5 >= len(isi) * 4
+
+
+def _bentuk_baris(baris: str) -> str:
+    """Bentuk baris form: nilai sesudah ':' dikosongkan.
+
+    Dua salinan halaman form yang sama hanya beda nilainya (mis. NIP
+    yang satu terisi, yang satu kosong) punya bentuk yang sama. Baris
+    tanpa ':' dibandingkan apa adanya (teks mahasiswa harus sama persis).
+    """
+    s = ' '.join(str(baris or '').split()).strip()
+    if ':' in s:
+        return s.split(':', 1)[0].strip() + ' :'
+    return s
+
+
+def _sama_bentuk_form(baris_a, baris_b) -> bool:
+    """Apakah dua daftar baris sama bentuknya (panjang + bentuk per baris)?"""
+    a = list(baris_a or [])
+    b = list(baris_b or [])
+    if len(a) != len(b):
+        return False
+    return all(_bentuk_baris(x) == _bentuk_baris(y) for x, y in zip(a, b))
+
+
+def _awalan_bentuk_form(baris, awalan) -> bool:
+    """Apakah `baris` diawali `awalan` (per bentuk, bukan nilai)?"""
+    a = list(baris or [])
+    b = list(awalan or [])
+    if len(a) < len(b) or not b:
+        return False
+    return all(_bentuk_baris(x) == _bentuk_baris(y)
+               for x, y in zip(a[:len(b)], b))
+
+
+def hitung_judul_depan(paragraf) -> dict:
+    """Jumlah kemunculan tiap judul seksi di daftar paragraf.
+
+    Dipakai mengukur duplikat yang dibuang Perbarui (sebelum vs sesudah
+    tulis). Sampul/judul tidak punya judul seksi sendiri (tidak dihitung).
+    """
+    keluar: dict[str, int] = {}
+    for teks in (paragraf or []):
+        kunci = _kunci_dari_judul(teks)
+        if kunci is not None:
+            keluar[kunci] = keluar.get(kunci, 0) + 1
+    return keluar
+
+
 def baca_bagian_awal(paragraf: list[str]) -> dict:
     """Baca bagian depan yang sudah ada dari daftar paragraf naskah.
 
@@ -742,6 +862,10 @@ def baca_bagian_awal(paragraf: list[str]) -> dict:
     mirip sampul, atau blok tambahan bila tidak (prosa sebelum Bab I).
     Sampul dan judul tidak punya judul seksi sendiri, jadi baris judul
     ikut di dalam `sampul`. Baris judul seksi tidak ikut isi.
+    Tiap kunci hanya blok PERTAMAnya yang dipertahankan: salinan berikut
+    dibuang bila identik atau salinan daftar lama, dan dipindah ke
+    `tambahan` (asal dicatat di `tambahan_asal`) bila isinya sungguh
+    berbeda; jumlah yang dibuang ada di `duplikat_dibuang`.
     """
     paragraf = [str(p or '') for p in (paragraf or [])]
     idx = cari_indeks_bab1(paragraf)
@@ -798,12 +922,29 @@ def baca_bagian_awal(paragraf: list[str]) -> dict:
         awal = []
         awal_idx = []
 
+    _URUTAN_INDEKS = {k: i for i, (k, _) in enumerate(URUTAN)}
+    # Apakah blok daftar kini sudah berisi entri bernomor (bab/subbab)?
+    # Baris judul seksi ('KATA PENGANTAR') hanya dihitung entri daftar
+    # bila muncul SEBELUM entri bernomor pertama: entri pertama Daftar
+    # Isi memang bisa bernama seksi (berkas 126), tapi sesudah entri
+    # bernomor, baris judul seksi adalah seksi sungguhan, bukan entri.
+    # Tanpa batas ini, Kata Pengantar asli yang mengikuti Daftar Isi
+    # ikut tersedot ke dalam daftar, lalu drafnya menimpa teks asli
+    # (cacat tes regresi 12d, 16 Nov 2026).
+    ada_nomor_di_daftar = False
     for urut, teks in enumerate(depan):
         kunci = _kunci_dari_judul(teks)
         if kunci is not None:
+            if kini in TURUNAN and not ada_nomor_di_daftar \
+                    and _URUTAN_INDEKS.get(kunci, 99) \
+                    <= _URUTAN_INDEKS.get(kini, 99):
+                bagian[kini].append(teks)
+                indeks[kini].append(urut)
+                continue
             _tutup_awal()
             _tutup_tambahan()
             kini = kunci
+            ada_nomor_di_daftar = False
             bagian.setdefault(kunci, [])
             indeks.setdefault(kunci, []).append(urut)
             continue
@@ -823,6 +964,10 @@ def baca_bagian_awal(paragraf: list[str]) -> dict:
             else:
                 bagian[kini].append(teks)
                 indeks[kini].append(urut)
+                if kini in TURUNAN and not ada_nomor_di_daftar \
+                        and (_nomor_bab(teks) is not None
+                             or re.match(r'^\s*\d+\.\d+\b', teks)):
+                    ada_nomor_di_daftar = True
         elif kini_tambahan is not None:
             kini_tambahan.append(teks)
             kini_tambahan_idx.append(urut)
@@ -831,13 +976,69 @@ def baca_bagian_awal(paragraf: list[str]) -> dict:
             awal_idx.append(urut)
     _tutup_awal()
     _tutup_tambahan()
+    # ── Dedup salinan bagian depan ─────────────────────────────────
+    # Perbarui lama mempertahankan SEMUA salinan (baca menggabung semua
+    # kemunculan kunci yang sama ke satu seksi), jadi berkas yang sudah
+    # tercemar tumbuh tiap Perbarui (Kata Pengantar 5 jadi 7 judul,
+    # halaman 204 jadi 209, uji live 16 Nov 2026). Di sini, per kunci
+    # hanya blok PERTAMA yang dipertahankan; salinan berikut dibuang
+    # bila identik atau bila isinya salinan daftar lama, dan dipindah
+    # ke tambahan bila isinya sungguh berbeda (tulisan mahasiswa tidak
+    # pernah hilang diam-diam).
+    duplikat_dibuang: dict[str, int] = {}
+    tambahan_asal: list[str | None] = [None] * len(tambahan)
+    judul_daftar: set[str] = set()
+    for _k in TURUNAN:
+        for _b in bagian.get(_k, []) or []:
+            _t = ' '.join(str(_b or '').split()).strip().split('\t')[0]
+            if _t:
+                judul_daftar.add(_tanpa_penanda_bab(_t))
+    for kunci in list(bagian.keys()):
+        idxs = indeks.get(kunci, []) or []
+        if len(idxs) <= 1:
+            continue
+        blok = _blok_kemunculan(depan, idxs, kunci)
+        if len(blok) <= 1:
+            continue
+        teks_pertama = _teks_normal_blok(depan, blok[0][1])
+        simpan_idx = ([blok[0][0]] + list(blok[0][1])
+                      if blok[0][0] is not None else list(blok[0][1]))
+        simpan_isi = list(blok[0][1])
+        for judul_idx, isi_idx in blok[1:]:
+            teks_blok = _teks_normal_blok(depan, isi_idx)
+            if teks_blok == teks_pertama:
+                duplikat_dibuang[kunci] = duplikat_dibuang.get(kunci, 0) + 1
+                continue
+            if _salinan_daftar_lama(depan, isi_idx, judul_daftar):
+                duplikat_dibuang[kunci] = duplikat_dibuang.get(kunci, 0) + 1
+                continue
+            # Isi sungguh berbeda: pindah ke tambahan (dipertahankan).
+            blok_baris = [depan[i] for i in isi_idx]
+            if judul_idx is not None:
+                blok_baris = [depan[judul_idx]] + blok_baris
+            tambahan.append(blok_baris)
+            tambahan_indeks.append(
+                ([judul_idx] if judul_idx is not None else [])
+                + list(isi_idx))
+            tambahan_asal.append(kunci)
+        # Seksi ini tinggal blok pertama.
+        bagian[kunci] = [depan[i] for i in simpan_isi]
+        indeks[kunci] = simpan_idx
     # Buang blok tambahan yang kosong melompong (teks + indeks sejalan).
-    pasangan = [(b, t) for b, t in zip(tambahan, tambahan_indeks)
-                if any(x.strip() for x in b)]
-    tambahan = [b for b, _ in pasangan]
-    tambahan_indeks = [t for _, t in pasangan]
+    pasangan = [(b, t, a) for b, t, a in zip(
+        tambahan, tambahan_indeks, tambahan_asal)
+        if any(x.strip() for x in b)]
+    # Urutkan tambahan menurut posisi dokumen (blok pindahan dedup
+    # ditambahkan belakangan, supaya penyisipan kembali mengikuti
+    # tempat asalnya, bukan urutan penambahan).
+    pasangan.sort(key=lambda p: min(p[1]) if p[1] else 0)
+    tambahan = [b for b, _, _ in pasangan]
+    tambahan_indeks = [t for _, t, _ in pasangan]
+    tambahan_asal = [a for _, _, a in pasangan]
     return {'bagian': bagian, 'tambahan': tambahan, 'idx_bab1': idx,
-            'indeks': indeks, 'tambahan_indeks': tambahan_indeks}
+            'indeks': indeks, 'tambahan_indeks': tambahan_indeks,
+            'tambahan_asal': tambahan_asal,
+            'duplikat_dibuang': duplikat_dibuang}
 
 
 # ── Rencana update (tiga daftar untuk layar konfirmasi) ────────────────
@@ -1041,13 +1242,29 @@ def susun_bagian(data: dict, tahap: str, entri: dict,
         idn = list(abs_d.get('id') or [''])
         kunci_en = ', '.join(abs_d.get('kunci_en') or [])
         kunci_id = ', '.join(abs_d.get('kunci_id') or [])
+        # Kolom nama di KEDUA halaman (cacat uji live 16 Nov 2026:
+        # ABSTRACT kehilangan 'Mahasiswa Uji', ABSTRAK memilikinya).
         keluar.append(('abstract', 'Abstract',
-                       ['ABSTRACT', '', judul, ''] + en + ['',
+                       ['ABSTRACT', '', _isi(nama), judul, ''] + en + ['',
                         'Keywords: ' + kunci_en if kunci_en else '']))
         keluar.append(('abstrak', 'Abstrak',
                        ['ABSTRAK', '', _isi(nama), judul, ''] + idn + ['',
                         'Kata kunci: ' + kunci_id if kunci_id else '']))
-    return keluar
+    # Baris kosong di ujung seksi hanya spasi: buang supaya tidak ada
+    # paragraf kosong tertinggal yang bisa meluber ke halaman kosong
+    # (cacat uji live 16 Nov 2026: halaman kosong antara Abstract dan
+    # Abstrak). Isi tidak berkurang, hanya ekor kosongnya. Minimal dua
+    # baris dipertahankan (judul + satu garis kosong) supaya seksi yang
+    # memang kosong tetap punya satu baris isi sesudah judulnya.
+    return [(k, j, _buang_ekor_kosong(b)) for k, j, b in keluar]
+
+
+def _buang_ekor_kosong(baris: list[str]) -> list[str]:
+    """Buang baris kosong di ujung daftar baris (sisakan minimal 2)."""
+    baris = list(baris or [])
+    while len(baris) > 2 and not (baris[-1] or '').strip():
+        baris.pop()
+    return baris
 
 
 # ── Entri daftar dari peta + naskah ───────────────────────────────────
@@ -1071,7 +1288,40 @@ def nomor_halaman_dari_render(halaman_render, judul: str) -> int | None:
     for i, teks_halaman in enumerate(halaman_render):
         if cari in _normalisasi_cari(teks_halaman):
             return i + 1
+    # Judul bab berpenanda ('BAB 1. Lanskap ...') tidak tertulis
+    # begitu di badan (badan hanya 'BAB 1' + 'PENDAHULUAN'): cari
+    # lewat penandanya saja (cacat uji live 16 Nov 2026).
+    nomor_bab = _nomor_penanda_judul(judul)
+    if nomor_bab is not None:
+        for i, teks_halaman in enumerate(halaman_render):
+            if _halaman_memuat_penanda(teks_halaman, nomor_bab):
+                return i + 1
     return None
+
+
+def _nomor_penanda_judul(judul: str) -> int | None:
+    """Nomor bab dari penanda di depan judul ('BAB 3. X' -> 3)."""
+    m = re.match(r'^\s*BAB\s+([IVX]+|\d+)\b', str(judul or ''),
+                 re.IGNORECASE)
+    if not m:
+        return None
+    t = m.group(1).upper()
+    if t in ROMAWI:
+        return ROMAWI[t]
+    try:
+        n = int(t)
+    except ValueError:
+        return None
+    return n if 1 <= n <= 6 else None
+
+
+def _halaman_memuat_penanda(teks_halaman: str, nomor: int) -> bool:
+    """Apakah halaman ini memuat penanda bab telanjang ('BAB n')?"""
+    for b in (teks_halaman or '').splitlines():
+        s = ' '.join(b.split()).strip()
+        if _POLAA_BAB_TELANJANG.match(s) and _nomor_bab(s) == nomor:
+            return True
+    return False
 
 
 def ke_romawi(n) -> str:
@@ -1142,10 +1392,22 @@ def _judul_cocok_di_halaman(teks_halaman: str, judul: str) -> bool:
             gabung = b + ' ' + baris[i + 1]
             if gabung == cari or gabung.startswith(cari + ' '):
                 return True
+            gabung_titik = b + '. ' + baris[i + 1]
+            if gabung_titik == cari or gabung_titik.startswith(cari + ' '):
+                return True
+    # Judul berpenanda ('BAB 3. Perilaku ...') cocok bila halaman
+    # memuat penanda telanjangnya ('BAB 3'): judul badan bisa berbeda
+    # dari judul di Daftar Isi (naskah buku).
+    nomor_bab = _nomor_penanda_judul(judul)
+    if nomor_bab is not None:
+        for b in baris:
+            if _POLAA_BAB_TELANJANG.match(b) and _nomor_bab(b) == nomor_bab:
+                return True
     return False
 
 
-def nomor_footer_dari_render(halaman_render, judul: str):
+def nomor_footer_dari_render(halaman_render, judul: str,
+                           mulai_badan: int | None = None):
     """Nomor footer nyata dari render untuk satu judul daftar.
 
     Return int (Arab, badan: Bab I = 1) atau str Romawi kecil (bagian
@@ -1153,7 +1415,10 @@ def nomor_footer_dari_render(halaman_render, judul: str):
     diketahui: nomor TIDAK PERNAH dikarang. Beda dengan
     nomor_halaman_dari_render yang mengembalikan nomor fisik halaman:
     nomor footer inilah yang tercetak di kaki halaman dan yang harus
-    tertulis di Daftar Isi.
+    tertulis di Daftar Isi. `mulai_badan` (indeks fisik halaman): mulai
+    cari judul badan dari halaman itu, dipakai untuk judul ganda
+    ('Ringkasan Bab' tiap bab) supaya kemunculan kedua tidak kembali
+    menunjuk halaman kemunculan pertama.
     """
     if not halaman_render or not (judul or '').strip():
         return None
@@ -1165,19 +1430,125 @@ def nomor_footer_dari_render(halaman_render, judul: str):
     # halaman), nomornya Romawi kecil. Syarat baris pertama penting:
     # halaman Daftar Isi memuat semua entri sebagai baris, jadi cocok
     # sembarang baris akan salah menunjuk halaman daftar itu sendiri.
+    # Halaman LANJUTAN Daftar Isi (daftar panjang, puluhan entri)
+    # diawali baris entri, dan baris itu bisa sama persis dengan judul
+    # bab ('Arsitektur Strategi ...' adalah entri sekaligus judul Bab
+    # 2): tanpa pengecualian, nomor footer bab menunjuk halaman daftar
+    # yang salah (cacat uji live 16 Nov 2026). Rentang daftar = dari
+    # halaman yang diawali 'DAFTAR ISI' sampai halaman bagian depan
+    # berikutnya (daftar lain / abstrak) atau awal badan.
+    rentang_daftar: set[int] = set()
     for i in range(0, awal):
+        baris_i = [b for b in (halaman_render[i] or '').splitlines()
+                   if b.strip()]
+        if baris_i and _normalisasi_cari(baris_i[0]) == 'daftar isi':
+            j = i + 1
+            while j < awal:
+                baris_j = [b for b in (halaman_render[j] or '').splitlines()
+                           if b.strip()]
+                if baris_j and _normalisasi_cari(baris_j[0]) \
+                        in _JUDUL_BAGIAN_DEPAN_RENDER:
+                    break
+                rentang_daftar.add(j)
+                j += 1
+            break
+    for i in range(0, awal):
+        if i in rentang_daftar:
+            continue
         baris = [b for b in (halaman_render[i] or '').splitlines()
                  if b.strip()]
         if baris and _normalisasi_cari(baris[0]) == cari:
             return ke_romawi(i + 1)
-    for i in range(awal, len(halaman_render)):
+    for i in range(max(awal, mulai_badan or awal), len(halaman_render)):
         if _judul_cocok_di_halaman(halaman_render[i], judul):
             return i - awal + 1
     return None
 
 
-def entri_daftar_isi(peta_json, halaman_render=None) -> list[dict]:
-    """Entri Daftar Isi dari peta Jev terverifikasi (bab + subbab)."""
+def _bab_dari_daftar_peta(peta) -> list[tuple[int, str]]:
+    """Bab dari daftar datar peta (mode peta_awal): [(nomor, 'BAB n. Judul')].
+
+    Tiap kelompok entri dengan kolom `bab` = 'BAB n' membawa judul bab
+    di `judul_bab` pertama yang bukan penanda telanjang, bukan nomor
+    subbab, dan diawali huruf besar (fragmen huruf kecil dilewati).
+    """
+    keluar: list[tuple[int, str]] = []
+    try:
+        peta_d = json.loads(peta) if isinstance(peta, str) else (peta or {})
+        daftar = peta_d.get('daftar') or []
+    except Exception:                                          # noqa: BLE001
+        return keluar
+    kini_n = None
+    kini_judul = None
+    for entri in daftar:
+        if not isinstance(entri, dict):
+            continue
+        bab_kolom = str(entri.get('bab', '') or '').strip()
+        n = _nomor_penanda_judul(bab_kolom) \
+            if bab_kolom.upper().startswith('BAB') else None
+        if n is not None and kini_n != n:
+            if kini_n is not None and kini_judul:
+                keluar.append((kini_n, f'BAB {kini_n}. {kini_judul}'))
+            kini_n = n
+            kini_judul = None
+        if kini_n is None or kini_judul:
+            continue
+        judul = str(entri.get('judul_bab', '') or '').strip()
+        if not judul:
+            continue
+        if _nomor_penanda_judul(judul) is not None \
+                and _tanpa_penanda_bab(judul) == '':
+            continue  # penanda telanjang ('BAB 1' saja)
+        if re.match(r'^\d+\.\d+\b', judul):
+            continue  # nomor subbab ('1.1 ...')
+        if not judul[0].isupper():
+            continue  # fragmen huruf kecil ('dalam Ekosistem ...')
+        kini_judul = judul
+    if kini_n is not None and kini_judul:
+        keluar.append((kini_n, f'BAB {kini_n}. {kini_judul}'))
+    sudah: dict[int, str] = {}
+    for n, lengkap in keluar:
+        sudah.setdefault(n, lengkap)
+    return [(n, sudah[n]) for n in sorted(sudah)]
+
+
+def _bab_dari_badan(paragraf_badan) -> list[tuple[int, str]]:
+    """Bab dari pindai badan: [(nomor, 'BAB n. Judul')].
+
+    Penanda bab telanjang ('BAB 1') + baris judul berikutnya yang
+    tidak kosong. Dipakai melengkapi Daftar Isi bila peta melewatkan
+    penanda bab (naskah buku tanpa gaya Heading).
+    """
+    keluar: list[tuple[int, str]] = []
+    paras = [str(p or '') for p in (paragraf_badan or [])]
+    for i, teks in enumerate(paras):
+        s = ' '.join(teks.split()).strip()
+        if not _POLAA_BAB_TELANJANG.match(s):
+            continue
+        n = _nomor_bab(s)
+        if n is None or any(x[0] == n for x in keluar):
+            continue
+        judul = ''
+        for j in range(i + 1, min(i + 3, len(paras))):
+            t = ' '.join(str(paras[j] or '').split()).strip()
+            if t:
+                judul = t
+                break
+        keluar.append((n, f'BAB {n}. {judul}' if judul else f'BAB {n}'))
+    return keluar
+
+
+def entri_daftar_isi(peta_json, halaman_render=None,
+                     paragraf_badan=None) -> list[dict]:
+    """Entri Daftar Isi dari peta Jev terverifikasi (bab + subbab).
+
+    Bab yang peta hanya kenal lewat judul polosnya (tanpa penanda
+    'BAB n') ditulis ulang lengkap ('BAB 1. <judul>'), dan bab yang
+    peta lewatkan sama sekali ditambahkan dari daftar datar peta atau
+    dari pindai badan, Daftar Isi harus memuat BAB 1..5, bukan hanya
+    judulnya (cacat uji live 16 Nov 2026). `paragraf_badan`: paragraf
+    badan (mulai Bab I) bila ada.
+    """
     keluar = []
     try:
         from . import struktur as _str
@@ -1197,6 +1568,75 @@ def entri_daftar_isi(peta_json, halaman_render=None) -> list[dict]:
                                        halaman_render, teks)})
     except Exception:                                          # noqa: BLE001
         pass
+    # Bab dari daftar datar peta dulu (judul peta yang terverifikasi),
+    # lalu dari badan (hanya nomor yang daftar peta tidak punya).
+    bab_sumber = _bab_dari_daftar_peta(peta_json)
+    if not bab_sumber:
+        bab_sumber = _bab_dari_badan(paragraf_badan)
+    else:
+        ada_nomor = {n for n, _ in bab_sumber}
+        for e in keluar:
+            n = _nomor_penanda_judul(e.get('judul', ''))
+            if n is not None:
+                ada_nomor.add(n)
+        for n, lengkap in _bab_dari_badan(paragraf_badan):
+            if n not in ada_nomor:
+                bab_sumber.append((n, lengkap))
+                ada_nomor.add(n)
+    if not bab_sumber:
+        return keluar
+    # Tulis ulang entri peta yang judulnya sama dengan judul bab
+    # (tanpa penanda): 'Lanskap ...' -> 'BAB 1. Lanskap ...'. Entri
+    # penanda telanjang ('BAB 1' saja, judul bab dari peta Jev bisa
+    # telanjang) juga ditulis ulang ke judul lengkap dari badan:
+    # tanpa ini Daftar Isi memuat DUA baris untuk bab yang sama
+    # ('BAB 1' dan 'BAB 1. PENDAHULUAN'), lalu pencari Bab I salah
+    # menunjuk entri itu sebagai badan dan Perbarui mengganda
+    # (ABSTRACT/ABSTRAK dua kali, entri daftar tiga kali, cacat tes
+    # regresi 16 Nov 2026).
+    for n, lengkap in bab_sumber:
+        judul_bab = lengkap.split('.', 1)[1].strip() \
+            if '.' in lengkap else lengkap
+        pertama = None
+        buang: list[int] = []
+        for i, e in enumerate(keluar):
+            if e.get('level') not in (0, 1):
+                continue
+            judul_e = e.get('judul', '')
+            sama_judul = (_tanpa_penanda_bab(judul_e)
+                          == _tanpa_penanda_bab(judul_bab))
+            penanda_telanjang = (
+                e.get('level') == 0
+                and _nomor_penanda_judul(judul_e) == n
+                and _tanpa_penanda_bab(judul_e) == '')
+            if sama_judul or penanda_telanjang:
+                if pertama is None:
+                    pertama = i
+                else:
+                    buang.append(i)
+        if pertama is not None:
+            keluar[pertama]['judul'] = lengkap
+            keluar[pertama]['level'] = 0
+            keluar[pertama]['halaman'] = nomor_halaman_dari_render(
+                halaman_render, lengkap)
+        for i in reversed(buang):
+            del keluar[i]
+    # Bab yang belum ada di daftar: sisipkan sebelum entri bab
+    # pertama yang nomornya lebih besar (atau di akhir bila tidak ada).
+    ada_judul = {_tanpa_penanda_bab(e.get('judul', '')) for e in keluar}
+    for n, lengkap in bab_sumber:
+        if _tanpa_penanda_bab(lengkap) in ada_judul:
+            continue
+        sisip = len(keluar)
+        for i, e in enumerate(keluar):
+            m = _nomor_penanda_judul(e.get('judul', ''))
+            if m is not None and m > n:
+                sisip = i
+                break
+        keluar.insert(sisip, {'judul': lengkap, 'level': 0,
+                              'halaman': nomor_halaman_dari_render(
+                                  halaman_render, lengkap)})
+        ada_judul.add(_tanpa_penanda_bab(lengkap))
     return keluar
 
 
@@ -1397,7 +1837,15 @@ def _xml_paragraf(teks: str, ppr: str = '') -> str:
 def _ppr_dari_xml(par_xml: str) -> str:
     from .pustaka_periksa import _RE_PPR
     m = _RE_PPR.search(par_xml or '')
-    return m.group(0) if m else ''
+    if not m:
+        return ''
+    # Pemutus bagian tidak pernah ikut format paragraf yang dipakai
+    # ulang: sectPr lama di pPr sumber bocor ke SEMUA paragraf yang
+    # dibuat ulang dari pPr itu, jadi muncul pemutus ganda di tengah
+    # bagian depan (dua sectPr berurutan = halaman tanpa nomor, bahkan
+    # halaman kosong di sebagian render). Penulis memasang tepat satu
+    # sectPr sendiri di akhir wilayah depan (cacat uji live 16 Nov 2026).
+    return _buang_sectpr(m.group(0))
 
 
 def _teks_dari_xml(par_xml: str) -> str:
@@ -1679,26 +2127,57 @@ def perbarui_nomor_daftar(path, halaman_render=None, ukur_fn=None) -> dict:
     cocok = list(_RE_P.finditer(doc))
     teks_par = [_teks_dari_xml(m.group(0)) for m in cocok]
     baca = baca_bagian_awal(teks_par)
+    awal_badan = cari_awal_badan_render(halaman_render)
     ganti: list[tuple[int, int, str]] = []
     diperbarui = 0
     hilang: list[str] = []
+    # Halaman fisik terakhir per judul (untuk rantai judul ganda).
+    terakhir_fisik: dict[str, int] = {}
     for kunci in TURUNAN:
-        for baris in baca.get('bagian', {}).get(kunci, []) or []:
+        baris_list = baca.get('bagian', {}).get(kunci, []) or []
+        # indeks[kunci][0] = judul seksi, indeks[kunci][1:] sejajar
+        # dengan baris_list: nomor ditulis ke paragraf entri INI.
+        idx_list = (baca.get('indeks', {}) or {}).get(kunci, []) or []
+        for pos, baris in enumerate(baris_list):
             judul = baris.split('\t')[0].strip()
             if not judul or judul == BARIS_BELUM_ADA_LAMPIRAN:
                 continue
-            nomor = nomor_footer_dari_render(halaman_render, judul)
+            norm_judul = _normalisasi_cari(judul)
+            mulai = None
+            if norm_judul in terakhir_fisik:
+                mulai = terakhir_fisik[norm_judul] + 1
+            nomor = nomor_footer_dari_render(halaman_render, judul,
+                                             mulai_badan=mulai)
             if nomor is None:
                 hilang.append(judul[:60])
                 continue
-            # Cari paragraf baris ini (pertama yang cocok).
-            for i, teks in enumerate(teks_par):
-                if teks.split('\t')[0].strip() == judul:
-                    ppr = _ppr_dari_xml(cocok[i].group(0))
-                    baru = _xml_paragraf(f'{judul}\t{nomor}', ppr)
-                    ganti.append((cocok[i].start(), cocok[i].end(), baru))
-                    diperbarui += 1
+            # Cari paragraf entri ini di DALAM seksi daftarnya saja.
+            # Cari pertama di seluruh dokumen SALAH: judul seksi yang
+            # sama ('KATA PENGANTAR' juga judul Kata Pengantar, paragraf
+            # 144) akan tertimpa nomor, dan judul ganda ('Ringkasan
+            # Bab' tiap bab) akan menimpa entri pertama berulang kali
+            # (cacat uji 16 Nov 2026: judul seksi 'KATA PENGANTAR\txii',
+            # 4 entri 'Ringkasan Bab' kosong).
+            target = None
+            calon = []
+            if pos + 1 < len(idx_list):
+                calon.append(idx_list[pos + 1])
+            calon.extend(i for i in idx_list[1:] if i not in calon)
+            for i in calon:
+                if 0 <= i < len(teks_par) and \
+                        teks_par[i].split('\t')[0].strip() == judul:
+                    target = i
                     break
+            if target is None:
+                hilang.append(judul[:60])
+                continue
+            ppr = _ppr_dari_xml(cocok[target].group(0))
+            baru = _xml_paragraf(f'{judul}\t{nomor}', ppr)
+            ganti.append((cocok[target].start(), cocok[target].end(),
+                          baru))
+            diperbarui += 1
+            if isinstance(nomor, int) and awal_badan is not None:
+                terakhir_fisik[norm_judul] = nomor + awal_badan - 1
     if not ganti:
         return {'ok': True, 'diperbarui': 0, 'hilang': hilang, 'sebab': ''}
     doc_baru = doc
