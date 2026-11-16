@@ -31,6 +31,7 @@ import logging
 import re
 import shutil
 import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 log = logging.getLogger('eduai.bagian_awal')
@@ -68,6 +69,8 @@ MILIK_MAHASISWA = ('kata_pengantar', 'persembahan', 'pernyataan',
                    'abstract', 'abstrak')
 # Bagian yang hanya ada di tahap final.
 HANYA_FINAL = ('abstract', 'abstrak')
+# Baris jujur bila naskah belum punya lampiran (bukan halaman kosong).
+BARIS_BELUM_ADA_LAMPIRAN = 'Belum ada lampiran.'
 # Bagian dari data form (dibuat ulang bila data berubah dan tidak disentuh).
 DATA_FORM = tuple(k for k, _ in URUTAN
                   if k not in MILIK_MAHASISWA and k not in TURUNAN
@@ -78,11 +81,13 @@ def _baris_judul_tambahan(teks: str) -> bool:
     """Baris judul blok baru (huruf besar, pendek, ada huruf).
 
     Dipakai baca_bagian_awal: baris seperti ini di tengah seksi form
-    menandai halaman baru mahasiswa, bukan isi seksi form.
+    menandai halaman baru mahasiswa, bukan isi seksi form. Baris label
+    form ('NIP : ', 'NIM : 000...') BUKAN judul baru: label memakai
+    titik dua, jadi baris bertitik dua tidak pernah dihitung judul.
     """
     s = ' '.join(str(teks or '').split()).strip()
-    return bool(s) and len(s) <= 60 and s.isupper() and any(
-        c.isalpha() for c in s)
+    return bool(s) and ':' not in s and len(s) <= 60 and s.isupper() \
+        and any(c.isalpha() for c in s)
 
 ROMAWI = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6}
 ANGKA_ROMAWI = {v: k for k, v in ROMAWI.items()}
@@ -119,21 +124,94 @@ GRUP_FORM = [
     ('penguji', 'Penguji'),
     ('pimpinan', 'Pimpinan kampus'),
 ]
+# Kolom form yang wajib diisi sekarang (tampil dulu); sisanya boleh
+# nanti (di balik "Tambah detail"). Kolom boleh-nanti memang boleh
+# kosong, jadi menyembunyikannya tidak menghilangkan apa pun.
+WAJIB_SEKARANG = ('judul', 'nama', 'nim', 'pembimbing_nama')
+BOLEH_NANTI = tuple(k for k in KUNCI_FORM if k not in WAJIB_SEKARANG)
 # Kolom NIP (dicek format 18 angka, bukan kebenarannya).
 KOLOM_NIP = ('pembimbing_nip', 'penguji1_nip', 'penguji2_nip',
              'kaprodi_nip', 'dekan_nip', 'rektor_nip')
 GARIS_KOSONG = ''
 
 
+# Kelompok ringkasan layar pertama: 4 kelompok kolom form + daftar.
+_KELOMPOK_RINGKAS = [
+    ('tentang', 'Tentang kamu',
+     ('nama', 'nim', 'judul', 'prodi', 'fakultas', 'jenjang', 'kota',
+      'tahun')),
+    ('pembimbing', 'Pembimbing',
+     ('pembimbing_nama', 'pembimbing_gelar', 'pembimbing_nip')),
+    ('penguji', 'Penguji',
+     ('penguji1_nama', 'penguji1_nip', 'penguji2_nama', 'penguji2_nip')),
+    ('pimpinan', 'Pimpinan kampus',
+     ('kaprodi_nama', 'kaprodi_nip', 'dekan_nama', 'dekan_nip',
+      'rektor_nama', 'rektor_nip', 'tanggal_sidang')),
+]
+
+
+def ringkas_kelompok(data: dict, cek: list[dict], tahap: str) -> list[dict]:
+    """Ringkasan 5 kelompok untuk layar pertama (satu baris per kelompok).
+
+    Empat kelompok pertama dari kolom form (sudah = terisi); kelompok
+    kelima dari daftar cek bagian (sudah = ada di naskah). Di tahap
+    proposal, abstract/abstrak tidak dihitung (baru ada di tahap final).
+    Return [{kelompok, label, sudah, total, lengkap}].
+    """
+    data = bersihkan_data(data)
+    keluar = []
+    for kode, label, kunci_kolom in _KELOMPOK_RINGKAS:
+        sudah = sum(1 for k in kunci_kolom if data.get(k, ''))
+        keluar.append({'kelompok': kode, 'label': label, 'sudah': sudah,
+                       'total': len(kunci_kolom),
+                       'lengkap': sudah == len(kunci_kolom)})
+    bagian = [c for c in (cek or [])
+              if c.get('kunci') in dict(URUTAN)
+              and c.get('kunci') != 'judul']
+    if tahap != 'final':
+        bagian = [c for c in bagian if c.get('kunci') not in HANYA_FINAL]
+    sudah_d = sum(1 for c in bagian if c.get('ada'))
+    keluar.append({'kelompok': 'daftar', 'label': 'Daftar-daftar',
+                   'sudah': sudah_d, 'total': len(bagian),
+                   'lengkap': bool(bagian) and sudah_d == len(bagian)})
+    return keluar
+
+
 def bersihkan_data(data: dict | None) -> dict:
-    """Data form yang bersih: semua kolom ada, spasi dirapikan, tanpa None."""
+    """Data form yang bersih: semua kolom ada, spasi dirapikan, tanpa None.
+
+    Nama tidak pernah berupa alamat email: bila kolom nama terisi alamat
+    email (mis. terisi otomatis dari akun), dikosongkan supaya tidak
+    tercetak sebagai nama di halaman persetujuan.
+    """
     keluar = {}
     for kunci in KUNCI_FORM:
-        nilai = (data or {}).get(kunci, '')
-        keluar[kunci] = str(nilai or '').strip()
+        nilai = str((data or {}).get(kunci, '') or '').strip()
+        if kunci in _KUNCI_NAMA:
+            nilai = _nama_bukan_email(nilai)
+        keluar[kunci] = nilai
     # Judul bukan kolom form, tapi ikut dibawa (dari naskah / form).
     keluar['judul'] = str((data or {}).get('judul', '') or '').strip()
     return keluar
+
+
+_KUNCI_NAMA = ('nama', 'pembimbing_nama', 'penguji1_nama', 'penguji2_nama',
+               'kaprodi_nama', 'dekan_nama', 'rektor_nama')
+
+
+def _nama_bukan_email(nilai: str) -> str:
+    """Nama, atau '' bila isinya alamat email (bukan nama orang)."""
+    nilai = (nilai or '').strip()
+    return '' if '@' in nilai else nilai
+
+
+def hitung_baris_isi(baris: list[str]) -> int:
+    """Jumlah baris berisi (bukan garis kosong) dalam satu bagian.
+
+    Satu cara hitung untuk semua struk, supaya tempel dan perbarui
+    melaporkan angka yang sama untuk teks yang sama.
+    """
+    return sum(1 for b in (baris or []) if str(b or '').strip())
 
 
 def cek_nip(nip: str) -> bool:
@@ -250,8 +328,22 @@ def tahap_dari_bab(bab: set) -> str:
 
 
 # ── Bab dari peta / dari teks ──────────────────────────────────────────
-_POLAA_BAB_JUDUL = re.compile(r'^\s*BAB\s+([IVX]+)\b', re.IGNORECASE)
+# Penanda bab Romawi ('BAB IV') atau Arab ('BAB 4'): naskah buku dan
+# sebagian skripsi memakai angka Arab, dan keduanya sah.
+_POLAA_BAB_JUDUL = re.compile(r'^\s*BAB\s+([IVX]+|\d+)\b', re.IGNORECASE)
 _POLAA_SUBBAB = re.compile(r'^(\d+)\.\d+\b')
+
+
+def _angka_bab(teks_nomor: str) -> int | None:
+    """Angka bab dari penanda Romawi ('IV') atau Arab ('4')."""
+    t = (teks_nomor or '').strip().upper()
+    if t in ROMAWI:
+        return ROMAWI[t]
+    try:
+        n = int(t)
+    except ValueError:
+        return None
+    return n if 1 <= n <= 6 else None
 
 
 def bab_dari_peta(peta_json) -> set:
@@ -262,8 +354,9 @@ def bab_dari_peta(peta_json) -> set:
         for bab in _str.ringkas_peta(peta_json).get('bab', []):
             judul = str(bab.get('judul', '') or '')
             m = _POLAA_BAB_JUDUL.match(judul)
-            if m and m.group(1).upper() in ROMAWI:
-                keluar.add(ROMAWI[m.group(1).upper()])
+            nomor = _angka_bab(m.group(1)) if m else None
+            if nomor is not None:
+                keluar.add(nomor)
             for sub in bab.get('subbab', []) or []:
                 teks = sub.get('teks') if isinstance(sub, dict) else str(sub)
                 m2 = _POLAA_SUBBAB.match(str(teks or '').strip())
@@ -291,8 +384,9 @@ def bab_dari_teks(teks: str) -> set:
             judul = str((butir or {}).get('section_title', '') or '')
             for calon in (sid, judul):
                 m = _POLAA_BAB_JUDUL.match(calon.strip())
-                if m and m.group(1).upper() in ROMAWI:
-                    keluar.add(ROMAWI[m.group(1).upper()])
+                nomor = _angka_bab(m.group(1)) if m else None
+                if nomor is not None:
+                    keluar.add(nomor)
                     break
     except Exception:                                          # noqa: BLE001
         pass
@@ -300,8 +394,9 @@ def bab_dari_teks(teks: str) -> set:
         # Jatuh ke pemindaian baris (naskah pendek / deteksi gagal).
         for baris in (teks or '').splitlines():
             m = _POLAA_BAB_JUDUL.match(baris.strip())
-            if m and m.group(1).upper() in ROMAWI:
-                keluar.add(ROMAWI[m.group(1).upper()])
+            nomor = _angka_bab(m.group(1)) if m else None
+            if nomor is not None:
+                keluar.add(nomor)
     return keluar
 
 
@@ -312,7 +407,7 @@ def judul_bab_pertama(peta_json, teks: str = '') -> str:
         for bab in _str.ringkas_peta(peta_json).get('bab', []):
             judul = str(bab.get('judul', '') or '').strip()
             m = _POLAA_BAB_JUDUL.match(judul)
-            if m and m.group(1).upper() == 'I':
+            if m and _angka_bab(m.group(1)) == 1:
                 sisa = _POLAA_BAB_JUDUL.sub('', judul).strip(' :.-')
                 return sisa
     except Exception:                                          # noqa: BLE001
@@ -406,6 +501,81 @@ def sidik_bagian(baris: list[str]) -> str:
         return hashlib.sha256(teks.encode('utf-8')).hexdigest()
 
 
+def sidik_daftar(peta_json, paragraf) -> str:
+    """Sidik sumber keempat daftar: judul bab/subbab dari peta + baris
+    keterangan tabel/gambar/lampiran dari naskah. Berubah hanya bila
+    sumber daftar berubah (bukan bila isi badan lain berubah)."""
+    entri: list[str] = []
+    try:
+        entri.extend(f"{e.get('judul', '')}|{e.get('level', 0)}"
+                     for e in entri_daftar_isi(peta_json))
+    except Exception:                                          # noqa: BLE001
+        pass
+    try:
+        # Sumber keterangan hanya badan naskah (mulai Bab I): baris di
+        # daftar lama ikut terpindai bila seluruh dokumen dibaca, lalu
+        # entri ganda saat Perbarui.
+        idx_bab1 = cari_indeks_bab1(paragraf or [])
+        badan = (paragraf or [])[idx_bab1:] \
+            if idx_bab1 is not None else (paragraf or [])
+        ket = entri_daftar_keterangan(badan)
+    except Exception:                                          # noqa: BLE001
+        ket = {}
+    for kunci in ('daftar_tabel', 'daftar_gambar', 'daftar_lampiran'):
+        for e in ket.get(kunci, []) or []:
+            entri.append(f"{kunci}:{e.get('judul', '')}")
+    teks = '\n'.join(_normalisasi_cari(e) for e in entri)
+    return hashlib.sha256(teks.encode('utf-8')).hexdigest()
+
+
+def _instans(nilai):
+    """Datetime/ISO -> aware UTC, atau None bila tak bisa diurai.
+
+    Waktu naif dianggap UTC: SQLite membuang info zona saat simpan,
+    jadi perbandingan mentah string ISO selalu berbeda ('+00:00' lawan
+    tanpa zona) dan peringatan usang menyala selamanya.
+    """
+    if nilai is None:
+        return None
+    if isinstance(nilai, datetime):
+        d = nilai
+    else:
+        try:
+            d = datetime.fromisoformat(str(nilai).strip())
+        except ValueError:
+            return None
+    if d.tzinfo is None:
+        d = d.replace(tzinfo=timezone.utc)
+    return d.astimezone(timezone.utc)
+
+
+def daftar_usang(hasil, peta_json, paragraf, diubah) -> bool:
+    """True bila daftar isi/tabel/gambar/lampiran perlu diperbarui.
+
+    Usang bila sidik sumber daftar berubah sesudah pembuatan terakhir,
+    atau berkas berubah sesudah pembuatan terakhir (halaman bisa
+    bergeser walau sumber daftar sama). Sesudah tempel/perbarui sendiri
+    TIDAK usang: sidik sama dan waktu berkas sama dengan yang dicatat.
+    """
+    hasil = hasil or {}
+    if not hasil.get('ditempel'):
+        return False
+    sidik_lama = hasil.get('sidik_daftar')
+    if sidik_lama:
+        try:
+            if sidik_daftar(peta_json, paragraf) != sidik_lama:
+                return True
+        except Exception:                                      # noqa: BLE001
+            pass
+    diubah_pada = hasil.get('diubah_pada') or ''
+    if diubah_pada and diubah is not None:
+        a = _instans(diubah)
+        b = _instans(diubah_pada)
+        if a is not None and b is not None and a > b:
+            return True
+    return False
+
+
 # ── Baca bagian awal yang sudah ada ────────────────────────────────────
 # Judul seksi yang dikenali di naskah (varian ejaan Pedoman).
 _JUDUL_SEKSI = {
@@ -429,7 +599,6 @@ _JUDUL_SEKSI = {
     'abstract': ('abstract',),
     'abstrak': ('abstrak',),
 }
-_POLAA_BAB_I = re.compile(r'^\s*BAB\s+I\b', re.IGNORECASE)
 _POLAA_TOC = re.compile(r'\.{3,}\s*\d+\s*$')
 
 
@@ -476,12 +645,15 @@ def _nomor_bab(teks: str) -> int | None:
 
 
 def cari_indeks_bab1(paragraf: list[str]) -> int | None:
-    """Indeks paragraf Bab I (awal badan), bukan baris daftar isi.
+    """Indeks paragraf awal badan (judul bab pertama, Bab I bila ada),
+    bukan baris daftar isi.
 
     Baris 'BAB ...' di dalam blok Daftar Isi adalah entri (nomor bab
     naik); badan dimulai saat nomor bab MENGULANG (daftar sudah menyebut
     nomor itu) atau saat baris bab muncul di luar blok Daftar Isi.
-    Baris daftar isi bertitik ('BAB I .... 1') tetap dihitung sebagai entri.
+    Judul bab boleh Romawi ('BAB I') atau Arab ('BAB 1'): keduanya
+    dikenali lewat _nomor_bab yang sama. Baris daftar isi bertitik
+    ('BAB I .... 1') tetap dihitung sebagai entri.
     """
     di_daftar = False
     maks = 0
@@ -503,7 +675,7 @@ def cari_indeks_bab1(paragraf: list[str]) -> int | None:
                 return i
             maks = max(maks, n)
             continue
-        if _POLAA_BAB_I.match(s):
+        if _nomor_bab(s) is not None:
             return i
     return None
 
@@ -520,9 +692,18 @@ def _mirip_sampul(baris: list[str]) -> bool:
     (skripsi/fakultas/program studi/universitas/diajukan/oleh/NIM).
     Blok prosa (abstrak/pengantar) sebelum Bab I bukan sampul: ia masuk
     `tambahan` dan dipertahankan, bukan diganti sampul buatan.
+    Sampul yang ditulis fitur ini (dan sampul lama yang sama bentuknya)
+    dikenali juga dari tanda khasnya, walau bloknya panjang: sampul +
+    judul digabung jadi satu blok karena keduanya tanpa judul seksi
+    sendiri, jadi batas 12 baris tidak berlaku untuk tanda ini.
     """
     isi = [str(b or '').strip() for b in (baris or []) if str(b or '').strip()]
-    if not isi or len(isi) > 12:
+    if not isi:
+        return False
+    if any(b.upper() == 'SKRIPSI' for b in isi) and any(
+            b.startswith('Diajukan untuk Memenuhi') for b in isi):
+        return True
+    if len(isi) > 12:
         return False
     if any(len(b) > 60 for b in isi):
         return False
@@ -562,11 +743,31 @@ def baca_bagian_awal(paragraf: list[str]) -> dict:
         kini_tambahan_idx = None
 
     def _tutup_awal():
-        """Baris sebelum judul seksi pertama: sampul lama atau tambahan."""
+        """Baris sebelum judul seksi pertama: sampul lama atau tambahan.
+
+        Bila bloknya sampul buatan fitur ini yang menempel pada blok
+        tambahan sebelumnya (mis. sampul buku), pisahkan: sampul buatan
+        selalu 5 baris sebelum 'SKRIPSI' (fakultas, prodi, '', judul,
+        ''), sisanya di depan tetap tambahan supaya tidak hilang saat
+        sampul dibuat ulang dari data form.
+        """
         nonlocal awal, awal_idx
         if not awal:
             return
         if _mirip_sampul(awal):
+            try:
+                i_skripsi = next(
+                    i for i, b in enumerate(awal)
+                    if str(b or '').strip().upper() == 'SKRIPSI')
+            except StopIteration:
+                i_skripsi = None
+            if i_skripsi is not None and i_skripsi >= 5:
+                awal_sampul = i_skripsi - 5
+                if awal_sampul > 0:
+                    tambahan.append(list(awal[:awal_sampul]))
+                    tambahan_indeks.append(list(awal_idx[:awal_sampul]))
+                    awal = awal[awal_sampul:]
+                    awal_idx = awal_idx[awal_sampul:]
             bagian['sampul'] = list(awal)
             indeks['sampul'] = list(awal_idx)
         else:
@@ -808,6 +1009,9 @@ def susun_bagian(data: dict, tahap: str, entri: dict,
                 continue
             halaman = e.get('halaman')
             baris.append(f"{teks}\t{halaman}" if halaman else teks)
+        if kunci == 'daftar_lampiran' and not (entri or {}).get(kunci):
+            # Belum ada lampiran: tulis jujur, bukan halaman kosong.
+            baris.append(BARIS_BELUM_ADA_LAMPIRAN)
         keluar.append((kunci, label, baris))
     if tahap == 'final':
         abs_d = abstrak or {}
@@ -848,6 +1052,108 @@ def nomor_halaman_dari_render(halaman_render, judul: str) -> int | None:
     return None
 
 
+def ke_romawi(n) -> str:
+    """Angka Arab -> Romawi kecil ('iii'); '' bila di luar 1..3999."""
+    try:
+        n = int(n)
+    except (TypeError, ValueError):
+        return ''
+    if n < 1 or n > 3999:
+        return ''
+    keluar = ''
+    for nilai, huruf in ((1000, 'm'), (900, 'cm'), (500, 'd'), (400, 'cd'),
+                         (100, 'c'), (90, 'xc'), (50, 'l'), (40, 'xl'),
+                         (10, 'x'), (9, 'ix'), (5, 'v'), (4, 'iv'),
+                         (1, 'i')):
+        while n >= nilai:
+            keluar += huruf
+            n -= nilai
+    return keluar
+
+
+_JUDUL_BAGIAN_DEPAN_RENDER = ('daftar isi', 'daftar tabel',
+                              'daftar gambar', 'daftar lampiran',
+                              'abstract', 'abstrak')
+
+
+def cari_awal_badan_render(halaman_render) -> int | None:
+    """Indeks halaman badan pertama (0-based) dari render, atau None.
+
+    Badan dimulai sesudah halaman bagian depan terakhir (daftar atau
+    abstrak). Bila tidak ada halaman bagian depan yang dikenali, pakai
+    halaman pertama yang memuat judul bab badan.
+    """
+    if not halaman_render:
+        return None
+    terakhir_depan = None
+    for i, teks in enumerate(halaman_render):
+        baris = [_normalisasi_cari(b) for b in (teks or '').splitlines()]
+        if any(b in _JUDUL_BAGIAN_DEPAN_RENDER for b in baris):
+            terakhir_depan = i
+    if terakhir_depan is not None and terakhir_depan + 1 < len(halaman_render):
+        return terakhir_depan + 1
+    for i, teks in enumerate(halaman_render):
+        for b in (teks or '').splitlines():
+            if _nomor_bab(b) is not None:
+                return i
+    return None
+
+
+def _judul_cocok_di_halaman(teks_halaman: str, judul: str) -> bool:
+    """Apakah judul muncul sebagai judul badan di halaman ini?
+
+    Baris yang sama persis dengan judul, baris yang diawali judul +
+    spasi (judul lalu isi badan sebaris), atau dua baris berurutan yang
+    digabung sama dengan judul ('BAB 1' + 'PENDAHULUAN'). Pencarian
+    selalu dimulai dari halaman badan, jadi baris entri daftar (yang
+    ada di halaman daftar) tidak ikut terhitung.
+    """
+    cari = _normalisasi_cari(judul)
+    if not cari:
+        return False
+    baris = [_normalisasi_cari(b) for b in (teks_halaman or '').splitlines()]
+    baris = [b for b in baris if b]
+    for i, b in enumerate(baris):
+        if b == cari or b.startswith(cari + ' '):
+            return True
+        if i + 1 < len(baris):
+            gabung = b + ' ' + baris[i + 1]
+            if gabung == cari or gabung.startswith(cari + ' '):
+                return True
+    return False
+
+
+def nomor_footer_dari_render(halaman_render, judul: str):
+    """Nomor footer nyata dari render untuk satu judul daftar.
+
+    Return int (Arab, badan: Bab I = 1) atau str Romawi kecil (bagian
+    depan), atau None bila judul tidak ketemu atau awal badan tidak
+    diketahui: nomor TIDAK PERNAH dikarang. Beda dengan
+    nomor_halaman_dari_render yang mengembalikan nomor fisik halaman:
+    nomor footer inilah yang tercetak di kaki halaman dan yang harus
+    tertulis di Daftar Isi.
+    """
+    if not halaman_render or not (judul or '').strip():
+        return None
+    awal = cari_awal_badan_render(halaman_render)
+    if awal is None:
+        return None
+    cari = _normalisasi_cari(judul)
+    # Judul bagian depan: halaman yang DIAWALI judul itu (baris pertama
+    # halaman), nomornya Romawi kecil. Syarat baris pertama penting:
+    # halaman Daftar Isi memuat semua entri sebagai baris, jadi cocok
+    # sembarang baris akan salah menunjuk halaman daftar itu sendiri.
+    for i in range(0, awal):
+        baris = [b for b in (halaman_render[i] or '').splitlines()
+                 if b.strip()]
+        if baris and _normalisasi_cari(baris[0]) == cari:
+            return ke_romawi(i + 1)
+    for i in range(awal, len(halaman_render)):
+        if _judul_cocok_di_halaman(halaman_render[i], judul):
+            return i - awal + 1
+    return None
+
+
 def entri_daftar_isi(peta_json, halaman_render=None) -> list[dict]:
     """Entri Daftar Isi dari peta Jev terverifikasi (bab + subbab)."""
     keluar = []
@@ -879,8 +1185,14 @@ _POLAA_LAMPIRAN = re.compile(r'^\s*Lampiran\s+\d+\b.*', re.IGNORECASE)
 
 def entri_daftar_keterangan(paragraf: list[str],
                             halaman_render=None) -> dict:
-    """Entri Daftar Tabel/Gambar/Lampiran dari baris keterangan naskah."""
+    """Entri Daftar Tabel/Gambar/Lampiran dari baris keterangan naskah.
+
+    Satu judul keterangan hanya masuk sekali: baris yang sama bisa
+    muncul dua kali di naskah (misalnya di Daftar Tabel lama dan di
+    badan), dan tanpa dedup entri daftar ikut ganda saat Perbarui.
+    """
     keluar = {'daftar_tabel': [], 'daftar_gambar': [], 'daftar_lampiran': []}
+    sudah: set[str] = set()
     for teks in (paragraf or []):
         s = ' '.join(str(teks or '').split()).strip()
         if not s or _POLAA_TOC.search(s):
@@ -893,6 +1205,10 @@ def entri_daftar_keterangan(paragraf: list[str],
         elif _POLAA_LAMPIRAN.match(s):
             kunci = 'daftar_lampiran'
         if kunci:
+            kunci_dedup = f"{kunci}:{_normalisasi_cari(s)}"
+            if kunci_dedup in sudah:
+                continue
+            sudah.add(kunci_dedup)
             keluar[kunci].append(
                 {'judul': s, 'level': 0,
                  'halaman': nomor_halaman_dari_render(halaman_render, s)})
@@ -944,9 +1260,9 @@ def cuplikan_naskah(teks: str) -> dict:
     """
     teks = teks or ''
     keluar = {'latar': '', 'hasil': '', 'penutup': ''}
-    pola = {'latar': re.compile(r'BAB\s+I\b', re.IGNORECASE),
-            'hasil': re.compile(r'BAB\s+IV\b', re.IGNORECASE),
-            'penutup': re.compile(r'BAB\s+V\b', re.IGNORECASE)}
+    pola = {'latar': re.compile(r'BAB\s+(?:I|1)\b', re.IGNORECASE),
+            'hasil': re.compile(r'BAB\s+(?:IV|4)\b', re.IGNORECASE),
+            'penutup': re.compile(r'BAB\s+(?:V|5)\b', re.IGNORECASE)}
     posisi = {}
     for kunci, rx in pola.items():
         m = rx.search(teks)
@@ -1067,12 +1383,48 @@ def _teks_dari_xml(par_xml: str) -> str:
     return _teks_par_xml(par_xml)
 
 
-def _sisip_sectpr(par_xml: str, fmt: str, mulai: int = 1) -> str:
+def _awali_jeda_halaman(par_xml: str) -> str:
+    """Awali paragraf dengan jeda halaman (tiap seksi mulai di halaman
+    baru). Jeda berupa run <w:br w:type="page"/> di dalam paragraf yang
+    sama, jadi teks paragraf (dan sidiknya) tidak berubah. Bila paragraf
+    sudah diawali jeda (dipakai ulang dari tempel sebelumnya), jangan
+    ganda: dua jeda berarti satu halaman kosong.
+    """
+    jeda = '<w:r><w:br w:type="page"/></w:r>'
+    m = re.search(r'</w:pPr>', par_xml or '')
+    awal = m.end() if m else 0
+    if not m:
+        m2 = re.match(r'(<w:p\b[^>]*>)', par_xml or '')
+        awal = m2.end() if m2 else 0
+    if (par_xml or '')[awal:].startswith(jeda):
+        return par_xml
+    return par_xml[:awal] + jeda + par_xml[awal:]
+
+
+def _buang_sectpr(par_xml: str) -> str:
+    """Buang pemutus bagian dari paragraf yang dipakai ulang.
+
+    Penulis memasang tepat satu sectPr di paragraf terakhir wilayah
+    depan; sectPr lama di XML yang dipertahankan akan jadi pemutus
+    ganda di tengah bagian depan (penomoran mulai ulang di tengah).
+    """
+    return re.sub(r'<w:sectPr[^>]*>.*?</w:sectPr>', '', par_xml or '',
+                  flags=re.S)
+
+
+def _sisip_sectpr(par_xml: str, fmt: str, mulai: int = 1,
+                  footer_rid: str | None = None) -> str:
     """Sisip <w:sectPr> (pemutus bagian + jenis nomor halaman) ke paragraf.
 
     `fmt`: 'lowerRoman' untuk bagian awal, 'decimal' untuk badan.
+    `footer_rid`: rId footer badan yang dipakai ulang supaya halaman
+    depan menampilkan nomor (footer yang sama, nomor mengikuti jenis
+    seksi: Romawi di depan, Arab di badan). Urutan anak sectPr mengikuti
+    skema (footerReference dulu, lalu type, lalu pgNumType).
     """
-    sect = ('<w:sectPr><w:type w:val="nextPage"/>'
+    ref = (f'<w:footerReference w:type="default" r:id="{footer_rid}"/>'
+           if footer_rid else '')
+    sect = ('<w:sectPr>' + ref + '<w:type w:val="nextPage"/>'
             f'<w:pgNumType w:fmt="{fmt}" w:start="{mulai}"/></w:sectPr>')
     ppr = _ppr_dari_xml(par_xml)
     if ppr:
@@ -1084,34 +1436,87 @@ def _sisip_sectpr(par_xml: str, fmt: str, mulai: int = 1) -> str:
     return par_xml[:m.end()] + f'<w:pPr>{sect}</w:pPr>' + par_xml[m.end():]
 
 
-def _atur_pgnumtype_akhir(doc_xml: str, fmt: str = 'decimal') -> str:
-    """Pastikan sectPr TERAKHIR dokumen memakai jenis nomor halaman itu.
+def _sisip_pgnumtype(sectpr_xml: str, fmt: str, mulai: int = 1) -> str:
+    """Pasang/ganti pgNumType di satu sectPr pada posisi yang sah menurut
+    skema (sesudah type/pgSz/pgMar, sebelum cols/docGrid). Posisi yang
+    salah (mis. sebelum pgSz) diabaikan sebagian render, jadi jangan
+    tempel di awal sectPr begitu saja.
+    """
+    baru = f'<w:pgNumType w:fmt="{fmt}" w:start="{mulai}"/>'
+    if '<w:pgNumType' in sectpr_xml:
+        return re.sub(r'<w:pgNumType[^>]*/>', baru, sectpr_xml, count=1)
+    for penanda in ('<w:cols', '<w:formProt', '<w:vAlign', '<w:noEndnote',
+                    '<w:titlePg', '<w:textDirection', '<w:bidi',
+                    '<w:gutter', '<w:docGrid', '</w:sectPr>'):
+        pos = sectpr_xml.find(penanda)
+        if pos >= 0:
+            return sectpr_xml[:pos] + baru + sectpr_xml[pos:]
+    return sectpr_xml
 
-    SectPr terakhir adalah milik badan naskah (Bab I dst mulai halaman 1
-    Arab). Bila belum ada sectPr sama sekali, tempel ke paragraf terakhir.
-    SectPr bagian depan (lowerRoman) tidak pernah disentuh.
+
+def _footer_rid_default(doc_xml: str) -> str | None:
+    """rId footer default dari sectPr terakhir dokumen (milik badan)."""
+    pola = re.compile(r'<w:sectPr[^>]*>.*?</w:sectPr>', re.S)
+    semua = list(pola.finditer(doc_xml or ''))
+    if not semua:
+        return None
+    m = re.search(r'<w:footerReference[^>]*w:type="default"[^>]*'
+                  r'r:id="([^"]+)"', semua[-1].group(0))
+    if not m:
+        m = re.search(r'<w:footerReference[^>]*r:id="([^"]+)"[^>]*'
+                      r'w:type="default"', semua[-1].group(0))
+    return m.group(1) if m else None
+
+
+def _atur_pgnumtype_akhir(doc_xml: str, fmt: str = 'decimal',
+                          mulai_paragraf: int | None = None,
+                          cocok=None) -> str:
+    """Pastikan seksi badan memakai jenis nomor halaman itu (Arab 1).
+
+    Sasaran BUKAN sembarang sectPr terakhir, melainkan sectPr yang
+    mengakhiri seksi tempat Bab I berada: pemutus bagian pertama pada
+    atau sesudah paragraf Bab I; bila tidak ada, sectPr terakhir
+    dokumen. SectPr bagian depan (lowerRoman) tidak pernah disentuh.
     """
     pola = re.compile(r'<w:sectPr[^>]*>.*?</w:sectPr>', re.S)
     semua = list(pola.finditer(doc_xml))
-    for m in reversed(semua):
-        isi = m.group(0)
-        if 'lowerRoman' in isi:
-            continue
-        if '<w:pgNumType' in isi:
-            isi_baru = re.sub(r'<w:pgNumType[^>]*/>',
-                              f'<w:pgNumType w:fmt="{fmt}" w:start="1"/>', isi)
-        else:
-            isi_baru = isi[:-len('</w:sectPr>')] + \
-                f'<w:pgNumType w:fmt="{fmt}" w:start="1"/></w:sectPr>'
-        return doc_xml[:m.start()] + isi_baru + doc_xml[m.end():]
-    # Belum ada sectPr: tempel ke paragraf terakhir.
-    from .pustaka_periksa import _RE_P
-    cocok = list(_RE_P.finditer(doc_xml))
-    if not cocok:
-        return doc_xml
-    m = cocok[-1]
-    par_baru = _sisip_sectpr(m.group(0), fmt, 1)
-    return doc_xml[:m.start()] + par_baru + doc_xml[m.end():]
+    if not semua:
+        # Belum ada sectPr: tempel ke paragraf terakhir.
+        from .pustaka_periksa import _RE_P
+        cocok_p = list(_RE_P.finditer(doc_xml))
+        if not cocok_p:
+            return doc_xml
+        m = cocok_p[-1]
+        par_baru = _sisip_sectpr(m.group(0), fmt, 1)
+        return doc_xml[:m.start()] + par_baru + doc_xml[m.end():]
+    target = None
+    if mulai_paragraf is not None and cocok \
+            and 0 <= mulai_paragraf < len(cocok):
+        awal_badan = cocok[mulai_paragraf].start()
+        for m in semua:
+            if m.start() >= awal_badan:
+                target = m
+                break
+    if target is None:
+        for m in reversed(semua):
+            if 'lowerRoman' in m.group(0):
+                continue
+            target = m
+            break
+    if target is None:
+        # Tidak ada sectPr badan (hanya Romawi): buat pemutus badan di
+        # paragraf terakhir dokumen, supaya badan punya seksi sendiri
+        # dengan nomor Arab mulai 1.
+        from .pustaka_periksa import _RE_P
+        cocok_p = list(_RE_P.finditer(doc_xml))
+        if not cocok_p:
+            return doc_xml
+        m = cocok_p[-1]
+        par_baru = _sisip_sectpr(m.group(0), fmt, 1)
+        return doc_xml[:m.start()] + par_baru + doc_xml[m.end():]
+    isi = target.group(0)
+    isi_baru = _sisip_pgnumtype(isi, fmt, 1)
+    return doc_xml[:target.start()] + isi_baru + doc_xml[target.end():]
 
 
 def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
@@ -1121,9 +1526,12 @@ def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
     ppr}] seurutan URUTAN + blok tambahan mahasiswa di akhir. `xml` yang
     terisi = dipertahankan kata per kata (XML asli dipakai lagi). `xml`
     None = dibuat ulang dari `baris` (pPr dari `ppr` bila ada).
-    Wilayah depan = paragraf sebelum Bab I (atau awal dokumen bila Bab I
-    tak ketemu). Paragraf terakhir wilayah depan diberi pemutus bagian
-    Romawi; sectPr akhir badan diatur Arab mulai 1.
+    Wilayah depan = paragraf sebelum Bab I. Tiap seksi bagian depan
+    mulai di halaman baru. Paragraf terakhir wilayah depan diberi
+    pemutus bagian Romawi (dengan footer badan dipakai ulang supaya
+    halaman depan menampilkan nomor); seksi badan diatur Arab mulai 1.
+    Bila Bab I tidak ditemukan, GAGAL tertutup (tidak ditempel): tempel
+    di awal tanpa Bab I akan menggandakan bagian depan.
     Return {ok, diterapkan, sebab, butuh_render}.
     """
     from .pustaka_periksa import _RE_P
@@ -1141,27 +1549,42 @@ def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
     cocok = list(_RE_P.finditer(doc))
     teks_par = [_teks_dari_xml(m.group(0)) for m in cocok]
     idx_bab1 = cari_indeks_bab1(teks_par)
+    if idx_bab1 is None:
+        return {'ok': False,
+                'sebab': 'Bab I tidak ditemukan di naskah, bagian awal '
+                         'tidak ditempel supaya tidak mengganda.',
+                'diterapkan': 0}
     awal_wilayah = 0
-    akhir_wilayah = idx_bab1 if idx_bab1 is not None else 0
-    # Susun XML wilayah depan yang baru.
+    akhir_wilayah = idx_bab1
+    # Susun XML wilayah depan yang baru. Tiap seksi mulai di halaman
+    # baru (jeda halaman di awal paragraf pertama tiap seksi, kecuali
+    # seksi pertama).
     potongan: list[str] = []
     for item in (bagian_baru or []):
         xml_asli = item.get('xml')
         if xml_asli:
-            potongan.extend(xml_asli)
-            continue
-        kunci = item.get('kunci', '')
-        baris = item.get('baris') or []
-        ppr = item.get('ppr', '') or ''
-        # Judul halaman sudah ada di baris pertama (dari susun_bagian);
-        # penulis tidak menambah judul lagi supaya tidak ganda.
-        for baris_satu in baris:
-            potongan.append(_xml_paragraf(str(baris_satu or ''), ppr))
+            # XML dipertahankan: buang sectPr lama (penulis memasang
+            # satu sectPr baru di akhir wilayah depan).
+            blok = [_buang_sectpr(x) for x in xml_asli]
+        else:
+            kunci = item.get('kunci', '')
+            baris = item.get('baris') or []
+            ppr = item.get('ppr', '') or ''
+            # Judul halaman sudah ada di baris pertama (dari susun_bagian);
+            # penulis tidak menambah judul lagi supaya tidak ganda.
+            blok = [_xml_paragraf(str(baris_satu or ''), ppr)
+                    for baris_satu in baris]
+        if blok and potongan:
+            blok[0] = _awali_jeda_halaman(blok[0])
+        potongan.extend(blok)
     wilayah_baru = ''.join(potongan)
     if potongan:
         # Pemutus bagian Romawi di paragraf terakhir wilayah depan.
+        # Footer badan dipakai ulang supaya halaman depan menampilkan
+        # nomor (Romawi di depan, Arab di badan).
         terakhir = potongan[-1]
-        terakhir_baru = _sisip_sectpr(terakhir, 'lowerRoman', 1)
+        terakhir_baru = _sisip_sectpr(terakhir, 'lowerRoman', 1,
+                                      footer_rid=_footer_rid_default(doc))
         wilayah_baru = wilayah_baru[:-len(terakhir)] + terakhir_baru
     if akhir_wilayah > awal_wilayah:
         a = cocok[awal_wilayah].start()
@@ -1173,8 +1596,12 @@ def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
             doc_baru = doc[:pos] + wilayah_baru + doc[pos:]
         else:
             doc_baru = doc + wilayah_baru
-    # Badan: nomor Arab mulai 1 (sectPr terakhir dokumen).
-    doc_baru = _atur_pgnumtype_akhir(doc_baru, 'decimal')
+    # Badan: nomor Arab mulai 1 (seksi tempat Bab I berada). Bab I di
+    # dokumen baru ada di indeks len(potongan) (sesudah wilayah depan).
+    cocok_baru = list(_RE_P.finditer(doc_baru))
+    doc_baru = _atur_pgnumtype_akhir(doc_baru, 'decimal',
+                                     mulai_paragraf=len(potongan),
+                                     cocok=cocok_baru)
     try:
         tmp = path.with_suffix('.tmp.docx')
         with zipfile.ZipFile(tmp, 'w', zipfile.ZIP_DEFLATED) as z:
@@ -1236,9 +1663,9 @@ def perbarui_nomor_daftar(path, halaman_render=None, ukur_fn=None) -> dict:
     for kunci in TURUNAN:
         for baris in baca.get('bagian', {}).get(kunci, []) or []:
             judul = baris.split('\t')[0].strip()
-            if not judul:
+            if not judul or judul == BARIS_BELUM_ADA_LAMPIRAN:
                 continue
-            nomor = nomor_halaman_dari_render(halaman_render, judul)
+            nomor = nomor_footer_dari_render(halaman_render, judul)
             if nomor is None:
                 hilang.append(judul[:60])
                 continue

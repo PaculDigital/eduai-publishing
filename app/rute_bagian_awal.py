@@ -213,12 +213,7 @@ async def bagian_awal_halaman(
     rencana = None
     if request.query_params.get('konfirmasi') == '1':
         rencana = BA.muat_rencana(db, fid)
-    usang = False
-    if hasil.get('ditempel') and hasil.get('diubah_pada'):
-        try:
-            usang = (fb.diubah or '').isoformat() != hasil.get('diubah_pada')
-        except Exception:                                  # noqa: BLE001
-            usang = False
+    usang = BA.daftar_usang(hasil, keadaan['peta'], paragraf, fb.diubah)
     jalan = _proses_jalan(db, u.id, fid)
     pesan = request.query_params.get('pesan', '')
     draf_abstrak = BA.muat_abstrak(db, fid)
@@ -229,6 +224,8 @@ async def bagian_awal_halaman(
         'pesan': pesan, 'draf_abstrak': draf_abstrak,
         'peringatan': BA.peringatan_form(data),
         'kolom': BA.KOLOM_FORM, 'grup': BA.GRUP_FORM,
+        'ringkasan': BA.ringkas_kelompok(data, cek, keadaan['tahap']),
+        'wajib': BA.WAJIB_SEKARANG,
         'tooltip_umum': BA.TOOLTIP_TOMBOL_UMUM,
         'harga_buat': BA.HARGA_BUAT, 'harga_update': BA.HARGA_UPDATE,
         'harga_abstrak': BA.HARGA_ABSTRAK,
@@ -321,10 +318,19 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
         'daftar_gambar': [],
         'daftar_lampiran': [],
     }, kata_pengantar=kata_pengantar, abstrak=abstrak)
-    ket = BA.entri_daftar_keterangan(paragraf)
+    # Keterangan hanya dipindai dari badan (mulai Bab I): baris di daftar
+    # lama ikut terpindai bila seluruh dokumen dibaca, lalu entri ganda
+    # saat Perbarui.
+    _idx_bab1 = BA.cari_indeks_bab1(paragraf or [])
+    _badan = (paragraf or [])[_idx_bab1:] \
+        if _idx_bab1 is not None else (paragraf or [])
+    ket = BA.entri_daftar_keterangan(_badan)
     for kunci in ('daftar_tabel', 'daftar_gambar', 'daftar_lampiran'):
         for item in susun:
             if item[0] == kunci:
+                # Entri nyata menggantikan baris 'Belum ada lampiran.'
+                item[2][:] = [b for b in item[2]
+                              if b != BA.BARIS_BELUM_ADA_LAMPIRAN]
                 item[2].extend(
                     [f"{e['judul']}\t{e['halaman']}" if e.get('halaman')
                      else e['judul'] for e in ket.get(kunci, [])])
@@ -461,7 +467,10 @@ def _buat_kerja_tempel(p, fid, u, jumlah, rencana):
             if not teks.strip():
                 raise RuntimeError('Berkas ini belum bisa dibaca sebagai teks.')
             bab = BA.bab_dari_teks(teks)
-            tahap = BA.tahap_dari_bab(bab)
+            # Tahap ikut rencana (dari peta terverifikasi, satu sumber
+            # dengan struk): pekerja tidak menghitung ulang dari teks,
+            # supaya abstrak tidak hilang bila teks memakai 'BAB 1'.
+            tahap = rencana.get('tahap') or BA.tahap_dari_bab(bab)
             spans = _xml_spans(path)
             paragraf = [t for t, _ in spans]
             baca = BA.baca_bagian_awal(paragraf)
@@ -494,6 +503,17 @@ def _buat_kerja_tempel(p, fid, u, jumlah, rencana):
             if not tulis.get('ok'):
                 raise RuntimeError(tulis.get('sebab') or 'Gagal menulis berkas.')
             _segarkan_berkas(d2, fb2, path)
+            # Nomor daftar dari render nyata sesudah tempel (nomor
+            # bergeser karena penempelan). Gagal render tidak
+            # menggagalkan tempel: nomor dibiarkan kosong + ditandai
+            # butuh render, mahasiswa bisa menekan Perbarui Daftar Isi
+            # (gratis) nanti.
+            butuh_render = True
+            try:
+                per = BA.perbarui_nomor_daftar(path)
+                butuh_render = not per.get('ok') or bool(per.get('hilang'))
+            except Exception as e:                              # noqa: BLE001
+                log.warning('[bagian-awal] perbarui nomor gagal: %s', e)
             # Sidik per bagian sesudah tulis (untuk rencana update berikut).
             spans_baru = _xml_spans(path)
             baca_baru = BA.baca_bagian_awal([t for t, _ in spans_baru])
@@ -501,7 +521,7 @@ def _buat_kerja_tempel(p, fid, u, jumlah, rencana):
                      for k, v in baca_baru.get('bagian', {}).items()}
             struk = {
                 'dipertahankan': [
-                    f"{d['label']} ({len((baca.get('bagian', {}).get(d['kunci']) or []))} baris)"
+                    f"{d['label']} ({BA.hitung_baris_isi(baca_baru.get('bagian', {}).get(d['kunci']) or [])} baris)"
                     for d in rencana.get('dipertahankan', [])],
                 'dibuat_ulang': [d['label']
                                  for d in rencana.get('dibuat_ulang', [])],
@@ -510,11 +530,13 @@ def _buat_kerja_tempel(p, fid, u, jumlah, rencana):
             }
             BA.simpan_hasil(d2, fid, {
                 'ditempel': True, 'tahap': tahap, 'sidik': sidik,
+                'sidik_daftar': BA.sidik_daftar(
+                    peta, [t for t, _ in spans_baru]),
                 'data': data,
                 'diperiksa_pada': datetime.now(timezone.utc).isoformat(),
                 'diubah_pada': (fb2.diubah or '').isoformat()
                 if hasattr(fb2.diubah, 'isoformat') else str(fb2.diubah or ''),
-                'butuh_render': True, 'struk': struk})
+                'butuh_render': butuh_render, 'struk': struk})
             proses_mod.tandai_selesai(
                 p.kode, hasil='Bagian Awal selesai ditempel.')
         except Exception as e:                                  # noqa: BLE001
@@ -595,9 +617,11 @@ async def bagian_awal_status(
     jalan = _proses_jalan(db, u.id, file_id)
     hasil = BA.muat_hasil(db, file_id) or {}
     usang = False
-    if hasil.get('ditempel') and hasil.get('diubah_pada'):
+    if not jalan and hasil.get('ditempel'):
         try:
-            usang = (fb.diubah or '').isoformat() != hasil.get('diubah_pada')
+            peta_st, _ = _peta_tersimpan(db, file_id)
+            usang = BA.daftar_usang(
+                hasil, peta_st, _paragraf_docx(_path_berkas(fb)), fb.diubah)
         except Exception:                                      # noqa: BLE001
             usang = False
     terakhir = None
@@ -758,6 +782,16 @@ async def bagian_awal_perbarui_daftar(
         _segarkan_berkas(db, fb, _path_berkas(fb))
         simpan = BA.muat_hasil(db, fid) or {}
         if simpan.get('ditempel'):
+            # Daftar baru saja dibuat ulang dari isi kini: segarkan
+            # sidik + waktu supaya peringatan usang tidak menyala lagi.
+            try:
+                peta_s, _ = _peta_tersimpan(db, fid)
+                simpan['sidik_daftar'] = BA.sidik_daftar(
+                    peta_s, _paragraf_docx(_path_berkas(fb)))
+            except Exception:                                  # noqa: BLE001
+                pass
+            simpan['diubah_pada'] = (fb.diubah or '').isoformat() \
+                if hasattr(fb.diubah, 'isoformat') else str(fb.diubah or '')
             simpan['butuh_render'] = False
             BA.simpan_hasil(db, fid, simpan)
         if hasil.get('diperbarui'):

@@ -1,6 +1,8 @@
 {# Halaman Lengkapi Bagian Awal skripsi (16 Nov 2026, GAS Bos 14:17 WIB).
-   Satu layar: daftar cek + form identitas + tombol tempel/perbarui +
-   layar verifikasi ulang (tiga daftar) sebelum jalan berbayar.
+   Layar pertama ringkas (16 Nov 2026, Gas Bos 16:07 WIB): maksud satu
+   kalimat + ringkasan 5 kelompok + tombol Isi data dan tempel. Form
+   21 kolom tidak tampil sekaligus: "Wajib sekarang" dulu, "Boleh
+   nanti" di balik Tambah detail. Daftar cek lengkap di balik detail.
    Tooltip mengikuti pola tinjau_baca.html: title + span.tip di dalam
    tombol; tombol nonaktif dibungkus span bertitle supaya alasannya
    tetap terbaca saat diarahkan. #}
@@ -27,11 +29,17 @@
   h2 { margin-top: 0; }
   .lulus { color: #137333; } .kurang { color: #b06000; }
   .struk { background: #f1f8ff; border: 1px solid #a8c8e8; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+  details.kotak summary { cursor: pointer; }
+  summary.tombol { display: inline-block; list-style: none; }
+  summary.tombol::-webkit-details-marker { display: none; }
+  details details { border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-top: 10px; }
+  details details summary { font-weight: 600; }
 </style>
 </head>
 <body>
 <h1>Lengkapi Bagian Awal</h1>
 <p>Berkas: <strong>{{ berkas.nama }}</strong> &middot; Tahap: <strong>{{ 'Proposal (Bab I-III)' if keadaan.tahap == 'proposal' else 'Final (Bab IV/V/VI)' }}</strong></p>
+<p>Bagian Awal melengkapi halaman depan skripsi (sampul sampai abstrak) dari data kamu, tanpa mengubah tulisanmu.</p>
 
 {% if pesan %}<div class="pesan">{{ pesan }}</div>{% endif %}
 {% if peringatan %}
@@ -53,40 +61,44 @@
 {% endif %}
 
 <div class="kotak">
-<h2>Keadaan tombol</h2>
+<h2>Ringkasan</h2>
 {% if keadaan.tombol.aktif %}
-  <p>{{ keadaan.tombol.label }} siap. Isi data di bawah, lalu tekan Periksa ulang.</p>
+  <p>{{ keadaan.tombol.label }} siap. Isi data dulu, lalu Periksa ulang sebelum menempel.</p>
 {% else %}
-  <span class="bungkus-tip" title="{{ keadaan.tombol.tooltip }}">
-    <button class="tombol" type="button" disabled title="{{ keadaan.tombol.tooltip }}">{{ keadaan.tombol.label }}<span class="tip">{{ keadaan.tombol.tooltip }}</span></button>
-  </span>
   <p>{{ keadaan.tombol.alasan }}</p>
 {% endif %}
+<table class="cek">
+{% for g in ringkasan %}
+<tr><td>{% if g.lengkap %}<span class="lulus">Lengkap</span>{% else %}<span class="kurang">Belum lengkap</span>{% endif %}</td><td><strong>{{ g.label }}</strong><br><small>Sudah {{ g.sudah }} dari {{ g.total }}</small></td></tr>
+{% endfor %}
+</table>
 <p><small>{{ tooltip_umum }}</small></p>
 </div>
 
-<div class="kotak">
-<h2>Daftar cek</h2>
-<table class="cek">
-{% for butir in cek %}
-<tr><td>{% if butir.ada %}<span class="lulus">Sudah ada</span>{% else %}<span class="kurang">Belum</span>{% endif %}</td><td><strong>{{ butir.label }}</strong>{% if butir.catatan %}<br><small>{{ butir.catatan }}</small>{% endif %}</td></tr>
-{% endfor %}
-</table>
-</div>
-
-<div class="kotak">
+<details class="kotak" {% if rencana %}open{% endif %}>
+<summary class="tombol" title="{{ keadaan.tombol.tooltip }}">Isi data dan tempel<span class="tip">{{ keadaan.tombol.tooltip }}</span></summary>
+<div>
 <h2>Data vital</h2>
 <p>Semua kolom boleh kosong. Yang kosong tetap tersimpan dan tampil sebagai garis kosong di halaman, lalu dilengkapi nanti lewat Perbarui. Sebelum jalan berbayar, periksa ulang semua data.</p>
 <form method="post" action="/naskah/{{ berkas.id }}/bagian-awal/konfirmasi">
+  <h3>Wajib sekarang</h3>
   <label>Judul skripsi<input type="text" name="judul" value="{{ data.judul }}" placeholder="cth: Pengaruh Kualitas Pelayanan terhadap Kepuasan Pelanggan"></label>
+  {% for kunci, label, contoh, grup_kolom in kolom %}
+  {% if kunci in wajib %}
+  <label>{{ label }}<input type="text" name="{{ kunci }}" value="{{ data[kunci] }}" placeholder="{{ contoh }}"></label>
+  {% endif %}
+  {% endfor %}
+  <details>
+  <summary>Tambah detail (boleh nanti)</summary>
   {% for kode_grup, nama_grup in grup %}
   <h3>{{ nama_grup }}</h3>
   {% for kunci, label, contoh, grup_kolom in kolom %}
-  {% if grup_kolom == kode_grup %}
+  {% if grup_kolom == kode_grup and kunci not in wajib %}
   <label>{{ label }}<input type="text" name="{{ kunci }}" value="{{ data[kunci] }}" placeholder="{{ contoh }}"></label>
   {% endif %}
   {% endfor %}
   {% endfor %}
+  </details>
   <label><input type="checkbox" name="tanpa_ai_pengantar" value="1"> Biarkan Kata Pengantar kosong, saya tulis sendiri (tanpa AI)</label>
   <p>
   {% if keadaan.tombol.aktif %}
@@ -102,6 +114,16 @@
   </p>
 </form>
 </div>
+</details>
+
+<details class="kotak">
+<summary>Daftar cek lengkap</summary>
+<table class="cek">
+{% for butir in cek %}
+<tr><td>{% if butir.ada %}<span class="lulus">Sudah ada</span>{% else %}<span class="kurang">Belum</span>{% endif %}</td><td><strong>{{ butir.label }}</strong>{% if butir.catatan %}<br><small>{{ butir.catatan }}</small>{% endif %}</td></tr>
+{% endfor %}
+</table>
+</details>
 
 {% if rencana %}
 <div class="kotak">
@@ -136,8 +158,8 @@
 {% endif %}
 
 {% if keadaan.tahap == 'final' %}
-<div class="kotak">
-<h2>Abstrak (tahap final)</h2>
+<details class="kotak" {% if draf_abstrak %}open{% endif %}>
+<summary><strong>Abstrak (tahap final)</strong></summary>
 <p>Abstrak lengkap dua bahasa (Indonesia + Inggris), 6 token, bukan kerangka. Draf AI hanya usulan, periksa dan ubah dulu. Atau tulis sendiri (gratis).</p>
 {% if draf_abstrak %}
   <h3>Draf abstrak {{ '(AI)' if draf_abstrak.dari_ai else '(tulisan sendiri)' }} {{ '(diterima)' if draf_abstrak.diterima else '(belum diterima)' }}</h3>
@@ -163,7 +185,7 @@
   <label>Keywords (comma separated)<input type="text" name="kunci_en" value="{{ draf_abstrak.kunci_en | join(', ') if draf_abstrak else '' }}" placeholder="cth: service quality, satisfaction, customer"></label>
   <p><button class="tombol kedua" type="submit">Simpan abstrak (gratis)</button></p>
 </form>
-</div>
+</details>
 {% else %}
 <div class="kotak"><h2>Abstrak</h2><p>Abstrak hanya di tahap final, sesudah Bab IV, V, atau VI selesai. Di tahap proposal, abstrak tidak ditagih.</p></div>
 {% endif %}
