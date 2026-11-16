@@ -29,6 +29,7 @@
   h2 { margin-top: 0; }
   .lulus { color: #137333; } .kurang { color: #b06000; }
   .struk { background: #f1f8ff; border: 1px solid #a8c8e8; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+  .gagal { background: #fdecea; border-color: #d93025; }
   details.kotak summary { cursor: pointer; }
   summary.tombol { display: inline-block; list-style: none; }
   summary.tombol::-webkit-details-marker { display: none; }
@@ -146,15 +147,35 @@
 <script>
 (function () {
   var fid = {{ berkas.id }};
+  var kotak = document.getElementById('sedang');
+  var timer = setInterval(cek, 3000);
   function cek() {
     fetch('/v1/bagian-awal/status?file_id=' + fid)
       .then(function (r) { return r.json(); })
-      .then(function (j) { if (j && !j.sedang_jalan) { location.reload(); } })
+      .then(function (j) {
+        if (!j || j.sedang_jalan) { return; }
+        clearInterval(timer);
+        if (j.terakhir && j.terakhir.status === 'gagal') {
+          var judul = (j.terakhir.jenis === 'abstrak')
+            ? 'Abstrak AI gagal.' : 'Tempel Bagian Awal gagal.';
+          var galat = j.terakhir.galat ? ' ' + j.terakhir.galat : '';
+          kotak.classList.add('gagal');
+          kotak.textContent = judul + galat
+            + ' Token kembali. Periksa datanya lalu tekan tombol tempel lagi.';
+          return;
+        }
+        var u = new URL(location.href);
+        u.searchParams.delete('pesan');
+        location.href = u.toString();
+      })
       .catch(function () {});
   }
-  setInterval(cek, 3000);
 })();
 </script>
+{% endif %}
+
+{% if gagal_terakhir %}
+<div class="kotak gagal" id="gagal"><strong>{% if gagal_terakhir.jenis == 'abstrak' %}Abstrak AI gagal.{% else %}Tempel Bagian Awal gagal.{% endif %}</strong> {{ gagal_terakhir.galat }} Token kembali. Periksa datanya lalu tekan tombol tempel lagi.</div>
 {% endif %}
 
 {% if keadaan.tahap == 'final' %}
