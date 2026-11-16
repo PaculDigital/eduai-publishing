@@ -1539,6 +1539,32 @@ def _bab_dari_badan(paragraf_badan) -> list[tuple[int, str]]:
     return keluar
 
 
+def _judul_subbab_normal(judul: str) -> str:
+    """Judul subbab tanpa nomor dan tanpa awalan 'SUB-BAB'.
+
+    '1.2 Perkembangan ...' dan 'SUB-BAB Perkembangan ...' adalah judul
+    yang sama; begitu pula '1.4 Posisi ...' dan 'Posisi ...' telanjang.
+    Dipakai membedakan gema judul dari judul yang memang beda.
+    """
+    s = _tanpa_penanda_bab(judul)
+    s = re.sub(r'^\d+\.\d+\s*', '', s)
+    s = re.sub(r'^sub[ -]?bab\b\s*', '', s)
+    return s.strip()
+
+
+def _judul_ada_di_badan(gabung: str, paragraf_badan) -> bool:
+    """True bila judul gabungan ada persis sebagai paragraf badan."""
+    if not paragraf_badan:
+        return False
+    cari = _normalisasi_cari(gabung)
+    if not cari:
+        return False
+    for p in paragraf_badan:
+        if _normalisasi_cari(str(p or '')) == cari:
+            return True
+    return False
+
+
 def entri_daftar_isi(peta_json, halaman_render=None,
                      paragraf_badan=None) -> list[dict]:
     """Entri Daftar Isi dari peta Jev terverifikasi (bab + subbab).
@@ -1638,7 +1664,34 @@ def entri_daftar_isi(peta_json, halaman_render=None,
                               'halaman': nomor_halaman_dari_render(
                                   halaman_render, lengkap)})
         ada_judul.add(_tanpa_penanda_bab(lengkap))
-    return keluar
+    # Gema subbab: baris peta yang bukan judul sendiri (cacat uji live
+    # 17 Nov 2026, file 126). Badan menulis judul yang sama dua kali
+    # berurutan ('1.2 ...' lalu 'SUB-BAB ...'; '1.4 ...' lalu judul
+    # telanjang) dan peta melabeli keduanya 'subbab', jadi Daftar Isi
+    # memuat dua baris untuk satu subbab. Lanjutan judul yang terpotong
+    # baris ('1.1 ... Digital' lalu 'dalam Ekosistem ...') juga masuk
+    # sebagai baris sendiri. Hanya yang BERURUTAN yang dibuang: judul
+    # sah yang berulang di tiap bab ('Ringkasan Bab') tidak pernah
+    # berurutan karena selalu ada entri bab di antaranya. Lanjutan
+    # huruf kecil hanya dibuang bila ditempel ke judul sebelumnya
+    # membentuk judul badan yang nyata (badan tersedia); tanpa badan,
+    # baris itu dibiarkan supaya tidak ada judul yang hilang diam-diam.
+    bersih: list[dict] = []
+    for e in keluar:
+        if e.get('level') == 1 and bersih \
+                and bersih[-1].get('level') == 1:
+            dulu = bersih[-1]
+            normal_e = _judul_subbab_normal(e.get('judul', ''))
+            normal_dulu = _judul_subbab_normal(dulu.get('judul', ''))
+            if normal_e and normal_e == normal_dulu:
+                continue  # gema: judul sama persis, buang yang kedua
+            frag = str(e.get('judul', '') or '').strip()
+            if frag and frag[0].islower():
+                gabung = (f"{dulu.get('judul', '').strip()} {frag}")
+                if _judul_ada_di_badan(gabung, paragraf_badan):
+                    continue  # lanjutan judul, bukan judul sendiri
+        bersih.append(e)
+    return bersih
 
 
 _POLAA_TABEL = re.compile(r'^\s*Tabel\s+\d+\.\d+\b.*', re.IGNORECASE)
