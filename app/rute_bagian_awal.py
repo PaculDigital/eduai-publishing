@@ -15,7 +15,8 @@ Rancangan: RENCANA_BAGIAN_AWAL.md (disepakati Bos).
   - POST /naskah/{fid}/bagian-awal/abstrak-pakai -> terima draf (gratis)
   - POST /naskah/{fid}/bagian-awal/abstrak-manual -> tulis sendiri (gratis)
   - POST /naskah/{fid}/bagian-awal/perbarui-daftar -> isi ulang nomor
-    halaman keempat daftar (gratis, deterministik)
+    halaman keempat daftar (gratis, deterministik; titip ke pekerja
+    latar, ukur lewat OnlyOffice ConvertService, 17 Nov 2026)
 
 Pola yang SAMA dengan /v1/peta/mulai-latar dan /v1/pustaka/mulai-latar:
 endpoint HANYA menitipkan pekerjaan ke pekerja latar (`proses`) lalu
@@ -37,8 +38,10 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
 from . import bagian_awal as BA
+from . import onlyoffice
 from . import proses as proses_mod
 from . import saldo as _saldo
+from . import sesi as _sesi
 from . import struktur as _str
 from .auth import wajib_login, wajib_login_api
 from .config import UPLOAD_DIR
@@ -76,7 +79,7 @@ def _pesan_ke(pesan: str) -> str:
 
 
 def _adalah_proses_bagian_awal(komentar_json) -> bool:
-    """True bila baris proses ini adalah Bagian Awal (tempel/abstrak)."""
+    """True bila baris proses ini adalah Bagian Awal (tempel/abstrak/daftar)."""
     try:
         import json as _json
         data = _json.loads(komentar_json) if isinstance(komentar_json, str) \
@@ -86,12 +89,46 @@ def _adalah_proses_bagian_awal(komentar_json) -> bool:
     if isinstance(data, list):
         return any(isinstance(x, str)
                    and (x.startswith(BA.KOMENTAR_PROSES)
-                        or x.startswith(BA.KOMENTAR_PROSES_ABSTRAK))
+                        or x.startswith(BA.KOMENTAR_PROSES_ABSTRAK)
+                        or x.startswith(BA.KOMENTAR_PROSES_DAFTAR))
                    for x in data)
     if isinstance(data, str):
         return data.startswith(BA.KOMENTAR_PROSES)
     return isinstance(komentar_json, str) and \
         BA.KOMENTAR_PROSES in komentar_json
+
+
+async def _paksa_simpan_bila_diedit(db, uid: int, fid: int) -> dict:
+    """Paksa simpan bila berkas sedang dibuka di editor (17 Nov 2026).
+
+    Converter OnlyOffice merender berkas TERSIMPAN di disk; kalau
+    mahasiswa sedang mengetik, nomor bisa ketinggalan beberapa detik
+    (autosave ~10 detik). Cari sesi edit aktif (SesiEdit) untuk
+    (uid, fid); bila ada, await onlyoffice.forcesave(kunci_oo, uid)
+    (error 1 & 3 dianggap aman oleh forcesave sendiri, bug #2822).
+    Bila tidak ada sesi, berkas tidak sedang disunting: tidak ada
+    yang perlu dipaksa.
+    Return {'perlu': bool, 'ok': bool, 'sebab': str}.
+    """
+    try:
+        aktif = [s for s in _sesi.sesi_user(db, uid)
+                 if getattr(s, 'file_id', None) == int(fid)
+                 and getattr(s, 'kunci_oo', '')]
+    except Exception as e:                                  # noqa: BLE001
+        return {'perlu': False, 'ok': False,
+                'sebab': f'tidak bisa membaca sesi edit: {e}'}
+    if not aktif:
+        return {'perlu': False, 'ok': True, 'sebab': ''}
+    kunci = aktif[0].kunci_oo
+    try:
+        hasil = await onlyoffice.forcesave(kunci, uid)
+    except Exception as e:                                  # noqa: BLE001
+        return {'perlu': True, 'ok': False,
+                'sebab': f'paksa simpan gagal: {e}'}
+    if not hasil.get('ok'):
+        return {'perlu': True, 'ok': False,
+                'sebab': f"paksa simpan gagal: {hasil.get('pesan', '')}"}
+    return {'perlu': True, 'ok': True, 'sebab': ''}
 
 
 def _peta_tersimpan(db: Session, fid: int):
@@ -574,15 +611,29 @@ def _buat_kerja_tempel(p, fid, u, jumlah, rencana):
                 raise RuntimeError(tulis.get('sebab') or 'Gagal menulis berkas.')
             _segarkan_berkas(d2, fb2, path)
             # Nomor daftar dari render nyata sesudah tempel (nomor
-            # bergeser karena penempelan). Gagal render tidak
-            # menggagalkan tempel: nomor dibiarkan kosong + ditandai
-            # butuh render, mahasiswa bisa menekan Perbarui Daftar Isi
-            # (gratis) nanti.
+            # bergeser karena penempelan). Ukur lewat OnlyOffice
+            # (17 Nov 2026, GAS Bos): render yang sama dengan editor.
+            # Sebelum ukur, paksa simpan bila berkas sedang disunting
+            # (converter merender berkas tersimpan). Gagal render /
+            # gagal paksa simpan tidak menggagalkan tempel: nomor
+            # dibiarkan kosong + ditandai butuh render, mahasiswa bisa
+            # menekan Perbarui Daftar Isi (gratis) nanti.
             butuh_render = True
+            butuh_render_sebab = ''
             try:
-                per = BA.perbarui_nomor_daftar(path)
-                butuh_render = not per.get('ok') or bool(per.get('hilang'))
+                simpan = await _paksa_simpan_bila_diedit(d2, u.id, fid)
+                if not simpan['ok']:
+                    butuh_render_sebab = simpan['sebab']
+                    log.warning('[bagian-awal] paksa simpan gagal: %s',
+                                simpan['sebab'])
+                else:
+                    per = BA.perbarui_nomor_daftar(path, fid=fid,
+                                                   user_id=u.id)
+                    butuh_render = not per.get('ok') or bool(per.get('hilang'))
+                    if not per.get('ok'):
+                        butuh_render_sebab = str(per.get('sebab', ''))
             except Exception as e:                              # noqa: BLE001
+                butuh_render_sebab = str(e)[:200]
                 log.warning('[bagian-awal] perbarui nomor gagal: %s', e)
             # Sidik per bagian sesudah tulis (untuk rencana update berikut).
             spans_baru = _xml_spans(path)
@@ -616,7 +667,9 @@ def _buat_kerja_tempel(p, fid, u, jumlah, rencana):
                 'diperiksa_pada': datetime.now(timezone.utc).isoformat(),
                 'diubah_pada': (fb2.diubah or '').isoformat()
                 if hasattr(fb2.diubah, 'isoformat') else str(fb2.diubah or ''),
-                'butuh_render': butuh_render, 'struk': struk,
+                'butuh_render': butuh_render,
+                'butuh_render_sebab': butuh_render_sebab,
+                'struk': struk,
                 'duplikat_dibuang': duplikat_dibuang})
             proses_mod.tandai_selesai(
                 p.kode, hasil='Bagian Awal selesai ditempel.')
@@ -704,8 +757,12 @@ def _proses_terakhir(db: Session, uid: int, fid: int):
             komentar = getattr(pr, 'komentar_json', '') or ''
             if not _adalah_proses_bagian_awal(komentar):
                 continue
-            jenis = 'abstrak' if BA.KOMENTAR_PROSES_ABSTRAK in komentar \
-                else 'tempel'
+            if BA.KOMENTAR_PROSES_ABSTRAK in komentar:
+                jenis = 'abstrak'
+            elif BA.KOMENTAR_PROSES_DAFTAR in komentar:
+                jenis = 'daftar'
+            else:
+                jenis = 'tempel'
             return {'kode': pr.kode, 'status': pr.status,
                     'galat': pr.galat or '', 'jenis': jenis}
     except Exception:                                      # noqa: BLE001
@@ -862,42 +919,86 @@ async def bagian_awal_abstrak_manual(
         status_code=303)
 
 
+def _buat_kerja_daftar(p, fid, u):
+    """Pekerja latar Perbarui Daftar Isi (gratis, deterministik).
+
+    Nomor diukur lewat OnlyOffice ConvertService (~18 detik untuk
+    191 halaman), JANGAN dari request web, jalan di pekerja latar
+    `proses` (utas + event loop sendiri). Gagal apa pun -> pekerja
+    gagal dengan jujur: nomor LAMA dipertahankan (tidak ditulis yang
+    salah), layar menampilkan kegagalan lewat kotak yang sudah ada.
+    """
+    async def _kerja(lapor):
+        d2 = proses_mod._sesi_baru()
+        try:
+            fb2 = _berkas(d2, fid, u.id)
+            path = _path_berkas(fb2)
+            simpan = await _paksa_simpan_bila_diedit(d2, u.id, fid)
+            if not simpan['ok']:
+                raise RuntimeError('Paksa simpan OnlyOffice gagal: '
+                                   + simpan['sebab'])
+            hasil = BA.perbarui_nomor_daftar(path, fid=fid, user_id=u.id)
+            if not hasil.get('ok'):
+                raise RuntimeError(hasil.get('sebab')
+                                   or 'Ukur nomor gagal.')
+            _segarkan_berkas(d2, fb2, path)
+            simpan_h = BA.muat_hasil(d2, fid) or {}
+            if simpan_h.get('ditempel'):
+                # Daftar baru saja dibuat ulang dari isi kini: segarkan
+                # sidik + waktu supaya peringatan usang tidak menyala lagi.
+                try:
+                    peta_s, _ = _peta_tersimpan(d2, fid)
+                    simpan_h['sidik_daftar'] = BA.sidik_daftar(
+                        peta_s, _paragraf_docx(path))
+                except Exception:                              # noqa: BLE001
+                    pass
+                simpan_h['diubah_pada'] = (fb2.diubah or '').isoformat() \
+                    if hasattr(fb2.diubah, 'isoformat') \
+                    else str(fb2.diubah or '')
+                simpan_h['butuh_render'] = False
+                simpan_h['butuh_render_sebab'] = ''
+                BA.simpan_hasil(d2, fid, simpan_h)
+            pesan = (f"Nomor halaman diperbarui "
+                     f"({hasil['diperbarui']} entri).")
+            if hasil.get('hilang'):
+                pesan += (' Sebagian judul tidak ketemu di render: '
+                          + ', '.join(hasil['hilang'][:3]) + '.')
+            proses_mod.tandai_selesai(p.kode, hasil=pesan)
+        except Exception as e:                                  # noqa: BLE001
+            log.error('[bagian-awal] perbarui daftar %s gagal: %s',
+                      p.kode, e)
+            proses_mod.tandai_gagal(p.kode, str(e)[:300])
+        finally:
+            d2.close()
+
+    return _kerja
+
+
 @router.post('/naskah/{fid}/bagian-awal/perbarui-daftar')
 async def bagian_awal_perbarui_daftar(
     fid: int, request: Request,
     u: User = Depends(wajib_login),
     db: Session = Depends(get_db),
 ):
-    """Isi ulang nomor halaman keempat daftar (gratis, deterministik)."""
+    """Isi ulang nomor halaman keempat daftar (gratis, deterministik).
+
+    TITIP ke pekerja latar lalu BALAS CEPAT (pola tempel/abstrak):
+    konversi OnlyOffice ~18 detik tidak boleh menahan request web.
+    Tekan 2x saat jalan ditahan sopan; hasil tampil lewat polling
+    status yang sudah ada (kotak 'Sedang diproses!' + kotak gagal).
+    """
     fb = _berkas(db, fid, u.id)
-    hasil = BA.perbarui_nomor_daftar(_path_berkas(fb))
-    if hasil.get('ok'):
-        _segarkan_berkas(db, fb, _path_berkas(fb))
-        simpan = BA.muat_hasil(db, fid) or {}
-        if simpan.get('ditempel'):
-            # Daftar baru saja dibuat ulang dari isi kini: segarkan
-            # sidik + waktu supaya peringatan usang tidak menyala lagi.
-            try:
-                peta_s, _ = _peta_tersimpan(db, fid)
-                simpan['sidik_daftar'] = BA.sidik_daftar(
-                    peta_s, _paragraf_docx(_path_berkas(fb)))
-            except Exception:                                  # noqa: BLE001
-                pass
-            simpan['diubah_pada'] = (fb.diubah or '').isoformat() \
-                if hasattr(fb.diubah, 'isoformat') else str(fb.diubah or '')
-            simpan['butuh_render'] = False
-            BA.simpan_hasil(db, fid, simpan)
-        if hasil.get('diperbarui'):
-            pesan = (f"Nomor halaman diperbarui ({hasil['diperbarui']} "
-                     'entri).')
-        else:
-            pesan = 'Tidak ada entri daftar yang butuh nomor baru.'
-        if hasil.get('hilang'):
-            pesan += (' Sebagian judul tidak ketemu di render: '
-                      + ', '.join(hasil['hilang'][:3]) + '.')
-    else:
-        pesan = 'Nomor halaman belum bisa diisi: ' + str(
-            hasil.get('sebab', ''))[:200]
+    jalan = _proses_jalan(db, u.id, fid)
+    if jalan:
+        pesan = 'Masih ada pekerjaan bagian awal berjalan untuk naskah ini.'
+        return RedirectResponse(
+            f'/naskah/{fid}/bagian-awal?pesan={_pesan_ke(pesan)}',
+            status_code=303)
+    p = proses_mod.mulai(db, user_id=u.id, file_id=fid,
+                         komentar=[BA.KOMENTAR_PROSES_DAFTAR])
+    proses_mod.jalankan(p.kode, _buat_kerja_daftar(p, fid, u))
+    pesan = ('Nomor daftar sedang diukur OnlyOffice. '
+             'Tunggu sebentar lalu muat ulang.')
     return RedirectResponse(
         f'/naskah/{fid}/bagian-awal?pesan={_pesan_ke(pesan)}',
         status_code=303)

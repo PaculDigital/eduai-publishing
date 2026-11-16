@@ -43,6 +43,7 @@ HARGA_ABSTRAK = 6
 
 KOMENTAR_PROSES = 'Lengkapi Bagian Awal'
 KOMENTAR_PROSES_ABSTRAK = 'Abstrak AI Bagian Awal'
+KOMENTAR_PROSES_DAFTAR = 'Perbarui Daftar Bagian Awal'
 
 # ── Urutan bagian awal (Pedoman UPB 2025) ─────────────────────────────
 URUTAN = [
@@ -2087,12 +2088,17 @@ def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
     return {'ok': True, 'diterapkan': len(bagian_baru or []), 'sebab': ''}
 
 
-def perbarui_nomor_daftar(path, halaman_render=None, ukur_fn=None) -> dict:
+def perbarui_nomor_daftar(path, halaman_render=None, ukur_fn=None,
+                          fid=None, user_id=None) -> dict:
     """Isi ulang nomor halaman keempat daftar (gratis, deterministik).
 
-    `halaman_render`: teks per halaman (format sidecar). Bila None, coba
-    sidecar `teks_halaman`. Bila render tidak ada/gagal, nomor dibiarkan
-    kosong dan dilaporkan jujur (tidak pernah dikarang).
+    `halaman_render`: teks per halaman. Bila None, ukur lewat OnlyOffice
+    ConvertService (app.ukur_onlyoffice), render yang SAMA dengan yang
+    dilihat mahasiswa di editor (191 halaman), bukan WordCraft (247
+    halaman, nomor meleset; 17 Nov 2026). Bila render tidak ada/gagal,
+    nomor dibiarkan kosong dan dilaporkan jujur (tidak pernah dikarang,
+    tidak pernah kembali diam-diam ke angka WordCraft).
+    `fid`/`user_id` wajib untuk ukur lewat OnlyOffice (token /oo/unduh).
     Return {ok, diperbarui, hilang, sebab}.
     """
     from .pustaka_periksa import _RE_P
@@ -2103,19 +2109,21 @@ def perbarui_nomor_daftar(path, halaman_render=None, ukur_fn=None) -> dict:
         try:
             halaman_render = ukur_fn(path)
         except Exception as e:                                  # noqa: BLE001
-            halaman_render = None
-            sebab_render = str(e)
-        else:
-            sebab_render = ''
-    else:
-        sebab_render = ''
-    if halaman_render is None:
-        try:
-            from . import sidecar_buku as _sc
-            halaman_render = _sc.teks_halaman(path)
-        except Exception as e:                                  # noqa: BLE001
             return {'ok': False, 'diperbarui': 0, 'hilang': [],
                     'sebab': 'Render halaman tidak tersedia: ' + str(e)[:200]}
+    if halaman_render is None:
+        if fid is None or user_id is None:
+            return {'ok': False, 'diperbarui': 0, 'hilang': [],
+                    'sebab': 'Ukur halaman butuh file_id dan user_id '
+                             '(OnlyOffice).'}
+        try:
+            from . import ukur_onlyoffice as _uo
+            halaman_render = _uo.ukur_halaman(
+                fid=int(fid), user_id=int(user_id),
+                nama_berkas=Path(path).name)
+        except Exception as e:                                  # noqa: BLE001
+            return {'ok': False, 'diperbarui': 0, 'hilang': [],
+                    'sebab': 'Ukur halaman OnlyOffice gagal: ' + str(e)[:200]}
     try:
         with zipfile.ZipFile(path) as z:
             nama = z.namelist()

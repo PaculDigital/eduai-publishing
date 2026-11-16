@@ -156,12 +156,17 @@
         if (!j || j.sedang_jalan) { return; }
         clearInterval(timer);
         if (j.terakhir && j.terakhir.status === 'gagal') {
-          var judul = (j.terakhir.jenis === 'abstrak')
-            ? 'Abstrak AI gagal.' : 'Tempel Bagian Awal gagal.';
+          var judul = 'Tempel Bagian Awal gagal.';
+          var ekor = ' Token kembali. Periksa datanya lalu tekan tombol tempel lagi.';
+          if (j.terakhir.jenis === 'abstrak') {
+            judul = 'Abstrak AI gagal.';
+          } else if (j.terakhir.jenis === 'daftar') {
+            judul = 'Perbarui Daftar gagal.';
+            ekor = ' Nomor lama dipertahankan. Tekan Perbarui Daftar Isi lagi.';
+          }
           var galat = j.terakhir.galat ? ' ' + j.terakhir.galat : '';
           kotak.classList.add('gagal');
-          kotak.textContent = judul + galat
-            + ' Token kembali. Periksa datanya lalu tekan tombol tempel lagi.';
+          kotak.textContent = judul + galat + ekor;
           return;
         }
         var u = new URL(location.href);
@@ -175,7 +180,7 @@
 {% endif %}
 
 {% if gagal_terakhir %}
-<div class="kotak gagal" id="gagal"><strong>{% if gagal_terakhir.jenis == 'abstrak' %}Abstrak AI gagal.{% else %}Tempel Bagian Awal gagal.{% endif %}</strong> {{ gagal_terakhir.galat }} Token kembali. Periksa datanya lalu tekan tombol tempel lagi.</div>
+<div class="kotak gagal" id="gagal"><strong>{% if gagal_terakhir.jenis == 'abstrak' %}Abstrak AI gagal.{% elif gagal_terakhir.jenis == 'daftar' %}Perbarui Daftar gagal.{% else %}Tempel Bagian Awal gagal.{% endif %}</strong> {{ gagal_terakhir.galat }}{% if gagal_terakhir.jenis == 'daftar' %} Nomor lama dipertahankan. Tekan Perbarui Daftar Isi lagi.{% else %} Token kembali. Periksa datanya lalu tekan tombol tempel lagi.{% endif %}</div>
 {% endif %}
 
 {% if keadaan.tahap == 'final' %}

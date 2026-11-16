@@ -23,6 +23,11 @@ Aturan yang diuji (RENCANA_BAGIAN_AWAL.md):
      dibuat ulang dengan nomor halaman yang benar.
   7. Penomoran Romawi (bagian awal) lalu Arab mulai 1 (Bab I).
   8. Dua versi Persetujuan (proposal vs final); urutan 13 halaman.
+  9. Ukur nomor pakai OnlyOffice ConvertService (17 Nov 2026, GAS Bos):
+     render sama dengan editor (191 halaman, bukan WordCraft 247),
+     XML jawaban diparse, host FileUrl ditulis ulang, FileUrl
+     kedaluwarsa, paksa simpan bila disunting, gagal dengan jujur
+     (nomor lama dipertahankan), jalan di pekerja latar.
 """
 import os
 import sys
@@ -1329,6 +1334,375 @@ def jalankan():
     _awal = naskah_isi.find('Lengkapi Bagian Awal')
     cek('0 em dash: blok tombol naskah.html',
         '\u2014' not in naskah_isi[_awal - 400:_awal + 1200])
+
+    # ── 15. Ukur nomor halaman pakai OnlyOffice (17 Nov 2026) ─────────
+    import hashlib as _hl
+    import hmac as _hm
+    from app import ukur_onlyoffice as UO
+
+    _XML_OK = ('<FileResult><FileUrl>http://docservice/cache/files/'
+               'x/output.pdf</FileUrl><FileType>pdf</FileType>'
+               '<Percent>100</Percent><EndConvert>True</EndConvert>'
+               '</FileResult>')
+    cek('ukur-oo: parse XML sukses -> FileUrl',
+        UO.parse_jawaban_konversi(_XML_OK)
+        == 'http://docservice/cache/files/x/output.pdf')
+    try:
+        UO.parse_jawaban_konversi('{"error": -8}')
+        cek('ukur-oo: JSON error -8 -> UkurGagal', False, 'tidak melempar')
+    except UO.UkurGagal as e:
+        cek('ukur-oo: JSON error -8 -> UkurGagal', '-8' in str(e), str(e))
+    try:
+        UO.parse_jawaban_konversi('')
+        cek('ukur-oo: jawaban kosong -> UkurGagal', False, 'tidak melempar')
+    except UO.UkurGagal:
+        cek('ukur-oo: jawaban kosong -> UkurGagal', True)
+    try:
+        UO.parse_jawaban_konversi('<FileResult></FileResult>')
+        cek('ukur-oo: XML tanpa FileUrl -> UkurGagal', False,
+            'tidak melempar')
+    except UO.UkurGagal:
+        cek('ukur-oo: XML tanpa FileUrl -> UkurGagal', True)
+
+    cek('ukur-oo: host docservice ditulis ulang jadi oo-converter',
+        UO.tulis_ulang_host_fileurl(
+            'http://docservice/cache/files/x/output.pdf?token=a',
+            'oo-converter')
+        == 'http://oo-converter/cache/files/x/output.pdf?token=a')
+    cek('ukur-oo: host oo-converter dibiarkan',
+        UO.tulis_ulang_host_fileurl(
+            'http://oo-converter/cache/files/x/output.pdf', 'oo-converter')
+        == 'http://oo-converter/cache/files/x/output.pdf')
+    cek('ukur-oo: host lain dibiarkan',
+        UO.tulis_ulang_host_fileurl(
+            'http://lain.invalid/x.pdf', 'oo-converter')
+        == 'http://lain.invalid/x.pdf')
+
+    _token_harap = _hm.new(
+        b'uji-sementara-bukan-rahasia', b'126:12', _hl.sha256
+    ).hexdigest()[:40]
+    cek('ukur-oo: token unduh = HMAC SECRET_KEY atas fid:user_id',
+        UO.token_unduh_berkas(126, 12) == _token_harap
+        and len(_token_harap) == 40, _token_harap)
+    _oo_env_lama = os.environ.get('EDUAI_OO_INTERNAL_URL')
+    os.environ['EDUAI_OO_INTERNAL_URL'] = 'http://eduai-app:8000'
+    try:
+        _url_u = UO.url_unduh_berkas(126, 12)
+    finally:
+        if _oo_env_lama is None:
+            os.environ.pop('EDUAI_OO_INTERNAL_URL', None)
+        else:
+            os.environ['EDUAI_OO_INTERNAL_URL'] = _oo_env_lama
+    cek('ukur-oo: URL masukan = basis internal + /oo/unduh/{token}',
+        _url_u == f'http://eduai-app:8000/oo/unduh/{_token_harap}', _url_u)
+
+    cek('ukur-oo: rapikan buang nomor footer di depan',
+        UO._rapikan_teks_halaman('xi\r\nKATA PENGANTAR\r\nIsi')
+        == 'KATA PENGANTAR\nIsi'
+        and UO._rapikan_teks_halaman('24\r\n1.5 Judul\r\nIsi')
+        == '1.5 Judul\nIsi')
+    cek('ukur-oo: rapikan tidak menyentuh baris isi',
+        UO._rapikan_teks_halaman('BAB 1\r\nIsi') == 'BAB 1\nIsi'
+        and UO._rapikan_teks_halaman('') == '')
+
+    _pdf_bukti = (Path(ROOT, 'tests', 'fixtures', 'ukur_onlyoffice',
+                      'f126_oo.pdf').read_bytes())
+    _hal_oo = UO.teks_per_halaman_pdf(_pdf_bukti)
+    cek('ukur-oo: PDF bukti dibaca pypdfium2 = 191 halaman',
+        len(_hal_oo) == 191, f'jumlah {len(_hal_oo)}')
+    cek('ukur-oo: halaman 11 diawali KATA PENGANTAR (bukan nomor)',
+        _hal_oo[10].split('\n')[0].strip() == 'KATA PENGANTAR',
+        _hal_oo[10][:60])
+    cek('ukur-oo: halaman 53 memuat BAB 2',
+        'BAB 2' in _hal_oo[52], _hal_oo[52][:80])
+    _txt_bukti = (Path(ROOT, 'tests', 'fixtures', 'ukur_onlyoffice',
+                       'f126_oo.txt').read_text(
+                           encoding='utf-8', errors='ignore'))
+    _hal_txt = _txt_bukti.split('\f')
+    cek('ukur-oo: peta nomor dari teks bukti = footer editor (bukan WordCraft)',
+        BA.nomor_footer_dari_render(
+            _hal_txt, 'KATA PENGANTAR') == 'xi'
+        and BA.nomor_footer_dari_render(
+            _hal_txt,
+            'BAB 1. Lanskap Pemasaran Digital: Ruang Lingkup, Batasan, '
+            'dan Fondasi Konseptual') == 1
+        and BA.nomor_footer_dari_render(
+            _hal_txt,
+            '1.5 Implikasi Struktural terhadap Pemetaan Bidang dan '
+            'Sistematika Buku Referensi Ini') == 24
+        and BA.nomor_footer_dari_render(
+            _hal_txt,
+            'BAB 2. Arsitektur Strategi Pemasaran Digital dan Dinamika '
+            'Platform') == 32
+        and BA.nomor_footer_dari_render(
+            _hal_txt,
+            '2.1 Definisi dan Konsep Kunci Strategi Pemasaran Digital '
+            'Berbasis Platform') == 33)
+    cek('ukur-oo: peta nomor dari PDF pypdfium2 = footer editor',
+        BA.nomor_footer_dari_render(_hal_oo, 'KATA PENGANTAR') == 'xi'
+        and BA.nomor_footer_dari_render(
+            _hal_oo,
+            'BAB 2. Arsitektur Strategi Pemasaran Digital dan Dinamika '
+            'Platform') == 32)
+
+    class _RespPalsu:
+        def __init__(self, kode, teks='', konten=b''):
+            self.status_code = kode
+            self.text = teks
+            self.content = konten
+
+    class _PemanggilPalsu:
+        """Peniru httpx sync: POST -> XML bukti, GET -> PDF bukti."""
+
+        def __init__(self):
+            self.panggilan = []
+
+        def __call__(self, metode, url, **kw):
+            self.panggilan.append((metode, url, kw))
+            if metode == 'POST':
+                return _RespPalsu(200, teks=_XML_OK)
+            return _RespPalsu(200, konten=_pdf_bukti)
+
+    _panggil = _PemanggilPalsu()
+    _oo_url_asli = UO.OO_URL
+    UO.OO_URL = 'http://oo-converter'
+    try:
+        _hal_ukur = UO.ukur_halaman(
+            fid=126, user_id=12, nama_berkas='f126_v3.docx',
+            pemanggil=_panggil)
+    finally:
+        UO.OO_URL = _oo_url_asli
+    _post = [p for p in _panggil.panggilan if p[0] == 'POST']
+    _get = [p for p in _panggil.panggilan if p[0] == 'GET']
+    cek('ukur-oo: alur penuh (POST XML + GET PDF) -> 191 halaman',
+        len(_hal_ukur) == 191 and 'BAB 2' in _hal_ukur[52],
+        f'halaman {len(_hal_ukur)}')
+    cek('ukur-oo: POST ke ConvertService.ashx + URL /oo/unduh + token',
+        len(_post) == 1
+        and _post[0][1] == 'http://oo-converter/ConvertService.ashx'
+        and _post[0][2].get('json', {}).get('async') is False
+        and _post[0][2].get('json', {}).get('outputtype') == 'pdf'
+        and '/oo/unduh/' in _post[0][2].get('json', {}).get('url', '')
+        and bool(_post[0][2].get('json', {}).get('token')),
+        str(_post)[:300])
+    cek('ukur-oo: GET PDF memakai host oo-converter (bukan docservice)',
+        len(_get) == 1
+        and _get[0][1].startswith('http://oo-converter/cache/files/'),
+        str(_get)[:200])
+    cek('ukur-oo: hasil hanya daftar halaman (URL tidak disimpan)',
+        isinstance(_hal_ukur, list)
+        and not any('FileUrl' in (h or '') or 'docservice' in (h or '')
+                    for h in _hal_ukur))
+
+    class _PemanggilGagal(_PemanggilPalsu):
+        def __call__(self, metode, url, **kw):
+            self.panggilan.append((metode, url, kw))
+            if metode == 'POST':
+                return _RespPalsu(200, teks='{"error": -8}')
+            return _RespPalsu(404)
+    UO.OO_URL = 'http://oo-converter'
+    try:
+        UO.ukur_halaman(fid=126, user_id=12, nama_berkas='x.docx',
+                        pemanggil=_PemanggilGagal())
+        cek('ukur-oo: ConvertService error -8 -> UkurGagal', False,
+            'tidak melempar')
+    except UO.UkurGagal as e:
+        cek('ukur-oo: ConvertService error -8 -> UkurGagal', '-8' in str(e),
+            str(e))
+    finally:
+        UO.OO_URL = _oo_url_asli
+
+    class _Pemanggil404(_PemanggilPalsu):
+        def __call__(self, metode, url, **kw):
+            self.panggilan.append((metode, url, kw))
+            if metode == 'POST':
+                return _RespPalsu(200, teks=_XML_OK)
+            return _RespPalsu(404)
+    UO.OO_URL = 'http://oo-converter'
+    try:
+        UO.ukur_halaman(fid=126, user_id=12, nama_berkas='x.docx',
+                        pemanggil=_Pemanggil404())
+        cek('ukur-oo: unduh PDF 404 -> UkurGagal', False, 'tidak melempar')
+    except UO.UkurGagal as e:
+        cek('ukur-oo: unduh PDF 404 -> UkurGagal', '404' in str(e), str(e))
+    finally:
+        UO.OO_URL = _oo_url_asli
+    _oo_url_kosong = UO.OO_URL
+    UO.OO_URL = ''
+    try:
+        UO.ukur_halaman(fid=126, user_id=12, nama_berkas='x.docx',
+                        pemanggil=_PemanggilPalsu())
+        cek('ukur-oo: OO_URL kosong -> UkurGagal', False, 'tidak melempar')
+    except UO.UkurGagal:
+        cek('ukur-oo: OO_URL kosong -> UkurGagal', True)
+    finally:
+        UO.OO_URL = _oo_url_kosong
+
+    # perbarui_nomor_daftar: jalur default baru butuh fid/user_id.
+    _docx_u = Path(TMP) / 'naskah_u.docx'
+    _buat_naskah(_docx_u)
+    BA.tulis_bagian_awal(_docx_u, [
+        {'kunci': k, 'judul': j, 'baris': b, 'xml': None, 'ppr': ''}
+        for k, j, b in BA.susun_bagian(
+            {'nama': 'Siti Aminah', 'judul': 'Judul Saya'}, 'proposal',
+            {'daftar_isi': BA.entri_daftar_isi(PETA_BAB123)})])
+    _r_tanpa = BA.perbarui_nomor_daftar(_docx_u)
+    cek('ukur-oo: tanpa fid/user_id -> gagal jujur (bukan WordCraft)',
+        _r_tanpa.get('ok') is False
+        and 'file_id dan user_id' in _r_tanpa.get('sebab', ''),
+        str(_r_tanpa))
+    _uo_asli = UO.ukur_halaman
+
+    def _uo_gagal(**k):
+        raise UO.UkurGagal('ConvertService menolak: error -8.')
+    UO.ukur_halaman = _uo_gagal
+    try:
+        _teks_sebelum = _teks_docx(_docx_u)
+        _r_gagal_oo = BA.perbarui_nomor_daftar(
+            _docx_u, fid=126, user_id=12)
+        _teks_sesudah = _teks_docx(_docx_u)
+    finally:
+        UO.ukur_halaman = _uo_asli
+    cek('ukur-oo: ConvertService gagal -> gagal jujur, docx tidak berubah',
+        _r_gagal_oo.get('ok') is False
+        and 'OnlyOffice' in _r_gagal_oo.get('sebab', '')
+        and _teks_sebelum == _teks_sesudah, str(_r_gagal_oo))
+    UO.ukur_halaman = lambda **k: render2
+    try:
+        _r_ukur = BA.perbarui_nomor_daftar(_docx_u, fid=126, user_id=12)
+        _teks_ukur = _teks_docx(_docx_u)
+    finally:
+        UO.ukur_halaman = _uo_asli
+    cek('ukur-oo: ukur stub -> nomor ditulis dari render OnlyOffice',
+        _r_ukur.get('ok') and _r_ukur.get('diperbarui', 0) >= 2
+        and 'BAB I\t1' in _teks_ukur and 'BAB II\t2' in _teks_ukur,
+        str(_r_ukur))
+
+    # Paksa simpan bila disunting (pembantu rute, async).
+    import app.models as _mdl2
+    _sesi_row = _mdl2.SesiEdit(user_id=u.id, file_id=fb.id,
+                               kunci_oo='e9v9')
+    db.add(_sesi_row)
+    db.commit()
+    _fs_asli = _RB.onlyoffice.forcesave
+
+    async def _fs_ok(kunci, uid):
+        return {'ok': True, 'pesan': 'perintah diterima', 'dicoba': True}
+
+    async def _fs_gagal(kunci, uid):
+        return {'ok': False, 'pesan': 'HTTP 500', 'dicoba': True}
+    _RB.onlyoffice.forcesave = _fs_ok
+    try:
+        _ps_ok = _asyncio.run(_RB._paksa_simpan_bila_diedit(db, u.id, fb.id))
+    finally:
+        _RB.onlyoffice.forcesave = _fs_asli
+    cek('ukur-oo: sesi aktif + forcesave ok -> perlu + ok',
+        _ps_ok.get('perlu') is True and _ps_ok.get('ok') is True,
+        str(_ps_ok))
+    _RB.onlyoffice.forcesave = _fs_gagal
+    try:
+        _ps_gagal = _asyncio.run(
+            _RB._paksa_simpan_bila_diedit(db, u.id, fb.id))
+    finally:
+        _RB.onlyoffice.forcesave = _fs_asli
+    cek('ukur-oo: sesi aktif + forcesave gagal -> ok False + sebab',
+        _ps_gagal.get('perlu') is True and _ps_gagal.get('ok') is False
+        and 'paksa simpan' in _ps_gagal.get('sebab', '').lower(),
+        str(_ps_gagal))
+    db.delete(_sesi_row)
+    db.commit()
+    _ps_tidak = _asyncio.run(_RB._paksa_simpan_bila_diedit(db, u.id, fb.id))
+    cek('ukur-oo: tanpa sesi edit -> tidak perlu dipaksa, ok',
+        _ps_tidak.get('perlu') is False and _ps_tidak.get('ok') is True,
+        str(_ps_tidak))
+
+    # Rute Perbarui Daftar Isi: titip ke pekerja latar, bukan request web.
+    # Render realistis untuk docx tempel: penanda bab telanjang di
+    # baris sendiri (paragraf docx terpisah), entri daftar Arab
+    # ("BAB 1. PENDAHULUAN") dicocokkan lewat penanda telanjang.
+    render_fb = ['Sampul', 'KATA PENGANTAR', 'DAFTAR ISI',
+                 'BAB I\nPENDAHULUAN\n1.1 Latar Belakang\nlatar',
+                 'BAB II\nTINJAUAN PUSTAKA\n2.1 Teori tentang Variabel Y\nteori',
+                 'BAB III\nMETODE PENELITIAN\n3.1 Jenis dan Desain Penelitian\nmetode']
+
+    UO.ukur_halaman = lambda **k: render_fb
+    try:
+        _hal_pd = _asyncio.run(RB.bagian_awal_perbarui_daftar(
+            fid=fb.id, request=_ReqPalsu(), u=u, db=db))
+        _st_pd = _tunggu_selesai(fb.id)
+    finally:
+        UO.ukur_halaman = _uo_asli
+    _teks_pd = _teks_docx(folder_u / 'skripsi.docx')
+    cek('rute daftar: 303 + pekerja selesai + jenis daftar',
+        _hal_pd.status_code == 303 and _st_pd is not None
+        and _st_pd.get('terakhir', {}).get('status') == 'selesai'
+        and _st_pd.get('terakhir', {}).get('jenis') == 'daftar',
+        str(_st_pd))
+    _idx_pd = _teks_pd.find('DAFTAR ISI')
+    cek('rute daftar: nomor ditulis ke docx (BAB 1 = 1)',
+        'BAB 1. PENDAHULUAN\t1' in _teks_pd
+        and '1.1 Latar Belakang\t1' in _teks_pd,
+        _teks_pd[_idx_pd:_idx_pd + 500])
+    _p_jalan = _proses.mulai(db, user_id=u.id, file_id=fb.id,
+                             komentar=[BA.KOMENTAR_PROSES_DAFTAR])
+    _hal_dobel = _asyncio.run(RB.bagian_awal_perbarui_daftar(
+        fid=fb.id, request=_ReqPalsu(), u=u, db=db))
+    cek('rute daftar: tekan 2x saat jalan ditahan sopan',
+        _hal_dobel.status_code == 303
+        and 'Masih%20ada%20pekerjaan' in str(
+            _hal_dobel.headers.get('location', '')),
+        str(_hal_dobel.headers.get('location')))
+    _proses.tandai_selesai(_p_jalan.kode, hasil='uji penahan')
+    UO.ukur_halaman = _uo_gagal
+    try:
+        _asyncio.run(RB.bagian_awal_perbarui_daftar(
+            fid=fb.id, request=_ReqPalsu(), u=u, db=db))
+        _st_pd_gagal = _tunggu_selesai(fb.id)
+    finally:
+        UO.ukur_halaman = _uo_asli
+    cek('rute daftar gagal: pekerja gagal + jenis daftar + galat jujur',
+        _st_pd_gagal is not None
+        and _st_pd_gagal.get('terakhir', {}).get('status') == 'gagal'
+        and _st_pd_gagal.get('terakhir', {}).get('jenis') == 'daftar'
+        and 'OnlyOffice' in _st_pd_gagal.get('terakhir', {}).get('galat', ''),
+        str(_st_pd_gagal))
+    _hal_pd_gagal = _asyncio.run(RB.bagian_awal_halaman(
+        fid=fb.id, request=_ReqPalsu(), u=u, db=db))
+    _badan_pd_gagal = _hal_pd_gagal.body.decode('utf-8')
+    cek('rute daftar gagal: halaman menampilkan kegagalan + nomor lama',
+        _hal_pd_gagal.status_code == 200
+        and 'Perbarui Daftar gagal' in _badan_pd_gagal
+        and 'Nomor lama dipertahankan' in _badan_pd_gagal,
+        _badan_pd_gagal[:300])
+
+    # Rute daftar gagal karena paksa simpan (berkas sedang disunting).
+    _sesi_row2 = _mdl2.SesiEdit(user_id=u.id, file_id=fb.id,
+                                kunci_oo='e9v9')
+    db.add(_sesi_row2)
+    db.commit()
+    _RB.onlyoffice.forcesave = _fs_gagal
+    try:
+        _asyncio.run(RB.bagian_awal_perbarui_daftar(
+            fid=fb.id, request=_ReqPalsu(), u=u, db=db))
+        _st_pd_fs = _tunggu_selesai(fb.id)
+    finally:
+        _RB.onlyoffice.forcesave = _fs_asli
+        db.delete(_sesi_row2)
+        db.commit()
+    cek('rute daftar gagal: paksa simpan gagal -> pekerja gagal jujur',
+        _st_pd_fs is not None
+        and _st_pd_fs.get('terakhir', {}).get('status') == 'gagal'
+        and 'Paksa simpan' in _st_pd_fs.get('terakhir', {}).get('galat', ''),
+        str(_st_pd_fs))
+    _tpl_oo = Path(ROOT, 'app', 'templates', 'bagian_awal.html').read_text()
+    for frasa in ('Perbarui Daftar gagal', 'Nomor lama dipertahankan',
+                  "j.terakhir.jenis === 'daftar'"):
+        cek(f'template: ada "{frasa}"', frasa in _tpl_oo)
+    for berkas in ('app/ukur_onlyoffice.py', 'app/bagian_awal.py',
+                   'app/rute_bagian_awal.py',
+                   'app/templates/bagian_awal.html'):
+        isi = Path(ROOT, berkas).read_text()
+        cek(f'0 em dash: {berkas}', '\u2014' not in isi)
 
 
 if __name__ == '__main__':
