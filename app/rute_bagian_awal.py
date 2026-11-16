@@ -609,7 +609,7 @@ async def bagian_awal_tempel(
                          komentar=[BA.KOMENTAR_PROSES])
     proses_mod.jalankan(
         p.kode, _buat_kerja_tempel(p, fid, u, jumlah, rencana))
-    pesan = 'Bagian Awal sedang ditempel. Tunggu sebentar lalu muat ulang.'
+    pesan = 'Bagian Awal sedang diproses! Tunggu sebentar lalu muat ulang.'
     return RedirectResponse(
         f'/naskah/{fid}/bagian-awal?pesan={_pesan_ke(pesan)}',
         status_code=303)
