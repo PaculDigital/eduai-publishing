@@ -27,7 +27,9 @@ label belum terverifikasi), atau menghapusnya.
 
 HEMAT: entri yang tidak berubah (sidik sama) TIDAK diperiksa ulang ke
 jaringan, vonis lamanya dipakai lagi. DOI yang sudah pernah dicek tidak
-dicek ulang selamanya (cache audit_doi).
+dicek ulang selamanya (cache audit_doi). Jeda 15 menit antar pemeriksaan
+per naskah + gerbang sidik berkas: berkas yang tidak berubah sama sekali
+langsung menampilkan hasil terakhir tanpa pekerja latar dan tanpa jaringan.
 """
 
 from __future__ import annotations
@@ -39,6 +41,7 @@ import re
 import shutil
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 from pathlib import Path
 from xml.sax.saxutils import escape as _xml_escape
 
@@ -52,6 +55,81 @@ log = logging.getLogger('eduai.pustaka.periksa')
 
 KUNCI_HASIL = 'pustaka_hasil_berkas_{fid}'
 KOMENTAR_PROSES = 'Periksa Daftar Pustaka'
+
+# Jeda antar pemeriksaan (Gas Bos 16 Nov 2026 11:18 WIB): pemeriksaan ulang
+# untuk naskah yang sama hanya boleh JEDA_PERIKSA_MENIT sesudah pemeriksaan
+# terakhir yang selesai, supaya tombol tidak bisa di-spam. Per naskah
+# (per fid), bukan per pengguna, supaya naskah lain tetap bisa diperiksa.
+# Ubah angka ini saja bila Bos mau jeda lain.
+JEDA_PERIKSA_MENIT = 15
+
+
+def sidik_berkas(jalur) -> str | None:
+    """SHA-256 isi berkas (byte). Gagal dibaca -> None (gerbang terbuka)."""
+    try:
+        h = hashlib.sha256()
+        with open(jalur, 'rb') as f:
+            while True:
+                potong = f.read(1024 * 1024)
+                if not potong:
+                    break
+                h.update(potong)
+        return h.hexdigest()
+    except Exception:                                      # noqa: BLE001
+        return None
+
+
+def _waktu_periksa(hasil_lama: dict | None):
+    """Waktu pemeriksaan terakhir dari hasil tersimpan, atau None.
+
+    Hasil lama tanpa `diperiksa_pada` (dari sebelum fitur jeda) dibaca
+    None: bukan galat, diperlakukan seperti tidak ada pemeriksaan lama.
+    """
+    if not isinstance(hasil_lama, dict):
+        return None
+    teks = hasil_lama.get('diperiksa_pada') or ''
+    if not isinstance(teks, str) or not teks.strip():
+        return None
+    try:
+        kapan = datetime.fromisoformat(teks.strip())
+    except ValueError:
+        return None
+    if kapan.tzinfo is None:
+        kapan = kapan.replace(tzinfo=timezone.utc)
+    return kapan
+
+
+def sisa_jeda_detik(hasil_lama: dict | None, kini=None) -> int:
+    """Sisa jeda (detik) sebelum boleh periksa lagi. 0 berarti boleh."""
+    kapan = _waktu_periksa(hasil_lama)
+    if kapan is None:
+        return 0
+    kini = kini or datetime.now(timezone.utc)
+    if kini.tzinfo is None:
+        kini = kini.replace(tzinfo=timezone.utc)
+    sisa = JEDA_PERIKSA_MENIT * 60 - (kini - kapan).total_seconds()
+    return int(sisa) if sisa > 0 else 0
+
+
+def keputusan_mulai(hasil_lama: dict | None, sidik_baru: str | None,
+                    kini=None) -> dict:
+    """Putuskan sebelum pemeriksaan baru dimulai.
+
+    'pakai_hasil_lama': berkas tidak berubah sama sekali sejak pemeriksaan
+    terakhir (sidik byte sama) -> kembalikan hasil tersimpan, tanpa pekerja
+    latar, tanpa jaringan. 'jeda': berkas berubah tapi pemeriksaan terakhir
+    selesai kurang dari JEDA_PERIKSA_MENIT lalu -> tunggu `sisa_detik`.
+    'jalan': jalankan pemeriksaan biasa. Hasil lama tanpa sidik berkas atau
+    tanpa penanda waktu diperlakukan seperti tidak ada (jalan/jeda dari
+    penanda yang ada), bukan galat.
+    """
+    if hasil_lama and sidik_baru and \
+            hasil_lama.get('sidik_berkas') == sidik_baru:
+        return {'aksi': 'pakai_hasil_lama', 'sisa_detik': 0}
+    sisa = sisa_jeda_detik(hasil_lama, kini=kini)
+    if sisa > 0:
+        return {'aksi': 'jeda', 'sisa_detik': sisa}
+    return {'aksi': 'jalan', 'sisa_detik': 0}
 
 # Judul bagian yang dicari: HARUS persis "Daftar Pustaka" (bukan
 # "Daftar Referensi", itu daftar rujukan per bab di buku, bukan

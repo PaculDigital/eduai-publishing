@@ -22,6 +22,10 @@ Aturan yang diuji (RENCANA_DAFTAR_PUSTAKA.md):
      dicari dari sidik teksnya.
   7. NOL LLM: modul + rute tidak memanggil model apa pun.
   8. Halaman hasil + tombol di naskah + aksi per baris/borongan.
+  9. Jeda 15 menit antar pemeriksaan per naskah + gerbang sidik berkas:
+     berkas tidak berubah -> hasil lama tanpa pekerja baru; berkas berubah
+     tapi belum 15 menit -> ditolak dengan sisa detik; jeda satu naskah
+     tidak memblokir naskah lain; hasil lama tanpa sidik tetap jalan.
 """
 import os
 import sys
@@ -348,6 +352,52 @@ def jalankan():
         and AUDIT_PANGGIL[0] == ['10.1016/j.heliyon.2020.e04829'],
         str(AUDIT_PANGGIL))
 
+    # ── 6b. Jeda + gerbang sidik berkas (murni, tanpa rute) ───────────────
+    from datetime import datetime as _dt, timezone as _tz, timedelta as _td
+    kini = _dt(2026, 11, 16, 11, 30, tzinfo=_tz.utc)
+    lama_5 = {'diperiksa_pada': (kini - _td(minutes=5)).isoformat(),
+              'sidik_berkas': 'aaa'}
+    lama_20 = {'diperiksa_pada': (kini - _td(minutes=20)).isoformat(),
+               'sidik_berkas': 'aaa'}
+    cek('jeda: tanpa hasil lama -> jalan',
+        PP.keputusan_mulai(None, 'abc', kini=kini)['aksi'] == 'jalan')
+    cek('jeda: berkas sama -> pakai hasil lama (tanpa peduli waktu)',
+        PP.keputusan_mulai(lama_5, 'aaa', kini=kini)['aksi']
+        == 'pakai_hasil_lama')
+    cek('jeda: berkas berubah + 5 menit lalu -> jeda 10 menit',
+        PP.keputusan_mulai(lama_5, 'bbb', kini=kini)
+        == {'aksi': 'jeda', 'sisa_detik': 600})
+    cek('jeda: berkas berubah + 20 menit lalu -> jalan',
+        PP.keputusan_mulai(lama_20, 'bbb', kini=kini)['aksi'] == 'jalan')
+    cek('jeda: tepat 15 menit lalu -> jalan',
+        PP.keputusan_mulai(
+            {'diperiksa_pada': (kini - _td(minutes=15)).isoformat(),
+             'sidik_berkas': 'aaa'}, 'bbb',
+            kini=kini)['aksi'] == 'jalan')
+    cek('jeda: hasil lama tanpa penanda waktu -> jalan',
+        PP.keputusan_mulai({'sidik_berkas': 'aaa'}, 'bbb',
+                           kini=kini)['aksi'] == 'jalan')
+    cek('jeda: hasil lama tanpa sidik + 20 menit lalu -> jalan',
+        PP.keputusan_mulai(
+            {'diperiksa_pada': (kini - _td(minutes=20)).isoformat()},
+            'bbb', kini=kini)['aksi'] == 'jalan')
+    cek('jeda: penanda waktu rusak -> jalan',
+        PP.keputusan_mulai({'diperiksa_pada': 'bukan-tanggal',
+                            'sidik_berkas': 'aaa'}, 'bbb',
+                           kini=kini)['aksi'] == 'jalan')
+    cek('jeda: sisa detik 0 bila boleh',
+        PP.sisa_jeda_detik(lama_20, kini=kini) == 0)
+    cek('jeda: konstanta 15 menit bernama',
+        PP.JEDA_PERIKSA_MENIT == 15)
+    import hashlib as _hl
+    berkas_uji = Path(TMP) / 'sidik.bin'
+    berkas_uji.write_bytes(b'isi-berkas-uji')
+    cek('sidik berkas: SHA-256 isi byte',
+        PP.sidik_berkas(berkas_uji)
+        == _hl.sha256(b'isi-berkas-uji').hexdigest())
+    cek('sidik berkas: berkas hilang -> None',
+        PP.sidik_berkas(Path(TMP) / 'tidak-ada.bin') is None)
+
     # ── 7. Sumber lama bertahan ───────────────────────────────────────────
     lama = dict(hasil)
     lama_entri = [dict(e) for e in hasil['entri']]
@@ -483,7 +533,8 @@ def jalankan():
                   'Tambahkan semua yang kurang', 'Perbaiki format',
                   'Tambahkan ke daftar', 'Hapus dari daftar',
                   'Pakai yang ini', 'Tandai sumber lama',
-                  'tidak memakai AI'):
+                  'tidak memakai AI', '15 menit sesudah pemeriksaan terakhir',
+                  'Coba lagi dalam'):
         cek(f'template: ada "{frasa}"', frasa in tpl)
     naskah_tpl = Path(ROOT, 'app', 'templates', 'naskah.html').read_text()
     cek('naskah: tombol Periksa Daftar Pustaka ada',
@@ -566,6 +617,15 @@ def jalankan():
                             cari_satu=cari_palsu, cari_penulis=karya_palsu,
                             hasil_lama=hasil_lama)
     PP.periksa_naskah = _periksa_lambat
+    # Jeda: hasil dari aksi baris di atas bertanda baru saja diperiksa.
+    # Mundurkan penandanya supaya uji tekan-2x tidak kena jeda 15 menit.
+    from datetime import datetime as _dt2, timezone as _tz2, \
+        timedelta as _td2
+    _h_sebelum = PP.muat_hasil(db, fb.id)
+    if _h_sebelum is not None:
+        _h_sebelum['diperiksa_pada'] = (
+            _dt2.now(_tz2.utc) - _td2(minutes=20)).isoformat()
+        PP.simpan_hasil(db, fb.id, _h_sebelum)
     try:
         r1 = _asyncio.run(RP.pustaka_mulai_latar(
             request=_ReqPalsu({'file_id': fb.id}), u=u, db=db))
@@ -593,6 +653,116 @@ def jalankan():
         cek('rute: hasil latar berisi entri',
             h_lat is not None and h_lat['ringkasan']['total_entri'] >= 1,
             str((h_lat or {}).get('ringkasan')))
+
+        # ── 15. Jeda + gerbang sidik berkas (rute) ───────────────────────
+        from app.models import ProsesAI as _ProsesAI
+
+        def _jml_proses(fid):
+            db.expire_all()
+            return db.query(_ProsesAI).filter(
+                _ProsesAI.file_id == fid).count()
+
+        def _tunggu_selesai(fid, maks=30):
+            for _ in range(maks):
+                time.sleep(0.5)
+                db.expire_all()
+                st = _asyncio.run(
+                    RP.pustaka_status(file_id=fid, u=u, db=db))
+                if st.get('keadaan') in ('selesai', 'gagal'):
+                    return st.get('keadaan') == 'selesai'
+            return False
+
+        def _mundurkan_jam(fid, menit):
+            h = PP.muat_hasil(db, fid)
+            h['diperiksa_pada'] = (
+                _dt2.now(_tz2.utc) - _td2(minutes=menit)).isoformat()
+            PP.simpan_hasil(db, fid, h)
+
+        # Hasil latar sudah tersimpan + sidik berkas ikut tersimpan.
+        h_lat2 = PP.muat_hasil(db, fb.id)
+        cek('jeda rute: hasil latar menyimpan sidik berkas',
+            h_lat2 is not None
+            and h_lat2.get('sidik_berkas')
+            == PP.sidik_berkas(docx3 / 'naskah.docx'),
+            str((h_lat2 or {}).get('sidik_berkas')))
+        st_awal = _asyncio.run(RP.pustaka_status(file_id=fb.id, u=u, db=db))
+        cek('rute: status melaporkan sisa jeda + belum boleh periksa',
+            st_awal.get('sisa_jeda_detik', 0) > 0
+            and st_awal.get('boleh_periksa') is False, str(st_awal))
+        jml0 = _jml_proses(fb.id)
+        r_g = _asyncio.run(RP.pustaka_mulai_latar(
+            request=_ReqPalsu({'file_id': fb.id}), u=u, db=db))
+        cek('jeda rute: berkas tidak berubah -> hasil lama, tanpa pekerja',
+            r_g.get('sudah_tersedia') is True
+            and r_g.get('dijadwalkan') is False
+            and _jml_proses(fb.id) == jml0, str(r_g))
+
+        # Ubah berkas (tambah satu paragraf) -> sidik berubah -> kena jeda.
+        def _buat_docx_ubah(jalur, catatan='Catatan tambahan untuk uji jeda.'):
+            d = _Docx()
+            d.add_paragraph('BAB I')
+            d.add_paragraph('PENDAHULUAN')
+            d.add_paragraph('Menurut Bandura (2001), teori ini penting.')
+            d.add_paragraph(catatan)
+            d.add_paragraph('DAFTAR PUSTAKA')
+            d.add_paragraph(ENTRI_BANDURA)
+            d.add_paragraph(ENTRI_ALRAWAHI)
+            d.add_paragraph(ENTRI_SUGIYONO)
+            d.add_paragraph('TENTANG PENULIS')
+            d.add_paragraph('Penulis adalah mahasiswa.')
+            d.save(str(jalur))
+
+        _buat_docx_ubah(docx3 / 'naskah.docx')
+        r_j = _asyncio.run(RP.pustaka_mulai_latar(
+            request=_ReqPalsu({'file_id': fb.id}), u=u, db=db))
+        cek('jeda rute: berkas berubah + belum 15 menit -> ditolak + sisa',
+            r_j.get('jeda') is True and r_j.get('dijadwalkan') is False
+            and 0 < r_j.get('sisa_detik', 0) <= 900
+            and 'Coba lagi dalam' in (r_j.get('alasan') or ''), str(r_j))
+        cek('jeda rute: jeda tidak membuat pekerja baru',
+            _jml_proses(fb.id) == jml0, str(_jml_proses(fb.id)))
+
+        # Naskah lain tidak ikut kena jeda naskah ini.
+        _buat_docx(docx3 / 'naskah2.docx')
+        fb2 = FileBerkas(user_id=u.id, nama='naskah2.docx',
+                         nama_simpan='naskah2.docx', ukuran=100)
+        db.add(fb2)
+        db.commit()
+        r_2 = _asyncio.run(RP.pustaka_mulai_latar(
+            request=_ReqPalsu({'file_id': fb2.id}), u=u, db=db))
+        cek('jeda rute: jeda satu naskah tidak memblokir naskah lain',
+            r_2.get('dijadwalkan') is True, str(r_2))
+        cek('jeda rute: pekerja naskah lain selesai',
+            _tunggu_selesai(fb2.id))
+
+        # Hasil lama tanpa sidik + penanda 20 menit lalu -> jalan normal.
+        h_lama = PP.muat_hasil(db, fb.id)
+        h_lama.pop('sidik_berkas', None)
+        h_lama['diperiksa_pada'] = (
+            _dt2.now(_tz2.utc) - _td2(minutes=20)).isoformat()
+        PP.simpan_hasil(db, fb.id, h_lama)
+        r_l = _asyncio.run(RP.pustaka_mulai_latar(
+            request=_ReqPalsu({'file_id': fb.id}), u=u, db=db))
+        cek('jeda rute: hasil lama tanpa sidik + 20 menit lalu -> jalan',
+            r_l.get('dijadwalkan') is True, str(r_l))
+        cek('jeda rute: pekerja sesudah hasil lama selesai',
+            _tunggu_selesai(fb.id))
+
+        # Jeda habis (20 menit lalu, sidik ada) -> jalan. Berkas diubah
+        # lagi dulu supaya gerbang sidik tidak mengembalikan hasil lama.
+        _buat_docx_ubah(docx3 / 'naskah.docx', 'Catatan kedua untuk uji jeda.')
+        _mundurkan_jam(fb.id, 20)
+        r_h = _asyncio.run(RP.pustaka_mulai_latar(
+            request=_ReqPalsu({'file_id': fb.id}), u=u, db=db))
+        cek('jeda rute: sesudah 15 menit -> jalan lagi',
+            r_h.get('dijadwalkan') is True, str(r_h))
+        cek('jeda rute: pekerja sesudah jeda selesai',
+            _tunggu_selesai(fb.id))
+        _mundurkan_jam(fb.id, 20)
+        st_b = _asyncio.run(RP.pustaka_status(file_id=fb.id, u=u, db=db))
+        cek('rute: status sesudah jeda habis boleh periksa',
+            st_b.get('sisa_jeda_detik') == 0
+            and st_b.get('boleh_periksa') is True, str(st_b))
     finally:
         PP.periksa_jaringan = asli_jaringan
         PP.periksa_naskah = asli_periksa

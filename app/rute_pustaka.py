@@ -8,7 +8,10 @@ Rancangan: RENCANA_DAFTAR_PUSTAKA.md (disepakati Bos 14 Nov 2026).
 
 NOL TOKEN LLM: tidak ada panggilan model di rute ini. Pemeriksaan jalan
 di pekerja latar (`proses`, pola yang SAMA dengan /v1/peta/mulai-latar):
-tekan 2x saat jalan ditahan sopan, bukan proses kedua. Hasil tersimpan
+tekan 2x saat jalan ditahan sopan, bukan proses kedua. Jeda 15 menit
+antar pemeriksaan per naskah (JEDA_PERIKSA_MENIT di pustaka_periksa) +
+gerbang sidik berkas: berkas yang tidak berubah langsung menampilkan
+hasil terakhir tanpa pekerja baru. Hasil tersimpan
 di Setelan (app.pustaka_periksa.simpan_hasil). Aksi yang mengubah naskah
 menulis ulang .docx di disk (pola ZIP/XML stdlib) lalu menaikkan
 `fb.diubah` supaya kunci editor OnlyOffice ikut berubah
@@ -120,11 +123,15 @@ def _halaman(db: Session, fid: int, u: User, request: Request,
     fb = _berkas(db, fid, u.id)
     hasil = PP.muat_hasil(db, fid)
     keadaan = _pemeriksaan_terkini(db, u.id, fid, hasil is not None)
+    # Tombol tidak tampil saat pemeriksaan sedang jalan, jadi hitung
+    # mundur hanya perlu bila tidak ada yang jalan.
+    sisa_jeda = 0 if keadaan.get('keadaan') == 'jalan' \
+        else PP.sisa_jeda_detik(hasil)
     return _tpl.TemplateResponse('pustaka_hasil.html', {
         'request': request, 'fid': int(fid), 'nama': fb.nama,
         'hasil': hasil, 'keadaan': keadaan.get('keadaan', 'belum'),
         'galat': keadaan.get('galat', ''), 'pesan': pesan,
-        'alasan': ALASAN,
+        'alasan': ALASAN, 'sisa_jeda': sisa_jeda,
     })
 
 
@@ -145,12 +152,26 @@ async def pustaka_status(file_id: int,
     fb = _berkas(db, file_id, u.id)
     hasil = PP.muat_hasil(db, file_id)
     keadaan = _pemeriksaan_terkini(db, u.id, file_id, hasil is not None)
+    sisa = PP.sisa_jeda_detik(hasil)
     return {'ok': True, 'file_id': int(file_id),
             'keadaan': keadaan.get('keadaan', 'belum'),
             'galat': keadaan.get('galat', ''),
             'ringkasan': (hasil or {}).get('ringkasan'),
             'diperiksa_pada': (hasil or {}).get('diperiksa_pada'),
-            'ada_pustaka': (hasil or {}).get('ada_pustaka')}
+            'ada_pustaka': (hasil or {}).get('ada_pustaka'),
+            'sisa_jeda_detik': sisa,
+            'boleh_periksa': sisa == 0}
+
+
+def _teks_sisa(sisa_detik: int) -> str:
+    """Sisa jeda dalam Bahasa Indonesia: '45 detik' / '2 menit 10 detik'."""
+    sisa = max(0, int(sisa_detik))
+    if sisa < 60:
+        return f'{sisa} detik'
+    menit, detik = divmod(sisa, 60)
+    if detik == 0:
+        return f'{menit} menit'
+    return f'{menit} menit {detik} detik'
 
 
 @router.post('/v1/pustaka/mulai-latar')
@@ -165,7 +186,11 @@ async def pustaka_mulai_latar(
     menitipkan pekerjaan ke pekerja latar (`proses`) lalu langsung
     membalas; halaman membaca keadaan lewat `pustaka_status` sampai
     selesai. Tekan 2x saat jalan: yang kedua DITAHAN sopan (dijadwalkan
-    False, sedang_jalan True), bukan proses kedua.
+    False, sedang_jalan True), bukan proses kedua. Berkas yang tidak
+    berubah sejak pemeriksaan terakhir: hasil terakhir langsung
+    dikembalikan (sudah_tersedia), tanpa pekerja baru. Berkas berubah
+    tapi belum 15 menit sejak pemeriksaan terakhir: ditolak dengan sisa
+    jeda (jeda), bukan dijadwalkan.
     """
     body = await request.json()
     if not isinstance(body, dict):
@@ -188,6 +213,27 @@ async def pustaka_mulai_latar(
         return {'ok': True, 'dijadwalkan': False, 'sedang_jalan': True,
                 'kode': jalan[0].kode,
                 'alasan': 'masih ada pemeriksaan berjalan untuk naskah ini'}
+    # Gerbang sidik berkas + jeda 15 menit (Gas Bos 16 Nov 2026 11:18 WIB).
+    # Hasil lama tanpa sidik berkas atau tanpa penanda waktu diperlakukan
+    # seperti tidak ada (jalan/jeda dari penanda yang ada), bukan galat.
+    try:
+        sidik_baru = PP.sidik_berkas(_path_berkas(fb))
+    except Exception:                                      # noqa: BLE001
+        sidik_baru = None
+    lama = PP.muat_hasil(db, fid)
+    putus = PP.keputusan_mulai(lama, sidik_baru)
+    if putus['aksi'] == 'pakai_hasil_lama':
+        return {'ok': True, 'dijadwalkan': False, 'sedang_jalan': False,
+                'sudah_tersedia': True,
+                'diperiksa_pada': (lama or {}).get('diperiksa_pada'),
+                'alasan': 'Berkas tidak berubah sejak pemeriksaan terakhir. '
+                          'Menampilkan hasil terakhir.'}
+    if putus['aksi'] == 'jeda':
+        return {'ok': True, 'dijadwalkan': False, 'sedang_jalan': False,
+                'jeda': True, 'sisa_detik': putus['sisa_detik'],
+                'alasan': 'Pemeriksaan terakhir baru saja selesai. '
+                          'Coba lagi dalam '
+                          + _teks_sisa(putus['sisa_detik']) + '.'}
     p = proses_mod.mulai(db, user_id=u.id, file_id=fid,
                          komentar=[PP.KOMENTAR_PROSES])
 
@@ -200,12 +246,17 @@ async def pustaka_mulai_latar(
             teks = _tb(_pb(fb2), fb2.nama) or ''
             if not teks.strip():
                 raise RuntimeError('Berkas ini belum bisa dibaca sebagai teks.')
+            # Sidik berkas dibaca tepat sesudah teks dibaca, supaya hasil
+            # yang disimpan memang untuk isi berkas ini.
+            sidik_baru = PP.sidik_berkas(_pb(fb2))
             if not PP.periksa_jaringan():
                 raise RuntimeError(
                     'Layanan pemeriksa tidak bisa dihubungi. '
                     'Coba lagi sebentar lagi.')
             lama = PP.muat_hasil(d2, fid)
             hasil = PP.periksa_naskah(teks, hasil_lama=lama)
+            if sidik_baru:
+                hasil['sidik_berkas'] = sidik_baru
             PP.simpan_hasil(d2, fid, hasil)
             proses_mod.tandai_selesai(
                 p.kode, hasil='Periksa Daftar Pustaka selesai.')
@@ -246,6 +297,11 @@ def _segarkan_berkas(db: Session, fb: FileBerkas, path) -> None:
 
 def _setelah_docx(db: Session, fb: FileBerkas, path, hasil: dict) -> None:
     _segarkan_berkas(db, fb, path)
+    # Berkas ditulis ulang: sidiknya ikut diperbarui supaya gerbang sidik
+    # berkas tetap benar sesudah aksi per baris/borongan.
+    sidik_baru = PP.sidik_berkas(path)
+    if sidik_baru:
+        hasil['sidik_berkas'] = sidik_baru
     PP.simpan_hasil(db, fb.id, hasil)
 
 

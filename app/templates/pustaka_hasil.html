@@ -119,7 +119,7 @@
       </form>
       {% endif %}
     </div>
-    <p class="kecil" style="margin-top:10px">Periksa ulang hanya memeriksa entri yang berubah. Bila naskah sedang terbuka di editor, tutup lalu buka lagi supaya perubahan terlihat.</p>
+    <p class="kecil" style="margin-top:10px">Periksa ulang hanya memeriksa entri yang berubah. Pemeriksaan ulang bisa dilakukan 15 menit sesudah pemeriksaan terakhir; bila berkas tidak berubah, hasil terakhir langsung ditampilkan tanpa pemeriksaan baru. Bila naskah sedang terbuka di editor, tutup lalu buka lagi supaya perubahan terlihat.</p>
   </div>
 
   {% if not hasil.ada_pustaka %}
@@ -218,6 +218,26 @@
 <script>
 var FID = {{ fid }};
 var KEADAAN = "{{ keadaan }}";
+var SISA_JEDA = {{ sisa_jeda | default(0) }};
+function formatSisa(detik) {
+  detik = Math.max(0, Math.floor(detik));
+  if (detik < 60) { return detik + ' detik'; }
+  var m = Math.floor(detik / 60), s = detik % 60;
+  return s === 0 ? m + ' menit' : m + ' menit ' + s + ' detik';
+}
+function mulaiHitungMundur(sisa) {
+  var b = document.getElementById('tombol-periksa');
+  if (!b || sisa <= 0) { return; }
+  var labelAwal = b.textContent;
+  function perbarui() {
+    if (sisa <= 0) { b.disabled = false; b.textContent = labelAwal; return; }
+    b.disabled = true;
+    b.textContent = 'Coba lagi dalam ' + formatSisa(sisa);
+    sisa -= 1;
+    setTimeout(perbarui, 1000);
+  }
+  perbarui();
+}
 function cekStatus() {
   fetch('/v1/pustaka/status?file_id=' + FID)
     .then(function (r) { return r.json(); })
@@ -229,6 +249,7 @@ function cekStatus() {
 }
 function mulaiPeriksa() {
   var b = document.getElementById('tombol-periksa');
+  var labelAwal = b ? b.textContent : '';
   if (b) { b.disabled = true; b.textContent = 'Sedang diperiksa...'; }
   fetch('/v1/pustaka/mulai-latar', {
     method: 'POST',
@@ -237,14 +258,25 @@ function mulaiPeriksa() {
   })
   .then(function (r) { return r.json(); })
   .then(function (d) {
+    if (d.ok && d.sudah_tersedia) {
+      location.href = location.pathname + '?pesan='
+        + encodeURIComponent(d.alasan || 'Berkas tidak berubah sejak pemeriksaan terakhir.');
+      return;
+    }
+    if (d.ok && d.jeda) {
+      location.href = location.pathname + '?pesan='
+        + encodeURIComponent(d.alasan || 'Coba lagi sebentar lagi.');
+      return;
+    }
     if (d.ok) { cekStatus(); }
-    else if (b) { b.disabled = false; b.textContent = 'Periksa Daftar Pustaka'; }
+    else if (b) { b.disabled = false; b.textContent = labelAwal; }
   })
   .catch(function () {
-    if (b) { b.disabled = false; b.textContent = 'Periksa Daftar Pustaka'; }
+    if (b) { b.disabled = false; b.textContent = labelAwal; }
   });
 }
 if (KEADAAN === 'jalan') { cekStatus(); }
+if (SISA_JEDA > 0) { mulaiHitungMundur(SISA_JEDA); }
 </script>
 </body>
 </html>
