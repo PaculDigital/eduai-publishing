@@ -1704,6 +1704,95 @@ def jalankan():
         isi = Path(ROOT, berkas).read_text()
         cek(f'0 em dash: {berkas}', '\u2014' not in isi)
 
+    # ── 16. Gema subbab di Daftar Isi (17 Nov 2026) ───────────────────
+    # Uji live file 126: nomor sudah benar (OnlyOffice), tapi Daftar Isi
+    # memuat dua baris ganda: di bawah '1.2 ...' muncul 'SUB-BAB ...'
+    # (judul sama), dan '1.4 ...' tertulis dua kali (sekali bernomor,
+    # sekali telanjang). Akar: badan menulis judul yang sama dua kali
+    # berurutan (judul bernomor lalu gema), peta melabeli keduanya
+    # 'subbab'. Judul 1.1 juga terpotong baris ('... Digital' lalu
+    # 'dalam Ekosistem ...'). Data di bawah memakai judul ASLI file 126.
+    _BARIS_GEMA = [
+        'KATA PENGANTAR',
+        'Lanskap Pemasaran Digital: Ruang Lingkup, Batasan, dan Fondasi Konseptual',
+        '1.1 Definisi dan Konsep Kunci Pemasaran Digital',
+        'dalam Ekosistem Ekonomi Digital',
+        '1.2 Perkembangan Teori dan Kajian Transisi dari Pemasaran Tradisional ke Digital',
+        'SUB-BAB Perkembangan Teori dan Kajian Transisi dari Pemasaran Tradisional ke Digital',
+        '1.3 Perbandingan Kritis Paradigma Pemasaran Transaksional dan Relasional di Era Digital',
+        '1.4 Posisi dan Sintesis Penulis atas Ontologi Pemasaran Digital',
+        'Posisi dan Sintesis Penulis atas Ontologi Pemasaran Digital',
+        '1.5 Implikasi Struktural terhadap Pemetaan Bidang dan Sistematika Buku Referensi Ini',
+        'Ringkasan Bab',
+        'Arsitektur Strategi Pemasaran Digital dan Dinamika Platform',
+        '2.1 Definisi dan Konsep Kunci Strategi Pemasaran Digital Berbasis Platform',
+        'Ringkasan Bab',
+    ]
+    _LABEL_GEMA = {str(i): 'subbab' for i in range(len(_BARIS_GEMA))}
+    _LABEL_GEMA['0'] = 'bab'
+    _BAB_GEMA = ['0', 'BAB 1', '1.1', 'BAB 1', '1.2', 'BAB 1', '1.3',
+                 '1.4', 'BAB 1', '1.5', 'BAB 1', 'BAB 2', '2.1', 'BAB 2']
+    _DAFTAR_GEMA = [
+        {'id': f'g{i}', 'bab': _BAB_GEMA[i],
+         'subbab': '', 'judul_bab': t, 'sub_judul': ''}
+        for i, t in enumerate(_BARIS_GEMA)]
+    _PETA_GEMA = {'peta_surveyor': {
+        'baris': _BARIS_GEMA, 'label': _LABEL_GEMA,
+        'hakim': {'jumlah_ragu': 0, 'jumlah_curiga': 0}},
+        'daftar': _DAFTAR_GEMA}
+    _BADAN_GEMA = [
+        'BAB 1',
+        'Lanskap Pemasaran Digital: Ruang Lingkup, Batasan, dan Fondasi Konseptual',
+        '1.1 Definisi dan Konsep Kunci Pemasaran Digital dalam Ekosistem Ekonomi Digital',
+        'Isi bab satu.',
+        '1.2 Perkembangan Teori dan Kajian Transisi dari Pemasaran Tradisional ke Digital',
+        'SUB-BAB Perkembangan Teori dan Kajian Transisi dari Pemasaran Tradisional ke Digital',
+        'Isi subbab 1.2.',
+        '1.4 Posisi dan Sintesis Penulis atas Ontologi Pemasaran Digital',
+        'Posisi dan Sintesis Penulis atas Ontologi Pemasaran Digital',
+        'Isi subbab 1.4.',
+    ]
+    _entri_gema = BA.entri_daftar_isi(_PETA_GEMA,
+                                      paragraf_badan=_BADAN_GEMA)
+    _judul_gema = [e['judul'] for e in _entri_gema]
+    cek('regresi gema: 1.2 dan 1.4 masing-masing satu baris (tanpa ganda)',
+        _judul_gema.count(
+            '1.2 Perkembangan Teori dan Kajian Transisi dari Pemasaran Tradisional ke Digital') == 1
+        and _judul_gema.count(
+            '1.4 Posisi dan Sintesis Penulis atas Ontologi Pemasaran Digital') == 1,
+        str(_judul_gema))
+    cek('regresi gema: baris SUB-BAB dan judul telanjang tidak masuk Daftar Isi',
+        not any(j.startswith('SUB-BAB') for j in _judul_gema)
+        and 'Posisi dan Sintesis Penulis atas Ontologi Pemasaran Digital'
+        not in _judul_gema,
+        str(_judul_gema))
+    cek('regresi gema: lanjutan judul terpotong baris tidak jadi baris sendiri',
+        'dalam Ekosistem Ekonomi Digital' not in _judul_gema
+        and _judul_gema.count('1.1 Definisi dan Konsep Kunci Pemasaran Digital') == 1,
+        str(_judul_gema))
+    cek('regresi gema: judul sah yang berulang tiap bab tetap ada (Ringkasan Bab x2)',
+        _judul_gema.count('Ringkasan Bab') == 2
+        and _judul_gema.count(
+            'BAB 1. Lanskap Pemasaran Digital: Ruang Lingkup, Batasan, dan Fondasi Konseptual') == 1
+        and _judul_gema.count(
+            'BAB 2. Arsitektur Strategi Pemasaran Digital dan Dinamika Platform') == 1,
+        str(_judul_gema))
+    _entri_tanpa_badan = BA.entri_daftar_isi(_PETA_GEMA)
+    _judul_tanpa_badan = [e['judul'] for e in _entri_tanpa_badan]
+    cek('regresi gema: tanpa badan, gema tetap dibuang tapi lanjutan dibiarkan (tidak hilang diam-diam)',
+        not any(j.startswith('SUB-BAB') for j in _judul_tanpa_badan)
+        and 'Posisi dan Sintesis Penulis atas Ontologi Pemasaran Digital'
+        not in _judul_tanpa_badan
+        and 'dalam Ekosistem Ekonomi Digital' in _judul_tanpa_badan,
+        str(_judul_tanpa_badan))
+    cek('regresi gema: normalisasi judul menyamakan nomor dan SUB-BAB',
+        BA._judul_subbab_normal(
+            'SUB-BAB Perkembangan Teori dan Kajian Transisi dari Pemasaran Tradisional ke Digital')
+        == BA._judul_subbab_normal(
+            '1.2 Perkembangan Teori dan Kajian Transisi dari Pemasaran Tradisional ke Digital')
+        and BA._judul_subbab_normal('1.4 Posisi dan Sintesis Penulis atas Ontologi Pemasaran Digital')
+        == BA._judul_subbab_normal('Posisi dan Sintesis Penulis atas Ontologi Pemasaran Digital'))
+
 
 if __name__ == '__main__':
     jalankan()
