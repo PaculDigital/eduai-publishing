@@ -600,6 +600,8 @@ _JUDUL_SEKSI = {
     'abstrak': ('abstrak',),
 }
 _POLAA_TOC = re.compile(r'\.{3,}\s*\d+\s*$')
+# Baris telanjang 'BAB 1' / 'BAB I' (tanpa judul, tanpa nomor halaman).
+_POLAA_BAB_TELANJANG = re.compile(r'^BAB\s+([IVX]+|\d+)\s*$', re.IGNORECASE)
 
 
 def _kunci_dari_judul(teks: str) -> str | None:
@@ -654,9 +656,22 @@ def cari_indeks_bab1(paragraf: list[str]) -> int | None:
     Judul bab boleh Romawi ('BAB I') atau Arab ('BAB 1'): keduanya
     dikenali lewat _nomor_bab yang sama. Baris daftar isi bertitik
     ('BAB I .... 1') tetap dihitung sebagai entri.
+    Baris TELANJANG ('BAB 1' saja, tanpa judul dan tanpa nomor
+    halaman) di dalam blok Daftar Isi adalah judul badan HANYA bila
+    blok itu sudah berisi entri BERJUDUL ('BAB 1. Lanskap ...'):
+    entri Daftar Isi selalu membawa judul dan/atau nomor halaman,
+    jadi telanjang sesudah entri berjudul tidak mungkin entri.
+    Sebaliknya telanjang SEBELUM entri berjudul adalah entri Daftar
+    Isi buatan aplikasi (judul bab dari peta Jev bisa telanjang),
+    jadi dihitung sebagai entri seperti biasa dan badan dikenali
+    lewat aturan ulang. Bentuk ini menutup berkas 126 (blok Daftar
+    Isi terakhir langsung sebelum badan, entri berjudul huruf
+    campuran tidak terhitung _nomor_bab, aturan ulang tidak menyala)
+    tanpa merusak Perbarui (daftar buatan berisi entri telanjang).
     """
     di_daftar = False
     maks = 0
+    ada_entri_berjudul = False
     for i, teks in enumerate(paragraf or []):
         s = ' '.join(str(teks or '').split()).strip()
         if not s:
@@ -664,10 +679,17 @@ def cari_indeks_bab1(paragraf: list[str]) -> int | None:
         kunci = _kunci_dari_judul(s)
         if kunci is not None:
             di_daftar = (kunci == 'daftar_isi')
+            ada_entri_berjudul = False
             continue
         if _POLAA_TOC.search(s) and not di_daftar:
             continue
         if di_daftar:
+            if _POLAA_BAB_TELANJANG.match(s):
+                if ada_entri_berjudul:
+                    return i
+            else:
+                if _POLAA_BAB_JUDUL.match(s):
+                    ada_entri_berjudul = True
             n = _nomor_bab(s)
             if n is None:
                 continue

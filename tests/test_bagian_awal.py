@@ -255,6 +255,24 @@ def jalankan():
     cek('baca: baris daftar isi bukan Bab I',
         BA.cari_indeks_bab1(['DAFTAR ISI', 'BAB I PENDAHULUAN .... 1',
                              'BAB I', 'Isi']) == 2)
+    # Regresi berkas 126 (uji live 16 Nov 2026): entri Daftar Isi
+    # berjudul huruf campuran tidak terhitung _nomor_bab, jadi aturan
+    # ulang tidak menyala; blok Daftar Isi terakhir langsung sebelum
+    # judul badan 'BAB 1' telanjang. Baris telanjang adalah badan.
+    cek('cari: entri Daftar Isi huruf campuran + BAB 1 telanjang sesudah blok daftar',
+        BA.cari_indeks_bab1(['DAFTAR ISI',
+                             'BAB 1. Lanskap Pemasaran Digital: Ruang Lingkup, Batasan, dan Fondasi Konseptual',
+                             'BAB 2. Arsitektur Strategi Pemasaran Digital dan Dinamika Platform',
+                             'BAB 1', 'PENDAHULUAN', 'Isi.']) == 3)
+    cek('cari: dua blok Daftar Isi, yang terakhir langsung sebelum BAB 1 telanjang',
+        BA.cari_indeks_bab1(['DAFTAR ISI', 'BAB 1. Pendahuluan',
+                             'DAFTAR TABEL', 'Tabel 1.1 Jenis Data',
+                             'DAFTAR ISI', 'BAB 1. Pendahuluan',
+                             'BAB 2. Tinjauan Pustaka',
+                             'BAB 1', 'PENDAHULUAN']) == 7)
+    cek('cari: BAB 1 telanjang tetap badan walau tanpa blok daftar',
+        BA.cari_indeks_bab1(['KATA PENGANTAR', 'Isi.', 'BAB 1',
+                             'PENDAHULUAN']) == 2)
     cek('baca: tanpa Bab I -> idx None, seluruh jadi depan',
         BA.baca_bagian_awal(['KATA PENGANTAR', 'Isi.'])['idx_bab1'] is None)
 
@@ -749,6 +767,58 @@ def jalankan():
         and 'INDEKS SUBJEK' in _teks_b1 and 'TENTANG PENULIS' in _teks_b1,
         _teks_b1[:200])
 
+    # Regresi berkas 126 (uji live 16 Nov 2026): tiruan setia strukturnya
+    # (bagian depan mengganda + entri Daftar Isi berjudul huruf campuran
+    # + blok Daftar Isi terakhir langsung sebelum judul badan 'BAB 1'
+    # telanjang). Pencari harus menemukan Bab I dan tempel harus jalan.
+    _par_126 = [
+        'PEMASARAN DIGITAL',
+        'Strategi, Perilaku Konsumen, dan Kinerja Bisnis di Era Ekonomi Digital',
+        'Oleh: Uji Buku', '2026',
+        'KATA PENGANTAR',
+        'Buku referensi ini disusun untuk menjawab satu pertanyaan sentral.',
+        'DAFTAR ISI',
+        'BAB 1. Lanskap Pemasaran Digital: Ruang Lingkup, Batasan, dan Fondasi Konseptual',
+        'BAB 2. Arsitektur Strategi Pemasaran Digital dan Dinamika Platform',
+        'DAFTAR TABEL',
+        'Tabel 1.1 Jenis Data',
+        'LEMBAR PERSETUJUAN',
+        'KATA PENGANTAR',
+        'Buku referensi ini disusun untuk menjawab satu pertanyaan sentral.',
+        'DAFTAR ISI',
+        'BAB 1. Lanskap Pemasaran Digital: Ruang Lingkup, Batasan, dan Fondasi Konseptual',
+        'BAB 2. Arsitektur Strategi Pemasaran Digital dan Dinamika Platform',
+        'BAB 1', 'PENDAHULUAN',
+        'Isi latar belakang penelitian ini.',
+        'BAB 2', 'TINJAUAN PUSTAKA',
+        'Isi teori.',
+    ]
+    docx_126 = Path(TMP) / 'tiruan126.docx'
+    _d126 = _Docx()
+    for _t in _par_126:
+        _d126.add_paragraph(_t)
+    _d126.save(str(docx_126))
+    _spans_126 = _RBA._xml_spans(docx_126)
+    _teks_126 = [t for t, _ in _spans_126]
+    cek('regresi 126: pencari menemukan Bab I telanjang sesudah blok daftar',
+        BA.cari_indeks_bab1(_teks_126) == _teks_126.index('BAB 1'),
+        str(BA.cari_indeks_bab1(_teks_126)))
+    _tulis_126 = BA.tulis_bagian_awal(docx_126, [
+        {'kunci': 'kata_pengantar', 'judul': 'KATA PENGANTAR',
+         'baris': ['KATA PENGANTAR', 'Isi pengantar uji.'],
+         'xml': None, 'ppr': ''}])
+    _teks_126b = _teks_docx(docx_126)
+    _par_126b = _par_xml(docx_126)
+    cek('regresi 126: tempel berhasil pada tiruan berkas 126, badan utuh',
+        _tulis_126.get('ok')
+        and 'Isi latar belakang penelitian ini.' in _teks_126b
+        and 'Isi teori.' in _teks_126b, str(_tulis_126))
+    cek('regresi 126: sesudah tempel bagian depan lama terganti (satu pengantar, tanpa daftar isi lama)',
+        _hitung_judul(_par_126b, 'KATA PENGANTAR') == 1
+        and _hitung_judul(_par_126b, 'DAFTAR ISI') == 0,
+        str({k: _hitung_judul(_par_126b, k)
+             for k in ('KATA PENGANTAR', 'DAFTAR ISI')}))
+
     # Perbarui: ubah NIP pembimbing, rencana dari sidik pasca-tempel.
     _DATA_B2 = dict(_DATA_BUKU, pembimbing_nip='198501012010011001')
     _spans_b2 = _RBA._xml_spans(docx_buku)
@@ -1132,11 +1202,34 @@ def jalankan():
     except Exception as e:
         cek('rute: status berkas orang lain 404',
             getattr(e, 'status_code', None) == 404, str(e))
+
+    # Tempel gagal -> status + halaman menampilkan kegagalan (bukan
+    # 'sedang ditempel' selamanya, uji live 16 Nov 2026).
+    p_gagal = _proses.mulai(db, user_id=u.id, file_id=fb.id,
+                            komentar=[BA.KOMENTAR_PROSES])
+    _proses.tandai_gagal(
+        p_gagal.kode,
+        'Bab I tidak ditemukan di naskah, bagian awal tidak ditempel '
+        'supaya tidak mengganda.')
+    db.expire_all()
+    st_g = _asyncio.run(RB.bagian_awal_status(file_id=fb.id, u=u, db=db))
+    cek('rute gagal: status membawa pekerjaan gagal + galat + jenis tempel',
+        st_g.get('terakhir', {}).get('status') == 'gagal'
+        and 'Bab I tidak ditemukan' in st_g.get('terakhir', {}).get('galat', '')
+        and st_g.get('terakhir', {}).get('jenis') == 'tempel', str(st_g))
+    hal_g = _asyncio.run(RB.bagian_awal_halaman(
+        fid=fb.id, request=_ReqPalsu(), u=u, db=db))
+    badan_g = hal_g.body.decode('utf-8')
+    cek('rute gagal: halaman menampilkan kegagalan + galat',
+        hal_g.status_code == 200 and 'Tempel Bagian Awal gagal' in badan_g
+        and 'Bab I tidak ditemukan' in badan_g, badan_g[:300])
     tpl = Path(ROOT, 'app', 'templates', 'bagian_awal.html').read_text()
     for frasa in ('Lengkapi Bagian Awal', 'Perbarui Bagian Awal',
                   'Periksa ulang', 'Saya sudah periksa',
                   'Tulis abstrak dengan AI (6 token)',
                   'Perbarui Daftar Isi (gratis)', 'Daftar cek',
+                  'Tempel Bagian Awal gagal', "terakhir.status === 'gagal'",
+                  "searchParams.delete('pesan')", 'id="gagal"',
                   'Yang dipertahankan'):
         cek(f'template: ada "{frasa}"', frasa in tpl)
     naskah_tpl = Path(ROOT, 'app', 'templates', 'naskah.html').read_text()

@@ -215,12 +215,20 @@ async def bagian_awal_halaman(
         rencana = BA.muat_rencana(db, fid)
     usang = BA.daftar_usang(hasil, keadaan['peta'], paragraf, fb.diubah)
     jalan = _proses_jalan(db, u.id, fid)
+    # Kegagalan terakhir tampil di halaman, bukan hilang begitu pekerja
+    # berhenti: sebelumnya layar terus menampilkan pesan 'sedang
+    # ditempel' dari ?pesan= yang basi, padahal pekerja sudah gagal.
+    terakhir = _proses_terakhir(db, u.id, fid)
+    gagal_terakhir = terakhir \
+        if (terakhir and terakhir.get('status') == 'gagal' and not jalan) \
+        else None
     pesan = request.query_params.get('pesan', '')
     draf_abstrak = BA.muat_abstrak(db, fid)
     return _tpl.TemplateResponse('bagian_awal.html', {
         'request': request, 'user': u, 'berkas': fb,
         'keadaan': keadaan, 'data': data, 'cek': cek,
         'rencana': rencana, 'usang': usang, 'jalan': bool(jalan),
+        'gagal_terakhir': gagal_terakhir,
         'pesan': pesan, 'draf_abstrak': draf_abstrak,
         'peringatan': BA.peringatan_form(data),
         'kolom': BA.KOLOM_FORM, 'grup': BA.GRUP_FORM,
@@ -601,10 +609,35 @@ async def bagian_awal_tempel(
                          komentar=[BA.KOMENTAR_PROSES])
     proses_mod.jalankan(
         p.kode, _buat_kerja_tempel(p, fid, u, jumlah, rencana))
-    pesan = 'Bagian Awal sedang ditempel. Tunggu sebentar lalu muat ulang.'
+    pesan = 'Bagian Awal sedang diproses! Tunggu sebentar lalu muat ulang.'
     return RedirectResponse(
         f'/naskah/{fid}/bagian-awal?pesan={_pesan_ke(pesan)}',
         status_code=303)
+
+
+def _proses_terakhir(db: Session, uid: int, fid: int):
+    """Pekerjaan Bagian Awal terakhir untuk naskah ini (tempel/abstrak).
+
+    Dipakai endpoint status dan halaman, supaya kegagalan yang sama
+    tampil di keduanya (sebelumnya hanya endpoint yang tahu, halaman
+    tidak pernah menampilkannya).
+    """
+    try:
+        semua = (db.query(ProsesAI)
+                   .filter(ProsesAI.user_id == uid,
+                           ProsesAI.file_id == fid)
+                   .order_by(ProsesAI.id.desc()).limit(20).all())
+        for pr in semua:
+            komentar = getattr(pr, 'komentar_json', '') or ''
+            if not _adalah_proses_bagian_awal(komentar):
+                continue
+            jenis = 'abstrak' if BA.KOMENTAR_PROSES_ABSTRAK in komentar \
+                else 'tempel'
+            return {'kode': pr.kode, 'status': pr.status,
+                    'galat': pr.galat or '', 'jenis': jenis}
+    except Exception:                                      # noqa: BLE001
+        return None
+    return None
 
 
 @router.get('/v1/bagian-awal/status')
@@ -624,20 +657,7 @@ async def bagian_awal_status(
                 hasil, peta_st, _paragraf_docx(_path_berkas(fb)), fb.diubah)
         except Exception:                                      # noqa: BLE001
             usang = False
-    terakhir = None
-    try:
-        semua = (db.query(ProsesAI)
-                   .filter(ProsesAI.user_id == u.id,
-                           ProsesAI.file_id == file_id)
-                   .order_by(ProsesAI.id.desc()).limit(20).all())
-        for pr in semua:
-            if _adalah_proses_bagian_awal(
-                    getattr(pr, 'komentar_json', '') or ''):
-                terakhir = {'kode': pr.kode, 'status': pr.status,
-                            'galat': pr.galat or ''}
-                break
-    except Exception:                                          # noqa: BLE001
-        terakhir = None
+    terakhir = _proses_terakhir(db, u.id, file_id)
     return {'ok': True, 'sedang_jalan': bool(jalan),
             'kode': jalan[0].kode if jalan else None,
             'terakhir': terakhir, 'sudah_ditempel': bool(hasil.get('ditempel')),
