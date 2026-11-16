@@ -1,0 +1,173 @@
+{# Halaman Lengkapi Bagian Awal skripsi (16 Nov 2026, GAS Bos 14:17 WIB).
+   Satu layar: daftar cek + form identitas + tombol tempel/perbarui +
+   layar verifikasi ulang (tiga daftar) sebelum jalan berbayar.
+   Tooltip mengikuti pola tinjau_baca.html: title + span.tip di dalam
+   tombol; tombol nonaktif dibungkus span bertitle supaya alasannya
+   tetap terbaca saat diarahkan. #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Lengkapi Bagian Awal - {{ berkas.nama }}</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 860px; margin: 0 auto; padding: 16px; }
+  .pesan { background: #eef6ee; border: 1px solid #9ccc9c; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+  .peringatan { background: #fff4e0; border: 1px solid #e0a800; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+  .kotak { border: 1px solid #ddd; border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+  .tombol { background: #1a73e8; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 15px; position: relative; }
+  .tombol:disabled { background: #9aa0a6; cursor: not-allowed; }
+  .tombol.kedua { background: #fff; color: #1a73e8; border: 1px solid #1a73e8; }
+  .tip { display: none; position: absolute; left: 0; top: 110%; z-index: 20; background: #222; color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 13px; width: 320px; white-space: normal; text-align: left; }
+  .tombol:hover .tip, .bungkus-tip:hover .tip { display: block; }
+  .bungkus-tip { display: inline-block; position: relative; }
+  table.cek { border-collapse: collapse; width: 100%; }
+  table.cek td, table.cek th { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; vertical-align: top; }
+  label { display: block; margin: 8px 0 2px; font-weight: 600; }
+  input[type=text], textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+  h2 { margin-top: 0; }
+  .lulus { color: #137333; } .kurang { color: #b06000; }
+  .struk { background: #f1f8ff; border: 1px solid #a8c8e8; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<h1>Lengkapi Bagian Awal</h1>
+<p>Berkas: <strong>{{ berkas.nama }}</strong> &middot; Tahap: <strong>{{ 'Proposal (Bab I-III)' if keadaan.tahap == 'proposal' else 'Final (Bab IV/V/VI)' }}</strong></p>
+
+{% if pesan %}<div class="pesan">{{ pesan }}</div>{% endif %}
+{% if peringatan %}
+<div class="peringatan"><strong>Periksa lagi:</strong><ul>{% for p in peringatan %}<li>{{ p }}</li>{% endfor %}</ul></div>
+{% endif %}
+
+{% if keadaan.hasil.struk %}
+<div class="struk"><strong>Struk terakhir:</strong>
+  {% if keadaan.hasil.struk.dipertahankan %}<br>Tetap dipertahankan: {{ keadaan.hasil.struk.dipertahankan | join(', ') }}{% endif %}
+  {% if keadaan.hasil.struk.dibuat_ulang %}<br>Dibuat ulang: {{ keadaan.hasil.struk.dibuat_ulang | join(', ') }}{% endif %}
+  {% if keadaan.hasil.struk.berubah %}<br>Berubah: {{ keadaan.hasil.struk.berubah | join(', ') }}{% endif %}
+</div>
+{% endif %}
+
+{% if usang %}
+<div class="peringatan"><strong>Daftar isi sudah usang:</strong> isi naskah berubah sesudah bagian awal ditempel. Tekan Perbarui Daftar Isi (gratis) atau Perbarui Bagian Awal ({{ harga_update }} token).
+<form method="post" action="/naskah/{{ berkas.id }}/bagian-awal/perbarui-daftar" style="display:inline"><button class="tombol kedua" type="submit">Perbarui Daftar Isi (gratis)</button></form>
+</div>
+{% endif %}
+
+<div class="kotak">
+<h2>Keadaan tombol</h2>
+{% if keadaan.tombol.aktif %}
+  <p>{{ keadaan.tombol.label }} siap. Isi data di bawah, lalu tekan Periksa ulang.</p>
+{% else %}
+  <span class="bungkus-tip" title="{{ keadaan.tombol.tooltip }}">
+    <button class="tombol" type="button" disabled title="{{ keadaan.tombol.tooltip }}">{{ keadaan.tombol.label }}<span class="tip">{{ keadaan.tombol.tooltip }}</span></button>
+  </span>
+  <p>{{ keadaan.tombol.alasan }}</p>
+{% endif %}
+<p><small>{{ tooltip_umum }}</small></p>
+</div>
+
+<div class="kotak">
+<h2>Daftar cek</h2>
+<table class="cek">
+{% for butir in cek %}
+<tr><td>{% if butir.ada %}<span class="lulus">Sudah ada</span>{% else %}<span class="kurang">Belum</span>{% endif %}</td><td><strong>{{ butir.label }}</strong>{% if butir.catatan %}<br><small>{{ butir.catatan }}</small>{% endif %}</td></tr>
+{% endfor %}
+</table>
+</div>
+
+<div class="kotak">
+<h2>Data vital</h2>
+<p>Semua kolom boleh kosong. Yang kosong tetap tersimpan dan tampil sebagai garis kosong di halaman, lalu dilengkapi nanti lewat Perbarui. Sebelum jalan berbayar, periksa ulang semua data.</p>
+<form method="post" action="/naskah/{{ berkas.id }}/bagian-awal/konfirmasi">
+  <label>Judul skripsi<input type="text" name="judul" value="{{ data.judul }}" placeholder="cth: Pengaruh Kualitas Pelayanan terhadap Kepuasan Pelanggan"></label>
+  {% for kode_grup, nama_grup in grup %}
+  <h3>{{ nama_grup }}</h3>
+  {% for kunci, label, contoh, grup_kolom in kolom %}
+  {% if grup_kolom == kode_grup %}
+  <label>{{ label }}<input type="text" name="{{ kunci }}" value="{{ data[kunci] }}" placeholder="{{ contoh }}"></label>
+  {% endif %}
+  {% endfor %}
+  {% endfor %}
+  <label><input type="checkbox" name="tanpa_ai_pengantar" value="1"> Biarkan Kata Pengantar kosong, saya tulis sendiri (tanpa AI)</label>
+  <p>
+  {% if keadaan.tombol.aktif %}
+    <span class="bungkus-tip" title="{{ keadaan.tombol.tooltip }}">
+      <button class="tombol" type="submit" title="{{ keadaan.tombol.tooltip }}">{{ keadaan.tombol.label }}<span class="tip">{{ keadaan.tombol.tooltip }}</span></button>
+    </span>
+  {% else %}
+    <span class="bungkus-tip" title="{{ keadaan.tombol.tooltip }}">
+      <button class="tombol" type="button" disabled title="{{ keadaan.tombol.tooltip }}">{{ keadaan.tombol.label }}<span class="tip">{{ keadaan.tombol.tooltip }}</span></button>
+    </span>
+  {% endif %}
+  <button class="tombol kedua" type="submit" formaction="/naskah/{{ berkas.id }}/bagian-awal/simpan">Simpan data saja (gratis)</button>
+  </p>
+</form>
+</div>
+
+{% if rencana %}
+<div class="kotak">
+<h2>Periksa ulang sebelum jalan berbayar</h2>
+<p>Biaya {{ harga_update if keadaan.sudah_ditempel else harga_buat }} token. Pastikan semua data di atas benar.</p>
+{% if rencana.berubah %}<h3>Yang berubah</h3><ul>{% for b in rencana.berubah %}<li>{{ b.label }} <small>{{ b.catatan }}</small></li>{% endfor %}</ul>{% endif %}
+{% if rencana.dipertahankan %}<h3>Yang dipertahankan (tulisan mahasiswa, tetap utuh)</h3><ul>{% for b in rencana.dipertahankan %}<li>{{ b.label }} <small>{{ b.catatan }}</small></li>{% endfor %}</ul>{% endif %}
+{% if rencana.dibuat_ulang %}<h3>Yang dibuat ulang</h3><ul>{% for b in rencana.dibuat_ulang %}<li>{{ b.label }} <small>{{ b.catatan }}</small></li>{% endfor %}</ul>{% endif %}
+<form method="post" action="/naskah/{{ berkas.id }}/bagian-awal/tempel">
+  {% if rencana.kembalikan %}<h3>Halaman yang dihapus, kembalikan?</h3>{% for b in rencana.kembalikan %}<label><input type="checkbox" name="kembalikan" value="{{ b.kunci }}"> {{ b.label }} <small>{{ b.catatan }}</small></label>{% endfor %}{% endif %}
+  <p><span class="bungkus-tip" title="{{ keadaan.tombol.tooltip }}">
+  <button class="tombol" type="submit" title="{{ keadaan.tombol.tooltip }}">Saya sudah periksa, tempel ({{ harga_update if keadaan.sudah_ditempel else harga_buat }} token)<span class="tip">{{ keadaan.tombol.tooltip }}</span></button>
+  </span></p>
+</form>
+</div>
+{% endif %}
+
+{% if jalan %}
+<div class="kotak" id="sedang"><strong>Sedang ditempel...</strong> Halaman ini memuat ulang sendiri bila selesai.</div>
+<script>
+(function () {
+  var fid = {{ berkas.id }};
+  function cek() {
+    fetch('/v1/bagian-awal/status?file_id=' + fid)
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (j && !j.sedang_jalan) { location.reload(); } })
+      .catch(function () {});
+  }
+  setInterval(cek, 3000);
+})();
+</script>
+{% endif %}
+
+{% if keadaan.tahap == 'final' %}
+<div class="kotak">
+<h2>Abstrak (tahap final)</h2>
+<p>Abstrak lengkap dua bahasa (Indonesia + Inggris), 6 token, bukan kerangka. Draf AI hanya usulan, periksa dan ubah dulu. Atau tulis sendiri (gratis).</p>
+{% if draf_abstrak %}
+  <h3>Draf abstrak {{ '(AI)' if draf_abstrak.dari_ai else '(tulisan sendiri)' }} {{ '(diterima)' if draf_abstrak.diterima else '(belum diterima)' }}</h3>
+  {% for p in draf_abstrak.id %}<p>{{ p }}</p>{% endfor %}
+  <p><small>Kata kunci: {{ draf_abstrak.kunci_id | join(', ') }}</small></p>
+  {% for p in draf_abstrak.en %}<p>{{ p }}</p>{% endfor %}
+  <p><small>Keywords: {{ draf_abstrak.kunci_en | join(', ') }}</small></p>
+  {% if not draf_abstrak.diterima %}
+  <form method="post" action="/naskah/{{ berkas.id }}/bagian-awal/abstrak-pakai" style="display:inline"><button class="tombol" type="submit" name="aksi" value="pakai">Pakai draf ini (gratis)</button></form>
+  {% endif %}
+  <form method="post" action="/naskah/{{ berkas.id }}/bagian-awal/abstrak-pakai" style="display:inline"><button class="tombol kedua" type="submit" name="aksi" value="buang">Buang draf</button></form>
+{% endif %}
+<form method="post" action="/naskah/{{ berkas.id }}/bagian-awal/abstrak-ai" style="display:inline">
+  <span class="bungkus-tip" title="AI membaca naskah lalu menulis abstrak lengkap Bahasa Indonesia dan Inggris beserta kata kunci. Biaya 6 token. Bila AI gagal, token kembali.">
+  <button class="tombol" type="submit" title="AI membaca naskah lalu menulis abstrak lengkap Bahasa Indonesia dan Inggris beserta kata kunci. Biaya 6 token. Bila AI gagal, token kembali.">Tulis abstrak dengan AI (6 token)<span class="tip">AI membaca naskah lalu menulis abstrak lengkap Bahasa Indonesia dan Inggris beserta kata kunci. Biaya 6 token. Bila AI gagal, token kembali.</span></button>
+  </span>
+</form>
+<h3>Tulis sendiri (gratis)</h3>
+<form method="post" action="/naskah/{{ berkas.id }}/bagian-awal/abstrak-manual">
+  <label>Abstrak (Bahasa Indonesia)<textarea name="abstrak_id" rows="5">{% if draf_abstrak and not draf_abstrak.dari_ai %}{{ draf_abstrak.id | join('\n') }}{% endif %}</textarea></label>
+  <label>Kata kunci (pisahkan koma)<input type="text" name="kunci_id" value="{{ draf_abstrak.kunci_id | join(', ') if draf_abstrak else '' }}" placeholder="cth: kualitas pelayanan, kepuasan, pelanggan"></label>
+  <label>Abstract (English)<textarea name="abstrak_en" rows="5">{% if draf_abstrak and not draf_abstrak.dari_ai %}{{ draf_abstrak.en | join('\n') }}{% endif %}</textarea></label>
+  <label>Keywords (comma separated)<input type="text" name="kunci_en" value="{{ draf_abstrak.kunci_en | join(', ') if draf_abstrak else '' }}" placeholder="cth: service quality, satisfaction, customer"></label>
+  <p><button class="tombol kedua" type="submit">Simpan abstrak (gratis)</button></p>
+</form>
+</div>
+{% else %}
+<div class="kotak"><h2>Abstrak</h2><p>Abstrak hanya di tahap final, sesudah Bab IV, V, atau VI selesai. Di tahap proposal, abstrak tidak ditagih.</p></div>
+{% endif %}
+
+<p><a href="/naskah">Kembali ke daftar naskah</a></p>
+</body>
+</html>

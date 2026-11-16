@@ -543,6 +543,12 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
 .aksi button.periksa:disabled{background:#d8d2c7;border-color:#d8d2c7;color:#8a8276;
     cursor:default;box-shadow:none}
 .aksi button.periksa.sedang{background:#fff3d6;border-color:#F4A025;color:#8a6d00}
+/* Tooltip tombol Bagian Awal (16 Nov 2026): pola tinjau_baca.html. */
+.aksi .bungkus-tip{display:inline-block;position:relative}
+.aksi .bungkus-tip .tip{display:none;position:absolute;left:0;top:110%;z-index:20;
+  background:#222;color:#fff;padding:8px 10px;border-radius:8px;font-size:13px;
+  width:320px;white-space:normal;text-align:left}
+.aksi .bungkus-tip:hover .tip{display:block}
 /* Logo EduAi sebagai penanda loading (15 Nov 2026, perintah Bos 11:13):
    logo yang SUDAH ADA (/static/logo-96.png), berdenyut halus di samping
    tulisan "Sedang Diperiksa". Tanpa hiasan tambahan. */
@@ -989,6 +995,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
         {% if e in ['docx','odt','txt','md','markdown','csv','pdf'] %}
         <button class="periksa" type="button" data-periksa data-file-id="{{ f.id }}">Periksa Struktur</button>
         <button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/pustaka'">Periksa Daftar Pustaka</button>
+        <span class="bungkus-tip" title="Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi."><button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/bagian-awal'" title="Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi.">Lengkapi Bagian Awal<span class="tip">Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi.</span></button></span>
         {% endif %}
         {% if f.bisa_edit %}
         <a href="/edit/{{ f.id }}" class="edit" title="Edit langsung di browser">
