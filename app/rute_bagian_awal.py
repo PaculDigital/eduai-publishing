@@ -383,7 +383,7 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
                 item[2][:] = [b for b in item[2]
                               if b != BA.BARIS_BELUM_ADA_LAMPIRAN]
                 item[2].extend(
-                    [f"{e['judul']}\t{e['halaman']}" if e.get('halaman')
+                    [f"{e['judul']}  {e['halaman']}" if e.get('halaman')
                      else e['judul'] for e in ket.get(kunci, [])])
     susun_map = {k: (j, b) for k, j, b in susun}
     dipertahankan = {d['kunci'] for d in rencana.get('dipertahankan', [])}

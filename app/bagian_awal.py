@@ -1242,6 +1242,30 @@ def _baris_label(label: str, nilai: str) -> str:
     return f'{label} : {_isi(nilai)}'
 
 
+def _pisah_entri_daftar(baris: str) -> tuple[str, str | None]:
+    """(judul, nomor) dari satu baris entri daftar.
+
+    Format kini: 'Judul  70' (dua spasi). Format lama: 'Judul\\t70'
+    (tab), masih dibaca supaya berkas yang ditulis kode lama tetap
+    bisa diperbarui nomornya. Tab tunggal tidak lagi ditulis: di editor
+    dan di ekstraksi teks ia runtuh (angka menempel ke judul,
+    'Relevan44') atau terpisah ke baris sendiri (BAB 4 tampak tak
+    bernomor padahal tersimpan 'BAB 4 ...\\t70'; cacat uji live
+    17 Nov 2026, fid 81). Dua spasi tidak pernah hilang atau memecah
+    baris di pembaca mana pun; dot leader dan perataan kanan tetap
+    ditahan sebagai keputusan desain (belum diputuskan Boss).
+    """
+    s = str(baris or '')
+    if '\t' in s:
+        judul, nomor = s.split('\t', 1)
+        return judul.strip(), (nomor.strip() or None)
+    m = re.match(r'^(.*?)\s{2,}(\d+|[ivxlcdm]+)\s*$', s.strip(),
+                 re.IGNORECASE)
+    if m:
+        return m.group(1).strip(), m.group(2)
+    return s.strip(), None
+
+
 def susun_bagian(data: dict, tahap: str, entri: dict,
                  kata_pengantar: list[str] | None = None,
                  abstrak: dict | None = None) -> list[tuple]:
@@ -1333,7 +1357,7 @@ def susun_bagian(data: dict, tahap: str, entri: dict,
             if not teks:
                 continue
             halaman = e.get('halaman')
-            baris.append(f"{teks}\t{halaman}" if halaman else teks)
+            baris.append(f"{teks}  {halaman}" if halaman else teks)
         if kunci == 'daftar_lampiran' and not (entri or {}).get(kunci):
             # Belum ada lampiran: tulis jujur, bukan halaman kosong.
             baris.append(BARIS_BELUM_ADA_LAMPIRAN)
@@ -1605,9 +1629,11 @@ def _mode_nomor_badan(halaman_render, awal: int) -> str:
     berfooter 1 karakter ('1'..'9'); bila absolut, berfooter sebanyak
     digit nomor fisiknya ('23', '100'). Yang menang harus unggul
     jelas (>= 3 halaman dan selisih >= 3); bila tidak ada bukti
-    (render sintetis / footer sudah dibuang _rapikan), kembali ke
-    perilaku lama 'relatif'. Bukti fid 81: 108 halaman cocok absolut,
-    78 cocok relatif (yang tumpang tindih), selisih 30 -> 'absolut'.
+    (render sintetis), kembali ke perilaku lama 'relatif'. Bukti
+    fid 81: pypdfium2 108 halaman cocok absolut, 78 cocok relatif
+    (yang tumpang tindih), selisih 30 -> 'absolut'; pdftotext mentah
+    104 cocok absolut -> 'absolut' (17 Nov 2026). Footer TIDAK lagi
+    dibuang _rapikan, jadi bukti itu kini ada di kedua ekstraktor.
     """
     skor_abs = skor_rel = 0
     for i in range(awal, len(halaman_render or [])):
@@ -1623,6 +1649,25 @@ def _mode_nomor_badan(halaman_render, awal: int) -> str:
     if skor_abs >= 3 and skor_abs - skor_rel >= 3:
         return 'absolut'
     return 'relatif'
+
+
+def _baris_isi_halaman(teks_halaman: str) -> list[str]:
+    """Baris isi halaman (tanpa baris kosong, tanpa SATU footer di depan).
+
+    _rapikan_teks_halaman SENGAJA tidak lagi membuang nomor footer di
+    depan (mode nomor badan membacanya), jadi aturan yang memakai baris
+    pertama sebagai judul bagian depan harus melewatinya sendiri:
+    halaman yang diawali 'xi' tetap dikenali sebagai 'KATA PENGANTAR'
+    (dulu _rapikan yang membuangnya; cacat yang sama, 17 Nov 2026).
+    Hanya SATU baris depan yang dilewati, dan hanya bila mirip footer
+    (_mirip_nomor_footer): baris isi yang kebetulan pendek tidak ikut
+    terbuang.
+    """
+    baris = [b.strip() for b in (teks_halaman or '').splitlines()
+             if b.strip()]
+    if baris and _mirip_nomor_footer(baris[0]):
+        return baris[1:]
+    return baris
 
 
 def _cari_nomor_dari_render(halaman_render, judul: str,
@@ -1656,13 +1701,11 @@ def _cari_nomor_dari_render(halaman_render, judul: str,
     # berikutnya (daftar lain / abstrak) atau awal badan.
     rentang_daftar: set[int] = set()
     for i in range(0, awal):
-        baris_i = [b for b in (halaman_render[i] or '').splitlines()
-                   if b.strip()]
+        baris_i = _baris_isi_halaman(halaman_render[i])
         if baris_i and _normalisasi_cari(baris_i[0]) == 'daftar isi':
             j = i + 1
             while j < awal:
-                baris_j = [b for b in (halaman_render[j] or '').splitlines()
-                           if b.strip()]
+                baris_j = _baris_isi_halaman(halaman_render[j])
                 if baris_j and _normalisasi_cari(baris_j[0]) \
                         in _JUDUL_BAGIAN_DEPAN_RENDER:
                     break
@@ -1672,8 +1715,7 @@ def _cari_nomor_dari_render(halaman_render, judul: str,
     for i in range(0, awal):
         if i in rentang_daftar:
             continue
-        baris = [b for b in (halaman_render[i] or '').splitlines()
-                 if b.strip()]
+        baris = _baris_isi_halaman(halaman_render[i])
         if baris and _normalisasi_cari(baris[0]) == cari:
             return ke_romawi(i + 1), i
     absolut = _mode_nomor_badan(halaman_render, awal)
@@ -2239,6 +2281,26 @@ def _tanpa_gaya_heading(ppr: str) -> str:
                   r'.*?</w:pStyle>', '', keluar, flags=re.S)
 
 
+def _xml_tanpa_gaya_heading(par_xml: str) -> str:
+    """XML paragraf tanpa gaya Heading (untuk baris yang dipertahankan).
+
+    Cermin _tanpa_gaya_heading (yang bekerja pada pPr): dipakai untuk
+    baris bagian depan yang dipertahankan kata per kata, XML aslinya
+    dipakai lagi di tulis_bagian_awal, jadi gaya Heading lamanya ikut
+    bertahan (baris formulir Persetujuan, baris kosong, nama di
+    Abstract/Abstrak; cacat uji live 17 Nov 2026, fid 81: dulu hanya
+    baris yang dibuat ulang yang dibersihkan). Hanya pPr yang
+    disentuh; isi dan pemutus bagian tidak berubah. Tanpa pPr,
+    XML dikembalikan apa adanya.
+    """
+    from .pustaka_periksa import _RE_PPR
+    m = _RE_PPR.search(par_xml or '')
+    if not m:
+        return par_xml
+    bersih = _tanpa_gaya_heading(m.group(0))
+    return par_xml[:m.start()] + bersih + par_xml[m.end():]
+
+
 def _ppr_dari_xml(par_xml: str) -> str:
     from .pustaka_periksa import _RE_PPR
     m = _RE_PPR.search(par_xml or '')
@@ -2439,8 +2501,27 @@ def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
         xml_asli = item.get('xml')
         if xml_asli:
             # XML dipertahankan: buang sectPr lama (penulis memasang
-            # satu sectPr baru di akhir wilayah depan).
-            blok = [_buang_sectpr(x) for x in xml_asli]
+            # satu sectPr baru di akhir wilayah depan) DAN buang gaya
+            # Heading dari semua baris kecuali judul seksi (paragraf
+            # berisi pertama, bukan sampul/judul): baris formulir dan
+            # baris kosong yang dipertahankan ikut masuk panel Tajuk
+            # sebagai judul bila gayanya dibiarkan (cacat uji live
+            # 17 Nov 2026, fid 81; dulu hanya baris yang dibuat ulang
+            # yang dibersihkan). Sampul/judul bukan halaman berjudul
+            # (baris pertamanya isi, bukan judul), jadi semua barisnya
+            # dibersihkan.
+            kunci = item.get('kunci', '')
+            pertama_isi = None
+            for _i, _x in enumerate(xml_asli):
+                if _teks_dari_xml(_x).strip():
+                    pertama_isi = _i
+                    break
+            blok = []
+            for _i, _x in enumerate(xml_asli):
+                _x = _buang_sectpr(_x)
+                if kunci in ('sampul', 'judul') or _i != pertama_isi:
+                    _x = _xml_tanpa_gaya_heading(_x)
+                blok.append(_x)
         else:
             kunci = item.get('kunci', '')
             baris = item.get('baris') or []
@@ -2563,7 +2644,7 @@ def perbarui_nomor_daftar(path, halaman_render=None, ukur_fn=None,
         # dengan baris_list: nomor ditulis ke paragraf entri INI.
         idx_list = (baca.get('indeks', {}) or {}).get(kunci, []) or []
         for pos, baris in enumerate(baris_list):
-            judul = baris.split('\t')[0].strip()
+            judul = _pisah_entri_daftar(baris)[0]
             if not judul or judul == BARIS_BELUM_ADA_LAMPIRAN:
                 continue
             norm_judul = _normalisasi_cari(judul)
@@ -2589,14 +2670,14 @@ def perbarui_nomor_daftar(path, halaman_render=None, ukur_fn=None,
             calon.extend(i for i in idx_list[1:] if i not in calon)
             for i in calon:
                 if 0 <= i < len(teks_par) and \
-                        teks_par[i].split('\t')[0].strip() == judul:
+                        _pisah_entri_daftar(teks_par[i])[0] == judul:
                     target = i
                     break
             if target is None:
                 hilang.append(judul[:60])
                 continue
             ppr = _ppr_dari_xml(cocok[target].group(0))
-            baru = _xml_paragraf(f'{judul}\t{nomor}', ppr)
+            baru = _xml_paragraf(f'{judul}  {nomor}', ppr)
             ganti.append((cocok[target].start(), cocok[target].end(),
                           baru))
             diperbarui += 1

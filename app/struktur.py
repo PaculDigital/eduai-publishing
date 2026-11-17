@@ -18,6 +18,53 @@ from .ambang_periksa import bandingkan_perubahan
 
 LABEL_SAH = ('bab', 'subbab', 'paragraf', 'biasa')
 
+_ROMAWI_BAB = {'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5, 'VI': 6}
+_ANGKA_ROMAWI_BAB = {v: k for k, v in _ROMAWI_BAB.items()}
+_POLAA_BAB_BERLABEL = re.compile(r'^\s*BAB\s+([IVX]+|\d+)\b',
+                                 re.IGNORECASE)
+
+
+def _nomor_penanda_bab_telanjang(teks: str) -> int | None:
+    """Angka bab dari penanda TELANJANG ('BAB II', 'BAB 3') atau None.
+
+    Hanya yang telanjang (tidak ada teks sesudah penanda): sebutan bab
+    di Sistematika Penulisan ('BAB II TINJAUAN PUSTAKA') BUKAN awal
+    bab, peta lengkap fid 81 memuat 5 sebutan itu (baris 191-207) di
+    samping 5 penanda telanjang yang asli (baris 0/211/385/607/833),
+    jadi pola awalan saja akan memecah pengelompokan jadi 10 kelompok.
+    Cermin _POLAA_BAB_JUDUL + _angka_bab di bagian_awal.py (pemindai
+    gerbang yang sama), diperketat jadi telanjang; struktur.py tidak
+    boleh mengimpor bagian_awal (bagian_awal memakai struktur, impor
+    balik = siklus).
+    """
+    s = ' '.join(str(teks or '').split()).strip()
+    m = re.fullmatch(r'BAB\s+([IVX]+|\d+)', s, re.IGNORECASE)
+    if not m:
+        return None
+    t = m.group(1).upper()
+    if t in _ROMAWI_BAB:
+        return _ROMAWI_BAB[t]
+    try:
+        n = int(t)
+    except ValueError:
+        return None
+    return n if 1 <= n <= 6 else None
+
+
+def _nomor_dari_judul_bab(teks: str) -> int | None:
+    """Angka bab dari judul bab berlabel ('BAB II TINJAUAN PUSTAKA')."""
+    m = _POLAA_BAB_BERLABEL.match(' '.join(str(teks or '').split()))
+    if not m:
+        return None
+    t = m.group(1).upper()
+    if t in _ROMAWI_BAB:
+        return _ROMAWI_BAB[t]
+    try:
+        n = int(t)
+    except ValueError:
+        return None
+    return n if 1 <= n <= 6 else None
+
 
 def keadaan_tombol(sudah_diperiksa: bool, berubah_berarti: bool) -> dict:
     """Keadaan tombol "Periksa Struktur" untuk satu naskah.
@@ -120,12 +167,33 @@ def ringkas_peta(peta_json, menunggu_idx: set | None = None) -> dict:
     keluar['jumlah_ragu'] = int(hakim.get('jumlah_ragu') or 0)
     keluar['jumlah_curiga'] = int(hakim.get('jumlah_curiga') or 0)
     bab_kini = None
+    nomor_bab_kini = None
     for i, teks in enumerate(baris):
         lab = label.get(str(i)) or label.get(i) or ''
-        if lab not in LABEL_SAH:
-            continue
         teks_ringan = ' '.join(teks.split()).strip()
         if not teks_ringan:
+            continue
+        # Penanda bab telanjang ('BAB II', tanpa nama dan tanpa label):
+        # peta Jev tidak melabeli satu pun judul bab fid 81, jadi tanpa
+        # ini 131 subbab menumpuk di bawah satu bab palsu berjudul
+        # kosong dan template menampilkan kata ganti 'Bab' (cacat panel
+        # 'Struktur naskah', 17 Nov 2026). Hanya yang telanjang dan
+        # yang nomornya NAIK dari bab kini yang membuka kelompok baru:
+        # sebutan di Sistematika ('BAB II TINJAUAN PUSTAKA') dan
+        # penanda yang terulang tidak boleh memecah kelompok.
+        # Baris berlabel 'bab'/'subbab' tidak disentuh di sini (label
+        # Jev yang menang).
+        if lab not in ('bab', 'subbab'):
+            nomor = _nomor_penanda_bab_telanjang(teks_ringan)
+            if nomor is not None and (nomor_bab_kini is None
+                                      or nomor > nomor_bab_kini):
+                bab_kini = {'judul': f'BAB {_ANGKA_ROMAWI_BAB[nomor]}',
+                            'subbab': [],
+                            'diperiksa': i not in menunggu_idx}
+                keluar['bab'].append(bab_kini)
+                nomor_bab_kini = nomor
+                continue
+        if lab not in LABEL_SAH:
             continue
         butir = {'teks': teks_ringan, 'label': lab,
                  'diperiksa': i not in menunggu_idx}
@@ -133,6 +201,9 @@ def ringkas_peta(peta_json, menunggu_idx: set | None = None) -> dict:
             bab_kini = {'judul': teks_ringan, 'subbab': [],
                         'diperiksa': butir['diperiksa']}
             keluar['bab'].append(bab_kini)
+            _nomor = _nomor_dari_judul_bab(teks_ringan)
+            if _nomor is not None:
+                nomor_bab_kini = _nomor
         elif lab == 'subbab':
             if bab_kini is None:
                 bab_kini = {'judul': '', 'subbab': [], 'diperiksa': True}
