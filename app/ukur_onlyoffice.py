@@ -20,7 +20,8 @@ panjang lain):
      tulis ulang jadi host OO_URL sebelum mengunduh.
   4. FileUrl kedaluwarsa ~15 menit (919 detik): unduh SEGERA, jangan
      simpan URL-nya; PDF dibaca lalu dibuang.
-  5. Baca teks per halaman dari PDF dengan pypdfium2 (sudah ada di
+  5. Baca teks per halaman dari PDF dengan pdftotext (poppler-utils,
+     ada di image); bila tidak ada, jatuh ke pypdfium2 (sudah ada di
      produksi, pola app/ai.py) -> list[str], indeks 0 = halaman 1
      (format sama dengan sidecar teks_halaman).
   6. Gagal apa pun -> UkurGagal (jujur): nomor lama dipertahankan,
@@ -35,6 +36,9 @@ import logging
 import os
 import re
 import secrets
+import shutil
+import subprocess
+import tempfile
 import time
 import xml.etree.ElementTree as _ET
 from urllib.parse import urlparse, urlunparse
@@ -162,40 +166,76 @@ def tulis_ulang_host_fileurl(url: str, host_baru: str) -> str:
     return urlunparse(bagi._replace(netloc=netloc))
 
 
-_RE_NOMOR_HALAMAN_SAJA = re.compile(r'^([0-9]+|[ivxlcdm]+)$',
-                                     re.IGNORECASE)
-
-
 def _rapikan_teks_halaman(teks: str) -> str:
     """Rapikan teks satu halaman dari PDF ke tata letak yang dipakai pencocok.
 
-    pypdfium2 mengembalikan nomor footer (xi, 1, 24, ...) sebagai BARIS
-    PERTAMA halaman, sedangkan pdftotext (yang dipakai pencocok selama
-    ini) menaruh judul dulu. Aturan judul bagian depan di
-    nomor_footer_dari_render memakai baris pertama, jadi baris nomor
-    di depan harus dibuang, kalau tidak, 'KATA PENGANTAR' tidak
-    ketemu (terukur 17 Nov 2026: None padahal ada di halaman xi).
-    Hanya baris depan yang HANYA nomor halaman (Arab / Romawi kecil)
-    yang dibuang; isi lain tidak disentuh. Akhir baris diseragamkan
-    ke '\\n' (pypdfium2 memakai '\\r\\n').
+    Hanya akhir baris yang diseragamkan ke '\\n' (pypdfium2 memakai
+    '\\r\\n'). Nomor footer di baris pertama (xi, 1, 24, ...) SENGAJA
+    TIDAK dibuang: _mode_nomor_badan membaca panjang baris itu untuk
+    menentukan badan mencetak nomor absolut atau relatif, dan pdftotext
+    menaruh footer bersih di depan (dulu dibuang _rapikan, mode jatuh
+    ke 'relatif' dan BAB I tertulis 1 padahal 23; cacat uji live
+    17 Nov 2026, fid 81). Pencocok bagian depan yang memakai baris
+    pertama melewati satu baris footer sendiri
+    (bagian_awal._baris_isi_halaman).
     """
-    teks = (teks or '').replace('\r\n', '\n').replace('\r', '\n')
-    baris = teks.split('\n')
-    while baris and _RE_NOMOR_HALAMAN_SAJA.match(baris[0].strip()):
-        baris.pop(0)
-    return '\n'.join(baris)
+    return (teks or '').replace('\r\n', '\n').replace('\r', '\n')
+
+
+def _halaman_dari_teks_pdftotext(teks: str) -> list[str]:
+    """Pisah keluaran pdftotext jadi teks per halaman.
+
+    pdftotext memisah halaman dengan '\\f' dan menutup halaman terakhir
+    dengan '\\f' juga: buang SATU bagian kosong di ujung (bukan semua).
+    Tiap halaman dirapikan seperti jalur pypdfium2.
+    """
+    bagian = (teks or '').split('\f')
+    if bagian and not bagian[-1].strip():
+        bagian.pop()
+    return [_rapikan_teks_halaman(b) for b in bagian]
 
 
 def teks_per_halaman_pdf(data_pdf: bytes) -> list[str]:
-    """Teks per halaman dari byte PDF (pypdfium2, sudah ada di produksi).
+    """Teks per halaman dari byte PDF.
+
+    Utama: pdftotext (poppler-utils, ada di image). pypdfium2 MEMBACA
+    SALAH teks badan naskah mahasiswa: font TNR subset tanpa peta
+    ToUnicode yang dibaca pdfium membuat huruf jadi sandi kontrol,
+    sehingga judul subbab bergaya ListParagraph/StyleCaption tidak
+    pernah ketemu dan Daftar Isi kehilangan nomornya (terukur
+    17 Nov 2026, fid 81: 'uji validitas' 0 halaman di pypdfium2,
+    10 halaman di pdftotext; 'manfaat teoritis' 0 lawan 2).
+    Bila pdftotext tidak ada (lingkungan uji), jatuh ke pypdfium2
+    supaya uji tetap jalan; bila pdftotext ada tapi gagal, gagal
+    jujur (UkurGagal), bukan diam-diam memakai bacaan yang salah.
 
     Return list[str], indeks 0 = halaman 1 (format sama dengan sidecar
-    teks_halaman). Tiap halaman dirapikan (_rapikan_teks_halaman) supaya
-    pencocok yang sama bisa dipakai. PDF tanpa halaman / tanpa teks ->
-    UkurGagal.
+    teks_halaman). PDF tanpa halaman / tanpa teks -> UkurGagal.
     """
     if not data_pdf:
         raise UkurGagal('PDF hasil konversi kosong.')
+    if shutil.which('pdftotext'):
+        try:
+            with tempfile.NamedTemporaryFile(suffix='.pdf',
+                                            delete=False) as tf:
+                tf.write(data_pdf)
+                jalur = tf.name
+            try:
+                jalan = subprocess.run(['pdftotext', jalur, '-'],
+                                       capture_output=True, timeout=120)
+            finally:
+                os.unlink(jalur)
+        except Exception as e:                                  # noqa: BLE001
+            raise UkurGagal(f'pdftotext gagal: {e}')
+        if jalan.returncode != 0:
+            raise UkurGagal(
+                'pdftotext gagal: ' + (jalan.stderr or b'').decode(
+                    'utf-8', 'ignore')[:200])
+        keluar = _halaman_dari_teks_pdftotext(
+            jalan.stdout.decode('utf-8', errors='ignore'))
+        if not keluar or not any(h.strip() for h in keluar):
+            raise UkurGagal('pdftotext tidak menghasilkan teks.')
+        return keluar
     try:
         import pypdfium2 as _pdfium  # type: ignore
     except ImportError as e:

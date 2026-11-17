@@ -234,15 +234,15 @@ def jalankan():
     cek('docx: perbarui nomor berhasil dari render fid 81',
         r_per.get('ok') and r_per.get('diperbarui', 0) >= 5, str(r_per))
     cek('docx: nomor Daftar Isi absolut di dokumen',
-        'BAB 1. PENDAHULUAN\t23' in teks_per
-        and 'BAB 2. TINJAUAN PUSTAKA\t39' in teks_per
-        and 'BAB 3. METODE PENELITIAN\t54' in teks_per
-        and 'BAB 4. HASIL DAN PEMBAHASAN\t70' in teks_per
-        and 'BAB 5. PENUTUP\t83' in teks_per, teks_per[:600])
+        'BAB 1. PENDAHULUAN  23' in teks_per
+        and 'BAB 2. TINJAUAN PUSTAKA  39' in teks_per
+        and 'BAB 3. METODE PENELITIAN  54' in teks_per
+        and 'BAB 4. HASIL DAN PEMBAHASAN  70' in teks_per
+        and 'BAB 5. PENUTUP  83' in teks_per, teks_per[:600])
     cek('docx: nomor subbab absolut di dokumen',
-        'Digital Marketing\t41' in teks_per
-        and 'Keberlanjutan Usaha\t39' in teks_per
-        and 'Orientasi Kewirausahaan\t42' in teks_per, teks_per[:600])
+        'Digital Marketing  41' in teks_per
+        and 'Keberlanjutan Usaha  39' in teks_per
+        and 'Orientasi Kewirausahaan  42' in teks_per, teks_per[:600])
     # Gaya Heading: hanya judul seksi (baris pertama) yang boleh
     # Heading; entri daftar dan baris formulir tidak boleh.
     gaya = _gaya_per_paragraf(docx1)
