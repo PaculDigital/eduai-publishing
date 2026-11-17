@@ -12,6 +12,7 @@ perubahan yang diperiksa dua kali.
 from __future__ import annotations
 
 import json
+import re
 
 from .ambang_periksa import bandingkan_perubahan
 
@@ -81,6 +82,22 @@ def nilai_gerbang(*, peta_json, peta_sidik: str, sidik_kini: str,
             'detail': detail}
 
 
+def _teks_subbab_normal(teks: str) -> str:
+    """Judul subbab tanpa nomor, penanda bab, dan awalan 'SUB-BAB'.
+
+    '1.2 Perkembangan ...' dan 'SUB-BAB Perkembangan ...' adalah judul
+    yang sama; begitu pula '1.4 Posisi ...' dan 'Posisi ...' telanjang.
+    Cermin _judul_subbab_normal di bagian_awal.py (perbaikan Daftar Isi
+    f1ed9e3), supaya panel 'Struktur naskah' dan Daftar Isi membuang
+    gema yang sama.
+    """
+    s = ' '.join(str(teks or '').split()).strip().lower()
+    s = re.sub(r'^bab\s+(?:[ivx]+|\d+)[\s.]*', '', s)
+    s = re.sub(r'^\d+\.\d+\s*', '', s)
+    s = re.sub(r'^sub[ -]?bab\b\s*', '', s)
+    return s.strip()
+
+
 def ringkas_peta(peta_json, menunggu_idx: set | None = None) -> dict:
     """Ringkas peta tersimpan jadi pohon bab/subbab untuk layar mahasiswa.
 
@@ -125,6 +142,28 @@ def ringkas_peta(peta_json, menunggu_idx: set | None = None) -> dict:
                 bab_kini['diperiksa'] = False
         # 'paragraf'/'biasa' tidak tampil di daftar bab (sesuai rancangan:
         # layar hasil hanya daftar bab/subbab).
+    # Gema subbab: badan menulis judul yang sama dua kali berurutan
+    # ('1.2 ...' lalu 'SUB-BAB ...'; '1.4 ...' lalu judul telanjang) dan
+    # peta melabeli keduanya 'subbab' (cacat uji live 17 Nov 2026,
+    # file 126; perbaikan Daftar Isi f1ed9e3 memakai aturan yang sama).
+    # Hanya yang BERURUTAN yang dibuang: judul sah yang berulang
+    # ('Ringkasan Bab') tidak pernah berurutan. Yang dipertahankan
+    # ditandai diperiksa hanya bila SEMUA gema sudah diperiksa, supaya
+    # baris yang masih antre tidak hilang dari penanda.
+    for bab in keluar['bab']:
+        bersih = []
+        for sub in bab.get('subbab') or []:
+            normal = _teks_subbab_normal(sub.get('teks', ''))
+            if bersih and normal and normal == _teks_subbab_normal(
+                    bersih[-1].get('teks', '')):
+                bersih[-1]['diperiksa'] = bool(
+                    bersih[-1].get('diperiksa')) and bool(
+                    sub.get('diperiksa'))
+                continue  # gema: judul sama persis, buang yang kedua
+            bersih.append(sub)
+        bab['subbab'] = bersih
+        bab['diperiksa'] = bool(bab.get('diperiksa')) and all(
+            s.get('diperiksa') for s in bersih)
     return keluar
 
 
