@@ -1,4 +1,4 @@
-"""DIAGRAM MODEL DAN DESAIN PENELITIAN — logika murni, tanpa AI.
+"""DIAGRAM MODEL DAN DESAIN PENELITIAN, logika murni, tanpa AI.
 
 Harga: 1 token per gambar (keputusan Boss 17 Nov 2026 09:24 WIB).
 Gambar digambar mesin secara deterministik dari data model (bukan AI);
@@ -135,6 +135,20 @@ def normalisasi_model(data) -> tuple:
         masalah.append('Perantara (Z) hanya boleh satu.')
     nama_ke_kode = {_normalisasi_nama(v['nama']): v['kode']
                     for v in variabel}
+    kode_ke_kode = {v['kode'].lower(): v['kode'] for v in variabel}
+
+    def _cari_kode(teks: str):
+        """Cari kode variabel dari nama atau kode apa adanya.
+
+        Formulir mengirim kode (X1, X2, Z, Y), naskah/peta mengirim
+        nama; keduanya harus dikenali. Nama didahulukan supaya nama
+        "X2" tetap menunjuk variabel bernama X2, bukan kode X2.
+        """
+        kunci = _normalisasi_nama(teks)
+        if kunci in nama_ke_kode:
+            return nama_ke_kode[kunci]
+        return kode_ke_kode.get(kunci)
+
     jalur: list[dict] = []
     label_pakai: set[str] = set()
     for j in jalur_masuk:
@@ -142,19 +156,39 @@ def normalisasi_model(data) -> tuple:
             continue
         dari = _rapi(j.get('dari'))
         ke = _rapi(j.get('ke'))
+        lewat = _rapi(j.get('lewat'))
         label = _rapi(j.get('hipotesis'))
         jenis = str(j.get('jenis') or 'langsung').strip().lower()
         arah = str(j.get('arah') or '').strip()
         if not dari or not ke:
             continue
-        if _normalisasi_nama(dari) not in nama_ke_kode:
+        kode_dari = _cari_kode(dari)
+        if kode_dari is None:
             masalah.append(f'Jalur menunjuk "{dari}" yang tidak ada '
                            'di daftar variabel.')
             continue
-        if _normalisasi_nama(ke) not in nama_ke_kode:
+        kode_ke = _cari_kode(ke)
+        if kode_ke is None:
             masalah.append(f'Jalur menunjuk "{ke}" yang tidak ada '
                            'di daftar variabel.')
             continue
+        kode_lewat = ''
+        if lewat:
+            kode_lewat = _cari_kode(lewat)
+            if kode_lewat is None:
+                masalah.append(f'Jalur menunjuk "{lewat}" yang tidak '
+                               'ada di daftar variabel.')
+                continue
+            if kode_lewat in (kode_dari, kode_ke):
+                masalah.append('Lewat harus variabel lain, bukan Dari '
+                               'atau Ke.')
+                continue
+            peran_lewat = next((v['peran'] for v in variabel
+                                if v['kode'] == kode_lewat), '')
+            if peran_lewat != 'Z':
+                masalah.append('Lewat harus perantara (Z).')
+                continue
+            jenis = 'tidak_langsung'
         if not label:
             masalah.append('Ada jalur yang belum berlabel hipotesis.')
             continue
@@ -166,14 +200,70 @@ def normalisasi_model(data) -> tuple:
             jenis = 'langsung'
         if arah not in ('+', '-', ''):
             arah = ''
-        jalur.append({'dari': nama_ke_kode[_normalisasi_nama(dari)],
-                      'ke': nama_ke_kode[_normalisasi_nama(ke)],
-                      'hipotesis': label, 'jenis': jenis, 'arah': arah})
+        jalur.append({'dari': kode_dari, 'ke': kode_ke,
+                      'lewat': kode_lewat, 'hipotesis': label,
+                      'jenis': jenis, 'arah': arah})
     if masalah:
         return None, masalah
     return {'variabel': variabel, 'jalur': jalur,
             'jenis': data.get('jenis') or '',
             'desain': data.get('desain') or ''}, []
+
+
+def model_tampilan(data) -> dict:
+    """Bentuk model apa adanya untuk ditampilkan lagi di formulir.
+
+    Dipakai saat validasi gagal: isian mahasiswa (nama, peran, Dari,
+    Ke, Lewat, label, arah) ditampilkan lagi persis seperti diketik,
+    tidak hilang. Tidak memeriksa apa pun; kode dihitung dari urutan
+    peran seperti normalisasi_model, dan Dari/Ke/Lewat ditulis sebagai
+    kode bila dikenali supaya cocok dengan pilihan formulir.
+    """
+    if not isinstance(data, dict):
+        return {'variabel': [], 'jalur': [], 'jenis': '', 'desain': ''}
+    variabel: list[dict] = []
+    hitung = {'X': 0}
+    for v in data.get('variabel') or []:
+        if not isinstance(v, dict):
+            continue
+        nama = _rapi(v.get('nama'))
+        peran = str(v.get('peran') or 'X').strip().upper()
+        if peran not in PERAN_SAH:
+            peran = 'X'
+        if peran == 'M':
+            peran = 'Z'
+        if not nama:
+            continue
+        if peran == 'X':
+            hitung['X'] += 1
+            kode = f"X{hitung['X']}"
+        elif peran == 'Z':
+            kode = 'Z'
+        else:
+            kode = 'Y'
+        variabel.append({'nama': nama, 'peran': peran, 'kode': kode})
+    kunci: dict[str, str] = {}
+    for v in variabel:
+        kunci[_normalisasi_nama(v['nama'])] = v['kode']
+        kunci[v['kode'].lower()] = v['kode']
+
+    def _kode(teks: str) -> str:
+        return kunci.get(_normalisasi_nama(teks), _rapi(teks))
+
+    jalur: list[dict] = []
+    for j in data.get('jalur') or []:
+        if not isinstance(j, dict):
+            continue
+        lewat = _rapi(j.get('lewat'))
+        jalur.append({'dari': _kode(j.get('dari')),
+                      'ke': _kode(j.get('ke')),
+                      'lewat': _kode(lewat) if lewat else '',
+                      'hipotesis': _rapi(j.get('hipotesis')),
+                      'jenis': str(j.get('jenis') or 'langsung'),
+                      'arah': str(j.get('arah') or '').strip()})
+    return {'variabel': variabel, 'jalur': jalur,
+            'jenis': data.get('jenis') or '',
+            'desain': data.get('desain') or ''}
 
 
 def bentuk_model(model: dict) -> str:

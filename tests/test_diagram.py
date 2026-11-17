@@ -135,6 +135,102 @@ def jalankan():
         DG.model_dari_peta_bab4({}) is None
         and DG.model_dari_peta_bab4({'variabel': []}) is None)
 
+    # ── 1b. Perbaikan formulir (cacat uji live 17 Nov 10:50 WIB) ─────
+    # Cacat 1: jalur boleh memakai kode (X1/X2/Z/Y) atau nama.
+    model_kode, mk = DG.normalisasi_model(
+        {'variabel': [{'nama': 'X1 Keaslian Streamer', 'peran': 'X'},
+                      {'nama': 'X2 Interaksi Parasosial', 'peran': 'X'},
+                      {'nama': 'Z Keterlibatan Pelanggan', 'peran': 'Z'},
+                      {'nama': 'Y Pembelian Impulsif', 'peran': 'Y'}],
+         'jalur': [{'dari': 'X1', 'ke': 'Z', 'hipotesis': 'H1',
+                    'arah': '+'},
+                   {'dari': 'X2', 'ke': 'Z', 'hipotesis': 'H2',
+                    'arah': '+'},
+                   {'dari': 'Z', 'ke': 'Y', 'hipotesis': 'H3',
+                    'arah': '+'},
+                   {'dari': 'X1', 'ke': 'Y', 'hipotesis': 'H4',
+                    'arah': '+'},
+                   {'dari': 'X2', 'ke': 'Y', 'hipotesis': 'H5',
+                    'arah': '+'},
+                   {'dari': 'X1', 'ke': 'Y', 'lewat': 'Z',
+                    'hipotesis': 'H6', 'arah': '+'},
+                   {'dari': 'X2', 'ke': 'Y', 'lewat': 'Z',
+                    'hipotesis': 'H7', 'arah': '+'}]})
+    cek('jalur boleh memakai kode X1/X2/Z/Y (cacat 1)',
+        model_kode is not None and not mk, str(mk))
+    model_campur, mc = DG.normalisasi_model(
+        {'variabel': [{'nama': 'Keaslian Streamer', 'peran': 'X'},
+                      {'nama': 'Keterlibatan Pelanggan', 'peran': 'Z'},
+                      {'nama': 'Pembelian Impulsif', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Keaslian Streamer',
+                    'ke': 'Keterlibatan Pelanggan', 'hipotesis': 'H1'},
+                   {'dari': 'X1', 'ke': 'Y', 'hipotesis': 'H2'}]})
+    cek('jalur campuran nama + kode diterima',
+        model_campur is not None and not mc
+        and model_campur['jalur'][1]['dari'] == 'X1', str(mc))
+    # Cacat 4: H6/H7 dua langkah lewat Z.
+    cek('H6/H7 dua langkah tersimpan sebagai tidak_langsung (cacat 4)',
+        model_kode is not None
+        and model_kode['jalur'][5]['jenis'] == 'tidak_langsung'
+        and model_kode['jalur'][5]['lewat'] == 'Z'
+        and model_kode['jalur'][6]['lewat'] == 'Z')
+    cek('tata H6/H7 lewat Z: tetap 5 panah (tidak digambar sendiri)',
+        model_kode is not None
+        and len(DG.tata_letak(model_kode)['panah']) == 5)
+    _m, m4a = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'Z'},
+                      {'nama': 'C', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'C', 'lewat': 'D',
+                    'hipotesis': 'H1'}]})
+    cek('lewat yang tidak ada ditolak',
+        _m is None and any('tidak ada' in s for s in m4a), str(m4a))
+    _m, m4b = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'Z'},
+                      {'nama': 'C', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'C', 'lewat': 'A',
+                    'hipotesis': 'H1'}]})
+    cek('lewat sama dengan Dari ditolak',
+        _m is None and any('Lewat' in s for s in m4b), str(m4b))
+    _m, m4c = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'X'},
+                      {'nama': 'C', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'C', 'lewat': 'B',
+                    'hipotesis': 'H1'}]})
+    cek('lewat bukan perantara (Z) ditolak',
+        _m is None and any('perantara' in s for s in m4c), str(m4c))
+    cek('tidak_langsung tanpa lewat tetap sah (kompatibel)',
+        model is not None
+        and model['jalur'][5]['jenis'] == 'tidak_langsung'
+        and model['jalur'][5].get('lewat') == '')
+    # Cacat 2: isian bertahan untuk ditampilkan lagi sesudah gagal.
+    tampil = DG.model_tampilan(
+        {'variabel': [{'nama': 'X1 Keaslian Streamer', 'peran': 'X'},
+                      {'nama': 'Z Keterlibatan Pelanggan', 'peran': 'Z'},
+                      {'nama': 'Y Pembelian Impulsif', 'peran': 'Y'}],
+         'jalur': [{'dari': 'X1', 'ke': 'Z', 'hipotesis': 'H1',
+                    'arah': '+'},
+                   {'dari': 'Z', 'ke': 'Y', 'hipotesis': 'H2',
+                    'arah': '+'}]})
+    cek('isian bertahan untuk ditampilkan lagi (cacat 2)',
+        tampil['jalur'][0]['dari'] == 'X1'
+        and tampil['jalur'][0]['ke'] == 'Z'
+        and tampil['jalur'][1]['dari'] == 'Z'
+        and tampil['jalur'][1]['ke'] == 'Y'
+        and tampil['variabel'][0]['kode'] == 'X1'
+        and tampil['variabel'][1]['kode'] == 'Z')
+    tampil_nama = DG.model_tampilan(
+        {'variabel': [{'nama': 'Keaslian Streamer', 'peran': 'X'},
+                      {'nama': 'Keterlibatan Pelanggan', 'peran': 'Z'},
+                      {'nama': 'Pembelian Impulsif', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Keaslian Streamer',
+                    'ke': 'Keterlibatan Pelanggan', 'hipotesis': 'H1'}]})
+    cek('tampilan mengubah Dari nama jadi kode supaya cocok pilihan',
+        tampil_nama['jalur'][0]['dari'] == 'X1'
+        and tampil_nama['jalur'][0]['ke'] == 'Z')
+
     # ── 2. Tata letak ──────────────────────────────────────────────────
     tata = DG.tata_letak(model)
     kotak = {k['id']: k for k in tata['kotak']}
@@ -318,6 +414,33 @@ def jalankan():
     cek('tidak ada istilah teknis di layar mahasiswa',
         not _re.search(r'ConvertService|DrawingML|deterministik',
                        layar, _re.IGNORECASE))
+    isi_model = (ROOT / 'app' / 'templates'
+                 / 'diagram_model.html').read_text()
+    cek("opsi arah: kosong tampil 'Tanpa arah', bukan '-' (cacat 3)",
+        'Tanpa arah' in isi_model
+        and '<option value="">-</option>' not in isi_model)
+    cek('formulir punya kolom Lewat (cacat 4)',
+        'name="jl"' in isi_model and '<th>Lewat</th>' in isi_model)
+    # Render Jinja2 formulir dengan model berkode (cacat 2): pilihan
+    # Dari/Ke/Lewat harus menunjuk kode yang benar, pesan tampil.
+    try:
+        from jinja2 import Environment, FileSystemLoader
+        _env = Environment(
+            loader=FileSystemLoader(str(ROOT / 'app' / 'templates')))
+        _tpl_m = _env.get_template('diagram_model.html')
+        html_m = _tpl_m.render(
+            berkas={'id': 126, 'nama': 'uji.docx'}, model=model_kode,
+            sumber='', pesan='Jalur menunjuk "X9" yang tidak ada.')
+        _render_ok = ('data-awal="X1"' in html_m
+                      and 'data-awal="Z"' in html_m
+                      and 'data-awal="Y"' in html_m
+                      and 'Jalur menunjuk' in html_m
+                      and 'name="jl"' in html_m)
+    except Exception as e:                                  # noqa: BLE001
+        _render_ok = False
+        print('    render gagal: ' + str(e)[:200])
+    cek('formulir ter-render: data-awal berkode + pesan tampil',
+        _render_ok)
     cek('harga 1 token per gambar', DG.HARGA_GAMBAR == 1)
 
 
