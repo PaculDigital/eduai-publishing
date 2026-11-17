@@ -410,6 +410,164 @@ def gambar_grafik(data: Any, jenis: str = 'batang', judul: str = 'Grafik',
     return buf.getvalue()
 
 
+# ══════════════════════════════════════════════════════════════════════════
+# DIAGRAM PANAH MODEL PENELITIAN + ALUR DESAIN (17Nov26, GAS Bos 09:25)
+# Digambar mesin secara deterministik dari data model (bukan AI).
+# Panah = garis + kepala segitiga kecil. Kotak X teal, Z oranye, Y nila.
+# ══════════════════════════════════════════════════════════════════════════
+WARNA_PERAN = {'X': TEAL, 'Z': ORANYE, 'M': ORANYE, 'Y': '#5C6BC0',
+               'langkah': TEAL}
+
+
+def _bungkus_teks(d, teks: str, font, maks_lebar: int,
+                  maks_baris: int = 2) -> list:
+    """Bungkus teks jadi paling banyak `maks_baris` baris yang muat."""
+    kata = str(teks or '').split()
+    baris: list[str] = []
+    kini = ''
+    for k in kata:
+        coba = f'{kini} {k}'.strip()
+        if d.textlength(coba, font=font) <= maks_lebar or not kini:
+            kini = coba
+        else:
+            baris.append(kini)
+            kini = k
+            if len(baris) >= maks_baris:
+                break
+    if kini and len(baris) < maks_baris:
+        baris.append(kini)
+    elif kini and baris:
+        baris[-1] = baris[-1] + '…'
+    return baris or ['']
+
+
+def _teks_kotak(d, kotak: dict) -> None:
+    """Tulis kode + nama di dalam kotak (nama dibungkus, ukuran mengecil
+    sampai muat; tidak pernah terpotong)."""
+    x, y, w = kotak['x'], kotak['y'], kotak['w']
+    f_kode = _font(24, True)
+    d.text((x + w / 2, y + 10), str(kotak.get('kode') or ''),
+           font=f_kode, fill=TINTA, anchor='ma')
+    f_nama, _uk = _font_muat(str(kotak.get('nama') or ''), w - 24, 24)
+    baris = _bungkus_teks(d, kotak.get('nama') or '', f_nama, w - 24)
+    ty = y + 42
+    for b in baris:
+        d.text((x + w / 2, ty), b, font=f_nama, fill=TINTA, anchor='ma')
+        ty += 28
+
+
+def _garis_panah(d, x1: float, y1: float, x2: float, y2: float,
+                 putus: bool = False) -> None:
+    """Garis + kepala segitiga kecil di ujung."""
+    dx, dy = x2 - x1, y2 - y1
+    panjang = math.hypot(dx, dy)
+    if panjang < 4:
+        return
+    ux, uy = dx / panjang, dy / panjang
+    #  ujung garis berhenti 20 px sebelum titik (ruang kepala panah)
+    ex, ey = x2 - ux * 20, y2 - uy * 20
+    if putus:
+        langkah = 14
+        s = 0.0
+        while s < panjang - 20:
+            t = min(langkah, panjang - 20 - s)
+            d.line([(x1 + ux * s, y1 + uy * s),
+                    (x1 + ux * (s + t), y1 + uy * (s + t))],
+                   fill=TINTA, width=4)
+            s += langkah * 2
+    else:
+        d.line([(x1, y1), (ex, ey)], fill=TINTA, width=4)
+    px, py = -uy, ux
+    d.polygon([(x2, y2), (ex + px * 11, ey + py * 11),
+               (ex - px * 11, ey - py * 11)], fill=TINTA)
+
+
+def _label_panah(d, x1: float, y1: float, x2: float, y2: float,
+                 label: str) -> None:
+    """Label hipotesis di tengah panah (kotak putih di belakang teks
+    supaya tetap terbaca walau panah bersilangan)."""
+    if not label:
+        return
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+    f = _font(22, True)
+    kiri, atas, kanan, bawah = d.textbbox((0, 0), label, font=f)
+    lw, lh = kanan - kiri, bawah - atas
+    d.rectangle([mx - lw / 2 - 6, my - lh / 2 - 4,
+                 mx + lw / 2 + 6, my + lh / 2 + 4], fill='white')
+    d.text((mx, my - lh / 2), label, font=f, fill=TINTA, anchor='ma')
+
+
+def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
+    """Diagram panah model penelitian → bytes PNG. Return b'' bila
+    data tidak layak (kotak kosong / tanpa X / tanpa Y)."""
+    from .diagram import tata_letak as _tata
+    if tata is None:
+        tata = _tata(model or {})
+    kotak = tata.get('kotak') or []
+    if not kotak:
+        return b''
+    g = Image.new('RGB', (W, H), LATAR)
+    d = ImageDraw.Draw(g)
+    peta_kotak = {k['id']: k for k in kotak}
+    #  panah dulu (di bawah kotak), lalu kotak, lalu label.
+    for p in tata.get('panah') or []:
+        a, b = peta_kotak.get(p.get('dari')), peta_kotak.get(p.get('ke'))
+        if not a or not b:
+            continue
+        _garis_panah(d, a['x'] + a['w'], a['y'] + a['h'] / 2,
+                     b['x'], b['y'] + b['h'] / 2,
+                     putus=(p.get('gaya') == 'putus'))
+    for k in kotak:
+        warna = WARNA_PERAN.get(str(k.get('peran') or 'X'), TEAL)
+        d.rounded_rectangle([k['x'], k['y'], k['x'] + k['w'],
+                             k['y'] + k['h']], radius=12,
+                            outline=warna, width=4, fill='white')
+        _teks_kotak(d, k)
+    for p in tata.get('panah') or []:
+        a, b = peta_kotak.get(p.get('dari')), peta_kotak.get(p.get('ke'))
+        if not a or not b:
+            continue
+        _label_panah(d, a['x'] + a['w'], a['y'] + a['h'] / 2,
+                     b['x'], b['y'] + b['h'] / 2, p.get('label') or '')
+    buf = io.BytesIO()
+    g.save(buf, 'PNG', optimize=True)
+    return buf.getvalue()
+
+
+def gambar_alur(langkah: list) -> bytes:
+    """Diagram alur penelitian (rantai kotak ke bawah) → bytes PNG."""
+    langkah = [str(s or '').strip() for s in (langkah or []) if str(s or '').strip()]
+    if not langkah:
+        return b''
+    tinggi = 120 + len(langkah) * 140
+    g = Image.new('RGB', (1200, tinggi), LATAR)
+    d = ImageDraw.Draw(g)
+    for i, s in enumerate(langkah):
+        y = 60 + i * 140
+        d.rounded_rectangle([300, y, 900, y + 90], radius=12,
+                            outline=TEAL, width=4, fill='white')
+        f, _uk = _font_muat(f'{i + 1}. {s}', 560, 26)
+        baris = _bungkus_teks(d, f'{i + 1}. {s}', f, 560)
+        ty = y + 12
+        for b in baris:
+            d.text((600, ty), b, font=f, fill=TINTA, anchor='ma')
+            ty += 30
+        if i + 1 < len(langkah):
+            _garis_panah(d, 600, y + 90, 600, y + 140)
+    buf = io.BytesIO()
+    g.save(buf, 'PNG', optimize=True)
+    return buf.getvalue()
+
+
+def label_berikut_bab(teks_naskah: str, bab: int) -> str:
+    """Nomor gambar berikutnya di satu bab ('Gambar 2.1', 'Gambar 2.2',
+    ...). Beda dengan label_berikut (bab terbesar di seluruh naskah)."""
+    nomor = re.findall(r'Gambar\s+%d\.(\d+)' % int(bab), teks_naskah or '')
+    if not nomor:
+        return f'Gambar {int(bab)}.1'
+    return f'Gambar {int(bab)}.{max(int(n) for n in nomor) + 1}'
+
+
 def _rapikan_data(data: Any) -> list:
     """Terima [{label, nilai}] / {label: nilai} / [[label, nilai]] / [angka]."""
     seri: list = []
@@ -743,7 +901,8 @@ def _cocok_judul(teks: str, bagian: str) -> bool:
 
 def sisip_gambar_setelah_bagian(docx_path, png: bytes, bagian: str,
                                 bagian_berikut: str = '',
-                                keterangan: str = '') -> dict:
+                                keterangan: str = '',
+                                rata_keterangan: str = 'center') -> dict:
     """Sisipkan gambar TEPAT di akhir bagian `bagian` (sebelum bagian berikutnya).
 
     Kalau tidak bisa dipastikan posisinya → ok=False (jangan menebak;
@@ -844,8 +1003,10 @@ def sisip_gambar_setelah_bagian(docx_path, png: bytes, bagian: str,
     )
     par_cap = ''
     if keterangan:
+        rata = rata_keterangan if rata_keterangan in ('center', 'left',
+                                                       'right') else 'center'
         par_cap = (
-            '<w:p><w:pPr><w:jc w:val="center"/></w:pPr>'
+            f'<w:p><w:pPr><w:jc w:val="{rata}"/></w:pPr>'
             '<w:r><w:rPr><w:i/><w:sz w:val="20"/></w:rPr>'
             f'<w:t xml:space="preserve">{keterangan}</w:t></w:r></w:p>'
         )
