@@ -1,0 +1,77 @@
+{# Halaman Diagram (17 Nov 2026, GAS Bos 09:25).
+   Satu langkah satu layar, kata pendek, Bahasa Indonesia polos.
+   Istilah sama di semua tempat: "Model Penelitian", "Desain Penelitian". #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Diagram - {{ berkas.nama }}</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 16px; }
+  .kotak { border: 1px solid #ddd; border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+  .tombol { background: #1a73e8; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 15px; }
+  .tombol.kedua { background: #fff; color: #1a73e8; border: 1px solid #1a73e8; }
+  .tawaran { background: #fff4e0; border: 1px solid #e0a800; padding: 10px; border-radius: 8px; margin-top: 10px; }
+  .pesan { background: #eef6ee; border: 1px solid #9ccc9c; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+  a { color: #1a73e8; }
+</style>
+</head>
+<body>
+<h2>Diagram</h2>
+<p>Gambar Model dan Desain Penelitian untuk naskah ini.</p>
+{% if pesan %}<div class="pesan">{{ pesan }}</div>{% endif %}
+{% if keadaan.sedang_jalan %}<div class="pesan">Sedang dimasukkan, tunggu sebentar lalu muat ulang.</div>{% endif %}
+
+<div class="kotak">
+  <h3>Model Penelitian</h3>
+  {% if keadaan.sudah_model %}
+  <p>Model sudah masuk: {{ keadaan.hasil.model.keterangan }}.</p>
+  {% elif keadaan.vonis_model.vonis == 'sesuai' %}
+  <p>Gambar Model sudah ada dan cocok.</p>
+  {% elif keadaan.vonis_model.vonis == 'meragukan' %}
+  <p>Gambar Model sudah ada, tapi keterangannya tidak cocok.</p>
+  {% else %}
+  <p>Belum ada gambar Model.</p>
+  {% endif %}
+  {% if keadaan.vonis_model.vonis != 'tidak_ada' %}
+  <div class="tawaran" id="tawaran-model">
+    <p>Gambar sudah ada. Tetap pakai yang lama, atau buat draf baru?</p>
+    <button class="tombol kedua" type="button" onclick="tetapPakai('model')">Tetap pakai yang lama</button>
+    <button class="tombol" type="button" onclick="location.href='/naskah/{{ berkas.id }}/diagram/model'">Buat draf baru</button>
+  </div>
+  <p id="tetap-model" hidden>Tetap dipakai.</p>
+  {% endif %}
+  <p><button class="tombol" type="button" onclick="location.href='/naskah/{{ berkas.id }}/diagram/model'">{% if keadaan.sudah_model %}Perbarui Model Penelitian{% else %}Buat Model Penelitian{% endif %}</button></p>
+</div>
+
+<div class="kotak">
+  <h3>Desain Penelitian</h3>
+  {% if keadaan.sudah_desain %}
+  <p>Desain sudah masuk: {{ keadaan.hasil.desain.keterangan }}.</p>
+  {% elif keadaan.vonis_desain.vonis == 'sesuai' %}
+  <p>Gambar Desain sudah ada dan cocok.</p>
+  {% elif keadaan.vonis_desain.vonis == 'meragukan' %}
+  <p>Gambar Desain sudah ada, tapi keterangannya tidak cocok.</p>
+  {% else %}
+  <p>Belum ada gambar Desain.</p>
+  {% endif %}
+  {% if keadaan.vonis_desain.vonis != 'tidak_ada' %}
+  <div class="tawaran" id="tawaran-desain">
+    <p>Gambar sudah ada. Tetap pakai yang lama, atau buat draf baru?</p>
+    <button class="tombol kedua" type="button" onclick="tetapPakai('desain')">Tetap pakai yang lama</button>
+    <button class="tombol" type="button" onclick="location.href='/naskah/{{ berkas.id }}/diagram/desain'">Buat draf baru</button>
+  </div>
+  <p id="tetap-desain" hidden>Tetap dipakai.</p>
+  {% endif %}
+  <p><button class="tombol" type="button" onclick="location.href='/naskah/{{ berkas.id }}/diagram/desain'">{% if keadaan.sudah_desain %}Perbarui Desain Penelitian{% else %}Buat Desain Penelitian{% endif %}</button></p>
+</div>
+
+<p><a href="/naskah">Kembali ke naskah</a></p>
+<script>
+function tetapPakai(jenis) {
+  document.getElementById('tawaran-' + jenis).hidden = true;
+  document.getElementById('tetap-' + jenis).hidden = false;
+}
+</script>
+</body>
+</html>

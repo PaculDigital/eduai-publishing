@@ -1,0 +1,281 @@
+{# Editor Diagram (17 Nov 2026, GAS Bos 09:25).
+   Draf mesin, geser kotak, Terima / Tolak / Selesai.
+   Kata pendek, Bahasa Indonesia polos. #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Gambar - {{ 'Desain' if jenis == 'desain' else 'Model' }} Penelitian</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 980px; margin: 0 auto; padding: 16px; }
+  .tombol { background: #1a73e8; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 15px; margin-right: 8px; }
+  .tombol.kedua { background: #fff; color: #1a73e8; border: 1px solid #1a73e8; }
+  .pesan { background: #eef6ee; border: 1px solid #9ccc9c; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+  .galat { background: #fdecea; border: 1px solid #d93025; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+  .panel { border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-top: 12px; }
+  input[type=text], select { padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+  svg { border: 1px solid #ddd; border-radius: 8px; width: 100%; background: #fbfcfd; touch-action: none; }
+  svg text { font-family: system-ui, sans-serif; }
+  a { color: #1a73e8; }
+</style>
+</head>
+<body>
+<h2>Gambar {{ 'Desain' if jenis == 'desain' else 'Model' }} Penelitian</h2>
+<p>Geser kotak untuk mengatur letak. Klik kotak untuk mengubah tulisannya.</p>
+<div id="pesan" class="pesan" hidden></div>
+<div id="galat" class="galat" hidden></div>
+<svg id="kanvas" viewBox="0 0 1200 {{ tinggi }}">
+  <defs>
+    <marker id="panah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#10222e"></path>
+    </marker>
+  </defs>
+  <g id="lapis-panah"></g>
+  <g id="lapis-kotak"></g>
+</svg>
+
+<div class="panel" id="panel-ubah" hidden>
+  <label>Tulisan kotak</label>
+  <input type="text" id="isi-kotak" style="width: 60%">
+  {% if jenis == 'model' %}
+  <select id="peran-kotak">
+    <option value="X">X (bebas)</option>
+    <option value="Z">Z (perantara)</option>
+    <option value="Y">Y (hasil)</option>
+  </select>
+  {% endif %}
+  <button class="tombol kedua" type="button" onclick="simpanKotak()">Simpan</button>
+  <button class="tombol kedua" type="button" onclick="hapusKotak()">Hapus kotak</button>
+</div>
+
+<div class="panel" id="panel-alat" hidden>
+  {% if jenis == 'model' %}
+  <button class="tombol kedua" type="button" onclick="tambahKotak()">+ Kotak</button>
+  <button class="tombol kedua" type="button" id="tombol-sambung" onclick="modeSambung()">Sambungkan</button>
+  {% else %}
+  <button class="tombol kedua" type="button" onclick="tambahLangkah()">+ Langkah</button>
+  {% endif %}
+</div>
+
+<p>
+  <button class="tombol" type="button" id="tombol-terima" onclick="masukkan()">Terima</button>
+  <button class="tombol" type="button" id="tombol-selesai" onclick="masukkan()" hidden>Selesai (1 token)</button>
+  <button class="tombol kedua" type="button" id="tombol-tolak" onclick="tolak()">Tolak</button>
+  <a href="/naskah/{{ berkas.id }}/diagram">Batal</a>
+</p>
+<p id="keterangan-token">Selesai memotong 1 token.</p>
+<script>
+var JENIS = {{ jenis | tojson }};
+var FID = {{ berkas.id }};
+var state = {{ tata | tojson }};
+var diubah = false;
+var manual = false;
+var sambung = false;
+var sambungDari = null;
+var pilih = null;
+var seret = null;
+var WARNA = {X: '#1d7a8c', Z: '#e8833a', M: '#e8833a', Y: '#5c6bc0', langkah: '#1d7a8c'};
+var NS = 'http://www.w3.org/2000/svg';
+
+function el(nama, atribut) {
+  var e = document.createElementNS(NS, nama);
+  for (var k in atribut) e.setAttribute(k, atribut[k]);
+  return e;
+}
+function bungkus(teks, maks) {
+  var kata = String(teks || '').split(/\s+/).filter(Boolean);
+  var baris = [], kini = '';
+  kata.forEach(function (k) {
+    var coba = (kini + ' ' + k).trim();
+    if (coba.length <= maks || !kini) kini = coba;
+    else { baris.push(kini); kini = k; }
+  });
+  if (kini) baris.push(kini);
+  return baris.slice(0, 2);
+}
+function panahUntuk() {
+  if (JENIS === 'desain') {
+    var urut = state.kotak.slice().sort(function (a, b) { return a.y - b.y; });
+    var keluar = [];
+    for (var i = 0; i + 1 < urut.length; i++)
+      keluar.push({dari: urut[i].id, ke: urut[i + 1].id, label: '', gaya: 'lurus'});
+    return keluar;
+  }
+  return state.panah;
+}
+function gambarUlang() {
+  var lp = document.getElementById('lapis-panah');
+  var lk = document.getElementById('lapis-kotak');
+  lp.innerHTML = ''; lk.innerHTML = '';
+  var peta = {};
+  state.kotak.forEach(function (k) { peta[k.id] = k; });
+  panahUntuk().forEach(function (p) {
+    var a = peta[p.dari], b = peta[p.ke];
+    if (!a || !b) return;
+    var x1 = a.x + a.w, y1 = a.y + a.h / 2, x2 = b.x, y2 = b.y + b.h / 2;
+    if (JENIS === 'desain') { x1 = a.x + a.w / 2; y1 = a.y + a.h; x2 = b.x + b.w / 2; y2 = b.y; }
+    var g = el('line', {x1: x1, y1: y1, x2: x2, y2: y2, stroke: '#10222e', 'stroke-width': 4, 'marker-end': 'url(#panah)'});
+    if (p.gaya === 'putus') g.setAttribute('stroke-dasharray', '12 10');
+    lp.appendChild(g);
+    if (p.label) {
+      var t = el('text', {x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 8, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 'bold', fill: '#10222e'});
+      t.textContent = p.label;
+      lp.appendChild(t);
+    }
+  });
+  state.kotak.forEach(function (k) {
+    var g = el('g', {id: 'kotak-' + k.id, style: 'cursor: move'});
+    var r = el('rect', {x: k.x, y: k.y, width: k.w, height: k.h, rx: 12, fill: 'white', stroke: WARNA[k.peran] || '#1d7a8c', 'stroke-width': 4});
+    g.appendChild(r);
+    var maks = k.w > 400 ? 30 : 18;
+    var baris = bungkus(k.nama, maks);
+    var kode = el('text', {x: k.x + k.w / 2, y: k.y + 30, 'text-anchor': 'middle', 'font-size': 24, 'font-weight': 'bold', fill: '#10222e'});
+    kode.textContent = k.kode || '';
+    g.appendChild(kode);
+    baris.forEach(function (b, i) {
+      var t = el('text', {x: k.x + k.w / 2, y: k.y + 60 + i * 26, 'text-anchor': 'middle', 'font-size': 22, fill: '#10222e'});
+      t.textContent = b;
+      g.appendChild(t);
+    });
+    g.addEventListener('pointerdown', function (ev) { mulaiSeret(ev, k); });
+    lk.appendChild(g);
+  });
+}
+function tandaiUbah() {
+  if (!diubah) {
+    diubah = true;
+    document.getElementById('tombol-terima').hidden = true;
+    document.getElementById('tombol-selesai').hidden = false;
+  }
+}
+function mulaiSeret(ev, k) {
+  if (sambung) { klikSambung(k); return; }
+  var svg = document.getElementById('kanvas');
+  var pt = svg.createSVGPoint();
+  pt.x = ev.clientX; pt.y = ev.clientY;
+  var awal = pt.matrixTransform(svg.getScreenCTM().inverse());
+  seret = {k: k, dx: awal.x - k.x, dy: awal.y - k.y, gerak: false};
+  svg.setPointerCapture(ev.pointerId);
+  ev.preventDefault();
+}
+document.getElementById('kanvas').addEventListener('pointermove', function (ev) {
+  if (!seret) return;
+  var svg = document.getElementById('kanvas');
+  var pt = svg.createSVGPoint();
+  pt.x = ev.clientX; pt.y = ev.clientY;
+  var p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  var nx = Math.max(0, Math.min(1200 - seret.k.w, p.x - seret.dx));
+  var ny = Math.max(0, p.y - seret.dy);
+  if (Math.abs(nx - seret.k.x) + Math.abs(ny - seret.k.y) > 2) seret.gerak = true;
+  seret.k.x = Math.round(nx); seret.k.y = Math.round(ny);
+  gambarUlang();
+});
+document.getElementById('kanvas').addEventListener('pointerup', function (ev) {
+  if (!seret) return;
+  var k = seret.k, gerak = seret.gerak;
+  seret = null;
+  if (gerak) { tandaiUbah(); return; }
+  pilih = k;
+  document.getElementById('isi-kotak').value = k.nama;
+  var sel = document.getElementById('peran-kotak');
+  if (sel) sel.value = k.peran;
+  document.getElementById('panel-ubah').hidden = false;
+});
+function simpanKotak() {
+  if (!pilih) return;
+  pilih.nama = document.getElementById('isi-kotak').value.trim() || pilih.nama;
+  var sel = document.getElementById('peran-kotak');
+  if (sel && JENIS === 'model') pilih.peran = sel.value;
+  tandaiUbah(); gambarUlang();
+}
+function hapusKotak() {
+  if (!pilih) return;
+  state.kotak = state.kotak.filter(function (k) { return k.id !== pilih.id; });
+  state.panah = state.panah.filter(function (p) { return p.dari !== pilih.id && p.ke !== pilih.id; });
+  pilih = null;
+  document.getElementById('panel-ubah').hidden = true;
+  tandaiUbah(); gambarUlang();
+}
+function tolak() {
+  state.kotak = []; state.panah = [];
+  manual = true; pilih = null;
+  document.getElementById('panel-ubah').hidden = true;
+  document.getElementById('panel-alat').hidden = false;
+  document.getElementById('tombol-terima').hidden = true;
+  document.getElementById('tombol-selesai').hidden = false;
+  document.getElementById('tombol-tolak').hidden = true;
+  gambarUlang();
+}
+function tambahKotak() {
+  var n = state.kotak.length + 1;
+  state.kotak.push({id: 'k' + Date.now(), nama: 'Kotak baru', kode: 'X' + n, peran: 'X', x: 450, y: 300, w: 300, h: 90});
+  tandaiUbah(); gambarUlang();
+}
+function tambahLangkah() {
+  var n = state.kotak.length + 1;
+  var y = state.kotak.length ? Math.max.apply(null, state.kotak.map(function (k) { return k.y; })) + 140 : 60;
+  state.kotak.push({id: 's' + Date.now(), nama: 'Langkah baru', kode: String(n), peran: 'langkah', x: 300, y: y, w: 600, h: 90});
+  tandaiUbah(); gambarUlang();
+}
+function modeSambung() {
+  sambung = !sambung; sambungDari = null;
+  document.getElementById('tombol-sambung').textContent = sambung ? 'Batal sambung' : 'Sambungkan';
+}
+function klikSambung(k) {
+  if (!sambungDari) { sambungDari = k; return; }
+  if (sambungDari.id === k.id) return;
+  var n = state.panah.length + 1;
+  state.panah.push({dari: sambungDari.id, ke: k.id, label: 'H' + n, gaya: 'lurus'});
+  sambungDari = null; sambung = false;
+  document.getElementById('tombol-sambung').textContent = 'Sambungkan';
+  tandaiUbah(); gambarUlang();
+}
+function masukkan() {
+  var pesan = document.getElementById('pesan');
+  var galat = document.getElementById('galat');
+  pesan.hidden = true; galat.hidden = true;
+  fetch('/api/diagram/' + FID + '/selesai', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({jenis: JENIS, kotak: state.kotak, panah: state.panah})
+  }).then(function (r) { return r.json(); }).then(function (d) {
+    if (!d.ok) {
+      galat.textContent = (d.detail && d.detail.pesan) || d.pesan || 'Gagal.';
+      galat.hidden = false;
+      return;
+    }
+    if (d.sedang_jalan) {
+      pesan.textContent = 'Masih ada gambar berjalan. Tunggu sebentar.';
+      pesan.hidden = false;
+      return;
+    }
+    pesan.textContent = 'Sedang dimasukkan, tunggu sebentar.';
+    pesan.hidden = false;
+    var kode = d.kode;
+    var timer = setInterval(function () {
+      fetch('/api/diagram/' + FID + '/status?kode=' + encodeURIComponent(kode))
+        .then(function (r) { return r.json(); }).then(function (s) {
+          var t = s.terakhir;
+          if (!t) return;
+          if (t.status === 'selesai') {
+            clearInterval(timer);
+            pesan.textContent = (t.hasil || 'Gambar sudah masuk.') + ' ';
+            var a = document.createElement('a');
+            a.href = '/naskah'; a.textContent = 'Kembali ke naskah';
+            pesan.appendChild(a);
+          } else if (t.status === 'gagal') {
+            clearInterval(timer);
+            galat.textContent = 'Gagal: ' + (t.galat || 'coba lagi.') + ' Token kembali.';
+            galat.hidden = false;
+            pesan.hidden = true;
+          }
+        });
+    }, 3000);
+  }).catch(function () {
+    galat.textContent = 'Gagal mengirim. Coba lagi.';
+    galat.hidden = false;
+  });
+}
+gambarUlang();
+</script>
+</body>
+</html>

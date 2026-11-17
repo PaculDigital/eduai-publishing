@@ -1,0 +1,47 @@
+{# Formulir kecil Desain Penelitian (17 Nov 2026).
+   Kata pendek, Bahasa Indonesia polos. #}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Desain Penelitian - {{ berkas.nama }}</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 16px; }
+  .tombol { background: #1a73e8; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 15px; }
+  label { display: block; margin: 8px 0 2px; font-weight: 600; }
+  select { padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; width: 100%; }
+  a { color: #1a73e8; }
+</style>
+</head>
+<body>
+<h2>Desain Penelitian</h2>
+<form method="post" action="/naskah/{{ berkas.id }}/diagram/desain">
+  <label>Jenis</label>
+  <select name="jenis" id="pilih-jenis" onchange="gantiDesain()">
+    <option value="kuantitatif" {% if model.jenis == 'kuantitatif' %}selected{% endif %}>Kuantitatif</option>
+    <option value="kualitatif" {% if model.jenis == 'kualitatif' %}selected{% endif %}>Kualitatif</option>
+    <option value="campuran" {% if model.jenis == 'campuran' %}selected{% endif %}>Campuran</option>
+  </select>
+  <label>Desain</label>
+  <select name="desain" id="pilih-desain"></select>
+  <p><button class="tombol" type="submit">Lihat draf</button>
+  <a href="/naskah/{{ berkas.id }}/diagram">Batal</a></p>
+</form>
+<script>
+var pilihan = {{ pilihan | tojson }};
+var awal = {{ model.desain | tojson }} || '';
+function gantiDesain() {
+  var j = document.getElementById('pilih-jenis').value;
+  var s = document.getElementById('pilih-desain');
+  s.innerHTML = '';
+  (pilihan[j] || []).forEach(function (d) {
+    var o = document.createElement('option');
+    o.value = d; o.textContent = d.charAt(0).toUpperCase() + d.slice(1);
+    if (d === awal) o.selected = true;
+    s.appendChild(o);
+  });
+}
+gantiDesain();
+</script>
+</body>
+</html>
