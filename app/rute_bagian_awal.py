@@ -362,6 +362,13 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
     # Aturan Judul: judul sampul mengisi form yang kosong, supaya sampul
     # yang dibuat ulang tidak kehilangan judul (17 Nov 2026).
     data = BA.judul_efektif_form(data, paragraf)
+    # Aturan yang sama untuk Program Studi/Fakultas: nilai dari naskah
+    # mengisi form yang kosong, supaya halaman Judul/Persetujuan tidak
+    # kosong padahal naskah menyebutkannya (cacat uji live 17 Nov 2026,
+    # fid 81: 'Program Studi:'/'Fakultas:' kosong di Judul dan
+    # Persetujuan, padahal sampul 'Sarjana Manajemen' dan pengesahan
+    # 'Fakultas Ekonomi dan Bisnis').
+    data = BA.prodi_fakultas_efektif_form(data, paragraf)
     # Keterangan hanya dipindai dari badan (mulai Bab I): baris di daftar
     # lama ikut terpindai bila seluruh dokumen dibaca, lalu entri ganda
     # saat Perbarui. Badan dipakai juga untuk melengkapi entri Daftar Isi
@@ -375,7 +382,10 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
         'daftar_gambar': [],
         'daftar_lampiran': [],
     }, kata_pengantar=kata_pengantar, abstrak=abstrak)
-    ket = BA.entri_daftar_keterangan(_badan)
+    ket = BA.entri_daftar_keterangan(
+        _badan,
+        gaya=[BA._gaya_dari_xml(x) for _, x in (spans or [])[_idx_bab1:]]
+        if spans and len(spans) == len(paragraf or []) else None)
     for kunci in ('daftar_tabel', 'daftar_gambar', 'daftar_lampiran'):
         for item in susun:
             if item[0] == kunci:

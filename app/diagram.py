@@ -581,7 +581,10 @@ def segarkan_daftar_gambar(path) -> dict:
     if not indeks:
         return {'ok': False, 'jumlah': 0,
                 'sebab': 'Daftar Gambar belum ada di naskah.'}
-    entri = BA.entri_daftar_keterangan(teks_par).get('daftar_gambar', [])
+    entri = BA.entri_daftar_keterangan(
+        teks_par,
+        gaya=[BA._gaya_dari_xml(m.group(0)) for m in cocok]).get(
+            'daftar_gambar', [])
     judul_entri = [e['judul'] for e in entri]
     # Paragraf entri lama: indeks[1:] (indeks[0] = judul seksi).
     lama = indeks[1:]
