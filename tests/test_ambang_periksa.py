@@ -23,6 +23,8 @@ Yang diuji:
   9. batas laju otomatis 24 jam (boleh_otomatis_jalan).
   10. fail-open perbandingan: gagal membandingkan -> tombol aktif,
       otomatis tetap mati.
+  11. buang gema panel 'Struktur naskah' (17 Nov 2026): subbab berurutan
+      yang judulnya sama sesudah dinormalisasi dibuang di ringkas_peta.
 """
 import hashlib
 import importlib.util
@@ -614,6 +616,63 @@ def main():
     cek('fail-open: gagal membandingkan -> tombol aktif, otomatis mati',
         d['berubah_berarti'] and not d['berubah_besar']
         and d.get('otomatis') is False)
+
+    # ── 11. BUANG GEMA PANEL 'STRUKTUR NASKAH' (17 Nov 2026) ───────────
+    #     Aturan yang sama dengan perbaikan Daftar Isi f1ed9e3, di
+    #     ringkas_peta (satu pembangun ringkasan yang dipakai panel):
+    #     subbab berurutan yang judulnya sama sesudah dinormalisasi
+    #     dibuang, yang pertama dipertahankan.
+    def _peta_gema(baris, label):
+        return {'peta_surveyor': {'baris': list(baris),
+                                  'label': {str(i): lab
+                                            for i, lab in enumerate(label)}},
+                'hakim': {'jumlah_ragu': 0, 'jumlah_curiga': 0}}
+
+    gema = _peta_gema(
+        ['BAB I PENDAHULUAN',
+         '1.2 Perkembangan Teori dan Kajian Transisi',
+         'SUB-BAB Perkembangan Teori dan Kajian Transisi',
+         '1.4 Posisi dan Sintesis Penulis',
+         'Posisi dan Sintesis Penulis',
+         'Ringkasan Bab'],
+        ['bab', 'subbab', 'subbab', 'subbab', 'subbab', 'subbab'])
+    rg = st.ringkas_peta(gema)
+    cek('gema panel: 1.2 dan 1.4 tinggal satu, SUB-BAB hilang',
+        [s['teks'] for s in rg['bab'][0]['subbab']] == [
+            '1.2 Perkembangan Teori dan Kajian Transisi',
+            '1.4 Posisi dan Sintesis Penulis', 'Ringkasan Bab'])
+    gema2 = _peta_gema(
+        ['BAB I PENDAHULUAN', '1.1 Latar', 'Ringkasan Bab',
+         'BAB II TINJAUAN', '2.1 Teori', 'Ringkasan Bab'],
+        ['bab', 'subbab', 'subbab', 'bab', 'subbab', 'subbab'])
+    rg2 = st.ringkas_peta(gema2)
+    cek('gema panel: judul sah berulang tidak berurutan tetap ada',
+        sum(1 for b in rg2['bab'] for s in b['subbab']
+            if s['teks'] == 'Ringkasan Bab') == 2)
+    # Penanda diperiksa: gema dipertahankan hanya bila SEMUA sudah
+    # diperiksa; satu antre -> penanda tetap 'sedang diperiksa'.
+    rg3 = st.ringkas_peta(gema, menunggu_idx={1})
+    cek('gema panel: gema pertama antre -> yang dipertahankan antre',
+        rg3['bab'][0]['subbab'][0]['diperiksa'] is False
+        and rg3['bab'][0]['diperiksa'] is False)
+    rg4 = st.ringkas_peta(gema, menunggu_idx={2})
+    cek('gema panel: gema kedua antre -> yang dipertahankan ikut antre',
+        rg4['bab'][0]['subbab'][0]['diperiksa'] is False)
+    # Peta tersimpan asli file 126 (pemeriksaan 16 Nov 08:25).
+    peta126 = json.loads(
+        (ROOT / 'tests' / 'fixtures' / 'struktur'
+         / 'peta126.json').read_text(encoding='utf-8'))
+    r126 = st.ringkas_peta(peta126)
+    semua126 = [s['teks'] for b in r126['bab'] for s in b['subbab']]
+    cek('gema panel file 126: 1.2 dan 1.4 masing-masing satu kali',
+        sum(1 for t in semua126
+            if 'Perkembangan Teori dan Kajian Transisi' in t) == 1
+        and sum(1 for t in semua126
+                if 'Posisi dan Sintesis Penulis atas Ontologi' in t) == 1
+        and not any('SUB-BAB' in t for t in semua126))
+    cek('gema panel file 126: Ringkasan Bab tetap 5, bab tetap 3',
+        sum(1 for t in semua126 if t == 'Ringkasan Bab') == 5
+        and len(r126['bab']) == 3 and len(semua126) == 50)
 
     print(f'\n{len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
