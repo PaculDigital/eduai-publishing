@@ -2550,6 +2550,40 @@ def _teks_dari_xml(par_xml: str) -> str:
     return _teks_par_xml(par_xml)
 
 
+_RE_T_ISI = re.compile(r'(<w:t[^>]*>)([^<]*)(</w:t>)')
+
+
+def _isi_label_kosong_xml(par_xml: str, label: str, nilai: str) -> str:
+    """XML paragraf dengan baris label kosong terisi nilai.
+
+    Hanya bila teks paragraf (gabungan semua w:t, spasi dinormalisasi)
+    persis label kosong ('Program Studi :' / 'Fakultas :'): nilai
+    ditulis ke w:t pertama, w:t lain dikosongkan. Baris yang sudah
+    berisi nilai tidak disentuh (tulisan mahasiswa menang). pPr dan
+    rPr asli tetap utuh, tidak seperti membangun paragraf baru.
+    Dipakai halaman form yang dipertahankan (cacat uji live 17 Nov 2026,
+    fid 81): isian efektif dari naskah hanya mengalir ke susun_bagian
+    (halaman yang dibuat ulang), sementara XML sampul (berisi halaman
+    Judul) dan Persetujuan yang dipertahankan tetap kosong.
+    """
+    nilai = (nilai or '').strip()
+    if not nilai:
+        return par_xml
+    cocoks = list(_RE_T_ISI.finditer(par_xml or ''))
+    if not cocoks:
+        return par_xml
+    normal = ' '.join(''.join(m.group(2) for m in cocoks).split())
+    if normal not in (label + ' :', label + ':'):
+        return par_xml
+    baru = label + ' : ' + nilai
+    keluar = par_xml
+    for i in range(len(cocoks) - 1, -1, -1):
+        m = cocoks[i]
+        isi = baru if i == 0 else ''
+        keluar = keluar[:m.start(2)] + isi + keluar[m.end(2):]
+    return keluar
+
+
 def _awali_jeda_halaman(par_xml: str) -> str:
     """Awali paragraf dengan jeda halaman (tiap seksi mulai di halaman
     baru). Jeda berupa run <w:br w:type="page"/> di dalam paragraf yang

@@ -237,6 +237,15 @@ async def bagian_awal_halaman(
     keadaan = _keadaan(db, fid, u.id, fb)
     data = _data_awal(db, fid, u)
     paragraf = _paragraf_docx(_path_berkas(fb))
+    # Isian efektif tampil di form: judul sampul + prodi/fakultas dari
+    # naskah mengisi form yang kosong (aturan yang sama dengan judul).
+    # Tanpa ini kolom form tetap kosong padahal naskah menyebut nilainya,
+    # dan rencana update dihitung dari data mentah sehingga halaman yang
+    # dipertahankan tidak pernah terisi (cacat uji live 17 Nov 2026,
+    # fid 81: rencana 'tidak berubah' karena data mentah kosong sama
+    # dengan data lama kosong).
+    data = BA.judul_efektif_form(data, paragraf)
+    data = BA.prodi_fakultas_efektif_form(data, paragraf)
     baca = BA.baca_bagian_awal(paragraf)
     hasil = keadaan['hasil']
     judul_naskah = BA.judul_sampul(paragraf)
@@ -311,6 +320,15 @@ async def bagian_awal_konfirmasi(
     data = {k: (form.get(k) or '') for k in BA.KUNCI_FORM}
     data['judul'] = form.get('judul') or ''
     data = BA.bersihkan_data(data)
+    # Isian efektif SEBELUM simpan + rencana: judul sampul dan
+    # prodi/fakultas dari naskah mengisi form yang kosong, supaya rencana
+    # melihat perubahan data (halaman dibuat ulang, bukan 'tidak
+    # berubah') dan nilai tersimpan tampil di form sesudah jalan (cacat
+    # uji live 17 Nov 2026, fid 81: rencana 'tidak berubah' karena data
+    # mentah kosong sama dengan data lama kosong).
+    paragraf = _paragraf_docx(_path_berkas(fb))
+    data = BA.judul_efektif_form(data, paragraf)
+    data = BA.prodi_fakultas_efektif_form(data, paragraf)
     BA.simpan_data(db, fid, data)
     BA.simpan_profil(db, u.id, data)
     keadaan = _keadaan(db, fid, u.id, fb)
@@ -319,7 +337,6 @@ async def bagian_awal_konfirmasi(
         return RedirectResponse(
             f'/naskah/{fid}/bagian-awal?pesan={_pesan_ke(pesan)}',
             status_code=303)
-    paragraf = _paragraf_docx(_path_berkas(fb))
     baca = BA.baca_bagian_awal(paragraf)
     hasil = keadaan['hasil']
     data_lama = hasil.get('data') or {}
@@ -460,6 +477,24 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
                         xml = xml[:_sisip] + [
                             BA._xml_paragraf(_nama, _ppr_nama)] \
                             + xml[_sisip:]
+                # Baris label kosong di halaman form yang dipertahankan:
+                # 'Program Studi :' / 'Fakultas :' diisi dari data
+                # efektif (naskah bila form kosong). Tanpa ini, isian
+                # efektif hanya mengalir ke susun_bagian (halaman yang
+                # dibuat ulang), sementara halaman Judul (di dalam XML
+                # sampul) dan Persetujuan yang dipertahankan tetap
+                # kosong (cacat uji live 17 Nov 2026, fid 81). Hanya
+                # baris kosong yang diisi; baris berisi tidak disentuh.
+                if kunci in BA.DATA_FORM:
+                    _prodi = ' '.join(
+                        str((data or {}).get('prodi', '') or '').split())
+                    _fakultas = ' '.join(
+                        str((data or {}).get('fakultas', '') or '').split())
+                    if _prodi or _fakultas:
+                        xml = [BA._isi_label_kosong_xml(
+                            x, 'Program Studi', _prodi) for x in xml]
+                        xml = [BA._isi_label_kosong_xml(
+                            x, 'Fakultas', _fakultas) for x in xml]
                 keluar.append({'kunci': kunci, 'judul': label, 'baris': [],
                                'xml': xml, 'ppr': ''})
                 if kunci == 'sampul':
