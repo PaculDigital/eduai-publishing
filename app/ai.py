@@ -4416,6 +4416,18 @@ async def peta_mulai(
             #  lama apa pun modenya ('peta_awal' maupun 'revisi'), 0 Jev.
             #  Kunci internal (peta_surveyor/sidik_bagian/hakim_bagian)
             #  hanya untuk DB — dibuang sebelum dikembalikan ke layar.
+            #  STEMPEL (17 Nov 2026, cacat gerbang fid 81): pemeriksaan
+            #  ulang yang menemukan naskah tak berubah TETAP pemeriksaan
+            #  (layar menampilkan "Terakhir diperiksa" dari peta_dibuat),
+            #  jadi stempel diperbarui walau petanya dipakai lagi. Efek
+            #  samping: jendela 24 jam pemeriksaan otomatis dihitung dari
+            #  pemeriksaan manual terakhir ini.
+            try:
+                from .models import _now as _sekarang_stempel
+                prof.peta_dibuat = _sekarang_stempel()
+                db.commit()
+            except Exception:                              # noqa: BLE001
+                db.rollback()
             try:
                 simpan = json.loads(prof.peta_json)
                 from . import revisi_hemat as _rh
@@ -4443,6 +4455,16 @@ async def peta_mulai(
                 peta_json=prof.peta_json, peta_sidik=prof.peta_sidik,
                 sidik_kini=sid, teks_kini_bersih=_buang_g(teks))
             if not _g.get('berubah_berarti'):
+                #  STEMPEL (17 Nov 2026, cacat gerbang fid 81): sama
+                #  seperti pagar C2 di atas — perubahan di bawah ambang
+                #  tetap pemeriksaan, stempel diperbarui walau peta lama
+                #  yang dikembalikan.
+                try:
+                    from .models import _now as _sekarang_stempel2
+                    prof.peta_dibuat = _sekarang_stempel2()
+                    db.commit()
+                except Exception:                          # noqa: BLE001
+                    db.rollback()
                 _simpan_lama = _rh_g.buang_kunci_internal(
                     json.loads(prof.peta_json))
                 _simpan_lama['ok'] = True
