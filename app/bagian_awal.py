@@ -476,6 +476,94 @@ def judul_efektif_form(data: dict, paragraf) -> dict:
     return d
 
 
+_KATA_BERHENTI_PRODI = ('fakultas', 'universitas', 'institut',
+                        'politeknik', 'sekolah', 'program', 'oleh',
+                        'nim', 'nama')
+
+
+def _nilai_prodi_fakultas(s: str) -> str:
+    """Nilai Program Studi/Fakultas sesudah labelnya, atau ''.
+
+    Ambil kata demi kata selama berawalan huruf besar ('Manajemen',
+    'Ekonomi dan Bisnis'); berhenti di kata kunci lembaga
+    ('Fakultas', 'Universitas', ...) atau kata berawalan huruf kecil
+    yang bukan 'dan' penghubung. 'Program Studi Manajemen Fakultas
+    Ekonomi dan Bisnis' -> 'Manajemen' (bukan seluruh ekor baris).
+    """
+    kata = [k.strip(' ,;:') for k in str(s or '').split()]
+    kata = [k for k in kata if k]
+    keluar: list[str] = []
+    for i, k in enumerate(kata):
+        rendah = k.lower()
+        if rendah in _KATA_BERHENTI_PRODI:
+            break
+        if k[0].isupper():
+            keluar.append(k)
+            continue
+        if rendah in ('dan', '&') and i + 1 < len(kata) \
+                and kata[i + 1][:1].isupper():
+            keluar.append(k)
+            continue
+        break
+    return ' '.join(keluar).strip(' ,;:')
+
+
+def prodi_fakultas_dari_dokumen(paragraf) -> dict:
+    """{'prodi': ..., 'fakultas': ...} dari naskah, atau '' bila tak ada.
+
+    Sumber (fid 81): 'Program Studi Manajemen' (persetujuan/kata
+    pengantar/riwayat hidup), 'Fakultas Ekonomi dan Bisnis'
+    (pengesahan/kata pengantar/riwayat hidup), dan cadangan prodi
+    'Memperoleh Gelar Sarjana Manajemen' (sampul). Yang eksplisit
+    menang atas cadangan; kemunculan pertama menang (sampul dulu).
+    """
+    prodi = ''
+    fakultas = ''
+    prodi_cadangan = ''
+    for p in (paragraf or []):
+        s = ' '.join(str(p or '').split()).strip()
+        if not s:
+            continue
+        rendah = s.lower()
+        if not prodi and 'program studi' in rendah:
+            m = re.search(r'program studi\s*:?\s*(.*)', s,
+                          re.IGNORECASE)
+            if m:
+                prodi = _nilai_prodi_fakultas(m.group(1))
+        if not fakultas and 'fakultas' in rendah:
+            m = re.search(r'fakultas\s*:?\s*(.*)', s, re.IGNORECASE)
+            if m:
+                fakultas = _nilai_prodi_fakultas(m.group(1))
+        if not prodi_cadangan and 'sarjana' in rendah:
+            m = re.search(r'sarjana\s+([A-Z][^,;]*)', s, re.IGNORECASE)
+            if m:
+                prodi_cadangan = _nilai_prodi_fakultas(m.group(1))
+        if prodi and fakultas:
+            break
+    if not prodi:
+        prodi = prodi_cadangan
+    return {'prodi': prodi, 'fakultas': fakultas}
+
+
+def prodi_fakultas_efektif_form(data: dict, paragraf) -> dict:
+    """Data form dengan prodi/fakultas diisi dari naskah bila form kosong.
+
+    Aturan yang sama dengan judul (17 Nov 2026): nilai dari dokumen
+    mengisi form yang kosong; bila form terisi, form yang menang.
+    Mengembalikan salinan data (data asli tidak diubah).
+    """
+    d = dict(data or {})
+    if not (d.get('prodi') or '').strip() \
+            or not (d.get('fakultas') or '').strip():
+        dari = prodi_fakultas_dari_dokumen(paragraf or [])
+        if not (d.get('prodi') or '').strip() and dari.get('prodi'):
+            d['prodi'] = dari['prodi']
+        if not (d.get('fakultas') or '').strip() \
+                and dari.get('fakultas'):
+            d['fakultas'] = dari['fakultas']
+    return d
+
+
 def judul_bab_pertama(peta_json, teks: str = '') -> str:
     """Judul Bab I dari peta (tanpa awalan 'BAB I'), atau '' bila tak ada."""
     try:
@@ -1505,7 +1593,8 @@ def cari_awal_badan_render(halaman_render) -> int | None:
 
 
 _POLAA_NOMOR_AWAL = re.compile(
-    r'^(?:\d+(?:\.\d+)*|bab\s+(?:[ivx]+|\d+))\.?\s+', re.IGNORECASE)
+    r'^(?:\d+(?:\.\d+)*\.?|bab\s+(?:[ivx]+|\d+)\.?|[a-z]\.)\s+',
+    re.IGNORECASE)
 
 
 def _tanpa_nomor_awal(baris: str) -> str:
@@ -1548,6 +1637,20 @@ def _judul_bernomo_di_halaman(teks_halaman: str, judul: str) -> bool:
             if gabung_titik != cari \
                     and _tanpa_nomor_awal(gabung_titik) == cari:
                 return True
+        # Nomor di baris sendiri di atas judul: render OnlyOffice
+        # memecah penomoran daftar ('1.' lalu 'a.' lalu 'Uji
+        # Validitas', hal. 72 fid 81) atau menyisipkan kata ekor
+        # ('4.1.2.4' lalu 'berikut:' lalu 'Koefisien Determinasi
+        # (R2)', hal. 78 fid 81), jadi judulnya tampil telanjang
+        # padahal bernomor. Baris yang hanya nomor (angka, 'BAB n',
+        # atau satu huruf 'a.') dalam 2 baris di atas judul telanjang
+        # yang sama persis = judul bernomor. Tanpa ini lintasan
+        # bernomor melewati judul babnya sendiri dan jatuh ke nomor
+        # lampiran (106/110; cacat uji live 17 Nov 2026, fid 81).
+        if b == cari:
+            for j in range(max(0, i - 2), i):
+                if _baris_hanya_nomor(baris[j]):
+                    return True
     nomor_bab = _nomor_penanda_judul(judul)
     if nomor_bab is not None \
             and _halaman_memuat_penanda(teks_halaman, nomor_bab):
@@ -1555,17 +1658,30 @@ def _judul_bernomo_di_halaman(teks_halaman: str, judul: str) -> bool:
     return False
 
 
-def _judul_cocok_di_halaman(teks_halaman: str, judul: str) -> bool:
-    """Apakah judul muncul sebagai JUDUL badan di halaman ini?
+def _baris_hanya_nomor(baris: str) -> bool:
+    """True bila baris hanya penanda nomor ('1.', '4.1.2.4', 'a.', 'BAB 2').
+
+    Dipakai lintasan bernomor untuk nomor yang rendernya jatuh di baris
+    sendiri di atas judul (fid 81, hal. 72/78). Baris isi biasa tidak
+    pernah cocok: harus SELURUH baris berupa nomor.
+    """
+    s = (baris or '').strip()
+    if not s:
+        return False
+    return bool(re.fullmatch(r'(?:\d+(?:\.\d+)*\.?|bab\s+(?:[ivx]+|\d+)\.?'
+                             r'|[a-z]\.)', s, re.IGNORECASE))
+
+
+def _judul_cocok_baris_tunggal(teks_halaman: str, judul: str) -> bool:
+    """Apakah judul muncul sebagai JUDUL badan di satu baris halaman?
 
     Hanya baris yang sama persis dengan judul (sesudah nomor depannya
-    dibuang), atau dua baris berurutan yang digabung sama dengan judul
-    ('BAB 1' + 'PENDAHULUAN'). Baris yang DIAWALI judul lalu isi badan
-    ('Digital Marketing adalah ...') BUKAN judul, jadi tidak dihitung:
-    dulu cabang itu yang membuat subbab menunjuk halaman penyebutan
-    pertama di badan (cacat uji live 17 Nov 2026, fid 81).
-    Pencarian selalu dimulai dari halaman badan, jadi baris entri daftar
-    (yang ada di halaman daftar) tidak ikut terhitung.
+    dibuang). Dipakai lintasan kedua pencari nomor: baris tunggal lebih
+    kuat daripada gabung dua baris, karena gabung juga menyambung
+    kalimat badan yang terpotong baris ('variabel Digital' + 'Marketing'
+    di tabel Bab I, hal. 30 fid 81, bukan judul; cacat uji live
+    17 Nov 2026). Penanda bab dan aturan baris isi pertama ikut di
+    sini (keduanya baris tunggal).
     """
     cari = _normalisasi_cari(judul)
     if not cari:
@@ -1575,14 +1691,6 @@ def _judul_cocok_di_halaman(teks_halaman: str, judul: str) -> bool:
     for i, b in enumerate(baris):
         if b == cari or _tanpa_nomor_awal(b) == cari:
             return True
-        if i + 1 < len(baris):
-            gabung = b + ' ' + baris[i + 1]
-            if gabung == cari or _tanpa_nomor_awal(gabung) == cari:
-                return True
-            gabung_titik = b + '. ' + baris[i + 1]
-            if gabung_titik == cari \
-                    or _tanpa_nomor_awal(gabung_titik) == cari:
-                return True
     # Judul berpenanda ('BAB 3. Perilaku ...') cocok bila halaman
     # memuat penanda telanjangnya ('BAB 3'): judul badan bisa berbeda
     # dari judul di Daftar Isi (naskah buku).
@@ -1603,6 +1711,37 @@ def _judul_cocok_di_halaman(teks_halaman: str, judul: str) -> bool:
             if _POLAA_NOMOR_AWAL.match(pertama) and (
                     pertama.startswith(cari + ' ')
                     or _tanpa_nomor_awal(pertama).startswith(cari + ' ')):
+                return True
+    return False
+
+
+def _judul_cocok_di_halaman(teks_halaman: str, judul: str) -> bool:
+    """Apakah judul muncul sebagai JUDUL badan di halaman ini?
+
+    Hanya baris yang sama persis dengan judul (sesudah nomor depannya
+    dibuang), atau dua baris berurutan yang digabung sama dengan judul
+    ('BAB 1' + 'PENDAHULUAN'). Baris yang DIAWALI judul lalu isi badan
+    ('Digital Marketing adalah ...') BUKAN judul, jadi tidak dihitung:
+    dulu cabang itu yang membuat subbab menunjuk halaman penyebutan
+    pertama di badan (cacat uji live 17 Nov 2026, fid 81).
+    Pencarian selalu dimulai dari halaman badan, jadi baris entri daftar
+    (yang ada di halaman daftar) tidak ikut terhitung.
+    """
+    if _judul_cocok_baris_tunggal(teks_halaman, judul):
+        return True
+    cari = _normalisasi_cari(judul)
+    if not cari:
+        return False
+    baris = [_normalisasi_cari(b) for b in (teks_halaman or '').splitlines()]
+    baris = [b for b in baris if b]
+    for i, b in enumerate(baris):
+        if i + 1 < len(baris):
+            gabung = b + ' ' + baris[i + 1]
+            if gabung == cari or _tanpa_nomor_awal(gabung) == cari:
+                return True
+            gabung_titik = b + '. ' + baris[i + 1]
+            if gabung_titik == cari \
+                    or _tanpa_nomor_awal(gabung_titik) == cari:
                 return True
     return False
 
@@ -1720,12 +1859,20 @@ def _cari_nomor_dari_render(halaman_render, judul: str,
             return ke_romawi(i + 1), i
     absolut = _mode_nomor_badan(halaman_render, awal)
     mulai = max(awal, mulai_badan or awal)
-    # Dua lintasan: judul bernomor dulu (lebih kuat daripada baris
-    # telanjang yang sama), lalu baris telanjang. Tanpa ini subbab
-    # menunjuk penyebutan di bab lain ('Digital Marketing' di Bab I
-    # halaman 27, padahal judul 2.1.2 di halaman 41; cacat uji live
-    # 17 Nov 2026, fid 81).
-    for cocok in (_judul_bernomo_di_halaman, _judul_cocok_di_halaman):
+    # Tiga lintasan, dari yang terkuat: judul bernomor dulu (lebih kuat
+    # daripada baris telanjang yang sama; tanpa ini subbab menunjuk
+    # penyebutan di bab lain, 'Digital Marketing' di Bab I halaman 27
+    # padahal judul 2.1.2 di halaman 41; cacat uji live 17 Nov 2026,
+    # fid 81), lalu baris telanjang TUNGGAL, lalu gabung dua baris.
+    # Baris tunggal dipisah dari gabung karena gabung juga menyambung
+    # kalimat badan yang terpotong baris ('variabel Digital' +
+    # 'Marketing' di tabel Bab I hal. 30, bukan judul 'Variabel
+    # Digital Marketing' Bab IV hal. 72; cacat yang sama). Dan judul
+    # bernomor yang rendernya memecah nomor ke baris sendiri kini
+    # dikenali lintasan pertama, supaya judul babnya sendiri (hal. 72/
+    # 78) tidak kalah dari nomor lampiran (106/110; cacat yang sama).
+    for cocok in (_judul_bernomo_di_halaman, _judul_cocok_baris_tunggal,
+                  _judul_cocok_di_halaman):
         for i in range(mulai, len(halaman_render)):
             if cocok(halaman_render[i], judul):
                 if absolut == 'absolut':
@@ -1917,7 +2064,11 @@ def entri_daftar_isi(peta_json, halaman_render=None,
         for bab in _str.ringkas_peta(peta_json).get('bab', []):
             judul = str(bab.get('judul', '') or '').strip()
             n_bab = _nomor_penanda_judul(judul)
-            if judul:
+            # Kelompok LAMPIRAN bukan bab: subbabnya tetap masuk
+            # Daftar Isi (level-1), tapi judul 'LAMPIRAN' sendiri
+            # tidak ditulis sebagai entri level-0 (Daftar Isi tidak
+            # memuat judul LAMPIRAN; keputusan desain 17 Nov 2026).
+            if judul and _normalisasi_cari(judul) != 'lampiran':
                 keluar.append({'judul': judul, 'level': 0, 'bab': n_bab,
                                'halaman': nomor_halaman_dari_render(
                                    halaman_render, judul)})
@@ -2071,22 +2222,56 @@ def entri_daftar_isi(peta_json, halaman_render=None,
     return bersih
 
 
-_POLAA_TABEL = re.compile(r'^\s*Tabel\s+\d+\.\d+\b.*', re.IGNORECASE)
-_POLAA_GAMBAR = re.compile(r'^\s*Gambar\s+\d+\.\d+\b.*', re.IGNORECASE)
+_POLAA_TABEL = re.compile(r'^\s*Tabel\s+\d+\.\s*\d+\b.*', re.IGNORECASE)
+_POLAA_GAMBAR = re.compile(r'^\s*Gambar\s+\d+\.\s*\d+\b.*', re.IGNORECASE)
 _POLAA_LAMPIRAN = re.compile(r'^\s*Lampiran\s+\d+\b.*', re.IGNORECASE)
+
+# Gaya paragraf keterangan asli (Word/OnlyOffice menaruh nomor + judul
+# keterangan dengan gaya Caption; kalimat badan bergaya biasa).
+_GAYA_KETERANGAN = {'caption', 'stylecaption'}
+
+# Kata kerja pembuka kalimat narasi badan ('Tabel 4.1 menunjukkan
+# bahwa ...' bukan keterangan tabel).
+_KATA_NARASI_KETERANGAN = ('menunjukkan', 'menunjukan', 'memperlihatkan',
+                           'menyajikan', 'menampilkan', 'menggambarkan')
+
+
+def _baris_narasi_keterangan(s: str) -> bool:
+    """True bila baris 'Tabel/Gambar N.N ...' adalah kalimat narasi badan.
+
+    Kalimat badan diawali kata kerja narasi ('menunjukkan', ...) atau
+    memuat ' bahwa ' sesudah nomornya; keterangan asli adalah frasa
+    judul ('Tabel 4.1 Hasil Uji ...') tanpa kata kerja narasi.
+    (cacat uji live 17 Nov 2026, fid 81: Daftar Tabel berisi 4 kalimat
+    narasi, tanpa keterangan asli; keterangan asli tertulis
+    'Tabel 4. 1' dengan spasi sesudah titik, jadi pola lama yang
+    menuntut 'N.N' rapat tidak pernah mengenalinya.)
+    """
+    rendah = _normalisasi_cari(s)
+    sisa = re.sub(r'^(?:tabel|gambar)\s+\d+\.\s*\d+\s*', '', rendah)
+    if not sisa:
+        return False
+    if any(sisa.startswith(k) for k in _KATA_NARASI_KETERANGAN):
+        return True
+    return ' bahwa ' in f' {sisa} '
 
 
 def entri_daftar_keterangan(paragraf: list[str],
-                            halaman_render=None) -> dict:
+                            halaman_render=None,
+                            gaya: list[str] | None = None) -> dict:
     """Entri Daftar Tabel/Gambar/Lampiran dari baris keterangan naskah.
 
     Satu judul keterangan hanya masuk sekali: baris yang sama bisa
     muncul dua kali di naskah (misalnya di Daftar Tabel lama dan di
     badan), dan tanpa dedup entri daftar ikut ganda saat Perbarui.
+    `gaya`: nama gaya tiap paragraf, sejajar `paragraf` (bila ada).
+    Keterangan asli bergaya Caption/StyleCaption; kalimat badan
+    bergaya biasa yang diawali 'Tabel N.N'/'Gambar N.N' ditolak bila
+    naratif. Tanpa info gaya, uji naratif saja yang dipakai.
     """
     keluar = {'daftar_tabel': [], 'daftar_gambar': [], 'daftar_lampiran': []}
     sudah: set[str] = set()
-    for teks in (paragraf or []):
+    for idx, teks in enumerate(paragraf or []):
         s = ' '.join(str(teks or '').split()).strip()
         if not s or _POLAA_TOC.search(s):
             continue
@@ -2098,6 +2283,12 @@ def entri_daftar_keterangan(paragraf: list[str],
         elif _POLAA_LAMPIRAN.match(s):
             kunci = 'daftar_lampiran'
         if kunci:
+            st = ''
+            if gaya is not None and idx < len(gaya or []):
+                st = str(gaya[idx] or '').strip().lower()
+            if st not in _GAYA_KETERANGAN \
+                    and _baris_narasi_keterangan(s):
+                continue
             kunci_dedup = f"{kunci}:{_normalisasi_cari(s)}"
             if kunci_dedup in sudah:
                 continue
@@ -2277,8 +2468,23 @@ def _tanpa_gaya_heading(ppr: str) -> str:
     """
     keluar = re.sub(r'<w:pStyle\b[^>]*w:val="Heading\d+"[^>]*/>',
                     '', ppr or '')
-    return re.sub(r'<w:pStyle\b[^>]*w:val="Heading\d+"[^>]*>'
-                  r'.*?</w:pStyle>', '', keluar, flags=re.S)
+    keluar = re.sub(r'<w:pStyle\b[^>]*w:val="Heading\d+"[^>]*>'
+                    r'.*?</w:pStyle>', '', keluar, flags=re.S)
+    # Tingkat outline ikut dibuang: paragraf daftar kosong bergaya
+    # ListParagraph + outlineLvl masuk panel Tajuk sebagai judul
+    # bernomor ('2.1.', '4.', ...) padahal isinya kosong, walau
+    # gayanya bukan Heading (cacat uji live 17 Nov 2026, fid 81:
+    # 7 paragraf kosong ber-outline di badan).
+    keluar = re.sub(r'<w:outlineLvl\b[^>]*/>', '', keluar)
+    keluar = re.sub(r'<w:outlineLvl\b[^>]*>.*?</w:outlineLvl>', '',
+                    keluar, flags=re.S)
+    return keluar
+
+
+def _gaya_dari_xml(par_xml: str) -> str:
+    """Nama gaya paragraf dari XML-nya ('' bila tidak ada)."""
+    m = re.search(r'<w:pStyle\b[^>]*w:val="([^"]+)"', par_xml or '')
+    return m.group(1) if m else ''
 
 
 def _xml_tanpa_gaya_heading(par_xml: str) -> str:
@@ -2298,6 +2504,30 @@ def _xml_tanpa_gaya_heading(par_xml: str) -> str:
     if not m:
         return par_xml
     bersih = _tanpa_gaya_heading(m.group(0))
+    return par_xml[:m.start()] + bersih + par_xml[m.end():]
+
+
+def _buang_outline_paragraf_kosong(par_xml: str) -> str:
+    """Paragraf kosong tanpa outline/Heading (untuk badan).
+
+    Paragraf daftar kosong ber-outline (ListParagraph + numPr +
+    outlineLvl, tanpa teks) masuk panel Tajuk OnlyOffice sebagai judul
+    bernomor ('2.1.', '4.', ...) padahal isinya kosong (cacat uji live
+    17 Nov 2026, fid 81: 7 paragraf, idx 536-538, 624-625, 858, 972).
+    Hanya paragraf KOSONG yang disentuh: teks tidak berubah, spasi dan
+    penomoran daftar tetap (numPr dibiarkan); judul berisi tidak pernah
+    disentuh. Tanpa pPr, XML dikembalikan apa adanya.
+    """
+    if (_teks_dari_xml(par_xml) or '').strip():
+        return par_xml
+    from .pustaka_periksa import _RE_PPR
+    m = _RE_PPR.search(par_xml or '')
+    if not m:
+        return par_xml
+    ppr = m.group(0)
+    if '<w:outlineLvl' not in ppr and 'Heading' not in ppr:
+        return par_xml
+    bersih = _tanpa_gaya_heading(ppr)
     return par_xml[:m.start()] + bersih + par_xml[m.end():]
 
 
@@ -2457,7 +2687,8 @@ def _atur_pgnumtype_akhir(doc_xml: str, fmt: str = 'decimal',
 
 
 def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
-    """Tulis bagian depan ke .docx (ganti wilayah depan, badan utuh).
+    """Tulis bagian depan ke .docx (ganti wilayah depan; badan utuh kecuali
+    paragraf kosong ber-outline yang dibersihkan tingkatnya).
 
     `bagian_baru`: [{kunci, judul, baris, xml (list XML asli atau None),
     ppr}] seurutan URUTAN + blok tambahan mahasiswa di akhir. `xml` yang
@@ -2467,6 +2698,9 @@ def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
     mulai di halaman baru. Paragraf terakhir wilayah depan diberi
     pemutus bagian Romawi (dengan footer badan dipakai ulang supaya
     halaman depan menampilkan nomor); seksi badan diatur Arab mulai 1.
+    Badan: teks tidak pernah diubah, hanya paragraf KOSONG ber-outline
+    yang kehilangan tingkat outline-nya (panel Tajuk; cacat uji live
+    17 Nov 2026, fid 81).
     Bila Bab I tidak ditemukan, GAGAL tertutup (tidak ditempel): tempel
     di awal tanpa Bab I akan menggandakan bagian depan.
     Return {ok, diterapkan, sebab, butuh_render}.
@@ -2519,7 +2753,15 @@ def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
             blok = []
             for _i, _x in enumerate(xml_asli):
                 _x = _buang_sectpr(_x)
-                if kunci in ('sampul', 'judul') or _i != pertama_isi:
+                # Blok tambahan bukan halaman berjudul: baris pertamanya
+                # pun bukan judul seksi ('SKRIPSI' halaman Judul masuk
+                # tambahan lewat baca, lalu Heading1-nya bertahan dan
+                # muncul di panel Tajuk sebagai judul level-1; cacat
+                # uji live 17 Nov 2026, fid 81). Jadi semua baris
+                # tambahan dibersihkan, bukan hanya sesudah yang pertama.
+                if kunci in ('sampul', 'judul') \
+                        or str(kunci).startswith('tambahan_') \
+                        or _i != pertama_isi:
                     _x = _xml_tanpa_gaya_heading(_x)
                 blok.append(_x)
         else:
@@ -2564,6 +2806,18 @@ def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
             doc_baru = doc[:pos] + wilayah_baru + doc[pos:]
         else:
             doc_baru = doc + wilayah_baru
+    # Badan: paragraf kosong ber-outline kehilangan tingkatnya (panel
+    # Tajuk), teks tidak berubah. Hanya badan (indeks >= len(potongan));
+    # wilayah depan sudah dibersihkan di atas. Sisip dari belakang
+    # supaya posisi awal paragraf lain tidak bergeser.
+    cocok_doc = list(_RE_P.finditer(doc_baru))
+    for _k in range(len(cocok_doc) - 1, -1, -1):
+        if _k < len(potongan):
+            continue
+        _m = cocok_doc[_k]
+        _baru = _buang_outline_paragraf_kosong(_m.group(0))
+        if _baru != _m.group(0):
+            doc_baru = doc_baru[:_m.start()] + _baru + doc_baru[_m.end():]
     # Badan: nomor Arab mulai 1 (seksi tempat Bab I berada). Bab I di
     # dokumen baru ada di indeks len(potongan) (sesudah wilayah depan).
     cocok_baru = list(_RE_P.finditer(doc_baru))

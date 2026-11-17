@@ -193,6 +193,24 @@ def ringkas_peta(peta_json, menunggu_idx: set | None = None) -> dict:
                 keluar['bab'].append(bab_kini)
                 nomor_bab_kini = nomor
                 continue
+            # Penanda lampiran telanjang ('LAMPIRAN', tanpa nama dan
+            # tanpa label): isi lampiran sesudahnya bukan subbab BAB V
+            # (cacat uji live 17 Nov 2026, fid 81: 46 subbab lampiran
+            # menumpuk di BAB V, padahal BAB V hanya Kesimpulan +
+            # Saran). Hanya sesudah bab dimulai dan hanya bila kelompok
+            # kini belum lampiran; 'DAFTAR PUSTAKA' tidak membuka
+            # kelompok (isinya bukan subbab, tidak ada yang menumpuk).
+            # Kelompok ini tampil sebagai baris ke-6 di panel; Daftar
+            # Isi tetap tidak memuat judul 'LAMPIRAN' (entri_daftar_isi
+            # melewati entri level-0 kelompok ini, subbabnya tetap
+            # level-1).
+            if nomor_bab_kini is not None and bab_kini is not None \
+                    and (bab_kini.get('judul') or '') != 'LAMPIRAN' \
+                    and teks_ringan.upper() == 'LAMPIRAN':
+                bab_kini = {'judul': 'LAMPIRAN', 'subbab': [],
+                            'diperiksa': i not in menunggu_idx}
+                keluar['bab'].append(bab_kini)
+                continue
         if lab not in LABEL_SAH:
             continue
         butir = {'teks': teks_ringan, 'label': lab,
