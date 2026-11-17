@@ -239,7 +239,7 @@ async def bagian_awal_halaman(
     paragraf = _paragraf_docx(_path_berkas(fb))
     baca = BA.baca_bagian_awal(paragraf)
     hasil = keadaan['hasil']
-    judul_naskah = BA.judul_bab_pertama(keadaan['peta'])
+    judul_naskah = BA.judul_sampul(paragraf)
     cek = BA.daftar_cek(data, {
         'bab': set(keadaan['bab']), 'terperiksa': keadaan['terperiksa'],
         'tahap': keadaan['tahap'], 'judul_naskah': judul_naskah,
@@ -359,6 +359,9 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
     dipertahankan bersama sampul tidak ditulis dua kali: baris judul
     sudah di dalam XML sampul.
     """
+    # Aturan Judul: judul sampul mengisi form yang kosong, supaya sampul
+    # yang dibuat ulang tidak kehilangan judul (17 Nov 2026).
+    data = BA.judul_efektif_form(data, paragraf)
     # Keterangan hanya dipindai dari badan (mulai Bab I): baris di daftar
     # lama ikut terpindai bila seluruh dokumen dibaca, lalu entri ganda
     # saat Perbarui. Badan dipakai juga untuk melengkapi entri Daftar Isi
@@ -441,8 +444,9 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
                         _teks_xml = [BA._teks_dari_xml(x) for x in xml]
                         _sisip = 2 if len(xml) > 1 and not (
                             _teks_xml[1] or '').strip() else 1
-                        _ppr_nama = BA._ppr_dari_xml(
-                            xml[_sisip - 1]) if xml else ''
+                        _ppr_nama = BA._tanpa_gaya_heading(
+                            BA._ppr_dari_xml(xml[_sisip - 1])) \
+                            if xml else ''
                         xml = xml[:_sisip] + [
                             BA._xml_paragraf(_nama, _ppr_nama)] \
                             + xml[_sisip:]
