@@ -875,15 +875,15 @@ def jalankan():
     # ── 12d. Regresi perbaikan Perbarui #3 (16 Nov 2026) ────────────
     # (a) Daftar Isi buatan: satu baris per bab. Penanda telanjang
     # ('BAB 1') + judul polos ('PENDAHULUAN') bergabung jadi satu
-    # entri ('BAB 1. PENDAHULUAN'), bukan dua baris.
+    # entri ('BAB I. PENDAHULUAN'), bukan dua baris.
     _entri_buku = BA.entri_daftar_isi(
         PETA_BUKU, paragraf_badan=_BARIS_BUKU)
     _judul_entri = [e['judul'] for e in _entri_buku]
     cek('regresi 12d: Daftar Isi satu baris per bab (tanpa ganda)',
-        _judul_entri.count('BAB 1. PENDAHULUAN') == 1
+        _judul_entri.count('BAB I. PENDAHULUAN') == 1
         and 'BAB 1' not in _judul_entri
         and 'PENDAHULUAN' not in _judul_entri
-        and _judul_entri.count('BAB 5. PENUTUP') == 1,
+        and _judul_entri.count('BAB V. PENUTUP') == 1,
         str(_judul_entri))
     # (b) Pencari Bab I menunjuk badan, bukan entri Daftar Isi.
     _idx_b3 = BA.cari_indeks_bab1(_par_b3)
@@ -1623,8 +1623,8 @@ def jalankan():
 
     # Rute Perbarui Daftar Isi: titip ke pekerja latar, bukan request web.
     # Render realistis untuk docx tempel: penanda bab telanjang di
-    # baris sendiri (paragraf docx terpisah), entri daftar Arab
-    # ("BAB 1. PENDAHULUAN") dicocokkan lewat penanda telanjang.
+    # baris sendiri (paragraf docx terpisah), entri daftar Romawi
+    # ("BAB I. PENDAHULUAN") dicocokkan lewat penanda telanjang.
     render_fb = ['Sampul', 'KATA PENGANTAR', 'DAFTAR ISI',
                  'BAB I\nPENDAHULUAN\n1.1 Latar Belakang\nlatar',
                  'BAB II\nTINJAUAN PUSTAKA\n2.1 Teori tentang Variabel Y\nteori',
@@ -1644,8 +1644,8 @@ def jalankan():
         and _st_pd.get('terakhir', {}).get('jenis') == 'daftar',
         str(_st_pd))
     _idx_pd = _teks_pd.find('DAFTAR ISI')
-    cek('rute daftar: nomor ditulis ke docx (BAB 1 = 1)',
-        'BAB 1. PENDAHULUAN  1' in _teks_pd
+    cek('rute daftar: nomor ditulis ke docx (BAB I = 1)',
+        'BAB I. PENDAHULUAN  1' in _teks_pd
         and '1.1 Latar Belakang  1' in _teks_pd,
         _teks_pd[_idx_pd:_idx_pd + 500])
     _p_jalan = _proses.mulai(db, user_id=u.id, file_id=fb.id,
@@ -1778,9 +1778,9 @@ def jalankan():
     cek('regresi gema: judul sah yang berulang tiap bab tetap ada (Ringkasan Bab x2)',
         _judul_gema.count('Ringkasan Bab') == 2
         and _judul_gema.count(
-            'BAB 1. Lanskap Pemasaran Digital: Ruang Lingkup, Batasan, dan Fondasi Konseptual') == 1
+            'BAB I. Lanskap Pemasaran Digital: Ruang Lingkup, Batasan, dan Fondasi Konseptual') == 1
         and _judul_gema.count(
-            'BAB 2. Arsitektur Strategi Pemasaran Digital dan Dinamika Platform') == 1,
+            'BAB II. Arsitektur Strategi Pemasaran Digital dan Dinamika Platform') == 1,
         str(_judul_gema))
     _entri_tanpa_badan = BA.entri_daftar_isi(_PETA_GEMA)
     _judul_tanpa_badan = [e['judul'] for e in _entri_tanpa_badan]

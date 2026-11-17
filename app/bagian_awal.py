@@ -119,6 +119,46 @@ KOLOM_FORM = [
     ('tanggal_sidang', 'Tanggal ujian/sidang', 'cth: 12 Januari 2027', 'pimpinan'),
 ]
 KUNCI_FORM = [k for k, _, _, _ in KOLOM_FORM]
+
+# Kunci form yang DIPAKAI tiap seksi DATA_FORM (dari susun_bagian, 17 Nov
+# 2026). Cacat uji live putaran 3 (fid 81): rencana_update memakai
+# SEMUA KUNCI_FORM untuk semua seksi, jadi perubahan apa pun di form
+# (mis. prodi/fakultas) membuat SEMUA seksi 'berubah' dan dibuat ulang
+# dari templat kosong, padahal pengesahan tidak memakai prodi/fakultas
+# sama sekali. Akibatnya halaman Pengesahan Dewan Penguji yang kosong
+# ikut terbit berdampingan dengan pengesahan terisi yang dipertahankan.
+# Perbaikan putaran 4: 'berubah' hanya bila kunci seksi itu sendiri
+# yang berubah.
+_KUNCI_PER_SEKSI = {
+    # Sampul/judul = halaman identitas: semua kunci identitasnya.
+    'sampul': {'judul', 'nama', 'nim', 'prodi', 'fakultas', 'kota',
+               'tahun'},
+    'judul': {'judul', 'nama', 'nim', 'prodi', 'fakultas', 'kota',
+              'tahun'},
+    # Persetujuan memakai pembimbing + kaprodi (bukan penguji/dekan).
+    'persetujuan': {'judul', 'nama', 'nim', 'prodi', 'pembimbing_nama',
+                    'pembimbing_nip', 'kaprodi_nama', 'kaprodi_nip',
+                    'kota', 'tahun'},
+    # Pengesahan memakai tanggal sidang + penguji + dekan + rektor.
+    'pengesahan': {'judul', 'nama', 'nim', 'tanggal_sidang',
+                   'penguji1_nama', 'penguji1_nip', 'penguji2_nama',
+                   'penguji2_nip', 'dekan_nama', 'dekan_nip',
+                   'rektor_nama', 'rektor_nip', 'kota', 'tahun'},
+}
+
+# Kunci ISI tiap seksi: kunci yang membedakan halaman itu dari halaman
+# identitas kosong. Bila SEMUA kunci isi kosong di data form, templat
+# yang dibuat ulang adalah cangkang kosong (judul + nama/NIM + garis
+# tanda tangan kosong). Penjaga di rencana_update: cangkang kosong
+# tidak boleh menimpa halaman yang SUDAH TERISI (penguji/tanggal sudah
+# tertulis di naskah), halaman terisi dipertahankan.
+_KUNCI_ISI_SEKSI = {
+    'persetujuan': {'pembimbing_nama', 'pembimbing_nip',
+                    'kaprodi_nama', 'kaprodi_nip'},
+    'pengesahan': {'tanggal_sidang', 'penguji1_nama', 'penguji1_nip',
+                   'penguji2_nama', 'penguji2_nip', 'dekan_nama',
+                   'dekan_nip', 'rektor_nama', 'rektor_nip'},
+}
 GRUP_FORM = [
     ('tentang', 'Tentang kamu'),
     ('pembimbing', 'Pembimbing'),
@@ -1042,6 +1082,31 @@ def hitung_judul_depan(paragraf) -> dict:
     return keluar
 
 
+def _blok_skripsi_yatim(blok: list, bagian: dict) -> bool:
+    """True bila blok tambahan ini hanya judul 'SKRIPSI' yatim.
+
+    Halaman pengesahan asli mahasiswa yang kosong hanya berisi kata
+    'SKRIPSI' + paragraf kosong (fid 81: 'SKRIPSI' + 27 kosong, 27 Okt
+    2026). Kata itu masuk tambahan lewat _baris_judul_tambahan, lalu
+    diterbitkan lagi sebagai halaman sendiri ('SKRIPSI' saja, hal. 4
+    live) berdampingan dengan templat Pengesahan Dewan Penguji (hal. 5).
+    Blok ini dibuang bila kata 'SKRIPSI' juga ada di seksi yang
+    dipertahankan (sampul selalu membawanya), jadi kata itu tidak hilang
+    dari naskah, hanya halaman yatimnya yang hilang. Blok 'SKRIPSI'
+    yang diikuti isi lain (mis. 'Diajukan untuk...') bukan yatim dan
+    tetap dipertahankan.
+    """
+    isi = [str(x or '').strip() for x in (blok or [])
+           if str(x or '').strip()]
+    if len(isi) != 1 or isi[0].upper() != 'SKRIPSI':
+        return False
+    for baris in (bagian or {}).values():
+        for t in (baris or []):
+            if str(t or '').strip().upper() == 'SKRIPSI':
+                return True
+    return False
+
+
 def baca_bagian_awal(paragraf: list[str]) -> dict:
     """Baca bagian depan yang sudah ada dari daftar paragraf naskah.
 
@@ -1214,10 +1279,14 @@ def baca_bagian_awal(paragraf: list[str]) -> dict:
         # Seksi ini tinggal blok pertama.
         bagian[kunci] = [depan[i] for i in simpan_isi]
         indeks[kunci] = simpan_idx
-    # Buang blok tambahan yang kosong melompong (teks + indeks sejalan).
+    # Buang blok tambahan yang kosong melompong (teks + indeks sejalan),
+    # dan buang judul 'SKRIPSI' yatim: halaman pengesahan kosong yang
+    # hanya berisi kata itu (cacat uji live 17 Nov 2026, fid 81: hal. 4
+    # hanya 'SKRIPSI', hal. 5 templat Pengesahan Dewan Penguji).
     pasangan = [(b, t, a) for b, t, a in zip(
         tambahan, tambahan_indeks, tambahan_asal)
-        if any(x.strip() for x in b)]
+        if any(x.strip() for x in b)
+        and not _blok_skripsi_yatim(b, bagian)]
     # Urutkan tambahan menurut posisi dokumen (blok pindahan dedup
     # ditambahkan belakangan, supaya penyisipan kembali mengikuti
     # tempat asalnya, bukan urutan penambahan).
@@ -1229,6 +1298,86 @@ def baca_bagian_awal(paragraf: list[str]) -> dict:
             'indeks': indeks, 'tambahan_indeks': tambahan_indeks,
             'tambahan_asal': tambahan_asal,
             'duplikat_dibuang': duplikat_dibuang}
+
+
+def _templat_kosong_menimpa_isi(kunci: str, data_baru: dict,
+                                data_lama: dict, baris_kini: list,
+                                tahap: str) -> bool:
+    """True bila membuat ulang seksi ini menimpa isi dengan templat kosong.
+
+    Hanya untuk seksi yang punya kunci isi (_KUNCI_ISI_SEKSI): bila
+    SEMUA kunci isi kosong di data form, templat yang dibuat ulang
+    adalah cangkang kosong. Bila halaman kini SAMA dengan templat dari
+    data LAMA (halaman itu memang templat kosong dari jalan lalu),
+    membuat ulang aman (tidak ada yang hilang, hanya data form baru
+    yang diterapkan). Bila halaman kini BERBEDA dari templat lama
+    (penguji/tanggal sudah tertulis di naskah, atau judul halaman
+    buatan mahasiswa), halaman kini dipertahankan supaya isinya tidak
+    hilang ditimpa cangkang kosong. Perbandingan hanya isi (baris
+    sesudah judul) supaya beda judul karena tahap (proposal/final)
+    tidak menahan pembuatan ulang.
+    """
+    isi = _KUNCI_ISI_SEKSI.get(kunci)
+    if not isi:
+        return False
+    if any(str(data_baru.get(k, '') or '').strip() for k in isi):
+        return False  # form berisi isi halaman: templat tidak kosong
+    if not any(str(t or '').strip() for t in (baris_kini or [])):
+        return False  # halaman kini kosong juga: tidak ada yang hilang
+    try:
+        templat_lama = {k: b for k, _j, b in
+                        susun_bagian(data_lama, tahap, {})}
+        baris_lama = templat_lama.get(kunci) or []
+    except Exception:                                       # noqa: BLE001
+        return False  # gagal hitung templat: jangan tahan, ikut rencana
+    # Bandingkan isi (tanpa judul, tanpa kosong depan/belakang): baca
+    # SUDAH membuang baris judul seksi dari baris_kini, jadi templat
+    # dibuang judulnya ([1:]) sedangkan baris_kini dipakai utuh; tanpa
+    # buang kosong depan, keduanya geser satu baris dan penjaga salah
+    # menahan (cacat putaran 4, 17 Nov 2026). Baris identitas (judul,
+    # Nama, NIM, Prodi, Fakultas, kota/tahun) dinormalisasi supaya
+    # beda data form lama/baru tidak terlihat sebagai beda isi: yang
+    # dibandingkan hanya isi halaman (penguji/tanggal/pembimbing).
+    kini = _normalisasi_baris_banding(baris_kini, data_lama, data_baru)
+    lama = _normalisasi_baris_banding((baris_lama or [])[1:],
+                                      data_lama, data_baru)
+    return kini != lama
+
+
+def _normalisasi_baris_banding(baris: list, data_lama=None,
+                               data_baru=None) -> list:
+    """Baris isi untuk perbandingan: identitas DIBUANG, kosong depan dan
+    ujung dibuang.
+
+    Baris identitas (judul, 'Nama :', 'NIM :', 'Program Studi :',
+    'Fakultas :', kota/tahun) selalu dibuat ulang dari data form, jadi
+    bukan isi halaman: dibuang, bukan dinormalisasi (menormalisasi ke
+    placeholder tetap menggeser bila judulnya kosong di salah satu
+    data). Yang dibandingkan hanya isi halaman (penguji/tanggal/
+    pembimbing/NIP). Kosong depan/belakang hanya spasi.
+    """
+    keluar = []
+    for t in (baris or []):
+        s = str(t or '').strip()
+        if s.startswith(('Nama :', 'NIM :', 'Program Studi :',
+                         'Fakultas :')):
+            continue  # identitas, selalu dibuat ulang dari form
+        buang = False
+        for d in (data_lama or {}, data_baru or {}):
+            if d.get('judul') and s == str(d.get('judul') or '').strip():
+                buang = True
+                break
+            kota_tahun = ', '.join(
+                x for x in [d.get('kota', ''), d.get('tahun', '')] if x)
+            if kota_tahun and s == kota_tahun:
+                buang = True
+                break
+        if buang:
+            continue
+        keluar.append(s)
+    while keluar and not keluar[0]:
+        keluar.pop(0)
+    return _buang_ekor_kosong(keluar)
 
 
 # ── Rencana update (tiga daftar untuk layar konfirmasi) ────────────────
@@ -1300,13 +1449,28 @@ def rencana_update(data_baru: dict, data_lama: dict, baca: dict,
                    'Dibuat ulang dari peta + nomor halaman render.')
         else:
             # Form: data berubah dan tidak disentuh -> dibuat ulang.
+            # Hanya kunci seksi itu sendiri yang dihitung (bukan semua
+            # KUNCI_FORM): perubahan prodi/fakultas tidak boleh membuat
+            # ulang pengesahan (cacat uji live 17 Nov 2026, fid 81:
+            # templat Pengesahan Dewan Penguji kosong terbit di hal. 5
+            # berdampingan dengan pengesahan terisi di hal. 4).
+            kunci_seksi = _KUNCI_PER_SEKSI.get(kunci, KUNCI_FORM)
             data_berubah = any(
                 data_baru.get(k, '') != data_lama.get(k, '')
-                for k in KUNCI_FORM)
+                for k in kunci_seksi)
             if disentuh:
                 _masuk(dipertahankan, 'dipertahankan', kunci, label,
                        'Sudah diubah tangan, dipertahankan; data form '
                        'tidak menimpa halaman ini.')
+            elif data_berubah and _templat_kosong_menimpa_isi(
+                    kunci, data_baru, data_lama,
+                    bagian_kini.get(kunci) or [], tahap):
+                # Templat kosong menimpa halaman terisi: jangan dibuat
+                # ulang, halaman terisi dipertahankan.
+                _masuk(dipertahankan, 'dipertahankan', kunci, label,
+                       'Data form tidak berisi isi halaman ini, halaman '
+                       'terisi dipertahankan; templat kosong tidak '
+                       'menimpa.')
             elif data_berubah:
                 _masuk(berubah, 'berubah', kunci, label,
                        'Data form berubah, dibuat ulang.')
@@ -1562,6 +1726,24 @@ def ke_romawi(n) -> str:
             keluar += huruf
             n -= nilai
     return keluar
+
+
+def _judul_bab_romawi(judul: str) -> str:
+    """Judul bab dengan nomor Romawi ('BAB 1. X' -> 'BAB I. X').
+
+    Judul bab di badan memakai Romawi ('BAB I'), jadi Daftar Isi harus
+    memakai Romawi juga (cacat uji live 17 Nov 2026, fid 81: Daftar Isi
+    menulis 'BAB 1./2./3./4./5.' Arab). Judul tanpa penanda bab atau
+    yang sudah Romawi dikembalikan apa adanya.
+    """
+    s = str(judul or '').strip()
+    m = re.match(r'^(BAB\s+)(\d+)(\b.*)$', s, re.IGNORECASE)
+    if not m:
+        return s
+    romawi = ke_romawi(int(m.group(2))).upper()
+    if not romawi:
+        return s
+    return f'BAB {romawi}{m.group(3)}'
 
 
 _JUDUL_BAGIAN_DEPAN_RENDER = ('daftar isi', 'daftar tabel',
@@ -1903,7 +2085,7 @@ def nomor_footer_dari_render(halaman_render, judul: str,
 
 
 def _bab_dari_daftar_peta(peta) -> list[tuple[int, str]]:
-    """Bab dari daftar datar peta (mode peta_awal): [(nomor, 'BAB n. Judul')].
+    """Bab dari daftar datar peta (mode peta_awal): [(nomor, 'BAB I. Judul')].
 
     Tiap kelompok entri dengan kolom `bab` = 'BAB n' membawa judul bab
     di `judul_bab` pertama yang bukan penanda telanjang, bukan nomor
@@ -1925,7 +2107,7 @@ def _bab_dari_daftar_peta(peta) -> list[tuple[int, str]]:
             if bab_kolom.upper().startswith('BAB') else None
         if n is not None and kini_n != n:
             if kini_n is not None and kini_judul:
-                keluar.append((kini_n, f'BAB {kini_n}. {kini_judul}'))
+                keluar.append((kini_n, f'BAB {ke_romawi(kini_n).upper()}. {kini_judul}'))
             kini_n = n
             kini_judul = None
         if kini_n is None or kini_judul:
@@ -1945,7 +2127,7 @@ def _bab_dari_daftar_peta(peta) -> list[tuple[int, str]]:
         # ganda ('BAB 1. BAB I PENDAHULUAN', cacat uji live 17 Nov 2026).
         kini_judul = _buang_penanda_bab(judul)
     if kini_n is not None and kini_judul:
-        keluar.append((kini_n, f'BAB {kini_n}. {kini_judul}'))
+        keluar.append((kini_n, f'BAB {ke_romawi(kini_n).upper()}. {kini_judul}'))
     sudah: dict[int, str] = {}
     for n, lengkap in keluar:
         sudah.setdefault(n, lengkap)
@@ -1953,7 +2135,7 @@ def _bab_dari_daftar_peta(peta) -> list[tuple[int, str]]:
 
 
 def _bab_dari_badan(paragraf_badan) -> list[tuple[int, str]]:
-    """Bab dari pindai badan: [(nomor, 'BAB n. Judul')].
+    """Bab dari pindai badan: [(nomor, 'BAB I. Judul')].
 
     Penanda bab telanjang ('BAB 1') + baris judul berikutnya yang
     tidak kosong. Dipakai melengkapi Daftar Isi bila peta melewatkan
@@ -1974,7 +2156,7 @@ def _bab_dari_badan(paragraf_badan) -> list[tuple[int, str]]:
             if t:
                 judul = t
                 break
-        keluar.append((n, f'BAB {n}. {judul}' if judul else f'BAB {n}'))
+        keluar.append((n, f'BAB {ke_romawi(n).upper()}. {judul}' if judul else f'BAB {ke_romawi(n).upper()}'))
     return keluar
 
 
@@ -2050,11 +2232,12 @@ def entri_daftar_isi(peta_json, halaman_render=None,
     """Entri Daftar Isi dari peta Jev terverifikasi (bab + subbab).
 
     Bab yang peta hanya kenal lewat judul polosnya (tanpa penanda
-    'BAB n') ditulis ulang lengkap ('BAB 1. <judul>'), dan bab yang
+    'BAB n') ditulis ulang lengkap ('BAB I. <judul>'), dan bab yang
     peta lewatkan sama sekali ditambahkan dari daftar datar peta atau
-    dari pindai badan, Daftar Isi harus memuat BAB 1..5, bukan hanya
-    judulnya (cacat uji live 16 Nov 2026). `paragraf_badan`: paragraf
-    badan (mulai Bab I) bila ada.
+    dari pindai badan, Daftar Isi harus memuat BAB I..V, bukan hanya
+    judulnya (cacat uji live 16 Nov 2026). Nomor bab selalu Romawi,
+    sama seperti judul bab di badan (cacat uji live 17 Nov 2026).
+    `paragraf_badan`: paragraf badan (mulai Bab I) bila ada.
     """
     keluar = []
     bab_subbab = _bab_subbab_dari_peta(peta_json)
@@ -2069,6 +2252,7 @@ def entri_daftar_isi(peta_json, halaman_render=None,
             # tidak ditulis sebagai entri level-0 (Daftar Isi tidak
             # memuat judul LAMPIRAN; keputusan desain 17 Nov 2026).
             if judul and _normalisasi_cari(judul) != 'lampiran':
+                judul = _judul_bab_romawi(judul)
                 keluar.append({'judul': judul, 'level': 0, 'bab': n_bab,
                                'halaman': nomor_halaman_dari_render(
                                    halaman_render, judul)})
@@ -2124,7 +2308,7 @@ def entri_daftar_isi(peta_json, halaman_render=None,
                     and _tanpa_penanda_bab(judul_peta) in subbab_judul \
                     and judul_badan \
                     and _tanpa_penanda_bab(judul_badan) not in subbab_judul:
-                diperbaiki.append((n, f'BAB {n}. {judul_badan}'))
+                diperbaiki.append((n, f'BAB {ke_romawi(n).upper()}. {judul_badan}'))
             else:
                 diperbaiki.append((n, lengkap))
         bab_sumber = diperbaiki
@@ -2720,6 +2904,65 @@ def _atur_pgnumtype_akhir(doc_xml: str, fmt: str = 'decimal',
     return doc_xml[:target.start()] + isi_baru + doc_xml[target.end():]
 
 
+# Pola pecah paragraf: bentuk menutup sendiri DIDAHULUKAN supaya tidak
+# tertelan paragraf berikut (lihat _pecah_span_menelan). _RE_P di
+# pustaka_periksa memakai urutan sebaliknya (`<w:p>.*?</w:p>` dulu),
+# jadi paragraf kosong `<w:p .../>` tertelan ke paragraf berikut; pola
+# itu tidak diubah di sini (mengubahnya menggeser semua indeks paragraf
+# peta/tes), yang diperbaiki hanya tulisannya di bawah.
+_RE_P_PECAH = re.compile(r'<w:p\b[^>]*/>|<w:p\b.*?</w:p>', re.S)
+
+
+def _pecah_span_menelan(blok: list) -> list:
+    """Pecah span XML yang menelan beberapa paragraf jadi satu.
+
+    _RE_P (pustaka_periksa) memakai `<w:p>.*?</w:p>`; paragraf kosong
+    yang menutup sendiri (`<w:p .../>`) tidak punya `</w:p>`, jadi ia
+    tertelan ke paragraf berikut (fid 81: 26 paragraf kosong sebelum
+    judul Pernyataan tertelan jadi satu span dengan judulnya). Pecah
+    span itu kembali jadi paragraf-paragrafnya, dan buang paragraf
+    kosong yang tersembunyi SEBELUM isi pertama span itu (paragraf
+    kosong itu hanya spasi, bukan isi; bila dibiarkan, ia mendorong
+    judul ke halaman berikut dan halaman sebelumnya tampak kosong
+    penuh, hal. 7 live). Paragraf kosong di tengah/ujung tidak
+    disentuh di sini (ujung ditangani _buang_ekor_kosong_xml).
+    """
+    keluar = []
+    for span in (blok or []):
+        bagian = [m.group(0) for m in _RE_P_PECAH.finditer(span)]
+        if len(bagian) <= 1:
+            keluar.append(span)
+            continue
+        pertama = next((i for i, b in enumerate(bagian)
+                        if _teks_dari_xml(b).strip()), None)
+        if pertama is None:
+            # Span ini seluruhnya kosong: simpan satu saja (bukan nol,
+            # supaya seksi tidak kehilangan paragrafnya).
+            keluar.append(bagian[0])
+            continue
+        keluar.extend(bagian[pertama:])
+    return keluar
+
+
+def _buang_ekor_kosong_xml(blok: list) -> list:
+    """Buang paragraf kosong di ujung XML seksi yang dipertahankan.
+
+    Seksi yang dipertahankan dipakai kata per kata, jadi ekor kosongnya
+    ikut diterbitkan: 27 paragraf kosong di ujung persembahan (sisa
+    halaman pengesahan asli mahasiswa yang kosong) meluber jadi halaman
+    kosong penuh (hal. 7 live), dan paragraf PAGE-BR kosong di ujung
+    pernyataan jadi halaman kosong penuh (hal. 9 live). Buang ekor
+    kosongnya, sisakan minimal 2 paragraf (judul + satu garis kosong)
+    supaya seksi yang memang kosong tetap punya satu baris isi, sama
+    seperti _buang_ekor_kosong untuk seksi yang dibuat ulang. Isi
+    mahasiswa tidak berkurang, hanya ekor kosongnya.
+    """
+    blok = list(blok or [])
+    while len(blok) > 2 and not _teks_dari_xml(blok[-1]).strip():
+        blok.pop()
+    return blok
+
+
 def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
     """Tulis bagian depan ke .docx (ganti wilayah depan; badan utuh kecuali
     paragraf kosong ber-outline yang dibersihkan tingkatnya).
@@ -2798,6 +3041,11 @@ def tulis_bagian_awal(path, bagian_baru: list[dict]) -> dict:
                         or _i != pertama_isi:
                     _x = _xml_tanpa_gaya_heading(_x)
                 blok.append(_x)
+            # Span yang menelan paragraf kosong ikut diterbitkan dan
+            # meluber jadi halaman kosong penuh (hal. 7 live, fid 81):
+            # pecah dulu, baru buang ekor kosongnya.
+            blok = _pecah_span_menelan(blok)
+            blok = _buang_ekor_kosong_xml(blok)
         else:
             kunci = item.get('kunci', '')
             baris = item.get('baris') or []

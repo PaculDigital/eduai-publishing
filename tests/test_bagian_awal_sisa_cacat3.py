@@ -148,8 +148,22 @@ def jalankan():
         return {k: sorted(d['kunci'] for d in r.get(k, []))
                 for k in ('berubah', 'dipertahankan', 'dibuat_ulang',
                           'kembalikan')}
-    cek('akar: rencana dari data mentah sama dengan rencana tersimpan',
-        _nasib(rencana_mentah) == _nasib(RENCANA_TERSIMPAN),
+    # Putaran 4 (17 Nov 2026): rencana tersimpan (kode lama) masih
+    # memuat 'tambahan_0' (blok 'SKRIPSI' yatim); kode baru membuang
+    # blok itu di baca, jadi tambahan_0 hilang dari rencana. Selebihnya
+    # rencana sama (data mentah = data tersimpan, tidak ada yang
+    # berubah, termasuk pengesahan yang tidak memakai prodi).
+    cek('akar: rencana baru = tersimpan, kecuali tambahan_0 hilang '
+        '(putaran 4: blok SKRIPSI yatim dibuang)',
+        _nasib(rencana_mentah)['berubah']
+        == _nasib(RENCANA_TERSIMPAN)['berubah']
+        and _nasib(rencana_mentah)['dibuat_ulang']
+        == _nasib(RENCANA_TERSIMPAN)['dibuat_ulang']
+        and _nasib(rencana_mentah)['kembalikan']
+        == _nasib(RENCANA_TERSIMPAN)['kembalikan']
+        and sorted(_nasib(rencana_mentah)['dipertahankan'])
+        == sorted(x for x in _nasib(RENCANA_TERSIMPAN)['dipertahankan']
+                  if x != 'tambahan_0'),
         str(_nasib(rencana_mentah)))
     cek('akar: rencana mentah tidak mengubah apa pun (berubah kosong)',
         rencana_mentah.get('berubah') == [])
@@ -230,8 +244,12 @@ def jalankan():
         (baca_baru.get('bagian', {}).get('persetujuan') or []))
     cek('tulis: badan utuh (BAB I + isi tetap ada)',
         'BAB I' in par_baru and 'Isi badan tetap utuh.' in par_baru)
-    cek('tulis: pernyataan tetap kosong',
-        (baca_baru.get('bagian', {}).get('pernyataan') or []) == ['', ''])
+    # Putaran 4: pangkas ekor kosong XML yang dipertahankan (satu baris
+    # kosong di ujung Pernyataan dibuang, sisakan judul + satu kosong),
+    # jadi baca ulang memberi [''] bukan ['', '']; isinya tetap kosong
+    # (tidak ada Prodi/Fakultas yang disisipkan).
+    cek('tulis: pernyataan tetap kosong (judul + satu baris kosong)',
+        (baca_baru.get('bagian', {}).get('pernyataan') or []) == [''])
 
     # ── 5. Rencana dengan data efektif (jalur konfirmasi) ────────
     data_efektif = BA.prodi_fakultas_efektif_form(

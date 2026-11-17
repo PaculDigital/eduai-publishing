@@ -120,18 +120,20 @@ def jalankan():
     cek('entri: 136 entri dari peta fid 81',
         len(entri) == 136, str(len(entri)))
     cek('entri: judul bab benar (bukan judul subbab pertama)',
-        'BAB 2. TINJAUAN PUSTAKA' in judul_entri
-        and 'BAB 3. METODE PENELITIAN' in judul_entri
-        and 'BAB 4. HASIL DAN PEMBAHASAN' in judul_entri
-        and 'BAB 5. PENUTUP' in judul_entri, str(judul_entri[:8]))
-    cek('entri: tanpa awalan ganda "BAB 1. BAB I"',
-        not any(j.startswith('BAB 1. BAB I') or j.startswith('BAB 2. BAB II')
+        'BAB II. TINJAUAN PUSTAKA' in judul_entri
+        and 'BAB III. METODE PENELITIAN' in judul_entri
+        and 'BAB IV. HASIL DAN PEMBAHASAN' in judul_entri
+        and 'BAB V. PENUTUP' in judul_entri, str(judul_entri[:8]))
+    cek('entri: tanpa awalan ganda "BAB I. BAB I" (Romawi, putaran 4)',
+        not any(j.startswith('BAB 1. BAB I') or j.startswith('BAB I. BAB I')
+                or j.startswith('BAB 2. BAB II')
+                or j.startswith('BAB II. BAB II')
                 for j in judul_entri), str(judul_entri[:8]))
     cek("entri: 'Landasan Teori' tetap subbab (bukan judul Bab II)",
-        'BAB 2. Landasan Teori' not in judul_entri
+        'BAB II. Landasan Teori' not in judul_entri
         and 'Landasan Teori' in judul_entri, str(judul_entri[:8]))
-    idx_bab1 = judul_entri.index('BAB 1. PENDAHULUAN')
-    idx_bab2 = judul_entri.index('BAB 2. TINJAUAN PUSTAKA')
+    idx_bab1 = judul_entri.index('BAB I. PENDAHULUAN')
+    idx_bab2 = judul_entri.index('BAB II. TINJAUAN PUSTAKA')
     cek('entri: urutan benar (Bab I dulu, lalu subbabnya, lalu Bab II)',
         idx_bab1 == 0 and idx_bab2 == 10
         and all(e.get('bab') == 1 for e in entri[1:10])
@@ -234,11 +236,11 @@ def jalankan():
     cek('docx: perbarui nomor berhasil dari render fid 81',
         r_per.get('ok') and r_per.get('diperbarui', 0) >= 5, str(r_per))
     cek('docx: nomor Daftar Isi absolut di dokumen',
-        'BAB 1. PENDAHULUAN  23' in teks_per
-        and 'BAB 2. TINJAUAN PUSTAKA  39' in teks_per
-        and 'BAB 3. METODE PENELITIAN  54' in teks_per
-        and 'BAB 4. HASIL DAN PEMBAHASAN  70' in teks_per
-        and 'BAB 5. PENUTUP  83' in teks_per, teks_per[:600])
+        'BAB I. PENDAHULUAN  23' in teks_per
+        and 'BAB II. TINJAUAN PUSTAKA  39' in teks_per
+        and 'BAB III. METODE PENELITIAN  54' in teks_per
+        and 'BAB IV. HASIL DAN PEMBAHASAN  70' in teks_per
+        and 'BAB V. PENUTUP  83' in teks_per, teks_per[:600])
     cek('docx: nomor subbab absolut di dokumen',
         'Digital Marketing  41' in teks_per
         and 'Keberlanjutan Usaha  39' in teks_per
@@ -258,7 +260,7 @@ def jalankan():
         not entri_heading, str(entri_heading[:5]))
     cek('docx: entri Daftar Isi bukan Heading',
         all(g == '' for t, g in gaya
-            if t.startswith('BAB 1. PENDAHULUAN')
+            if t.startswith('BAB I. PENDAHULUAN')
             or t.startswith('Digital Marketing')
             or t.startswith('Latar Belakang')), str(gaya[:8]))
     cek('docx: baris formulir Persetujuan bukan Heading',
