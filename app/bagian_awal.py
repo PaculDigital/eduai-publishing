@@ -348,7 +348,18 @@ def _angka_bab(teks_nomor: str) -> int | None:
 
 
 def bab_dari_peta(peta_json) -> set:
-    """Himpunan angka bab (1..6) dari peta Jev tersimpan (ringkas_peta)."""
+    """Himpunan angka bab (1..6) dari peta Jev tersimpan (ringkas_peta).
+
+    Tambahan (17 Nov 2026, cacat gerbang fid 81): peta Jev tidak selalu
+    melabeli judul bab ('BAB I' telanjang tidak berlabel 'bab', dan
+    judul subbab tanpa nomor karena penomoran Word otomatis bukan teks
+    harfiah), sehingga ringkas_peta saja mengembalikan himpunan kosong
+    untuk skripsi yang Bab I-III-nya lengkap. Karena itu baris mentah
+    `peta_surveyor.baris` ikut dipindai dengan pola yang sama: baris
+    pendek (<= 80 huruf) yang diawali 'BAB I/II/III...' adalah judul
+    bab, walau tanpa label. Yang TIDAK dipindai: 'daftar' dan
+    'bab_terdeteksi' (nomor 'bab'-nya tercemar nomor urut subbab).
+    """
     keluar = set()
     try:
         from . import struktur as _str
@@ -365,6 +376,18 @@ def bab_dari_peta(peta_json) -> set:
                     nomor = int(m2.group(1))
                     if 1 <= nomor <= 6:
                         keluar.add(nomor)
+        import json as _json
+        peta = _json.loads(peta_json) if isinstance(peta_json, str) \
+            else (peta_json or {})
+        surveyor = peta.get('peta_surveyor') or {}
+        for teks in (surveyor.get('baris') or []):
+            s = str(teks or '').strip()
+            if not s or len(s) > 80:
+                continue
+            m = _POLAA_BAB_JUDUL.match(s)
+            nomor = _angka_bab(m.group(1)) if m else None
+            if nomor is not None:
+                keluar.add(nomor)
     except Exception:                                          # noqa: BLE001
         pass
     return keluar
@@ -583,13 +606,16 @@ _JUDUL_SEKSI = {
     'sampul': ('sampul',),
     'judul': ('judul', 'halaman judul'),
     'persetujuan': ('persetujuan', 'lembar persetujuan',
+                    'persetujuan pembimbing',
                     'lembar persetujuan pembimbing',
                     'lembar persetujuan pembimbing proposal skripsi'),
     'pengesahan': ('pengesahan', 'lembar pengesahan',
                    'lembar pengesahan dewan penguji'),
     'persembahan': ('persembahan', 'motto', 'persembahan dan motto',
+                    'motto dan persembahan',
                     'persembahan/motto', 'lembar motto dan persembahan'),
     'pernyataan': ('pernyataan keaslian',
+                   'pernyataan keaslian skripsi',
                    'pernyataan keaslian karya tulis skripsi',
                    'lembar pernyataan keaslian skripsi', 'pernyataan'),
     'kata_pengantar': ('kata pengantar',),
@@ -739,12 +765,20 @@ def _mirip_sampul(baris: list[str]) -> bool:
     dikenali juga dari tanda khasnya, walau bloknya panjang: sampul +
     judul digabung jadi satu blok karena keduanya tanpa judul seksi
     sendiri, jadi batas 12 baris tidak berlaku untuk tanda ini.
+    Sampul ganda (sampul luar + halaman judul) juga dikenali dari
+    kombinasi penanda 'SKRIPSI' telanjang + 'NIM' + 'UNIVERSITAS'
+    (17 Nov 2026, cacat gerbang fid 81): bloknya panjang dan judulnya
+    panjang, tapi kombinasi ketiganya hanya ada di sampul.
     """
     isi = [str(b or '').strip() for b in (baris or []) if str(b or '').strip()]
     if not isi:
         return False
     if any(b.upper() == 'SKRIPSI' for b in isi) and any(
             b.startswith('Diajukan untuk Memenuhi') for b in isi):
+        return True
+    if (any(b.upper() == 'SKRIPSI' for b in isi)
+            and any('NIM' in b.upper() for b in isi)
+            and any('UNIVERSITAS' in b.upper() for b in isi)):
         return True
     if len(isi) > 12:
         return False

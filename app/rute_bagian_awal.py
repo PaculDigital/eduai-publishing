@@ -145,22 +145,25 @@ def _peta_tersimpan(db: Session, fid: int):
 def _keadaan(db: Session, fid: int, uid: int, fb: FileBerkas) -> dict:
     """Keadaan tombol + tahap untuk satu naskah (baca DB + teks bila perlu).
 
-    Bab dari peta bila ada; bila peta belum ada, baca teks naskah supaya
-    "Bab I-III belum selesai" dan "sudah selesai tapi belum diperiksa"
-    tidak tertukar.
+    Bab dari peta bila ada, DIGABUNG dengan bab dari teks naskah
+    (17 Nov 2026, cacat gerbang fid 81): peta Jev tidak selalu melabeli
+    judul bab ('BAB I' telanjang tanpa label), jadi peta saja bisa buta
+    padahal Bab I-III lengkap di dokumen. Teks hanya MENAMBAH bab
+    (gabungan), tidak pernah mengurangi yang sudah dibaca peta. Bila
+    peta belum ada, teks satu-satunya sumber, supaya "Bab I-III belum
+    selesai" dan "sudah selesai tapi belum diperiksa" tidak tertukar.
     """
     hasil = BA.muat_hasil(db, fid) or {}
     sudah_ditempel = bool(hasil.get('ditempel'))
     peta, terperiksa = _peta_tersimpan(db, fid)
     bab = BA.bab_dari_peta(peta) if peta else set()
-    if not peta:
-        try:
-            from .ai import _path_berkas as _pb
-            from .ai import _teks_dari_berkas as _tb
-            teks = _tb(_pb(fb), fb.nama) or ''
-            bab = BA.bab_dari_teks(teks)
-        except Exception:                                  # noqa: BLE001
-            bab = set()
+    try:
+        from .ai import _path_berkas as _pb
+        from .ai import _teks_dari_berkas as _tb
+        teks = _tb(_pb(fb), fb.nama) or ''
+        bab = bab | BA.bab_dari_teks(teks)
+    except Exception:                                      # noqa: BLE001
+        pass
     tombol = BA.keadaan_tombol(bab, terperiksa, sudah_ditempel)
     tahap = BA.tahap_dari_bab(bab)
     return {'bab': sorted(bab), 'terperiksa': terperiksa, 'tahap': tahap,
