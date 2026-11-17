@@ -601,7 +601,7 @@ def jalankan():
     teks_per = _teks_docx(docx2)
     cek('docx: perbarui nomor daftar mengisi nomor nyata dari render',
         r_per.get('ok') and r_per.get('diperbarui', 0) >= 2
-        and 'BAB I  1' in teks_per and 'BAB II  2' in teks_per,
+        and 'BAB I\t1' in teks_per and 'BAB II\t2' in teks_per,
         str(r_per) + ' | ' + teks_per[:400])
     import app.sidecar_buku as _sc
     _sc_asli = _sc.teks_halaman
@@ -698,7 +698,35 @@ def jalankan():
                   'tanggal_sidang': '16 November 2026'}
 
     def _hitung_judul(teks, kata):
-        return sum(1 for t in teks if t.strip().upper() == kata)
+        """Hitung kemunculan judul seksi DI LUAR blok Daftar Isi.
+
+        Daftar Isi kini memuat entri depan (nama seksi sebagai entri,
+        tanpa nomor sebelum Perbarui), jadi hitung mentah mengganda
+        ('KATA PENGANTAR' 2x: entri + judul seksi). Blok Daftar Isi =
+        dari judul seksi 'DAFTAR ISI' sampai judul seksi 'DAFTAR
+        TABEL' berikutnya di URUTAN (entri 'Daftar Tabel' di dalam
+        daftar memakai huruf campuran, jadi tidak tertukar dengan
+        judul seksi 'DAFTAR TABEL'). Judul seksi 'DAFTAR ISI' sendiri
+        tetap dihitung (batas awal blok, bukan isi blok).
+        """
+        atas = kata.strip().upper()
+        awal = None
+        akhir = None
+        for i, t in enumerate(teks):
+            if t.strip() == 'DAFTAR ISI' and awal is None:
+                awal = i
+            elif awal is not None and t.strip() == 'DAFTAR TABEL':
+                akhir = i
+                break
+        n = 0
+        for i, t in enumerate(teks):
+            if t.strip().upper() != atas:
+                continue
+            if awal is not None and awal < i and (akhir is None
+                                                 or i < akhir):
+                continue
+            n += 1
+        return n
 
     docx_buku = Path(TMP) / 'buku.docx'
     _buat_buku(docx_buku)
@@ -752,8 +780,13 @@ def jalankan():
                     'DAFTAR LAMPIRAN')]
     cek('regresi cacat 3: urutan daftar ikut Pedoman (Isi, Tabel, Gambar, Lampiran)',
         _idx_daftar == sorted(_idx_daftar), str(_idx_daftar))
-    _i_abs = _par_b1.index('ABSTRACT')
-    _i_abr = _par_b1.index('ABSTRAK')
+    # Kemunculan TERAKHIR: Daftar Isi kini memuat entri depan, jadi
+    # kemunculan pertama 'ABSTRAK' adalah entri daftar, bukan judul
+    # seksi (entri 'Abstract' huruf campuran tidak tertukar, tapi
+    # 'ABSTRAK' huruf besar tertukar). Judul seksi selalu sesudah
+    # Daftar Isi, jadi kemunculan terakhir adalah judul seksi.
+    _i_abs = len(_par_b1) - 1 - _par_b1[::-1].index('ABSTRACT')
+    _i_abr = len(_par_b1) - 1 - _par_b1[::-1].index('ABSTRAK')
     cek('regresi cacat 4: halaman abstract berisi judul + kolom (bukan kosong)',
         _par_b1[_i_abs + 2] == 'Mahasiswa Uji'
         and _par_b1[_i_abs + 3] == 'Pemasaran Digital'
@@ -869,8 +902,8 @@ def jalankan():
                 'BAB 1\nPENDAHULUAN\nTabel 1.1 Jenis Data',
                 'BAB 2\nTINJAUAN PUSTAKA\nGambar 2.1 Model Penelitian',
                 'BAB 3\nMETODE PENELITIAN\nLampiran 1 Kuesioner']).get('ok')
-        and 'Tabel 1.1 Jenis Data  1' in _teks_docx(docx_buku)
-        and 'Gambar 2.1 Model Penelitian  2' in _teks_docx(docx_buku))
+        and 'Tabel 1.1 Jenis Data\t1' in _teks_docx(docx_buku)
+        and 'Gambar 2.1 Model Penelitian\t2' in _teks_docx(docx_buku))
 
     # ── 12d. Regresi perbaikan Perbarui #3 (16 Nov 2026) ────────────
     # (a) Daftar Isi buatan: satu baris per bab. Penanda telanjang
@@ -917,13 +950,13 @@ def jalankan():
     _par_dup = _par_xml(_docx_dup)
     cek('regresi 12d: nomor daftar tidak menimpa judul seksi',
         _r_dup.get('ok') and _par_dup[0] == 'KATA PENGANTAR'
-        and _par_dup[3] == 'KATA PENGANTAR  ii',
+        and _par_dup[3] == 'KATA PENGANTAR\ti',
         str(_r_dup) + ' | ' + str(_par_dup[:8]))
     cek('regresi 12d: judul ganda bernomor berurutan (bukan satu nomor)',
-        _par_dup[5] == 'Ringkasan Bab  2'
-        and _par_dup[7] == 'Ringkasan Bab  4'
-        and _par_dup[4] == 'BAB 1. PENDAHULUAN  1'
-        and _par_dup[6] == 'BAB 2. TINJAUAN PUSTAKA  3',
+        _par_dup[5] == 'Ringkasan Bab\t2'
+        and _par_dup[7] == 'Ringkasan Bab\t4'
+        and _par_dup[4] == 'BAB 1. PENDAHULUAN\t1'
+        and _par_dup[6] == 'BAB 2. TINJAUAN PUSTAKA\t3',
         str(_par_dup[3:9]))
     cek('regresi 12d: judul badan tidak ikut bernomor daftar',
         _par_dup[13] == 'Ringkasan Bab' and _par_dup[17] == 'Ringkasan Bab',
@@ -954,9 +987,14 @@ def jalankan():
                      'DAFTAR ISI\nBAB 1\nPENDAHULUAN\n1.1 Latar Belakang',
                      'BAB 1\nPENDAHULUAN\nIsi bab satu.',
                      'BAB 2\nTINJAUAN PUSTAKA\nIsi teori.']
-    cek('regresi cacat 3: nomor footer depan Romawi (pengantar ii, isi iii)',
-        BA.nomor_footer_dari_render(_render_nomor, 'KATA PENGANTAR') == 'ii'
-        and BA.nomor_footer_dari_render(_render_nomor, 'DAFTAR ISI') == 'iii',
+    # Nomor footer depan Romawi: sampul tidak dihitung (model TOC asli
+    # mahasiswa 27 Okt 2026: Judul i di fisik 2, Kata Pengantar vi di
+    # fisik 7). Render sintetis ini tanpa footer tercetak, jadi
+    # dihitung dari posisi (fisik - 1): pengantar i, isi ii. Dulu
+    # 'ii'/'iii' (fisik), dibalik putaran 5.
+    cek('regresi cacat 3: nomor footer depan Romawi (pengantar i, isi ii)',
+        BA.nomor_footer_dari_render(_render_nomor, 'KATA PENGANTAR') == 'i'
+        and BA.nomor_footer_dari_render(_render_nomor, 'DAFTAR ISI') == 'ii',
         str(BA.nomor_footer_dari_render(_render_nomor, 'KATA PENGANTAR')))
     cek('regresi cacat 3: nomor footer badan Arab mulai 1 di Bab I',
         BA.nomor_footer_dari_render(_render_nomor, 'BAB 1') == 1
@@ -1580,7 +1618,7 @@ def jalankan():
         UO.ukur_halaman = _uo_asli
     cek('ukur-oo: ukur stub -> nomor ditulis dari render OnlyOffice',
         _r_ukur.get('ok') and _r_ukur.get('diperbarui', 0) >= 2
-        and 'BAB I  1' in _teks_ukur and 'BAB II  2' in _teks_ukur,
+        and 'BAB I\t1' in _teks_ukur and 'BAB II\t2' in _teks_ukur,
         str(_r_ukur))
 
     # Paksa simpan bila disunting (pembantu rute, async).
@@ -1645,8 +1683,8 @@ def jalankan():
         str(_st_pd))
     _idx_pd = _teks_pd.find('DAFTAR ISI')
     cek('rute daftar: nomor ditulis ke docx (BAB I = 1)',
-        'BAB I. PENDAHULUAN  1' in _teks_pd
-        and '1.1 Latar Belakang  1' in _teks_pd,
+        'BAB I. PENDAHULUAN\t1' in _teks_pd
+        and '1.1 Latar Belakang\t1' in _teks_pd,
         _teks_pd[_idx_pd:_idx_pd + 500])
     _p_jalan = _proses.mulai(db, user_id=u.id, file_id=fb.id,
                              komentar=[BA.KOMENTAR_PROSES_DAFTAR])

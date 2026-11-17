@@ -174,21 +174,21 @@ def jalankan():
     teks1 = _teks_dari_docx(docx2)
     cek('docx: perbarui pertama berhasil',
         r1.get('ok') and r1.get('diperbarui', 0) >= 4, str(r1))
-    cek('docx: BAB 4 bernomor 70 dengan dua spasi',
-        'BAB 4. HASIL DAN PEMBAHASAN  70' in teks1, teks1[:500])
-    cek('docx: tidak ada pemisah tab di entri daftar',
-        not any('\t' in ln and ('BAB' in ln or 'Digital Marketing' in ln
-                                or 'Keberlanjutan Usaha' in ln)
-                for ln in teks1.splitlines()), teks1[:500])
+    cek('docx: BAB 4 bernomor 70 dengan tab (dot leader)',
+        'BAB 4. HASIL DAN PEMBAHASAN\t70' in teks1, teks1[:500])
+    cek('docx: pemisah tab (dot leader) di entri daftar',
+        any('\t' in ln and ('BAB' in ln or 'Digital Marketing' in ln
+                            or 'Keberlanjutan Usaha' in ln)
+            for ln in teks1.splitlines()), teks1[:500])
     r2 = BA.perbarui_nomor_daftar(docx2, halaman_render=RENDER)
     teks2 = _teks_dari_docx(docx2)
     cek('docx: perbarui kedua (baca dua spasi) tetap berhasil',
         r2.get('ok') and r2.get('diperbarui', 0) >= 4, str(r2))
     cek('docx: BAB 4 tetap 70 sesudah perbarui kedua',
-        'BAB 4. HASIL DAN PEMBAHASAN  70' in teks2, teks2[:500])
+        'BAB 4. HASIL DAN PEMBAHASAN\t70' in teks2, teks2[:500])
     cek('docx: subbab tetap bernomor sesudah perbarui kedua',
-        'Digital Marketing  41' in teks2
-        and 'Keberlanjutan Usaha  39' in teks2, teks2[:500])
+        'Digital Marketing\t41' in teks2
+        and 'Keberlanjutan Usaha\t39' in teks2, teks2[:500])
 
     # ── 3. XML dipertahankan: judul seksi boleh Heading, isi tidak ───
     docx3 = Path(TMP) / 'naskah81c.docx'

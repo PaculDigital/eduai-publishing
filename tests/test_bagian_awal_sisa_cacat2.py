@@ -177,22 +177,22 @@ def jalankan():
     cek('perbarui: berhasil, 12 entri diperbarui',
         r.get('ok') and r.get('diperbarui', 0) == 12, str(r))
     cek('perbarui: BAB 1 23, Latar Belakang 23, BAB 4 70',
-        'BAB 1. PENDAHULUAN  23' in teks_n
-        and 'Latar Belakang  23' in teks_n
-        and 'BAB 4. HASIL DAN PEMBAHASAN  70' in teks_n, teks_n[:400])
+        'BAB 1. PENDAHULUAN\t23' in teks_n
+        and 'Latar Belakang\t23' in teks_n
+        and 'BAB 4. HASIL DAN PEMBAHASAN\t70' in teks_n, teks_n[:400])
     cek('perbarui: Uji Validitas 64 lalu 72',
-        'Uji Validitas  64' in teks_n
-        and 'Uji Validitas  72' in teks_n, teks_n[:400])
+        'Uji Validitas\t64' in teks_n
+        and 'Uji Validitas\t72' in teks_n, teks_n[:400])
     cek('perbarui: Koefisien Determinasi 67, 78, 110',
-        'Koefisien Determinasi (R2)  67' in teks_n
-        and 'Koefisien Determinasi (R2)  78' in teks_n
-        and 'Koefisien Determinasi (R2)  110' in teks_n, teks_n[:600])
+        'Koefisien Determinasi (R2)\t67' in teks_n
+        and 'Koefisien Determinasi (R2)\t78' in teks_n
+        and 'Koefisien Determinasi (R2)\t110' in teks_n, teks_n[:600])
     cek('perbarui: Variabel Digital Marketing 72, Identitas 94, '
         'Daftar Pernyataan 95, Digital Marketing 41',
-        'Variabel Digital Marketing  72' in teks_n
-        and 'Identitas Responden  94' in teks_n
-        and 'Daftar Pernyataan  95' in teks_n
-        and 'Digital Marketing  41' in teks_n, teks_n[:600])
+        'Variabel Digital Marketing\t72' in teks_n
+        and 'Identitas Responden\t94' in teks_n
+        and 'Daftar Pernyataan\t95' in teks_n
+        and 'Digital Marketing\t41' in teks_n, teks_n[:600])
     cek('perbarui: tidak ada entri hilang',
         r.get('hilang', []) == [], str(r.get('hilang')))
 
@@ -266,11 +266,16 @@ def jalankan():
         [s['teks'] for s in ringkas['bab'][4]['subbab']]
         == ['Kesimpulan', 'Saran'])
     entri_isi = BA.entri_daftar_isi(PETA)
-    cek('struktur: Daftar Isi tanpa entri level-0 LAMPIRAN',
-        not any(e.get('judul') == 'LAMPIRAN' for e in entri_isi))
-    cek('struktur: jumlah entri Daftar Isi tetap 132 (sama seperti '
-        'sebelum perbaikan)',
-        len(entri_isi) == 132, str(len(entri_isi)))
+    # Putaran 5 MEMBALIKKAN pengecualian putaran 2 dengan sengaja
+    # (keputusan catatan Boss 17 Nov 21:37 WIB): judul kelompok
+    # LAMPIRAN kini DIMASUKKAN sebagai entri level-0, seperti TOC
+    # asli mahasiswa ('LAMPIRAN 66'). Jumlah entri jadi 133
+    # (132 + judul LAMPIRAN).
+    cek('struktur: Daftar Isi MEMUAT entri level-0 LAMPIRAN (putaran 5)',
+        any(e.get('judul') == 'LAMPIRAN' and e.get('level') == 0
+            for e in entri_isi))
+    cek('struktur: jumlah entri Daftar Isi 133 (132 + judul LAMPIRAN)',
+        len(entri_isi) == 133, str(len(entri_isi)))
     cek('struktur: subbab lampiran tetap di Daftar Isi sebagai level-1',
         any(e.get('judul') == 'Identitas Responden'
             and e.get('level') == 1 for e in entri_isi)

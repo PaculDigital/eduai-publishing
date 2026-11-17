@@ -394,7 +394,16 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
     _badan = (paragraf or [])[_idx_bab1:] \
         if _idx_bab1 is not None else (paragraf or [])
     susun = BA.susun_bagian(data, tahap, {
-        'daftar_isi': BA.entri_daftar_isi(peta, paragraf_badan=_badan),
+        'daftar_isi': BA.entri_daftar_isi(
+            peta, paragraf_badan=_badan,
+            gaya_badan=[BA._gaya_dari_xml(x)
+                        for _, x in (spans or [])[_idx_bab1:]]
+            if spans and len(spans) == len(paragraf or []) else None,
+            bagian_depan=[k for k, _ in BA.URUTAN
+                          if k != 'sampul'
+                          and not (k in BA.HANYA_FINAL
+                                   and tahap != 'final')],
+            judul_naskah=data.get('judul', '')),
         'daftar_tabel': [],
         'daftar_gambar': [],
         'daftar_lampiran': [],
@@ -410,7 +419,7 @@ def _bangun_bagian_baru(rencana: dict, baca: dict, spans, data: dict,
                 item[2][:] = [b for b in item[2]
                               if b != BA.BARIS_BELUM_ADA_LAMPIRAN]
                 item[2].extend(
-                    [f"{e['judul']}  {e['halaman']}" if e.get('halaman')
+                    [f"{e['judul']}\t{e['halaman']}" if e.get('halaman')
                      else e['judul'] for e in ket.get(kunci, [])])
     susun_map = {k: (j, b) for k, j, b in susun}
     dipertahankan = {d['kunci'] for d in rencana.get('dipertahankan', [])}
@@ -680,7 +689,9 @@ def _buat_kerja_tempel(p, fid, u, jumlah, rencana):
                                 simpan['sebab'])
                 else:
                     per = BA.perbarui_nomor_daftar(path, fid=fid,
-                                                   user_id=u.id)
+                                                   user_id=u.id,
+                                                   judul_naskah=data.get(
+                                                       'judul', ''))
                     butuh_render = not per.get('ok') or bool(per.get('hilang'))
                     if not per.get('ok'):
                         butuh_render_sebab = str(per.get('sebab', ''))
@@ -989,7 +1000,9 @@ def _buat_kerja_daftar(p, fid, u):
             if not simpan['ok']:
                 raise RuntimeError('Paksa simpan OnlyOffice gagal: '
                                    + simpan['sebab'])
-            hasil = BA.perbarui_nomor_daftar(path, fid=fid, user_id=u.id)
+            hasil = BA.perbarui_nomor_daftar(
+                path, fid=fid, user_id=u.id,
+                judul_naskah=BA.muat_data(d2, fid).get('judul'))
             if not hasil.get('ok'):
                 raise RuntimeError(hasil.get('sebab')
                                    or 'Ukur nomor gagal.')

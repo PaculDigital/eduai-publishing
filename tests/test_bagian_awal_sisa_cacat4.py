@@ -346,11 +346,18 @@ def jalankan():
     cek('tulis: teks seksi dipertahankan utuh dan urut (suburutan)',
         _suburutan(isi_dipertahankan, isi_baru),
         f'{len(isi_dipertahankan)} baris dipertahankan')
-    # Daftar Isi yang ditulis memakai Romawi.
+    # Daftar Isi yang ditulis memakai Romawi. Bentuk akhir diawali 12
+    # entri depan, jadi 'BAB I. PENDAHULUAN' jatuh lebih jauh: cari di
+    # seluruh seksi Daftar Isi (sampai judul seksi berikutnya), bukan
+    # 8 baris pertama.
     idx_daftar = next(
         (i for i, t in enumerate(teks_baru)
          if t.strip() == 'DAFTAR ISI'), None)
-    daftar_baru = teks_baru[idx_daftar:idx_daftar + 8] \
+    idx_akhir = next(
+        (i for i in range(idx_daftar + 1, len(teks_baru))
+         if teks_baru[i].strip() == 'DAFTAR TABEL'), len(teks_baru)) \
+        if idx_daftar is not None else len(teks_baru)
+    daftar_baru = teks_baru[idx_daftar:idx_akhir] \
         if idx_daftar is not None else []
     cek('tulis: Daftar Isi tertulis BAB I. PENDAHULUAN (Romawi)',
         'BAB I. PENDAHULUAN' in daftar_baru, str(daftar_baru[:4]))
