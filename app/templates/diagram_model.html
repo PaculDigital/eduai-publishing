@@ -35,6 +35,7 @@
       <td><select name="vp" onchange="segarkanPilihan()">
         <option value="X" {% if v.peran == 'X' %}selected{% endif %}>X (bebas)</option>
         <option value="Z" {% if v.peran in ('Z', 'M') %}selected{% endif %}>Z (perantara)</option>
+        <option value="W" {% if v.peran == 'W' %}selected{% endif %}>W (penguat)</option>
         <option value="Y" {% if v.peran == 'Y' %}selected{% endif %}>Y (hasil)</option>
       </select></td>
       <td><button class="tombol kedua" type="button" onclick="hapusBaris(this)">Hapus</button></td>
@@ -62,26 +63,45 @@
     {% endfor %}
   </table>
   <p><button class="tombol kedua" type="button" onclick="tambahHipotesis()">+ Hipotesis</button></p>
+  <p>Jalur dari penguat (W) ke hasil (Y) digambar putus-putus.</p>
 
   <p><button class="tombol" type="submit">Lihat draf</button>
   <a href="/naskah/{{ berkas.id }}/diagram">Batal</a></p>
 </form>
 <script>
+function kodePeran(peran, nomor, jumlah) {
+  // Kode kotak: X selalu bernomor (X1, X2, ...); Z/W bernomor HANYA
+  // bila lebih dari satu (Z1/Z2, W1/W2), satu saja tetap 'Z'/'W'
+  // seperti dulu (dan seperti M1/M2 di Bab IV).
+  if (peran === 'X') return 'X' + nomor;
+  if (peran === 'Z') return jumlah > 1 ? 'Z' + nomor : 'Z';
+  if (peran === 'W') return jumlah > 1 ? 'W' + nomor : 'W';
+  return 'Y';
+}
 function barisVariabel() {
   var keluar = [];
-  var nX = 0, idx = 0;
+  var nX = 0, nZ = 0, nW = 0, idx = 0;
+  var baris = [];
   document.querySelectorAll('#tabel-variabel tr').forEach(function (tr) {
     var nama = tr.querySelector('input[name="vn"]');
     var peran = tr.querySelector('select[name="vp"]');
     if (!nama) return;
     var t = (nama.value || '').trim();
     if (!t) return;
-    var p = peran ? peran.value : 'X';
-    var kode = 'Y';
-    if (p === 'X') { nX += 1; kode = 'X' + nX; }
-    else if (p === 'Z') { kode = 'Z'; }
-    keluar.push({nama: t, peran: p, kode: kode, indeks: idx});
+    baris.push({nama: t, peran: peran ? peran.value : 'X', indeks: idx});
     idx += 1;
+  });
+  var jmlZ = 0, jmlW = 0;
+  baris.forEach(function (b) {
+    if (b.peran === 'Z') jmlZ += 1;
+    if (b.peran === 'W') jmlW += 1;
+  });
+  baris.forEach(function (b) {
+    var kode = 'Y';
+    if (b.peran === 'X') { nX += 1; kode = kodePeran('X', nX, 0); }
+    else if (b.peran === 'Z') { nZ += 1; kode = kodePeran('Z', nZ, jmlZ); }
+    else if (b.peran === 'W') { nW += 1; kode = kodePeran('W', nW, jmlW); }
+    keluar.push({nama: b.nama, peran: b.peran, kode: kode, indeks: b.indeks});
   });
   return keluar;
 }
@@ -126,7 +146,11 @@ function isiPilihan(sel, kunci) {
     sel.appendChild(kosong);
   }
   var cocok = cariVariabel(daftar, kunci);
+  var lewat = sel.classList.contains('pilih-lewat');
   daftar.forEach(function (v) {
+    // Lewat harus perantara (Z): penguat (W) tidak ditawarkan
+    // sebagai Lewat (server juga menolaknya).
+    if (lewat && v.peran === 'W') return;
     var o = document.createElement('option');
     o.value = v.kode;
     o.dataset.nama = v.nama;
@@ -185,6 +209,7 @@ function tambahVariabel() {
   tr.innerHTML = '<td><input type="text" name="vn" oninput="segarkanPilihan()"></td>'
     + '<td><select name="vp" onchange="segarkanPilihan()"><option value="X">X (bebas)</option>'
     + '<option value="Z">Z (perantara)</option>'
+    + '<option value="W">W (penguat)</option>'
     + '<option value="Y">Y (hasil)</option></select></td>'
     + '<td><button class="tombol kedua" type="button" onclick="hapusBaris(this)">Hapus</button></td>';
   t.appendChild(tr);

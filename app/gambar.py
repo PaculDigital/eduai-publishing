@@ -413,10 +413,11 @@ def gambar_grafik(data: Any, jenis: str = 'batang', judul: str = 'Grafik',
 # ══════════════════════════════════════════════════════════════════════════
 # DIAGRAM PANAH MODEL PENELITIAN + ALUR DESAIN (17Nov26, GAS Bos 09:25)
 # Digambar mesin secara deterministik dari data model (bukan AI).
-# Panah = garis + kepala segitiga kecil. Kotak X teal, Z oranye, Y nila.
+# Panah = garis + kepala segitiga kecil. Kotak X teal, Z oranye,
+# W hijau (penguat, dibedakan dari perantara oranye), Y nila.
 # ══════════════════════════════════════════════════════════════════════════
-WARNA_PERAN = {'X': TEAL, 'Z': ORANYE, 'M': ORANYE, 'Y': '#5C6BC0',
-               'langkah': TEAL}
+WARNA_PERAN = {'X': TEAL, 'Z': ORANYE, 'M': ORANYE, 'W': '#2E7D32',
+               'Y': '#5C6BC0', 'langkah': TEAL}
 
 
 def _bungkus_teks(d, teks: str, font, maks_lebar: int,
@@ -898,8 +899,8 @@ def skor_tata_letak(tata: dict | None) -> dict:
           utamakan panjang yang seimbang;
       (d) simetri: simpangan maksimum pusat kotak X dan Y saja
           dari cermin terhadap garis tengah, px (0 = simetris
-          sempurna; perantara M/Z tidak ikut, memang di atas/bawah
-          garis);
+          sempurna; perantara M/Z dan penguat W tidak ikut, memang
+          di atas/bawah garis atau di kolom X);
       (e) celah_kotak: jarak minimum panah ke kotak yang tidak
           disentuhnya, px (paling besar paling bagus, harus > 0);
       (f) bengkok: jumlah panah yang dibengkokkan (jalan terakhir
@@ -998,8 +999,8 @@ def skor_tata_letak(tata: dict | None) -> dict:
     panah_pendek = min(panjang) if panjang else 0.0
     panah_panjang = max(panjang) if panjang else 0.0
     # (d) Simetri: hanya kolom X dan Y (perantara M/Z memang
-    # ditempatkan di atas/bawah garis, bukan di garisnya, jadi
-    # tidak ikut diukur). Simpangan maksimum pusat kotak X/Y dari
+    # ditempatkan di atas/bawah garis, penguat W di kolom X, bukan
+    # di garisnya, jadi tidak ikut diukur). Simpangan maksimum pusat kotak X/Y dari
     # cermin terhadap garis tengah ('tengah' dari tata), px (0 =
     # simetris sempurna).
     tengah = tata.get('tengah')
