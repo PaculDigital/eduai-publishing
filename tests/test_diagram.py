@@ -384,10 +384,11 @@ def jalankan():
     cek('tata Nura: X kiri, Z tengah, Y kanan, simetris',
         kotak['X1']['x'] == 60 and kotak['Z']['x'] == 550
         and kotak['Y']['x'] == 1040
-        and kotak['Z']['y'] + kotak['Z']['h'] / 2 == 400
-        and kotak['Y']['y'] + kotak['Y']['h'] / 2 == 400
+        and kotak['Z']['y'] + kotak['Z']['h'] / 2 == tata.get('tengah')
+        and kotak['Y']['y'] + kotak['Y']['h'] / 2 == tata.get('tengah')
         and (kotak['X1']['y'] + kotak['X1']['h'] / 2
-             + kotak['X2']['y'] + kotak['X2']['h'] / 2) / 2 == 400)
+             + kotak['X2']['y'] + kotak['X2']['h'] / 2) / 2
+        == tata.get('tengah'))
     cek('tata Nura: 7 panah (H6/H7 tidak langsung digambar putus-putus)',
         len(tata['panah']) == 7 and
         sorted(p['label'] for p in tata['panah']) ==
@@ -676,13 +677,19 @@ def jalankan():
     cek('buang gambar 3.1 satu-satunya (keterangan beda) menghapus 2',
         buang_mini31.get('ok') and buang_mini31.get('dibuang') == 2,
         str(buang_mini31))
-    # Lewat: 9 panah berkode, 7 panah Nura, gaya lewat.
+    # Lewat: 9 panah berkode, 7 panah Nura, gaya lewat. Label H6
+    # hanya di segmen pertama (X1 ke Z); segmen kedua (Z ke Y)
+    # tanpa label (contoh 3: tiap segmen berlabel beda, tidak ada
+    # label yang sama dua kali).
     tata_kode = DG.tata_letak(model_kode)
-    cek('tata berkode: H6 dua segmen lewat Z (X1 ke Z, Z ke Y)',
+    cek('tata berkode: H6/H7 dua segmen lewat Z (X1 ke Z, Z ke Y)',
         sorted((p['dari'], p['ke'], p['gaya'])
                for p in tata_kode['panah']
-               if p['label'].startswith('H6')) ==
-        [('X1', 'Z', 'lewat'), ('Z', 'Y', 'lewat')])
+               if p['gaya'] == 'lewat') ==
+        [('X1', 'Z', 'lewat'), ('X2', 'Z', 'lewat'),
+         ('Z', 'Y', 'lewat'), ('Z', 'Y', 'lewat')]
+        and sorted(p['label'] for p in tata_kode['panah']
+                   if p['gaya'] == 'lewat') == ['', '', 'H6 (+)', 'H7 (+)'])
     cek('tata Nura: H6 satu segmen lewat putus-putus',
         sorted((p['dari'], p['ke'], p['gaya']) for p in tata['panah']
                if p['label'].startswith('H6')) ==
@@ -691,12 +698,12 @@ def jalankan():
     cek('gambar panah berkode = PNG asli (H6 tergambar)',
         png_kode[:8] == b'\x89PNG\r\n\x1a\n' and len(png_kode) > 10000,
         str(len(png_kode)))
-    # Tinggi oval: nama 2 baris = 240, 1 baris = 200 (oval besar,
-    # rasio 1,33 / 1,60 seperti oval contoh; cacat 6).
+    # Tinggi oval: nama 2 baris = 216, 1 baris = 180 (oval besar,
+    # rasio 1,39 / 1,67 seperti oval contoh; cacat 6).
     kotak_nura = {k['id']: k for k in tata['kotak']}
-    cek('tinggi oval: Z/X2 2 baris = 240, X1/Y 1 baris = 200 (cacat 6)',
-        kotak_nura['Z']['h'] == 240 and kotak_nura['X2']['h'] == 240
-        and kotak_nura['X1']['h'] == 200 and kotak_nura['Y']['h'] == 200,
+    cek('tinggi oval: Z/X2 2 baris = 216, X1/Y 1 baris = 180 (cacat 6)',
+        kotak_nura['Z']['h'] == 216 and kotak_nura['X2']['h'] == 216
+        and kotak_nura['X1']['h'] == 180 and kotak_nura['Y']['h'] == 180,
         str({k: v['h'] for k, v in kotak_nura.items()}))
     tata_m, _ = DG.tata_dari_kotak(
         [{'id': 'Z', 'nama': 'Keterlibatan Pelanggan', 'peran': 'Z',
@@ -707,9 +714,9 @@ def jalankan():
           'x': 60, 'y': 110, 'h': 90}],
         [{'dari': 'X1', 'ke': 'Z', 'label': 'H1', 'gaya': 'lewat'}],
         'model')
-    cek('tata manual: tinggi 90 dibetulkan 240 + gaya lewat dipertahankan',
+    cek('tata manual: tinggi 90 dibetulkan 216 + gaya lewat dipertahankan',
         tata_m is not None
-        and {k['id']: k['h'] for k in tata_m['kotak']}['Z'] == 240
+        and {k['id']: k['h'] for k in tata_m['kotak']}['Z'] == 216
         and tata_m['panah'][0]['gaya'] == 'lewat', str(tata_m))
     # Baris variabel kosong = placeholder, dilewati (cacat 7).
     model_kosong, mkos = DG.normalisasi_model(
@@ -764,22 +771,30 @@ def jalankan():
     h2_81 = [p for p in pl81 if p['label'] == 'H2 (+)']
     h6_81 = [p for p in pl81 if p['label'] == 'H6 (+)']
     cek('label H2 dan H6 tidak bertumpuk (cacat 1, PNG)',
-        len(h2_81) == 1 and len(h6_81) == 2
+        len(h2_81) == 1 and len(h6_81) == 1
         and not any(_tumpang(h2_81[0], h) for h in h6_81),
         str(pl81))
-    cek('label H6 tetap 2 (satu per segmen, tidak dibuang)',
-        len(h6_81) == 2)
-    # H1 (X1 ke Y) kini dibengkokkan lewat atas Z, karena Z yang
-    # tinggi (240) menutupi sudut rute lurusnya; yang tetap: H1
-    # menempel di tengah elips (tanpa geser jalur sejajar, dy 0),
-    # dan belokannya di atas Z (y 220 < atas Z 280).
+    cek('label H6 satu kali saja (segmen pertama X1 ke Z; segmen '
+        'kedua Z ke Y tanpa label, contoh 3)',
+        len(h6_81) == 1 and h6_81[0]['dari'] == 'X1'
+        and h6_81[0]['ke'] == 'Z'
+        and len([p for p in pl81 if p['gaya'] == 'lewat'
+                 and p['dari'] == 'Z' and p['ke'] == 'Y'
+                 and p['label'] == '']) == 1)
+    # H1 (X1 ke Y) kini LURUS lewat atas Z seperti contoh 1 (bukan
+    # dibengkokkan seperti v3): menempel di tengah tepi kanan X1
+    # (y1 = pusat X1), garis lurusnya di atas Z, labelnya di atas Z.
     _h1_81 = [p for p in pl81 if p['label'] == 'H1 (+)']
-    cek('label H1 sendiri: menempel di tengah elips, dibengkokkan '
-        'lewat atas Z',
+    _z81 = next(k for k in tata81['kotak'] if k['id'] == 'Z')
+    _x1_81 = next(k for k in tata81['kotak'] if k['id'] == 'X1')
+    cek('label H1 sendiri: panah lurus lewat atas Z (contoh 1)',
         len(_h1_81) == 1
-        and _h1_81[0]['y1'] == 150 and _h1_81[0]['y2'] == 400
-        and len(_h1_81[0].get('rute') or []) >= 1
-        and all(r[1] < 280 for r in _h1_81[0]['rute']),
+        and _h1_81[0]['y1'] == _x1_81['y'] + _x1_81['h'] / 2
+        and not _h1_81[0].get('rute')
+        and _h1_81[0]['cy'] < _z81['y']
+        and not GB._segmen_lewat_kotak(
+            _h1_81[0]['x1'], _h1_81[0]['y1'], _h1_81[0]['x2'],
+            _h1_81[0]['y2'], _z81),
         str(_h1_81))
     png81 = GB.gambar_panah(model81, tata81)
     cek('gambar panah fid 81 = PNG asli (label geser)',
@@ -826,8 +841,8 @@ def jalankan():
                          'Lokasi'))]})
     tata5 = DG.tata_letak(model5)
     xs5 = [k for k in tata5['kotak'] if k['peran'] == 'X']
-    cek('kotak X padat 5: oval 200 (nama 1 baris), teks terpusat',
-        len(xs5) == 5 and all(k['h'] == 200 for k in xs5)
+    cek('kotak X padat 5: oval 180 (nama 1 baris), teks terpusat',
+        len(xs5) == 5 and all(k['h'] == 180 for k in xs5)
         and all(_pad_teks(k) >= 20 for k in xs5),
         str([(k['nama'], k['y'], k['h']) for k in xs5]))
     cek('kotak X padat 5: tidak tumpang tindih',
@@ -849,12 +864,12 @@ def jalankan():
                          'Promosi', 'Lokasi', 'Pelayanan'))]})
     tata6 = DG.tata_letak(model6)
     xs6 = [k for k in tata6['kotak'] if k['peran'] == 'X']
-    cek('kotak X padat 6: nama 2 baris 240, 1 baris 200, '
+    cek('kotak X padat 6: nama 2 baris 216, 1 baris 180, '
         'tidak tumpang tindih',
         len(xs6) == 6
         and {k['nama']: k['h'] for k in xs6}[
-            'Kualitas Produk dan Layanan'] == 240
-        and all(k['h'] == 200 for k in xs6
+            'Kualitas Produk dan Layanan'] == 216
+        and all(k['h'] == 180 for k in xs6
                 if k['nama'] != 'Kualitas Produk dan Layanan')
         and all(_pad_teks(k) >= 20 for k in xs6)
         and all(xs6[i]['y'] + xs6[i]['h'] <= xs6[i + 1]['y']
@@ -881,11 +896,13 @@ def jalankan():
         and len([p for p in tata_nl['panah'] if p['gaya'] == 'lewat']) == 4,
         str(tata_nl['panah']))
     pl_nl = GB.penempatan_label(tata_nl)
-    cek('label Nura lewat Z: 9 label (H1-H5, H6x2, H7x2)',
-        len(pl_nl) == 9
-        and sorted(p['label'] for p in pl_nl) == sorted(
+    cek('label Nura lewat Z: 7 label (H1-H5, H6x1, H7x1; label tidak '
+        'langsung satu kali, contoh 3)',
+        len([p for p in pl_nl if p['label']]) == 7
+        and sorted(p['label'] for p in pl_nl if p['label']) == sorted(
             ['H1 (+)', 'H2 (+)', 'H3 (+)', 'H4 (+)', 'H5 (+)',
-             'H6 (+)', 'H6 (+)', 'H7 (+)', 'H7 (+)']),
+             'H6 (+)', 'H7 (+)'])
+        and len(pl_nl) == 9,
         str([p['label'] for p in pl_nl]))
     tumpang_nl = [(a['label'], b['label'])
                   for i, a in enumerate(pl_nl) for b in pl_nl[i + 1:]
@@ -907,7 +924,7 @@ def jalankan():
     for _la, _lb, _titik in (
             ('H1 (+)', 'H6 (+)', 'H6 atas H1 di X1 ke Z'),
             ('H2 (+)', 'H7 (+)', 'H7 atas H2 di X2 ke Z'),
-            ('H3 (+)', 'H7 (+)', 'H7 atas H3 di Z ke Y')):
+            ('H3 (+)', 'H7 (+)', 'H7 (X2 ke Z) tidak menimpa H3 (Z ke Y)')):
         _a, _b = _pasangan(_la, _lb)
         cek('label Nura: %s tidak bertumpuk (titik live)' % _titik,
             _a is not None and _b is not None and not _tumpang(_a, _b),
@@ -1006,22 +1023,30 @@ def jalankan():
     cek('Nura lewat Z: tiap panah punya garis sendiri (tidak menumpuk)',
         not _garis_unik(pl_nl), str(_garis_unik(pl_nl)))
     # Putus-putus di kedua segmen H6/H7, lurus tetap lurus (piksel).
+    # Segmen kedua Z ke Y kini tanpa label, dicari lewat dari/ke.
     _seg_h6_81 = [p for p in pl81 if p['label'] == 'H6 (+)']
+    _seg_h6b_81 = [p for p in pl81 if p['gaya'] == 'lewat'
+                   and p['dari'] == 'Z' and p['ke'] == 'Y']
     _seg_h2_81 = [p for p in pl81 if p['label'] == 'H2 (+)']
     cek('Asih: H6 putus-putus di kedua segmen, H2 lurus (piksel)',
-        len(_seg_h6_81) == 2
+        len(_seg_h6_81) == 1 and len(_seg_h6b_81) == 1
         and all(_fraksi_terang(_png81, pl81, p) >= 0.25
-                for p in _seg_h6_81)
+                for p in _seg_h6_81 + _seg_h6b_81)
         and all(_fraksi_terang(_png81, pl81, p) <= 0.10
                 for p in _seg_h2_81),
         str([round(_fraksi_terang(_png81, pl81, p), 2)
-             for p in _seg_h6_81 + _seg_h2_81]))
+             for p in _seg_h6_81 + _seg_h6b_81 + _seg_h2_81]))
     _png_nl = GB.gambar_panah(model_nl, tata_nl)
     _seg_nl = {lab: [p for p in pl_nl if p['label'] == lab]
                for lab in ('H6 (+)', 'H7 (+)', 'H3 (+)')}
+    _seg_nl_tanpa = [p for p in pl_nl if p['gaya'] == 'lewat'
+                     and p['dari'] == 'Z' and p['ke'] == 'Y']
     cek('Nura: H6/H7 putus-putus di kedua segmen, H3 lurus (piksel)',
-        all(_fraksi_terang(_png_nl, pl_nl, p) >= 0.25
-            for lab in ('H6 (+)', 'H7 (+)') for p in _seg_nl[lab])
+        len(_seg_nl_tanpa) == 2
+        and all(_fraksi_terang(_png_nl, pl_nl, p) >= 0.25
+                for lab in ('H6 (+)', 'H7 (+)') for p in _seg_nl[lab])
+        and all(_fraksi_terang(_png_nl, pl_nl, p) >= 0.25
+                for p in _seg_nl_tanpa)
         and all(_fraksi_terang(_png_nl, pl_nl, p) <= 0.10
                 for p in _seg_nl['H3 (+)']),
         str({lab: [round(_fraksi_terang(_png_nl, pl_nl, p), 2)
@@ -1102,10 +1127,11 @@ def jalankan():
                 _t_mat = DG.tata_letak(_m_mat)
                 _k_mat = {k['id']: k for k in _t_mat['kotak']}
                 _pl_mat = GB.penempatan_label(_t_mat)
-                # Garis tengah = tinggi kanvas // 2 (kanvas tumbuh
-                # mengikuti kolom tertinggi, oval besar).
+                # Garis tengah = 'tengah' dari tata_letak (pusat Z/Y);
+                # kanvas kini memeluk isi, jadi garis tengah bukan
+                # lagi tinggi kanvas // 2.
                 _tinggi_mat = _t_mat.get('tinggi') or 800
-                _tengah = _tinggi_mat / 2
+                _tengah = _t_mat.get('tengah', _tinggi_mat / 2)
                 _tag = '%d X%s%s' % (
                     _n_x, ' + Z' if _dengan_z else '',
                     ' + lewat' if _lewat else '')
@@ -1150,6 +1176,20 @@ def jalankan():
                                 _kena.append((_p['label'], _j, _k['id']))
                 cek('matriks %s: tidak ada ruas menembus kotak' % _tag,
                     not _kena, str(_kena))
+                # Panah langsung lurus, kecuali X tengah yang segaris
+                # dengan Z dan Y (3/5/9 X + Z): garis lurus dari tepi
+                # kanan/kiri hanya berjarak ~4 px dari atas Z, jadi
+                # jalannya tetap dibengkokkan lewat atas Z
+                # (pengecualian yang didokumentasikan, bukan cacat).
+                _bengkok_mat = [(p['label'], p['dari'], p['ke'])
+                                for p in _pl_mat if p.get('rute')]
+                _tengah_x = (_n_x + 1) // 2
+                _bengkok_harap = (
+                    [('H%d (+)' % _tengah_x, 'X%d' % _tengah_x, 'Y')]
+                    if _dengan_z and _n_x in (3, 5, 9) else [])
+                cek('matriks %s: panah lurus kecuali X tengah' % _tag,
+                    _bengkok_mat == _bengkok_harap,
+                    str(_bengkok_mat))
                 # Label tidak menyentuh kotak, kecuali 9 X + Z + lewat
                 # (padat ekstrem, lihat catatan di atas).
                 if not (_dengan_z and _lewat and _n_x == 9):
@@ -1166,16 +1206,20 @@ def jalankan():
                     cek('matriks %s: tidak ada label bertumpuk' % _tag,
                         _celah_min(_pl_mat) >= 0,
                         str(round(_celah_min(_pl_mat), 1)))
-    # 3 X + Z: panah langsung X tengah (di garis tengah) ke Y harus
-    # dibengkokkan lewat atas Z, bukan menembus Z. Belokan kini
-    # 3 titik (naik, datar di atas Z, turun), semuanya di atas Z
-    # (atas Z y=300, belokan y=240).
+    # 3 X + Z: panah langsung X tengah (di garis tengah, segaris
+    # dengan Z dan Y) TIDAK BISA lurus: titik tempel tertinggi di
+    # tepi kanan/kiri hanya 4 px di atas Z, jadi jalannya tetap
+    # dibengkokkan lewat atas Z (3 titik: naik, datar di atas Z,
+    # turun), semuanya di atas Z. Ini pengecualian yang
+    # didokumentasikan (garis lurus tidak mungkin dengan jarak
+    # yang layak), bukan cacat; panah langsung lain lurus.
     _m3 = _model_matriks(3, True, False)
     _t3 = DG.tata_letak(_m3)
     _pl3 = GB.penempatan_label(_t3)
     _tengah3 = [p for p in _pl3 if p['label'] == 'H2 (+)']
     _z3 = next(k for k in _t3['kotak'] if k['id'] == 'Z')
-    cek('3 X + Z: panah X tengah dibengkokkan lewat atas Z',
+    cek('3 X + Z: panah X tengah dibengkokkan lewat atas Z '
+        '(pengecualian segaris)',
         len(_tengah3) == 1 and len(_tengah3[0].get('rute') or []) >= 1
         and all(r[1] < _z3['y'] for r in _tengah3[0]['rute']),
         str(_tengah3))
@@ -1263,9 +1307,11 @@ def jalankan():
         'jenis': 'kuantitatif', 'desain': 'survei'}
 
     def _kolom_simetris(tata):
-        # Simetri terhadap garis tengah kanvas (tinggi // 2).
+        # Simetri terhadap garis tengah ('tengah' dari tata_letak,
+        # pusat Z/Y); kanvas kini memeluk isi, jadi garis tengah
+        # bukan lagi tinggi // 2.
         tinggi = tata.get('tinggi') or 800
-        tengah = tinggi / 2
+        tengah = tata.get('tengah', tinggi / 2)
         kolom = {}
         for k in tata['kotak']:
             kolom.setdefault(k['x'], []).append(k)
@@ -1369,13 +1415,23 @@ def jalankan():
         cek('%s: tiap panah punya garis sendiri' % _nama,
             not _garis_unik(_pl), str(_garis_unik(_pl)))
     # Panah lompat kolom (H1 contoh 5: X3 tahap 0 ke M2 tahap 3)
-    # dibengkokkan melewati kotak antara, bukan menembus.
+    # kini LURUS lewat di luar kotak antara, bukan dibengkokkan.
     _tc5 = DG.tata_letak(_c5)
     _plc5 = GB.penempatan_label(_tc5)
     _h1c5 = [p for p in _plc5 if p['label'] == 'H1 (+)']
-    cek('contoh 5: panah lompat kolom H1 dibengkokkan',
-        len(_h1c5) == 1 and len(_h1c5[0].get('rute') or []) >= 1,
+    cek('contoh 5: panah lompat kolom H1 lurus (contoh 1 dan 3)',
+        len(_h1c5) == 1 and not _h1c5[0].get('rute'),
         str(_h1c5[0].get('rute') if _h1c5 else None))
+    # H4 (M1 ke M2) dan H8 (M3 ke Y1) lompat kolom TAPI segaris
+    # dengan kotak antara (semua di garis tengah): pengecualian
+    # yang sama seperti X tengah, tetap dibengkokkan lewat atas.
+    _h4c5 = [p for p in _plc5 if p['label'] == 'H4 (+)']
+    _h8c5 = [p for p in _plc5 if p['label'] == 'H8 (+)']
+    cek('contoh 5: H4/H8 segaris tetap dibengkokkan (pengecualian)',
+        len(_h4c5) == 1 and len(_h4c5[0].get('rute') or []) >= 1
+        and len(_h8c5) == 1 and len(_h8c5[0].get('rute') or []) >= 1,
+        str([_h4c5[0].get('rute') if _h4c5 else None,
+             _h8c5[0].get('rute') if _h8c5 else None]))
     # Panah vertikal: dua kotak satu kolom dihubungkan bawah ke atas.
     _tata_v, _masalah_v = DG.tata_dari_kotak(
         [{'id': 'A', 'nama': 'Atas', 'kode': 'A', 'peran': 'X',
@@ -1406,7 +1462,8 @@ def jalankan():
         lebar=_tata_goal.get('lebar') or DG.KANVAS_LEBAR,
         teks31=None)
     cek('editor Goal-Directed: viewBox 2180 dan state lebar 2180',
-        'viewBox="0 0 2180 800"' in _html_goal
+        'viewBox="0 0 2180 %d"' % (_tata_goal.get('tinggi') or 800)
+        in _html_goal
         and '"lebar": 2180' in _html_goal,
         'viewBox/state lebar')
 
@@ -1414,8 +1471,10 @@ def jalankan():
     # Oval contoh (diukur dari berkas gambar): rasio lebar:tinggi
     # 1,18-1,45 (contoh 1), 1,48-1,78 (contoh 6); mesin lama pipih
     # 300x90 (3,33) / 300x110 (2,73) dengan teks menempel tepi.
-    # Mesin kini: lebar 320, tinggi 200 (1 baris, rasio 1,60) / 240
-    # (2 baris, rasio 1,33), teks dipusatkan vertikal di dalam oval.
+    # Mesin kini: lebar 300, tinggi 180 (1 baris, rasio 1,67) / 216
+    # (2 baris, rasio 1,39), teks dipusatkan vertikal di dalam oval.
+    # Boss 18 Nov 11:43 minta dikecilkan sedikit dari v3 (320x200/240):
+    # 180 = 200 kurang 10 persen, 216 = 240 kurang 10 persen.
     for _nama_m, _m13 in (('Nura', MODEL_NURA), ('Asih', model81),
                           ('Goal-Directed', _goal)):
         _t13 = DG.tata_letak(_m13)
@@ -1435,16 +1494,16 @@ def jalankan():
     _t5b = DG.tata_letak(model5)
     cek('oval 5 X: kanvas tumbuh di atas 800 (oval tidak dirampingkan)',
         _t5b.get('tinggi', 800) > 800
-        and all(k['h'] == 200 for k in _t5b['kotak']
+        and all(k['h'] == 180 for k in _t5b['kotak']
                 if k['peran'] == 'X'),
         str((_t5b.get('tinggi'), [k['h'] for k in _t5b['kotak']])))
     _t9b = DG.tata_letak(_model_matriks(9, True, True))
     cek('oval 9 X + Z + lewat: kanvas tumbuh, Z/Y tetap di garis tengah',
         _t9b.get('tinggi', 800) > 800
         and _pusat({k['id']: k for k in _t9b['kotak']}['Z'])
-        == _t9b['tinggi'] / 2
+        == _t9b.get('tengah')
         and _pusat({k['id']: k for k in _t9b['kotak']}['Y'])
-        == _t9b['tinggi'] / 2,
+        == _t9b.get('tengah'),
         str(_t9b.get('tinggi')))
     # PNG ikut tinggi kanvas (bukan 800 tetap).
     _png13 = GB.gambar_panah(model5, _t5b)
@@ -1452,11 +1511,59 @@ def jalankan():
     cek('oval 5 X: PNG setinggi kanvas dinamis',
         _img13.size[1] == _t5b['tinggi'] and _img13.size[0] == 1400,
         str(_img13.size))
-    # Editor: kotak baru 320x200, tinggi minimum oval 200/240.
-    cek('editor: kotak baru 320x200 (oval besar)',
-        "w: 320, h: 200" in isi_editor, 'tambahKotak')
-    cek('editor: tinggi minimum oval 240/200 (bukan 110/90)',
-        "(dua ? 240 : 200)" in isi_editor, 'tinggiTampil')
+    # Editor: kotak baru 300x180, tinggi minimum oval 180/216.
+    cek('editor: kotak baru 300x180 (oval besar)',
+        "w: 300, h: 180" in isi_editor, 'tambahKotak')
+    cek('editor: tinggi minimum oval 216/180 (bukan 110/90)',
+        "(dua ? 216 : 180)" in isi_editor, 'tinggiTampil')
+    # ── 14. Panah lurus + label sekali + kanvas memeluk isi ──────────
+    # (Boss 18 Nov 11:38: bentuk v3 masih aneh dan membingungkan;
+    # contoh 1 dan 3 menggambar semua panah lurus tanpa siku, tiap
+    # segmen jalur tidak langsung berlabel beda, kanvas penuh.)
+    # Panah langsung lurus di semua bentuk (kecuali pengecualian
+    # segaris yang sudah dikunci di matriks dan contoh 5).
+    for _nama14, _m14 in (('Asih', model81), ('Nura lewat Z', model_nl),
+                          ('Goal-Directed', _goal)):
+        _t14 = DG.tata_letak(_m14)
+        _pl14 = GB.penempatan_label(_t14)
+        cek('lurus %s: tidak ada panah bengkok' % _nama14,
+            not any(p.get('rute') for p in _pl14),
+            str([(p['label'], p['dari'], p['ke'])
+                 for p in _pl14 if p.get('rute')]))
+        # Label hipotesis tidak muncul dua kali (tidak langsung
+        # dilabeli satu kali saja di segmen pertama).
+        _lab14 = [p['label'] for p in _pl14 if p['label']]
+        cek('label sekali %s: tidak ada label ganda' % _nama14,
+            len(_lab14) == len(set(_lab14)), str(_lab14))
+        # Kanvas memeluk isi: atas 20 px, bawah = tinggi - 20.
+        _atas14 = min(k['y'] for k in _t14['kotak'])
+        _bawah14 = max(k['y'] + k['h'] for k in _t14['kotak'])
+        cek('kanvas memeluk isi %s: tinggi = bentang + 40' % _nama14,
+            _atas14 == 20 and _bawah14 == _t14['tinggi'] - 20
+            and _t14['tinggi'] == (_bawah14 - _atas14) + 40,
+            str((_t14['tinggi'], _atas14, _bawah14)))
+    # Editor memakai rute lurus yang sama dengan PNG (cermin JS).
+    cek("editor: fungsi ruteLurus ada dan dipakai di gambarUlang",
+        'function ruteLurus' in isi_editor
+        and 'ruteLurus(aT2, bT2' in isi_editor)
+    # PNG akhir dari editor (tata_dari_kotak) ikut memeluk isi.
+    _tm14, _ = DG.tata_dari_kotak(
+        [{'id': 'X1', 'nama': 'Digital Marketing', 'peran': 'X',
+          'x': 60, 'y': 20, 'w': 300, 'h': 180},
+         {'id': 'Z', 'nama': 'Orientasi Kewirausahaan', 'peran': 'Z',
+          'x': 550, 'y': 252, 'w': 300, 'h': 216},
+         {'id': 'Y', 'nama': 'Keberlanjutan Usaha', 'peran': 'Y',
+          'x': 1040, 'y': 252, 'w': 300, 'h': 216}],
+        [{'dari': 'X1', 'ke': 'Y', 'label': 'H1 (+)', 'gaya': 'lurus'},
+         {'dari': 'Z', 'ke': 'Y', 'label': 'H2 (+)', 'gaya': 'lurus'},
+         {'dari': 'X1', 'ke': 'Z', 'label': 'H6 (+)', 'gaya': 'lewat'},
+         {'dari': 'Z', 'ke': 'Y', 'label': '', 'gaya': 'lewat'}],
+        jenis='model', tinggi=488)
+    _png14 = GB.gambar_panah(None, _tm14)
+    _img14 = _Image.open(io.BytesIO(_png14))
+    cek('PNG akhir editor: tinggi memeluk isi (bukan 800)',
+        _tm14['tinggi'] == 488 and _img14.size[1] == 488,
+        str((_tm14['tinggi'], _img14.size)))
 
 
 if __name__ == '__main__':

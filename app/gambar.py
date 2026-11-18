@@ -520,25 +520,29 @@ def _label_panah(d, cx: float, cy: float, label: str) -> None:
 JARAK_JALUR = 40
 
 
-def _titik_elips(kotak: dict, geser: float, sisi: str) -> tuple:
+def _titik_elips(kotak: dict, geser: float, sisi: str,
+                 jepit: float = 6) -> tuple:
     """Titik di tepi elips ('kanan'/'kiri' setinggi tengah + geser,
     'atas'/'bawah' selebar tengah + geser).
 
     Dipakai jalur sejajar: tiap panah menempel di titiknya sendiri,
     bukan di tengah tepi yang sama. Geser dijepit supaya titik tetap
-    di elips (ry - 6 untuk kanan/kiri, rx - 6 untuk atas/bawah).
+    di elips (ry - jepit untuk kanan/kiri, rx - jepit untuk
+    atas/bawah); jepit 2 dipakai rute lurus supaya titik tempel
+    bisa sampai dekat puncak elips (perlu untuk X tengah yang
+    segaris dengan Z).
     """
     cx = kotak['x'] + kotak['w'] / 2
     cy = kotak['y'] + kotak['h'] / 2
     rx = kotak['w'] / 2
     ry = kotak['h'] / 2
     if sisi in ('atas', 'bawah'):
-        geser = max(-(rx - 6), min(rx - 6, geser))
+        geser = max(-(rx - jepit), min(rx - jepit, geser))
         sisa = max(0.0, 1 - (geser / rx) ** 2)
         y = cy - (ry * math.sqrt(sisa) if sisi == 'atas'
                   else -ry * math.sqrt(sisa))
         return cx + geser, y
-    geser = max(-(ry - 6), min(ry - 6, geser))
+    geser = max(-(ry - jepit), min(ry - jepit, geser))
     sisa = max(0.0, 1 - (geser / ry) ** 2)
     x = cx + (rx * math.sqrt(sisa) if sisi == 'kanan'
               else -rx * math.sqrt(sisa))
@@ -627,6 +631,70 @@ def _titik_polilinia(titik, s):
             return (ax + (bx - ax) * f, ay + (by - ay) * f)
         sisa -= ruas
     return titik[-1]
+
+
+def _rute_lurus(a, b, dy, kotak_semua, dari_id, ke_id, vertikal):
+    """Titik tempel supaya panah langsung LURUS lewat di luar kotak
+    perantara (contoh 1 dan 3 Boss 18 Nov 2026: H1 garis lurus
+    diagonal yang lewat di atas perantara, tanpa siku).
+
+    Titik tempel digeser vertikal di tepi elips (dari titik tengah
+    + dy ke arah atas/bawah) sampai segmen lurus tidak menembus
+    kotak lain. Sisi mengikuti posisi kotak asal terhadap kotak
+    yang ditembus: asal di atas perantara lewat atas, asal di bawah
+    lewat bawah (sama tinggi lewat atas). Utamakan titik asal tetap
+    (cari geser tujuan dulu), seperti contoh 1 yang H1-nya
+    menempel di tengah tepi kanan X dan di atas tengah tepi kiri Y.
+    Kembalikan (x1, y1, x2, y2) atau None bila tidak ada garis
+    lurus yang bersih (pemanggil memakai _rute_bengkok sebagai
+    jalan terakhir, bukan diam-diam).
+    """
+    if vertikal:
+        return None
+
+    def _bersih(x1, y1, x2, y2):
+        return not any(_segmen_lewat_kotak(x1, y1, x2, y2, k)
+                       for k in kotak_semua
+                       if k['id'] not in (dari_id, ke_id))
+
+    x1, y1 = _titik_elips(a, dy, 'kanan')
+    x2, y2 = _titik_elips(b, dy, 'kiri')
+    if _bersih(x1, y1, x2, y2):
+        return (x1, y1, x2, y2)
+    temu = None
+    for k in sorted(kotak_semua, key=lambda k: k['x']):
+        if k['id'] in (dari_id, ke_id):
+            continue
+        if _segmen_lewat_kotak(x1, y1, x2, y2, k):
+            temu = k
+            break
+    if temu is None:
+        return (x1, y1, x2, y2)
+    acy = a['y'] + a['h'] / 2
+    mcy = temu['y'] + temu['h'] / 2
+
+    def _geser_awal(d, ry, atas):
+        # Sampai dekat puncak elips (ry - 2): X tengah yang segaris
+        # dengan Z hanya bisa lurus bila titik tempelnya naik sampai
+        # dekat puncak (tepi kanan biasa mentok 6 px di bawah atas Z).
+        batas = -(ry - 2) if atas else (ry - 2)
+        out = []
+        g = d
+        while (g >= batas) if atas else (g <= batas):
+            out.append(g)
+            g += -6 if atas else 6
+        if out and out[-1] != batas:
+            out.append(batas)
+        return out
+
+    for atas in (acy <= mcy, acy > mcy):
+        for ga in _geser_awal(dy, a['h'] / 2, atas):
+            px, py = _titik_elips(a, ga, 'kanan', jepit=2)
+            for gb in _geser_awal(dy, b['h'] / 2, atas):
+                qx, qy = _titik_elips(b, gb, 'kiri', jepit=2)
+                if _bersih(px, py, qx, qy):
+                    return (px, py, qx, qy)
+    return None
 
 
 def _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua, dari_id, ke_id,
@@ -750,13 +818,16 @@ def penempatan_label(tata: dict | None) -> list:
     setinggi tengah + dy, dy = (i - (n-1)/2) * JARAK_JALUR, lurus di
     tengah, lewat di atas/bawah (contoh ke-3 Boss). Label di tengah
     garisnya sendiri. Panah sendiri tetap di tengah (dy 0).
-    Ruas yang menembus kotak (bukan kotak ujung) dibengkokkan lewat
-    atas/bawah kotak itu (mis. panah langsung X di garis tengah ke Y
-    yang menembus Z); label yang mendarat di atas kotak atau label
-    lain digeser sepanjang garisnya sampai bebas. Kembalikan
-    [{'label', 'gaya', 'x1', 'y1', 'x2', 'y2', 'rute', 'cx', 'cy',
-    'geser', 'kiri', 'atas', 'kanan', 'bawah'}]; panah tanpa kotak
-    dilewati.
+    Panah langsung digambar LURUS seperti contoh 1 dan 3: titik
+    tempel dipilih supaya garis lurus lewat di luar kotak perantara
+    (_rute_lurus); bila tidak ada garis lurus yang bersih, ruas
+    dibengkokkan lewat atas/bawah kotak itu (_rute_bengkok, jalan
+    terakhir). Label yang mendarat di atas kotak atau label lain
+    digeser sepanjang garisnya sampai bebas. Kembalikan
+    [{'label', 'gaya', 'dari', 'ke', 'x1', 'y1', 'x2', 'y2',
+    'rute', 'cx', 'cy', 'geser', 'kiri', 'atas', 'kanan', 'bawah'}];
+    panah tanpa kotak dilewati. 'label' kosong berarti segmen kedua
+    jalur tidak langsung (labelnya hanya di segmen pertama).
     """
     if not tata:
         return []
@@ -813,12 +884,20 @@ def penempatan_label(tata: dict | None) -> list:
             label = p.get('label') or ''
             kiri, atas, kanan, bawah = d.textbbox((0, 0), label, font=f)
             lw, lh = kanan - kiri, bawah - atas
-            # Bengkok: ruas yang menembus kotak dibengkokkan lewat
-            # atas/bawah kotak itu (aturan umum, bukan per model).
-            rute = _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua,
-                                 p.get('dari'), p.get('ke'),
-                                 lebar_kanvas,
-                                 tata.get('tinggi') or H)
+            # Panah lurus seperti contoh 1 dan 3: titik tempel dipilih
+            # supaya garis lurus lewat di luar kotak perantara; bila
+            # tidak ada garis lurus yang bersih, dibengkokkan
+            # (jalan terakhir, dilaporkan tes).
+            lurus = _rute_lurus(a, b, dy, kotak_semua, p.get('dari'),
+                                p.get('ke'), vertikal)
+            if lurus is not None:
+                x1, y1, x2, y2 = lurus
+                rute = []
+            else:
+                rute = _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua,
+                                     p.get('dari'), p.get('ke'),
+                                     lebar_kanvas,
+                                     tata.get('tinggi') or H)
             titik = [(x1, y1)] + rute + [(x2, y2)]
             # Label di tengah polilinia; geser sepanjang garisnya bila
             # mendarat di atas kotak atau label lain (aturan umum).
@@ -827,6 +906,7 @@ def penempatan_label(tata: dict | None) -> list:
                 titik, mx, my, lw, lh, kotak_semua, keluar)
             keluar.append({
                 'label': label, 'gaya': p.get('gaya') or 'lurus',
+                'dari': p.get('dari'), 'ke': p.get('ke'),
                 'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
                 'rute': rute,
                 'cx': mx, 'cy': my,

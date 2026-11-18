@@ -106,28 +106,31 @@ function bungkus(teks, maks) {
 function tinggiTampil(k) {
   // Tinggi kotak di layar: setinggi nama, supaya teks tidak
   // terpotong di tepi bawah kotak sesudah digeser. Oval model
-  // (lebar 320): 1 baris = 200, 2 baris = 240; kotak Desain
+  // (lebar 300): 1 baris = 180, 2 baris = 216; kotak Desain
   // (lebar 600): 1 baris = 90, 2 baris = 110.
   var maks = k.w > 400 ? 30 : 18;
   var dua = bungkus(k.nama, maks).length >= 2;
   return Math.max(k.h, k.w > 400 ? (dua ? 110 : 90)
-                                 : (dua ? 240 : 200));
+                                 : (dua ? 216 : 180));
 }
-function titikElips(k, h, geser, sisi) {
+function titikElips(k, h, geser, sisi, jepit) {
   // Titik di tepi elips ('kanan'/'kiri' setinggi tengah + geser,
   // 'atas'/'bawah' selebar tengah + geser), sama dengan _titik_elips
   // di app/gambar.py. Geser dijepit supaya titik tetap di elips
-  // (ry - 6 untuk kanan/kiri, rx - 6 untuk atas/bawah).
+  // (ry - jepit untuk kanan/kiri, rx - jepit untuk atas/bawah);
+  // jepit 2 dipakai rute lurus supaya titik tempel bisa sampai
+  // dekat puncak elips.
+  jepit = jepit || 6;
   var cx = k.x + k.w / 2, cy = k.y + h / 2;
   var rx = k.w / 2, ry = h / 2;
   if (sisi === 'atas' || sisi === 'bawah') {
-    geser = Math.max(-(rx - 6), Math.min(rx - 6, geser));
+    geser = Math.max(-(rx - jepit), Math.min(rx - jepit, geser));
     var sisa = Math.max(0, 1 - (geser / rx) * (geser / rx));
     var y = cy - (sisi === 'atas' ? ry * Math.sqrt(sisa)
                                   : -ry * Math.sqrt(sisa));
     return [cx + geser, y];
   }
-  geser = Math.max(-(ry - 6), Math.min(ry - 6, geser));
+  geser = Math.max(-(ry - jepit), Math.min(ry - jepit, geser));
   var sisa2 = Math.max(0, 1 - (geser / ry) * (geser / ry));
   var x = cx + (sisi === 'kanan' ? rx * Math.sqrt(sisa2)
                                  : -rx * Math.sqrt(sisa2));
@@ -214,6 +217,63 @@ function titikPolilinia(titik, s) {
     sisa -= ruas;
   }
   return titik[titik.length - 1];
+}
+function ruteLurus(a, b, dy, kotak, dariId, keId, vertikal) {
+  // Titik tempel supaya panah langsung LURUS lewat di luar kotak
+  // perantara (contoh 1 dan 3 Bos 18 Nov 2026: H1 garis lurus
+  // diagonal yang lewat di atas perantara, tanpa siku). Sama
+  // dengan _rute_lurus di app/gambar.py. Kembalikan
+  // [x1, y1, x2, y2] atau null bila tidak ada garis lurus yang
+  // bersih (pemanggil memakai ruteBengkok sebagai jalan terakhir).
+  if (vertikal) return null;
+  function bersih(x1, y1, x2, y2) {
+    for (var i = 0; i < kotak.length; i++) {
+      var k = kotak[i];
+      if (k.id === dariId || k.id === keId) continue;
+      if (segmenLewatKotak(x1, y1, x2, y2, k, 4)) return false;
+    }
+    return true;
+  }
+  function geserAwal(d, ry, atas) {
+    var batas = atas ? -(ry - 2) : (ry - 2);
+    var out = [], g = d;
+    while (atas ? g >= batas : g <= batas) {
+      out.push(g);
+      g += atas ? -6 : 6;
+    }
+    if (out.length && out[out.length - 1] !== batas) out.push(batas);
+    return out;
+  }
+  var p0 = titikElips(a, a.h, dy, 'kanan'),
+      q0 = titikElips(b, b.h, dy, 'kiri');
+  if (bersih(p0[0], p0[1], q0[0], q0[1]))
+    return [p0[0], p0[1], q0[0], q0[1]];
+  var temu = null;
+  var urut = kotak.slice().sort(function (k1, k2) { return k1.x - k2.x; });
+  for (var i = 0; i < urut.length; i++) {
+    var k = urut[i];
+    if (k.id === dariId || k.id === keId) continue;
+    if (segmenLewatKotak(p0[0], p0[1], q0[0], q0[1], k, 4)) {
+      temu = k;
+      break;
+    }
+  }
+  if (!temu) return [p0[0], p0[1], q0[0], q0[1]];
+  var acy = a.y + a.h / 2, mcy = temu.y + temu.h / 2;
+  var sisi = [acy <= mcy, acy > mcy];
+  for (var s = 0; s < sisi.length; s++) {
+    var atas = sisi[s];
+    var geserA = geserAwal(dy, a.h / 2, atas),
+        geserB = geserAwal(dy, b.h / 2, atas);
+    for (var ia = 0; ia < geserA.length; ia++) {
+      var p = titikElips(a, a.h, geserA[ia], 'kanan', 2);
+      for (var ib = 0; ib < geserB.length; ib++) {
+        var q = titikElips(b, b.h, geserB[ib], 'kiri', 2);
+        if (bersih(p[0], p[1], q[0], q[1])) return [p[0], p[1], q[0], q[1]];
+      }
+    }
+  }
+  return null;
 }
 function ruteBengkok(x1, y1, x2, y2, dy, kotak, dariId, keId) {
   // Titik belok bila segmen menembus kotak (bukan kotak ujung):
@@ -412,6 +472,21 @@ function gambarUlang() {
     var titik = [[u.x1, u.y1], [u.x2, u.y2]];
     var g;
     if (JENIS === 'model') {
+      // Panah lurus seperti contoh 1 dan 3: titik tempel dipilih
+      // supaya garis lurus lewat di luar kotak perantara (sama
+      // dengan PNG); bila tidak ada garis lurus yang bersih,
+      // dibengkokkan (jalan terakhir).
+      var aT2 = {x: a.x, y: a.y, w: a.w, h: tinggi[a.id]};
+      var bT2 = {x: b.x, y: b.y, w: b.w, h: tinggi[b.id]};
+      var lurus = ruteLurus(aT2, bT2, geserLabel[idx], kotakGambar,
+                            p.dari, p.ke, tumpukVertikal(aT2, bT2));
+      if (lurus) {
+        u = {x1: lurus[0], y1: lurus[1], x2: lurus[2], y2: lurus[3],
+             lx: (lurus[0] + lurus[2]) / 2,
+             ly: (lurus[1] + lurus[3]) / 2};
+        mx = u.lx; my = u.ly;
+        titik = [[u.x1, u.y1], [u.x2, u.y2]];
+      }
       // Bengkok bila ruas menembus kotak (aturan umum, sama dengan PNG).
       var rute = ruteBengkok(u.x1, u.y1, u.x2, u.y2, geserLabel[idx],
                              kotakGambar, p.dari, p.ke);
@@ -541,7 +616,7 @@ function tolak() {
 }
 function tambahKotak() {
   var n = state.kotak.length + 1;
-  state.kotak.push({id: 'k' + Date.now(), nama: 'Kotak baru', kode: 'X' + n, peran: 'X', x: 450, y: 300, w: 320, h: 200});
+  state.kotak.push({id: 'k' + Date.now(), nama: 'Kotak baru', kode: 'X' + n, peran: 'X', x: 450, y: 300, w: 300, h: 180});
   tandaiUbah(); gambarUlang();
 }
 function tambahLangkah() {

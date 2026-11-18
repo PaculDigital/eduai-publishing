@@ -71,16 +71,21 @@ KANVAS_TINGGI = 800
 # simetris terhadap garis ini (contoh skripsi Boss 18 Nov 2026).
 TENGAH_KANVAS = KANVAS_TINGGI // 2
 # Jarak pusat X terluar ke garis tengah (1 X) / setengah bentang
-# kolom X (2-4 X). 250 px supaya panah langsung X ke Y lewat jelas
-# di atas/bawah Z (66 px di atas Z bila Z 2 baris, tinggi 240).
+# kolom X (2-4 X). 250 px supaya panah langsung X ke Y bisa lurus
+# lewat di atas/bawah Z (titik tempel dipilih mesin, lihat
+# _rute_lurus di app/gambar.py).
 LANGKAH_X = 250
-LEBAR_KOTAK = 320
+LEBAR_KOTAK = 300
 # Tinggi oval model (contoh skripsi Boss 18 Nov 2026): oval contoh
 # besar dan bulat alami (rasio lebar:tinggi 1,2-1,8, teks di tengah
-# dengan ruang lega), bukan pipih 300x90. Lebar 320, tinggi 200
-# (nama 1 baris, rasio 1,60) / 240 (nama 2 baris, rasio 1,33).
-TINGGI_OVAL_1 = 200
-TINGGI_OVAL_2 = 240
+# dengan ruang lega), bukan pipih 300x90. Lebar 300, tinggi 180
+# (nama 1 baris, rasio 1,67) / 216 (nama 2 baris, rasio 1,39).
+# Boss 18 Nov 11:43 minta dikecilkan sedikit dari v3 (320x200/240):
+# 180 = 200 kurang 10 persen, 216 = 240 kurang 10 persen (215 Boss
+# dibulatkan ke 216 supaya tinggi genap dan pusat oval tepat di
+# garis tengah).
+TINGGI_OVAL_1 = 180
+TINGGI_OVAL_2 = 216
 
 
 def _rapi(teks) -> str:
@@ -316,11 +321,11 @@ def tinggi_kotak(nama: str, lebar: int = LEBAR_KOTAK) -> int:
 
 
 def tinggi_oval(nama: str, lebar: int = LEBAR_KOTAK) -> int:
-    """Tinggi oval model: 200 (nama 1 baris) / 240 (nama 2 baris).
+    """Tinggi oval model: 180 (nama 1 baris) / 216 (nama 2 baris).
 
     Oval contoh besar dan bulat alami (rasio 1,2-1,8); oval mesin
     lama 300x90 pipih (rasio 3,33) dengan teks menempel tepi.
-    Lebar 320 dengan tinggi ini memberi rasio 1,60 / 1,33 dan
+    Lebar 300 dengan tinggi ini memberi rasio 1,67 / 1,39 dan
     ruang teks lega (teks dipusatkan di dalam oval, lihat
     _teks_kotak di app/gambar.py).
     """
@@ -375,7 +380,7 @@ def _tahap_variabel(variabel, jalur):
     return tahap
 
 
-def _pusat_tumpukan(i, n, pusat_satu=400, tinggi_maks=240):
+def _pusat_tumpukan(i, n, pusat_satu=400, tinggi_maks=216):
     """Pusat vertikal kotak ke-i dari n kotak yang simetris terhadap
     garis tengah. 1 kotak di pusat_satu; 2-4 kotak berjarak sama
     dengan pusat terluar ±LANGKAH_X dari garis tengah, direnggang
@@ -414,9 +419,10 @@ def _y_tumpukan_padat(nama_list, lebar=LEBAR_KOTAK, pusat=400,
 
 
 def tata_letak(model: dict) -> dict:
-    """Tata letak deterministik: kotak + panah dalam kanvas 1400x800
-    (dilebarkan bila kolom lebih dari 3, ditinggikan bila kolom
-    lebih tinggi dari 800).
+    """Tata letak deterministik: kotak + panah dalam kanvas 1400
+    (dilebarkan bila kolom lebih dari 3); tinggi kanvas memeluk isi
+    (mengikuti kotak teratas sampai terbawah + margin, tanpa ruang
+    kosong besar di bawah diagram).
 
     Template per jumlah variabel (aturan umum, bukan per model):
     tahap tiap variabel diturunkan dari graf jalur (longest-path):
@@ -430,20 +436,23 @@ def tata_letak(model: dict) -> dict:
     terpusat simetris. Jarak antar kolom 490 px (3 kolom ke bawah,
     sama seperti dulu: X 60, Z 550, Y 1040) atau 440 px (4 kolom ke
     atas, kanvas dilebarkan supaya label panah muat di celah 120 px).
-    Kotak model adalah oval besar (lebar 320, tinggi 200/240,
-    rasio 1,60/1,33 seperti oval contoh); tinggi kanvas tumbuh
-    mengikuti kolom tertinggi supaya oval tetap muat dan simetris
-    (garis tengah = tinggi kanvas // 2).
-    Panah langsung yang menabrak kotak (mis. X di garis tengah ke Y
-    lewat Z) TIDAK dihindari dengan menggeser kotak, melainkan
-    dibengkokkan lewat atas kotak itu di penempatan_label
-    (app/gambar.py) dan gambarUlang editor. Panah 'tidak_langsung'
+    Kotak model adalah oval besar (lebar 300, tinggi 180/216,
+    rasio 1,67/1,39 seperti oval contoh); garis tengah (pusat Z/Y)
+    dicatat di 'tengah' karena kanvas yang memeluk isi tidak lagi
+    berpusat di garis tengah.
+    Panah langsung digambar LURUS seperti contoh 1 dan 3: titik
+    tempel dipilih supaya garis lurus lewat di luar kotak
+    perantara (di atas/bawah), bukan menembus lalu dibengkokkan
+    (lihat _rute_lurus di app/gambar.py). Panah 'tidak_langsung'
     digambar putus-putus: dua segmen (Dari ke Lewat, Lewat ke Ke)
-    bila ada Lewat, satu segmen (Dari ke Ke) bila tidak ada; tiap
-    segmen berlabel hipotesisnya, supaya H6/H7 terlihat di draf.
-    Kembalikan {'kotak', 'panah', 'bentuk', 'lebar', 'tinggi'};
-    'lebar' = lebar kanvas model ini (1400 bila 3 kolom ke bawah),
-    'tinggi' = tinggi kanvas model ini (800 bila muat).
+    bila ada Lewat, satu segmen (Dari ke Ke) bila tidak ada; label
+    hipotesisnya muncul SATU kali saja (di segmen pertama, yang
+    paling terbaca seperti label TL contoh 3), segmen kedua tanpa
+    label, supaya tidak ada label yang sama dua kali.
+    Kembalikan {'kotak', 'panah', 'bentuk', 'lebar', 'tinggi',
+    'tengah'}; 'lebar' = lebar kanvas model ini (1400 bila 3 kolom
+    ke bawah), 'tinggi' = tinggi kanvas model ini (memeluk isi),
+    'tengah' = garis tengah (pusat Z/Y) dalam koordinat akhir.
     """
     variabel = model.get('variabel') or []
     tahap = _tahap_variabel(variabel, model.get('jalur') or [])
@@ -490,23 +499,23 @@ def tata_letak(model: dict) -> dict:
                           'peran': v.get('peran') or 'X',
                           'x': x_kolom[t], 'y': y,
                           'w': LEBAR_KOTAK, 'h': h})
-    # Tinggi kanvas tumbuh mengikuti kolom tertinggi (oval besar),
-    # lalu semua kotak digeser supaya pusat tiap kotak tetap di
-    # garis tengah yang baru (tinggi // 2). Setengah bentang diukur
-    # dari garis tengah (bukan dari total bentang), supaya kolom
-    # yang tingginya tidak simetris (nama 1 dan 2 baris bercampur)
-    # tidak menggeser Z/Y dari garis tengah.
+    # Tinggi kanvas memeluk isi: dari kotak teratas sampai kotak
+    # terbawah + margin 20 px di atas dan bawah. Kanvas tidak lagi
+    # simetris terhadap garis tengah (model 1 X memang berat ke
+    # atas, seperti contoh 1 Boss); garis tengah akhir dicatat di
+    # 'tengah' supaya uji simetri tidak memakai tinggi // 2.
     if kotak:
         atas = min(k['y'] for k in kotak)
         bawah = max(k['y'] + k['h'] for k in kotak)
-        setengah = max(TENGAH_KANVAS - atas, bawah - TENGAH_KANVAS)
-        tinggi_kanvas = max(KANVAS_TINGGI, 2 * setengah + 40)
-        geser = tinggi_kanvas // 2 - TENGAH_KANVAS
+        tinggi_kanvas = (bawah - atas) + 2 * 20
+        geser = 20 - atas
         if geser:
             for k in kotak:
                 k['y'] += geser
+        tengah = TENGAH_KANVAS + geser
     else:
         tinggi_kanvas = KANVAS_TINGGI
+        tengah = TENGAH_KANVAS
     panah: list[dict] = []
     for j in model.get('jalur') or []:
         label = j['hipotesis']
@@ -514,10 +523,14 @@ def tata_letak(model: dict) -> dict:
             label = f"{label} ({j['arah']})"
         if j.get('jenis') == 'tidak_langsung':
             if j.get('lewat'):
+                # Label SATU kali saja (segmen pertama, Dari ke
+                # Lewat); segmen kedua (Lewat ke Ke) tanpa label,
+                # seperti contoh 3 yang tiap segmen berlabel beda
+                # dan tidak ada label yang sama dua kali.
                 panah.append({'dari': j['dari'], 'ke': j['lewat'],
                               'label': label, 'gaya': 'lewat'})
                 panah.append({'dari': j['lewat'], 'ke': j['ke'],
-                              'label': label, 'gaya': 'lewat'})
+                              'label': '', 'gaya': 'lewat'})
             else:
                 panah.append({'dari': j['dari'], 'ke': j['ke'],
                               'label': label, 'gaya': 'lewat'})
@@ -527,7 +540,7 @@ def tata_letak(model: dict) -> dict:
                       else 'lurus'})
     return {'kotak': kotak, 'panah': panah,
             'bentuk': bentuk_model(model), 'lebar': lebar_kanvas,
-            'tinggi': tinggi_kanvas}
+            'tinggi': tinggi_kanvas, 'tengah': tengah}
 
 
 def tata_dari_kotak(kotak, panah, jenis: str = 'model',
@@ -602,9 +615,13 @@ def tata_dari_kotak(kotak, panah, jenis: str = 'model',
     lebar_manual = max(
         KANVAS_LEBAR,
         max((b['x'] + b['w'] for b in bersih), default=0) + 60)
+    # Tinggi kanvas memeluk isi (kotak terbawah + 20 px, sama dengan
+    # margin atas draf), bukan 800 tetap: PNG akhir ikut terpotong
+    # seperti drafnya. Batas bawah 240 px supaya diagram yang sangat
+    # kecil tetap punya ruang.
     tinggi_manual = max(
-        KANVAS_TINGGI,
-        max((b['y'] + b['h'] for b in bersih), default=0) + 60)
+        240,
+        max((b['y'] + b['h'] for b in bersih), default=0) + 20)
     return {'kotak': bersih, 'panah': panah_bersih,
             'bentuk': 'manual', 'lebar': lebar_manual,
             'tinggi': tinggi_manual}, []
