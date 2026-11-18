@@ -1208,7 +1208,9 @@ def model_dari_peta_bab4(peta: dict) -> dict | None:
     Peta Bab IV sudah dibaca dari naskah (beserta bukti kalimatnya),
     jadi ini hanya alih bentuk, bukan baca ulang. Peta memakai
     istilah lazim yang sama (M perantara, Z penguat), jadi peran
-    diteruskan apa adanya tanpa ubah."""
+    diteruskan apa adanya tanpa ubah. Jalur tidak langsung membawa
+    'lewat' (nama perantara) — wajib diteruskan, kalau tidak
+    normalisasi menolak jalur itu karena Lewat kosong."""
     if not isinstance(peta, dict) or not peta.get('variabel'):
         return None
     return {'variabel': [{'nama': v.get('nama', ''),
@@ -1217,6 +1219,7 @@ def model_dari_peta_bab4(peta: dict) -> dict | None:
                               v.get('indikator'))}
                          for v in peta.get('variabel') or []],
             'jalur': [{'dari': j.get('dari', ''), 'ke': j.get('ke', ''),
+                       'lewat': j.get('lewat', ''),
                        'hipotesis': j.get('hipotesis', ''),
                        'jenis': j.get('jenis', 'langsung'), 'arah': ''}
                       for j in peta.get('jalur') or []],
