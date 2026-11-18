@@ -277,13 +277,8 @@ def bentuk_model(model: dict) -> str:
     return 'langsung'
 
 
-def tinggi_kotak(nama: str, lebar: int = LEBAR_KOTAK) -> int:
-    """Tinggi kotak supaya nama muat di dalamnya (tidak terpotong).
-
-    Aturan bungkus sama dengan editor (maks 18 karakter per baris
-    untuk lebar 300, 30 untuk lebar 600): 1 baris = 90, 2 baris = 110
-    (baris kedua berakhir di y+98 di PNG dan y+91 di editor).
-    """
+def _jumlah_baris_nama(nama: str, lebar: int = LEBAR_KOTAK) -> int:
+    """Jumlah baris nama bila dibungkus (aturan sama dengan editor)."""
     maks = 30 if lebar > 400 else 18
     kata = str(nama or '').split()
     baris = 1
@@ -295,7 +290,28 @@ def tinggi_kotak(nama: str, lebar: int = LEBAR_KOTAK) -> int:
         else:
             baris += 1
             kini = k
-    return 110 if baris >= 2 else 90
+    return baris
+
+
+def tinggi_kotak(nama: str, lebar: int = LEBAR_KOTAK) -> int:
+    """Tinggi kotak supaya nama muat di dalamnya (tidak terpotong).
+
+    Aturan bungkus sama dengan editor (maks 18 karakter per baris
+    untuk lebar 300, 30 untuk lebar 600): 1 baris = 90, 2 baris = 110
+    (baris kedua berakhir di y+98 di PNG dan y+91 di editor).
+    """
+    return 110 if _jumlah_baris_nama(nama, lebar) >= 2 else 90
+
+
+def _tinggi_muat(nama: str, lebar: int = LEBAR_KOTAK) -> int:
+    """Tinggi minimal supaya nama muat di dalam kotak (tidak terpotong).
+
+    Teks kotak di PNG: kode di y+10, nama mulai y+42, tiap baris 28 px
+    (font 24, tinggi glif 23); nama 1 baris berakhir y+70, 2 baris
+    y+98. Jadi 76 / 104 (margin 6 px). Dipakai kolom X yang padat
+    (5 X ke atas), supaya kotak tetap ramping tapi teks tidak meluap.
+    """
+    return 104 if _jumlah_baris_nama(nama, lebar) >= 2 else 76
 
 
 def tata_letak(model: dict) -> dict:
@@ -319,12 +335,39 @@ def tata_letak(model: dict) -> dict:
             return 305
         return round(110 + i * (390 / (n_x - 1)))
 
+    # Posisi Y kolom X yang padat: tinggi mengikuti nama, celah 14 px,
+    # kolom di tengah (y=350); bila kolom lebih tinggi dari kanvas,
+    # celah ditekan ke 6 px dan atas ditekan ke 20.
+    if n_x > 4:
+        _hs_padat = [_tinggi_muat(v['nama']) for v in xs]
+        _celah = 14
+        _total = sum(_hs_padat) + (n_x - 1) * _celah
+        if _total > 660:
+            _celah = max(6, (660 - sum(_hs_padat)) // max(1, n_x - 1))
+            _total = sum(_hs_padat) + (n_x - 1) * _celah
+        _y0 = max(20, 350 - _total // 2)
+        _y_x_padat = []
+        _yy = _y0
+        for _h in _hs_padat:
+            _y_x_padat.append(_yy)
+            _yy += _h + _celah
+    else:
+        _y_x_padat = []
+
     for i, v in enumerate(xs):
-        # Kolom X yang padat (5 X ke atas) tetap ramping 64 supaya
-        # kotak tidak tumpang tindih; sisanya setinggi nama.
-        h = 64 if n_x > 4 else tinggi_kotak(v['nama'])
+        # Kolom X yang padat (5 X ke atas): kotak setinggi nama (76/104)
+        # supaya teks tidak meluap (dulu ramping 64, nama 1 baris
+        # berakhir y+70 dan melewati tepi bawah), dan kolom direnggang
+        # supaya kotak tidak tumpang tindih (celah 14 px, tengah di
+        # y=350, ditekan ke 20 bila kolom lebih tinggi dari kanvas).
+        if n_x > 4:
+            h = _tinggi_muat(v['nama'])
+            y = _y_x_padat[i]
+        else:
+            h = tinggi_kotak(v['nama'])
+            y = _y_x(i)
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
-                      'peran': 'X', 'x': 60, 'y': _y_x(i),
+                      'peran': 'X', 'x': 60, 'y': y,
                       'w': LEBAR_KOTAK, 'h': h})
     for v in zs:
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
@@ -551,8 +594,11 @@ def buang_gambar_bagian(path, bagian: str, judul_harapan: str) -> dict:
     keterangannya (gambar milik bagian ini apa pun keterangannya,
     supaya tidak ada duplikat; gambar milik mahasiswa yang
     keterangannya "Desain Penelitian" ikut terbuang saat diganti
-    gambar "Alur Penelitian"). Berkas media lama dibiarkan di dalam
-    zip (tidak terpakai, tidak merusak dokumen).
+    gambar "Alur Penelitian"). Baris "Sumber:" yang langsung mengikut
+    keterangan gambar yang dibuang ikut dibuang (baris itu milik
+    gambar lama; bila dibiarkan, ia duduk di atas gambar baru sebagai
+    baris yatim). Berkas media lama dibiarkan di dalam zip (tidak
+    terpakai, tidak merusak dokumen).
     """
     from .gambar import rentang_bagian
     path = Path(path)
@@ -584,6 +630,7 @@ def buang_gambar_bagian(path, bagian: str, judul_harapan: str) -> dict:
                 break
         pasangan.append((i, ket))
     buang: set[int] = set()
+    pola_sumber = re.compile(r'^\s*Sumber\s*:', re.IGNORECASE)
     for g, ket in pasangan:
         cocok_judul = ket is not None and \
             harapan in _normalisasi_nama(teks_par[ket])
@@ -591,6 +638,11 @@ def buang_gambar_bagian(path, bagian: str, judul_harapan: str) -> dict:
             buang.add(g)
             if ket is not None:
                 buang.add(ket)
+                # Baris Sumber tepat sesudah keterangan milik gambar
+                # ini (hanya baris itu; Sumber lain tidak disentuh).
+                if ket + 1 < akhir and pola_sumber.match(
+                        teks_par[ket + 1] or ''):
+                    buang.add(ket + 1)
     if not buang:
         return {'ok': True, 'dibuang': 0, 'sebab': ''}
     ganti = []
@@ -668,6 +720,26 @@ def sisip_teks_setelah_judul(path, bagian: str, baris: list[str]) -> dict:
     return {'ok': True, 'ditambah': len(baris)}
 
 
+def _nomor_gambar(judul: str) -> tuple | None:
+    """(bab, nomor) dari 'Gambar 2.1 ...' (terima 'Gambar 2. 1')."""
+    m = re.search(r'Gambar\s+(\d+)\s*\.\s*(\d+)', str(judul or ''),
+                  re.IGNORECASE)
+    if not m:
+        return None
+    return (int(m.group(1)), int(m.group(2)))
+
+
+def _urutkan_entri_gambar(entri: list[dict]) -> list[dict]:
+    """Urutkan entri Daftar Gambar menurut nomor gambar (2.1, 2.2, 3.1).
+
+    Urutan dokumen biasanya sudah bernomor, tapi entri baru yang
+    disisipkan belakangan harus terselip pada tempatnya, bukan di
+    akhir daftar. Entri tanpa nomor tetap di akhir, urutan dokumen.
+    """
+    return sorted(entri, key=lambda e: _nomor_gambar(e.get('judul') or '')
+                  or (10 ** 9, 10 ** 9))
+
+
 def segarkan_daftar_gambar(path) -> dict:
     """Tulis ulang entri Daftar Gambar dari keterangan di naskah.
 
@@ -698,9 +770,17 @@ def segarkan_daftar_gambar(path) -> dict:
         return {'ok': False, 'jumlah': 0,
                 'sebab': 'Daftar Gambar belum ada di naskah.'}
     entri = BA.entri_daftar_keterangan(
-        teks_par,
-        gaya=[BA._gaya_dari_xml(m.group(0)) for m in cocok]).get(
-            'daftar_gambar', [])
+        # Hanya keterangan di BADAN, bukan dari daftar lama itu
+        # sendiri: entri daftar lama (dengan nomor halaman menempel)
+        # tidak terdedup dengan keterangan badan, sehingga daftar
+        # jadi ganda dan entri baru menempel di akhir, di luar urutan
+        # (cacat kosmetik 18 Nov 2026: Gambar 2.2 di akhir daftar).
+        [teks_par[i] for i in range(len(teks_par))
+         if i not in set(indeks)],
+        gaya=[BA._gaya_dari_xml(cocok[i].group(0))
+              for i in range(len(teks_par)) if i not in set(indeks)]
+        ).get('daftar_gambar', [])
+    entri = _urutkan_entri_gambar(entri)
     judul_entri = [e['judul'] for e in entri]
     # Paragraf entri lama: indeks[1:] (indeks[0] = judul seksi).
     lama = indeks[1:]

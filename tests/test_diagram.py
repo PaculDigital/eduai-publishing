@@ -507,8 +507,10 @@ def jalankan():
     cek('keterangan tidak cocok = meragukan',
         vonis_salah['vonis'] == 'meragukan', str(vonis_salah))
     segar = DG.segarkan_daftar_gambar(jalur)
-    cek('Daftar Gambar segar: entri baru masuk otomatis',
-        segar.get('ok') and segar.get('jumlah') == 2, str(segar))
+    cek('Daftar Gambar segar: entri baru masuk otomatis (cacat 2)',
+        segar.get('ok') and segar.get('jumlah') == 1, str(segar))
+    cek('Daftar Gambar segar: entri lama tanpa keterangan dibuang',
+        'Gambar 1.1 Peta Jalan' not in _teks(), str(segar))
     cek('Daftar Gambar berisi Gambar 2.1 Model Penelitian',
         'Gambar 2.1 Model Penelitian' in _teks())
     # Nomor halaman dari render palsu (hal. 1 depan, hal. 2 Bab I,
@@ -639,9 +641,12 @@ def jalankan():
     shutil.copy(mini, mini_buang)
     buang_mini = DG.buang_gambar_bagian(mini_buang, '2.3.2',
                                         'Model Penelitian')
-    cek('buang gambar 2.3.2 (keterangan cocok) menghapus 2 paragraf',
-        buang_mini.get('ok') and buang_mini.get('dibuang') == 2,
+    cek('buang gambar 2.3.2 menghapus gambar + keterangan + Sumber (cacat 3)',
+        buang_mini.get('ok') and buang_mini.get('dibuang') == 3,
         str(buang_mini))
+    cek('buang gambar 2.3.2: baris Sumber hilang, isi lain utuh',
+        'Sumber: Data diolah' not in _teks_mini(mini_buang)
+        and 'Isi model.' in _teks_mini(mini_buang))
     cek('sesudah dibuang: 2.3.2 tidak ada gambar lagi',
         DG.periksa_gambar(mini_buang, '2.3.2', 'Model Penelitian')
         ['vonis'] == 'tidak_ada')
@@ -711,6 +716,123 @@ def jalankan():
                   / 'diagram_desain.html').read_text()
     cek('formulir Desain menyebut teks 3.1 otomatis + gratis (cacat 5)',
         'Teks 3.1' in isi_desain and 'gratis' in isi_desain)
+
+    # ── 8. Kosmetik Diagram 18 Nov 08:15 WIB (uji live putaran 2) ────
+    # Cacat 1: label H2 dan H6 bertumpuk di segmen Z ke Y (fid 81).
+    model81, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                      {'nama': 'Orientasi Kewirausahaan', 'peran': 'Z'},
+                      {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Digital Marketing',
+                    'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H1',
+                    'arah': '+', 'jenis': 'langsung'},
+                   {'dari': 'Orientasi Kewirausahaan',
+                    'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                    'arah': '+', 'jenis': 'langsung'},
+                   {'dari': 'Digital Marketing',
+                    'ke': 'Keberlanjutan Usaha',
+                    'lewat': 'Orientasi Kewirausahaan',
+                    'hipotesis': 'H6', 'arah': '+',
+                    'jenis': 'tidak_langsung'}]})
+    tata81 = DG.tata_letak(model81)
+    pl81 = GB.penempatan_label(tata81)
+
+    def _tumpang(a, b):
+        return not (a['kanan'] <= b['kiri'] or b['kanan'] <= a['kiri']
+                    or a['bawah'] <= b['atas'] or b['bawah'] <= a['atas'])
+
+    h2_81 = [p for p in pl81 if p['label'] == 'H2 (+)']
+    h6_81 = [p for p in pl81 if p['label'] == 'H6 (+)']
+    cek('label H2 dan H6 tidak bertumpuk (cacat 1, PNG)',
+        len(h2_81) == 1 and len(h6_81) == 2
+        and not any(_tumpang(h2_81[0], h) for h in h6_81),
+        str(pl81))
+    cek('label H6 tetap 2 (satu per segmen, tidak dibuang)',
+        len(h6_81) == 2)
+    cek('label H1 sendiri tetap di tengah (geser 0)',
+        len([p for p in pl81 if p['label'] == 'H1 (+)']) == 1
+        and [p for p in pl81 if p['label'] == 'H1 (+)'][0]['geser']
+        == (0.0, 0.0))
+    png81 = GB.gambar_panah(model81, tata81)
+    cek('gambar panah fid 81 = PNG asli (label geser)',
+        png81[:8] == b'\x89PNG\r\n\x1a\n' and len(png81) > 10000,
+        str(len(png81)))
+    cek('editor menggeser label panah berbagi segmen (cacat 1)',
+        'geserLabel' in isi_editor and "p.gaya === 'lewat'" in isi_editor)
+    # Cacat 2: entri Daftar Gambar manual di luar urutan.
+    jalur2 = Path(TMP) / 'naskah_dg_manual.docx'
+    d2 = _Docx()
+    d2.add_paragraph('DAFTAR GAMBAR')
+    d2.add_paragraph('Gambar 2.1 Model Penelitian')
+    d2.add_paragraph('Gambar 3.1 Desain Penelitian')
+    d2.add_paragraph('BAB II')
+    d2.add_paragraph('2.3.2 Model Penelitian')
+    d2.add_paragraph('Isi model.')
+    d2.add_paragraph('Gambar 2.1 Model Penelitian')
+    d2.add_paragraph('BAB III')
+    d2.add_paragraph('3.1 Desain Penelitian')
+    d2.add_paragraph('Gambar 3.1 Desain Penelitian')
+    d2.save(str(jalur2))
+    sisip2 = GB.sisip_gambar_setelah_bagian(
+        jalur2, png81, '2.3.2', '2.4',
+        keterangan='Gambar 2.2 Model Penelitian', rata_keterangan='left')
+    segar2 = DG.segarkan_daftar_gambar(jalur2)
+    dg2 = BA.baca_bagian_awal(_teks_mini(jalur2).split('\n')
+                              )['bagian']['daftar_gambar']
+    cek('Daftar Gambar manual: 2.2 terselip urut (cacat 2)',
+        sisip2.get('ok') and segar2.get('ok')
+        and dg2 == ['Gambar 2.1 Model Penelitian',
+                    'Gambar 2.2 Model Penelitian',
+                    'Gambar 3.1 Desain Penelitian'],
+        str(dg2))
+    cek('Daftar Gambar manual: tanpa ganda',
+        len(dg2) == len(set(dg2)))
+    # Cacat 4: kotak X padat (5 X ke atas) meluap.
+    model5, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': n, 'peran': 'X'} for n in
+                      ('Harga', 'Kualitas', 'Merek', 'Promosi', 'Lokasi')]
+                     + [{'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': n, 'ke': 'Keputusan Beli',
+                    'hipotesis': f'H{i + 1}'} for i, n in enumerate(
+                        ('Harga', 'Kualitas', 'Merek', 'Promosi',
+                         'Lokasi'))]})
+    tata5 = DG.tata_letak(model5)
+    xs5 = [k for k in tata5['kotak'] if k['peran'] == 'X']
+    cek('kotak X padat 5: nama 1 baris muat (cacat 4)',
+        len(xs5) == 5 and all(k['h'] >= 76 for k in xs5)
+        and all(k['y'] + 70 <= k['y'] + k['h'] for k in xs5),
+        str([(k['nama'], k['y'], k['h']) for k in xs5]))
+    cek('kotak X padat 5: tidak tumpang tindih',
+        all(xs5[i]['y'] + xs5[i]['h'] + 14 <= xs5[i + 1]['y']
+            for i in range(len(xs5) - 1)),
+        str([(k['y'], k['h']) for k in xs5]))
+    png5 = GB.gambar_panah(model5, tata5)
+    cek('gambar panah 5 X = PNG asli',
+        png5[:8] == b'\x89PNG\r\n\x1a\n' and len(png5) > 10000,
+        str(len(png5)))
+    model6, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': n, 'peran': 'X'} for n in
+                      ('Harga', 'Kualitas Produk dan Layanan', 'Merek',
+                       'Promosi', 'Lokasi', 'Pelayanan')]
+                     + [{'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': n, 'ke': 'Keputusan Beli',
+                    'hipotesis': f'H{i + 1}'} for i, n in enumerate(
+                        ('Harga', 'Kualitas Produk dan Layanan', 'Merek',
+                         'Promosi', 'Lokasi', 'Pelayanan'))]})
+    tata6 = DG.tata_letak(model6)
+    xs6 = [k for k in tata6['kotak'] if k['peran'] == 'X']
+    cek('kotak X padat 6: nama 2 baris muat (104), 1 baris 76, '
+        'tidak tumpang tindih',
+        len(xs6) == 6
+        and {k['nama']: k['h'] for k in xs6}[
+            'Kualitas Produk dan Layanan'] == 104
+        and all(k['h'] == 76 for k in xs6
+                if k['nama'] != 'Kualitas Produk dan Layanan')
+        and all(k['y'] + 42 + 28 * DG._jumlah_baris_nama(k['nama'])
+                <= k['y'] + k['h'] for k in xs6)
+        and all(xs6[i]['y'] + xs6[i]['h'] <= xs6[i + 1]['y']
+                for i in range(len(xs6) - 1)),
+        str([(k['nama'], k['y'], k['h']) for k in xs6]))
 
     cek('harga 1 token per gambar', DG.HARGA_GAMBAR == 1)
 

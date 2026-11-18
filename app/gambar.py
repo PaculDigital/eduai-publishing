@@ -483,18 +483,85 @@ def _garis_panah(d, x1: float, y1: float, x2: float, y2: float,
 
 
 def _label_panah(d, x1: float, y1: float, x2: float, y2: float,
-                 label: str) -> None:
+                 label: str, geser=(0.0, 0.0)) -> None:
     """Label hipotesis di tengah panah (kotak putih di belakang teks
-    supaya tetap terbaca walau panah bersilangan)."""
+    supaya tetap terbaca walau panah bersilangan). `geser` menggeser
+    label tegak lurus segmen (untuk panah yang berbagi segmen)."""
     if not label:
         return
-    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+    mx, my = (x1 + x2) / 2 + geser[0], (y1 + y2) / 2 + geser[1]
     f = _font(22, True)
     kiri, atas, kanan, bawah = d.textbbox((0, 0), label, font=f)
     lw, lh = kanan - kiri, bawah - atas
     d.rectangle([mx - lw / 2 - 6, my - lh / 2 - 4,
                  mx + lw / 2 + 6, my + lh / 2 + 4], fill='white')
     d.text((mx, my - lh / 2), label, font=f, fill=TINTA, anchor='ma')
+
+
+def penempatan_label(tata: dict | None) -> list:
+    """Posisi label tiap panah (untuk uji + gambar).
+
+    Panah yang berbagi segmen yang sama (dari dan ke sama) digeser
+    tegak lurus supaya labelnya tidak bertumpuk di tengah segmen
+    (cacat kosmetik 18 Nov 2026: H2 dan H6 berbagi segmen Z ke Y,
+    labelnya bersentuhan). Panah sendiri tetap di tengah (geser 0).
+    Kembalikan [{'label', 'x1', 'y1', 'x2', 'y2', 'geser', 'kiri',
+    'atas', 'kanan', 'bawah'}]; label tanpa segmen dilewati.
+    """
+    if not tata:
+        return []
+    kotak = {k['id']: k for k in tata.get('kotak') or []}
+    if not kotak:
+        return []
+    g = Image.new('RGB', (W, H), LATAR)
+    d = ImageDraw.Draw(g)
+    f = _font(22, True)
+    kelompok: dict = {}
+    urutan: list = []
+    for p in tata.get('panah') or []:
+        a, b = kotak.get(p.get('dari')), kotak.get(p.get('ke'))
+        if not a or not b or not p.get('label'):
+            continue
+        kunci = (p.get('dari'), p.get('ke'))
+        if kunci not in kelompok:
+            kelompok[kunci] = []
+            urutan.append(kunci)
+        kelompok[kunci].append((a, b, p))
+    keluar = []
+    for kunci in urutan:
+        butir = kelompok[kunci]
+        n = len(butir)
+        lebar = tinggi = 0
+        for _a, _b, p in butir:
+            kiri, atas, kanan, bawah = d.textbbox(
+                (0, 0), p.get('label') or '', font=f)
+            lebar = max(lebar, kanan - kiri + 12)
+            tinggi = max(tinggi, bawah - atas + 8)
+        a, b, _p = butir[0]
+        x1, y1 = a['x'] + a['w'], a['y'] + a['h'] / 2
+        x2, y2 = b['x'], b['y'] + b['h'] / 2
+        dx, dy = x2 - x1, y2 - y1
+        pj = math.hypot(dx, dy) or 1.0
+        px, py = -dy / pj, dx / pj
+        # Langkah antar label: cukup supaya kotak putih tidak
+        # bersentuhan pada arah tegak lurus (pilih syarat yang lebih
+        # kecil dari keduanya, supaya label tetap dekat garis).
+        langkah = min(lebar / abs(px) if abs(px) > 1e-6 else 1e9,
+                      tinggi / abs(py) if abs(py) > 1e-6 else 1e9) + 12
+        mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+        for i, (_a, _b, p) in enumerate(butir):
+            geser = (i - (n - 1) / 2) * langkah
+            cx, cy = mx + px * geser, my + py * geser
+            kiri, atas, kanan, bawah = d.textbbox(
+                (0, 0), p.get('label') or '', font=f)
+            lw, lh = kanan - kiri, bawah - atas
+            keluar.append({
+                'label': p.get('label') or '',
+                'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
+                'geser': (px * geser, py * geser),
+                'kiri': cx - lw / 2 - 6, 'atas': cy - lh / 2 - 4,
+                'kanan': cx + lw / 2 + 6, 'bawah': cy + lh / 2 + 4})
+    return keluar
 
 
 def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
@@ -523,12 +590,9 @@ def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
                              k['y'] + k['h']], radius=12,
                             outline=warna, width=4, fill='white')
         _teks_kotak(d, k)
-    for p in tata.get('panah') or []:
-        a, b = peta_kotak.get(p.get('dari')), peta_kotak.get(p.get('ke'))
-        if not a or not b:
-            continue
-        _label_panah(d, a['x'] + a['w'], a['y'] + a['h'] / 2,
-                     b['x'], b['y'] + b['h'] / 2, p.get('label') or '')
+    for pl in penempatan_label(tata):
+        _label_panah(d, pl['x1'], pl['y1'], pl['x2'], pl['y2'],
+                     pl['label'], pl['geser'])
     buf = io.BytesIO()
     g.save(buf, 'PNG', optimize=True)
     return buf.getvalue()
