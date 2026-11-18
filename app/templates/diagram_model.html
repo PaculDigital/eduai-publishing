@@ -101,17 +101,17 @@
 </form>
 <script>
 function kodePeran(peran, nomor, jumlah) {
-  // Kode kotak: X selalu bernomor (X1, X2, ...); M/Z bernomor HANYA
-  // bila lebih dari satu (M1/M2, Z1/Z2), satu saja tetap 'M'/'Z'
-  // seperti dulu (dan seperti M1/M2 di Bab IV).
+  // Kode kotak: X selalu bernomor (X1, X2, ...); M/Z/Y bernomor
+  // HANYA bila lebih dari satu (M1/M2, Z1/Z2, Y1/Y2), satu saja
+  // tetap 'M'/'Z'/'Y' seperti dulu (dan seperti M1/M2 di Bab IV).
   if (peran === 'X') return 'X' + nomor;
   if (peran === 'M') return jumlah > 1 ? 'M' + nomor : 'M';
   if (peran === 'Z') return jumlah > 1 ? 'Z' + nomor : 'Z';
-  return 'Y';
+  return jumlah > 1 ? 'Y' + nomor : 'Y';
 }
 function barisVariabel() {
   var keluar = [];
-  var nX = 0, nM = 0, nZ = 0, idx = 0;
+  var nX = 0, nM = 0, nZ = 0, nY = 0, idx = 0;
   var baris = [];
   document.querySelectorAll('#tabel-variabel tr').forEach(function (tr) {
     var nama = tr.querySelector('input[name="vn"]');
@@ -122,16 +122,18 @@ function barisVariabel() {
     baris.push({nama: t, peran: peran ? peran.value : 'X', indeks: idx});
     idx += 1;
   });
-  var jmlM = 0, jmlZ = 0;
+  var jmlM = 0, jmlZ = 0, jmlY = 0;
   baris.forEach(function (b) {
     if (b.peran === 'M') jmlM += 1;
     if (b.peran === 'Z') jmlZ += 1;
+    if (b.peran === 'Y') jmlY += 1;
   });
   baris.forEach(function (b) {
     var kode = 'Y';
     if (b.peran === 'X') { nX += 1; kode = kodePeran('X', nX, 0); }
     else if (b.peran === 'M') { nM += 1; kode = kodePeran('M', nM, jmlM); }
     else if (b.peran === 'Z') { nZ += 1; kode = kodePeran('Z', nZ, jmlZ); }
+    else if (b.peran === 'Y') { nY += 1; kode = kodePeran('Y', nY, jmlY); }
     keluar.push({nama: b.nama, peran: b.peran, kode: kode, indeks: b.indeks});
   });
   return keluar;

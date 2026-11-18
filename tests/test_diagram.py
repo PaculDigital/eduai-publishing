@@ -2354,7 +2354,7 @@ def jalankan():
     cek('campuran dari peta: segitiga atas',
         _t_uc.get('posisi_z') == 'atas',
         str(_t_uc.get('posisi_z')))
-    # kodePeran di formulir (JS): X selalu bernomor; M/Z bernomor
+    # kodePeran di formulir (JS): X selalu bernomor; M/Z/Y bernomor
     # HANYA bila lebih dari satu. Diuji lewat node (fungsi murni,
     # tanpa DOM) supaya penomoran di pilihan formulir benar.
     _m_kode = re.search(
@@ -2366,7 +2366,8 @@ def jalankan():
                   ('M', 1, 1, 'M'), ('M', 1, 2, 'M1'),
                   ('M', 2, 2, 'M2'), ('Z', 1, 1, 'Z'),
                   ('Z', 1, 2, 'Z1'), ('Z', 2, 2, 'Z2'),
-                  ('Y', 1, 0, 'Y')]
+                  ('Y', 1, 0, 'Y'), ('Y', 1, 2, 'Y1'),
+                  ('Y', 2, 2, 'Y2')]
         _skrip = _m_kode.group(0) + '\n' + '\n'.join(
             'console.log(kodePeran(%r, %d, %d));' % (p, n, j)
             for p, n, j, _ in _kasus)
@@ -2754,6 +2755,127 @@ def jalankan():
         str(_label_tumpuk_ind(_tata_campur_ind)))
     _banding_indikator('Campuran', _model_campur_ind, 31)
     _banding_indikator('Nura', MODEL_NURA, 32)
+
+    # ── 21. Lebih dari 1 Y (Boss 18 Nov 17:06 WIB: cabut batas 1 Y)
+    # Pola sama seperti pencabutan batas 1 Z (putaran 8/9):
+    # penolakan 'Variabel hasil (Y) hanya boleh satu.' dihapus;
+    # kode Y1/Y2/... bila lebih dari satu, satu Y tetap 'Y'.
+    # Mesin tata letak sudah bisa multi-Y (Goal-Directed, contoh 5
+    # punya 2 Y) tapi dulu harus bypass normalisasi_model; kini
+    # Goal-Directed mentah lewat normalisasi dan tata letaknya
+    # byte-identik dengan fixture bypass.
+    _my, _mas_my = DG.normalisasi_model(
+        {'variabel': [{'nama': 'Harga', 'peran': 'X'},
+                      {'nama': 'Kepuasan', 'peran': 'M'},
+                      {'nama': 'Loyalitas', 'peran': 'Y'},
+                      {'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Harga', 'ke': 'Loyalitas',
+                    'hipotesis': 'H1', 'arah': '+',
+                    'jenis': 'langsung'},
+                   {'dari': 'Harga', 'ke': 'Keputusan Beli',
+                    'hipotesis': 'H2', 'arah': '+',
+                    'jenis': 'langsung'},
+                   {'dari': 'Kepuasan', 'ke': 'Loyalitas',
+                    'hipotesis': 'H3', 'arah': '+',
+                    'jenis': 'langsung'},
+                   {'dari': 'Harga', 'ke': 'Loyalitas',
+                    'lewat': 'Kepuasan', 'hipotesis': 'H4',
+                    'arah': '+', 'jenis': 'tidak_langsung'}]})
+    cek('multi-Y: diterima tanpa masalah',
+        _my is not None and not _mas_my, str(_mas_my))
+    cek('multi-Y: kode Y1/Y2',
+        [v['kode'] for v in _my['variabel']]
+        == ['X1', 'M', 'Y1', 'Y2'],
+        str([v['kode'] for v in _my['variabel']]))
+    cek('multi-Y: jalur ke Y1/Y2 + lewat M',
+        [(j['dari'], j['ke'], j.get('lewat', ''))
+         for j in _my['jalur']]
+        == [('X1', 'Y1', ''), ('X1', 'Y2', ''),
+            ('M', 'Y1', ''), ('X1', 'Y1', 'M')],
+        str(_my['jalur']))
+    # Satu Y tetap 'Y'.
+    _sy, _mas_sy = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+                    'arah': '+'}]})
+    cek('multi-Y: satu Y tetap Y',
+        [v['kode'] for v in _sy['variabel']] == ['X1', 'Y']
+        and not _mas_sy, str(_mas_sy))
+    # Tiga Y jadi Y1/Y2/Y3.
+    _ty, _mas_ty = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B1', 'peran': 'Y'},
+                      {'nama': 'B2', 'peran': 'Y'},
+                      {'nama': 'B3', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B2', 'hipotesis': 'H1',
+                    'arah': '+'}]})
+    cek('multi-Y: tiga Y jadi Y1/Y2/Y3',
+        [v['kode'] for v in _ty['variabel']]
+        == ['X1', 'Y1', 'Y2', 'Y3'], str(_mas_ty))
+    # Referensi 'Y' lama (kode/nama) menunjuk Y pertama.
+    _ly, _mas_ly = DG.normalisasi_model(
+        {'variabel': [{'nama': 'Harga', 'peran': 'X'},
+                      {'nama': 'Loyalitas', 'peran': 'Y'},
+                      {'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Harga', 'ke': 'Y', 'hipotesis': 'H1',
+                    'arah': '+'}]})
+    cek('multi-Y: referensi Y lama ke Y pertama',
+        _ly['jalur'][0]['ke'] == 'Y1' and not _mas_ly,
+        str(_mas_ly))
+    # model_tampilan (tampil lagi saat validasi gagal) ikut Y1/Y2.
+    _ty_tampil = DG.model_tampilan(
+        {'variabel': [{'nama': 'Harga', 'peran': 'X'},
+                      {'nama': 'Loyalitas', 'peran': 'Y'},
+                      {'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Harga', 'ke': 'Keputusan Beli',
+                    'hipotesis': 'H2', 'arah': '+'}]})
+    cek('multi-Y: model_tampilan Y1/Y2',
+        [v['kode'] for v in _ty_tampil['variabel']]
+        == ['X1', 'Y1', 'Y2']
+        and _ty_tampil['jalur'][0]['ke'] == 'Y2',
+        str(_ty_tampil))
+    # Bentuk model multi-Y murni tetap 'langsung'.
+    cek('multi-Y: bentuk langsung',
+        DG.bentuk_model({'variabel': [{'nama': 'A', 'peran': 'X'},
+                                      {'nama': 'B', 'peran': 'Y'},
+                                      {'nama': 'C', 'peran': 'Y'}]})
+        == 'langsung')
+    # Goal-Directed mentah lewat normalisasi: kode sama dengan
+    # fixture bypass, tata letak byte-identik.
+    _nama_dari_kode = {v['kode']: v['nama'] for v in _goal['variabel']}
+    _goal_mentah = {
+        'variabel': [{'nama': v['nama'], 'peran': v['peran']}
+                     for v in _goal['variabel']],
+        'jalur': [{'dari': _nama_dari_kode[j['dari']],
+                   'ke': _nama_dari_kode[j['ke']],
+                   'hipotesis': j['hipotesis'],
+                   'jenis': j['jenis'], 'arah': j['arah']}
+                  for j in _goal['jalur']]}
+    _goal_n, _mas_goal = DG.normalisasi_model(_goal_mentah)
+    cek('multi-Y: Goal-Directed mentah diterima',
+        _goal_n is not None and not _mas_goal, str(_mas_goal))
+    cek('multi-Y: Goal-Directed kode sama dengan fixture',
+        [v['kode'] for v in _goal_n['variabel']]
+        == [v['kode'] for v in _goal['variabel']],
+        str([v['kode'] for v in _goal_n['variabel']]))
+    _tata_goal_n = DG.tata_letak(_goal_n)
+    _tata_goal = DG.tata_letak(_goal)
+    cek('multi-Y: Goal-Directed tata letak byte-identik',
+        _tata_goal_n['kotak'] == _tata_goal['kotak']
+        and _tata_goal_n['panah'] == _tata_goal['panah'])
+    # Tata letak model multi-Y: dua oval Y, tidak menabrak.
+    _tata_my = DG.tata_letak(_my)
+    _kotak_my = _tata_my['kotak']
+    cek('multi-Y: dua oval Y tergambar',
+        len([k for k in _kotak_my if k['id'] in ('Y1', 'Y2')]) == 2,
+        str([k['id'] for k in _kotak_my]))
+    cek('multi-Y: kotak tidak menabrak',
+        not [(_a.get('id'), _b.get('id'))
+             for _i, _a in enumerate(_kotak_my)
+             for _b in _kotak_my[_i + 1:]
+             if _tumpang2(_a, _b)])
+    _banding_cermin('multi-Y', _my, 33)
 
 
 

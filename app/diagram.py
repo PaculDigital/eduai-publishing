@@ -175,6 +175,8 @@ def _mediator_lama(variabel_masuk, jalur_masuk) -> set:
             kenali.setdefault(f'x{n}', v)
         elif peran == 'Y':
             kenali.setdefault('y', v)
+            if jml.get(peran, 0) > 1:
+                kenali.setdefault(f'y{n}', v)
         elif jml.get(peran, 0) > 1:
             kenali.setdefault(f'{peran.lower()}{n}', v)
         else:
@@ -269,8 +271,6 @@ def normalisasi_model(data) -> tuple:
         masalah.append('Belum ada variabel bebas (X).')
     if 'Y' not in peran_ada:
         masalah.append('Belum ada variabel hasil (Y).')
-    if sum(1 for v in variabel if v['peran'] == 'Y') > 1:
-        masalah.append('Variabel hasil (Y) hanya boleh satu.')
     # Kode lama (sebelum migrasi, untuk referensi jalur yang memakai
     # kode lama): X1, X2, ...; Z bila satu, Z1/Z2/... bila lebih
     # dari satu, dihitung dari peran masukan (M lama dan Z sama-sama
@@ -308,10 +308,12 @@ def normalisasi_model(data) -> tuple:
     # Kode baru (istilah M/Z): X1, X2, ...; M bila satu perantara,
     # M1/M2/... bila lebih dari satu (mediasi paralel, seperti
     # M1/M2 di Bab IV); Z bila satu penguat, Z1/Z2/... bila lebih
-    # dari satu; Y.
+    # dari satu; Y bila satu hasil, Y1/Y2/... bila lebih dari satu
+    # (Boss 18 Nov 17:06 WIB: cabut batas 1 Y).
     jml_m = sum(1 for v in variabel if v['peran'] == 'M')
     jml_z = sum(1 for v in variabel if v['peran'] == 'Z')
-    hitung = {'X': 0, 'M': 0, 'Z': 0}
+    jml_y = sum(1 for v in variabel if v['peran'] == 'Y')
+    hitung = {'X': 0, 'M': 0, 'Z': 0, 'Y': 0}
     for v in variabel:
         if v['peran'] == 'X':
             hitung['X'] += 1
@@ -323,7 +325,8 @@ def normalisasi_model(data) -> tuple:
             hitung['Z'] += 1
             v['kode'] = f"Z{hitung['Z']}" if jml_z > 1 else 'Z'
         else:
-            v['kode'] = 'Y'
+            hitung['Y'] += 1
+            v['kode'] = f"Y{hitung['Y']}" if jml_y > 1 else 'Y'
     nama_ke_kode = {_normalisasi_nama(v['nama']): v['kode']
                     for v in variabel}
     kode_ke_kode = {v['kode'].lower(): v['kode'] for v in variabel}
@@ -334,7 +337,7 @@ def normalisasi_model(data) -> tuple:
     def _cari_kode(teks: str):
         """Cari kode variabel dari nama atau kode apa adanya.
 
-        Formulir mengirim kode (X1, X2, M, Z, Y), naskah/peta
+        Formulir mengirim kode (X1, X2, M/M1, Z/Z1, Y/Y1), naskah/peta
         mengirim nama; keduanya harus dikenali. Nama didahulukan
         supaya nama "X2" tetap menunjuk variabel bernama X2, bukan
         kode X2. Kode lama ('Z' untuk perantara lama, kini M) ikut
@@ -472,8 +475,9 @@ def model_tampilan(data) -> dict:
                        _bersihkan_indikator(v.get('indikator'))))
     jml_m = sum(1 for _, p, _ in mentah if p == 'M')
     jml_z = sum(1 for _, p, _ in mentah if p == 'Z')
+    jml_y = sum(1 for _, p, _ in mentah if p == 'Y')
     variabel: list[dict] = []
-    hitung = {'X': 0, 'M': 0, 'Z': 0}
+    hitung = {'X': 0, 'M': 0, 'Z': 0, 'Y': 0}
     for nama, peran, ind in mentah:
         if peran == 'X':
             hitung['X'] += 1
@@ -485,7 +489,8 @@ def model_tampilan(data) -> dict:
             hitung['Z'] += 1
             kode = f"Z{hitung['Z']}" if jml_z > 1 else 'Z'
         else:
-            kode = 'Y'
+            hitung['Y'] += 1
+            kode = f"Y{hitung['Y']}" if jml_y > 1 else 'Y'
         variabel.append({'nama': nama, 'peran': peran, 'kode': kode,
                          'indikator': ind})
     kunci: dict[str, str] = {}
