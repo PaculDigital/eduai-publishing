@@ -18,10 +18,10 @@ from pathlib import Path
 
 HARGA_GAMBAR = 1
 
-# Peran sah: X bebas, Z perantara, M perantara (dari peta Bab IV,
-# dibaca sama dengan Z), W penguat/moderator (konvensi Hayes:
-# M perantara, W penguat), Y hasil.
-PERAN_SAH = ('X', 'Z', 'M', 'W', 'Y')
+# Peran sah: X bebas, M perantara (mediasi), Z penguat (moderasi),
+# Y hasil. Istilah lazim (koreksi Boss 18 Nov 16:12 WIB): M untuk
+# Mediasi, Z untuk Moderasi. Peta Bab IV sudah memakai M/Z ini.
+PERAN_SAH = ('X', 'M', 'Z', 'Y')
 JENIS_SAH = ('kuantitatif', 'kualitatif', 'campuran')
 DESAIN_PER_JENIS = {
     'kuantitatif': ('survei', 'eksperimen', 'pra-eksperimen', 'korelasional'),
@@ -72,8 +72,8 @@ KANVAS_LEBAR = 1400
 KANVAS_TINGGI = 800
 # Garis tengah horizontal kanvas: pusat X dan Y selalu di sini,
 # tumpukan X dan Y simetris terhadap garis ini (template default
-# Boss 18 Nov 12:12 WIB); perantara M/Z di atas garis ini,
-# bukan di garisnya; penguat W duduk di kolom X (tahap 0).
+# Boss 18 Nov 12:12 WIB); perantara M di atas garis ini,
+# bukan di garisnya; penguat Z duduk di kolom X (tahap 0).
 TENGAH_KANVAS = KANVAS_TINGGI // 2
 # Jarak pusat X terluar ke garis tengah (2-4 X) / setengah
 # bentang kolom X. 250 px; juga dipakai sebagai tinggi atap
@@ -104,19 +104,102 @@ def _normalisasi_nama(nama: str) -> str:
     return re.sub(r'\s+', ' ', str(nama or '').strip()).lower()
 
 
+def _mediator_lama(variabel_masuk, jalur_masuk) -> set:
+    """Nama (ternormalisasi) variabel peran 'Z' yang sebenarnya
+    perantara lama (sebelum istilah M/Z Boss 18 Nov 16:12 WIB).
+
+    Z lama muncul sebagai Lewat, atau punya jalur masuk DAN keluar.
+    Z penguat (baru) hanya punya jalur 'interaksi' keluar ke Y,
+    tanpa jalur masuk, jadi tidak ikut. Referensi jalur bisa berupa
+    nama atau kode: kode sementara dihitung dari peran masukan
+    (X1.., Z/Z1.., M/M1.., Y), dan kode yang dikirim ikut dikenali.
+    Dipakai normalisasi_model dan model_tampilan supaya model
+    tersimpan lama (mis. Asih fid 81: Orientasi Kewirausahaan
+    peran Z, H6 lewat Z) tetap terbaca sebagai perantara M tanpa
+    mengubah berkas tersimpan itu.
+    """
+    if not variabel_masuk or not jalur_masuk:
+        return set()
+    jml = {}
+    for v in variabel_masuk:
+        if not isinstance(v, dict):
+            continue
+        p = str(v.get('peran') or '').strip().upper()
+        jml[p] = jml.get(p, 0) + 1
+    kenali = {}
+    hitung = {}
+    for v in variabel_masuk:
+        if not isinstance(v, dict):
+            continue
+        nama = _normalisasi_nama(v.get('nama'))
+        if not nama:
+            continue
+        kenali.setdefault(nama, v)
+        kode_kirim = _rapi(v.get('kode'))
+        if kode_kirim:
+            kenali.setdefault(kode_kirim.lower(), v)
+        peran = str(v.get('peran') or '').strip().upper()
+        if peran not in ('X', 'Z', 'M', 'Y'):
+            continue
+        hitung[peran] = hitung.get(peran, 0) + 1
+        n = hitung[peran]
+        if peran == 'X':
+            kenali.setdefault(f'x{n}', v)
+        elif peran == 'Y':
+            kenali.setdefault('y', v)
+        elif jml.get(peran, 0) > 1:
+            kenali.setdefault(f'{peran.lower()}{n}', v)
+        else:
+            kenali.setdefault(peran.lower(), v)
+    masuk = set()
+    keluar = set()
+    for j in jalur_masuk or []:
+        if not isinstance(j, dict):
+            continue
+        dari = kenali.get(_normalisasi_nama(j.get('dari')))
+        ke = kenali.get(_normalisasi_nama(j.get('ke')))
+        lewat = kenali.get(_normalisasi_nama(j.get('lewat')))
+        if dari is not None:
+            keluar.add(id(dari))
+        if ke is not None:
+            masuk.add(id(ke))
+        if lewat is not None:
+            masuk.add(id(lewat))
+            keluar.add(id(lewat))
+    lama = set()
+    for v in variabel_masuk:
+        if not isinstance(v, dict):
+            continue
+        if str(v.get('peran') or '').strip().upper() != 'Z':
+            continue
+        if id(v) in masuk and id(v) in keluar:
+            lama.add(_normalisasi_nama(v.get('nama')))
+    return lama
+
+
 def normalisasi_model(data) -> tuple:
     """Periksa + rapikan data model. Kembalikan (model, masalah).
 
     Model: {'variabel': [{'nama', 'peran', 'kode'}],
             'jalur': [{'dari', 'ke', 'hipotesis', 'jenis', 'arah'}],
             'jenis': ..., 'desain': ...}.
-    Peran 'M' (peta Bab IV) dibaca sama dengan 'Z' (perantara).
-    Peran 'W' adalah penguat (moderator, konvensi Hayes: M
-    perantara, W penguat); jalur dari W otomatis 'interaksi' dan
-    harus ke Y. Kode: X1, X2, ...; Z bila satu perantara, Z1/Z2/...
-    bila lebih dari satu; W bila satu penguat, W1/W2/... bila
-    lebih dari satu; Y. Lebih dari 1 Z diizinkan (Boss 18 Nov
-    15:47 WIB) supaya mediasi + moderasi bisa digambar bersama.
+    Istilah lazim (Boss 18 Nov 16:12 WIB): M perantara (mediasi),
+    Z penguat (moderasi). Peran 'Z' lama (perantara, sebelum
+    istilah ini) yang muncul sebagai Lewat atau punya jalur masuk
+    DAN keluar dibaca jadi 'M' (migrasi di kode, berkas tersimpan
+    tidak diubah). Jalur dari Z (penguat) otomatis 'interaksi' dan
+    harus ke Y; Z tidak memakai Lewat. Kode: X1, X2, ...; M bila
+    satu perantara, M1/M2/... bila lebih dari satu; Z bila satu
+    penguat, Z1/Z2/... bila lebih dari satu; Y. Lebih dari 1 M/Z
+    diizinkan (Boss 18 Nov 15:47 WIB) supaya mediasi + moderasi
+    bisa digambar bersama. Kolom 'Jenis jalur' di formulir
+    (Boss 18 Nov 16:12 WIB) dibaca dan divalidasi: 'langsung'
+    maka Lewat kosong, 'tidak_langsung' maka Lewat harus M,
+    'interaksi' maka Dari harus Z, Ke harus Y, Lewat kosong; bila
+    jenis tidak dikirim, disimpulkan seperti dulu (cocok mundur:
+    ada Lewat jadi tidak_langsung, Dari Z jadi interaksi, sisanya
+    langsung). Referensi jalur boleh memakai kode lama ('Z' untuk
+    perantara lama) atau nama; keduanya dikenali.
     Masalah berbahasa Indonesia polos; kosong berarti model sah.
     """
     masalah: list[str] = []
@@ -124,8 +207,10 @@ def normalisasi_model(data) -> tuple:
         return None, ['Data model tidak terbaca.']
     variabel_masuk = data.get('variabel') or []
     jalur_masuk = data.get('jalur') or []
+    lama = _mediator_lama(variabel_masuk, jalur_masuk)
     variabel: list[dict] = []
     lihat: dict[str, str] = {}
+    kode_lama: dict[str, str] = {}
     for v in variabel_masuk:
         if not isinstance(v, dict):
             continue
@@ -136,8 +221,8 @@ def normalisasi_model(data) -> tuple:
         if peran not in PERAN_SAH:
             masalah.append(f'Peran "{peran}" untuk "{nama}" tidak dikenal.')
             continue
-        if peran == 'M':
-            peran = 'Z'
+        if peran == 'Z' and _normalisasi_nama(nama) in lama:
+            peran = 'M'
         kunci = _normalisasi_nama(nama)
         if kunci in lihat and lihat[kunci] != peran:
             masalah.append(f'"{nama}" muncul dengan dua peran berbeda.')
@@ -146,6 +231,9 @@ def normalisasi_model(data) -> tuple:
             continue
         lihat[kunci] = peran
         variabel.append({'nama': nama, 'peran': peran})
+        kode_kirim = _rapi(v.get('kode'))
+        if kode_kirim:
+            kode_lama.setdefault(kode_kirim.lower(), kunci)
     peran_ada = {v['peran'] for v in variabel}
     if 'X' not in peran_ada:
         masalah.append('Belum ada variabel bebas (X).')
@@ -153,35 +241,74 @@ def normalisasi_model(data) -> tuple:
         masalah.append('Belum ada variabel hasil (Y).')
     if sum(1 for v in variabel if v['peran'] == 'Y') > 1:
         masalah.append('Variabel hasil (Y) hanya boleh satu.')
-    # Kode (urut masukan dipertahankan): X1, X2, ...; Z bila satu
-    # perantara, Z1/Z2/... bila lebih dari satu (mediasi paralel,
-    # seperti M1/M2 di Bab IV); W bila satu penguat, W1/W2/...
-    # bila lebih dari satu; Y.
+    # Kode lama (sebelum migrasi, untuk referensi jalur yang memakai
+    # kode lama): X1, X2, ...; Z bila satu, Z1/Z2/... bila lebih
+    # dari satu, dihitung dari peran masukan (M lama dan Z sama-sama
+    # berkode Z); Y. Dipetakan ke nama supaya sesudah migrasi
+    # referensi 'Z' tetap menunjuk perantara lama (kini M). Hanya
+    # variabel yang diterima yang dihitung (nama ganda dilewat).
+    peran_lama = {}
+    for v in variabel_masuk:
+        if not isinstance(v, dict):
+            continue
+        nama = _normalisasi_nama(v.get('nama'))
+        if not nama or nama not in lihat or nama in peran_lama:
+            continue
+        peran_lama[nama] = str(v.get('peran') or '').strip().upper()
+    jml_lama = {'X': 0, 'Z': 0}
+    for p in peran_lama.values():
+        if p == 'X':
+            jml_lama['X'] += 1
+        elif p in ('Z', 'M'):
+            jml_lama['Z'] += 1
+    hitung_lama = {'X': 0, 'Z': 0}
+    for v in variabel:
+        p = peran_lama.get(_normalisasi_nama(v['nama']), '')
+        if p == 'X':
+            hitung_lama['X'] += 1
+            kode_lama.setdefault(f"x{hitung_lama['X']}",
+                                 _normalisasi_nama(v['nama']))
+        elif p in ('Z', 'M'):
+            hitung_lama['Z'] += 1
+            n = hitung_lama['Z']
+            kode_lama.setdefault('z' if jml_lama['Z'] <= 1 else f'z{n}',
+                                 _normalisasi_nama(v['nama']))
+        elif p == 'Y':
+            kode_lama.setdefault('y', _normalisasi_nama(v['nama']))
+    # Kode baru (istilah M/Z): X1, X2, ...; M bila satu perantara,
+    # M1/M2/... bila lebih dari satu (mediasi paralel, seperti
+    # M1/M2 di Bab IV); Z bila satu penguat, Z1/Z2/... bila lebih
+    # dari satu; Y.
+    jml_m = sum(1 for v in variabel if v['peran'] == 'M')
     jml_z = sum(1 for v in variabel if v['peran'] == 'Z')
-    jml_w = sum(1 for v in variabel if v['peran'] == 'W')
-    hitung = {'X': 0, 'Z': 0, 'W': 0}
+    hitung = {'X': 0, 'M': 0, 'Z': 0}
     for v in variabel:
         if v['peran'] == 'X':
             hitung['X'] += 1
             v['kode'] = f"X{hitung['X']}"
+        elif v['peran'] == 'M':
+            hitung['M'] += 1
+            v['kode'] = f"M{hitung['M']}" if jml_m > 1 else 'M'
         elif v['peran'] == 'Z':
             hitung['Z'] += 1
             v['kode'] = f"Z{hitung['Z']}" if jml_z > 1 else 'Z'
-        elif v['peran'] == 'W':
-            hitung['W'] += 1
-            v['kode'] = f"W{hitung['W']}" if jml_w > 1 else 'W'
         else:
             v['kode'] = 'Y'
     nama_ke_kode = {_normalisasi_nama(v['nama']): v['kode']
                     for v in variabel}
     kode_ke_kode = {v['kode'].lower(): v['kode'] for v in variabel}
+    for k_lama, nama in kode_lama.items():
+        if k_lama not in kode_ke_kode and nama in nama_ke_kode:
+            kode_ke_kode[k_lama] = nama_ke_kode[nama]
 
     def _cari_kode(teks: str):
         """Cari kode variabel dari nama atau kode apa adanya.
 
-        Formulir mengirim kode (X1, X2, Z, Y), naskah/peta mengirim
-        nama; keduanya harus dikenali. Nama didahulukan supaya nama
-        "X2" tetap menunjuk variabel bernama X2, bukan kode X2.
+        Formulir mengirim kode (X1, X2, M, Z, Y), naskah/peta
+        mengirim nama; keduanya harus dikenali. Nama didahulukan
+        supaya nama "X2" tetap menunjuk variabel bernama X2, bukan
+        kode X2. Kode lama ('Z' untuk perantara lama, kini M) ikut
+        dikenali lewat alias di kode_ke_kode.
         """
         kunci = _normalisasi_nama(teks)
         if kunci in nama_ke_kode:
@@ -197,7 +324,7 @@ def normalisasi_model(data) -> tuple:
         ke = _rapi(j.get('ke'))
         lewat = _rapi(j.get('lewat'))
         label = _rapi(j.get('hipotesis'))
-        jenis = str(j.get('jenis') or 'langsung').strip().lower()
+        jenis_masuk = str(j.get('jenis') or '').strip().lower()
         arah = str(j.get('arah') or '').strip()
         if not dari or not ke:
             continue
@@ -224,17 +351,42 @@ def normalisasi_model(data) -> tuple:
                 continue
             peran_lewat = next((v['peran'] for v in variabel
                                 if v['kode'] == kode_lewat), '')
-            if peran_lewat != 'Z':
-                masalah.append('Lewat harus perantara (Z).')
+            if peran_lewat != 'M':
+                masalah.append('Lewat harus perantara (M).')
                 continue
-            jenis = 'tidak_langsung'
         peran_dari = next((v['peran'] for v in variabel
                            if v['kode'] == kode_dari), '')
-        if peran_dari == 'W':
-            if lewat:
-                masalah.append('Penguat (W) tidak memakai Lewat.')
-                continue
+        if peran_dari == 'Z' and lewat:
+            masalah.append('Penguat (Z) tidak memakai Lewat.')
+            continue
+        # Jenis jalur: bila dikirim eksplisit (kolom Jenis di
+        # formulir), divalidasi; bila tidak dikirim, disimpulkan
+        # seperti dulu (cocok mundur).
+        if jenis_masuk in ('langsung', 'tidak_langsung', 'interaksi'):
+            if jenis_masuk == 'langsung':
+                if lewat:
+                    masalah.append('Jalur langsung tidak memakai '
+                                   'Lewat.')
+                    continue
+                jenis = 'langsung'
+            elif jenis_masuk == 'tidak_langsung':
+                if not lewat:
+                    masalah.append('Jalur tidak langsung wajib lewat '
+                                   'perantara (M).')
+                    continue
+                jenis = 'tidak_langsung'
+            else:
+                if peran_dari != 'Z':
+                    masalah.append('Jalur interaksi (moderasi) harus '
+                                   'dari penguat (Z).')
+                    continue
+                jenis = 'interaksi'
+        elif lewat:
+            jenis = 'tidak_langsung'
+        elif peran_dari == 'Z':
             jenis = 'interaksi'
+        else:
+            jenis = 'langsung'
         if not label:
             masalah.append('Ada jalur yang belum berlabel hipotesis.')
             continue
@@ -242,8 +394,6 @@ def normalisasi_model(data) -> tuple:
             masalah.append(f'Label {label} dipakai dua jalur.')
             continue
         label_pakai.add(label)
-        if jenis not in ('langsung', 'tidak_langsung', 'interaksi'):
-            jenis = 'langsung'
         if jenis == 'interaksi':
             peran_ke = next((v['peran'] for v in variabel
                              if v['kode'] == kode_ke), '')
@@ -274,6 +424,8 @@ def model_tampilan(data) -> dict:
     """
     if not isinstance(data, dict):
         return {'variabel': [], 'jalur': [], 'jenis': '', 'desain': ''}
+    lama = _mediator_lama(data.get('variabel') or [],
+                          data.get('jalur') or [])
     mentah: list[tuple] = []
     for v in data.get('variabel') or []:
         if not isinstance(v, dict):
@@ -282,25 +434,25 @@ def model_tampilan(data) -> dict:
         peran = str(v.get('peran') or 'X').strip().upper()
         if peran not in PERAN_SAH:
             peran = 'X'
-        if peran == 'M':
-            peran = 'Z'
+        if peran == 'Z' and _normalisasi_nama(nama) in lama:
+            peran = 'M'
         if not nama:
             continue
         mentah.append((nama, peran))
+    jml_m = sum(1 for _, p in mentah if p == 'M')
     jml_z = sum(1 for _, p in mentah if p == 'Z')
-    jml_w = sum(1 for _, p in mentah if p == 'W')
     variabel: list[dict] = []
-    hitung = {'X': 0, 'Z': 0, 'W': 0}
+    hitung = {'X': 0, 'M': 0, 'Z': 0}
     for nama, peran in mentah:
         if peran == 'X':
             hitung['X'] += 1
             kode = f"X{hitung['X']}"
+        elif peran == 'M':
+            hitung['M'] += 1
+            kode = f"M{hitung['M']}" if jml_m > 1 else 'M'
         elif peran == 'Z':
             hitung['Z'] += 1
             kode = f"Z{hitung['Z']}" if jml_z > 1 else 'Z'
-        elif peran == 'W':
-            hitung['W'] += 1
-            kode = f"W{hitung['W']}" if jml_w > 1 else 'W'
         else:
             kode = 'Y'
         variabel.append({'nama': nama, 'peran': peran, 'kode': kode})
@@ -308,6 +460,46 @@ def model_tampilan(data) -> dict:
     for v in variabel:
         kunci[_normalisasi_nama(v['nama'])] = v['kode']
         kunci[v['kode'].lower()] = v['kode']
+    # Alias kode lama ('Z' untuk perantara lama, kini M) + kode yang
+    # dikirim, supaya referensi jalur lama tetap menunjuk variabel
+    # yang sama saat validasi gagal dan formulir ditampilkan lagi.
+    _peran_lama: dict[str, str] = {}
+    _kode_kirim: dict[str, str] = {}
+    for v in data.get('variabel') or []:
+        if not isinstance(v, dict):
+            continue
+        _nm = _normalisasi_nama(v.get('nama'))
+        if not _nm or _nm in _peran_lama:
+            continue
+        _peran_lama[_nm] = str(v.get('peran') or '').strip().upper()
+        _kk = _rapi(v.get('kode')).lower()
+        if _kk:
+            _kode_kirim[_nm] = _kk
+    _jml_lama = {'X': 0, 'Z': 0}
+    for _p in _peran_lama.values():
+        if _p == 'X':
+            _jml_lama['X'] += 1
+        elif _p in ('Z', 'M'):
+            _jml_lama['Z'] += 1
+    _hitung_lama = {'X': 0, 'Z': 0}
+    for v in variabel:
+        _nm = _normalisasi_nama(v['nama'])
+        _p = _peran_lama.get(_nm, '')
+        _kl = ''
+        if _p == 'X':
+            _hitung_lama['X'] += 1
+            _kl = f"x{_hitung_lama['X']}"
+        elif _p in ('Z', 'M'):
+            _hitung_lama['Z'] += 1
+            _n = _hitung_lama['Z']
+            _kl = 'z' if _jml_lama['Z'] <= 1 else f'z{_n}'
+        elif _p == 'Y':
+            _kl = 'y'
+        if _kl and _kl not in kunci:
+            kunci[_kl] = v['kode']
+        _kk = _kode_kirim.get(_nm, '')
+        if _kk and _kk not in kunci:
+            kunci[_kk] = v['kode']
 
     def _kode(teks: str) -> str:
         return kunci.get(_normalisasi_nama(teks), _rapi(teks))
@@ -329,15 +521,15 @@ def model_tampilan(data) -> dict:
 
 
 def bentuk_model(model: dict) -> str:
-    """'campuran' bila ada Z dan W, 'moderasi' bila ada W tanpa Z,
-    'mediasi' bila ada Z tanpa W, 'banyak_x' bila X lebih dari
+    """'campuran' bila ada M dan Z, 'moderasi' bila ada Z tanpa M,
+    'mediasi' bila ada M tanpa Z, 'banyak_x' bila X lebih dari
     satu, sisanya 'langsung'."""
     peran = [v['peran'] for v in model.get('variabel') or []]
-    if 'W' in peran and 'Z' in peran:
+    if 'M' in peran and 'Z' in peran:
         return 'campuran'
-    if 'W' in peran:
-        return 'moderasi'
     if 'Z' in peran:
+        return 'moderasi'
+    if 'M' in peran:
         return 'mediasi'
     if peran.count('X') > 1:
         return 'banyak_x'
@@ -389,7 +581,7 @@ def _tahap_variabel(variabel, jalur):
     pendahulu. Jalur lewat diurai jadi dua sisi (Dari ke Lewat,
     Lewat ke Ke). Diulang sebanyak jumlah variabel supaya graf
     berputar (siklus) tetap berhenti dengan nilai deterministik.
-    X/Z/Y biasa kembali jadi X 0, Z 1, Y 2; tanpa Z jadi X 0, Y 1.
+    X/M/Y biasa kembali jadi X 0, M 1, Y 2; tanpa M jadi X 0, Y 1.
     """
     kode = [v.get('kode') or v.get('nama') for v in variabel]
     tahap = {k: 0 for k in kode if k}
@@ -477,14 +669,14 @@ def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
     18 Nov 10:09 (Z dan Y sejajar di garis tengah): posisi selalu
     variabel X berhadapan dengan variabel Y, defaultnya SEJAJAR
     (satu garis tengah yang sama), berapapun jumlah X dan Y;
-    variabel lain seperti M/Z itu DI ATAS atau DI BAWAH garis X-Y
+    variabel lain seperti perantara M itu DI ATAS atau DI BAWAH garis X-Y
     itu, bukan di garisnya. Panah langsung diprioritaskan dulu
     (lurus, terpendek, jalurnya bersih); garis putus-putus mengalah,
     lewat perantara di atas/bawah, tidak pernah memotong jalur
     langsung. Posisi perantara TIDAK kaku (pilihan 1 Boss 18 Nov
-    13:03 WIB): untuk mediasi 3 kolom (X|Z|Y), mesin menghitung
-    tiga kandidat (Z di tengah garis seperti v4, Z di atas garis
-    seperti segitiga v5, Z di bawah garis sebagai cerminnya),
+    13:03 WIB): untuk mediasi 3 kolom (X|M|Y), mesin menghitung
+    tiga kandidat (M di tengah garis seperti v4, M di atas garis
+    seperti segitiga v5, M di bawah garis sebagai cerminnya),
     lengkap dengan panah dan labelnya, lalu memilih yang skornya
     terbaik (lihat skor_tata_letak di app/gambar.py: silangan
     paling sedikit, celah label paling lega, panjang panah
@@ -497,7 +689,7 @@ def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
     tengah seperti dulu.
     Tahap tiap variabel diturunkan dari graf jalur (longest-path):
     tanpa jalur masuk tahap 0, bila tidak 1 + maks tahap pendahulu;
-    X/Z/Y biasa kembali jadi 3 kolom (X 0, Z 1, Y 2), tanpa Z jadi
+    X/M/Y biasa kembali jadi 3 kolom (X 0, M 1, Y 2), tanpa M jadi
     2 kolom; model bertahap (mis. Goal-Directed) jadi N kolom.
     Kolom X dan Y simetris terhadap garis tengah (1 kotak di garis
     tengah, kecuali kolom X klasik 1 X di 'tengah' yang duduk di
@@ -508,7 +700,7 @@ def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
     250 px lalu dinaikkan sampai bawah kolom melewati garis langsung
     X ke Y tertinggi dengan celah 40 px; 'bawah': cermin 'atas').
     Jarak antar kolom 490 px (3 kolom ke bawah, sama seperti dulu:
-    X 60, Z 550, Y 1040) atau 440 px (4 kolom ke atas, kanvas
+    X 60, M 550, Y 1040) atau 440 px (4 kolom ke atas, kanvas
     dilebarkan supaya label panah muat di celah 120 px).
     Kotak model adalah oval besar (lebar 300, tinggi 180/216,
     rasio 1,67/1,39 seperti oval contoh); garis tengah (pusat X/Y)
@@ -550,15 +742,15 @@ def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
         x_kolom = [60 + i * pitch for i in range(n_kolom)]
     # Template default (Boss 18 Nov 12:12 WIB): X berhadapan dengan Y
     # pada SATU garis tengah yang sama (tumpukan X dan Y simetris
-    # terhadap garis itu, berapapun jumlahnya); perantara M/Z TIDAK
+    # terhadap garis itu, berapapun jumlahnya); perantara M TIDAK
     # di garis itu, melainkan DI ATAS atau DI BAWAH garis, supaya
     # panah langsung X ke Y lurus dan tidak terhalang perantara.
-    # Penguat W duduk di kolom X (tahap 0), jadi ikut garis tengah.
+    # Penguat Z duduk di kolom X (tahap 0), jadi ikut garis tengah.
     garis = TENGAH_KANVAS
     # Kolom perantara mediasi 3 kolom: hanya bila 3 kolom, kolom
-    # pertama hanya X/W/Z (penguat duduk di kolom X, tahap 0, entah
-    # berkode W atau Z2, jadi campuran mediasi + moderasi tetap
-    # dapat segitiga/skor), kolom tengah hanya Z, kolom terakhir
+    # pertama hanya X/Z (penguat duduk di kolom X, tahap 0, entah
+    # berkode Z atau Z2, jadi campuran mediasi + moderasi tetap
+    # dapat segitiga/skor), kolom tengah hanya M, kolom terakhir
     # hanya Y. Rantai multi-kolom (Goal-Directed, contoh 5) TIDAK
     # memakai aturan ini: perantaranya membentuk rantai utama, jadi
     # kolomnya tetap simetris terhadap garis tengah seperti dulu.
@@ -567,8 +759,8 @@ def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
         peran_kolom = {t: {v.get('peran') for v in vs}
                        for t, vs in kolom.items()}
         kolom0 = peran_kolom.get(0) or set()
-        if (kolom0 and kolom0 <= {'X', 'W', 'Z'} and 'X' in kolom0
-                and peran_kolom.get(1) == {'Z'}
+        if (kolom0 and kolom0 <= {'X', 'Z'} and 'X' in kolom0
+                and peran_kolom.get(1) == {'M'}
                 and peran_kolom.get(2) == {'Y'}):
             t_med = 1
     # Posisi perantara dipilih dari SKOR (pilihan 1 Boss 18 Nov
@@ -612,7 +804,7 @@ def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
     def _pusat_mediasi(posisi):
         """Pusat vertikal kolom perantara mediasi 3 kolom.
 
-        'tengah': di garis tengah seperti v4 (Z sejajar Y, 1 X di
+        'tengah': di garis tengah seperti v4 (M sejajar Y, 1 X di
         atas garis); 'atas': di atas garis, pusat awal garis - 250
         px (atap segitiga mediasi), lalu dinaikkan sampai bawah
         kolom melewati garis langsung X ke Y tertinggi di kolom itu
@@ -844,33 +1036,18 @@ def model_dari_peta_bab4(peta: dict) -> dict | None:
     """Ubah peta Bab IV (variabel + jalur) jadi data model diagram.
 
     Peta Bab IV sudah dibaca dari naskah (beserta bukti kalimatnya),
-    jadi ini hanya alih bentuk, bukan baca ulang. Peran 'M' dibaca
-    sama dengan 'Z' (perantara, oleh normalisasi); peran 'Z' peta
-    yang punya jalur 'interaksi' adalah penguat, dibaca 'W'
-    (moderator, konvensi Hayes: M perantara, W penguat). Peran 'Z'
-    peta tanpa jalur 'interaksi' (peta tidak sah, periksa_peta
-    menuntut penguat punya jalur interaksi) dibiarkan 'Z'."""
+    jadi ini hanya alih bentuk, bukan baca ulang. Peta memakai
+    istilah lazim yang sama (M perantara, Z penguat), jadi peran
+    diteruskan apa adanya tanpa ubah."""
     if not isinstance(peta, dict) or not peta.get('variabel'):
         return None
-    jalur_peta = peta.get('jalur') or []
-    penguat = set()
-    for j in jalur_peta:
-        if not isinstance(j, dict):
-            continue
-        if str(j.get('jenis') or '').strip().lower() == 'interaksi':
-            penguat.add(_normalisasi_nama(j.get('dari') or ''))
-    variabel = []
-    for v in peta.get('variabel') or []:
-        peran = v.get('peran', 'X')
-        if (peran == 'Z'
-                and _normalisasi_nama(v.get('nama', '')) in penguat):
-            peran = 'W'
-        variabel.append({'nama': v.get('nama', ''), 'peran': peran})
-    return {'variabel': variabel,
+    return {'variabel': [{'nama': v.get('nama', ''),
+                          'peran': v.get('peran', 'X')}
+                         for v in peta.get('variabel') or []],
             'jalur': [{'dari': j.get('dari', ''), 'ke': j.get('ke', ''),
                        'hipotesis': j.get('hipotesis', ''),
                        'jenis': j.get('jenis', 'langsung'), 'arah': ''}
-                      for j in jalur_peta],
+                      for j in peta.get('jalur') or []],
             'jenis': peta.get('jenis') or '',
             'desain': ''}
 

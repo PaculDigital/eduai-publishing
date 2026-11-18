@@ -170,6 +170,7 @@ async def diagram_model_simpan(
     jd: list[str] = Form(default=[]),
     jk: list[str] = Form(default=[]),
     jl: list[str] = Form(default=[]),
+    jj: list[str] = Form(default=[]),
     jh: list[str] = Form(default=[]),
     ja: list[str] = Form(default=[]),
     u: User = Depends(wajib_login),
@@ -181,9 +182,9 @@ async def diagram_model_simpan(
                          for i in range(max(len(vn), len(vp)))],
             'jalur': [{'dari': _ambil(jd, i), 'ke': _ambil(jk, i),
                        'lewat': _ambil(jl, i), 'hipotesis': _ambil(jh, i),
-                       'arah': _ambil(ja, i)}
+                       'jenis': _ambil(jj, i), 'arah': _ambil(ja, i)}
                       for i in range(max(len(jd), len(jk), len(jl),
-                                         len(jh), len(ja)))],
+                                         len(jj), len(jh), len(ja)))],
             'jenis': lama.get('jenis') or '',
             'desain': lama.get('desain') or ''}
     model, masalah = DG.normalisasi_model(data)

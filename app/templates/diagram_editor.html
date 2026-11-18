@@ -48,8 +48,8 @@
   {% if jenis == 'model' %}
   <select id="peran-kotak">
     <option value="X">X (bebas)</option>
-    <option value="Z">Z (perantara)</option>
-    <option value="W">W (penguat)</option>
+    <option value="M">M (perantara)</option>
+    <option value="Z">Z (penguat)</option>
     <option value="Y">Y (hasil)</option>
   </select>
   {% endif %}
@@ -85,7 +85,7 @@ var sambung = false;
 var sambungDari = null;
 var pilih = null;
 var seret = null;
-var WARNA = {X: '#1d7a8c', Z: '#e8833a', M: '#e8833a', W: '#2e7d32', Y: '#5c6bc0', langkah: '#1d7a8c'};
+var WARNA = {X: '#1d7a8c', M: '#e8833a', Z: '#2e7d32', Y: '#5c6bc0', langkah: '#1d7a8c'};
 var NS = 'http://www.w3.org/2000/svg';
 
 function el(nama, atribut) {
