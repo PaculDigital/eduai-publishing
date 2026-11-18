@@ -19,6 +19,10 @@
   table { border-collapse: collapse; width: 100%; margin-bottom: 8px; }
   td, th { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; }
   input[type=text], select { padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; width: 100%; }
+  .lipatan-indikator td { background: #f7f9fa; }
+  .lipatan-indikator summary { cursor: pointer; color: #1a73e8; font-weight: bold; }
+  .baris-indikator { display: flex; gap: 6px; margin: 4px 0; }
+  .baris-indikator input[type=text] { flex: 1; }
   h3 { margin-bottom: 4px; }
   a { color: #1a73e8; }
 </style>
@@ -33,6 +37,7 @@
   <table id="tabel-variabel">
     <tr><th>Nama</th><th>Peran</th><th></th></tr>
     {% for v in model.variabel %}
+    {% set idx_var = loop.index0 %}
     <tr>
       <td><input type="text" name="vn" value="{{ v.nama }}" oninput="segarkanPilihan()"></td>
       <td><select name="vp" onchange="segarkanPilihan()">
@@ -42,6 +47,23 @@
         <option value="Y" {% if v.peran == 'Y' %}selected{% endif %}>Y (hasil)</option>
       </select></td>
       <td><button class="tombol kedua" type="button" onclick="hapusBaris(this)">Hapus</button></td>
+    </tr>
+    <tr class="lipatan-indikator">
+      <td colspan="3">
+        <details {% if v.indikator %}open{% endif %}>
+          <summary>Indikator (<span class="jml-ind">{{ v.indikator | length if v.indikator else 0 }}</span>)</summary>
+          <div class="daftar-indikator">
+            {% for ind in v.indikator or [] %}
+            <div class="baris-indikator">
+              <input type="text" name="vi" value="{{ ind }}" oninput="segarkanIndikator()">
+              <input type="hidden" name="vk" value="{{ idx_var }}">
+              <button class="tombol kedua" type="button" onclick="hapusIndikator(this)">Hapus</button>
+            </div>
+            {% endfor %}
+          </div>
+          <button class="tombol kedua" type="button" onclick="tambahIndikator(this)">+ Indikator</button>
+        </details>
+      </td>
     </tr>
     {% endfor %}
   </table>
@@ -71,6 +93,7 @@
     {% endfor %}
   </table>
   <p><button class="tombol kedua" type="button" onclick="tambahHipotesis()">+ Hipotesis</button></p>
+  <p>Hanya perantara (M) yang muncul di sini. Ubah peran jadi M bila variabel ini ingin dilewati.</p>
   <p>Jalur dari penguat (Z) ke hasil (Y) digambar putus-putus.</p>
 
   <p><button class="tombol" type="submit">Lihat draf</button>
@@ -281,8 +304,59 @@ function segarkanPilihan() {
       p.hidden = true;
     }
   }
+  // Indikator ikut: nomor ulang vk (indeks baris variabel pemilik)
+  // supaya lipatan yang dipindah/dihapus tetap menunjuk variabel
+  // yang benar.
+  segarkanIndikator();
 }
-function hapusBaris(btn) { btn.closest('tr').remove(); segarkanPilihan(); }
+function segarkanIndikator() {
+  // Nomor ulang vk (indeks baris variabel pemilik, urutan baris di
+  // formulir termasuk yang namanya masih kosong) + hitung jumlah
+  // indikator terisi per lipatan. Indikator boleh kosong, tidak
+  // menghalangi (Boss 18 Nov 16:18 WIB).
+  var idx = -1;
+  document.querySelectorAll('#tabel-variabel tr').forEach(function (tr) {
+    if (tr.classList.contains('lipatan-indikator')) {
+      var n = 0;
+      tr.querySelectorAll('.baris-indikator').forEach(function (b) {
+        var inp = b.querySelector('input[name="vi"]');
+        var hid = b.querySelector('input[name="vk"]');
+        if (hid) hid.value = idx;
+        if (inp && inp.value.trim()) n += 1;
+      });
+      var jml = tr.querySelector('.jml-ind');
+      if (jml) jml.textContent = n;
+    } else if (tr.querySelector('input[name="vn"]')) {
+      idx += 1;
+    }
+  });
+}
+function tambahIndikator(btn) {
+  var det = btn.closest('details');
+  var daftar = det ? det.querySelector('.daftar-indikator') : null;
+  if (!daftar) return;
+  var div = document.createElement('div');
+  div.className = 'baris-indikator';
+  div.innerHTML = '<input type="text" name="vi" oninput="segarkanIndikator()">'
+    + '<input type="hidden" name="vk" value="0">'
+    + '<button class="tombol kedua" type="button" onclick="hapusIndikator(this)">Hapus</button>';
+  daftar.appendChild(div);
+  if (det) det.open = true;
+  segarkanIndikator();
+  div.querySelector('input[name="vi"]').focus();
+}
+function hapusIndikator(btn) {
+  btn.closest('.baris-indikator').remove();
+  segarkanIndikator();
+}
+function hapusBaris(btn) {
+  var tr = btn.closest('tr');
+  var berikut = tr.nextElementSibling;
+  tr.remove();
+  // Baris variabel punya lipatan indikator di bawahnya; hapus juga.
+  if (berikut && berikut.classList.contains('lipatan-indikator')) berikut.remove();
+  segarkanPilihan();
+}
 function tambahVariabel() {
   var t = document.getElementById('tabel-variabel');
   var tr = document.createElement('tr');
@@ -293,6 +367,14 @@ function tambahVariabel() {
     + '<option value="Y">Y (hasil)</option></select></td>'
     + '<td><button class="tombol kedua" type="button" onclick="hapusBaris(this)">Hapus</button></td>';
   t.appendChild(tr);
+  var lip = document.createElement('tr');
+  lip.className = 'lipatan-indikator';
+  lip.innerHTML = '<td colspan="3"><details><summary>Indikator (<span class="jml-ind">0</span>)</summary>'
+    + '<div class="daftar-indikator"></div>'
+    + '<button class="tombol kedua" type="button" onclick="tambahIndikator(this)">+ Indikator</button>'
+    + '</details></td>';
+  t.appendChild(lip);
+  segarkanPilihan();
 }
 function tambahHipotesis() {
   var t = document.getElementById('tabel-hipotesis');

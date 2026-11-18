@@ -67,6 +67,16 @@ TINTA = '#10222E'         # teks utama
 ABU = '#7C8B99'           # teks sekunder
 GRID = '#E8EEF2'          # garis bantu
 LATAR = '#FBFCFD'         # latar
+KUNING_IND = '#FFF59D'    # isi kotak indikator (kuning muda, contoh PLS-SEM Boss)
+OUTLINE_IND = '#F9A825'   # garis kotak indikator (kuning tua)
+# Lebar huruf DejaVu Sans Bold untuk indikator (diukur PIL,
+# 1 desimal; TABEL YANG SAMA dipakai editor JS, supaya
+# keputusan bungkus nama indikator sama persis di PNG dan
+# editor. Dibangkitkan /tmp/dg10/buat_tabel2.py.)
+LEBAR_HURUF_IND_18 = {" ": 6.3, "!": 8.2, "\"": 9.4, "#": 15.1, "$": 12.5, "%": 18.0, "&": 15.7, "'": 5.5, "(": 8.2, ")": 8.2, "*": 9.4, "+": 15.1, ",": 6.8, "-": 7.5, ".": 6.8, "/": 6.6, "0": 12.5, "1": 12.5, "2": 12.5, "3": 12.5, "4": 12.5, "5": 12.5, "6": 12.5, "7": 12.5, "8": 12.5, "9": 12.5, ":": 7.2, ";": 7.2, "<": 15.1, "=": 15.1, ">": 15.1, "?": 10.4, "@": 18.0, "A": 13.9, "B": 13.7, "C": 13.2, "D": 14.9, "E": 12.3, "F": 12.3, "G": 14.8, "H": 15.1, "I": 6.7, "J": 6.7, "K": 14.0, "L": 11.5, "M": 17.9, "N": 15.1, "O": 15.3, "P": 13.2, "Q": 15.3, "R": 13.9, "S": 13.0, "T": 12.3, "U": 14.6, "V": 13.9, "W": 19.9, "X": 13.9, "Y": 13.0, "Z": 13.0, "[": 8.2, "\\": 6.6, "]": 8.2, "^": 15.1, "_": 9.0, "`": 9.0, "a": 12.1, "b": 12.9, "c": 10.7, "d": 12.9, "e": 12.2, "f": 7.8, "g": 12.9, "h": 12.8, "i": 6.2, "j": 6.2, "k": 12.0, "l": 6.2, "m": 18.8, "n": 12.8, "o": 12.4, "p": 12.9, "q": 12.9, "r": 8.9, "s": 10.7, "t": 8.6, "u": 12.8, "v": 11.7, "w": 16.6, "x": 11.6, "y": 11.7, "z": 10.5, "{": 12.8, "|": 6.6, "}": 12.8, "~": 15.1, "é": 12.2, "è": 12.2, "ê": 12.2, "à": 12.1, "á": 12.1, "â": 12.1, "ä": 12.1, "ü": 12.8, "ö": 12.4, "ï": 6.2, "ç": 10.7, "ñ": 12.8}
+LEBAR_HURUF_IND_16 = {" ": 5.6, "!": 7.3, "\"": 8.3, "#": 13.4, "$": 11.1, "%": 16.0, "&": 14.0, "'": 4.9, "(": 7.3, ")": 7.3, "*": 8.4, "+": 13.4, ",": 6.1, "-": 6.6, ".": 6.1, "/": 5.8, "0": 11.1, "1": 11.1, "2": 11.1, "3": 11.1, "4": 11.1, "5": 11.1, "6": 11.1, "7": 11.1, "8": 11.1, "9": 11.1, ":": 6.4, ";": 6.4, "<": 13.4, "=": 13.4, ">": 13.4, "?": 9.3, "@": 16.0, "A": 12.4, "B": 12.2, "C": 11.8, "D": 13.3, "E": 10.9, "F": 10.9, "G": 13.1, "H": 13.4, "I": 6.0, "J": 6.0, "K": 12.4, "L": 10.2, "M": 15.9, "N": 13.4, "O": 13.6, "P": 11.7, "Q": 13.6, "R": 12.3, "S": 11.5, "T": 10.9, "U": 13.0, "V": 12.4, "W": 17.7, "X": 12.3, "Y": 11.6, "Z": 11.6, "[": 7.3, "\\": 5.8, "]": 7.3, "^": 13.4, "_": 8.0, "`": 8.0, "a": 10.8, "b": 11.5, "c": 9.5, "d": 11.5, "e": 10.9, "f": 7.0, "g": 11.5, "h": 11.4, "i": 5.5, "j": 5.5, "k": 10.6, "l": 5.5, "m": 16.7, "n": 11.4, "o": 11.0, "p": 11.5, "q": 11.5, "r": 7.9, "s": 9.5, "t": 7.7, "u": 11.4, "v": 10.4, "w": 14.8, "x": 10.3, "y": 10.4, "z": 9.3, "{": 11.4, "|": 5.8, "}": 11.4, "~": 13.4, "é": 10.9, "è": 10.9, "ê": 10.9, "à": 10.8, "á": 10.8, "â": 10.8, "ä": 10.8, "ü": 11.4, "ö": 11.0, "ï": 5.5, "ç": 9.5, "ñ": 11.4}
+LEBAR_HURUF_IND_14 = {" ": 4.9, "!": 6.4, "\"": 7.3, "#": 11.7, "$": 9.7, "%": 14.0, "&": 12.2, "'": 4.3, "(": 6.4, ")": 6.4, "*": 7.3, "+": 11.7, ",": 5.3, "-": 5.8, ".": 5.3, "/": 5.1, "0": 9.7, "1": 9.7, "2": 9.7, "3": 9.7, "4": 9.7, "5": 9.7, "6": 9.7, "7": 9.7, "8": 9.7, "9": 9.7, ":": 5.6, ";": 5.6, "<": 11.7, "=": 11.7, ">": 11.7, "?": 8.1, "@": 14.0, "A": 10.8, "B": 10.7, "C": 10.3, "D": 11.6, "E": 9.6, "F": 9.6, "G": 11.5, "H": 11.7, "I": 5.2, "J": 5.2, "K": 10.8, "L": 8.9, "M": 13.9, "N": 11.7, "O": 11.9, "P": 10.3, "Q": 11.9, "R": 10.8, "S": 10.1, "T": 9.5, "U": 11.4, "V": 10.8, "W": 15.4, "X": 10.8, "Y": 10.1, "Z": 10.2, "[": 6.4, "\\": 5.1, "]": 6.4, "^": 11.7, "_": 7.0, "`": 7.0, "a": 9.5, "b": 10.0, "c": 8.3, "d": 10.0, "e": 9.5, "f": 6.1, "g": 10.0, "h": 10.0, "i": 4.8, "j": 4.8, "k": 9.3, "l": 4.8, "m": 14.6, "n": 10.0, "o": 9.6, "p": 10.0, "q": 10.0, "r": 6.9, "s": 8.3, "t": 6.7, "u": 10.0, "v": 9.1, "w": 12.9, "x": 9.0, "y": 9.1, "z": 8.2, "{": 10.0, "|": 5.1, "}": 10.0, "~": 11.7, "é": 9.5, "è": 9.5, "ê": 9.5, "à": 9.5, "á": 9.5, "â": 9.5, "ä": 9.5, "ü": 10.0, "ö": 9.6, "ï": 4.8, "ç": 8.3, "ñ": 10.0}
+
 
 #  Palet pai (modern, tidak mentah)
 PALET = ('#1D7A8C', '#E8833A', '#5C6BC0', '#26A69A', '#EF5350',
@@ -443,6 +453,139 @@ def _bungkus_teks(d, teks: str, font, maks_lebar: int,
     return baris or ['']
 
 
+def _lebar_ind(teks: str, ukuran: int) -> float:
+    """Lebar teks (px) menurut tabel lebar huruf DejaVu Sans Bold
+    (ukuran 18/16/14), sama persis dengan tabel JS editor.
+    Dipakai bungkus indikator supaya keputusan bungkus Python dan
+    JS sama persis (kerning membuat jumlah per huruf sedikit lebih
+    besar dari textlength utuh, jadi kedua sisi harus memakai
+    ukuran yang sama). Huruf di luar tabel memakai lebar 'm'."""
+    tabel = {18: LEBAR_HURUF_IND_18, 16: LEBAR_HURUF_IND_16,
+             14: LEBAR_HURUF_IND_14}.get(ukuran) or LEBAR_HURUF_IND_18
+    jatuh = tabel.get('m', 12)
+    return sum(tabel.get(ch, jatuh) for ch in str(teks or ''))
+
+
+def _bungkus_seimbang(teks: str, ukuran: int, maks_lebar: int) -> list:
+    """Bungkus teks jadi paling banyak 2 baris yang SEIMBANG.
+
+    Nama indikator (Boss 18 Nov 16:26 WIB): kotak selalu setinggi
+    2 baris dan ramping; nama panjang dibungkus jadi 2 baris yang
+    seimbang (selisih lebar kedua baris terkecil), nama pendek tetap
+    1 baris. Bila satu baris muat, kembalikan 1 baris. Bila tidak
+    ada belahan dua baris yang muat, jatuh ke _bungkus_teks
+    (terpotong '…' di baris kedua). Lebar diukur dari tabel bersama
+    (_lebar_ind), sama dengan editor JS."""
+    kata = str(teks or '').split()
+    if not kata:
+        return ['']
+    utuh = ' '.join(kata)
+    if _lebar_ind(utuh, ukuran) <= maks_lebar:
+        return [utuh]
+    terbaik = None
+    for i in range(1, len(kata)):
+        b1 = ' '.join(kata[:i])
+        b2 = ' '.join(kata[i:])
+        w1 = _lebar_ind(b1, ukuran)
+        w2 = _lebar_ind(b2, ukuran)
+        if w1 > maks_lebar or w2 > maks_lebar:
+            continue
+        selisih = abs(w1 - w2)
+        if terbaik is None or selisih < terbaik[0]:
+            terbaik = (selisih, [b1, b2])
+    if terbaik is not None:
+        return terbaik[1]
+    return _bungkus_teks_dari_lebar(teks, ukuran, maks_lebar, 2)
+
+
+def _bungkus_teks_dari_lebar(teks: str, ukuran: int, maks_lebar: int,
+                             maks_baris: int = 2) -> list:
+    """Bungkus teks (seperti _bungkus_teks) tapi lebar diukur dari
+    tabel bersama (_lebar_ind), supaya jatuhannya sama dengan
+    editor JS bila nama indikator tidak muat dua baris."""
+    kata = str(teks or '').split()
+    baris: list[str] = []
+    kini = ''
+    for k in kata:
+        coba = f'{kini} {k}'.strip()
+        if _lebar_ind(coba, ukuran) <= maks_lebar or not kini:
+            kini = coba
+        else:
+            baris.append(kini)
+            kini = k
+            if len(baris) >= maks_baris:
+                break
+    if kini and len(baris) < maks_baris:
+        baris.append(kini)
+    elif kini and baris:
+        baris[-1] = baris[-1] + '…'
+    return baris or ['']
+
+
+def _pilih_font_indikator(teks: str) -> tuple:
+    """Font indikator terbesar yang memuat nama dalam 2 baris.
+
+    Coba 18, lalu 16, lalu 14 (tebal); yang pertama yang
+    membungkus tanpa terpotong ('…') dipakai. Bila 14 pun
+    terpotong, pakai 14 (terpotong). Kembalikan
+    (ukuran, baris)."""
+    from .diagram import LEBAR_IND
+    maks_lebar = LEBAR_IND - 16
+    for ukuran in (18, 16, 14):
+        baris = _bungkus_seimbang(teks, ukuran, maks_lebar)
+        if not any(b.endswith('…') for b in baris):
+            return ukuran, baris
+    return 14, _bungkus_seimbang(teks, 14, maks_lebar)
+
+
+def _teks_indikator(d, ind: dict) -> None:
+    """Tulis nama indikator di dalam kotaknya (selalu setinggi
+    2 baris, Boss 18 Nov 16:26 WIB): nama dibungkus jadi 2 baris
+    yang seimbang, font mengecil sampai muat; blok teks dipusatkan
+    vertikal di kotak (1 baris tetap di tengah)."""
+    from .diagram import TINGGI_IND
+    ukuran, baris = _pilih_font_indikator(ind.get('teks') or '')
+    f = _font(ukuran, True)
+    tinggi_baris = ukuran + 4
+    blok = len(baris) * tinggi_baris
+    ty = ind['y'] + (TINGGI_IND - blok) / 2
+    for b in baris:
+        d.text((ind['x'] + ind['w'] / 2, ty), b, font=f, fill=TINTA,
+               anchor='ma')
+        ty += tinggi_baris
+
+
+def panah_indikator(tata: dict | None) -> list:
+    """Panah dari oval variabel ke tiap kotak indikatornya.
+
+    Kembalikan [{'id', 'induk', 'x1', 'y1', 'x2', 'y2'}]: dari
+    tepi oval (setinggi tengah kotak indikator, jepit 6) ke tepi
+    kotak indikator yang menghadap oval. Tata tanpa indikator
+    menghasilkan []."""
+    if not tata:
+        return []
+    kotak = {k['id']: k for k in tata.get('kotak') or []}
+    if not kotak:
+        return []
+    keluar = []
+    for ind in tata.get('indikator') or []:
+        induk = kotak.get(ind.get('induk'))
+        if not induk:
+            continue
+        tengah_ind = ind['y'] + ind['h'] / 2
+        geser = tengah_ind - (induk['y'] + induk['h'] / 2)
+        sisi = ind.get('sisi') or 'kiri'
+        x1, y1 = _titik_elips(induk, geser, sisi)
+        if sisi == 'kanan':
+            x2, y2 = ind['x'], tengah_ind
+        else:
+            x2, y2 = ind['x'] + ind['w'], tengah_ind
+        keluar.append({'id': ind['id'], 'induk': ind['induk'],
+                       'x1': round(x1, 3), 'y1': round(y1, 3),
+                       'x2': round(x2, 3), 'y2': round(y2, 3)})
+    return keluar
+
+
 def _teks_kotak(d, kotak: dict) -> None:
     """Tulis kode + nama di dalam kotak (nama dibungkus, ukuran mengecil
     sampai muat; tidak pernah terpotong). Kotak digambar sebagai elips
@@ -468,7 +611,7 @@ def _teks_kotak(d, kotak: dict) -> None:
 
 
 def _garis_ruas(d, x1: float, y1: float, x2: float, y2: float,
-                putus: bool = False) -> None:
+                putus: bool = False, lebar: int = 4) -> None:
     """Satu ruas garis tanpa kepala panah (untuk polilinia)."""
     dx, dy = x2 - x1, y2 - y1
     panjang = math.hypot(dx, dy)
@@ -482,14 +625,14 @@ def _garis_ruas(d, x1: float, y1: float, x2: float, y2: float,
             t = min(langkah, panjang - s)
             d.line([(x1 + ux * s, y1 + uy * s),
                     (x1 + ux * (s + t), y1 + uy * (s + t))],
-                   fill=TINTA, width=4)
+                   fill=TINTA, width=lebar)
             s += langkah * 2
     else:
-        d.line([(x1, y1), (x2, y2)], fill=TINTA, width=4)
+        d.line([(x1, y1), (x2, y2)], fill=TINTA, width=lebar)
 
 
 def _garis_panah(d, x1: float, y1: float, x2: float, y2: float,
-                 putus: bool = False) -> None:
+                 putus: bool = False, lebar: int = 4) -> None:
     """Garis + kepala segitiga kecil di ujung."""
     dx, dy = x2 - x1, y2 - y1
     panjang = math.hypot(dx, dy)
@@ -498,10 +641,11 @@ def _garis_panah(d, x1: float, y1: float, x2: float, y2: float,
     ux, uy = dx / panjang, dy / panjang
     #  ujung garis berhenti 20 px sebelum titik (ruang kepala panah)
     ex, ey = x2 - ux * 20, y2 - uy * 20
-    _garis_ruas(d, x1, y1, ex, ey, putus)
+    _garis_ruas(d, x1, y1, ex, ey, putus, lebar)
     px, py = -uy, ux
-    d.polygon([(x2, y2), (ex + px * 11, ey + py * 11),
-               (ex - px * 11, ey - py * 11)], fill=TINTA)
+    kepala = max(5, int(11 * lebar / 4))
+    d.polygon([(x2, y2), (ex + px * kepala, ey + py * kepala),
+               (ex - px * kepala, ey - py * kepala)], fill=TINTA)
 
 
 def _label_panah(d, cx: float, cy: float, label: str) -> None:
@@ -807,6 +951,25 @@ def _geser_label_bebas(titik, mx, my, lw, lh, kotak_semua, sudah):
     hasil = _cari(0.0)
     if hasil is not None:
         return hasil
+    # Jalan terakhir: geser tegak lurus garis (bukan sepanjang
+    # garis). Dipakai bila label terjepit di antara dua kotak di
+    # sepanjang garisnya (temuan indikator 18 Nov 2026: label H3
+    # terjepit antara oval X1 dan kotak indikator M, tidak ada
+    # posisi bebas di sepanjang garis X1 ke M). Coba jarak
+    # membesar (24..96 px) ke dua arah tegak lurus, dari titik
+    # tengah garis; yang pertama bebas dipakai.
+    if len(titik) >= 2:
+        _dx = titik[-1][0] - titik[0][0]
+        _dy = titik[-1][1] - titik[0][1]
+        _pj = math.hypot(_dx, _dy)
+        if _pj > 0:
+            _nx, _ny = -_dy / _pj, _dx / _pj
+            for _jarak in (24.0, 36.0, 48.0, 60.0, 72.0, 84.0, 96.0):
+                for _tanda in (1.0, -1.0):
+                    _cx = mx + _nx * _jarak * _tanda
+                    _cy = my + _ny * _jarak * _tanda
+                    if _bebas(_cx, _cy, 0.0):
+                        return _cx, _cy
     return mx, my
 
 
@@ -1088,6 +1251,16 @@ def penempatan_label(tata: dict | None) -> list:
         kelompok[kunci].append((a, b, p))
     keluar = []
     kotak_semua = list(kotak.values())
+    # Label juga menghindari kotak indikator (bukan hanya oval):
+    # kotak indikator duduk di antara oval (mis. di kiri M, di
+    # jalur X ke M), jadi label yang mendarat di tengah garisnya
+    # bisa menimpa kotak indikator (temuan pratinjau campuran
+    # 18 Nov 2026: label H3 menimpa 'Pelayanan cepat'). Rute panah
+    # tetap hanya menghindari oval (kotak_semua), supaya skor dan
+    # bentuk panah tidak berubah.
+    kotak_label = kotak_semua + [
+        {'x': ind['x'], 'y': ind['y'], 'w': ind['w'], 'h': ind['h']}
+        for ind in tata.get('indikator') or []]
     lebar_kanvas = tata.get('lebar') or W
     for kunci in urutan:
         susun = _susunan_kelompok(kelompok[kunci])
@@ -1139,9 +1312,10 @@ def penempatan_label(tata: dict | None) -> list:
             titik = [(x1, y1)] + rute + [(x2, y2)]
             # Label di tengah polilinia; geser sepanjang garisnya bila
             # mendarat di atas kotak atau label lain (aturan umum).
+            # Kotak indikator ikut dihindari (kotak_label).
             mx, my = _titik_polilinia(titik, _panjang_polilinia(titik) / 2)
             mx, my = _geser_label_bebas(
-                titik, mx, my, lw, lh, kotak_semua, keluar)
+                titik, mx, my, lw, lh, kotak_label, keluar)
             keluar.append({
                 'label': label, 'gaya': p.get('gaya') or 'lurus',
                 'dari': p.get('dari'), 'ke': p.get('ke'),
@@ -1163,6 +1337,13 @@ def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
     kotak = tata.get('kotak') or []
     if not kotak:
         return b''
+    # Tata tanpa indikator (draf lama / tata manual tanpa kiriman
+    # indikator): hitung dari model bila ada, supaya PNG akhir
+    # tetap menggambar indikator yang tersimpan di model.
+    if not tata.get('indikator') and model:
+        from .diagram import tambah_indikator as _tambah
+        from .diagram import _indikator_dari_model as _dari_model
+        _tambah(tata, _dari_model(model))
     lebar_kanvas = tata.get('lebar') or W
     tinggi_kanvas = tata.get('tinggi') or H
     g = Image.new('RGB', (lebar_kanvas, tinggi_kanvas), LATAR)
@@ -1184,12 +1365,22 @@ def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
             else:
                 _garis_ruas(d, titik[j][0], titik[j][1],
                             titik[j + 1][0], titik[j + 1][1], putus)
+    # Panah indikator (tipis, dari oval ke tiap kotak indikator),
+    # lalu kotak indikator kuning + namanya.
+    for pi in panah_indikator(tata):
+        _garis_panah(d, pi['x1'], pi['y1'], pi['x2'], pi['y2'],
+                     lebar=2)
     for k in kotak:
         warna = WARNA_PERAN.get(str(k.get('peran') or 'X'), TEAL)
         d.ellipse([k['x'], k['y'], k['x'] + k['w'],
                    k['y'] + k['h']],
                   outline=warna, width=4, fill='white')
         _teks_kotak(d, k)
+    for ind in tata.get('indikator') or []:
+        d.rectangle([ind['x'], ind['y'],
+                     ind['x'] + ind['w'], ind['y'] + ind['h']],
+                    fill=KUNING_IND, outline=OUTLINE_IND, width=2)
+        _teks_indikator(d, ind)
     for pl in penempatan:
         _label_panah(d, pl['cx'], pl['cy'], pl['label'])
     buf = io.BytesIO()

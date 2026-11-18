@@ -21,7 +21,7 @@ var TINGGI_KANVAS = 800;
 var LEBAR_KANVAS = 1400;
 eval(tpl.slice(awal, akhir));
 
-function hitungPenempatan(kotak, panah) {
+function hitungPenempatan(kotak, panah, indikator) {
   var peta = {}, tinggi = {};
   kotak.forEach(function (k) {
     peta[k.id] = k;
@@ -79,6 +79,14 @@ function hitungPenempatan(kotak, panah) {
   var kotakGambar = kotak.map(function (k) {
     return {id: k.id, x: k.x, y: k.y, w: k.w, h: tinggi[k.id]};
   });
+  // Indikator (Bagian 20): posisi kotak + panah + teks dari
+  // hitungPosisiIndikator (template), sama dengan tambah_indikator
+  // + panah_indikator + pilihFontIndikator di Python. Label juga
+  // menghindari kotak indikator (kotakLabel, cermin penempatan_label).
+  var posInd = hitungPosisiIndikator(kotak, indikator || [], tinggi);
+  var kotakLabel = kotakGambar.concat(posInd.map(function (i) {
+    return {x: i.x, y: i.y, w: i.w, h: i.h};
+  }));
   var labelSudah = [];
   var hasil = [];
   // Urutan penempatan label sama dengan penempatan_label di
@@ -118,8 +126,9 @@ function hitungPenempatan(kotak, panah) {
       mx = tengah[0]; my = tengah[1];
     }
     // Python menggeser dan mencatat SEMUA panah, termasuk segmen
-    // kedua tanpa label (kotak 12x8).
-    var pos = geserLabelBebas(titik, mx, my, p.label || '', kotakGambar,
+    // kedua tanpa label (kotak 12x8). Label menghindari kotak
+    // indikator juga (kotakLabel).
+    var pos = geserLabelBebas(titik, mx, my, p.label || '', kotakLabel,
                               labelSudah);
     var cx = pos[0], cy = pos[1];
     labelSudah.push({
@@ -132,11 +141,12 @@ function hitungPenempatan(kotak, panah) {
                 x1: u.x1, y1: u.y1, x2: u.x2, y2: u.y2,
                 rute: rute, cx: cx, cy: cy});
   });
-  return hasil;
+  return {label: hasil, indikator: posInd};
 }
 
 const masuk = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 TINGGI_KANVAS = masuk.tinggi || 800;
 LEBAR_KANVAS = masuk.lebar || 1400;
-const keluar = hitungPenempatan(masuk.kotak, masuk.panah);
+const keluar = hitungPenempatan(masuk.kotak, masuk.panah,
+                                masuk.indikator);
 process.stdout.write(JSON.stringify(keluar));

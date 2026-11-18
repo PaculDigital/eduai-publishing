@@ -356,6 +356,140 @@ function tinggiLabel(teks) {
   if (!teks) return 0;
   return teks.indexOf('(') >= 0 ? 20 : 16;
 }
+
+// Kotak indikator gaya SmartPLS (Boss 18 Nov 16:24/16:26 WIB):
+// kotak kecil di samping oval, panah dari variabel ke indikator;
+// nama selalu dua baris (kotak ramping, setinggi 2 baris).
+var LEBAR_IND = 180, TINGGI_IND = 56, CELAH_IND = 40, JARAK_IND = 8;
+// Lebar huruf DejaVu Sans Bold 18/16/14 (sama dengan tabel Python
+// di app/gambar.py, diukur PIL; dibangkitkan /tmp/dg10/buat_tabel2.py).
+var LEBAR_HURUF_IND_18 = {" ":6.3,"!":8.2,"\"":9.4,"#":15.1,"$":12.5,"%":18.0,"&":15.7,"'":5.5,"(":8.2,")":8.2,"*":9.4,"+":15.1,",":6.8,"-":7.5,".":6.8,"/":6.6,"0":12.5,"1":12.5,"2":12.5,"3":12.5,"4":12.5,"5":12.5,"6":12.5,"7":12.5,"8":12.5,"9":12.5,":":7.2,";":7.2,"<":15.1,"=":15.1,">":15.1,"?":10.4,"@":18.0,"A":13.9,"B":13.7,"C":13.2,"D":14.9,"E":12.3,"F":12.3,"G":14.8,"H":15.1,"I":6.7,"J":6.7,"K":14.0,"L":11.5,"M":17.9,"N":15.1,"O":15.3,"P":13.2,"Q":15.3,"R":13.9,"S":13.0,"T":12.3,"U":14.6,"V":13.9,"W":19.9,"X":13.9,"Y":13.0,"Z":13.0,"[":8.2,"\\":6.6,"]":8.2,"^":15.1,"_":9.0,"`":9.0,"a":12.1,"b":12.9,"c":10.7,"d":12.9,"e":12.2,"f":7.8,"g":12.9,"h":12.8,"i":6.2,"j":6.2,"k":12.0,"l":6.2,"m":18.8,"n":12.8,"o":12.4,"p":12.9,"q":12.9,"r":8.9,"s":10.7,"t":8.6,"u":12.8,"v":11.7,"w":16.6,"x":11.6,"y":11.7,"z":10.5,"{":12.8,"|":6.6,"}":12.8,"~":15.1,"é":12.2,"è":12.2,"ê":12.2,"à":12.1,"á":12.1,"â":12.1,"ä":12.1,"ü":12.8,"ö":12.4,"ï":6.2,"ç":10.7,"ñ":12.8};
+var LEBAR_HURUF_IND_16 = {" ":5.6,"!":7.3,"\"":8.3,"#":13.4,"$":11.1,"%":16.0,"&":14.0,"'":4.9,"(":7.3,")":7.3,"*":8.4,"+":13.4,",":6.1,"-":6.6,".":6.1,"/":5.8,"0":11.1,"1":11.1,"2":11.1,"3":11.1,"4":11.1,"5":11.1,"6":11.1,"7":11.1,"8":11.1,"9":11.1,":":6.4,";":6.4,"<":13.4,"=":13.4,">":13.4,"?":9.3,"@":16.0,"A":12.4,"B":12.2,"C":11.8,"D":13.3,"E":10.9,"F":10.9,"G":13.1,"H":13.4,"I":6.0,"J":6.0,"K":12.4,"L":10.2,"M":15.9,"N":13.4,"O":13.6,"P":11.7,"Q":13.6,"R":12.3,"S":11.5,"T":10.9,"U":13.0,"V":12.4,"W":17.7,"X":12.3,"Y":11.6,"Z":11.6,"[":7.3,"\\":5.8,"]":7.3,"^":13.4,"_":8.0,"`":8.0,"a":10.8,"b":11.5,"c":9.5,"d":11.5,"e":10.9,"f":7.0,"g":11.5,"h":11.4,"i":5.5,"j":5.5,"k":10.6,"l":5.5,"m":16.7,"n":11.4,"o":11.0,"p":11.5,"q":11.5,"r":7.9,"s":9.5,"t":7.7,"u":11.4,"v":10.4,"w":14.8,"x":10.3,"y":10.4,"z":9.3,"{":11.4,"|":5.8,"}":11.4,"~":13.4,"é":10.9,"è":10.9,"ê":10.9,"à":10.8,"á":10.8,"â":10.8,"ä":10.8,"ü":11.4,"ö":11.0,"ï":5.5,"ç":9.5,"ñ":11.4};
+var LEBAR_HURUF_IND_14 = {" ":4.9,"!":6.4,"\"":7.3,"#":11.7,"$":9.7,"%":14.0,"&":12.2,"'":4.3,"(":6.4,")":6.4,"*":7.3,"+":11.7,",":5.3,"-":5.8,".":5.3,"/":5.1,"0":9.7,"1":9.7,"2":9.7,"3":9.7,"4":9.7,"5":9.7,"6":9.7,"7":9.7,"8":9.7,"9":9.7,":":5.6,";":5.6,"<":11.7,"=":11.7,">":11.7,"?":8.1,"@":14.0,"A":10.8,"B":10.7,"C":10.3,"D":11.6,"E":9.6,"F":9.6,"G":11.5,"H":11.7,"I":5.2,"J":5.2,"K":10.8,"L":8.9,"M":13.9,"N":11.7,"O":11.9,"P":10.3,"Q":11.9,"R":10.8,"S":10.1,"T":9.5,"U":11.4,"V":10.8,"W":15.4,"X":10.8,"Y":10.1,"Z":10.2,"[":6.4,"\\":5.1,"]":6.4,"^":11.7,"_":7.0,"`":7.0,"a":9.5,"b":10.0,"c":8.3,"d":10.0,"e":9.5,"f":6.1,"g":10.0,"h":10.0,"i":4.8,"j":4.8,"k":9.3,"l":4.8,"m":14.6,"n":10.0,"o":9.6,"p":10.0,"q":10.0,"r":6.9,"s":8.3,"t":6.7,"u":10.0,"v":9.1,"w":12.9,"x":9.0,"y":9.1,"z":8.2,"{":10.0,"|":5.1,"}":10.0,"~":11.7,"é":9.5,"è":9.5,"ê":9.5,"à":9.5,"á":9.5,"â":9.5,"ä":9.5,"ü":10.0,"ö":9.6,"ï":4.8,"ç":8.3,"ñ":10.0};
+function lebarTeksInd(teks, ukuran) {
+  var tabel = ukuran === 16 ? LEBAR_HURUF_IND_16
+    : ukuran === 14 ? LEBAR_HURUF_IND_14 : LEBAR_HURUF_IND_18;
+  var jatuh = tabel['m'] || 12, w = 0, s = String(teks || '');
+  for (var i = 0; i < s.length; i++)
+    w += tabel[s[i]] !== undefined ? tabel[s[i]] : jatuh;
+  return w;
+}
+function bungkusInd(teks, ukuran, maksBaris) {
+  // Bungkus teks (cermin _bungkus_teks_dari_lebar di app/gambar.py):
+  // lebar dari tabel bersama, maks 2 baris, terpotong '…'.
+  var kata = String(teks || '').split(/\s+/).filter(Boolean);
+  var maksLebar = LEBAR_IND - 16;
+  maksBaris = maksBaris || 2;
+  var baris = [], kini = '';
+  for (var i = 0; i < kata.length; i++) {
+    var k = kata[i];
+    var coba = (kini + ' ' + k).trim();
+    if (lebarTeksInd(coba, ukuran) <= maksLebar || !kini) {
+      kini = coba;
+    } else {
+      baris.push(kini);
+      kini = k;
+      if (baris.length >= maksBaris) break;
+    }
+  }
+  if (kini && baris.length < maksBaris) baris.push(kini);
+  else if (kini && baris.length) baris[baris.length - 1] += '…';
+  return baris.length ? baris : [''];
+}
+function bungkusSeimbangInd(teks, ukuran) {
+  // Bungkus seimbang 2 baris (cermin _bungkus_seimbang di
+  // app/gambar.py): selisih lebar kedua baris terkecil, nama
+  // pendek tetap 1 baris.
+  var kata = String(teks || '').split(/\s+/).filter(Boolean);
+  var maksLebar = LEBAR_IND - 16;
+  if (!kata.length) return [''];
+  var utuh = kata.join(' ');
+  if (lebarTeksInd(utuh, ukuran) <= maksLebar) return [utuh];
+  var terbaik = null;
+  for (var i = 1; i < kata.length; i++) {
+    var b1 = kata.slice(0, i).join(' ');
+    var b2 = kata.slice(i).join(' ');
+    var w1 = lebarTeksInd(b1, ukuran), w2 = lebarTeksInd(b2, ukuran);
+    if (w1 > maksLebar || w2 > maksLebar) continue;
+    var selisih = Math.abs(w1 - w2);
+    if (!terbaik || selisih < terbaik[0]) terbaik = [selisih, [b1, b2]];
+  }
+  if (terbaik) return terbaik[1];
+  return bungkusInd(teks, ukuran, 2);
+}
+function pilihFontIndikator(teks) {
+  // Font terbesar yang memuat nama dalam 2 baris (cermin
+  // _pilih_font_indikator di app/gambar.py): coba 18, 16, 14.
+  var daftar = [18, 16, 14];
+  for (var i = 0; i < daftar.length; i++) {
+    var ukuran = daftar[i];
+    var baris = bungkusSeimbangInd(teks, ukuran);
+    var terpotong = false;
+    baris.forEach(function (b) {
+      if (b.slice(-1) === '…') terpotong = true;
+    });
+    if (!terpotong) return {ukuran: ukuran, baris: baris};
+  }
+  return {ukuran: 14, baris: bungkusSeimbangInd(teks, 14)};
+}
+function posisiIndikator(induk, i, n, sisi) {
+  // Kotak indikator ke-i dari n (cermin posisi_indikator di
+  // app/diagram.py): ramping, selalu setinggi 2 baris, tumpukan
+  // dipusatkan di tengah oval induk; kiri untuk X/M/Z, kanan
+  // untuk kolom terakhir (Y).
+  var total = n * TINGGI_IND + (n - 1) * JARAK_IND;
+  var atas = induk.y + induk.h / 2 - total / 2;
+  var y = atas + i * (TINGGI_IND + JARAK_IND);
+  var x = sisi === 'kanan'
+    ? induk.x + induk.w + CELAH_IND
+    : induk.x - CELAH_IND - LEBAR_IND;
+  return {x: Math.round(x), y: Math.round(y), w: LEBAR_IND, h: TINGGI_IND};
+}
+function hitungPosisiIndikator(kotak, indikator, tinggi) {
+  // Posisi kotak + panah indikator dari kotak induknya (cermin
+  // tambah_indikator di app/diagram.py + panah_indikator di
+  // app/gambar.py). `kotak` = kotak struktural, `indikator` =
+  // [{induk, teks}], `tinggi` = {id: tinggi tampil}. Urutan ikut
+  // urutan kotak (sama dengan Python). Kembalikan [{id, induk,
+  // teks, sisi, x, y, w, h, ukuran, baris, x1, y1, x2, y2}].
+  var keluar = [];
+  if (!kotak || !kotak.length || !indikator) return keluar;
+  var xTerakhir = Math.max.apply(null, kotak.map(function (k) { return k.x; }));
+  var peta = {};
+  kotak.forEach(function (k) { peta[k.id] = k; });
+  var kelompok = {};
+  indikator.forEach(function (it) {
+    if (!it || !peta[it.induk]) return;
+    var teks = String(it.teks || '').trim();
+    if (!teks) return;
+    if (!kelompok[it.induk]) kelompok[it.induk] = [];
+    if (kelompok[it.induk].indexOf(teks) < 0)
+      kelompok[it.induk].push(teks);
+  });
+  kotak.forEach(function (induk) {
+    var daftar = kelompok[induk.id];
+    if (!daftar) return;
+    var hTampil = (tinggi && tinggi[induk.id]) || induk.h;
+    var indukT = {x: induk.x, y: induk.y, w: induk.w, h: hTampil};
+    var sisi = induk.x === xTerakhir ? 'kanan' : 'kiri';
+    daftar.forEach(function (teks, i) {
+      var pos = posisiIndikator(indukT, i, daftar.length, sisi);
+      var pilih = pilihFontIndikator(teks);
+      var tengahInd = pos.y + pos.h / 2;
+      var geser = tengahInd - (indukT.y + indukT.h / 2);
+      var ujung = titikElips(indukT, hTampil, geser, sisi);
+      var x2 = sisi === 'kanan' ? pos.x : pos.x + pos.w;
+      keluar.push({id: induk.id + '_i' + (i + 1), induk: induk.id,
+                   teks: teks, sisi: sisi, x: pos.x, y: pos.y,
+                   w: pos.w, h: pos.h, ukuran: pilih.ukuran,
+                   baris: pilih.baris,
+                   x1: Math.round(ujung[0] * 1000) / 1000,
+                   y1: Math.round(ujung[1] * 1000) / 1000,
+                   x2: x2, y2: tengahInd});
+    });
+  });
+  return keluar;
+}
 function geserLabelBebas(titik, mx, my, label, kotak, sudah) {
   // Geser label sepanjang polilinia sampai tidak menabrak kotak
   // maupun label yang sudah ditempatkan. Cari dulu posisi dengan
@@ -402,6 +536,30 @@ function geserLabelBebas(titik, mx, my, label, kotak, sudah) {
   if (hasil) return hasil;
   hasil = cari(0);
   if (hasil) return hasil;
+  // Jalan terakhir: geser tegak lurus garis (cermin
+  // _geser_label_bebas di app/gambar.py). Dipakai bila label
+  // terjepit di antara dua kotak di sepanjang garisnya (label H3
+  // terjepit antara oval X1 dan kotak indikator M). Coba jarak
+  // membesar (24..96 px) ke dua arah tegak lurus, dari titik
+  // tengah garis; yang pertama bebas dipakai.
+  if (titik.length >= 2) {
+    var dx = titik[titik.length - 1][0] - titik[0][0];
+    var dy = titik[titik.length - 1][1] - titik[0][1];
+    var pj = Math.hypot(dx, dy);
+    if (pj > 0) {
+      var nx = -dy / pj, ny = dx / pj;
+      var jarakList = [24, 36, 48, 60, 72, 84, 96];
+      for (var j = 0; j < jarakList.length; j++) {
+        var jarak = jarakList[j];
+        var tandaList = [1, -1];
+        for (var t = 0; t < tandaList.length; t++) {
+          var cx = mx + nx * jarak * tandaList[t];
+          var cy = my + ny * jarak * tandaList[t];
+          if (bebas(cx, cy, 0)) return [cx, cy];
+        }
+      }
+    }
+  }
   return [mx, my];
 }
 function gambarUlang() {
@@ -481,6 +639,25 @@ function gambarUlang() {
   var kotakGambar = state.kotak.map(function (k) {
     return {id: k.id, x: k.x, y: k.y, w: k.w, h: tinggi[k.id]};
   });
+  // Kotak + panah indikator (cermin tambah_indikator/panah_indikator):
+  // posisinya dihitung ulang dari kotak induknya, jadi ikut bila
+  // kotak digeser. state.indikator hanya menyimpan {induk, teks};
+  // posisi dan panahnya turunan.
+  var posInd = hitungPosisiIndikator(state.kotak, state.indikator, tinggi);
+  // Label juga menghindari kotak indikator (cermin kotak_label di
+  // app/gambar.py): kotak indikator duduk di antara oval, jadi
+  // label bisa mendarat menimpanya.
+  var kotakLabel = kotakGambar.concat(posInd.map(function (i) {
+    return {x: i.x, y: i.y, w: i.w, h: i.h};
+  }));
+  var lebarButuh = LEBAR_KANVAS, tinggiButuh = TINGGI_KANVAS;
+  posInd.forEach(function (i) {
+    lebarButuh = Math.max(lebarButuh, i.x + i.w + 60);
+    tinggiButuh = Math.max(tinggiButuh, i.y + i.h + 20);
+  });
+  if (lebarButuh !== LEBAR_KANVAS || tinggiButuh !== TINGGI_KANVAS)
+    document.getElementById('kanvas').setAttribute(
+      'viewBox', '0 0 ' + lebarButuh + ' ' + tinggiButuh);
   var labelSudah = [];
   // Urutan penempatan label sama dengan penempatan_label di
   // app/gambar.py: per kelompok (dari, ke) + susunan, bukan urutan
@@ -539,8 +716,9 @@ function gambarUlang() {
     // Geser label bila menabrak kotak/label lain (aturan umum).
     // Python menggeser dan mencatat SEMUA panah, termasuk segmen
     // kedua jalur tidak langsung yang tanpa label (kotak 12x8).
+    // Kotak indikator ikut dihindari (kotakLabel).
     var pos = (JENIS === 'model')
-      ? geserLabelBebas(titik, mx, my, p.label || '', kotakGambar, labelSudah)
+      ? geserLabelBebas(titik, mx, my, p.label || '', kotakLabel, labelSudah)
       : [mx, my];
     if (p.label) {
       var t = el('text', {x: pos[0], y: pos[1] - 8, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 'bold', fill: '#10222e'});
@@ -553,6 +731,12 @@ function gambarUlang() {
                        kanan: pos[0] + lebarLabel(p.label || '') / 2 + 6,
                        bawah: pos[1] + tinggiLabel(p.label || '') / 2 + 4});
     }
+  });
+  // Panah indikator (tipis, dari oval ke tiap kotak indikator),
+  // digambar di lapis panah (di bawah kotak).
+  posInd.forEach(function (i) {
+    var g = el('line', {x1: i.x1, y1: i.y1, x2: i.x2, y2: i.y2, stroke: '#10222e', 'stroke-width': 2, 'marker-end': 'url(#panah)'});
+    lp.appendChild(g);
   });
   state.kotak.forEach(function (k) {
     var g = el('g', {id: 'kotak-' + k.id, style: 'cursor: move'});
@@ -578,6 +762,25 @@ function gambarUlang() {
       g.appendChild(t);
     });
     g.addEventListener('pointerdown', function (ev) { mulaiSeret(ev, k); });
+    lk.appendChild(g);
+  });
+  // Kotak indikator (kuning muda, seperti contoh PLS-SEM Boss) +
+  // namanya (selalu setinggi 2 baris, dibungkus seimbang). Kotak
+  // indikator tidak bisa diseret sendiri; ia menempel pada oval
+  // induknya dan ikut bila oval digeser.
+  posInd.forEach(function (i) {
+    var g = el('g', {id: 'indikator-' + i.id});
+    var r = el('rect', {x: i.x, y: i.y, width: i.w, height: i.h, fill: '#fff59d', stroke: '#f9a825', 'stroke-width': 2});
+    g.appendChild(r);
+    var tinggiBaris = i.ukuran + 4;
+    i.baris.forEach(function (b, j) {
+      var t = el('text', {x: i.x + i.w / 2,
+                          y: i.y + i.h / 2 + (j - (i.baris.length - 1) / 2) * tinggiBaris,
+                          'text-anchor': 'middle', 'dominant-baseline': 'middle',
+                          'font-size': i.ukuran, 'font-weight': 'bold', fill: '#10222e'});
+      t.textContent = b;
+      g.appendChild(t);
+    });
     lk.appendChild(g);
   });
 }
@@ -632,12 +835,13 @@ function hapusKotak() {
   if (!pilih) return;
   state.kotak = state.kotak.filter(function (k) { return k.id !== pilih.id; });
   state.panah = state.panah.filter(function (p) { return p.dari !== pilih.id && p.ke !== pilih.id; });
+  state.indikator = (state.indikator || []).filter(function (i) { return i.induk !== pilih.id; });
   pilih = null;
   document.getElementById('panel-ubah').hidden = true;
   tandaiUbah(); gambarUlang();
 }
 function tolak() {
-  state.kotak = []; state.panah = [];
+  state.kotak = []; state.panah = []; state.indikator = [];
   manual = true; pilih = null;
   document.getElementById('panel-ubah').hidden = true;
   document.getElementById('panel-alat').hidden = false;
@@ -676,7 +880,8 @@ function masukkan() {
   pesan.hidden = true; galat.hidden = true;
   fetch('/api/diagram/' + FID + '/selesai', {
     method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({jenis: JENIS, kotak: state.kotak, panah: state.panah, tinggi: TINGGI_KANVAS})
+    body: JSON.stringify({jenis: JENIS, kotak: state.kotak, panah: state.panah, tinggi: TINGGI_KANVAS,
+                          indikator: (state.indikator || []).map(function (i) { return {induk: i.induk, teks: i.teks}; })})
   }).then(function (r) { return r.json(); }).then(function (d) {
     if (!d.ok) {
       galat.textContent = (d.detail && d.detail.pesan) || d.pesan || 'Gagal.';

@@ -1891,7 +1891,10 @@ def jalankan():
     def _cermin_js(_tata, _n):
         _masuk = {'kotak': _tata['kotak'], 'panah': _tata['panah'],
                   'tinggi': _tata.get('tinggi') or 800,
-                  'lebar': _tata.get('lebar') or 1400}
+                  'lebar': _tata.get('lebar') or 1400,
+                  'indikator': [{'induk': _i.get('induk'),
+                                 'teks': _i.get('teks')}
+                                for _i in _tata.get('indikator') or []]}
         _jalan = os.path.join(TMP, 'cermin_%02d.json' % _n)
         with open(_jalan, 'w') as _f:
             json.dump(_masuk, _f)
@@ -1914,6 +1917,7 @@ def jalankan():
         if _js is None:
             cek('cermin label %s: JS jalan' % _nama, False, _err)
             return
+        _js = _js.get('label') or []
         cek('cermin label %s: jumlah panah sama' % _nama,
             len(_py) == len(_js),
             'py=%d js=%d' % (len(_py), len(_js)))
@@ -2389,6 +2393,367 @@ def jalankan():
         and 'Z (penguat)' in _html_editor)
     # Cermin label editor JS vs PNG untuk 2 M.
     _banding_cermin('Dua perantara', _par_n, 22)
+
+    # ── 20. Indikator gaya SmartPLS (Boss 18 Nov 16:18/16:24/16:26 WIB)
+    # Model: 'indikator' per variabel (boleh kosong, maks 20); peta
+    # Bab IV menyalinnya; formulir lipatan; tata letak menaruh kotak
+    # kecil di samping oval (kiri X/M/Z, kanan Y) + panah dari oval;
+    # kotak selalu setinggi 2 baris (56 px), nama dibungkus seimbang
+    # maks 2 baris; cermin JS vs Python 0,000 px.
+    _model_ind, _m_ind = DG.normalisasi_model(
+        {'variabel': [
+            {'nama': 'Digital Marketing', 'peran': 'X',
+             'indikator': ['Media sosial', 'Konten promosi',
+                           'Iklan berbayar']},
+            {'nama': 'Orientasi Kewirausahaan', 'peran': 'M',
+             'indikator': ['Inovasi produk',
+                           'Keberanian mengambil risiko']},
+            {'nama': 'Keberlanjutan Usaha', 'peran': 'Y',
+             'indikator': ['Pertumbuhan penjualan',
+                           'Loyalitas pelanggan']}],
+         'jalur': [
+            {'dari': 'Digital Marketing', 'ke': 'Keberlanjutan Usaha',
+             'hipotesis': 'H1', 'arah': '+', 'jenis': 'langsung'},
+            {'dari': 'Orientasi Kewirausahaan',
+             'ke': 'Keberlanjutan Usaha',
+             'hipotesis': 'H2', 'arah': '+', 'jenis': 'langsung'},
+            {'dari': 'Digital Marketing', 'ke': 'Keberlanjutan Usaha',
+             'lewat': 'Orientasi Kewirausahaan',
+             'hipotesis': 'H6', 'arah': '+', 'jenis': 'tidak_langsung'}]})
+    cek('indikator: model menerima indikator per variabel',
+        _model_ind is not None and not _m_ind
+        and _model_ind['variabel'][0]['indikator']
+            == ['Media sosial', 'Konten promosi', 'Iklan berbayar']
+        and _model_ind['variabel'][1]['indikator']
+            == ['Inovasi produk', 'Keberanian mengambil risiko']
+        and _model_ind['variabel'][2]['indikator']
+            == ['Pertumbuhan penjualan', 'Loyalitas pelanggan'],
+        str(_m_ind))
+    _model_kos, _m_kos = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1'}]})
+    cek('indikator: kosong lolos (tidak menghalangi)',
+        _model_kos is not None and not _m_kos
+        and _model_kos['variabel'][0].get('indikator') == []
+        and _model_kos['variabel'][1].get('indikator') == [],
+        str(_m_kos))
+    _banyak = ['Indikator %d' % i for i in range(25)] + [
+        '', '  ', 'Indikator 1']
+    _model_batas, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X', 'indikator': _banyak},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1'}]})
+    cek('indikator: dibatasi 20, kosong/ganda dibuang',
+        _model_batas is not None
+        and len(_model_batas['variabel'][0]['indikator']) == 20
+        and _model_batas['variabel'][0]['indikator'][0] == 'Indikator 0'
+        and _model_batas['variabel'][0]['indikator'][19]
+            == 'Indikator 19',
+        str(_model_batas['variabel'][0]['indikator'][:3]
+            if _model_batas else None))
+    _peta_ind = DG.model_dari_peta_bab4(
+        {'variabel': [{'nama': 'A', 'peran': 'X',
+                       'indikator': ['Satu', 'Dua']},
+                      {'nama': 'B', 'peran': 'Y', 'indikator': []}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+                    'jenis': 'langsung'}]})
+    cek('indikator: peta Bab IV menyalin indikator',
+        _peta_ind is not None
+        and _peta_ind['variabel'][0].get('indikator') == ['Satu', 'Dua']
+        and _peta_ind['variabel'][1].get('indikator') == [],
+        str(_peta_ind))
+    _tampil_ind = DG.model_tampilan(
+        {'variabel': [{'nama': 'A', 'peran': 'X',
+                       'indikator': ['Satu', 'Dua']},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': []})
+    cek('indikator: model_tampilan mempertahankan indikator',
+        _tampil_ind['variabel'][0].get('indikator') == ['Satu', 'Dua'],
+        str(_tampil_ind))
+    # Pasangan vi/vk dari formulir (rute).
+    from app import rute_diagram as _RD
+    _pasang = _RD._indikator_per_variabel(
+        ['Satu', '', 'Dua', 'Tiga'], ['0', '0', '1', '9'], 2)
+    cek('indikator: vi/vk dipasangkan ke baris variabel',
+        _pasang == [['Satu'], ['Dua']],
+        str(_pasang))
+    # Tata letak: 7 kotak indikator, sisi benar, ukuran seragam,
+    # tanpa tumpang tindih, kanvas melebar, skor struktural tetap.
+    _tata_ind = DG.tata_letak(_model_ind)
+    _ind_py = _tata_ind.get('indikator') or []
+    cek('indikator: tata menaruh 7 kotak indikator',
+        len(_ind_py) == 7, str(len(_ind_py)))
+    _sisi_ok = all(
+        (_i['sisi'] == 'kanan') == (_i['induk'] == 'Y')
+        for _i in _ind_py)
+    cek('indikator: kiri untuk X/M, kanan untuk Y',
+        _sisi_ok, str([(i['induk'], i['sisi']) for i in _ind_py]))
+    _ukuran_ok = all(_i['w'] == DG.LEBAR_IND
+                      and _i['h'] == DG.TINGGI_IND for _i in _ind_py)
+    cek('indikator: kotak selalu ramping 180x56 (setinggi 2 baris)',
+        _ukuran_ok, str([(i['w'], i['h']) for i in _ind_py]))
+    def _tumpang2(_a, _b):
+        return not (_a['x'] + _a['w'] <= _b['x']
+                    or _b['x'] + _b['w'] <= _a['x']
+                    or _a['y'] + _a['h'] <= _b['y']
+                    or _b['y'] + _b['h'] <= _a['y'])
+    _semua_kotak = list(_tata_ind['kotak']) + _ind_py
+    _tumpuk_ind = [(_a['id'], _b['id'])
+                   for _i, _a in enumerate(_semua_kotak)
+                   for _b in _semua_kotak[_i + 1:]
+                   if _tumpang2(_a, _b)]
+    cek('indikator: tidak menabrak kotak lain (struktural + indikator)',
+        not _tumpuk_ind, str(_tumpuk_ind))
+    _margin_ok = all(_i['x'] >= 60 and _i['y'] >= 20 for _i in _ind_py)
+    cek('indikator: margin kiri 60 px dan atas 20 px terjaga',
+        _margin_ok, str([(i['x'], i['y']) for i in _ind_py]))
+    # Label hipotesis tidak menimpa kotak indikator (temuan pratinjau
+    # campuran 18 Nov 2026: label H3 menimpa 'Pelayanan cepat').
+    def _label_tumpuk_ind(_tata):
+        _pl = GB.penempatan_label(_tata)
+        _ind = _tata.get('indikator') or []
+        return [(_p['label'], _i['id'])
+                for _p in _pl for _i in _ind
+                if _tumpang2({'x': _p['kiri'], 'y': _p['atas'],
+                              'w': _p['kanan'] - _p['kiri'],
+                              'h': _p['bawah'] - _p['atas']}, _i)]
+    cek('indikator: label hipotesis tidak menimpa kotak indikator',
+        not _label_tumpuk_ind(_tata_ind),
+        str(_label_tumpuk_ind(_tata_ind)))
+    # Indikator melebarkan jarak kolom (pitch 520 supaya kotak
+    # indikator muat), jadi skor mutlak berubah; yang dipertahankan
+    # adalah pemenang posisi perantara (mesin tetap memilih 'atas'
+    # untuk Asih) dan tidak ada silangan baru.
+    cek('indikator: pemenang posisi perantara tetap sama (Asih atas)',
+        _tata_ind.get('posisi_z') == 'atas'
+        and tata81.get('posisi_z') == 'atas',
+        'dengan=%s tanpa=%s' % (_tata_ind.get('posisi_z'),
+                                tata81.get('posisi_z')))
+    cek('indikator: tidak ada silangan baru (skor silangan tetap 0)',
+        GB.skor_tata_letak(_tata_ind)['silangan'] == 0
+        and GB.skor_tata_letak(tata81)['silangan'] == 0,
+        'dengan=%s tanpa=%s'
+        % (GB.skor_tata_letak(_tata_ind)['silangan'],
+           GB.skor_tata_letak(tata81)['silangan']))
+    # Panah indikator: mendatar, dari tepi oval ke tepi kotak.
+    _panah_ind = GB.panah_indikator(_tata_ind)
+    cek('indikator: 7 panah indikator (satu per kotak)',
+        len(_panah_ind) == 7, str(len(_panah_ind)))
+    _ind_peta = {i['id']: i for i in _ind_py}
+    _panah_ok = True
+    for _p in _panah_ind:
+        _ind = _ind_peta.get(_p['id'])
+        if not _ind:
+            _panah_ok = False
+            break
+        if _p['y1'] != _p['y2'] or _p['y2'] != _ind['y'] + 28:
+            _panah_ok = False
+            break
+        if _ind['sisi'] == 'kanan':
+            if _p['x2'] != _ind['x'] or _p['x1'] >= _p['x2']:
+                _panah_ok = False
+                break
+        else:
+            if _p['x2'] != _ind['x'] + _ind['w'] or _p['x1'] <= _p['x2']:
+                _panah_ok = False
+                break
+    cek('indikator: panah mendatar dari oval ke tepi kotak',
+        _panah_ok, str(_panah_ind))
+    # Bungkus seimbang: nama pendek 1 baris, panjang 2 baris
+    # seimbang, tidak pernah lebih dari 2 baris.
+    _uk1, _br1 = GB._pilih_font_indikator('Media sosial')
+    _uk2, _br2 = GB._pilih_font_indikator('Keberanian mengambil risiko')
+    _uk3, _br3 = GB._pilih_font_indikator('Pertumbuhan penjualan')
+    cek('indikator: nama pendek 1 baris, panjang 2 baris seimbang',
+        _uk1 == 18 and _br1 == ['Media sosial']
+        and len(_br2) == 2 and len(_br3) == 2
+        and all(not _b.endswith('…') for _b in _br2 + _br3),
+        'uk1=%s %s uk2=%s %s uk3=%s %s'
+        % (_uk1, _br1, _uk2, _br2, _uk3, _br3))
+    # Bungkus seimbang: baris yang dipilih adalah belahan dengan
+    # selisih lebar terkecil di antara semua belahan yang muat
+    # (bukan ambang mutlak: kata-katanya sendiri bisa timpang).
+    def _belahan_terbaik(_teks, _uk):
+        _kata = _teks.split()
+        _maks = DG.LEBAR_IND - 16
+        _terbaik = None
+        for _i in range(1, len(_kata)):
+            _b1 = ' '.join(_kata[:_i])
+            _b2 = ' '.join(_kata[_i:])
+            _w1 = GB._lebar_ind(_b1, _uk)
+            _w2 = GB._lebar_ind(_b2, _uk)
+            if _w1 > _maks or _w2 > _maks:
+                continue
+            _s = abs(_w1 - _w2)
+            if _terbaik is None or _s < _terbaik[0]:
+                _terbaik = (_s, [_b1, _b2])
+        return _terbaik
+    _terbaik2 = _belahan_terbaik('Keberanian mengambil risiko', _uk2)
+    cek('indikator: dua baris seimbang (belahan selisih terkecil)',
+        _terbaik2 is not None and _br2 == _terbaik2[1],
+        'dipilih=%s terbaik=%s' % (_br2, _terbaik2))
+    # PNG: kotak indikator kuning muda tergambar.
+    _png_ind = GB.gambar_panah(_model_ind, _tata_ind)
+    cek('indikator: PNG tergambar dengan indikator',
+        _png_ind[:8] == b'\x89PNG\r\n\x1a\n' and len(_png_ind) > 10000,
+        str(len(_png_ind)))
+    _g_ind = _Image.open(io.BytesIO(_png_ind))
+    _px_ind = _g_ind.load()
+    _kuning_ok = True
+    for _ind in _ind_py:
+        # Sudut kotak (jauh dari teks tengah) harus kuning muda.
+        if _px_ind[_ind['x'] + 5, _ind['y'] + 5] != (255, 245, 157):
+            _kuning_ok = False
+            break
+    cek('indikator: kotak kuning muda (#FFF59D) di PNG',
+        _kuning_ok, 'bukan kuning di sudut kotak')
+    # Tata manual (editor): indikator ikut dari kiriman editor,
+    # induk tak dikenal dibuang, posisi dihitung ulang.
+    _tata_man, _m_man = DG.tata_dari_kotak(
+        [{'id': 'X1', 'nama': 'A', 'peran': 'X', 'x': 300, 'y': 300,
+          'w': 300, 'h': 180},
+         {'id': 'Y', 'nama': 'B', 'peran': 'Y', 'x': 900, 'y': 300,
+          'w': 300, 'h': 180}],
+        [{'dari': 'X1', 'ke': 'Y', 'label': 'H1', 'gaya': 'lurus'}],
+        'model', indikator=[{'induk': 'X1', 'teks': 'Satu'},
+                            {'induk': 'X1', 'teks': 'Dua'},
+                            {'induk': 'Y', 'teks': 'Tiga'},
+                            {'induk': 'Z', 'teks': 'Hantu'}])
+    cek('indikator: tata manual menerima indikator editor',
+        _tata_man is not None and not _m_man
+        and len(_tata_man.get('indikator') or []) == 3
+        and [_i['induk'] for _i in _tata_man['indikator']]
+            == ['X1', 'X1', 'Y'],
+        str(_m_man))
+    # Formulir: lipatan indikator + masukan vi/vk + tombol tambah,
+    # dan petunjuk Lewat (Boss 18 Nov 16:36 WIB).
+    _html_form = (ROOT / 'app' / 'templates'
+                  / 'diagram_model.html').read_text()
+    cek('formulir: lipatan indikator (details + vi/vk + tambah)',
+        'lipatan-indikator' in _html_form
+        and 'name="vi"' in _html_form
+        and 'name="vk"' in _html_form
+        and 'tambahIndikator' in _html_form
+        and 'segarkanIndikator' in _html_form,
+        'lipatan tidak ada di template')
+    cek('formulir: petunjuk Lewat hanya perantara (M)',
+        'Hanya perantara (M) yang muncul di sini. Ubah peran jadi M '
+        'bila variabel ini ingin dilewati.' in _html_form,
+        'petunjuk Lewat tidak ada')
+    # Editor: fungsi indikator + gambar kotak/panah + kirim Selesai.
+    cek('editor: fungsi indikator + gambar + kirim Selesai',
+        'hitungPosisiIndikator' in _html_editor
+        and 'pilihFontIndikator' in _html_editor
+        and 'indikator-' in _html_editor
+        and "#fff59d" in _html_editor
+        and 'indikator:' in _html_editor,
+        'indikator tidak ada di editor')
+    # Cermin JS vs Python untuk indikator (kotak + panah 0,000 px,
+    # ukuran font + baris teks sama persis).
+    def _cermin_ind(_tata, _n):
+        _masuk = {'kotak': _tata['kotak'], 'panah': _tata['panah'],
+                  'tinggi': _tata.get('tinggi') or 800,
+                  'lebar': _tata.get('lebar') or 1400,
+                  'indikator': [{'induk': _i.get('induk'),
+                                 'teks': _i.get('teks')}
+                                for _i in _tata.get('indikator') or []]}
+        _jalan = os.path.join(TMP, 'cermin_ind_%02d.json' % _n)
+        with open(_jalan, 'w') as _f:
+            json.dump(_masuk, _f)
+        try:
+            _out = subprocess.run(
+                ['node', str(ROOT / 'tests' / 'cermin_editor.js'),
+                 _jalan, str(ROOT / 'app' / 'templates'
+                             / 'diagram_editor.html')],
+                capture_output=True, text=True, timeout=60)
+        except FileNotFoundError:
+            return None, 'node tidak ada'
+        if _out.returncode != 0:
+            return None, _out.stderr.strip()[:200]
+        _semua = json.loads(_out.stdout)
+        return _semua.get('indikator') or [], ''
+
+    def _banding_indikator(_nama, _model, _n):
+        _tata = DG.tata_letak(_model)
+        _py = _tata.get('indikator') or []
+        _py_panah = {p['id']: p for p in GB.panah_indikator(_tata)}
+        _js, _err = _cermin_ind(_tata, _n)
+        if _js is None:
+            cek('cermin indikator %s: JS jalan' % _nama, False, _err)
+            return
+        cek('cermin indikator %s: jumlah kotak sama' % _nama,
+            len(_py) == len(_js),
+            'py=%d js=%d' % (len(_py), len(_js)))
+        if len(_py) != len(_js):
+            return
+        _js_peta = {j['id']: j for j in _js}
+        _maks = 0.0
+        _buruk = ''
+        for _a in _py:
+            _j = _js_peta.get(_a['id'])
+            if not _j:
+                _buruk = 'tidak ada %s di JS' % _a['id']
+                _maks = 999.0
+                break
+            for _k in ('x', 'y', 'w', 'h'):
+                _d = abs(_a[_k] - _j[_k])
+                if _d > _maks:
+                    _maks = _d
+                    _buruk = '%s %s py=%s js=%s' % (_a['id'], _k,
+                                                    _a[_k], _j[_k])
+            _pa = _py_panah.get(_a['id'])
+            for _k in ('x1', 'y1', 'x2', 'y2'):
+                _d = abs(_pa[_k] - _j[_k])
+                if _d > _maks:
+                    _maks = _d
+                    _buruk = '%s panah %s py=%s js=%s' % (
+                        _a['id'], _k, _pa[_k], _j[_k])
+            _uk, _br = GB._pilih_font_indikator(_a['teks'])
+            if _j.get('ukuran') != _uk or _j.get('baris') != _br:
+                _buruk = '%s teks py=(%s,%s) js=(%s,%s)' % (
+                    _a['id'], _uk, _br, _j.get('ukuran'),
+                    _j.get('baris'))
+                _maks = 999.0
+                break
+        cek('cermin indikator %s: kotak + panah + teks sama '
+            '(maks %.3f px)' % (_nama, _maks),
+            _maks <= 0.001, _buruk or ('maks %.3f' % _maks))
+    _banding_indikator('Asih', _model_ind, 30)
+    _model_campur_ind, _ = DG.normalisasi_model(
+        {'variabel': [
+            {'nama': 'Harga', 'peran': 'X',
+             'indikator': ['Harga terjangkau', 'Diskon menarik']},
+            {'nama': 'Kepuasan', 'peran': 'M',
+             'indikator': ['Pelayanan cepat']},
+            {'nama': 'Loyalitas', 'peran': 'Y',
+             'indikator': ['Beli lagi', 'Rekomendasi teman']},
+            {'nama': 'Promosi', 'peran': 'Z',
+             'indikator': ['Iklan menarik']}],
+         'jalur': [
+            {'dari': 'Harga', 'ke': 'Loyalitas', 'hipotesis': 'H1',
+             'arah': '+', 'jenis': 'langsung'},
+            {'dari': 'Kepuasan', 'ke': 'Loyalitas', 'hipotesis': 'H2',
+             'arah': '+', 'jenis': 'langsung'},
+            {'dari': 'Harga', 'ke': 'Loyalitas', 'lewat': 'Kepuasan',
+             'hipotesis': 'H3', 'arah': '+', 'jenis': 'tidak_langsung'},
+            {'dari': 'Promosi', 'ke': 'Loyalitas', 'hipotesis': 'H4',
+             'arah': '+', 'jenis': 'interaksi'}]})
+    _tata_campur_ind = DG.tata_letak(_model_campur_ind)
+    _semua_campur = (list(_tata_campur_ind['kotak'])
+                     + list(_tata_campur_ind.get('indikator') or []))
+    _tumpuk_campur = [(_a.get('id'), _b.get('id'))
+                      for _i, _a in enumerate(_semua_campur)
+                      for _b in _semua_campur[_i + 1:]
+                      if _tumpang2(_a, _b)]
+    cek('indikator: kotak tidak menabrak (campuran, M_i1 dulu '
+        'menabrak X1)',
+        not _tumpuk_campur, str(_tumpuk_campur))
+    cek('indikator: label tidak menimpa kotak indikator (campuran)',
+        not _label_tumpuk_ind(_tata_campur_ind),
+        str(_label_tumpuk_ind(_tata_campur_ind)))
+    _banding_indikator('Campuran', _model_campur_ind, 31)
+    _banding_indikator('Nura', MODEL_NURA, 32)
 
 
 

@@ -162,6 +162,26 @@ def _ambil(daftar: list, i: int) -> str:
     return str(daftar[i]) if i < len(daftar) else ''
 
 
+def _indikator_per_variabel(vi, vk, n_var: int) -> list:
+    """Pasangkan daftar indikator (vi) ke baris variabel (vk).
+
+    vi = teks indikator (satu per masukan lipatan), vk = indeks
+    baris variabel pemiliknya (0-based, urutan baris di formulir).
+    Kembalikan [[teks, ...], ...] sepanjang n_var; teks kosong
+    dibuang, induk di luar jangkauan dilewati."""
+    keluar: list[list] = [[] for _ in range(max(0, int(n_var)))]
+    for teks, k in zip(vi or [], vk or []):
+        try:
+            i = int(k)
+        except (TypeError, ValueError):
+            continue
+        if 0 <= i < len(keluar):
+            s = (teks or '').strip()
+            if s:
+                keluar[i].append(s)
+    return keluar
+
+
 @router.post('/naskah/{fid}/diagram/model')
 async def diagram_model_simpan(
     fid: int, request: Request,
@@ -173,13 +193,18 @@ async def diagram_model_simpan(
     jj: list[str] = Form(default=[]),
     jh: list[str] = Form(default=[]),
     ja: list[str] = Form(default=[]),
+    vi: list[str] = Form(default=[]),
+    vk: list[str] = Form(default=[]),
     u: User = Depends(wajib_login),
     db: Session = Depends(get_db),
 ):
     fb = _berkas(db, fid, u.id)
     lama, _sumber = _model_awal(db, u.id, fid)
-    data = {'variabel': [{'nama': _ambil(vn, i), 'peran': _ambil(vp, i)}
-                         for i in range(max(len(vn), len(vp)))],
+    n_var = max(len(vn), len(vp))
+    ind = _indikator_per_variabel(vi, vk, n_var)
+    data = {'variabel': [{'nama': _ambil(vn, i), 'peran': _ambil(vp, i),
+                          'indikator': ind[i]}
+                         for i in range(n_var)],
             'jalur': [{'dari': _ambil(jd, i), 'ke': _ambil(jk, i),
                        'lewat': _ambil(jl, i), 'hipotesis': _ambil(jh, i),
                        'jenis': _ambil(jj, i), 'arah': _ambil(ja, i)}
@@ -317,7 +342,8 @@ async def diagram_selesai(
         tinggi_kirim = None
     tata, masalah = DG.tata_dari_kotak(body.get('kotak'),
                                        body.get('panah'), jenis,
-                                       tinggi=tinggi_kirim)
+                                       tinggi=tinggi_kirim,
+                                       indikator=body.get('indikator'))
     if tata is None:
         raise HTTPException(400, detail={'ok': False,
                                          'pesan': ' '.join(masalah[:2])})

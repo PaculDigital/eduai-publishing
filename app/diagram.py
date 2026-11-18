@@ -94,10 +94,38 @@ LEBAR_KOTAK = 300
 # garis tengah).
 TINGGI_OVAL_1 = 180
 TINGGI_OVAL_2 = 216
+# Kotak indikator gaya SmartPLS (Boss 18 Nov 16:24 WIB): kotak kecil
+# di samping oval variabelnya, ada panah dari variabel ke tiap
+# indikator; indikator di kiri untuk X/M/Z, di kanan untuk Y.
+# Nama indikator SELALU dua baris (Boss 18 Nov 16:26 WIB) supaya
+# kotaknya ramping dan seragam: kotak sempit (lebar 180) dan selalu
+# setinggi 2 baris (56 px), nama panjang dibungkus jadi 2 baris yang
+# seimbang, nama pendek tetap 1 baris di tengah kotak. Jarak mendatar
+# oval ke kolom indikator 40 px, jarak tegak antar kotak 8 px.
+LEBAR_IND = 180
+TINGGI_IND = 56
+CELAH_IND = 40
+JARAK_IND = 8
+# Maks indikator per variabel (sama seperti Bab IV).
+BATAS_IND = 20
 
 
 def _rapi(teks) -> str:
     return ' '.join(str(teks or '').split()).strip()
+
+
+def _bersihkan_indikator(masuk) -> list:
+    """Daftar indikator yang bersih: teks dirapikan, kosong dibuang,
+    ganda dibuang (urutan dipertahankan), dibatasi BATAS_IND
+    (seperti Bab IV). Boleh kosong, tidak menghalangi."""
+    keluar: list[str] = []
+    if not isinstance(masuk, (list, tuple)):
+        return keluar
+    for t in masuk:
+        s = _rapi(t)
+        if s and s not in keluar:
+            keluar.append(s)
+    return keluar[:BATAS_IND]
 
 
 def _normalisasi_nama(nama: str) -> str:
@@ -230,7 +258,9 @@ def normalisasi_model(data) -> tuple:
         if kunci in lihat:
             continue
         lihat[kunci] = peran
-        variabel.append({'nama': nama, 'peran': peran})
+        variabel.append({'nama': nama, 'peran': peran,
+                         'indikator': _bersihkan_indikator(
+                             v.get('indikator'))})
         kode_kirim = _rapi(v.get('kode'))
         if kode_kirim:
             kode_lama.setdefault(kode_kirim.lower(), kunci)
@@ -438,12 +468,13 @@ def model_tampilan(data) -> dict:
             peran = 'M'
         if not nama:
             continue
-        mentah.append((nama, peran))
-    jml_m = sum(1 for _, p in mentah if p == 'M')
-    jml_z = sum(1 for _, p in mentah if p == 'Z')
+        mentah.append((nama, peran,
+                       _bersihkan_indikator(v.get('indikator'))))
+    jml_m = sum(1 for _, p, _ in mentah if p == 'M')
+    jml_z = sum(1 for _, p, _ in mentah if p == 'Z')
     variabel: list[dict] = []
     hitung = {'X': 0, 'M': 0, 'Z': 0}
-    for nama, peran in mentah:
+    for nama, peran, ind in mentah:
         if peran == 'X':
             hitung['X'] += 1
             kode = f"X{hitung['X']}"
@@ -455,7 +486,8 @@ def model_tampilan(data) -> dict:
             kode = f"Z{hitung['Z']}" if jml_z > 1 else 'Z'
         else:
             kode = 'Y'
-        variabel.append({'nama': nama, 'peran': peran, 'kode': kode})
+        variabel.append({'nama': nama, 'peran': peran, 'kode': kode,
+                         'indikator': ind})
     kunci: dict[str, str] = {}
     for v in variabel:
         kunci[_normalisasi_nama(v['nama'])] = v['kode']
@@ -659,6 +691,102 @@ def _y_tumpukan_padat(nama_list, lebar=LEBAR_KOTAK, pusat=400,
     return out
 
 
+def _indikator_dari_model(model: dict) -> dict:
+    """{kode variabel: [teks indikator, ...]} dari model yang sudah
+    dinormalisasi (kode = id kotak di tata draf)."""
+    keluar: dict[str, list] = {}
+    for v in (model or {}).get('variabel') or []:
+        if not isinstance(v, dict):
+            continue
+        ind = _bersihkan_indikator(v.get('indikator'))
+        if ind:
+            keluar[str(v.get('kode') or v.get('nama') or '')] = ind
+    return keluar
+
+
+def posisi_indikator(induk: dict, i: int, n: int,
+                     sisi: str = 'kiri') -> dict:
+    """Kotak indikator ke-i dari n milik satu variabel (oval induk).
+
+    Kotak ramping (lebar LEBAR_IND, tinggi TINGGI_IND = selalu
+    setinggi 2 baris, Boss 18 Nov 16:26 WIB); tumpukan dipusatkan
+    di tengah oval induk, celah JARAK_IND; kolom di kiri oval
+    (jarak CELAH_IND) untuk X/M/Z, di kanan untuk Y (kolom
+    terakhir). Kembalikan {'x', 'y', 'w', 'h'} (bilangan bulat)."""
+    total = n * TINGGI_IND + (n - 1) * JARAK_IND
+    atas = induk['y'] + induk['h'] / 2 - total / 2
+    y = atas + i * (TINGGI_IND + JARAK_IND)
+    if sisi == 'kanan':
+        x = induk['x'] + induk['w'] + CELAH_IND
+    else:
+        x = induk['x'] - CELAH_IND - LEBAR_IND
+    return {'x': round(x), 'y': round(y), 'w': LEBAR_IND,
+            'h': TINGGI_IND}
+
+
+def tambah_indikator(tata: dict, indikator: dict | None = None) -> dict:
+    """Tambah kotak indikator ke tata (draf mesin / gambar akhir).
+
+    `indikator` = {id kotak induk: [teks, ...]} (id = kode variabel
+    di draf mesin, atau id kotak di tata manual editor). Tiap
+    variabel yang punya indikator dapat satu kolom kotak kecil di
+    samping ovalnya (kiri untuk X/M/Z, kanan untuk kolom terakhir
+    = Y), dengan panah dari oval ke tiap kotak (lihat
+    GB.panah_indikator). Kanvas melebar/meninggi seperlunya
+    (memeluk isi); semua kotak digeser seperlunya supaya margin
+    kiri 60 px dan atas 20 px tetap. Tanpa indikator, tata
+    dikembalikan apa adanya (tidak ada perubahan, supaya skor dan
+    uji lama tetap). Kembalikan tata yang sama (diubah di tempat),
+    dengan 'indikator' = [{'id', 'induk', 'teks', 'sisi', 'x', 'y',
+    'w', 'h'}].
+    """
+    if not tata or not indikator:
+        return tata
+    kotak = tata.get('kotak') or []
+    if not kotak:
+        return tata
+    # Sisi: kolom terakhir (x terbesar) ke kanan, sisanya ke kiri.
+    x_terakhir = max(k['x'] for k in kotak)
+    daftar: list[dict] = []
+    for k in kotak:
+        teks_list = indikator.get(str(k.get('id') or '')) or []
+        if not teks_list:
+            continue
+        sisi = 'kanan' if k['x'] == x_terakhir else 'kiri'
+        n = len(teks_list)
+        for i, teks in enumerate(teks_list):
+            pos = posisi_indikator(k, i, n, sisi)
+            daftar.append({'id': f"{k['id']}_i{i + 1}",
+                           'induk': k['id'], 'teks': teks,
+                           'sisi': sisi, **pos})
+    if not daftar:
+        return tata
+    tata['indikator'] = daftar
+    # Kanvas memeluk isi (termasuk kolom indikator): geser semua
+    # kotak seperlunya supaya margin kiri 60 px dan atas 20 px
+    # tetap, lalu lebar/tinggi mengikuti isi + margin.
+    semua = list(kotak) + daftar
+    min_x = min(b['x'] for b in semua)
+    min_y = min(b['y'] for b in semua)
+    geser_x = 60 - min_x if min_x < 60 else 0
+    geser_y = 20 - min_y if min_y < 20 else 0
+    if geser_x:
+        for b in semua:
+            b['x'] += geser_x
+    if geser_y:
+        for b in semua:
+            b['y'] += geser_y
+        if tata.get('tengah') is not None:
+            tata['tengah'] = tata['tengah'] + geser_y
+    # Kanvas hanya melebar/meninggi, tidak menyusut (lebar draf
+    # minimal 1400, tinggi draf memeluk isi struktural).
+    tata['lebar'] = max(tata.get('lebar') or 0,
+                        max(b['x'] + b['w'] for b in semua) + 60)
+    tata['tinggi'] = max(tata.get('tinggi') or 0,
+                         max(b['y'] + b['h'] for b in semua) + 20)
+    return tata
+
+
 def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
     """Tata letak deterministik: kotak + panah dalam kanvas 1400
     (dilebarkan bila kolom lebih dari 3); tinggi kanvas memeluk isi
@@ -729,15 +857,26 @@ def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
         kolom.setdefault(tahap.get(v.get('kode') or v.get('nama'), 0),
                          []).append(v)
     n_kolom = (max(tahap.values()) + 1) if tahap else 1
+    # Bila ada indikator, jarak antar kolom harus cukup untuk kotak
+    # indikator (220 px di samping oval) supaya tidak menabrak kolom
+    # sebelah (temuan pratinjau campuran 18 Nov 2026: kotak M_i1
+    # menabrak oval X1 karena celah kolom 190 px < 220 px). Pitch
+    # minimum = oval 300 + celah 40 + indikator 180 = 520 px.
+    # Tanpa indikator pitch tetap seperti dulu (490/440), jadi skor
+    # dan uji lama tidak berubah.
+    ada_ind = any(isinstance(v, dict) and v.get('indikator')
+                  for v in variabel)
+    pitch_min = (LEBAR_KOTAK + CELAH_IND + LEBAR_IND) if ada_ind else 0
     if n_kolom <= 1:
         lebar_kanvas = KANVAS_LEBAR
         x_kolom = [550]
     elif n_kolom <= 3:
-        lebar_kanvas = KANVAS_LEBAR
-        pitch = 980 / (n_kolom - 1)
+        pitch = max(980 / (n_kolom - 1), pitch_min)
         x_kolom = [60 + round(i * pitch) for i in range(n_kolom)]
+        lebar_kanvas = max(KANVAS_LEBAR,
+                           x_kolom[-1] + LEBAR_KOTAK + 60)
     else:
-        pitch = 440
+        pitch = max(440, pitch_min)
         lebar_kanvas = 420 + (n_kolom - 1) * pitch
         x_kolom = [60 + i * pitch for i in range(n_kolom)]
     # Template default (Boss 18 Nov 12:12 WIB): X berhadapan dengan Y
@@ -921,17 +1060,25 @@ def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
         panah.append({'dari': j['dari'], 'ke': j['ke'], 'label': label,
                       'gaya': 'putus' if j.get('jenis') == 'interaksi'
                       else 'lurus'})
-    return {'kotak': kotak, 'panah': panah,
-            'bentuk': bentuk_model(model), 'lebar': lebar_kanvas,
-            'tinggi': tinggi_kanvas, 'tengah': tengah,
-            'posisi_z': posisi_z if t_med is not None else None}
+    hasil = {'kotak': kotak, 'panah': panah,
+             'bentuk': bentuk_model(model), 'lebar': lebar_kanvas,
+             'tinggi': tinggi_kanvas, 'tengah': tengah,
+             'posisi_z': posisi_z if t_med is not None else None}
+    # Indikator (bila ada): kolom kotak kecil di samping oval,
+    # kanvas melebar seperlunya; tanpa indikator tidak ada perubahan.
+    tambah_indikator(hasil, _indikator_dari_model(model))
+    return hasil
 
 
 def tata_dari_kotak(kotak, panah, jenis: str = 'model',
-                   tinggi: int | None = None) -> tuple:
+                   tinggi: int | None = None,
+                   indikator=None) -> tuple:
     """Periksa tata letak buatan mahasiswa di editor.
     Kembalikan (tata, masalah). 'tinggi' = tinggi kanvas yang
-    dikirim editor (bila tidak ada, pakai KANVAS_TINGGI)."""
+    dikirim editor (bila tidak ada, pakai KANVAS_TINGGI).
+    'indikator' = daftar {induk, teks} dari editor (kotak indikator
+    menempel pada kotak induknya; posisinya dihitung ulang di
+    sini dari posisi kotak akhir, supaya ikut bila kotak digeser)."""
     masalah: list[str] = []
     if not isinstance(kotak, list) or not kotak:
         return None, ['Belum ada kotak di gambar.']
@@ -1006,9 +1153,27 @@ def tata_dari_kotak(kotak, panah, jenis: str = 'model',
     tinggi_manual = max(
         240,
         max((b['y'] + b['h'] for b in bersih), default=0) + 20)
-    return {'kotak': bersih, 'panah': panah_bersih,
-            'bentuk': 'manual', 'lebar': lebar_manual,
-            'tinggi': tinggi_manual}, []
+    hasil = {'kotak': bersih, 'panah': panah_bersih,
+             'bentuk': 'manual', 'lebar': lebar_manual,
+             'tinggi': tinggi_manual}
+    # Indikator dari editor: {induk, teks} per kotak indikator;
+    # induk harus id kotak yang ada, teks dibersihkan, maks
+    # BATAS_IND per induk. Posisi dihitung ulang dari kotak akhir.
+    ind_kirim: dict[str, list] = {}
+    if isinstance(indikator, list):
+        for it in indikator:
+            if not isinstance(it, dict):
+                continue
+            induk = str(it.get('induk') or '')
+            teks = _rapi(it.get('teks'))
+            if induk not in id_ada or not teks:
+                continue
+            ind_kirim.setdefault(induk, [])
+            if teks not in ind_kirim[induk]:
+                ind_kirim[induk].append(teks)
+        ind_kirim = {k: v[:BATAS_IND] for k, v in ind_kirim.items()}
+    tambah_indikator(hasil, ind_kirim or None)
+    return hasil, []
 
 
 def langkah_alur(desain: str) -> list[str]:
@@ -1042,7 +1207,9 @@ def model_dari_peta_bab4(peta: dict) -> dict | None:
     if not isinstance(peta, dict) or not peta.get('variabel'):
         return None
     return {'variabel': [{'nama': v.get('nama', ''),
-                          'peran': v.get('peran', 'X')}
+                          'peran': v.get('peran', 'X'),
+                          'indikator': _bersihkan_indikator(
+                              v.get('indikator'))}
                          for v in peta.get('variabel') or []],
             'jalur': [{'dari': j.get('dari', ''), 'ke': j.get('ke', ''),
                        'hipotesis': j.get('hipotesis', ''),
