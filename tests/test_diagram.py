@@ -54,6 +54,19 @@ from app import bagian_awal as BA
 from app import diagram as DG
 from app import gambar as GB
 
+
+def _pad_teks(k):
+    """Ruang teks di dalam oval (px, atas = bawah): blok teks
+    (kode + nama) dipusatkan vertikal, sama dengan _teks_kotak
+    di app/gambar.py (blok 56 px nama 1 baris, 84 px 2 baris)."""
+    blok = 56 + 28 * (DG._jumlah_baris_nama(k['nama']) - 1)
+    return (k['h'] - blok) // 2
+
+
+def _rasio_oval(k):
+    """Rasio lebar:tinggi oval (contoh skripsi Boss: 1,2-1,8)."""
+    return k['w'] / k['h']
+
 # Model mediasi realistis (Nura: TikTok Shop, 7 hipotesis).
 MODEL_NURA = {
     'variabel': [
@@ -678,11 +691,12 @@ def jalankan():
     cek('gambar panah berkode = PNG asli (H6 tergambar)',
         png_kode[:8] == b'\x89PNG\r\n\x1a\n' and len(png_kode) > 10000,
         str(len(png_kode)))
-    # Tinggi kotak: nama 2 baris = 110, 1 baris = 90.
+    # Tinggi oval: nama 2 baris = 240, 1 baris = 200 (oval besar,
+    # rasio 1,33 / 1,60 seperti oval contoh; cacat 6).
     kotak_nura = {k['id']: k for k in tata['kotak']}
-    cek('tinggi kotak: Z/X2 2 baris = 110, X1/Y 1 baris = 90 (cacat 6)',
-        kotak_nura['Z']['h'] == 110 and kotak_nura['X2']['h'] == 110
-        and kotak_nura['X1']['h'] == 90 and kotak_nura['Y']['h'] == 90,
+    cek('tinggi oval: Z/X2 2 baris = 240, X1/Y 1 baris = 200 (cacat 6)',
+        kotak_nura['Z']['h'] == 240 and kotak_nura['X2']['h'] == 240
+        and kotak_nura['X1']['h'] == 200 and kotak_nura['Y']['h'] == 200,
         str({k: v['h'] for k, v in kotak_nura.items()}))
     tata_m, _ = DG.tata_dari_kotak(
         [{'id': 'Z', 'nama': 'Keterlibatan Pelanggan', 'peran': 'Z',
@@ -693,9 +707,9 @@ def jalankan():
           'x': 60, 'y': 110, 'h': 90}],
         [{'dari': 'X1', 'ke': 'Z', 'label': 'H1', 'gaya': 'lewat'}],
         'model')
-    cek('tata manual: tinggi 90 dibetulkan 110 + gaya lewat dipertahankan',
+    cek('tata manual: tinggi 90 dibetulkan 240 + gaya lewat dipertahankan',
         tata_m is not None
-        and {k['id']: k['h'] for k in tata_m['kotak']}['Z'] == 110
+        and {k['id']: k['h'] for k in tata_m['kotak']}['Z'] == 240
         and tata_m['panah'][0]['gaya'] == 'lewat', str(tata_m))
     # Baris variabel kosong = placeholder, dilewati (cacat 7).
     model_kosong, mkos = DG.normalisasi_model(
@@ -755,10 +769,18 @@ def jalankan():
         str(pl81))
     cek('label H6 tetap 2 (satu per segmen, tidak dibuang)',
         len(h6_81) == 2)
-    cek('label H1 sendiri tetap di tengah (geser 0)',
-        len([p for p in pl81 if p['label'] == 'H1 (+)']) == 1
-        and [p for p in pl81 if p['label'] == 'H1 (+)'][0]['geser']
-        == (0.0, 0.0))
+    # H1 (X1 ke Y) kini dibengkokkan lewat atas Z, karena Z yang
+    # tinggi (240) menutupi sudut rute lurusnya; yang tetap: H1
+    # menempel di tengah elips (tanpa geser jalur sejajar, dy 0),
+    # dan belokannya di atas Z (y 220 < atas Z 280).
+    _h1_81 = [p for p in pl81 if p['label'] == 'H1 (+)']
+    cek('label H1 sendiri: menempel di tengah elips, dibengkokkan '
+        'lewat atas Z',
+        len(_h1_81) == 1
+        and _h1_81[0]['y1'] == 150 and _h1_81[0]['y2'] == 400
+        and len(_h1_81[0].get('rute') or []) >= 1
+        and all(r[1] < 280 for r in _h1_81[0]['rute']),
+        str(_h1_81))
     png81 = GB.gambar_panah(model81, tata81)
     cek('gambar panah fid 81 = PNG asli (label geser)',
         png81[:8] == b'\x89PNG\r\n\x1a\n' and len(png81) > 10000,
@@ -804,9 +826,9 @@ def jalankan():
                          'Lokasi'))]})
     tata5 = DG.tata_letak(model5)
     xs5 = [k for k in tata5['kotak'] if k['peran'] == 'X']
-    cek('kotak X padat 5: nama 1 baris muat (cacat 4)',
-        len(xs5) == 5 and all(k['h'] >= 76 for k in xs5)
-        and all(k['y'] + 70 <= k['y'] + k['h'] for k in xs5),
+    cek('kotak X padat 5: oval 200 (nama 1 baris), teks terpusat',
+        len(xs5) == 5 and all(k['h'] == 200 for k in xs5)
+        and all(_pad_teks(k) >= 20 for k in xs5),
         str([(k['nama'], k['y'], k['h']) for k in xs5]))
     cek('kotak X padat 5: tidak tumpang tindih',
         all(xs5[i]['y'] + xs5[i]['h'] + 14 <= xs5[i + 1]['y']
@@ -827,15 +849,14 @@ def jalankan():
                          'Promosi', 'Lokasi', 'Pelayanan'))]})
     tata6 = DG.tata_letak(model6)
     xs6 = [k for k in tata6['kotak'] if k['peran'] == 'X']
-    cek('kotak X padat 6: nama 2 baris muat (104), 1 baris 76, '
+    cek('kotak X padat 6: nama 2 baris 240, 1 baris 200, '
         'tidak tumpang tindih',
         len(xs6) == 6
         and {k['nama']: k['h'] for k in xs6}[
-            'Kualitas Produk dan Layanan'] == 104
-        and all(k['h'] == 76 for k in xs6
+            'Kualitas Produk dan Layanan'] == 240
+        and all(k['h'] == 200 for k in xs6
                 if k['nama'] != 'Kualitas Produk dan Layanan')
-        and all(k['y'] + 42 + 28 * DG._jumlah_baris_nama(k['nama'])
-                <= k['y'] + k['h'] for k in xs6)
+        and all(_pad_teks(k) >= 20 for k in xs6)
         and all(xs6[i]['y'] + xs6[i]['h'] <= xs6[i + 1]['y']
                 for i in range(len(xs6) - 1)),
         str([(k['nama'], k['y'], k['h']) for k in xs6]))
@@ -1081,35 +1102,39 @@ def jalankan():
                 _t_mat = DG.tata_letak(_m_mat)
                 _k_mat = {k['id']: k for k in _t_mat['kotak']}
                 _pl_mat = GB.penempatan_label(_t_mat)
+                # Garis tengah = tinggi kanvas // 2 (kanvas tumbuh
+                # mengikuti kolom tertinggi, oval besar).
+                _tinggi_mat = _t_mat.get('tinggi') or 800
+                _tengah = _tinggi_mat / 2
                 _tag = '%d X%s%s' % (
                     _n_x, ' + Z' if _dengan_z else '',
                     ' + lewat' if _lewat else '')
                 if _dengan_z:
                     cek('matriks %s: Z dan Y di garis tengah' % _tag,
-                        _pusat(_k_mat['Z']) == 400
-                        and _pusat(_k_mat['Y']) == 400,
+                        _pusat(_k_mat['Z']) == _tengah
+                        and _pusat(_k_mat['Y']) == _tengah,
                         str((_pusat(_k_mat['Z']), _pusat(_k_mat['Y']))))
                 else:
                     cek('matriks %s: Y di garis tengah' % _tag,
-                        _pusat(_k_mat['Y']) == 400,
+                        _pusat(_k_mat['Y']) == _tengah,
                         str(_pusat(_k_mat['Y'])))
                 _xs_mat = [k for k in _t_mat['kotak']
                            if k['peran'] == 'X']
                 if _n_x == 1:
                     cek('matriks %s: 1 X di atas garis tengah' % _tag,
-                        _pusat(_xs_mat[0]) == 150,
+                        _pusat(_xs_mat[0]) == _tengah - 250,
                         str(_pusat(_xs_mat[0])))
                 elif _n_x <= 4:
                     _c = [_pusat(k) for k in _xs_mat]
                     cek('matriks %s: X simetris' % _tag,
-                        all(_c[i] + _c[-1 - i] == 800
+                        all(_c[i] + _c[-1 - i] == 2 * _tengah
                             for i in range(len(_c) // 2)),
                         str(_c))
                 else:
                     _atas = _xs_mat[0]['y']
                     _bawah = _xs_mat[-1]['y'] + _xs_mat[-1]['h']
                     cek('matriks %s: tumpukan X terpusat simetris' % _tag,
-                        (_atas + _bawah) / 2 == 400,
+                        (_atas + _bawah) / 2 == _tengah,
                         str((_atas, _bawah)))
                 _kena = []
                 for _p in _pl_mat:
@@ -1142,14 +1167,17 @@ def jalankan():
                         _celah_min(_pl_mat) >= 0,
                         str(round(_celah_min(_pl_mat), 1)))
     # 3 X + Z: panah langsung X tengah (di garis tengah) ke Y harus
-    # dibengkokkan lewat atas Z, bukan menembus Z.
+    # dibengkokkan lewat atas Z, bukan menembus Z. Belokan kini
+    # 3 titik (naik, datar di atas Z, turun), semuanya di atas Z
+    # (atas Z y=300, belokan y=240).
     _m3 = _model_matriks(3, True, False)
     _t3 = DG.tata_letak(_m3)
     _pl3 = GB.penempatan_label(_t3)
     _tengah3 = [p for p in _pl3 if p['label'] == 'H2 (+)']
+    _z3 = next(k for k in _t3['kotak'] if k['id'] == 'Z')
     cek('3 X + Z: panah X tengah dibengkokkan lewat atas Z',
-        len(_tengah3) == 1 and len(_tengah3[0].get('rute') or []) == 1
-        and _tengah3[0]['rute'][0][1] < 355,
+        len(_tengah3) == 1 and len(_tengah3[0].get('rute') or []) >= 1
+        and all(r[1] < _z3['y'] for r in _tengah3[0]['rute']),
         str(_tengah3))
 
     # ── 12. Template multi-tahap (N kolom, contoh 4 dan 5) ─────────
@@ -1235,22 +1263,25 @@ def jalankan():
         'jenis': 'kuantitatif', 'desain': 'survei'}
 
     def _kolom_simetris(tata):
+        # Simetri terhadap garis tengah kanvas (tinggi // 2).
+        tinggi = tata.get('tinggi') or 800
+        tengah = tinggi / 2
         kolom = {}
         for k in tata['kotak']:
             kolom.setdefault(k['x'], []).append(k)
         for ks in kolom.values():
             pusat = sorted(_pusat(k) for k in ks)
             if len(ks) == 1:
-                if pusat[0] != 400:
+                if pusat[0] != tengah:
                     return False, pusat
             elif len(ks) <= 4:
-                if not all(pusat[i] + pusat[-1 - i] == 800
+                if not all(pusat[i] + pusat[-1 - i] == 2 * tengah
                            for i in range(len(pusat) // 2)):
                     return False, pusat
             else:
                 atas = min(k['y'] for k in ks)
                 bawah = max(k['y'] + k['h'] for k in ks)
-                if (atas + bawah) / 2 != 400:
+                if (atas + bawah) / 2 != tengah:
                     return False, pusat
         return True, None
 
@@ -1316,8 +1347,8 @@ def jalankan():
     cek('tata siklus tetap tergambar (2 kotak)',
         len(_tata_siklus['kotak']) == 2, str(_tata_siklus['kotak']))
 
-    for _nama, _model, _lebar in (('Goal-Directed', _goal, 2100),
-                                  ('contoh 5', _c5, 2100)):
+    for _nama, _model, _lebar in (('Goal-Directed', _goal, 2180),
+                                  ('contoh 5', _c5, 2180)):
         _t = DG.tata_letak(_model)
         _pl = GB.penempatan_label(_t)
         cek('%s: lebar kanvas %d' % (_nama, _lebar),
@@ -1362,20 +1393,70 @@ def jalankan():
     cek('panah vertikal: label tidak menyentuh kotak',
         _jarak_label_kotak(_pl_v, _tata_v) > 0,
         str(round(_jarak_label_kotak(_pl_v, _tata_v), 1)))
-    # Editor 5 kolom: viewBox dan state memakai lebar kanvas.
+    # Editor 5 kolom: viewBox dan state memakai lebar/tinggi kanvas.
     from jinja2 import Environment as _Env, FileSystemLoader as _FSL
     _env = _Env(loader=_FSL(str(Path(__file__).resolve().parent.parent
                              / 'app' / 'templates')))
     _tpl = _env.get_template('diagram_editor.html')
+    _tata_goal = DG.tata_letak(_goal)
     _html_goal = _tpl.render(
         berkas={'id': 81, 'nama': 'x.docx'}, jenis='model',
-        tata=DG.tata_letak(_goal), tinggi=DG.KANVAS_TINGGI,
-        lebar=DG.tata_letak(_goal).get('lebar') or DG.KANVAS_LEBAR,
+        tata=_tata_goal,
+        tinggi=_tata_goal.get('tinggi') or DG.KANVAS_TINGGI,
+        lebar=_tata_goal.get('lebar') or DG.KANVAS_LEBAR,
         teks31=None)
-    cek('editor Goal-Directed: viewBox 2100 dan state lebar 2100',
-        'viewBox="0 0 2100 800"' in _html_goal
-        and '"lebar": 2100' in _html_goal,
+    cek('editor Goal-Directed: viewBox 2180 dan state lebar 2180',
+        'viewBox="0 0 2180 800"' in _html_goal
+        and '"lebar": 2180' in _html_goal,
         'viewBox/state lebar')
+
+    # ── 13. Oval besar seperti contoh (Boss 18 Nov 11:09) ─────────────
+    # Oval contoh (diukur dari berkas gambar): rasio lebar:tinggi
+    # 1,18-1,45 (contoh 1), 1,48-1,78 (contoh 6); mesin lama pipih
+    # 300x90 (3,33) / 300x110 (2,73) dengan teks menempel tepi.
+    # Mesin kini: lebar 320, tinggi 200 (1 baris, rasio 1,60) / 240
+    # (2 baris, rasio 1,33), teks dipusatkan vertikal di dalam oval.
+    for _nama_m, _m13 in (('Nura', MODEL_NURA), ('Asih', model81),
+                          ('Goal-Directed', _goal)):
+        _t13 = DG.tata_letak(_m13)
+        cek('oval %s: rasio tiap kotak 1,3-1,8 (seperti contoh)' % _nama_m,
+            all(1.3 <= _rasio_oval(k) <= 1.8 for k in _t13['kotak']),
+            str([round(_rasio_oval(k), 2) for k in _t13['kotak']]))
+        cek('oval %s: teks punya ruang lega (pad atas/bawah >= 20 px)'
+            % _nama_m,
+            all(_pad_teks(k) >= 20 for k in _t13['kotak']),
+            str([_pad_teks(k) for k in _t13['kotak']]))
+        cek('oval %s: semua kotak muat di kanvas' % _nama_m,
+            all(k['y'] >= 0 and k['y'] + k['h'] <= _t13['tinggi']
+                and k['x'] + k['w'] <= _t13['lebar']
+                for k in _t13['kotak']),
+            str((_t13['lebar'], _t13['tinggi'])))
+    # Kanvas tumbuh mengikuti kolom tertinggi, garis tengah ikut.
+    _t5b = DG.tata_letak(model5)
+    cek('oval 5 X: kanvas tumbuh di atas 800 (oval tidak dirampingkan)',
+        _t5b.get('tinggi', 800) > 800
+        and all(k['h'] == 200 for k in _t5b['kotak']
+                if k['peran'] == 'X'),
+        str((_t5b.get('tinggi'), [k['h'] for k in _t5b['kotak']])))
+    _t9b = DG.tata_letak(_model_matriks(9, True, True))
+    cek('oval 9 X + Z + lewat: kanvas tumbuh, Z/Y tetap di garis tengah',
+        _t9b.get('tinggi', 800) > 800
+        and _pusat({k['id']: k for k in _t9b['kotak']}['Z'])
+        == _t9b['tinggi'] / 2
+        and _pusat({k['id']: k for k in _t9b['kotak']}['Y'])
+        == _t9b['tinggi'] / 2,
+        str(_t9b.get('tinggi')))
+    # PNG ikut tinggi kanvas (bukan 800 tetap).
+    _png13 = GB.gambar_panah(model5, _t5b)
+    _img13 = _Image.open(io.BytesIO(_png13))
+    cek('oval 5 X: PNG setinggi kanvas dinamis',
+        _img13.size[1] == _t5b['tinggi'] and _img13.size[0] == 1400,
+        str(_img13.size))
+    # Editor: kotak baru 320x200, tinggi minimum oval 200/240.
+    cek('editor: kotak baru 320x200 (oval besar)',
+        "w: 320, h: 200" in isi_editor, 'tambahKotak')
+    cek('editor: tinggi minimum oval 240/200 (bukan 110/90)',
+        "(dua ? 240 : 200)" in isi_editor, 'tinggiTampil')
 
 
 if __name__ == '__main__':

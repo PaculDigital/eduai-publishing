@@ -77,6 +77,7 @@ var JENIS = {{ jenis | tojson }};
 var FID = {{ berkas.id }};
 var state = {{ tata | tojson }};
 var LEBAR_KANVAS = state.lebar || 1400;
+var TINGGI_KANVAS = state.tinggi || 800;
 var diubah = false;
 var manual = false;
 var sambung = false;
@@ -103,10 +104,14 @@ function bungkus(teks, maks) {
   return baris.slice(0, 2);
 }
 function tinggiTampil(k) {
-  // Tinggi kotak di layar: setinggi nama (2 baris = 110), supaya teks
-  // tidak terpotong di tepi bawah kotak sesudah digeser.
+  // Tinggi kotak di layar: setinggi nama, supaya teks tidak
+  // terpotong di tepi bawah kotak sesudah digeser. Oval model
+  // (lebar 320): 1 baris = 200, 2 baris = 240; kotak Desain
+  // (lebar 600): 1 baris = 90, 2 baris = 110.
   var maks = k.w > 400 ? 30 : 18;
-  return Math.max(k.h, bungkus(k.nama, maks).length >= 2 ? 110 : 90);
+  var dua = bungkus(k.nama, maks).length >= 2;
+  return Math.max(k.h, k.w > 400 ? (dua ? 110 : 90)
+                                 : (dua ? 240 : 200));
 }
 function titikElips(k, h, geser, sisi) {
   // Titik di tepi elips ('kanan'/'kiri' setinggi tengah + geser,
@@ -267,7 +272,7 @@ function ruteBengkok(x1, y1, x2, y2, dy, kotak, dariId, keId) {
         wy = atas ? k.y - 60 + dy : k.y + k.h + 60 + dy;
       }
     }
-    wy = Math.max(20, Math.min(780, wy));
+    wy = Math.max(20, Math.min(TINGGI_KANVAS - 20, wy));
     wx = Math.max(20, Math.min(LEBAR_KANVAS - 20, wx));
     titik = titik.slice(0, j + 1).concat([[wx, wy]], titik.slice(j + 1));
   }
@@ -452,11 +457,16 @@ function gambarUlang() {
     g.appendChild(r);
     var maks = k.w > 400 ? 30 : 18;
     var baris = bungkus(k.nama, maks);
-    var kode = el('text', {x: k.x + k.w / 2, y: k.y + 30, 'text-anchor': 'middle', 'font-size': 24, 'font-weight': 'bold', fill: '#10222e'});
+    // Blok teks (kode + nama) dipusatkan vertikal di dalam oval,
+    // sama dengan _teks_kotak di app/gambar.py (blok 56 px 1 baris,
+    // 84 px 2 baris).
+    var blok = baris.length >= 2 ? 84 : 56;
+    var geserTeks = (tinggi[k.id] - blok) / 2;
+    var kode = el('text', {x: k.x + k.w / 2, y: k.y + 30 + geserTeks, 'text-anchor': 'middle', 'font-size': 24, 'font-weight': 'bold', fill: '#10222e'});
     kode.textContent = k.kode || '';
     g.appendChild(kode);
     baris.forEach(function (b, i) {
-      var t = el('text', {x: k.x + k.w / 2, y: k.y + 60 + i * 26, 'text-anchor': 'middle', 'font-size': 22, fill: '#10222e'});
+      var t = el('text', {x: k.x + k.w / 2, y: k.y + 60 + i * 26 + geserTeks, 'text-anchor': 'middle', 'font-size': 22, fill: '#10222e'});
       t.textContent = b;
       g.appendChild(t);
     });
@@ -488,7 +498,7 @@ document.getElementById('kanvas').addEventListener('pointermove', function (ev) 
   pt.x = ev.clientX; pt.y = ev.clientY;
   var p = pt.matrixTransform(svg.getScreenCTM().inverse());
   var nx = Math.max(0, Math.min(LEBAR_KANVAS - seret.k.w, p.x - seret.dx));
-  var ny = Math.max(0, p.y - seret.dy);
+  var ny = Math.max(0, Math.min(TINGGI_KANVAS - seret.k.h, p.y - seret.dy));
   if (Math.abs(nx - seret.k.x) + Math.abs(ny - seret.k.y) > 2) seret.gerak = true;
   seret.k.x = Math.round(nx); seret.k.y = Math.round(ny);
   gambarUlang();
@@ -531,7 +541,7 @@ function tolak() {
 }
 function tambahKotak() {
   var n = state.kotak.length + 1;
-  state.kotak.push({id: 'k' + Date.now(), nama: 'Kotak baru', kode: 'X' + n, peran: 'X', x: 450, y: 300, w: 300, h: 90});
+  state.kotak.push({id: 'k' + Date.now(), nama: 'Kotak baru', kode: 'X' + n, peran: 'X', x: 450, y: 300, w: 320, h: 200});
   tandaiUbah(); gambarUlang();
 }
 function tambahLangkah() {
@@ -559,7 +569,7 @@ function masukkan() {
   pesan.hidden = true; galat.hidden = true;
   fetch('/api/diagram/' + FID + '/selesai', {
     method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({jenis: JENIS, kotak: state.kotak, panah: state.panah})
+    body: JSON.stringify({jenis: JENIS, kotak: state.kotak, panah: state.panah, tinggi: TINGGI_KANVAS})
   }).then(function (r) { return r.json(); }).then(function (d) {
     if (!d.ok) {
       galat.textContent = (d.detail && d.detail.pesan) || d.pesan || 'Gagal.';

@@ -72,10 +72,15 @@ KANVAS_TINGGI = 800
 TENGAH_KANVAS = KANVAS_TINGGI // 2
 # Jarak pusat X terluar ke garis tengah (1 X) / setengah bentang
 # kolom X (2-4 X). 250 px supaya panah langsung X ke Y lewat jelas
-# di atas/bawah Z (dengan 210 px, panah itu hanya 3,7 px di atas Z
-# bila Z 2 baris, sehingga ikut terbengkok).
+# di atas/bawah Z (66 px di atas Z bila Z 2 baris, tinggi 240).
 LANGKAH_X = 250
-LEBAR_KOTAK = 300
+LEBAR_KOTAK = 320
+# Tinggi oval model (contoh skripsi Boss 18 Nov 2026): oval contoh
+# besar dan bulat alami (rasio lebar:tinggi 1,2-1,8, teks di tengah
+# dengan ruang lega), bukan pipih 300x90. Lebar 320, tinggi 200
+# (nama 1 baris, rasio 1,60) / 240 (nama 2 baris, rasio 1,33).
+TINGGI_OVAL_1 = 200
+TINGGI_OVAL_2 = 240
 
 
 def _rapi(teks) -> str:
@@ -302,24 +307,25 @@ def _jumlah_baris_nama(nama: str, lebar: int = LEBAR_KOTAK) -> int:
 
 
 def tinggi_kotak(nama: str, lebar: int = LEBAR_KOTAK) -> int:
-    """Tinggi kotak supaya nama muat di dalamnya (tidak terpotong).
-
+    """Tinggi kotak langkah Desain (persegi, lebar 600): 1 baris = 90,
+    2 baris = 110. Kotak model memakai tinggi_oval (oval besar).
     Aturan bungkus sama dengan editor (maks 18 karakter per baris
-    untuk lebar 300, 30 untuk lebar 600): 1 baris = 90, 2 baris = 110
-    (baris kedua berakhir di y+98 di PNG dan y+91 di editor).
+    untuk lebar 320, 30 untuk lebar 600).
     """
     return 110 if _jumlah_baris_nama(nama, lebar) >= 2 else 90
 
 
-def _tinggi_muat(nama: str, lebar: int = LEBAR_KOTAK) -> int:
-    """Tinggi minimal supaya nama muat di dalam kotak (tidak terpotong).
+def tinggi_oval(nama: str, lebar: int = LEBAR_KOTAK) -> int:
+    """Tinggi oval model: 200 (nama 1 baris) / 240 (nama 2 baris).
 
-    Teks kotak di PNG: kode di y+10, nama mulai y+42, tiap baris 28 px
-    (font 24, tinggi glif 23); nama 1 baris berakhir y+70, 2 baris
-    y+98. Jadi 76 / 104 (margin 6 px). Dipakai kolom X yang padat
-    (5 X ke atas), supaya kotak tetap ramping tapi teks tidak meluap.
+    Oval contoh besar dan bulat alami (rasio 1,2-1,8); oval mesin
+    lama 300x90 pipih (rasio 3,33) dengan teks menempel tepi.
+    Lebar 320 dengan tinggi ini memberi rasio 1,60 / 1,33 dan
+    ruang teks lega (teks dipusatkan di dalam oval, lihat
+    _teks_kotak di app/gambar.py).
     """
-    return 104 if _jumlah_baris_nama(nama, lebar) >= 2 else 76
+    return TINGGI_OVAL_2 if _jumlah_baris_nama(nama, lebar) >= 2 \
+        else TINGGI_OVAL_1
 
 
 def _tahap_variabel(variabel, jalur):
@@ -369,27 +375,37 @@ def _tahap_variabel(variabel, jalur):
     return tahap
 
 
-def _pusat_tumpukan(i, n, pusat_satu=400):
+def _pusat_tumpukan(i, n, pusat_satu=400, tinggi_maks=240):
     """Pusat vertikal kotak ke-i dari n kotak yang simetris terhadap
     garis tengah. 1 kotak di pusat_satu; 2-4 kotak berjarak sama
-    dengan pusat terluar ±LANGKAH_X dari garis tengah."""
+    dengan pusat terluar ±LANGKAH_X dari garis tengah, direnggang
+    bila perlu supaya oval (setinggi tinggi_maks) tidak tumpang
+    tindih (jarak pusat paling sedikit tinggi_maks + 14 px)."""
     if n == 1:
         return pusat_satu
-    langkah = 2 * LANGKAH_X / (n - 1)
+    langkah = max(2 * LANGKAH_X / (n - 1), tinggi_maks + 14)
     return TENGAH_KANVAS + (i - (n - 1) / 2) * langkah
 
 
-def _y_tumpukan_padat(nama_list, lebar=LEBAR_KOTAK):
+def _y_tumpukan_padat(nama_list, lebar=LEBAR_KOTAK, pusat=400,
+                      batas=1560):
     """Daftar y untuk tumpukan padat (5+ kotak), terpusat simetris
-    di garis tengah; celah 14 px, ditekan ke 6 px bila kolom lebih
-    tinggi dari kanvas."""
-    hs = [_tinggi_muat(n, lebar) for n in nama_list]
+    di garis tengah (pusat); celah 14 px, ditekan ke 6 px bila
+    tumpukan lebih tinggi dari batas (kanvas lalu tumbuh, lihat
+    tata_letak). Oval padat tetap setinggi oval biasa (200/240),
+    bukan dirampingkan: oval kecil pipih adalah cacat yang
+    diperbaiki putaran ini."""
+    hs = [tinggi_oval(n, lebar) for n in nama_list]
     celah = 14
     total = sum(hs) + (len(hs) - 1) * celah
-    if total > 760:
-        celah = max(6, (760 - sum(hs)) // max(1, len(hs) - 1))
+    if total > batas:
+        celah = max(6, (batas - sum(hs)) // max(1, len(hs) - 1))
         total = sum(hs) + (len(hs) - 1) * celah
-    y0 = max(20, 400 - total // 2)
+    # Tanpa jepit ke 20: tumpukan yang lebih tinggi dari kanvas
+    # memang mulai di y negatif di sini, lalu digeser ke tengah
+    # oleh tata_letak sesudah tinggi kanvas dihitung (menjepit
+    # merusak simetri: pusat tumpukan bergeser dari garis tengah).
+    y0 = pusat - total // 2
     out, yy = [], y0
     for h in hs:
         out.append(yy)
@@ -399,7 +415,8 @@ def _y_tumpukan_padat(nama_list, lebar=LEBAR_KOTAK):
 
 def tata_letak(model: dict) -> dict:
     """Tata letak deterministik: kotak + panah dalam kanvas 1400x800
-    (dilebarkan bila kolom lebih dari 3).
+    (dilebarkan bila kolom lebih dari 3, ditinggikan bila kolom
+    lebih tinggi dari 800).
 
     Template per jumlah variabel (aturan umum, bukan per model):
     tahap tiap variabel diturunkan dari graf jalur (longest-path):
@@ -411,8 +428,12 @@ def tata_letak(model: dict) -> dict:
     tengah, supaya X, Z, Y tidak segaris seperti contoh 1 Boss);
     2-4 kotak berjarak sama simetris; 5 kotak ke atas tumpukan
     terpusat simetris. Jarak antar kolom 490 px (3 kolom ke bawah,
-    sama seperti dulu: X 60, Z 550, Y 1040) atau 420 px (4 kolom ke
+    sama seperti dulu: X 60, Z 550, Y 1040) atau 440 px (4 kolom ke
     atas, kanvas dilebarkan supaya label panah muat di celah 120 px).
+    Kotak model adalah oval besar (lebar 320, tinggi 200/240,
+    rasio 1,60/1,33 seperti oval contoh); tinggi kanvas tumbuh
+    mengikuti kolom tertinggi supaya oval tetap muat dan simetris
+    (garis tengah = tinggi kanvas // 2).
     Panah langsung yang menabrak kotak (mis. X di garis tengah ke Y
     lewat Z) TIDAK dihindari dengan menggeser kotak, melainkan
     dibengkokkan lewat atas kotak itu di penempatan_label
@@ -420,8 +441,9 @@ def tata_letak(model: dict) -> dict:
     digambar putus-putus: dua segmen (Dari ke Lewat, Lewat ke Ke)
     bila ada Lewat, satu segmen (Dari ke Ke) bila tidak ada; tiap
     segmen berlabel hipotesisnya, supaya H6/H7 terlihat di draf.
-    Kembalikan {'kotak', 'panah', 'bentuk', 'lebar'}; 'lebar' =
-    lebar kanvas model ini (1400 bila 3 kolom ke bawah).
+    Kembalikan {'kotak', 'panah', 'bentuk', 'lebar', 'tinggi'};
+    'lebar' = lebar kanvas model ini (1400 bila 3 kolom ke bawah),
+    'tinggi' = tinggi kanvas model ini (800 bila muat).
     """
     variabel = model.get('variabel') or []
     tahap = _tahap_variabel(variabel, model.get('jalur') or [])
@@ -438,7 +460,7 @@ def tata_letak(model: dict) -> dict:
         pitch = 980 / (n_kolom - 1)
         x_kolom = [60 + round(i * pitch) for i in range(n_kolom)]
     else:
-        pitch = 420
+        pitch = 440
         lebar_kanvas = 420 + (n_kolom - 1) * pitch
         x_kolom = [60 + i * pitch for i in range(n_kolom)]
     kotak: list[dict] = []
@@ -452,14 +474,14 @@ def tata_letak(model: dict) -> dict:
         pusat_satu = (TENGAH_KANVAS - LANGKAH_X) if klasik_x \
             else TENGAH_KANVAS
         if n > 4:
-            # Tumpukan padat: kotak setinggi nama (76/104) supaya
-            # teks tidak meluap, kolom direnggang supaya kotak tidak
-            # tumpang tindih (celah 14 px, tengah di y=400).
+            # Tumpukan padat: oval tetap setinggi oval biasa
+            # (200/240), kanvas tumbuh supaya muat (lihat bawah).
             ys = _y_tumpukan_padat([v['nama'] for v in vs])
-            hs = [_tinggi_muat(v['nama']) for v in vs]
+            hs = [tinggi_oval(v['nama']) for v in vs]
         else:
-            hs = [tinggi_kotak(v['nama']) for v in vs]
-            ys = [round(_pusat_tumpukan(i, n, pusat_satu) - h / 2)
+            hs = [tinggi_oval(v['nama']) for v in vs]
+            ys = [round(_pusat_tumpukan(i, n, pusat_satu, max(hs))
+                        - h / 2)
                   for i, h in enumerate(hs)]
         for v, h, y in zip(vs, hs, ys):
             kotak.append({'id': v.get('kode') or v.get('nama'),
@@ -468,6 +490,23 @@ def tata_letak(model: dict) -> dict:
                           'peran': v.get('peran') or 'X',
                           'x': x_kolom[t], 'y': y,
                           'w': LEBAR_KOTAK, 'h': h})
+    # Tinggi kanvas tumbuh mengikuti kolom tertinggi (oval besar),
+    # lalu semua kotak digeser supaya pusat tiap kotak tetap di
+    # garis tengah yang baru (tinggi // 2). Setengah bentang diukur
+    # dari garis tengah (bukan dari total bentang), supaya kolom
+    # yang tingginya tidak simetris (nama 1 dan 2 baris bercampur)
+    # tidak menggeser Z/Y dari garis tengah.
+    if kotak:
+        atas = min(k['y'] for k in kotak)
+        bawah = max(k['y'] + k['h'] for k in kotak)
+        setengah = max(TENGAH_KANVAS - atas, bawah - TENGAH_KANVAS)
+        tinggi_kanvas = max(KANVAS_TINGGI, 2 * setengah + 40)
+        geser = tinggi_kanvas // 2 - TENGAH_KANVAS
+        if geser:
+            for k in kotak:
+                k['y'] += geser
+    else:
+        tinggi_kanvas = KANVAS_TINGGI
     panah: list[dict] = []
     for j in model.get('jalur') or []:
         label = j['hipotesis']
@@ -487,12 +526,15 @@ def tata_letak(model: dict) -> dict:
                       'gaya': 'putus' if j.get('jenis') == 'interaksi'
                       else 'lurus'})
     return {'kotak': kotak, 'panah': panah,
-            'bentuk': bentuk_model(model), 'lebar': lebar_kanvas}
+            'bentuk': bentuk_model(model), 'lebar': lebar_kanvas,
+            'tinggi': tinggi_kanvas}
 
 
-def tata_dari_kotak(kotak, panah, jenis: str = 'model') -> tuple:
+def tata_dari_kotak(kotak, panah, jenis: str = 'model',
+                   tinggi: int | None = None) -> tuple:
     """Periksa tata letak buatan mahasiswa di editor.
-    Kembalikan (tata, masalah)."""
+    Kembalikan (tata, masalah). 'tinggi' = tinggi kanvas yang
+    dikirim editor (bila tidak ada, pakai KANVAS_TINGGI)."""
     masalah: list[str] = []
     if not isinstance(kotak, list) or not kotak:
         return None, ['Belum ada kotak di gambar.']
@@ -516,20 +558,22 @@ def tata_dari_kotak(kotak, panah, jenis: str = 'model') -> tuple:
         except (TypeError, ValueError):
             x, y = 0, 0
         x = max(0, min(KANVAS_LEBAR - 120, x))
-        y = max(0, min(KANVAS_TINGGI - 60, y))
+        tinggi_kanvas = tinggi or KANVAS_TINGGI
+        y = max(0, min(tinggi_kanvas - 60, y))
         kid = str(k.get('id') or f'k{len(bersih) + 1}')
         if kid in id_ada:
             kid = f'{kid}_{len(bersih) + 1}'
         id_ada.add(kid)
-        # Tinggi mengikuti nama (kotak 2 baris = 110), supaya teks
-        # tidak terpotong sesudah kotak digeser atau diubah tulisannya;
-        # tinggi yang dikirim editor tidak boleh lebih pendek dari itu.
+        # Tinggi mengikuti nama (oval model 2 baris = 240, kotak
+        # Desain 2 baris = 110), supaya teks tidak terpotong sesudah
+        # kotak digeser atau diubah tulisannya; tinggi yang dikirim
+        # editor tidak boleh lebih pendek dari itu.
         try:
             h_kirim = int(k.get('h') or 90)
         except (TypeError, ValueError):
             h_kirim = 90
         h = h_kirim if jenis == 'desain' else max(
-            h_kirim, tinggi_kotak(nama, LEBAR_KOTAK))
+            h_kirim, tinggi_oval(nama, LEBAR_KOTAK))
         bersih.append({'id': kid, 'nama': nama, 'kode': kid,
                        'peran': peran, 'x': x, 'y': y,
                        'w': LEBAR_KOTAK, 'h': h})
@@ -558,8 +602,12 @@ def tata_dari_kotak(kotak, panah, jenis: str = 'model') -> tuple:
     lebar_manual = max(
         KANVAS_LEBAR,
         max((b['x'] + b['w'] for b in bersih), default=0) + 60)
+    tinggi_manual = max(
+        KANVAS_TINGGI,
+        max((b['y'] + b['h'] for b in bersih), default=0) + 60)
     return {'kotak': bersih, 'panah': panah_bersih,
-            'bentuk': 'manual', 'lebar': lebar_manual}, []
+            'bentuk': 'manual', 'lebar': lebar_manual,
+            'tinggi': tinggi_manual}, []
 
 
 def langkah_alur(desain: str) -> list[str]:

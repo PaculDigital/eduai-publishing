@@ -445,14 +445,21 @@ def _teks_kotak(d, kotak: dict) -> None:
     """Tulis kode + nama di dalam kotak (nama dibungkus, ukuran mengecil
     sampai muat; tidak pernah terpotong). Kotak digambar sebagai elips
     (contoh skripsi Boss 18 Nov 2026), jadi kode dikecilkan supaya
-    muat di bagian atas elips yang menyempit (lebar aman 170 px)."""
-    x, y, w = kotak['x'], kotak['y'], kotak['w']
+    muat di bagian atas elips yang menyempit (lebar aman 170 px).
+    Blok teks (kode + nama) dipusatkan vertikal di dalam oval,
+    supaya teks punya ruang lega seperti oval contoh."""
+    x, y, w, h = kotak['x'], kotak['y'], kotak['w'], kotak['h']
     f_kode, _uk = _font_muat(str(kotak.get('kode') or ''), 170, 24)
-    d.text((x + w / 2, y + 10), str(kotak.get('kode') or ''),
-           font=f_kode, fill=TINTA, anchor='ma')
     f_nama, _uk = _font_muat(str(kotak.get('nama') or ''), w - 24, 24)
     baris = _bungkus_teks(d, kotak.get('nama') or '', f_nama, w - 24)
-    ty = y + 42
+    # Blok: kode di +10, nama mulai +42, tiap baris 28 px, tinggi
+    # glif 24; dipusatkan di dalam oval (blok 56 px 1 baris, 84 px
+    # 2 baris).
+    blok = 56 + 28 * (len(baris) - 1)
+    geser = (h - blok) / 2
+    d.text((x + w / 2, y + 10 + geser), str(kotak.get('kode') or ''),
+           font=f_kode, fill=TINTA, anchor='ma')
+    ty = y + 42 + geser
     for b in baris:
         d.text((x + w / 2, ty), b, font=f_nama, fill=TINTA, anchor='ma')
         ty += 28
@@ -623,7 +630,7 @@ def _titik_polilinia(titik, s):
 
 
 def _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua, dari_id, ke_id,
-                  lebar=W):
+                  lebar=W, tinggi=H):
     """Titik belok bila segmen menembus kotak (bukan kotak ujung):
     lewat atas/bawah kotak yang ditembus, di sisi titik tengah ruas
     (seperti H1 contoh 1 yang lewat di atas Z). Ruas yang lebih tegak
@@ -679,7 +686,7 @@ def _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua, dari_id, ke_id,
             else:
                 wx = k['x'] + k['w'] / 2
                 wy = (k['y'] - 60 + dy) if atas else (k['y'] + k['h'] + 60 + dy)
-        wy = max(20, min(H - 20, wy))
+        wy = max(20, min(tinggi - 20, wy))
         wx = max(20, min(lebar - 20, wx))
         titik = titik[:j + 1] + [(wx, wy)] + titik[j + 1:]
     return titik[1:-1]
@@ -810,7 +817,8 @@ def penempatan_label(tata: dict | None) -> list:
             # atas/bawah kotak itu (aturan umum, bukan per model).
             rute = _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua,
                                  p.get('dari'), p.get('ke'),
-                                 lebar_kanvas)
+                                 lebar_kanvas,
+                                 tata.get('tinggi') or H)
             titik = [(x1, y1)] + rute + [(x2, y2)]
             # Label di tengah polilinia; geser sepanjang garisnya bila
             # mendarat di atas kotak atau label lain (aturan umum).
@@ -838,7 +846,8 @@ def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
     if not kotak:
         return b''
     lebar_kanvas = tata.get('lebar') or W
-    g = Image.new('RGB', (lebar_kanvas, H), LATAR)
+    tinggi_kanvas = tata.get('tinggi') or H
+    g = Image.new('RGB', (lebar_kanvas, tinggi_kanvas), LATAR)
     d = ImageDraw.Draw(g)
     #  panah dulu (di bawah kotak), lalu kotak, lalu label. Garis tiap
     #  panah dari penempatan_label (jalur sendiri bila berbagi segmen),

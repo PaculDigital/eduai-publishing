@@ -258,7 +258,7 @@ async def diagram_editor_halaman(
                 f'/naskah/{fid}/diagram/model?pesan={_pesan_ke(pesan)}',
                 status_code=303)
         tata = DG.tata_letak(normal)
-        tinggi = DG.KANVAS_TINGGI
+        tinggi = tata.get('tinggi') or DG.KANVAS_TINGGI
         teks31 = []
     else:
         if not model.get('desain'):
@@ -310,8 +310,13 @@ async def diagram_selesai(
     if not isinstance(body, dict):
         body = {}
     jenis = 'desain' if str(body.get('jenis') or '') == 'desain' else 'model'
+    try:
+        tinggi_kirim = int(body.get('tinggi') or 0) or None
+    except (TypeError, ValueError):
+        tinggi_kirim = None
     tata, masalah = DG.tata_dari_kotak(body.get('kotak'),
-                                       body.get('panah'), jenis)
+                                       body.get('panah'), jenis,
+                                       tinggi=tinggi_kirim)
     if tata is None:
         raise HTTPException(400, detail={'ok': False,
                                          'pesan': ' '.join(masalah[:2])})
