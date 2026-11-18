@@ -67,14 +67,19 @@ LANGKAH_DESAIN = {
 
 KANVAS_LEBAR = 1400
 KANVAS_TINGGI = 800
-# Garis tengah horizontal kanvas: pusat Z dan Y selalu di sini, kolom X
-# simetris terhadap garis ini (contoh skripsi Boss 18 Nov 2026).
+# Garis tengah horizontal kanvas: pusat X dan Y selalu di sini,
+# tumpukan X dan Y simetris terhadap garis ini (template default
+# Boss 18 Nov 12:12 WIB); perantara M/Z di atas garis ini,
+# bukan di garisnya.
 TENGAH_KANVAS = KANVAS_TINGGI // 2
-# Jarak pusat X terluar ke garis tengah (1 X) / setengah bentang
-# kolom X (2-4 X). 250 px supaya panah langsung X ke Y bisa lurus
-# lewat di atas/bawah Z (titik tempel dipilih mesin, lihat
-# _rute_lurus di app/gambar.py).
+# Jarak pusat X terluar ke garis tengah (2-4 X) / setengah
+# bentang kolom X. 250 px; juga dipakai sebagai tinggi atap
+# segitiga mediasi (pusat kolom perantara = garis - 250 px).
 LANGKAH_X = 250
+# Celah minimum antara bawah kolom perantara dan garis langsung
+# X ke Y tertinggi yang lewat di kolom itu (px): supaya panah
+# langsung lurus dan tidak terhalang perantara.
+CELAH_PERANTARA = 40
 LEBAR_KOTAK = 300
 # Tinggi oval model (contoh skripsi Boss 18 Nov 2026): oval contoh
 # besar dan bulat alami (rasio lebar:tinggi 1,2-1,8, teks di tengah
@@ -382,14 +387,14 @@ def _tahap_variabel(variabel, jalur):
 
 def _pusat_tumpukan(i, n, pusat_satu=400, tinggi_maks=216):
     """Pusat vertikal kotak ke-i dari n kotak yang simetris terhadap
-    garis tengah. 1 kotak di pusat_satu; 2-4 kotak berjarak sama
-    dengan pusat terluar ±LANGKAH_X dari garis tengah, direnggang
+    pusat_satu. 1 kotak di pusat_satu; 2-4 kotak berjarak sama
+    dengan pusat terluar ±LANGKAH_X dari pusat_satu, direnggang
     bila perlu supaya oval (setinggi tinggi_maks) tidak tumpang
     tindih (jarak pusat paling sedikit tinggi_maks + 14 px)."""
     if n == 1:
         return pusat_satu
     langkah = max(2 * LANGKAH_X / (n - 1), tinggi_maks + 14)
-    return TENGAH_KANVAS + (i - (n - 1) / 2) * langkah
+    return pusat_satu + (i - (n - 1) / 2) * langkah
 
 
 def _y_tumpukan_padat(nama_list, lebar=LEBAR_KOTAK, pusat=400,
@@ -397,7 +402,7 @@ def _y_tumpukan_padat(nama_list, lebar=LEBAR_KOTAK, pusat=400,
     """Daftar y untuk tumpukan padat (5+ kotak), terpusat simetris
     di garis tengah (pusat); celah 14 px, ditekan ke 6 px bila
     tumpukan lebih tinggi dari batas (kanvas lalu tumbuh, lihat
-    tata_letak). Oval padat tetap setinggi oval biasa (200/240),
+    tata_letak). Oval padat tetap setinggi oval biasa (180/216),
     bukan dirampingkan: oval kecil pipih adalah cacat yang
     diperbaiki putaran ini."""
     hs = [tinggi_oval(n, lebar) for n in nama_list]
@@ -424,20 +429,34 @@ def tata_letak(model: dict) -> dict:
     (mengikuti kotak teratas sampai terbawah + margin, tanpa ruang
     kosong besar di bawah diagram).
 
-    Template per jumlah variabel (aturan umum, bukan per model):
-    tahap tiap variabel diturunkan dari graf jalur (longest-path):
+    Template default (Boss 18 Nov 12:12 WIB), menggantikan aturan
+    18 Nov 10:09 (Z dan Y sejajar di garis tengah): posisi selalu
+    variabel X berhadapan dengan variabel Y, defaultnya SEJAJAR
+    (satu garis tengah yang sama), berapapun jumlah X dan Y;
+    variabel lain seperti M/Z itu DI ATAS garis X-Y itu (default),
+    bukan di garisnya. Panah langsung diprioritaskan dulu (lurus,
+    terpendek, jalurnya bersih); garis putus-putus mengalah, lewat
+    perantara di atas/bawah, tidak pernah memotong jalur langsung.
+    Tahap tiap variabel diturunkan dari graf jalur (longest-path):
     tanpa jalur masuk tahap 0, bila tidak 1 + maks tahap pendahulu;
     X/Z/Y biasa kembali jadi 3 kolom (X 0, Z 1, Y 2), tanpa Z jadi
     2 kolom; model bertahap (mis. Goal-Directed) jadi N kolom.
-    Tiap kolom simetris terhadap garis tengah: 1 kotak di garis
-    tengah (kecuali kolom X klasik yang 1 X-nya di atas garis
-    tengah, supaya X, Z, Y tidak segaris seperti contoh 1 Boss);
-    2-4 kotak berjarak sama simetris; 5 kotak ke atas tumpukan
-    terpusat simetris. Jarak antar kolom 490 px (3 kolom ke bawah,
-    sama seperti dulu: X 60, Z 550, Y 1040) atau 440 px (4 kolom ke
-    atas, kanvas dilebarkan supaya label panah muat di celah 120 px).
+    Kolom X dan Y simetris terhadap garis tengah (1 kotak di garis
+    tengah; 2-4 kotak berjarak sama simetris; 5 kotak ke atas
+    tumpukan terpusat simetris). Kolom perantara mediasi 3 kolom
+    ditempatkan di atas garis: pusatnya garis - 250 px (atap
+    segitiga mediasi: X dan Y sejajar, Z di atas, H1 lurus
+    mendatar, H6 lewat atap Z), lalu dinaikkan sampai bawah kolom
+    melewati garis langsung X ke Y tertinggi di kolom itu dengan
+    celah 40 px. Rantai multi-kolom (Goal-Directed, contoh 5)
+    tidak memakai aturan perantara-di-atas: perantaranya
+    membentuk rantai utama, jadi kolomnya tetap simetris terhadap
+    garis tengah seperti dulu.
+    Jarak antar kolom 490 px (3 kolom ke bawah, sama seperti dulu:
+    X 60, Z 550, Y 1040) atau 440 px (4 kolom ke atas, kanvas
+    dilebarkan supaya label panah muat di celah 120 px).
     Kotak model adalah oval besar (lebar 300, tinggi 180/216,
-    rasio 1,67/1,39 seperti oval contoh); garis tengah (pusat Z/Y)
+    rasio 1,67/1,39 seperti oval contoh); garis tengah (pusat X/Y)
     dicatat di 'tengah' karena kanvas yang memeluk isi tidak lagi
     berpusat di garis tengah.
     Panah langsung digambar LURUS seperti contoh 1 dan 3: titik
@@ -452,7 +471,7 @@ def tata_letak(model: dict) -> dict:
     Kembalikan {'kotak', 'panah', 'bentuk', 'lebar', 'tinggi',
     'tengah'}; 'lebar' = lebar kanvas model ini (1400 bila 3 kolom
     ke bawah), 'tinggi' = tinggi kanvas model ini (memeluk isi),
-    'tengah' = garis tengah (pusat Z/Y) dalam koordinat akhir.
+    'tengah' = garis tengah (pusat X/Y) dalam koordinat akhir.
     """
     variabel = model.get('variabel') or []
     tahap = _tahap_variabel(variabel, model.get('jalur') or [])
@@ -472,26 +491,98 @@ def tata_letak(model: dict) -> dict:
         pitch = 440
         lebar_kanvas = 420 + (n_kolom - 1) * pitch
         x_kolom = [60 + i * pitch for i in range(n_kolom)]
+    # Template default (Boss 18 Nov 12:12 WIB): X berhadapan dengan Y
+    # pada SATU garis tengah yang sama (tumpukan X dan Y simetris
+    # terhadap garis itu, berapapun jumlahnya); perantara M/Z TIDAK
+    # di garis itu, melainkan DI ATAS garis (default), supaya panah
+    # langsung X ke Y lurus dan tidak terhalang perantara.
+    garis = TENGAH_KANVAS
+    # Kolom perantara mediasi 3 kolom: hanya bila 3 kolom, kolom
+    # pertama hanya X, kolom tengah hanya Z, kolom terakhir hanya Y.
+    # Rantai multi-kolom (Goal-Directed, contoh 5) TIDAK memakai
+    # aturan ini: perantaranya membentuk rantai utama, jadi kolomnya
+    # tetap simetris terhadap garis tengah seperti dulu.
+    t_med = None
+    if n_kolom == 3:
+        peran_kolom = {t: {v.get('peran') for v in vs}
+                       for t, vs in kolom.items()}
+        if (peran_kolom.get(0) == {'X'}
+                and peran_kolom.get(1) == {'Z'}
+                and peran_kolom.get(2) == {'Y'}):
+            t_med = 1
+
+    def _pusat_kolom(vs, pusat):
+        """Pusat vertikal tiap kotak di satu kolom, simetris
+        terhadap pusat (pra-geser)."""
+        n = len(vs)
+        hs = [tinggi_oval(v['nama']) for v in vs]
+        if n > 4:
+            ys = _y_tumpukan_padat([v['nama'] for v in vs],
+                                   pusat=pusat)
+            return [y + h / 2 for y, h in zip(ys, hs)]
+        return [_pusat_tumpukan(i, n, pusat, max(hs))
+                for i in range(n)]
+
+    # Pusat tiap kolom (pra-geser). Kolom ujung/rantai simetris
+    # terhadap garis; kolom perantara dihitung sesudah garis
+    # langsung diketahui (posisinya tergantung garis itu).
+    pusat_kolom = {}
+    for t, vs in kolom.items():
+        if t != t_med:
+            pusat_kolom[t] = _pusat_kolom(vs, garis)
+    if t_med is not None:
+        # Perantara di atas garis: pusat kolom = garis - LANGKAH_X
+        # (atap segitiga mediasi), lalu dinaikkan sampai bawah kolom
+        # melewati garis langsung X ke Y tertinggi di kolom itu
+        # dengan celah CELAH_PERANTARA, supaya panah langsung lurus
+        # dan tidak terhalang perantara (prioritas langsung,
+        # putus-putus mengalah). Bila tidak ada garis langsung X ke
+        # Y, pusatnya tetap garis - LANGKAH_X.
+        vs_med = kolom[t_med]
+        hs_med = [tinggi_oval(v['nama']) for v in vs_med]
+        pusat_awal = garis - LANGKAH_X
+        pusat_xy = {}
+        for t, vs in kolom.items():
+            if t == t_med:
+                continue
+            for v, c in zip(vs, pusat_kolom[t]):
+                pusat_xy[v.get('kode') or v.get('nama')] = (
+                    x_kolom[t] + LEBAR_KOTAK / 2, c)
+        peran_kode = {v.get('kode') or v.get('nama'): v.get('peran')
+                      for v in variabel}
+        x_med = x_kolom[t_med]
+        y_min_langsung = None
+        for j in model.get('jalur') or []:
+            if str(j.get('jenis') or '').strip().lower() != 'langsung':
+                continue
+            dari, ke = j.get('dari'), j.get('ke')
+            if (peran_kode.get(dari) != 'X'
+                    or peran_kode.get(ke) != 'Y'):
+                continue
+            if dari not in pusat_xy or ke not in pusat_xy:
+                continue
+            (x1, y1), (x2, y2) = pusat_xy[dari], pusat_xy[ke]
+            if x2 == x1:
+                continue
+            for x in (x_med, x_med + LEBAR_KOTAK):
+                y = y1 + (y2 - y1) * (x - x1) / (x2 - x1)
+                y_min_langsung = y if y_min_langsung is None \
+                    else min(y_min_langsung, y)
+        pusat_med = pusat_awal
+        if y_min_langsung is not None:
+            bawah_awal = max(
+                c + h / 2 for c, h in zip(
+                    _pusat_kolom(vs_med, pusat_awal), hs_med))
+            batas_bawah = y_min_langsung - CELAH_PERANTARA
+            if bawah_awal > batas_bawah:
+                pusat_med = pusat_awal - (bawah_awal - batas_bawah)
+        pusat_kolom[t_med] = _pusat_kolom(vs_med, pusat_med)
     kotak: list[dict] = []
     for t in sorted(kolom):
         vs = kolom[t]
-        n = len(vs)
-        # 1 kotak di kolom X klasik (3 kolom ke bawah) di atas garis
-        # tengah; kolom lain 1 kotaknya di garis tengah.
-        klasik_x = (n_kolom <= 3 and t == 0
-                    and all(v.get('peran') == 'X' for v in vs))
-        pusat_satu = (TENGAH_KANVAS - LANGKAH_X) if klasik_x \
-            else TENGAH_KANVAS
-        if n > 4:
-            # Tumpukan padat: oval tetap setinggi oval biasa
-            # (200/240), kanvas tumbuh supaya muat (lihat bawah).
-            ys = _y_tumpukan_padat([v['nama'] for v in vs])
-            hs = [tinggi_oval(v['nama']) for v in vs]
-        else:
-            hs = [tinggi_oval(v['nama']) for v in vs]
-            ys = [round(_pusat_tumpukan(i, n, pusat_satu, max(hs))
-                        - h / 2)
-                  for i, h in enumerate(hs)]
+        hs = [tinggi_oval(v['nama']) for v in vs]
+        ys = [round(c - h / 2)
+              for c, h in zip(pusat_kolom[t], hs)]
         for v, h, y in zip(vs, hs, ys):
             kotak.append({'id': v.get('kode') or v.get('nama'),
                           'nama': v['nama'],

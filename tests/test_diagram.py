@@ -381,10 +381,10 @@ def jalankan():
     kotak = {k['id']: k for k in tata['kotak']}
     cek('tata Nura: 4 kotak (X1, X2, Z, Y)',
         len(tata['kotak']) == 4 and set(kotak) == {'X1', 'X2', 'Z', 'Y'})
-    cek('tata Nura: X kiri, Z tengah, Y kanan, simetris',
+    cek('tata Nura: X kiri, Z di atas, Y kanan, X/Y sejajar',
         kotak['X1']['x'] == 60 and kotak['Z']['x'] == 550
         and kotak['Y']['x'] == 1040
-        and kotak['Z']['y'] + kotak['Z']['h'] / 2 == tata.get('tengah')
+        and kotak['Z']['y'] + kotak['Z']['h'] < tata.get('tengah')
         and kotak['Y']['y'] + kotak['Y']['h'] / 2 == tata.get('tengah')
         and (kotak['X1']['y'] + kotak['X1']['h'] / 2
              + kotak['X2']['y'] + kotak['X2']['h'] / 2) / 2
@@ -781,17 +781,22 @@ def jalankan():
         and len([p for p in pl81 if p['gaya'] == 'lewat'
                  and p['dari'] == 'Z' and p['ke'] == 'Y'
                  and p['label'] == '']) == 1)
-    # H1 (X1 ke Y) kini LURUS lewat atas Z seperti contoh 1 (bukan
-    # dibengkokkan seperti v3): menempel di tengah tepi kanan X1
-    # (y1 = pusat X1), garis lurusnya di atas Z, labelnya di atas Z.
+    # H1 (X1 ke Y) kini LURUS MENDATAR di garis tengah (segitiga
+    # mediasi, template default 18 Nov 12:12): X dan Y sejajar, Z
+    # di atas garis, H1 menempel di tengah tepi kanan X1 (y1 =
+    # pusat X1 = garis tengah), garis lurusnya di bawah Z, labelnya
+    # di garis tengah.
     _h1_81 = [p for p in pl81 if p['label'] == 'H1 (+)']
     _z81 = next(k for k in tata81['kotak'] if k['id'] == 'Z')
     _x1_81 = next(k for k in tata81['kotak'] if k['id'] == 'X1')
-    cek('label H1 sendiri: panah lurus lewat atas Z (contoh 1)',
+    cek('label H1 sendiri: panah lurus mendatar di garis tengah '
+        '(segitiga mediasi)',
         len(_h1_81) == 1
         and _h1_81[0]['y1'] == _x1_81['y'] + _x1_81['h'] / 2
+        and _h1_81[0]['y1'] == _h1_81[0]['y2']
+        and _h1_81[0]['y1'] == tata81.get('tengah')
         and not _h1_81[0].get('rute')
-        and _h1_81[0]['cy'] < _z81['y']
+        and _h1_81[0]['cy'] > _z81['y'] + _z81['h']
         and not GB._segmen_lewat_kotak(
             _h1_81[0]['x1'], _h1_81[0]['y1'], _h1_81[0]['x2'],
             _h1_81[0]['y2'], _z81),
@@ -1072,18 +1077,23 @@ def jalankan():
         _jarak_label_kotak(pl81, tata81) > 0,
         str(round(_jarak_label_kotak(pl81, tata81), 1)))
 
-    # ── 11. Template simetris (contoh skripsi Boss 18 Nov 10:09) ────
-    # Aturan umum di tata_letak (bukan per model): Z dan Y sejajar di
-    # garis tengah, kolom X simetris terhadap garis tengah, ruas yang
-    # menembus kotak dibengkokkan, label yang mendarat di kotak atau
-    # label lain digeser sepanjang garisnya. Matriks: jumlah X 1, 2,
-    # 3, 5, 9 x tanpa Z / dengan Z x langsung / lewat. Bentuk lewat
-    # dengan 3 X atau lebih TIDAK diuji tanpa-tumpuk label: label
-    # berkumpul di segmen Z ke Y (4-10 panah berbagi satu segmen,
-    # celah antar label 26 px atau kurang, lebar label ~104 px)
-    # sehingga satu label per panah tidak muat; jawabannya gaya label
-    # gabungan contoh 6 (putaran multi-tahap). Bentuk 9 X + Z + lewat
-    # juga tidak diuji label-kotak (padat ekstrem yang sama).
+    # ── 11. Template default (Boss 18 Nov 12:12 WIB) ────────────────
+    # Aturan umum di tata_letak (bukan per model): X berhadapan
+    # dengan Y pada SATU garis tengah yang sama (tumpukan X dan Y
+    # simetris terhadap garis itu, berapapun jumlahnya); perantara
+    # M/Z TIDAK di garis itu, melainkan DI ATAS garis (default),
+    # supaya panah langsung X ke Y lurus dan tidak terhalang
+    # perantara. Menggantikan aturan 18 Nov 10:09 (Z dan Y sejajar
+    # di garis tengah). Ruas yang menembus kotak dibengkokkan,
+    # label yang mendarat di kotak atau label lain digeser sepanjang
+    # garisnya. Matriks: jumlah X 1, 2, 3, 5, 9 x tanpa Z / dengan
+    # Z x langsung / lewat. Bentuk lewat dengan 3 X atau lebih TIDAK
+    # diuji tanpa-tumpuk label: label berkumpul di segmen Z ke Y
+    # (4-10 panah berbagi satu segmen, celah antar label 26 px atau
+    # kurang, lebar label ~104 px) sehingga satu label per panah
+    # tidak muat; jawabannya gaya label gabungan contoh 6 (putaran
+    # multi-tahap). Bentuk 9 X + Z + lewat juga tidak diuji
+    # label-kotak (padat ekstrem yang sama).
     def _model_matriks(n_x, dengan_z, lewat):
         nama_x = ['Harga', 'Kualitas', 'Merek', 'Promosi', 'Lokasi',
                   'Pelayanan', 'Suasana', 'Harga Diri', 'Gaya Hidup'][:n_x]
@@ -1127,7 +1137,7 @@ def jalankan():
                 _t_mat = DG.tata_letak(_m_mat)
                 _k_mat = {k['id']: k for k in _t_mat['kotak']}
                 _pl_mat = GB.penempatan_label(_t_mat)
-                # Garis tengah = 'tengah' dari tata_letak (pusat Z/Y);
+                # Garis tengah = 'tengah' dari tata_letak (pusat X/Y);
                 # kanvas kini memeluk isi, jadi garis tengah bukan
                 # lagi tinggi kanvas // 2.
                 _tinggi_mat = _t_mat.get('tinggi') or 800
@@ -1136,9 +1146,11 @@ def jalankan():
                     _n_x, ' + Z' if _dengan_z else '',
                     ' + lewat' if _lewat else '')
                 if _dengan_z:
-                    cek('matriks %s: Z dan Y di garis tengah' % _tag,
-                        _pusat(_k_mat['Z']) == _tengah
-                        and _pusat(_k_mat['Y']) == _tengah,
+                    cek('matriks %s: Y di garis tengah, Z di atas '
+                        'garis' % _tag,
+                        _pusat(_k_mat['Y']) == _tengah
+                        and _k_mat['Z']['y'] + _k_mat['Z']['h']
+                        < _tengah,
                         str((_pusat(_k_mat['Z']), _pusat(_k_mat['Y']))))
                 else:
                     cek('matriks %s: Y di garis tengah' % _tag,
@@ -1147,8 +1159,8 @@ def jalankan():
                 _xs_mat = [k for k in _t_mat['kotak']
                            if k['peran'] == 'X']
                 if _n_x == 1:
-                    cek('matriks %s: 1 X di atas garis tengah' % _tag,
-                        _pusat(_xs_mat[0]) == _tengah - 250,
+                    cek('matriks %s: 1 X di garis tengah' % _tag,
+                        _pusat(_xs_mat[0]) == _tengah,
                         str(_pusat(_xs_mat[0])))
                 elif _n_x <= 4:
                     _c = [_pusat(k) for k in _xs_mat]
@@ -1176,19 +1188,14 @@ def jalankan():
                                 _kena.append((_p['label'], _j, _k['id']))
                 cek('matriks %s: tidak ada ruas menembus kotak' % _tag,
                     not _kena, str(_kena))
-                # Panah langsung lurus, kecuali X tengah yang segaris
-                # dengan Z dan Y (3/5/9 X + Z): garis lurus dari tepi
-                # kanan/kiri hanya berjarak ~4 px dari atas Z, jadi
-                # jalannya tetap dibengkokkan lewat atas Z
-                # (pengecualian yang didokumentasikan, bukan cacat).
+                # Panah langsung SEMUA lurus (pengecualian segaris
+                # putaran 4 HILANG: Z kini di atas garis, bukan di
+                # garis tengah, jadi garis lurus X tengah ke Y tidak
+                # lagi terhalang Z; template default 18 Nov 12:12).
                 _bengkok_mat = [(p['label'], p['dari'], p['ke'])
                                 for p in _pl_mat if p.get('rute')]
-                _tengah_x = (_n_x + 1) // 2
-                _bengkok_harap = (
-                    [('H%d (+)' % _tengah_x, 'X%d' % _tengah_x, 'Y')]
-                    if _dengan_z and _n_x in (3, 5, 9) else [])
-                cek('matriks %s: panah lurus kecuali X tengah' % _tag,
-                    _bengkok_mat == _bengkok_harap,
+                cek('matriks %s: semua panah lurus' % _tag,
+                    _bengkok_mat == [],
                     str(_bengkok_mat))
                 # Label tidak menyentuh kotak, kecuali 9 X + Z + lewat
                 # (padat ekstrem, lihat catatan di atas).
@@ -1206,22 +1213,18 @@ def jalankan():
                     cek('matriks %s: tidak ada label bertumpuk' % _tag,
                         _celah_min(_pl_mat) >= 0,
                         str(round(_celah_min(_pl_mat), 1)))
-    # 3 X + Z: panah langsung X tengah (di garis tengah, segaris
-    # dengan Z dan Y) TIDAK BISA lurus: titik tempel tertinggi di
-    # tepi kanan/kiri hanya 4 px di atas Z, jadi jalannya tetap
-    # dibengkokkan lewat atas Z (3 titik: naik, datar di atas Z,
-    # turun), semuanya di atas Z. Ini pengecualian yang
-    # didokumentasikan (garis lurus tidak mungkin dengan jarak
-    # yang layak), bukan cacat; panah langsung lain lurus.
+    # 3 X + Z: panah langsung X tengah (di garis tengah) kini LURUS
+    # mendatar: Z pindah ke atas garis (template default 18 Nov
+    # 12:12), jadi garis lurus X tengah ke Y tidak lagi terhalang
+    # Z; pengecualian segaris putaran 4 HILANG untuk mediasi 3
+    # kolom (tetap ada untuk rantai multi-kolom, lihat contoh 5).
     _m3 = _model_matriks(3, True, False)
     _t3 = DG.tata_letak(_m3)
     _pl3 = GB.penempatan_label(_t3)
     _tengah3 = [p for p in _pl3 if p['label'] == 'H2 (+)']
-    _z3 = next(k for k in _t3['kotak'] if k['id'] == 'Z')
-    cek('3 X + Z: panah X tengah dibengkokkan lewat atas Z '
-        '(pengecualian segaris)',
-        len(_tengah3) == 1 and len(_tengah3[0].get('rute') or []) >= 1
-        and all(r[1] < _z3['y'] for r in _tengah3[0]['rute']),
+    cek('3 X + Z: panah X tengah lurus mendatar (bukan dibengkokkan)',
+        len(_tengah3) == 1 and not _tengah3[0].get('rute')
+        and _tengah3[0]['y1'] == _tengah3[0]['y2'],
         str(_tengah3))
 
     # ── 12. Template multi-tahap (N kolom, contoh 4 dan 5) ─────────
@@ -1308,8 +1311,12 @@ def jalankan():
 
     def _kolom_simetris(tata):
         # Simetri terhadap garis tengah ('tengah' dari tata_letak,
-        # pusat Z/Y); kanvas kini memeluk isi, jadi garis tengah
-        # bukan lagi tinggi // 2.
+        # pusat X/Y); kanvas kini memeluk isi, jadi garis tengah
+        # bukan lagi tinggi // 2. Untuk rantai multi-kolom
+        # (Goal-Directed, contoh 5) kolom perantara tetap simetris:
+        # perantaranya membentuk rantai utama, bukan penghalang
+        # garis langsung X ke Y (pengecualian template default,
+        # lihat tata_letak di app/diagram.py).
         tinggi = tata.get('tinggi') or 800
         tengah = tata.get('tengah', tinggi / 2)
         kolom = {}
@@ -1498,12 +1505,12 @@ def jalankan():
                 if k['peran'] == 'X'),
         str((_t5b.get('tinggi'), [k['h'] for k in _t5b['kotak']])))
     _t9b = DG.tata_letak(_model_matriks(9, True, True))
-    cek('oval 9 X + Z + lewat: kanvas tumbuh, Z/Y tetap di garis tengah',
+    _k9b = {k['id']: k for k in _t9b['kotak']}
+    cek('oval 9 X + Z + lewat: kanvas tumbuh, Y di garis tengah, '
+        'Z di atas garis',
         _t9b.get('tinggi', 800) > 800
-        and _pusat({k['id']: k for k in _t9b['kotak']}['Z'])
-        == _t9b.get('tengah')
-        and _pusat({k['id']: k for k in _t9b['kotak']}['Y'])
-        == _t9b.get('tengah'),
+        and _k9b['Z']['y'] + _k9b['Z']['h'] < _t9b.get('tengah')
+        and _pusat(_k9b['Y']) == _t9b.get('tengah'),
         str(_t9b.get('tinggi')))
     # PNG ikut tinggi kanvas (bukan 800 tetap).
     _png13 = GB.gambar_panah(model5, _t5b)
@@ -1564,6 +1571,84 @@ def jalankan():
     cek('PNG akhir editor: tinggi memeluk isi (bukan 800)',
         _tm14['tinggi'] == 488 and _img14.size[1] == 488,
         str((_tm14['tinggi'], _img14.size)))
+
+    # ── 15. Template default X-Y sejajar, M/Z di atas (Boss 18 Nov
+    # 12:12 WIB) ───────────────────────────────────────────────────
+    # X berhadapan dengan Y pada SATU garis tengah yang sama,
+    # berapapun jumlah X dan Y; M/Z di atas garis (default), bukan
+    # di garisnya; panah langsung diprioritaskan (lurus, tidak
+    # terhalang perantara). Menggantikan aturan 18 Nov 10:09
+    # (Z dan Y sejajar di garis tengah).
+    # 2 Y dalam mediasi 3 kolom (dict langsung, bypass
+    # normalisasi_model yang menolak lebih dari 1 Y): Y1/Y2
+    # simetris terhadap garis tengah, X di garis tengah, Z di atas
+    # garis, semua panah lurus.
+    _m2y = {
+        'variabel': [
+            {'nama': 'Harga', 'peran': 'X', 'kode': 'X1'},
+            {'nama': 'Minat Beli', 'peran': 'Z', 'kode': 'Z'},
+            {'nama': 'Keputusan Beli', 'peran': 'Y', 'kode': 'Y1'},
+            {'nama': 'Kepuasan', 'peran': 'Y', 'kode': 'Y2'}],
+        'jalur': [
+            {'dari': 'X1', 'ke': 'Y1', 'hipotesis': 'H1',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X1', 'ke': 'Y2', 'hipotesis': 'H2',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X1', 'ke': 'Z', 'hipotesis': 'H3',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'Z', 'ke': 'Y1', 'hipotesis': 'H4',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'Z', 'ke': 'Y2', 'hipotesis': 'H5',
+             'jenis': 'langsung', 'arah': '+'}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _t2y = DG.tata_letak(_m2y)
+    _k2y = {k['id']: k for k in _t2y['kotak']}
+    _pl2y = GB.penempatan_label(_t2y)
+    cek('template 2 Y: X di garis tengah, Y1/Y2 simetris, Z di atas',
+        _pusat(_k2y['X1']) == _t2y.get('tengah')
+        and _pusat(_k2y['Y1']) + _pusat(_k2y['Y2'])
+        == 2 * _t2y.get('tengah')
+        and _k2y['Z']['y'] + _k2y['Z']['h'] < _t2y.get('tengah'),
+        str({k: _pusat(v) for k, v in _k2y.items()}))
+    cek('template 2 Y: semua panah lurus',
+        not any(p.get('rute') for p in _pl2y),
+        str([(p['label'], p['dari'], p['ke'])
+             for p in _pl2y if p.get('rute')]))
+    # Segitiga mediasi Asih: X dan Y sejajar di garis tengah, Z
+    # seluruhnya di atas garis, H1 lurus mendatar.
+    _k81b = {k['id']: k for k in tata81['kotak']}
+    cek('template Asih: X dan Y sejajar di garis tengah',
+        _pusat(_k81b['X1']) == tata81.get('tengah')
+        and _pusat(_k81b['Y']) == tata81.get('tengah'),
+        str((_pusat(_k81b['X1']), _pusat(_k81b['Y']))))
+    cek('template Asih: Z seluruhnya di atas garis tengah',
+        _k81b['Z']['y'] + _k81b['Z']['h'] < tata81.get('tengah'),
+        str((_k81b['Z']['y'], _k81b['Z']['h'])))
+    # Nura: X1/X2 simetris, Y di garis tengah, Z di atas garis.
+    _t15n = DG.tata_letak(model_nl)
+    _k15n = {k['id']: k for k in _t15n['kotak']}
+    cek('template Nura: X1/X2 simetris, Y di garis tengah, Z di atas',
+        _pusat(_k15n['X1']) + _pusat(_k15n['X2'])
+        == 2 * _t15n.get('tengah')
+        and _pusat(_k15n['Y']) == _t15n.get('tengah')
+        and _k15n['Z']['y'] + _k15n['Z']['h'] < _t15n.get('tengah'),
+        str({k: _pusat(v) for k, v in _k15n.items()}))
+    # Pengecualian rantai multi-kolom (didokumentasikan, bukan
+    # pelanggaran): perantara Goal-Directed membentuk rantai utama,
+    # jadi kolomnya tetap simetris terhadap garis tengah, termasuk
+    # M6 yang pusatnya di garis tengah; X1 dan Y1/Y2 tetap sejajar
+    # di garis tengah.
+    _tg15 = DG.tata_letak(_goal)
+    _kg15 = {k['id']: k for k in _tg15['kotak']}
+    cek('template multi-kolom: X1 dan Y1/Y2 sejajar di garis tengah',
+        _pusat(_kg15['X1']) == _tg15.get('tengah')
+        and _pusat(_kg15['Y1']) + _pusat(_kg15['Y2'])
+        == 2 * _tg15.get('tengah'),
+        str({k: _pusat(v) for k, v in _kg15.items()}))
+    cek('template multi-kolom: M6 Goal-Directed tetap di garis '
+        'tengah (rantai, bukan penghalang)',
+        _pusat(_kg15['M6']) == _tg15.get('tengah'),
+        str(_pusat(_kg15['M6'])))
 
 
 if __name__ == '__main__':
