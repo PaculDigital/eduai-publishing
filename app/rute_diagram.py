@@ -144,10 +144,22 @@ async def diagram_model_halaman(
 ):
     fb = _berkas(db, fid, u.id)
     model, sumber = _model_awal(db, u.id, fid)
+    normal, _m = DG.normalisasi_model(model)
+    tampil = normal if normal is not None else DG.model_tampilan(model)
     return _tpl.TemplateResponse(
         'diagram_model.html',
-        {'request': request, 'berkas': fb, 'model': model,
-         'sumber': sumber})
+        {'request': request, 'berkas': fb, 'model': tampil,
+         'sumber': sumber,
+         'pesan': request.query_params.get('pesan') or ''})
+
+
+def _ambil(daftar: list, i: int) -> str:
+    """Ambil butir ke-i dari daftar formulir ('' bila tidak ada).
+
+    Daftar formulir bisa beda panjang (mis. halaman lama yang belum
+    punya kolom Lewat); jalur tidak boleh hilang diam-diam karenanya.
+    """
+    return str(daftar[i]) if i < len(daftar) else ''
 
 
 @router.post('/naskah/{fid}/diagram/model')
@@ -157,25 +169,34 @@ async def diagram_model_simpan(
     vp: list[str] = Form(default=[]),
     jd: list[str] = Form(default=[]),
     jk: list[str] = Form(default=[]),
+    jl: list[str] = Form(default=[]),
     jh: list[str] = Form(default=[]),
     ja: list[str] = Form(default=[]),
     u: User = Depends(wajib_login),
     db: Session = Depends(get_db),
 ):
-    _berkas(db, fid, u.id)
+    fb = _berkas(db, fid, u.id)
     lama, _sumber = _model_awal(db, u.id, fid)
-    data = {'variabel': [{'nama': n, 'peran': p}
-                         for n, p in zip(vn, vp)],
-            'jalur': [{'dari': a, 'ke': b, 'hipotesis': h, 'arah': r}
-                      for a, b, h, r in zip(jd, jk, jh, ja)],
+    data = {'variabel': [{'nama': _ambil(vn, i), 'peran': _ambil(vp, i)}
+                         for i in range(max(len(vn), len(vp)))],
+            'jalur': [{'dari': _ambil(jd, i), 'ke': _ambil(jk, i),
+                       'lewat': _ambil(jl, i), 'hipotesis': _ambil(jh, i),
+                       'arah': _ambil(ja, i)}
+                      for i in range(max(len(jd), len(jk), len(jl),
+                                         len(jh), len(ja)))],
             'jenis': lama.get('jenis') or '',
             'desain': lama.get('desain') or ''}
     model, masalah = DG.normalisasi_model(data)
     if model is None:
+        # Tampilkan lagi formulir dengan isian yang sama (bukan
+        # redirect): Dari/Ke/Lewat tidak boleh hilang saat validasi
+        # gagal, supaya mahasiswa tidak mengisi ulang 7 baris.
         pesan = ' '.join(masalah[:2])
-        return RedirectResponse(
-            f'/naskah/{fid}/diagram/model?pesan={_pesan_ke(pesan)}',
-            status_code=303)
+        return _tpl.TemplateResponse(
+            'diagram_model.html',
+            {'request': request, 'berkas': fb,
+             'model': DG.model_tampilan(data), 'sumber': _sumber,
+             'pesan': pesan})
     DG.simpan_model(db, fid, model)
     return RedirectResponse(f'/naskah/{fid}/diagram/editor?jenis=model',
                             status_code=303)

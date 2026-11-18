@@ -1,5 +1,8 @@
 {# Formulir kecil Model Penelitian (17 Nov 2026).
-   Kata pendek, Bahasa Indonesia polos. #}
+   Kata pendek, Bahasa Indonesia polos.
+   Pilihan Dari/Ke/Lewat memakai kode (X1, X2, Z, Y) sebagai nilai,
+   teksnya "Nama (Kode)": pilihan tidak hilang bila nama diubah,
+   dan validasi gagal pun isian ditampilkan lagi apa adanya. #}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -19,7 +22,7 @@
 </head>
 <body>
 <h2>Model Penelitian</h2>
-{% if request.query_params.get('pesan') %}<div class="pesan">{{ request.query_params.get('pesan') }}</div>{% endif %}
+{% if pesan %}<div class="pesan">{{ pesan }}</div>{% endif %}
 {% if sumber == 'naskah' %}<p>Diisi dari naskah, periksa dulu.</p>{% endif %}
 <form method="post" action="/naskah/{{ berkas.id }}/diagram/model">
   <h3>Variabel</h3>
@@ -28,7 +31,7 @@
     {% for v in model.variabel %}
     <tr>
       <td><input type="text" name="vn" value="{{ v.nama }}" oninput="segarkanPilihan()"></td>
-      <td><select name="vp">
+      <td><select name="vp" onchange="segarkanPilihan()">
         <option value="X" {% if v.peran == 'X' %}selected{% endif %}>X (bebas)</option>
         <option value="Z" {% if v.peran in ('Z', 'M') %}selected{% endif %}>Z (perantara)</option>
         <option value="Y" {% if v.peran == 'Y' %}selected{% endif %}>Y (hasil)</option>
@@ -41,14 +44,15 @@
 
   <h3>Hipotesis</h3>
   <table id="tabel-hipotesis">
-    <tr><th>Dari</th><th>Ke</th><th>Label</th><th>Arah</th><th></th></tr>
+    <tr><th>Dari</th><th>Ke</th><th>Lewat</th><th>Label</th><th>Arah</th><th></th></tr>
     {% for j in model.jalur %}
     <tr>
-      <td><select name="jd" class="pilih-variabel" data-awal="{{ j.dari }}"></select></td>
-      <td><select name="jk" class="pilih-variabel" data-awal="{{ j.ke }}"></select></td>
+      <td><select name="jd" class="pilih-variabel" data-awal="{{ j.dari }}" onchange="pilihBerubah(this)"></select></td>
+      <td><select name="jk" class="pilih-variabel" data-awal="{{ j.ke }}" onchange="pilihBerubah(this)"></select></td>
+      <td><select name="jl" class="pilih-variabel pilih-lewat" data-awal="{{ j.lewat or '' }}" onchange="pilihBerubah(this)"></select></td>
       <td><input type="text" name="jh" value="{{ j.hipotesis }}"></td>
       <td><select name="ja">
-        <option value="" {% if not j.arah %}selected{% endif %}>-</option>
+        <option value="" {% if not j.arah %}selected{% endif %}>Tanpa arah</option>
         <option value="+" {% if j.arah == '+' %}selected{% endif %}>+</option>
         <option value="-" {% if j.arah == '-' %}selected{% endif %}>-</option>
       </select></td>
@@ -62,23 +66,44 @@
   <a href="/naskah/{{ berkas.id }}/diagram">Batal</a></p>
 </form>
 <script>
-function namaVariabel() {
+function barisVariabel() {
   var keluar = [];
-  document.querySelectorAll('#tabel-variabel input[name="vn"]').forEach(function (el) {
-    var t = (el.value || '').trim();
-    if (t) keluar.push(t);
+  var nX = 0;
+  document.querySelectorAll('#tabel-variabel tr').forEach(function (tr) {
+    var nama = tr.querySelector('input[name="vn"]');
+    var peran = tr.querySelector('select[name="vp"]');
+    if (!nama) return;
+    var t = (nama.value || '').trim();
+    if (!t) return;
+    var p = peran ? peran.value : 'X';
+    var kode = 'Y';
+    if (p === 'X') { nX += 1; kode = 'X' + nX; }
+    else if (p === 'Z') { kode = 'Z'; }
+    keluar.push({nama: t, peran: p, kode: kode});
   });
   return keluar;
 }
 function isiPilihan(sel, nilai) {
-  var nama = namaVariabel();
+  var daftar = barisVariabel();
   sel.innerHTML = '';
-  nama.forEach(function (n) {
+  if (sel.classList.contains('pilih-lewat')) {
+    var kosong = document.createElement('option');
+    kosong.value = ''; kosong.textContent = 'Tidak ada';
+    if (!nilai) kosong.selected = true;
+    sel.appendChild(kosong);
+  }
+  daftar.forEach(function (v) {
     var o = document.createElement('option');
-    o.value = n; o.textContent = n;
-    if (n === nilai) o.selected = true;
+    o.value = v.kode;
+    o.dataset.nama = v.nama;
+    o.textContent = v.nama + ' (' + v.kode + ')';
+    if (v.nama === nilai || v.kode === nilai) o.selected = true;
     sel.appendChild(o);
   });
+}
+function pilihBerubah(sel) {
+  var pilih = sel.options[sel.selectedIndex];
+  sel.dataset.awal = (pilih && pilih.dataset.nama) || sel.value;
 }
 function segarkanPilihan() {
   document.querySelectorAll('select.pilih-variabel').forEach(function (sel) {
@@ -90,7 +115,7 @@ function tambahVariabel() {
   var t = document.getElementById('tabel-variabel');
   var tr = document.createElement('tr');
   tr.innerHTML = '<td><input type="text" name="vn" oninput="segarkanPilihan()"></td>'
-    + '<td><select name="vp"><option value="X">X (bebas)</option>'
+    + '<td><select name="vp" onchange="segarkanPilihan()"><option value="X">X (bebas)</option>'
     + '<option value="Z">Z (perantara)</option>'
     + '<option value="Y">Y (hasil)</option></select></td>'
     + '<td><button class="tombol kedua" type="button" onclick="hapusBaris(this)">Hapus</button></td>';
@@ -100,10 +125,11 @@ function tambahHipotesis() {
   var t = document.getElementById('tabel-hipotesis');
   var n = t.querySelectorAll('tr').length;
   var tr = document.createElement('tr');
-  tr.innerHTML = '<td><select name="jd" class="pilih-variabel"></select></td>'
-    + '<td><select name="jk" class="pilih-variabel"></select></td>'
+  tr.innerHTML = '<td><select name="jd" class="pilih-variabel" onchange="pilihBerubah(this)"></select></td>'
+    + '<td><select name="jk" class="pilih-variabel" onchange="pilihBerubah(this)"></select></td>'
+    + '<td><select name="jl" class="pilih-variabel pilih-lewat" onchange="pilihBerubah(this)"></select></td>'
     + '<td><input type="text" name="jh" value="H' + n + '"></td>'
-    + '<td><select name="ja"><option value="">-</option><option value="+">+</option><option value="-">-</option></select></td>'
+    + '<td><select name="ja"><option value="">Tanpa arah</option><option value="+">+</option><option value="-">-</option></select></td>'
     + '<td><button class="tombol kedua" type="button" onclick="hapusBaris(this)">Hapus</button></td>';
   t.appendChild(tr);
   segarkanPilihan();
