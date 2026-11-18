@@ -21,7 +21,9 @@ Aturan yang diuji (RENCANA_DIAGRAM_MODEL_DESAIN.md + keputusan Boss):
   Sederhana (Boss 17 Nov 09:26 WIB): label pendek Bahasa Indonesia polos.
 """
 import io
+import json
 import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -1860,6 +1862,104 @@ def jalankan():
         == 'atas',
         str(DG.tata_letak(model81, posisi_z='tengah')
             .get('posisi_z')))
+
+    # Bagian 17: cermin label editor JS vs PNG (Boss 18 Nov 13:42 WIB,
+    # samakan posisi label editor dan PNG). Editor JS
+    # (app/templates/diagram_editor.html) harus menaruh pusat label
+    # (cx, cy) di titik yang persis sama dengan PNG
+    # (GB.penempatan_label). Dulu beda sampai 143 px (contoh 5 H2)
+    # karena kotak tabrakan JS digeser ke atas (cy-28..cy-2) dan
+    # panah tanpa label tidak digeser/dicatat, sementara Python
+    # memusatkan kotak di titik label dan menggeser semua panah.
+    # Perbaikan di JS: kotak tabrakan dipusatkan seperti Python
+    # (lebar dari tabel huruf PIL, tinggi 20/16/0), urutan
+    # penempatan per kelompok + susunan, panah tanpa label ikut
+    # digeser dan dicatat (kotak 12x8). Cek lewat Node
+    # (tests/cermin_editor.js, fungsi geometri diekstrak dari
+    # template) untuk 20 bentuk; toleransi 0,5 px.
+    def _cermin_js(_tata, _n):
+        _masuk = {'kotak': _tata['kotak'], 'panah': _tata['panah'],
+                  'tinggi': _tata.get('tinggi') or 800,
+                  'lebar': _tata.get('lebar') or 1400}
+        _jalan = os.path.join(TMP, 'cermin_%02d.json' % _n)
+        with open(_jalan, 'w') as _f:
+            json.dump(_masuk, _f)
+        try:
+            _out = subprocess.run(
+                ['node', str(ROOT / 'tests' / 'cermin_editor.js'),
+                 _jalan, str(ROOT / 'app' / 'templates'
+                             / 'diagram_editor.html')],
+                capture_output=True, text=True, timeout=60)
+        except FileNotFoundError:
+            return None, 'node tidak ada'
+        if _out.returncode != 0:
+            return None, _out.stderr.strip()[:200]
+        return json.loads(_out.stdout), ''
+
+    def _banding_cermin(_nama, _model, _n):
+        _tata = DG.tata_letak(_model)
+        _py = GB.penempatan_label(_tata)
+        _js, _err = _cermin_js(_tata, _n)
+        if _js is None:
+            cek('cermin label %s: JS jalan' % _nama, False, _err)
+            return
+        cek('cermin label %s: jumlah panah sama' % _nama,
+            len(_py) == len(_js),
+            'py=%d js=%d' % (len(_py), len(_js)))
+        if len(_py) != len(_js):
+            return
+        # Pasangkan per (dari, ke, label, gaya); bila ganda, pilih
+        # pasangan dengan selisih geometri terkecil.
+        def _kunci(_r):
+            return (_r['dari'], _r['ke'], _r.get('label', ''),
+                    _r.get('gaya', ''))
+        _sisa = {}
+        for _r in _js:
+            _sisa.setdefault(_kunci(_r), []).append(_r)
+        _maks = 0.0
+        _buruk = ''
+        for _a in _py:
+            _k = _kunci(_a)
+            if _k not in _sisa or not _sisa[_k]:
+                cek('cermin label %s: panah %s ada di JS' % (_nama, _k),
+                    False, str(_k))
+                return
+            def _beda(_b):
+                _j = abs(_a['x1'] - _b['x1']) + abs(_a['y1'] - _b['y1'])
+                _j += abs(_a['x2'] - _b['x2']) + abs(_a['y2'] - _b['y2'])
+                if len(_a['rute']) != len(_b['rute']):
+                    _j += 1000.0
+                else:
+                    for _p, _q in zip(_a['rute'], _b['rute']):
+                        _j += abs(_p[0] - _q[0]) + abs(_p[1] - _q[1])
+                return _j
+            _b = min(_sisa[_k], key=_beda)
+            _sisa[_k].remove(_b)
+            for _f in ('cx', 'cy'):
+                _d = abs(_a[_f] - _b[_f])
+                if _d > _maks:
+                    _maks = _d
+                    _buruk = '%s %s py=%.3f js=%.3f' % (
+                        _k, _f, _a[_f], _b[_f])
+        cek('cermin label %s: pusat label sama (maks %.3f px, %d panah)'
+            % (_nama, _maks, len(_py)), _maks <= 0.5, _buruk)
+
+    _bentuk_cermin = [
+        ('Asih', model81), ('Nura lewat Z', model_nl),
+        ('Goal-Directed', _goal), ('contoh 5', _c5),
+        ('2 Y', _m2y),
+    ]
+    for _nx, _ada_z, _lewat in (
+            (1, False, False), (1, True, False), (1, True, True),
+            (2, False, False), (2, True, False), (2, True, True),
+            (3, False, False), (3, True, False), (3, True, True),
+            (5, False, False), (5, True, False), (5, True, True),
+            (9, False, False), (9, True, False), (9, True, True)):
+        _bentuk_cermin.append(
+            ('matriks %d X Z=%s lewat=%s' % (_nx, _ada_z, _lewat),
+             _model_matriks(_nx, _ada_z, _lewat)))
+    for _n, (_nama, _model) in enumerate(_bentuk_cermin):
+        _banding_cermin(_nama, _model, _n)
 
 
 if __name__ == '__main__':

@@ -338,19 +338,36 @@ function ruteBengkok(x1, y1, x2, y2, dy, kotak, dariId, keId) {
   }
   return titik.slice(1, -1);
 }
+// Lebar huruf DejaVu Sans Bold 22 (sama dengan font PIL di
+// app/gambar.py, diukur dengan textbbox). Lebar label = jumlah
+// lebar huruf + 1 (sama persis dengan PIL untuk semua label
+// hipotesis; hanya pasangan kern 'DZ' beda 1 px).
+var LEBAR_HURUF = {A:17,B:17,C:16,D:18,E:15,F:15,G:18,H:18,I:8,J:10,K:18,L:14,M:22,N:18,O:19,P:16,Q:19,R:17,S:16,T:15,U:18,V:17,W:24,X:17,Y:18,Z:16,'0':15,'1':15,'2':15,'3':15,'4':15,'5':15,'6':15,'7':15,'8':15,'9':15,' ':8,'(':10,')':10,'+':18,'-':9};
+function lebarLabel(teks) {
+  if (!teks) return 0;
+  var w = 1;
+  for (var i = 0; i < teks.length; i++) w += LEBAR_HURUF[teks[i]] || 13;
+  return w;
+}
+function tinggiLabel(teks) {
+  // Tinggi teks DejaVu Sans Bold 22 (textbbox PIL): kurung '(' ')'
+  // melampaui huruf (lh 20), tanpa kurung lh 16; tanpa label 0.
+  if (!teks) return 0;
+  return teks.indexOf('(') >= 0 ? 20 : 16;
+}
 function geserLabelBebas(titik, mx, my, label, kotak, sudah) {
   // Geser label sepanjang polilinia sampai tidak menabrak kotak
   // maupun label yang sudah ditempatkan. Cari dulu posisi dengan
   // celah 10 px antar label; bila tidak ada, pakai posisi bebas
-  // pertama (tanpa tumpuk). (mx, my) = titik garis; teks digambar
-  // di (mx, my - 8), bbox y-20 sampai y+6 dari posisi teks (seperti
-  // uji). Sama dengan _geser_label_bebas di app/gambar.py (di sana
-  // bbox berpusat di titik label).
-  var setengahW = (label.length * 13) / 2 + 6;
+  // pertama (tanpa tumpuk). (mx, my) = titik garis; kotak tabrakan
+  // berpusat di titik label (setengah lebar + 6, setengah tinggi
+  // + 4), sama dengan _geser_label_bebas di app/gambar.py.
+  var setengahW = lebarLabel(label) / 2 + 6;
+  var setengahH = tinggiLabel(label) / 2 + 4;
   function bebas(cx, cy, jeda) {
     jeda = jeda || 0;
-    var kiri = cx - setengahW, atas = cy - 28;
-    var kanan = cx + setengahW, bawah = cy - 2;
+    var kiri = cx - setengahW, atas = cy - setengahH;
+    var kanan = cx + setengahW, bawah = cy + setengahH;
     for (var i = 0; i < kotak.length; i++) {
       var k = kotak[i];
       if (!(kanan <= k.x || kiri >= k.x + k.w
@@ -365,7 +382,7 @@ function geserLabelBebas(titik, mx, my, label, kotak, sudah) {
     return true;
   }
   function cari(jeda) {
-    if (!label || bebas(mx, my, jeda)) return [mx, my];
+    if (bebas(mx, my, jeda)) return [mx, my];
     var panjang = panjangPolilinia(titik);
     var s0 = panjang / 2, langkah = 12, k = 1;
     while (k * langkah <= panjang / 2 + langkah) {
@@ -464,7 +481,17 @@ function gambarUlang() {
     return {id: k.id, x: k.x, y: k.y, w: k.w, h: tinggi[k.id]};
   });
   var labelSudah = [];
-  daftar.forEach(function (p, idx) {
+  // Urutan penempatan label sama dengan penempatan_label di
+  // app/gambar.py: per kelompok (dari, ke) + susunan, bukan urutan
+  // daftar panah (daftar mencampur segmen langsung dan lewat).
+  var urutanLabel = [];
+  Object.keys(kelompok).forEach(function (kunci) {
+    susunanKelompok(kelompok[kunci], daftar).forEach(function (idx) {
+      urutanLabel.push(idx);
+    });
+  });
+  urutanLabel.forEach(function (idx) {
+    var p = daftar[idx];
     var a = peta[p.dari], b = peta[p.ke];
     if (!a || !b || !garis[idx]) return;
     var u = garis[idx];
@@ -508,18 +535,22 @@ function gambarUlang() {
       if (p.gaya === 'putus' || p.gaya === 'lewat') g.setAttribute('stroke-dasharray', '12 10');
     }
     lp.appendChild(g);
+    // Geser label bila menabrak kotak/label lain (aturan umum).
+    // Python menggeser dan mencatat SEMUA panah, termasuk segmen
+    // kedua jalur tidak langsung yang tanpa label (kotak 12x8).
+    var pos = (JENIS === 'model')
+      ? geserLabelBebas(titik, mx, my, p.label || '', kotakGambar, labelSudah)
+      : [mx, my];
     if (p.label) {
-      // Geser label bila menabrak kotak/label lain (aturan umum).
-      var pos = (JENIS === 'model')
-        ? geserLabelBebas(titik, mx, my, p.label, kotakGambar, labelSudah)
-        : [mx, my];
       var t = el('text', {x: pos[0], y: pos[1] - 8, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 'bold', fill: '#10222e'});
       t.textContent = p.label;
       lp.appendChild(t);
-      labelSudah.push({kiri: pos[0] - (p.label.length * 13) / 2 - 6,
-                       atas: pos[1] - 28,
-                       kanan: pos[0] + (p.label.length * 13) / 2 + 6,
-                       bawah: pos[1] - 2});
+    }
+    if (JENIS === 'model' || p.label) {
+      labelSudah.push({kiri: pos[0] - lebarLabel(p.label || '') / 2 - 6,
+                       atas: pos[1] - tinggiLabel(p.label || '') / 2 - 4,
+                       kanan: pos[0] + lebarLabel(p.label || '') / 2 + 6,
+                       bawah: pos[1] + tinggiLabel(p.label || '') / 2 + 4});
     }
   });
   state.kotak.forEach(function (k) {
