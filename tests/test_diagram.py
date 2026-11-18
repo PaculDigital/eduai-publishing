@@ -834,6 +834,74 @@ def jalankan():
                 for i in range(len(xs6) - 1)),
         str([(k['nama'], k['y'], k['h']) for k in xs6]))
 
+    # ── 9. Label Nura lewat Z + spanduk basi (uji draf 18 Nov 09:18) ──────
+    # Bentuk LIVE model Nura: H6/H7 lewat Z (2 segmen), bukan H6/H7 tanpa
+    # lewat seperti MODEL_NURA (7 panah, 1 segmen). Tiga titik tumpuk di
+    # kode lama: H6 atas H1 (X1 ke Z), H7 atas H2 (X2 ke Z), H7 atas H3
+    # (Z ke Y). Perbaikan label putaran 3 (kelompok segmen sama + geser
+    # tegak lurus) sudah mencakup bentuk ini tanpa ubah kode: dibuktikan
+    # tes ini (PNG) dan jsdom editor 4/4 (skrip scratch /tmp/dg4).
+    nura_lewat = {
+        'variabel': MODEL_NURA['variabel'],
+        'jalur': [dict(j, lewat='Keterlibatan Pelanggan')
+                  if j['hipotesis'] in ('H6', 'H7') else dict(j)
+                  for j in MODEL_NURA['jalur']],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    model_nl, _ = DG.normalisasi_model(nura_lewat)
+    tata_nl = DG.tata_letak(model_nl)
+    cek('tata Nura lewat Z: 9 panah (5 langsung + 2x2 segmen lewat)',
+        len(tata_nl['panah']) == 9
+        and len([p for p in tata_nl['panah'] if p['gaya'] == 'lewat']) == 4,
+        str(tata_nl['panah']))
+    pl_nl = GB.penempatan_label(tata_nl)
+    cek('label Nura lewat Z: 9 label (H1-H5, H6x2, H7x2)',
+        len(pl_nl) == 9
+        and sorted(p['label'] for p in pl_nl) == sorted(
+            ['H1 (+)', 'H2 (+)', 'H3 (+)', 'H4 (+)', 'H5 (+)',
+             'H6 (+)', 'H6 (+)', 'H7 (+)', 'H7 (+)']),
+        str([p['label'] for p in pl_nl]))
+    tumpang_nl = [(a['label'], b['label'])
+                  for i, a in enumerate(pl_nl) for b in pl_nl[i + 1:]
+                  if _tumpang(a, b)]
+    cek('label Nura lewat Z: tidak ada pasangan bertumpuk (PNG, 36 pasang)',
+        not tumpang_nl, str(tumpang_nl))
+
+    def _segmen_sama(a, b):
+        return (a['x1'], a['y1'], a['x2'], a['y2']) == (
+            b['x1'], b['y1'], b['x2'], b['y2'])
+
+    def _pasangan(label_a, label_b):
+        for a in pl_nl:
+            if a['label'] != label_a:
+                continue
+            for b in pl_nl:
+                if b['label'] == label_b and _segmen_sama(a, b):
+                    return a, b
+        return None, None
+
+    for _la, _lb, _titik in (
+            ('H1 (+)', 'H6 (+)', 'H6 atas H1 di X1 ke Z'),
+            ('H2 (+)', 'H7 (+)', 'H7 atas H2 di X2 ke Z'),
+            ('H3 (+)', 'H7 (+)', 'H7 atas H3 di Z ke Y')):
+        _a, _b = _pasangan(_la, _lb)
+        cek('label Nura: %s tidak bertumpuk (titik live)' % _titik,
+            _a is not None and _b is not None and not _tumpang(_a, _b),
+            str((_a, _b)))
+    png_nl = GB.gambar_panah(model_nl, tata_nl)
+    cek('gambar panah Nura lewat Z = PNG asli',
+        png_nl[:8] == b'\x89PNG\r\n\x1a\n' and len(png_nl) > 10000,
+        str(len(png_nl)))
+    # Spanduk basi: pilihBerubah harus hitung ulang spanduk, dan kunci
+    # yang dikosongkan harus JSON null (bukan '') supaya kunciSel tidak
+    # jatuh kembali ke data-awal yang sudah basi.
+    _badan_pilih = isi_model.split('function pilihBerubah')[1].split(
+        'function segarkanPilihan')[0]
+    cek('formulir Model hitung ulang spanduk sesudah pilih berubah '
+        '(spanduk basi)',
+        'segarkanPilihan();' in _badan_pilih)
+    cek("formulir Model kunci kosong = JSON null, bukan '' (spanduk basi)",
+        "dataset.kunci = 'null'" in _badan_pilih)
+
     cek('harga 1 token per gambar', DG.HARGA_GAMBAR == 1)
 
 

@@ -87,7 +87,9 @@ function barisVariabel() {
 }
 function kunciSel(sel) {
   // Kunci tersimpan: JSON {indeks, nama, kode} di dataset.kunci,
-  // atau nilai lama data-awal (kode/nama) bila belum ada.
+  // atau nilai lama data-awal (kode/nama) bila belum ada. JSON null
+  // artinya sengaja dikosongkan (pilih 'Tidak ada'), bukan "belum ada",
+  // jadi jangan jatuh ke data-awal.
   try {
     if (sel.dataset.kunci) return JSON.parse(sel.dataset.kunci);
   } catch (e) { /* abaikan, pakai data-awal */ }
@@ -144,11 +146,19 @@ function isiPilihan(sel, kunci) {
 }
 function pilihBerubah(sel) {
   var pilih = sel.options[sel.selectedIndex];
-  if (!pilih || !pilih.value) { sel.dataset.kunci = ''; return; }
-  sel.dataset.kunci = JSON.stringify({
-    indeks: parseInt(pilih.dataset.indeks || '-1', 10),
-    nama: pilih.dataset.nama || '',
-    kode: pilih.value});
+  // Kosongkan dengan JSON null (bukan ''), supaya kunciSel tidak jatuh
+  // kembali ke data-awal yang sudah basi (variabel dihapus): '' tidak
+  // bisa dibedakan dari "belum pernah diset", null bisa.
+  if (!pilih || !pilih.value) { sel.dataset.kunci = 'null'; }
+  else {
+    sel.dataset.kunci = JSON.stringify({
+      indeks: parseInt(pilih.dataset.indeks || '-1', 10),
+      nama: pilih.dataset.nama || '',
+      kode: pilih.value});
+  }
+  // Hitung ulang spanduk: tanpa ini spanduk tetap tampil walau pilihan
+  // sudah diperbaiki (basi), baru hilang sesudah muat ulang.
+  segarkanPilihan();
 }
 function segarkanPilihan() {
   var hilang = 0;
