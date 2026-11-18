@@ -9,7 +9,8 @@ Inti yang dibangun di sini (bawa naskah, bukan menulis terpandu):
 PAKAI MESIN YANG SUDAH ADA (jangan buat engine baru):
   - audit DOI + cache permanen: app.pustaka.audit_doi_banyak
   - susun APA 7: app.pustaka.daftar_pustaka_apa7
-  - cari judul/penulis/tahun: API gratis yang sama (OpenAlex, CrossRef, Garuda)
+  - cari judul/penulis/tahun: API gratis yang sama (OpenAlex, CrossRef,
+    Garuda) + Open Library untuk buku (Gas Bos 19 Nov 2026)
   - ekstrak sitasi badan: app.citation_validator.extract_citations
   - baca teks .docx: app.ai._teks_dari_berkas (dipakai rute, bukan modul ini)
   - simpan hasil: tabel Setelan (pola yang SAMA dengan daftar pilihan
@@ -39,6 +40,7 @@ import json
 import logging
 import re
 import shutil
+import time
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -149,9 +151,6 @@ POLA_VOLUME = re.compile(r'\d+\s*\(\d+\)')
 POLA_HALAMAN = re.compile(r'\d+\s*[–-]\s*\d+')
 POLA_KOTA_PENERBIT = re.compile(r'^(.{2,60}?):\s*(.+)$')
 
-# Batas judul pendek: di bawah ini judul harus sama persis, bukan mengandung.
-PANJANG_JUDUL_PENDEK = 3
-
 
 # ══════════════════════════════════════════════════════════════════════════
 #  NORMALISASI + SIDIK
@@ -174,24 +173,42 @@ def normalisasi_judul(judul: str) -> str:
     return re.sub(r'\s+', ' ', j).strip()
 
 
+# Penanda edisi/volume yang dibuang sebelum judul dicari dan dibandingkan
+# (Gas Bos 19 Nov 2026): 'Research design 6th' -> 'research design',
+# supaya '6th' tidak mengotori pencarian dan judul pendek tetap cocok.
+_EDISI = re.compile(
+    r'\b\d+(st|nd|rd|th)\b|\b(ed|eds|edisi|edition|vol|volume|jilid|rev)\b',
+    re.IGNORECASE)
+
+
+def bersihkan_judul_cari(judul: str) -> str:
+    """Buang penanda edisi dari judul (untuk cari dan banding)."""
+    j = _EDISI.sub(' ', judul or '')
+    j = re.sub(r'[^A-Za-z0-9\s]', ' ', j)
+    return re.sub(r'\s+', ' ', j).strip()
+
+
 def judul_sama(a: str, b: str) -> bool:
     """True kalau dua judul artikel SAMA (bukan sekadar mirip).
 
-    Sama persis setelah dinormalisasi, atau salah satu memuat yang lain
-    dengan kata-kata yang hampir lengkap (rasio kata >= 0,8). Judul
-    pendek (<= 3 kata) harus sama persis, kalau tidak, "AI" cocok dengan
-    "AI in Education" dan vonis jadi salah.
+    Sama persis setelah dinormalisasi, atau salah satu memuat yang lain.
+    Judul entri yang DIPENDEKKAN mahasiswa (tanpa subjudul) tetap cocok
+    bila semua katanya ada di judul sumber, asalkan >= 2 kata, karena
+    penulis + tahun tetap diperiksa sesudahnya. Judul 1 kata harus sama
+    persis, kalau tidak, "AI" cocok dengan "AI in Education" dan vonis
+    jadi salah. Penanda edisi ('6th', 'ed.') dibuang dulu.
     """
-    na, nb = normalisasi_judul(a), normalisasi_judul(b)
+    na, nb = (normalisasi_judul(bersihkan_judul_cari(a)),
+              normalisasi_judul(bersihkan_judul_cari(b)))
     if not na or not nb:
         return False
     if na == nb:
         return True
     ka, kb = set(na.split()), set(nb.split())
-    if len(ka) <= PANJANG_JUDUL_PENDEK or len(kb) <= PANJANG_JUDUL_PENDEK:
+    if len(ka) <= 1 or len(kb) <= 1:
         return False
     kecil, besar = (ka, kb) if len(ka) <= len(kb) else (kb, ka)
-    return kecil <= besar and len(kecil) / max(1, len(besar)) >= 0.8
+    return kecil <= besar
 
 
 def samakan_format(a: str, b: str) -> bool:
@@ -408,6 +425,37 @@ def susun_apa7_kandidat(kandidat: dict) -> str:
 #  CARI JUDUL/PENULIS/TAHUN DI SUMBER GRATIS
 # ══════════════════════════════════════════════════════════════════════════
 
+def _pisah_menempel(kata: str) -> list[str]:
+    """Pisah kata menempel ('KewirausahaanLumpkin' -> keduanya).
+
+    Kata menempel terjadi bila jeda baris di naskah hilang saat teks
+    dibaca (Gas Bos 19 Nov 2026, poin 4): nama penulis menempel di kata
+    sebelumnya. Pisah di batas huruf kecil -> huruf besar.
+    """
+    return [p for p in re.split(r'(?<=[a-zà-ÿ])(?=[A-ZÀ-Ý])', kata or '')
+            if p]
+
+
+def _kata_pertama_nama(teks: str) -> str:
+    """Kata pertama nama penulis (buang inisial/et al./dkk).
+
+    Bila kata pertama menempel ('KewirausahaanLumpkin'), yang dipakai
+    bagian TERAKHIRnya ('Lumpkin'), karena kata sebelumnya yang menempel.
+    """
+    for tok in re.split(r'[\s,;&]+', (teks or '').strip()):
+        t = tok.strip('.,')
+        if not t:
+            continue
+        bagian = _pisah_menempel(t)
+        t = bagian[-1] if bagian else t
+        if len(t) <= 2:
+            continue
+        if t.lower() in ('et', 'al', 'dkk'):
+            continue
+        return t.lower()
+    return ''
+
+
 def _penulis_cocok(penulis_entri: str, penulis_kandidat: str) -> bool:
     """True kalau penulis pertama entri muncul di penulis kandidat.
 
@@ -416,16 +464,7 @@ def _penulis_cocok(penulis_entri: str, penulis_kandidat: str) -> bool:
     "Cetindamar Kozanoglu" (dua kata) agar cocok dengan sitasi
     "(Cetindamar Kozanoglu, 2021)".
     """
-    def _kata_pertama(s: str) -> str:
-        for tok in re.split(r'[\s,;&]+', (s or '').strip()):
-            t = tok.strip('.,')
-            if len(t) <= 2:
-                continue
-            if t.lower() in ('et', 'al', 'dkk'):
-                continue
-            return t.lower()
-        return ''
-    kata = _kata_pertama(penulis_entri)
+    kata = _kata_pertama_nama(penulis_entri)
     if not kata:
         return True
     blok = normalisasi_judul(penulis_kandidat.split(',')[0])
@@ -475,10 +514,36 @@ def _gabung_penulis(daftar_nama: list[str]) -> str:
     return ', '.join(olah)
 
 
+def _http_get(url: str, **kw):
+    """GET sekali, ulang sekali bila 429/5xx (Gas Bos 19 Nov 2026).
+
+    Batas laju sesaat tidak boleh membuat entri nyata jadi
+    'tidak ditemukan' diam-diam; satu kali ulang sesudah jeda 2 detik.
+    """
+    r = httpx.get(url, **kw)
+    if r.status_code in (429, 500, 502, 503):
+        time.sleep(2)
+        r = httpx.get(url, **kw)
+    return r
+
+
+def _nama_pertama(penulis: str) -> str:
+    """Kata pertama penulis pertama (buang inisial/et al./dkk)."""
+    for tok in re.split(r'[\s,;&]+', (penulis or '').strip()):
+        t = tok.strip('.,')
+        if len(t) <= 2:
+            continue
+        if t.lower() in ('et', 'al', 'dkk'):
+            continue
+        return t
+    return ''
+
+
 def _cari_judul_openalex(judul: str, penulis: str, tahun: int):
     try:
-        r = httpx.get(f'{_pustaka.OPENALEX_URL}/works',
-                      params={'search': judul, 'per-page': 5},
+        r = _http_get(f'{_pustaka.OPENALEX_URL}/works',
+                      params={'search': bersihkan_judul_cari(judul),
+                              'per-page': 10},
                       headers={'User-Agent': 'EduAi/1.0 (mailto:eduai@bikinaja.id)'},
                       timeout=15)
         if r.status_code != 200:
@@ -506,8 +571,9 @@ def _cari_judul_openalex(judul: str, penulis: str, tahun: int):
 
 def _cari_judul_crossref(judul: str, penulis: str, tahun: int):
     try:
-        r = httpx.get(_pustaka.CROSSREF_URL,
-                      params={'query.title': judul, 'rows': 5},
+        r = _http_get(_pustaka.CROSSREF_URL,
+                      params={'query.title': bersihkan_judul_cari(judul),
+                              'rows': 10},
                       headers={'Accept': 'application/json'},
                       timeout=15)
         if r.status_code != 200:
@@ -557,8 +623,57 @@ def _cari_judul_garuda(judul: str, penulis: str, tahun: int):
     return _cocokkan(daftar, judul, penulis, tahun)
 
 
+OPENLIBRARY_URL = 'https://openlibrary.org/search.json'
+
+
+def _cari_judul_openlibrary(judul: str, penulis: str, tahun: int):
+    """Cari buku di Open Library (Gas Bos 19 Nov 2026, poin 2).
+
+    Buku (mis. Creswell 2023) jarang ada di OpenAlex/CrossRef yang
+    isinya artikel; Open Library gratis tanpa kunci. Tahun edisi diambil
+    dari publish_year bila ada; bila tahun entri ada di daftar itu, tahun
+    kandidat = tahun entri (cocok), kalau tidak, tahun terdekat (mirip).
+    Bila publish_year kosong, tahun = 0 (tidak diperiksa) supaya buku
+    yang judul + penulisnya cocok tidak gagal hanya karena tahun edisi
+    tidak tercatat di Open Library.
+    """
+    try:
+        r = _http_get(OPENLIBRARY_URL,
+                      params={'title': bersihkan_judul_cari(judul),
+                              'author': _nama_pertama(penulis),
+                              'limit': 5,
+                              'fields': ('key,title,author_name,'
+                                         'publish_year,first_publish_year')},
+                      headers={'User-Agent': 'EduAi/1.0 (mailto:eduai@bikinaja.id)'},
+                      timeout=15)
+        if r.status_code != 200:
+            log.warning('[pustaka] Open Library HTTP %s', r.status_code)
+            return None, None
+        daftar = []
+        for d in (r.json().get('docs') or []):
+            th_daftar = [int(y) for y in (d.get('publish_year') or [])
+                         if str(y).isdigit()]
+            th = 0
+            if th_daftar:
+                if tahun and tahun in th_daftar:
+                    th = tahun
+                elif tahun:
+                    th = min(th_daftar, key=lambda y: abs(y - tahun))
+                else:
+                    th = th_daftar[0]
+            daftar.append({
+                'title': d.get('title') or '',
+                'authors': _gabung_penulis(d.get('author_name') or []),
+                'year': th, 'journal': '', 'doi': '', 'garuda_id': '',
+                'sumber': 'Open Library'})
+        return _cocokkan(daftar, judul, penulis, tahun)
+    except Exception as e:                                     # noqa: BLE001
+        log.warning('[pustaka] Open Library cari judul gagal: %s', e)
+        raise
+
+
 def cari_judul_sumber(judul: str, penulis: str = '', tahun: int = 0) -> dict:
-    """Cari judul di OpenAlex -> CrossRef -> Garuda.
+    """Cari judul di OpenAlex -> CrossRef -> Garuda -> Open Library.
 
     Return {'cocok': kandidat|None, 'mirip': kandidat|None}.
     Kandidat: {'title','authors','year','journal','doi','garuda_id','sumber'}.
@@ -567,7 +682,8 @@ def cari_judul_sumber(judul: str, penulis: str = '', tahun: int = 0) -> dict:
     gagal jujur (bukan menandai semua entri "tidak ditemukan").
     """
     galat = 0
-    for fn in (_cari_judul_openalex, _cari_judul_crossref, _cari_judul_garuda):
+    for fn in (_cari_judul_openalex, _cari_judul_crossref,
+               _cari_judul_garuda, _cari_judul_openlibrary):
         try:
             cocok, mirip = fn(judul, penulis, tahun)
         except Exception:                                      # noqa: BLE001
@@ -575,7 +691,7 @@ def cari_judul_sumber(judul: str, penulis: str = '', tahun: int = 0) -> dict:
             continue
         if cocok is not None or mirip is not None:
             return {'cocok': cocok, 'mirip': mirip}
-    if galat >= 3:
+    if galat >= 4:
         raise RuntimeError('layanan pemeriksa tidak bisa dihubungi')
     return {'cocok': None, 'mirip': None}
 
@@ -684,6 +800,24 @@ def _vonis_entri(urai: dict, audit_map: dict,
             if cocok.get('garuda_id'):
                 meta['garuda_id'] = cocok['garuda_id']
             kandidat = cocok
+        elif cari_hasil.get('mirip'):
+            # Judul + penulis cocok, tahun beda (Gas Bos 19 Nov 2026,
+            # poin 1): referensinya NYATA, tahunnya mungkin salah.
+            # Bentuk benar memakai tahun sumber supaya mahasiswa melihat
+            # tahun yang benar dan bisa membetulkannya.
+            mirip = cari_hasil['mirip']
+            meta = dict(urai)
+            if not meta.get('doi') and mirip.get('doi'):
+                meta['doi'] = mirip['doi']
+            if not meta.get('sumber') and mirip.get('journal'):
+                meta['sumber'] = mirip['journal']
+            if mirip.get('garuda_id'):
+                meta['garuda_id'] = mirip['garuda_id']
+            if mirip.get('year'):
+                meta['tahun'] = mirip['year']
+            apa7 = susun_apa7(meta) if meta else ''
+            return {'vonis': 'nyata', 'alasan': 'tahun_mungkin_salah',
+                    'apa7_benar': apa7, 'kandidat': mirip}
         else:
             return {'vonis': 'tidak_ditemukan', 'alasan': 'tidak_ditemukan',
                     'apa7_benar': '', 'kandidat': cari_hasil.get('mirip')}
@@ -700,14 +834,7 @@ def _vonis_entri(urai: dict, audit_map: dict,
 
 def _nama_sitasi(sitasi: dict) -> str:
     """Nama penulis pertama dari sitasi (buang inisial/et al./dkk)."""
-    for tok in re.split(r'[\s,;&]+', (sitasi.get('author') or '').strip()):
-        t = tok.strip('.,')
-        if len(t) <= 2:
-            continue
-        if t.lower() in ('et', 'al', 'dkk'):
-            continue
-        return t.lower()
-    return ''
+    return _kata_pertama_nama(sitasi.get('author') or '')
 
 
 def _sitasi_cocok_entri(sitasi: dict, entri: dict) -> bool:

@@ -106,11 +106,14 @@ ENTRI_KOTLER = (
     "Kotler, P., & Keller, K. L. (2016). Marketing Management. "
     "Harlow: Pearson.")
 ENTRI_ACAK = "Ini bukan entri pustaka sama sekali"
+ENTRI_TIDAKADA = (
+    "Zulfikar, Q. (2021). Teori khayalan tentang motivasi yang tidak "
+    "pernah ada. Jurnal Khayalan, 1(1), 1-9.")
 
 NASKAH = (
     BADAN + "DAFTAR PUSTAKA\n\n" + "\n\n".join([
         ENTRI_ALRAWAHI, ENTRI_AINI, ENTRI_BANDURA, ENTRI_BAKKER,
-        ENTRI_SUGIYONO, ENTRI_KOTLER, ENTRI_ACAK,
+        ENTRI_SUGIYONO, ENTRI_KOTLER, ENTRI_ACAK, ENTRI_TIDAKADA,
     ]) + "\n\nTENTANG PENULIS\n\nPenulis adalah mahasiswa."
 )
 
@@ -190,7 +193,7 @@ def jalankan():
     # ── 1. Temukan bagian ────────────────────────────────────────────────
     paragraf = [p.strip() for p in NASKAH.split('\n\n') if p.strip()]
     bagian = PP.cari_bagian_pustaka(paragraf)
-    cek('bagian: ada + 7 entri', bagian['ada'] and len(bagian['entri']) == 7,
+    cek('bagian: ada + 8 entri', bagian['ada'] and len(bagian['entri']) == 8,
         f"ada={bagian['ada']} jml={len(bagian['entri'])}")
     cek('bagian: TENTANG PENULIS bukan entri',
         all('TENTANG PENULIS' not in e['teks'] for e in bagian['entri']))
@@ -270,11 +273,18 @@ def jalankan():
         per_id['e3']['vonis'] == 'nyata', per_id['e3']['vonis'])
     cek('vonis: buku terverifikasi judul jadi nyata',
         per_id['e5']['vonis'] == 'nyata', per_id['e5']['vonis'])
-    cek('vonis: judul cocok tapi tahun beda jadi tidak ditemukan + kandidat',
-        per_id['e6']['vonis'] == 'tidak_ditemukan'
+    cek('vonis: judul cocok tapi tahun beda jadi nyata + tahun mungkin salah',
+        per_id['e6']['vonis'] == 'nyata'
+        and per_id['e6']['alasan'] == 'tahun_mungkin_salah'
         and per_id['e6']['kandidat'] is not None
-        and per_id['e6']['kandidat']['year'] == 2015,
-        f"{per_id['e6']['vonis']} {per_id['e6']['kandidat']}")
+        and per_id['e6']['kandidat']['year'] == 2015
+        and '2015' in (per_id['e6']['apa7_benar'] or ''),
+        f"{per_id['e6']['vonis']} {per_id['e6']['alasan']} "
+        f"{per_id['e6']['apa7_benar']!r}")
+    cek('vonis: entri yang memang tidak ada tetap tidak ditemukan',
+        per_id['e8']['vonis'] == 'tidak_ditemukan'
+        and per_id['e8']['kandidat'] is None,
+        f"{per_id['e8']['vonis']} {per_id['e8']['kandidat']}")
     cek('vonis: tanpa DOI, judul cocok jadi nyata',
         per_id['e2']['vonis'] == 'nyata', per_id['e2']['vonis'])
     cek('vonis: pola tidak dikenali jadi format salah',
@@ -284,9 +294,9 @@ def jalankan():
     cek('vonis: tidak ada kata palsu di hasil',
         'palsu' not in _json.dumps(hasil, ensure_ascii=False).lower())
     cek('ringkasan: hitungan konsisten',
-        hasil['ringkasan']['total_entri'] == 7
+        hasil['ringkasan']['total_entri'] == 8
         and hasil['ringkasan']['sitasi_tanpa_entri'] == 1
-        and hasil['ringkasan']['entri_tanpa_sitasi'] == 3,
+        and hasil['ringkasan']['entri_tanpa_sitasi'] == 4,
         str(hasil['ringkasan']))
 
     # ── 5. Cek dua arah ───────────────────────────────────────────────────
@@ -513,7 +523,7 @@ def jalankan():
     PP.simpan_hasil(db, 81, hasil)
     muat = PP.muat_hasil(db, 81)
     cek('setelan: simpan + muat hasil',
-        muat is not None and muat['ringkasan']['total_entri'] == 7)
+        muat is not None and muat['ringkasan']['total_entri'] == 8)
     cek('setelan: muat fid lain None', PP.muat_hasil(db, 999) is None)
     baris = db.get(Setelan, PP.KUNCI_HASIL.format(fid=81))
     baris.nilai = '{rusak'
@@ -583,16 +593,17 @@ def jalankan():
         cek('rute: status berkas orang lain 404',
             getattr(e, 'status_code', None) == 404, str(e))
 
-    # Aksi tandai sumber lama (tanpa ubah docx).
+    # Aksi tandai sumber lama (tanpa ubah docx), pakai e8 yang memang
+    # tidak ditemukan (e6 kini nyata karena tahun beda, Gas 19 Nov 2026).
     PP.simpan_hasil(db, fb.id, hasil)
     teks_sebelum = _teks_docx(docx3 / 'naskah.docx')
     hal = _asyncio.run(RP.pustaka_aksi(
         fid=fb.id, request=_ReqPalsu(), aksi='tandai_sumber_lama',
-        entri_id='e6', doi='', sitasi_author='', sitasi_year='', u=u, db=db))
+        entri_id='e8', doi='', sitasi_author='', sitasi_year='', u=u, db=db))
     h_sumber = PP.muat_hasil(db, fb.id)
-    e6 = [e for e in h_sumber['entri'] if e['id'] == 'e6'][0]
+    e8 = [e for e in h_sumber['entri'] if e['id'] == 'e8'][0]
     cek('rute: tandai sumber lama (tanpa ubah docx)',
-        e6.get('sumber_lama') is True and hal.status_code == 303)
+        e8.get('sumber_lama') is True and hal.status_code == 303)
     cek('rute: tandai sumber lama tidak mengubah teks docx',
         _teks_docx(docx3 / 'naskah.docx') == teks_sebelum)
 
@@ -766,6 +777,114 @@ def jalankan():
     finally:
         PP.periksa_jaringan = asli_jaringan
         PP.periksa_naskah = asli_periksa
+
+    # ── 15. Cocok longgar (Gas Bos 19 Nov 2026) ──────────────────────────
+    cek('judul: penanda edisi dibuang',
+        PP.bersihkan_judul_cari('Research design 6th. ed.') == 'Research design',
+        PP.bersihkan_judul_cari('Research design 6th. ed.'))
+    cek('judul: judul pendek entri (tanpa subjudul) tetap cocok',
+        PP.judul_sama('Research design 6th',
+                      'Research design: Qualitative, quantitative, and mixed methods approaches'),
+        'gagal cocok pendek')
+    cek('judul: 1 kata tetap harus persis',
+        not PP.judul_sama('AI', 'AI in Education')
+        and PP.judul_sama('AI', 'AI'),
+        'AI lolos')
+    cek('judul: kata berbeda tetap tidak cocok',
+        not PP.judul_sama('Digital marketing', 'Research design'),
+        'beda lolos')
+    cek('sitasi: kata menempel dipisah, nama terakhir dipakai',
+        PP._nama_sitasi({'author': 'KewirausahaanLumpkin & Dess',
+                         'year': '1996'}) == 'lumpkin',
+        PP._nama_sitasi({'author': 'KewirausahaanLumpkin & Dess',
+                         'year': '1996'}))
+    cek('sitasi: nama biasa tetap nama pertama',
+        PP._nama_sitasi({'author': 'Bandura', 'year': '2001'}) == 'bandura')
+    # Open Library dipalsukan (tanpa jaringan): buku Creswell ketemu,
+    # tahun edisi 2023 ada di publish_year -> cocok.
+    import httpx as _httpx
+
+    class _RespPalsu:
+        def __init__(self, status_code, isi):
+            self.status_code = status_code
+            self._isi = isi
+
+        def json(self):
+            return self._isi
+
+    def _get_palsu(url, **kw):
+        if 'openlibrary' in url:
+            return _RespPalsu(200, {'docs': [
+                {'title': 'Research Design',
+                 'author_name': ['John W. Creswell', 'J. David Creswell'],
+                 'publish_year': [2018, 2022, 2023, 1994],
+                 'first_publish_year': 1994}]})
+        raise AssertionError('URL tak terduga: ' + url)
+
+    asli_get = _httpx.get
+    try:
+        _httpx.get = _get_palsu
+        cocok, mirip = PP._cari_judul_openlibrary(
+            'Research design 6th', 'Creswell, J. W., & Creswell, J. D.', 2023)
+        cek('openlibrary: buku Creswell ketemu + tahun 2023 cocok',
+            cocok is not None and cocok['sumber'] == 'Open Library'
+            and cocok['year'] == 2023,
+            str(cocok))
+        cocok2, mirip2 = PP._cari_judul_openlibrary(
+            'Research design 6th', 'Creswell, J. W., & Creswell, J. D.', 2010)
+        cek('openlibrary: tahun entri tidak ada -> mirip (tahun terdekat)',
+            cocok2 is None and mirip2 is not None
+            and mirip2['year'] == 2018,
+            f'cocok={cocok2} mirip={mirip2}')
+    finally:
+        _httpx.get = asli_get
+    # Audit DOI: 429 tidak boleh tercache sebagai False (Gas 19 Nov 2026).
+    import httpx as _httpx2
+    from app import pustaka as _pustaka_mod
+
+    class _RespDOI:
+        def __init__(self, status_code):
+            self.status_code = status_code
+
+    def _get_doi_palsu(url, **kw):
+        if '10.9999/ada' in url:
+            return _RespDOI(200)
+        if '10.9999/tidak-ada' in url:
+            return _RespDOI(404)
+        if '10.9999/batas-laju' in url:
+            return _RespDOI(429)
+        raise AssertionError('URL DOI tak terduga: ' + url)
+
+    asli_get2 = _httpx2.get
+    _pustaka_mod._CACHE_DOI.clear()
+    try:
+        _httpx2.get = _get_doi_palsu
+        cek('audit_doi: 200 -> True + tercache',
+            _pustaka_mod.audit_doi('10.9999/ada') is True
+            and _pustaka_mod._CACHE_DOI.get('10.9999/ada') is True)
+        cek('audit_doi: 404 -> False + tercache',
+            _pustaka_mod.audit_doi('10.9999/tidak-ada') is False
+            and _pustaka_mod._CACHE_DOI.get('10.9999/tidak-ada') is False)
+        cek('audit_doi: 429 -> None + TIDAK tercache',
+            _pustaka_mod.audit_doi('10.9999/batas-laju') is None
+            and '10.9999/batas-laju' not in _pustaka_mod._CACHE_DOI)
+        _pustaka_mod._CACHE_DOI.clear()
+        hasil_banyak = _pustaka_mod.audit_doi_banyak(
+            ['10.9999/ada', '10.9999/batas-laju', '10.9999/tidak-ada'])
+        cek('audit_doi_banyak: 429 jadi False di hasil tapi TIDAK tercache',
+            hasil_banyak.get('10.9999/batas-laju') is False
+            and '10.9999/batas-laju' not in _pustaka_mod._CACHE_DOI
+            and hasil_banyak.get('10.9999/ada') is True)
+    finally:
+        _httpx2.get = asli_get2
+        _pustaka_mod._CACHE_DOI.clear()
+    # Sitasi 'dan' dalam kurung tertangkap (citasi validator).
+    from app.citation_validator import extract_citations as _ext
+    sit = _ext('Menurut teori ini (Chaffey dan Smith, 2020) pemasaran berubah.')
+    cek('sitasi: (Penulis dan Penulis, Tahun) tertangkap',
+        any(s.get('author') == 'Chaffey dan Smith'
+            and s.get('year') == '2020' for s in sit),
+        str(sit))
 
 
 if __name__ == '__main__':

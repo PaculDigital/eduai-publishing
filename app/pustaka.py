@@ -755,18 +755,14 @@ def _cache_doi_tulis() -> None:
         pass
 
 
-def audit_doi(doi: str) -> bool:
-    """True kalau DOI benar-benar ada di CrossRef.
+def audit_doi(doi: str) -> bool | None:
+    """True kalau DOI benar-benar ada di CrossRef, False kalau tidak ada,
+    None kalau tidak bisa dipastikan (batas laju/gangguan sesaat).
 
-    Ini pagar anti-halusinasi: DOI Scopus/OpenAlex bisa mismatch,
-    jadi SEMUA DOI dicek ke CrossRef sebelum dipakai.
-
-    ⚡ 01Nov26 — DIPERCEPAT TANPA MELONGGARKAN PAGAR:
-      - cache: DOI yang sudah pernah dicek tidak dicek ulang (selamanya)
-      - TEBAKAN benar dulu: DOI berawalan `10.<penerbit>` yang terdaftar
-        langsung diterima tanpa HTTP — CrossRef-lah pendaftar resminya,
-        jadi bentuk itu MUSTAHIL halusinasi.
-      Presisi TIDAK berubah: DOI palsu tetap tertolak.
+    None TIDAK PERNAH di-cache: vonisnya tetap False untuk pemeriksaan
+    ini, tapi pemeriksaan berikutnya mengaudit ulang, bukan memakai
+    False basi. (Gas Bos 19 Nov 2026: 9 DOI nyata sempat tercache False
+    gara-gara 429, lalu 'tidak ditemukan' selamanya.)
     """
     d = _doi_bersih(doi)
     if not d:
@@ -777,9 +773,21 @@ def audit_doi(doi: str) -> bool:
     try:
         r = httpx.get(f'{CROSSREF_URL}/{d}', timeout=10,
                          headers={'Accept': 'application/json'})
-        hasil = r.status_code == 200
+        if r.status_code in (429, 500, 502, 503):
+            # Batas laju sesaat: ulang sekali sesudah jeda 2 detik.
+            import time as _time
+            _time.sleep(2)
+            r = httpx.get(f'{CROSSREF_URL}/{d}', timeout=10,
+                             headers={'Accept': 'application/json'})
+        if r.status_code == 200:
+            hasil = True
+        elif r.status_code == 404:
+            hasil = False
+        else:
+            # 429/5xx = batas laju/gangguan sesaat, BUKAN 'tidak ada'.
+            return None
     except Exception:                                         # noqa: BLE001
-        return False          # ⚠️ JANGAN cache kegagalan jaringan
+        return None           # ⚠️ JANGAN cache kegagalan jaringan
     _CACHE_DOI[d] = hasil
     _CACHE_DOI_SIMPAN[0] += 1
     if _CACHE_DOI_SIMPAN[0] % 25 == 0:
@@ -803,11 +811,17 @@ def audit_doi_banyak(daftar: list, pekerja: int = 10) -> dict:
             from concurrent.futures import ThreadPoolExecutor
             with ThreadPoolExecutor(max_workers=max(1, min(pekerja, 16))) as ex:
                 for d, hasil in zip(belum, ex.map(audit_doi, belum)):
-                    _CACHE_DOI[d] = bool(hasil)
+                    # None = tidak bisa dipastikan (429/gangguan): vonis
+                    # False untuk pemeriksaan ini, TAPI jangan di-cache,
+                    # supaya pemeriksaan berikutnya mengaudit ulang.
+                    if hasil is not None:
+                        _CACHE_DOI[d] = bool(hasil)
         except Exception as e:                                # noqa: BLE001
             log.warning('[pustaka] audit DOI paralel gagal: %s', e)
             for d in belum:
-                _CACHE_DOI.setdefault(d, audit_doi(d))
+                h = audit_doi(d)
+                if h is not None:
+                    _CACHE_DOI.setdefault(d, h)
         _cache_doi_tulis()
     return {d: _CACHE_DOI.get(d, False) for d in unik}
 

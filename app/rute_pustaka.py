@@ -51,8 +51,11 @@ def pasang(templates) -> None:
 
 ALASAN = {
     'terverifikasi': 'Terverifikasi di sumber.',
+    'tahun_mungkin_salah': ('Judul dan penulisnya cocok dengan sumber, '
+                            'tapi tahunnya beda. Periksa tahun edisinya.'),
     'doi_tidak_ditemukan': 'DOI tidak ditemukan di CrossRef.',
-    'tidak_ditemukan': 'Tidak ditemukan di OpenAlex, CrossRef, maupun Garuda.',
+    'tidak_ditemukan': ('Tidak ditemukan di OpenAlex, CrossRef, Garuda, '
+                        'maupun Open Library.'),
     'format_salah': 'Formatnya tidak sesuai APA 7.',
     'pola_tidak_dikenali': 'Pola entrinya tidak bisa dibaca.',
 }
