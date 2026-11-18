@@ -26,8 +26,10 @@ from typing import Any
 # 1. REGEX SITASI (adaptasi langsung dari JS)
 # ════════════════════════════════════════════════════════════════
 # Sitasi multi-penulis: (Author, 2024) atau (Author et al., 2024) atau (Author1 & Author2, 2024)
+# 'dan' ikut diterima (Gas Bos 19 Nov 2026, poin 4): sitasi Indonesia
+# sering menulis '(Chaffey dan Smith, 2020)', dulu tidak tertangkap.
 CITATION_REGEX = re.compile(
-    r"\(([A-Z][a-zA-ZÀ-ÿ]+(?:\s*(?:et\s+al\.|&\s*[A-Z][a-zA-ZÀ-ÿ]+|,\s*[A-Z][a-zA-ZÀ-ÿ]+\s*[A-Z][a-zA-ZÀ-ÿ]+))?)(?:,\s*|\s+)(\d{4}[a-z]?)\)",
+    r"\(([A-Z][a-zA-ZÀ-ÿ]+(?:\s*(?:et\s+al\.|(?:&|dan)\s*[A-Z][a-zA-ZÀ-ÿ]+|,\s*[A-Z][a-zA-ZÀ-ÿ]+\s*[A-Z][a-zA-ZÀ-ÿ]+))?)(?:,\s*|\s+)(\d{4}[a-z]?)\)",
     re.UNICODE,
 )
 
