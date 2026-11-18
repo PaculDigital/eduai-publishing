@@ -906,7 +906,7 @@ def _cocok_judul(teks: str, bagian: str) -> bool:
 
 
 #  ══════════════════════════════════════════════════════════════════════
-#  PENOMORAN OTOMATIS (numPr) — 18 Nov 2026, cacat Diagram 1.
+#  PENOMORAN OTOMATIS (numPr), 18 Nov 2026, cacat Diagram 1.
 #  Di naskah nyata (fid 81) nomor judul BUKAN teks paragraf, melainkan
 #  penomoran otomatis Word: gaya Heading menunjuk numId, numId menunjuk
 #  abstractNum, dan nomor dihitung dari penghitung per tingkat.
