@@ -1961,6 +1961,232 @@ def jalankan():
     for _n, (_nama, _model) in enumerate(_bentuk_cermin):
         _banding_cermin(_nama, _model, _n)
 
+    # ── 18. Moderasi (jalur 'interaksi', Boss 18 Nov 15:09 WIB) ──────
+    # Peta Bab IV menyatakan penguat sebagai peran 'Z' (bab4.py:
+    # periksa_peta menuntut penguat punya jalur 'interaksi' ke hasil;
+    # perantara adalah peran 'M'). Diagram membaca 'M' sebagai 'Z'
+    # (perantara) dan 'Z' sebagai perantara juga, jadi huruf Z
+    # berarti DUA hal yang berbeda di dua tempat: penguat di peta,
+    # perantara di Diagram. model_dari_peta_bab4 menyalin peran apa
+    # adanya, jadi penguat dari naskah masuk ke Diagram sebagai Z.
+    # Yang diuji di sini: (a) jalur 'interaksi' diterima normalisasi
+    # dan digambar putus-putus; (b) moderasi murni (1 Z) lolos dan
+    # tidak merusak tata letak/skor; (c) campuran mediasi + moderasi
+    # (perantara M + penguat Z = 2 Z) DITOLAK normalisasi ("Perantara
+    # (Z) hanya boleh satu") -- perilaku saat ini, dikunci sebagai
+    # temuan, bukan diperbaiki di sini: skripsi yang punya mediasi
+    # DAN moderasi belum bisa digambar, butuh keputusan Boss soal
+    # batas formulir; (d) formulir TIDAK bisa menambah moderasi
+    # (diagram_model.html hanya punya peran X/Z/Y dan tanpa pilihan
+    # jenis jalur; jenis disimpulkan dari Lewat), moderasi hanya
+    # masuk lewat peta. Konvensi gambar TIDAK diubah: panah interaksi
+    # digambar putus-putus kotak-ke-kotak ke Y (bukan menunjuk ke
+    # garis X-Y seperti di buku); pratinjau v1 dibaca Wulan: moderasi
+    # murni rapi tapi terbaca seperti pengaruh putus-putus biasa,
+    # bukan moderasi.
+    _mod = {
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                     {'nama': 'Dukungan Sosial', 'peran': 'Z'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+        'jalur': [{'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H1',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Dukungan Sosial',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                   'jenis': 'interaksi', 'arah': '+'}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _mod_n, _mod_mas = DG.normalisasi_model(_mod)
+    cek('moderasi: jenis interaksi diterima normalisasi',
+        _mod_n is not None and not _mod_mas
+        and _mod_n['jalur'][1]['jenis'] == 'interaksi'
+        and _mod_n['variabel'][1]['kode'] == 'Z', str(_mod_mas))
+    _mod_x, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+                    'jenis': 'acak'}]})
+    cek("moderasi: jenis tidak dikenal tetap jadi 'langsung' "
+        "(interaksi tidak ikut terlipat)",
+        _mod_x is not None
+        and _mod_x['jalur'][0]['jenis'] == 'langsung')
+    # bentuk_model menyebut moderasi murni 'mediasi' (ada Z):
+    # perilaku saat ini, dikunci supaya perubahan disengaja.
+    cek('moderasi: bentuk moderasi murni masih disebut mediasi '
+        '(temuan: label bentuk belum bedakan moderasi)',
+        _mod_n is not None
+        and DG.bentuk_model(_mod_n) == 'mediasi')
+    _t_mod = DG.tata_letak(_mod_n)
+    _k_mod = {k['id']: k for k in _t_mod['kotak']}
+    cek('moderasi murni: 2 kolom, X1 dan penguat Z di kiri, Y kanan',
+        _t_mod.get('posisi_z') is None
+        and _k_mod['X1']['x'] == 60 and _k_mod['Z']['x'] == 60
+        and _k_mod['Y']['x'] == 1040, str(_t_mod.get('posisi_z')))
+    cek('moderasi murni: penguat di bawah garis, X1 di atas garis',
+        _pusat(_k_mod['X1']) < _t_mod.get('tengah')
+        and _pusat(_k_mod['Z']) > _t_mod.get('tengah')
+        and _pusat(_k_mod['Y']) == _t_mod.get('tengah'))
+    _p_mod = _t_mod['panah']
+    cek('moderasi murni: H1 lurus, H2 interaksi putus-putus',
+        len(_p_mod) == 2
+        and _p_mod[0]['gaya'] == 'lurus'
+        and _p_mod[1]['gaya'] == 'putus'
+        and _p_mod[1]['label'] == 'H2 (+)',
+        str([(p['label'], p['gaya']) for p in _p_mod]))
+    _s_mod = GB.skor_tata_letak(_t_mod)
+    cek('moderasi murni: 0 silangan, 0 bengkok, tanpa hukuman celah',
+        _s_mod['banding'] == (0, 0.0, -724.5, 724.5, 250.0, -384.8, 0),
+        str(_s_mod['banding']))
+    _pl_mod = GB.penempatan_label(_t_mod)
+    cek('moderasi murni: celah label lega (222 px)',
+        _celah_min(_pl_mod) >= 30.0, str(_celah_min(_pl_mod)))
+    _png_mod = GB.gambar_panah(_mod_n, _t_mod)
+    cek('moderasi murni: PNG asli + deterministik',
+        _png_mod[:8] == b'\x89PNG\r\n\x1a\n' and len(_png_mod) > 10000
+        and _png_mod == GB.gambar_panah(_mod_n, _t_mod),
+        str(len(_png_mod)))
+    # Campuran mediasi + moderasi (HIPOTETIS: normalisasi menolaknya,
+    # lihat cek di bawah; model ini dibangun tangan seperti fixture
+    # GOAL, tata_letak langsung, untuk melihat gambarnya andai batas
+    # 1 Z dibuka). Penguat berkode W supaya tidak bentrok kode Z
+    # perantara; peran tetap Z seperti peta Bab IV.
+    _mod_campur = {
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X',
+                      'kode': 'X1'},
+                     {'nama': 'Orientasi Kewirausahaan', 'peran': 'Z',
+                      'kode': 'Z'},
+                     {'nama': 'Dukungan Sosial', 'peran': 'Z',
+                      'kode': 'W'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y',
+                      'kode': 'Y'}],
+        'jalur': [{'dari': 'X1', 'ke': 'Z', 'hipotesis': 'H1',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Z', 'ke': 'Y', 'hipotesis': 'H2',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'X1', 'ke': 'Y', 'hipotesis': 'H3',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'X1', 'ke': 'Y', 'lewat': 'Z',
+                   'hipotesis': 'H4', 'jenis': 'tidak_langsung',
+                   'arah': '+'},
+                  {'dari': 'W', 'ke': 'Y', 'hipotesis': 'H5',
+                   'jenis': 'interaksi', 'arah': '+'}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _t_campur = DG.tata_letak(_mod_campur)
+    _k_campur = {k['id']: k for k in _t_campur['kotak']}
+    cek('campuran: 3 kolom, penguat W di kolom X, perantara Z tengah',
+        _t_campur.get('posisi_z') is None
+        and _k_campur['X1']['x'] == 60 and _k_campur['W']['x'] == 60
+        and _k_campur['Z']['x'] == 550 and _k_campur['Y']['x'] == 1040)
+    cek('campuran: skor posisi Z TIDAK berlaku (kolom 0 berisi X+Z)',
+        _t_campur.get('posisi_z') is None
+        and _pusat(_k_campur['Z']) == _t_campur.get('tengah'))
+    _p_campur = _t_campur['panah']
+    cek('campuran: 6 panah (H4 dua segmen), H5 interaksi putus-putus',
+        len(_p_campur) == 6
+        and [p['gaya'] for p in _p_campur].count('putus') == 1
+        and _p_campur[-1]['label'] == 'H5 (+)'
+        and _p_campur[-1]['gaya'] == 'putus',
+        str([(p['label'], p['gaya']) for p in _p_campur]))
+    _s_campur = GB.skor_tata_letak(_t_campur)
+    cek('campuran: 0 silangan, 0 bengkok (hukuman celah 18,0)',
+        _s_campur['banding'] == (0, 18.0, -195.2, 730.4, 250.0, -9.7, 0),
+        str(_s_campur['banding']))
+    _pl_campur = GB.penempatan_label(_t_campur)
+    cek('campuran: celah label terkecil 12 px (H1/H4, di atas minimum '
+        '10 px, di bawah ambang nyaman 30 px)',
+        _celah_min(_pl_campur) >= 10.0, str(_celah_min(_pl_campur)))
+    _png_campur = GB.gambar_panah(_mod_campur, _t_campur)
+    cek('campuran: PNG asli + deterministik',
+        _png_campur[:8] == b'\x89PNG\r\n\x1a\n'
+        and len(_png_campur) > 10000
+        and _png_campur == GB.gambar_panah(_mod_campur, _t_campur),
+        str(len(_png_campur)))
+    # Campuran DITOLAK normalisasi (perantara M jadi Z + penguat Z
+    # = 2 Z). Perilaku saat ini, dikunci sebagai temuan: skripsi
+    # dengan mediasi DAN moderasi belum bisa digambar sama sekali.
+    _mod_campur_mentah = {
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                     {'nama': 'Orientasi Kewirausahaan', 'peran': 'M'},
+                     {'nama': 'Dukungan Sosial', 'peran': 'Z'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+        'jalur': [{'dari': 'Digital Marketing',
+                   'ke': 'Orientasi Kewirausahaan', 'hipotesis': 'H1',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Orientasi Kewirausahaan',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H3',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Dukungan Sosial',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H5',
+                   'jenis': 'interaksi', 'arah': '+'}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _mc, _mc_mas = DG.normalisasi_model(_mod_campur_mentah)
+    cek('campuran DITOLAK: perantara (Z) hanya boleh satu (temuan)',
+        _mc is None
+        and any('hanya boleh satu' in s for s in _mc_mas),
+        str(_mc_mas))
+    # model_dari_peta_bab4: jalur 'interaksi' + peran penguat Z
+    # disalin apa adanya dari peta.
+    _peta_mod = {
+        'jenis': 'kuantitatif',
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                     {'nama': 'Dukungan Sosial', 'peran': 'Z'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+        'jalur': [{'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H1',
+                   'jenis': 'langsung'},
+                  {'dari': 'Dukungan Sosial',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                   'jenis': 'interaksi'}]}
+    _ubah_mod = DG.model_dari_peta_bab4(_peta_mod)
+    cek('moderasi dari peta: jalur interaksi + peran Z disalin',
+        _ubah_mod is not None
+        and _ubah_mod['jalur'][1]['jenis'] == 'interaksi'
+        and _ubah_mod['variabel'][1]['peran'] == 'Z')
+    _ubah_mod_n, _ = DG.normalisasi_model(_ubah_mod)
+    cek('moderasi dari peta: lolos normalisasi (1 Z)',
+        _ubah_mod_n is not None
+        and _ubah_mod_n['jalur'][1]['jenis'] == 'interaksi')
+    _peta_campur = {
+        'jenis': 'kuantitatif',
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                     {'nama': 'Orientasi Kewirausahaan', 'peran': 'M'},
+                     {'nama': 'Dukungan Sosial', 'peran': 'Z'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+        'jalur': [{'dari': 'Digital Marketing',
+                   'ke': 'Orientasi Kewirausahaan', 'hipotesis': 'H1',
+                   'jenis': 'langsung'},
+                  {'dari': 'Orientasi Kewirausahaan',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                   'jenis': 'langsung'},
+                  {'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H3',
+                   'jenis': 'langsung'},
+                  {'dari': 'Dukungan Sosial',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H5',
+                   'jenis': 'interaksi'}]}
+    _ubah_campur = DG.model_dari_peta_bab4(_peta_campur)
+    _uc, _uc_mas = DG.normalisasi_model(_ubah_campur)
+    cek('campuran dari peta: penguat Z disalin, lalu DITOLAK (2 Z)',
+        _ubah_campur is not None
+        and _ubah_campur['variabel'][2]['peran'] == 'Z'
+        and _uc is None
+        and any('hanya boleh satu' in s for s in _uc_mas),
+        str(_uc_mas))
+    # Formulir tidak bisa menambah moderasi: template formulir hanya
+    # punya peran X/Z/Y (Z = perantara) dan tanpa pilihan jenis jalur.
+    _html_form = (ROOT / 'app' / 'templates'
+                  / 'diagram_model.html').read_text()
+    cek('formulir: tanpa pilihan interaksi (moderasi hanya dari peta)',
+        'interaksi' not in _html_form
+        and 'Z (perantara)' in _html_form)
+    # Cermin label editor JS vs PNG untuk moderasi (Bagian 17):
+    # panah interaksi ('putus') ikut digeser seperti 'lewat'
+    # (bukan 'lurus'), jadi pusat labelnya harus sama persis.
+    _banding_cermin('Moderasi murni', _mod_n, 20)
+    _banding_cermin('Campuran (hipotetis)', _mod_campur, 21)
+
 
 if __name__ == '__main__':
     jalankan()
