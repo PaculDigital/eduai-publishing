@@ -381,10 +381,16 @@ def jalankan():
     kotak = {k['id']: k for k in tata['kotak']}
     cek('tata Nura: 4 kotak (X1, X2, Z, Y)',
         len(tata['kotak']) == 4 and set(kotak) == {'X1', 'X2', 'Z', 'Y'})
-    cek('tata Nura: X kiri, Z di atas, Y kanan, X/Y sejajar',
-        kotak['X1']['x'] == 60 and kotak['Z']['x'] == 550
+    # Putaran 6 (pilihan 1 Boss 18 Nov 13:03 WIB): posisi Z dipilih
+    # dari skor, bukan aturan kaku. Nura (2 X) menang 'tengah'
+    # (silangan 0 vs 2 di 'atas'/'bawah', lihat Bagian 16): Z
+    # kembali di garis tengah seperti v4, X1/X2 simetris, Y di
+    # garis tengah, semua lurus, tidak bersilangan.
+    cek('tata Nura: X kiri, Z di garis tengah, Y kanan, X/Y sejajar',
+        tata.get('posisi_z') == 'tengah'
+        and kotak['X1']['x'] == 60 and kotak['Z']['x'] == 550
         and kotak['Y']['x'] == 1040
-        and kotak['Z']['y'] + kotak['Z']['h'] < tata.get('tengah')
+        and kotak['Z']['y'] + kotak['Z']['h'] / 2 == tata.get('tengah')
         and kotak['Y']['y'] + kotak['Y']['h'] / 2 == tata.get('tengah')
         and (kotak['X1']['y'] + kotak['X1']['h'] / 2
              + kotak['X2']['y'] + kotak['X2']['h'] / 2) / 2
@@ -1080,20 +1086,23 @@ def jalankan():
     # ── 11. Template default (Boss 18 Nov 12:12 WIB) ────────────────
     # Aturan umum di tata_letak (bukan per model): X berhadapan
     # dengan Y pada SATU garis tengah yang sama (tumpukan X dan Y
-    # simetris terhadap garis itu, berapapun jumlahnya); perantara
-    # M/Z TIDAK di garis itu, melainkan DI ATAS garis (default),
-    # supaya panah langsung X ke Y lurus dan tidak terhalang
-    # perantara. Menggantikan aturan 18 Nov 10:09 (Z dan Y sejajar
-    # di garis tengah). Ruas yang menembus kotak dibengkokkan,
-    # label yang mendarat di kotak atau label lain digeser sepanjang
-    # garisnya. Matriks: jumlah X 1, 2, 3, 5, 9 x tanpa Z / dengan
-    # Z x langsung / lewat. Bentuk lewat dengan 3 X atau lebih TIDAK
-    # diuji tanpa-tumpuk label: label berkumpul di segmen Z ke Y
-    # (4-10 panah berbagi satu segmen, celah antar label 26 px atau
-    # kurang, lebar label ~104 px) sehingga satu label per panah
-    # tidak muat; jawabannya gaya label gabungan contoh 6 (putaran
-    # multi-tahap). Bentuk 9 X + Z + lewat juga tidak diuji
-    # label-kotak (padat ekstrem yang sama).
+    # simetris terhadap garis itu, berapapun jumlahnya). Posisi
+    # perantara M/Z (tengah/atas/bawah) DIPILIH MESIN dari skor
+    # (putaran 6, pilihan 1 Boss 18 Nov 13:03 WIB, lihat Bagian
+    # 16), bukan aturan kaku "selalu di atas garis" (v5): pemenang
+    # per bentuk di tabel _menang_mat di bawah (1 X atas, 2 X
+    # tengah, 3 X atas, 5 X tengah/atas, 9 X tengah). Tanpa Z
+    # tidak ada pilihan (posisi_z None). Ruas yang menembus kotak
+    # dibengkokkan, label yang mendarat di kotak atau label lain
+    # digeser sepanjang garisnya. Matriks: jumlah X 1, 2, 3, 5, 9
+    # x tanpa Z / dengan Z x langsung / lewat. Bentuk lewat dengan
+    # 3 X atau lebih TIDAK diuji tanpa-tumpuk label: label
+    # berkumpul di segmen Z ke Y (4-10 panah berbagi satu segmen,
+    # celah antar label 26 px atau kurang, lebar label ~104 px)
+    # sehingga satu label per panah tidak muat; jawabannya gaya
+    # label gabungan contoh 6 (putaran multi-tahap). Bentuk 9 X +
+    # Z + lewat juga tidak diuji label-kotak (padat ekstrem yang
+    # sama).
     def _model_matriks(n_x, dengan_z, lewat):
         nama_x = ['Harga', 'Kualitas', 'Merek', 'Promosi', 'Lokasi',
                   'Pelayanan', 'Suasana', 'Harga Diri', 'Gaya Hidup'][:n_x]
@@ -1130,6 +1139,19 @@ def jalankan():
     def _ruas_lewat_kotak(x1, y1, x2, y2, k):
         return GB._segmen_lewat_kotak(x1, y1, x2, y2, k)
 
+    # Pemenang skor per bentuk mediasi 3 kolom (putaran 6): mesin
+    # yang memutuskan dari angka (Bagian 16), bukan patokan jumlah
+    # X (1 X atas, 2 X tengah, 3 X atas, 5 X tengah/atas, 9 X
+    # tengah). Tanpa Z tidak ada pilihan (posisi_z None).
+    _menang_mat = {(1, True, False): 'atas', (1, True, True): 'atas',
+                   (2, True, False): 'tengah',
+                   (2, True, True): 'tengah',
+                   (3, True, False): 'atas', (3, True, True): 'atas',
+                   (5, True, False): 'tengah',
+                   (5, True, True): 'atas',
+                   (9, True, False): 'tengah',
+                   (9, True, True): 'tengah'}
+
     for _n_x in (1, 2, 3, 5, 9):
         for _dengan_z in (False, True):
             for _lewat in ((False, True) if _dengan_z else (False,)):
@@ -1145,16 +1167,23 @@ def jalankan():
                 _tag = '%d X%s%s' % (
                     _n_x, ' + Z' if _dengan_z else '',
                     ' + lewat' if _lewat else '')
+                _menang = _menang_mat.get((_n_x, _dengan_z, _lewat))
                 if _dengan_z:
-                    cek('matriks %s: Y di garis tengah, Z di atas '
-                        'garis' % _tag,
-                        _pusat(_k_mat['Y']) == _tengah
-                        and _k_mat['Z']['y'] + _k_mat['Z']['h']
-                        < _tengah,
-                        str((_pusat(_k_mat['Z']), _pusat(_k_mat['Y']))))
+                    _z_di = (_k_mat['Z']['y'] + _k_mat['Z']['h']
+                             < _tengah if _menang == 'atas'
+                             else _pusat(_k_mat['Z']) == _tengah)
+                    cek('matriks %s: Y di garis tengah, Z di %s '
+                        '(pemenang skor)' % (_tag, _menang),
+                        _t_mat.get('posisi_z') == _menang
+                        and _pusat(_k_mat['Y']) == _tengah
+                        and _z_di,
+                        str((_menang, _pusat(_k_mat['Z']),
+                             _pusat(_k_mat['Y']))))
                 else:
-                    cek('matriks %s: Y di garis tengah' % _tag,
-                        _pusat(_k_mat['Y']) == _tengah,
+                    cek('matriks %s: Y di garis tengah, tanpa Z '
+                        '(posisi_z None)' % _tag,
+                        _t_mat.get('posisi_z') is None
+                        and _pusat(_k_mat['Y']) == _tengah,
                         str(_pusat(_k_mat['Y'])))
                 _xs_mat = [k for k in _t_mat['kotak']
                            if k['peran'] == 'X']
@@ -1188,14 +1217,27 @@ def jalankan():
                                 _kena.append((_p['label'], _j, _k['id']))
                 cek('matriks %s: tidak ada ruas menembus kotak' % _tag,
                     not _kena, str(_kena))
-                # Panah langsung SEMUA lurus (pengecualian segaris
-                # putaran 4 HILANG: Z kini di atas garis, bukan di
-                # garis tengah, jadi garis lurus X tengah ke Y tidak
-                # lagi terhalang Z; template default 18 Nov 12:12).
+                # Panah lurus, kecuali pengecualian segaris yang
+                # KEMBALI untuk pemenang 'tengah' (putaran 4): bila
+                # Z di garis tengah dan jumlah X ganjil >= 3, panah
+                # langsung X tengah ke Y segaris dengan Z, jadi
+                # dibengkokkan (satu-satunya panah bengkok); pemenang
+                # 'atas' tidak punya panah bengkok (Z di atas garis,
+                # garis lurus X tengah ke Y tidak terhalang).
                 _bengkok_mat = [(p['label'], p['dari'], p['ke'])
                                 for p in _pl_mat if p.get('rute')]
-                cek('matriks %s: semua panah lurus' % _tag,
-                    _bengkok_mat == [],
+                # 'dari'/'ke' di penempatan_label adalah ID kotak
+                # (X3, Y), bukan nama (Merek, Keputusan Beli).
+                if (_dengan_z and _menang == 'tengah'
+                        and _n_x % 2 == 1 and _n_x >= 3):
+                    _boleh_bengkok = [('H%d (+)' % (_n_x // 2 + 1),
+                                       'X%d' % (_n_x // 2 + 1), 'Y')]
+                else:
+                    _boleh_bengkok = []
+                cek('matriks %s: panah lurus%s' % (
+                    _tag, ' (kecuali X tengah segaris di tengah)'
+                    if _boleh_bengkok else ''),
+                    _bengkok_mat == _boleh_bengkok,
                     str(_bengkok_mat))
                 # Label tidak menyentuh kotak, kecuali 9 X + Z + lewat
                 # (padat ekstrem, lihat catatan di atas).
@@ -1214,10 +1256,10 @@ def jalankan():
                         _celah_min(_pl_mat) >= 0,
                         str(round(_celah_min(_pl_mat), 1)))
     # 3 X + Z: panah langsung X tengah (di garis tengah) kini LURUS
-    # mendatar: Z pindah ke atas garis (template default 18 Nov
-    # 12:12), jadi garis lurus X tengah ke Y tidak lagi terhalang
-    # Z; pengecualian segaris putaran 4 HILANG untuk mediasi 3
-    # kolom (tetap ada untuk rantai multi-kolom, lihat contoh 5).
+    # mendatar: pemenang skornya 'atas' (Bagian 16), jadi Z di atas
+    # garis dan garis lurus X tengah ke Y tidak terhalang Z;
+    # pengecualian segaris putaran 4 hanya untuk pemenang 'tengah'
+    # (5 X dan 9 X + Z, lihat matriks di atas).
     _m3 = _model_matriks(3, True, False)
     _t3 = DG.tata_letak(_m3)
     _pl3 = GB.penempatan_label(_t3)
@@ -1507,9 +1549,10 @@ def jalankan():
     _t9b = DG.tata_letak(_model_matriks(9, True, True))
     _k9b = {k['id']: k for k in _t9b['kotak']}
     cek('oval 9 X + Z + lewat: kanvas tumbuh, Y di garis tengah, '
-        'Z di atas garis',
+        'Z di garis tengah (pemenang skor)',
         _t9b.get('tinggi', 800) > 800
-        and _k9b['Z']['y'] + _k9b['Z']['h'] < _t9b.get('tengah')
+        and _t9b.get('posisi_z') == 'tengah'
+        and _pusat(_k9b['Z']) == _t9b.get('tengah')
         and _pusat(_k9b['Y']) == _t9b.get('tengah'),
         str(_t9b.get('tinggi')))
     # PNG ikut tinggi kanvas (bukan 800 tetap).
@@ -1572,13 +1615,14 @@ def jalankan():
         _tm14['tinggi'] == 488 and _img14.size[1] == 488,
         str((_tm14['tinggi'], _img14.size)))
 
-    # ── 15. Template default X-Y sejajar, M/Z di atas (Boss 18 Nov
-    # 12:12 WIB) ───────────────────────────────────────────────────
+    # ── 15. Template default X-Y sejajar, posisi Z dari skor
+    # (Boss 18 Nov 13:03 WIB, pilihan 1) ────────────────────────
     # X berhadapan dengan Y pada SATU garis tengah yang sama,
-    # berapapun jumlah X dan Y; M/Z di atas garis (default), bukan
-    # di garisnya; panah langsung diprioritaskan (lurus, tidak
-    # terhalang perantara). Menggantikan aturan 18 Nov 10:09
-    # (Z dan Y sejajar di garis tengah).
+    # berapapun jumlah X dan Y; posisi M/Z (tengah/atas/bawah)
+    # dipilih mesin dari skor (Bagian 16), bukan aturan kaku:
+    # Asih (1 X) dan 2 Y menang 'atas' (segitiga), Nura (2 X)
+    # menang 'tengah' (kembali seperti v4). Menggantikan aturan
+    # 18 Nov 12:12 (M/Z selalu di atas garis).
     # 2 Y dalam mediasi 3 kolom (dict langsung, bypass
     # normalisasi_model yang menolak lebih dari 1 Y): Y1/Y2
     # simetris terhadap garis tengah, X di garis tengah, Z di atas
@@ -1605,7 +1649,8 @@ def jalankan():
     _k2y = {k['id']: k for k in _t2y['kotak']}
     _pl2y = GB.penempatan_label(_t2y)
     cek('template 2 Y: X di garis tengah, Y1/Y2 simetris, Z di atas',
-        _pusat(_k2y['X1']) == _t2y.get('tengah')
+        _t2y.get('posisi_z') == 'atas'
+        and _pusat(_k2y['X1']) == _t2y.get('tengah')
         and _pusat(_k2y['Y1']) + _pusat(_k2y['Y2'])
         == 2 * _t2y.get('tengah')
         and _k2y['Z']['y'] + _k2y['Z']['h'] < _t2y.get('tengah'),
@@ -1622,16 +1667,20 @@ def jalankan():
         and _pusat(_k81b['Y']) == tata81.get('tengah'),
         str((_pusat(_k81b['X1']), _pusat(_k81b['Y']))))
     cek('template Asih: Z seluruhnya di atas garis tengah',
-        _k81b['Z']['y'] + _k81b['Z']['h'] < tata81.get('tengah'),
+        tata81.get('posisi_z') == 'atas'
+        and _k81b['Z']['y'] + _k81b['Z']['h'] < tata81.get('tengah'),
         str((_k81b['Z']['y'], _k81b['Z']['h'])))
-    # Nura: X1/X2 simetris, Y di garis tengah, Z di atas garis.
+    # Nura: X1/X2 simetris, Y di garis tengah, Z di garis tengah
+    # (pemenang skor 'tengah', kembali seperti v4).
     _t15n = DG.tata_letak(model_nl)
     _k15n = {k['id']: k for k in _t15n['kotak']}
-    cek('template Nura: X1/X2 simetris, Y di garis tengah, Z di atas',
-        _pusat(_k15n['X1']) + _pusat(_k15n['X2'])
+    cek('template Nura: X1/X2 simetris, Y di garis tengah, '
+        'Z di garis tengah (pemenang skor)',
+        _t15n.get('posisi_z') == 'tengah'
+        and _pusat(_k15n['X1']) + _pusat(_k15n['X2'])
         == 2 * _t15n.get('tengah')
         and _pusat(_k15n['Y']) == _t15n.get('tengah')
-        and _k15n['Z']['y'] + _k15n['Z']['h'] < _t15n.get('tengah'),
+        and _pusat(_k15n['Z']) == _t15n.get('tengah'),
         str({k: _pusat(v) for k, v in _k15n.items()}))
     # Pengecualian rantai multi-kolom (didokumentasikan, bukan
     # pelanggaran): perantara Goal-Directed membentuk rantai utama,
@@ -1649,6 +1698,168 @@ def jalankan():
         'tengah (rantai, bukan penghalang)',
         _pusat(_kg15['M6']) == _tg15.get('tengah'),
         str(_pusat(_kg15['M6'])))
+
+    # ── 16. Skor pemilih posisi Z (putaran 6, pilihan 1 Boss
+    # 18 Nov 13:03 WIB) ──────────────────────────────────────────
+    # Mesin mencoba tiga posisi perantara (tengah/atas/bawah),
+    # mengukur tiap kandidat dari ukuran yang bisa diukur, dan
+    # memilih skor terbaik (banding, urut prioritas):
+    # (a) silangan antar panah (kipas di tepi kotak bersama tidak
+    # dihitung); (b) hukuman celah label, hanya bila celah di
+    # bawah ambang nyaman 30 px (3x minimum 10 px); (c) panjang
+    # panah terpendek (besar = bagus) dan terpanjang (kecil =
+    # bagus); (d) simetri X/Y terhadap garis tengah; (e) celah
+    # panah ke kotak yang tidak disentuhnya; (f) jumlah panah
+    # bengkok. Seri = pilih 'atas' dulu (segitiga klasik). Yang
+    # memutuskan adalah SKOR, bukan patokan jumlah X: 1 X menang
+    # atas, 2 X tengah, 3 X atas, 5 X tengah/atas, 9 X tengah.
+    def _skor16(m, pz):
+        return GB.skor_tata_letak(DG.tata_letak(m, posisi_z=pz))
+
+    cek('skor: tata kosong = skor buruk',
+        GB.skor_tata_letak(None)['silangan'] == 999
+        and GB.skor_tata_letak({})['silangan'] == 999
+        and GB.skor_tata_letak(None)['banding'][0] == 999)
+    # Asih (1 X): tiga kandidat, 'atas' dan 'bawah' seri persis
+    # (cermin), 'tengah' kalah lewat (c) panah pendek, (d) simetri,
+    # (e) celah kotak; seri atas/bawah dimenangi 'atas'.
+    _s_asih = {pz: _skor16(model81, pz)
+               for pz in ('atas', 'tengah', 'bawah')}
+    cek('skor Asih: banding tiap kandidat (angka)',
+        _s_asih['atas']['banding']
+        == (0, 0.0, -314.0, 680.0, 0.0, -142.0, 0)
+        and _s_asih['tengah']['banding']
+        == (0, 0.0, -195.2, 730.4, 250.0, -9.7, 0)
+        and _s_asih['bawah']['banding']
+        == (0, 0.0, -314.0, 680.0, 0.0, -142.0, 0),
+        str({k: v['banding'] for k, v in _s_asih.items()}))
+    cek('skor Asih: atas dan bawah seri persis, pilih atas',
+        _s_asih['atas']['banding'] == _s_asih['bawah']['banding']
+        and DG.tata_letak(model81).get('posisi_z') == 'atas',
+        str(DG.tata_letak(model81).get('posisi_z')))
+    cek('skor Asih: atas menang lewat panjang, simetri, celah kotak',
+        _s_asih['atas']['panah_pendek']
+        > _s_asih['tengah']['panah_pendek']
+        and _s_asih['atas']['panah_panjang']
+        < _s_asih['tengah']['panah_panjang']
+        and _s_asih['atas']['simetri']
+        < _s_asih['tengah']['simetri']
+        and _s_asih['atas']['celah_kotak']
+        > _s_asih['tengah']['celah_kotak'],
+        str({k: (v['panah_pendek'], v['panah_panjang'],
+                 v['simetri'], v['celah_kotak'])
+             for k, v in _s_asih.items()}))
+    # Nura lewat Z (2 X): 'tengah' menang lewat (a) silangan 0
+    # vs 2; 'atas'/'bawah' menyilangkan H4/H5 di tengah diagram.
+    _s_nl = {pz: _skor16(model_nl, pz)
+             for pz in ('atas', 'tengah', 'bawah')}
+    cek('skor Nura lewat Z: banding tiap kandidat (angka)',
+        _s_nl['atas']['banding']
+        == (2, 18.0, -205.6, 724.5, 0.0, -21.4, 0)
+        and _s_nl['tengah']['banding']
+        == (0, 18.0, -190.0, 736.6, 0.0, -6.5, 0)
+        and _s_nl['bawah']['banding']
+        == (2, 18.0, -204.5, 724.5, 0.0, -21.4, 0),
+        str({k: v['banding'] for k, v in _s_nl.items()}))
+    cek('skor Nura lewat Z: tengah menang, silangan 0 vs 2',
+        _s_nl['tengah']['silangan'] == 0
+        and _s_nl['atas']['silangan'] == 2
+        and _s_nl['bawah']['silangan'] == 2
+        and DG.tata_letak(model_nl).get('posisi_z') == 'tengah',
+        str({k: v['silangan'] for k, v in _s_nl.items()}))
+    # Nura tanpa lewat (MODEL_NURA): 'tengah' juga menang, silangan
+    # 2 vs 3 (H6/H7 tanpa lewat eksplisit dirutekan lewat Z, dua
+    # silangan tengah diagram tersisa di H6/H7 menyilang H4/H5).
+    _s_nura = {pz: _skor16(model, pz)
+               for pz in ('atas', 'tengah', 'bawah')}
+    cek('skor Nura: tengah menang, silangan 2 vs 3',
+        _s_nura['tengah']['silangan'] == 2
+        and _s_nura['atas']['silangan'] == 3
+        and _s_nura['bawah']['silangan'] == 3
+        and DG.tata_letak(model).get('posisi_z') == 'tengah',
+        str({k: v['silangan'] for k, v in _s_nura.items()}))
+    # 2 Y: silangan seri (1), 'tengah' kalah lewat (b) hukuman
+    # celah 30 vs 6,1 dan (f) 1 panah bengkok; 'atas'/'bawah' seri,
+    # pilih 'atas'.
+    _s_2y = {pz: _skor16(_m2y, pz)
+             for pz in ('atas', 'tengah', 'bawah')}
+    cek('skor 2 Y: pemenang atas (hukuman celah 6,1 vs 30)',
+        _s_2y['atas']['banding']
+        == (1, 6.1, -194.8, 724.5, 0.0, -21.4, 0)
+        and _s_2y['tengah']['banding']
+        == (1, 30.0, -314.0, 959.0, 250.0, -41.9, 1)
+        and _s_2y['bawah']['banding']
+        == (1, 6.1, -194.8, 724.5, 0.0, -21.4, 0)
+        and DG.tata_letak(_m2y).get('posisi_z') == 'atas',
+        str({k: v['banding'] for k, v in _s_2y.items()}))
+    # Kipas tidak dihitung: garis H1 dan H2 Asih 'atas' MEMANG
+    # bersilangan (mentah), tapi titiknya 13 px sebelum tepi Y
+    # (kipas masuk), jadi skor silangan tetap 0.
+    _pl_asih_atas = GB.penempatan_label(
+        DG.tata_letak(model81, posisi_z='atas'))
+    _h1a = [p for p in _pl_asih_atas if p['label'] == 'H1 (+)'][0]
+    _h2a = [p for p in _pl_asih_atas if p['label'] == 'H2 (+)'][0]
+    cek('skor: silangan kipas di tepi kotak bersama tidak dihitung',
+        GB._segmen_potong(_h1a['x1'], _h1a['y1'], _h1a['x2'],
+                          _h1a['y2'], _h2a['x1'], _h2a['y1'],
+                          _h2a['x2'], _h2a['y2'])
+        and _skor16(model81, 'atas')['silangan'] == 0,
+        str((_h1a['x1'], _h1a['y1'], _h1a['x2'], _h1a['y2'],
+             _h2a['x1'], _h2a['y1'], _h2a['x2'], _h2a['y2'])))
+    # Hukuman celah: hanya bila celah di bawah 30 px (ambang
+    # nyaman); di atas ambang, hukuman 0 walau celahnya berbeda
+    # (Asih atas 91 px vs bawah 111 px, keduanya lega).
+    cek('skor: hukuman celah = max(0, 30 - celah_label)',
+        _s_asih['atas']['hukuman_celah'] == 0.0
+        and _s_asih['atas']['celah_label'] == 91.0
+        and _s_nl['tengah']['hukuman_celah'] == 18.0
+        and _s_nl['tengah']['celah_label'] == 12.0
+        and _s_2y['tengah']['hukuman_celah'] == 30.0
+        and _s_2y['tengah']['celah_label'] == 0.0,
+        str([(_s_asih['atas']['celah_label'],
+              _s_asih['atas']['hukuman_celah']),
+             (_s_nl['tengah']['celah_label'],
+              _s_nl['tengah']['hukuman_celah']),
+             (_s_2y['tengah']['celah_label'],
+              _s_2y['tengah']['hukuman_celah'])]))
+    # Pilih otomatis = kandidat dengan banding terkecil (matriks
+    # 15 bentuk): verifikasi independen, bukan hanya posisi_z.
+    for _n_x16 in (1, 2, 3, 5, 9):
+        for _dz16 in (False, True):
+            for _lw16 in ((False, True) if _dz16 else (False,)):
+                _m16 = _model_matriks(_n_x16, _dz16, _lw16)
+                _sk16 = {pz: _skor16(_m16, pz)
+                         for pz in ('atas', 'tengah', 'bawah')}
+                _menang16 = min(_sk16,
+                                key=lambda pz: _sk16[pz]['banding'])
+                _tag16 = '%d X%s%s' % (
+                    _n_x16, ' + Z' if _dz16 else '',
+                    ' + lewat' if _lw16 else '')
+                if _dz16:
+                    cek('skor matriks %s: pilih otomatis = banding '
+                        'terkecil (%s)' % (_tag16, _menang16),
+                        DG.tata_letak(_m16).get('posisi_z')
+                        == _menang16
+                        == _menang_mat[(_n_x16, True, _lw16)],
+                        str({k: v['banding']
+                             for k, v in _sk16.items()}))
+                else:
+                    cek('skor matriks %s: tanpa Z, tidak ada pilihan'
+                        % _tag16,
+                        DG.tata_letak(_m16).get('posisi_z') is None,
+                        str(DG.tata_letak(_m16).get('posisi_z')))
+    # posisi_z eksplisit mengalahkan pilih otomatis (dipakai
+    # pratinjau dan uji): Asih bisa dipaksa 'tengah'/'bawah', Nura
+    # bisa dipaksa 'atas'.
+    cek('skor: posisi_z eksplisit mengalahkan pilih otomatis',
+        DG.tata_letak(model81, posisi_z='tengah').get('posisi_z')
+        == 'tengah'
+        and DG.tata_letak(model81, posisi_z='bawah').get('posisi_z')
+        == 'bawah'
+        and DG.tata_letak(model_nl, posisi_z='atas').get('posisi_z')
+        == 'atas',
+        str(DG.tata_letak(model81, posisi_z='tengah')
+            .get('posisi_z')))
 
 
 if __name__ == '__main__':

@@ -423,7 +423,7 @@ def _y_tumpukan_padat(nama_list, lebar=LEBAR_KOTAK, pusat=400,
     return out
 
 
-def tata_letak(model: dict) -> dict:
+def tata_letak(model: dict, posisi_z: str | None = None) -> dict:
     """Tata letak deterministik: kotak + panah dalam kanvas 1400
     (dilebarkan bila kolom lebih dari 3); tinggi kanvas memeluk isi
     (mengikuti kotak teratas sampai terbawah + margin, tanpa ruang
@@ -433,25 +433,36 @@ def tata_letak(model: dict) -> dict:
     18 Nov 10:09 (Z dan Y sejajar di garis tengah): posisi selalu
     variabel X berhadapan dengan variabel Y, defaultnya SEJAJAR
     (satu garis tengah yang sama), berapapun jumlah X dan Y;
-    variabel lain seperti M/Z itu DI ATAS garis X-Y itu (default),
-    bukan di garisnya. Panah langsung diprioritaskan dulu (lurus,
-    terpendek, jalurnya bersih); garis putus-putus mengalah, lewat
-    perantara di atas/bawah, tidak pernah memotong jalur langsung.
+    variabel lain seperti M/Z itu DI ATAS atau DI BAWAH garis X-Y
+    itu, bukan di garisnya. Panah langsung diprioritaskan dulu
+    (lurus, terpendek, jalurnya bersih); garis putus-putus mengalah,
+    lewat perantara di atas/bawah, tidak pernah memotong jalur
+    langsung. Posisi perantara TIDAK kaku (pilihan 1 Boss 18 Nov
+    13:03 WIB): untuk mediasi 3 kolom (X|Z|Y), mesin menghitung
+    tiga kandidat (Z di tengah garis seperti v4, Z di atas garis
+    seperti segitiga v5, Z di bawah garis sebagai cerminnya),
+    lengkap dengan panah dan labelnya, lalu memilih yang skornya
+    terbaik (lihat skor_tata_letak di app/gambar.py: silangan
+    paling sedikit, celah label paling lega, panjang panah
+    seimbang, simetris, jarak ke kotak lega; seri memilih 'atas'
+    dulu). Yang memutuskan adalah SKOR, bukan patokan jumlah X.
+    Asih (1 X) menang di 'atas' (segitiga), Nura (2 X) menang di
+    'tengah' (seperti v4). Rantai multi-kolom (Goal-Directed,
+    contoh 5) tidak ikut pemilihan ini: perantaranya membentuk
+    rantai utama, jadi kolomnya tetap simetris terhadap garis
+    tengah seperti dulu.
     Tahap tiap variabel diturunkan dari graf jalur (longest-path):
     tanpa jalur masuk tahap 0, bila tidak 1 + maks tahap pendahulu;
     X/Z/Y biasa kembali jadi 3 kolom (X 0, Z 1, Y 2), tanpa Z jadi
     2 kolom; model bertahap (mis. Goal-Directed) jadi N kolom.
     Kolom X dan Y simetris terhadap garis tengah (1 kotak di garis
-    tengah; 2-4 kotak berjarak sama simetris; 5 kotak ke atas
-    tumpukan terpusat simetris). Kolom perantara mediasi 3 kolom
-    ditempatkan di atas garis: pusatnya garis - 250 px (atap
-    segitiga mediasi: X dan Y sejajar, Z di atas, H1 lurus
-    mendatar, H6 lewat atap Z), lalu dinaikkan sampai bawah kolom
-    melewati garis langsung X ke Y tertinggi di kolom itu dengan
-    celah 40 px. Rantai multi-kolom (Goal-Directed, contoh 5)
-    tidak memakai aturan perantara-di-atas: perantaranya
-    membentuk rantai utama, jadi kolomnya tetap simetris terhadap
-    garis tengah seperti dulu.
+    tengah, kecuali kolom X klasik 1 X di 'tengah' yang duduk di
+    atas garis seperti v4; 2-4 kotak berjarak sama simetris; 5 kotak
+    ke atas tumpukan terpusat simetris). Kolom perantara mediasi 3
+    kolom ditempatkan menurut posisi_z yang dipilih skor ('tengah':
+    di garis seperti v4; 'atas': di atas garis, pusat awal garis -
+    250 px lalu dinaikkan sampai bawah kolom melewati garis langsung
+    X ke Y tertinggi dengan celah 40 px; 'bawah': cermin 'atas').
     Jarak antar kolom 490 px (3 kolom ke bawah, sama seperti dulu:
     X 60, Z 550, Y 1040) atau 440 px (4 kolom ke atas, kanvas
     dilebarkan supaya label panah muat di celah 120 px).
@@ -469,9 +480,11 @@ def tata_letak(model: dict) -> dict:
     paling terbaca seperti label TL contoh 3), segmen kedua tanpa
     label, supaya tidak ada label yang sama dua kali.
     Kembalikan {'kotak', 'panah', 'bentuk', 'lebar', 'tinggi',
-    'tengah'}; 'lebar' = lebar kanvas model ini (1400 bila 3 kolom
+    'tengah', 'posisi_z'}; 'lebar' = lebar kanvas model ini (1400 bila 3 kolom
     ke bawah), 'tinggi' = tinggi kanvas model ini (memeluk isi),
-    'tengah' = garis tengah (pusat X/Y) dalam koordinat akhir.
+    'tengah' = garis tengah (pusat X/Y) dalam koordinat akhir,
+    'posisi_z' = posisi perantara yang dipakai ('tengah'/'atas'/
+    'bawah') bila ada mediasi 3 kolom, bila tidak None.
     """
     variabel = model.get('variabel') or []
     tahap = _tahap_variabel(variabel, model.get('jalur') or [])
@@ -494,8 +507,8 @@ def tata_letak(model: dict) -> dict:
     # Template default (Boss 18 Nov 12:12 WIB): X berhadapan dengan Y
     # pada SATU garis tengah yang sama (tumpukan X dan Y simetris
     # terhadap garis itu, berapapun jumlahnya); perantara M/Z TIDAK
-    # di garis itu, melainkan DI ATAS garis (default), supaya panah
-    # langsung X ke Y lurus dan tidak terhalang perantara.
+    # di garis itu, melainkan DI ATAS atau DI BAWAH garis, supaya
+    # panah langsung X ke Y lurus dan tidak terhalang perantara.
     garis = TENGAH_KANVAS
     # Kolom perantara mediasi 3 kolom: hanya bila 3 kolom, kolom
     # pertama hanya X, kolom tengah hanya Z, kolom terakhir hanya Y.
@@ -510,6 +523,20 @@ def tata_letak(model: dict) -> dict:
                 and peran_kolom.get(1) == {'Z'}
                 and peran_kolom.get(2) == {'Y'}):
             t_med = 1
+    # Posisi perantara dipilih dari SKOR (pilihan 1 Boss 18 Nov
+    # 13:03 WIB), bukan aturan kaku: bila posisi_z tidak disebut
+    # dan ada mediasi 3 kolom, tiga kandidat dihitung lengkap lalu
+    # yang skornya terbaik yang dipakai (seri: 'atas' dulu, urutan
+    # evaluasi). Tanpa mediasi, posisi_z diabaikan.
+    if t_med is not None and posisi_z is None:
+        from .gambar import skor_tata_letak as _skor
+        _terbaik = None
+        for _pz in ('atas', 'tengah', 'bawah'):
+            _t = tata_letak(model, posisi_z=_pz)
+            _s = _skor(_t)
+            if _terbaik is None or _s['banding'] < _terbaik[0]['banding']:
+                _terbaik = (_s, _t)
+        return _terbaik[1]
 
     def _pusat_kolom(vs, pusat):
         """Pusat vertikal tiap kotak di satu kolom, simetris
@@ -523,24 +550,35 @@ def tata_letak(model: dict) -> dict:
         return [_pusat_tumpukan(i, n, pusat, max(hs))
                 for i in range(n)]
 
-    # Pusat tiap kolom (pra-geser). Kolom ujung/rantai simetris
-    # terhadap garis; kolom perantara dihitung sesudah garis
-    # langsung diketahui (posisinya tergantung garis itu).
-    pusat_kolom = {}
-    for t, vs in kolom.items():
-        if t != t_med:
-            pusat_kolom[t] = _pusat_kolom(vs, garis)
-    if t_med is not None:
-        # Perantara di atas garis: pusat kolom = garis - LANGKAH_X
-        # (atap segitiga mediasi), lalu dinaikkan sampai bawah kolom
-        # melewati garis langsung X ke Y tertinggi di kolom itu
-        # dengan celah CELAH_PERANTARA, supaya panah langsung lurus
-        # dan tidak terhalang perantara (prioritas langsung,
-        # putus-putus mengalah). Bila tidak ada garis langsung X ke
-        # Y, pusatnya tetap garis - LANGKAH_X.
+    def _pusat_untuk_kolom(t, vs):
+        """Pusat acuan satu kolom (bukan perantara). Kolom X klasik
+        1 X di 'tengah' duduk di atas garis (seperti v4, supaya X,
+        Z, Y tidak segaris); di 'atas'/'bawah', 1 X di garis tengah
+        (segitiga mediasi, v5). Kolom lain selalu di garis."""
+        if (posisi_z == 'tengah' and t_med is not None
+                and n_kolom <= 3 and t == 0 and len(vs) == 1
+                and vs[0].get('peran') == 'X'):
+            return garis - LANGKAH_X
+        return garis
+
+    def _pusat_mediasi(posisi):
+        """Pusat vertikal kolom perantara mediasi 3 kolom.
+
+        'tengah': di garis tengah seperti v4 (Z sejajar Y, 1 X di
+        atas garis); 'atas': di atas garis, pusat awal garis - 250
+        px (atap segitiga mediasi), lalu dinaikkan sampai bawah
+        kolom melewati garis langsung X ke Y tertinggi di kolom itu
+        dengan celah CELAH_PERANTARA; 'bawah': cermin 'atas' (pusat
+        awal garis + 250 px, diturunkan sampai atas kolom melewati
+        garis langsung X ke Y terendah dengan celah yang sama). Bila
+        tidak ada garis langsung X ke Y, pusatnya tetap pusat awal.
+        """
         vs_med = kolom[t_med]
         hs_med = [tinggi_oval(v['nama']) for v in vs_med]
-        pusat_awal = garis - LANGKAH_X
+        if posisi == 'tengah':
+            return _pusat_kolom(vs_med, garis)
+        atas = posisi == 'atas'
+        pusat_awal = garis - LANGKAH_X if atas else garis + LANGKAH_X
         pusat_xy = {}
         for t, vs in kolom.items():
             if t == t_med:
@@ -551,7 +589,7 @@ def tata_letak(model: dict) -> dict:
         peran_kode = {v.get('kode') or v.get('nama'): v.get('peran')
                       for v in variabel}
         x_med = x_kolom[t_med]
-        y_min_langsung = None
+        y_ekstrem = None
         for j in model.get('jalur') or []:
             if str(j.get('jenis') or '').strip().lower() != 'langsung':
                 continue
@@ -566,17 +604,31 @@ def tata_letak(model: dict) -> dict:
                 continue
             for x in (x_med, x_med + LEBAR_KOTAK):
                 y = y1 + (y2 - y1) * (x - x1) / (x2 - x1)
-                y_min_langsung = y if y_min_langsung is None \
-                    else min(y_min_langsung, y)
+                y_ekstrem = (y if y_ekstrem is None else
+                             (min(y_ekstrem, y) if atas
+                              else max(y_ekstrem, y)))
         pusat_med = pusat_awal
-        if y_min_langsung is not None:
-            bawah_awal = max(
-                c + h / 2 for c, h in zip(
-                    _pusat_kolom(vs_med, pusat_awal), hs_med))
-            batas_bawah = y_min_langsung - CELAH_PERANTARA
-            if bawah_awal > batas_bawah:
-                pusat_med = pusat_awal - (bawah_awal - batas_bawah)
-        pusat_kolom[t_med] = _pusat_kolom(vs_med, pusat_med)
+        if y_ekstrem is not None:
+            pusat_awal_list = _pusat_kolom(vs_med, pusat_awal)
+            tepi_awal = (
+                max(c + h / 2 for c, h in zip(pusat_awal_list, hs_med))
+                if atas else
+                min(c - h / 2 for c, h in zip(pusat_awal_list, hs_med)))
+            batas = (y_ekstrem - CELAH_PERANTARA if atas
+                     else y_ekstrem + CELAH_PERANTARA)
+            if (tepi_awal > batas) if atas else (tepi_awal < batas):
+                pusat_med = pusat_awal - (tepi_awal - batas)
+        return _pusat_kolom(vs_med, pusat_med)
+
+    # Pusat tiap kolom (pra-geser). Kolom ujung/rantai simetris
+    # terhadap garis; kolom perantara dihitung sesudah garis
+    # langsung diketahui (posisinya tergantung garis itu).
+    pusat_kolom = {}
+    for t, vs in kolom.items():
+        if t != t_med:
+            pusat_kolom[t] = _pusat_kolom(vs, _pusat_untuk_kolom(t, vs))
+    if t_med is not None:
+        pusat_kolom[t_med] = _pusat_mediasi(posisi_z or 'atas')
     kotak: list[dict] = []
     for t in sorted(kolom):
         vs = kolom[t]
@@ -631,7 +683,8 @@ def tata_letak(model: dict) -> dict:
                       else 'lurus'})
     return {'kotak': kotak, 'panah': panah,
             'bentuk': bentuk_model(model), 'lebar': lebar_kanvas,
-            'tinggi': tinggi_kanvas, 'tengah': tengah}
+            'tinggi': tinggi_kanvas, 'tengah': tengah,
+            'posisi_z': posisi_z if t_med is not None else None}
 
 
 def tata_dari_kotak(kotak, panah, jenis: str = 'model',

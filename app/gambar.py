@@ -808,6 +808,242 @@ def _geser_label_bebas(titik, mx, my, lw, lh, kotak_semua, sudah):
     return mx, my
 
 
+def _titik_potong(ax, ay, bx, by, cx, cy, dx, dy):
+    """Titik potong segmen AB dan CD (None bila sejajar atau tidak
+    berpotongan di dalam ruas)."""
+    d = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx)
+    if d == 0:
+        return None
+    t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / d
+    u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / d
+    if 0 < t < 1 and 0 < u < 1:
+        return (ax + t * (bx - ax), ay + t * (by - ay))
+    return None
+
+
+def _jarak_titik_segmen(px, py, x1, y1, x2, y2):
+    """Jarak titik ke segmen (px)."""
+    dx, dy = x2 - x1, y2 - y1
+    if dx == 0 and dy == 0:
+        return math.hypot(px - x1, py - y1)
+    t = max(0.0, min(1.0, ((px - x1) * dx + (py - y1) * dy)
+                       / (dx * dx + dy * dy)))
+    return math.hypot(px - (x1 + t * dx), py - (y1 + t * dy))
+
+
+def _jarak_titik_persegi(px, py, kiri, atas, kanan, bawah):
+    """Jarak titik ke persegi (0 bila di dalam)."""
+    dx = max(kiri - px, 0.0, px - kanan)
+    dy = max(atas - py, 0.0, py - bawah)
+    return math.hypot(dx, dy)
+
+
+def _jarak_persegi_segmen(kiri, atas, kanan, bawah, x1, y1, x2, y2):
+    """Jarak persegi ke segmen (0 bila segmen menyentuh persegi)."""
+    if (_jarak_titik_persegi(x1, y1, kiri, atas, kanan, bawah) == 0
+            or _jarak_titik_persegi(x2, y2, kiri, atas, kanan, bawah)
+            == 0):
+        return 0.0
+    for (ax, ay, bx, by) in (
+            (kiri, atas, kanan, atas), (kanan, atas, kanan, bawah),
+            (kanan, bawah, kiri, bawah), (kiri, bawah, kiri, atas)):
+        if _segmen_potong(x1, y1, x2, y2, ax, ay, bx, by):
+            return 0.0
+    return min(
+        _jarak_titik_persegi(x1, y1, kiri, atas, kanan, bawah),
+        _jarak_titik_persegi(x2, y2, kiri, atas, kanan, bawah),
+        min(_jarak_titik_segmen(cx, cy, x1, y1, x2, y2)
+            for cx, cy in ((kiri, atas), (kanan, atas),
+                           (kanan, bawah), (kiri, bawah))))
+
+
+def _jarak_persegi_persegi(a, b):
+    """Jarak dua persegi (kiri, atas, kanan, bawah); negatif bila
+    tumpang tindih (minus kedalaman tumpuk terkecil)."""
+    dx = max(b[0] - a[2], a[0] - b[2])
+    dy = max(b[1] - a[3], a[1] - b[3])
+    if dx <= 0 and dy <= 0:
+        return -min(a[2] - b[0], b[2] - a[0],
+                    a[3] - b[1], b[3] - a[1])
+    return math.hypot(max(dx, 0.0), max(dy, 0.0))
+
+
+def skor_tata_letak(tata: dict | None) -> dict:
+    """Skor tata letak dari ukuran yang bisa diukur (pilihan 1 Boss
+    18 Nov 13:03 WIB: mesin fleksibel, bukan aturan kaku).
+
+    Dipakai tata_letak untuk memilih posisi perantara (tengah/atas/
+    bawah) pada mediasi 3 kolom: tiap kandidat dihitung lengkap
+    (kotak + panah + label lewat penempatan_label), lalu yang
+    skornya terbaik yang dipakai. Kriteria, urut prioritas (lebih
+    kecil lebih bagus di 'banding'):
+      (a) silangan: jumlah silangan antar panah (ujung yang bertemu
+          di kotak yang sama tidak dihitung, _segmen_potong; kipas
+          di tepi kotak bersama dalam 40 px juga tidak dihitung,
+          karena panah yang keluar/masuk dari kotak yang sama
+          memang berangkat dari titik berdekatan);
+      (b) celah_label: celah minimum label, px (label ke label,
+          label ke garis RUTE LAIN; label ke garisnya sendiri dan
+          ke garis sejalur tidak dihitung). Dihitung sebagai
+          hukuman bila celah di bawah ambang nyaman 30 px (3x
+          minimum 10 px); di atas ambang, semua dianggap sama
+          leganya, supaya selisih kecil yang tidak terlihat tidak
+          menentukan pemenang (mis. Asih 'atas' 91 px vs 'bawah'
+          111 px, keduanya lega; yang menentukan adalah (c)-(e)).
+          Tumpang (negatif) dihukum berat;
+      (c) panah_pendek/panjang: panjang panah terpendek (paling
+          besar paling bagus, supaya tidak ada panah yang
+          berdesakan) dan terpanjang (paling kecil paling bagus,
+          supaya tidak ada panah yang sangat panjang/miring curam);
+          utamakan panjang yang seimbang;
+      (d) simetri: simpangan maksimum pusat kotak X dan Y saja
+          dari cermin terhadap garis tengah, px (0 = simetris
+          sempurna; perantara M/Z tidak ikut, memang di atas/bawah
+          garis);
+      (e) celah_kotak: jarak minimum panah ke kotak yang tidak
+          disentuhnya, px (paling besar paling bagus, harus > 0);
+      (f) bengkok: jumlah panah yang dibengkokkan (jalan terakhir
+          _rute_bengkok), paling sedikit paling bagus.
+    'banding' = (silangan, hukuman_celah, -panah_pendek,
+    panah_panjang, simetri, -celah_kotak, bengkok), dibulatkan ke
+    0,1 px supaya selisih desimal tidak menentukan; seri di semua
+    unsur diputus pemanggil dengan memilih 'atas' dulu.
+    Kembalikan dict dengan semua ukuran + 'banding'.
+    """
+    if not tata or not (tata.get('kotak') or []):
+        return {'silangan': 999, 'celah_label': -999.0,
+                'hukuman_celah': 999.0,
+                'panah_pendek': 0.0, 'panah_panjang': 9999.0,
+                'simetri': 9999.0, 'celah_kotak': -999.0,
+                'bengkok': 999,
+                'banding': (999, 999.0, 0.0, 9999.0, 9999.0, 999.0,
+                            999)}
+    pl = penempatan_label(tata)
+    kotak = list(tata.get('kotak') or [])
+    kotak_id = {k['id']: k for k in kotak}
+    garis = []
+    for p in pl:
+        titik = ([(p['x1'], p['y1'])] + list(p.get('rute') or [])
+                 + [(p['x2'], p['y2'])])
+        garis.append((p, titik))
+    # (a) Silangan antar panah (bukan satu panah). Kipas di tepi
+    # kotak bersama TIDAK dihitung: dua panah yang keluar/masuk
+    # dari kotak yang sama (sumber atau tujuan yang sama) memang
+    # berangkat dari titik yang berdekatan di tepi elips itu, jadi
+    # silangannya yang terjadi dalam 40 px dari kotak itu bukan
+    # cacat, melainkan pertemuan di kipas (mis. H1 dan H2 Asih
+    # bertemu 15 px sebelum tepi Y). Silangan di tengah diagram
+    # (mis. H2/H7 Nura menyilang H4) tetap dihitung.
+    silangan = 0
+    for i in range(len(garis)):
+        for j in range(i + 1, len(garis)):
+            _pi, _pj = garis[i][0], garis[j][0]
+            _bersama = ({_pi.get('dari'), _pi.get('ke')}
+                        & {_pj.get('dari'), _pj.get('ke')})
+            for a in range(len(garis[i][1]) - 1):
+                for b in range(len(garis[j][1]) - 1):
+                    _ax, _ay = garis[i][1][a]
+                    _bx, _by = garis[i][1][a + 1]
+                    _cx, _cy = garis[j][1][b]
+                    _dx, _dy = garis[j][1][b + 1]
+                    if not _segmen_potong(_ax, _ay, _bx, _by,
+                                          _cx, _cy, _dx, _dy):
+                        continue
+                    _tp = _titik_potong(_ax, _ay, _bx, _by,
+                                        _cx, _cy, _dx, _dy)
+                    _kipas = False
+                    if _tp is not None:
+                        for _bid in _bersama:
+                            _k = kotak_id.get(_bid)
+                            if _k is None:
+                                continue
+                            if _jarak_titik_persegi(
+                                    _tp[0], _tp[1], _k['x'], _k['y'],
+                                    _k['x'] + _k['w'],
+                                    _k['y'] + _k['h']) <= 40:
+                                _kipas = True
+                                break
+                    if not _kipas:
+                        silangan += 1
+    # (b) Celah label minimum: label ke label, label ke garis lain.
+    berlabel = [p for p in pl if p.get('label')]
+    celah = 999.0
+    for i in range(len(berlabel)):
+        for j in range(i + 1, len(berlabel)):
+            celah = min(celah, _jarak_persegi_persegi(
+                (berlabel[i]['kiri'], berlabel[i]['atas'],
+                 berlabel[i]['kanan'], berlabel[i]['bawah']),
+                (berlabel[j]['kiri'], berlabel[j]['atas'],
+                 berlabel[j]['kanan'], berlabel[j]['bawah'])))
+    for p in berlabel:
+        for q, titik in garis:
+            if q is p:
+                continue
+            # Garis sejalur (dari dan ke sama) tidak dihitung:
+            # jalur sejajar memang sengaja digeser 40 px, dan kotak
+            # putih label di garis curam kadang menyentuh garis
+            # tetangga sejalur itu (cacat kosmetik yang sudah
+            # diketahui, terbaca wajar); yang diukur di sini adalah
+            # label yang menyentuh garis RUTE LAIN.
+            if (q.get('dari'), q.get('ke')) == (p.get('dari'),
+                                                p.get('ke')):
+                continue
+            for a in range(len(titik) - 1):
+                celah = min(celah, _jarak_persegi_segmen(
+                    p['kiri'], p['atas'], p['kanan'], p['bawah'],
+                    titik[a][0], titik[a][1],
+                    titik[a + 1][0], titik[a + 1][1]))
+    # (c) Panjang panah terpendek / terpanjang.
+    panjang = [_panjang_polilinia(titik) for _, titik in garis]
+    panah_pendek = min(panjang) if panjang else 0.0
+    panah_panjang = max(panjang) if panjang else 0.0
+    # (d) Simetri: hanya kolom X dan Y (perantara M/Z memang
+    # ditempatkan di atas/bawah garis, bukan di garisnya, jadi
+    # tidak ikut diukur). Simpangan maksimum pusat kotak X/Y dari
+    # cermin terhadap garis tengah ('tengah' dari tata), px (0 =
+    # simetris sempurna).
+    tengah = tata.get('tengah')
+    if tengah is None:
+        tengah = (tata.get('tinggi') or H) / 2
+    simetri = 0.0
+    for _peran in ('X', 'Y'):
+        _pusat = sorted(k['y'] + k['h'] / 2 for k in kotak
+                        if str(k.get('peran') or '') == _peran)
+        for i in range(len(_pusat) // 2):
+            simetri = max(simetri, abs(
+                _pusat[i] + _pusat[-1 - i] - 2 * tengah))
+        if len(_pusat) % 2 == 1:
+            simetri = max(simetri, abs(_pusat[len(_pusat) // 2]
+                                       - tengah))
+    # (e) Celah panah ke kotak yang tidak disentuhnya.
+    celah_kotak = 999.0
+    for p, titik in garis:
+        for a in range(len(titik) - 1):
+            for k in kotak:
+                if k['id'] in (p.get('dari'), p.get('ke')):
+                    continue
+                celah_kotak = min(celah_kotak, _jarak_persegi_segmen(
+                    k['x'], k['y'], k['x'] + k['w'], k['y'] + k['h'],
+                    titik[a][0], titik[a][1],
+                    titik[a + 1][0], titik[a + 1][1]))
+    # (f) Panah yang dibengkokkan (jalan terakhir).
+    bengkok = sum(1 for p in pl if p.get('rute'))
+    # (b) sebagai hukuman: hanya bila celah di bawah ambang nyaman
+    # 30 px (3x minimum 10 px); di atas ambang, semua sama lega.
+    hukuman_celah = max(0.0, 30.0 - celah)
+    banding = (silangan, round(hukuman_celah, 1),
+               -round(panah_pendek, 1),
+               round(panah_panjang, 1), round(simetri, 1),
+               -round(celah_kotak, 1), bengkok)
+    return {'silangan': silangan, 'celah_label': round(celah, 1),
+            'hukuman_celah': round(hukuman_celah, 1),
+            'panah_pendek': round(panah_pendek, 1),
+            'panah_panjang': round(panah_panjang, 1),
+            'simetri': round(simetri, 1),
+            'celah_kotak': round(celah_kotak, 1),
+            'bengkok': bengkok, 'banding': banding}
+
+
 def penempatan_label(tata: dict | None) -> list:
     """Posisi garis + label tiap panah (untuk uji + gambar).
 
