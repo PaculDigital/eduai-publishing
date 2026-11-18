@@ -244,10 +244,10 @@ def periksa_peta(peta: dict) -> list[dict]:
         tambah('tanpa_y', 'Belum ada variabel hasil (Y).')
     if 'X' not in peran_ada:
         tambah('tanpa_x', 'Belum ada variabel bebas (X).')
-    if len([1 for r in peran_ada if r == 'Y']) and \
-            sum(1 for v in variabel if v.get('peran') == 'Y') > 1:
-        tambah('y_ganda', 'Variabel hasil (Y) lebih dari satu — model '
-                          'BAB IV ini mendukung satu Y.')
+    # Sinkron Diagram (multi-Y, 2M, 2Z): jumlah Y/M/Z TIDAK dibatasi
+    # lagi — yang diperiksa adalah struktur per variabel (di bawah:
+    # tiap M harus punya jalur masuk DAN keluar, tiap Z harus punya
+    # jalur interaksi ke hasil).
 
     label = [str(j.get('hipotesis') or '') for j in jalur]
     if any(not h for h in label):
@@ -321,8 +321,13 @@ def periksa_peta(peta: dict) -> list[dict]:
                        f'Perantara "{v["nama"]}" harus punya jalur masuk '
                        'DAN jalur keluar.')
         if v.get('peran') == 'Z':
+            # Sinkron 2Z: interaksi harus dari penguat INI (bukan
+            # sekadar ada interaksi mana pun ke Y), supaya penguat
+            # kedua tanpa interaksi tetap ketahuan.
+            nama_z = str(v.get('nama') or '')
             ada_interaksi = any(
-                j.get('jenis') == 'interaksi' and str(j.get('ke')) in
+                j.get('jenis') == 'interaksi' and
+                str(j.get('dari')) == nama_z and str(j.get('ke')) in
                 {n for n, r in nama_peran.items() if r == 'Y'}
                 for j in jalur)
             if not ada_interaksi:
@@ -559,9 +564,17 @@ def susun_payload_hitung(peta: dict, kolom: list, tahap: str = 'utama') -> dict:
             raise ValueError(
                 'Tidak ada kolom data yang cocok dengan variabel peta '
                 '— payload kosong tidak dikirim ke mesin.')
-        y = next((n for n, r in peran.items() if r == 'Y'), None)
+        ys = [n for n, r in peran.items() if r == 'Y']
         payload['konstruk'] = konstruk
-        payload['kolom_y_konstruk'] = y
+        # Sinkron Diagram (multi-Y): satu Y tetap satu nama seperti
+        # dulu (mesin tidak berubah); banyak Y dikirim sebagai daftar
+        # nama konstruk hasil supaya mesin PLS melihat semua hasil.
+        if len(ys) == 1:
+            payload['kolom_y_konstruk'] = ys[0]
+        elif ys:
+            payload['kolom_y_konstruk'] = ys
+        else:
+            payload['kolom_y_konstruk'] = None
     else:
         # BUG PALING BERAT (temuan review Fase 3): kontrak mesin SPSS
         # meminta kolom_y SATU nama kolom gabungan — mengirim daftar
@@ -763,9 +776,11 @@ def petakan_hasil_ke_hipotesis(peta: dict, hasil: dict) -> list[dict]:
                 if sumber is None:
                     sumber, asal = koef.get(ld), 'koef'
             elif lk.startswith('M'):
-                m = mediasi.get((ld, lk,
-                                 next((lb for nm, lb in label.items()
-                                       if lb.startswith('Y')), '')))
+                # Sinkron multi-Y: jalur X→M tidak terikat satu Y —
+                # cari entri mediasi apa pun dengan X dan M yang sama
+                # (koefisien 'a' tidak bergantung pada Y tujuannya).
+                m = next((mm for (x, mm_, y), mm in mediasi.items()
+                          if x == ld and mm_ == lk), None)
                 sumber, asal = (m or {}).get('a'), 'kaitan'
             if sumber:
                 entri.update(ketemu=True, b=sumber.get('b'),

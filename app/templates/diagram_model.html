@@ -1,8 +1,11 @@
 {# Formulir kecil Model Penelitian (17 Nov 2026).
    Kata pendek, Bahasa Indonesia polos.
-   Pilihan Dari/Ke/Lewat memakai kode (X1, X2, Z, Y) sebagai nilai,
+   Pilihan Dari/Ke/Lewat memakai kode (X1, X2, M, Z, Y) sebagai nilai,
    teksnya "Nama (Kode)": pilihan tidak hilang bila nama diubah,
-   dan validasi gagal pun isian ditampilkan lagi apa adanya. #}
+   dan validasi gagal pun isian ditampilkan lagi apa adanya.
+   Kolom Jenis jalur (Boss 18 Nov 16:12 WIB): Langsung (panah lurus)
+   atau Tidak langsung (panah putus-putus); bila Dari penguat (Z),
+   Jenis terkunci jadi Moderasi (panah putus-putus). #}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -16,6 +19,10 @@
   table { border-collapse: collapse; width: 100%; margin-bottom: 8px; }
   td, th { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; }
   input[type=text], select { padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; width: 100%; }
+  .lipatan-indikator td { background: #f7f9fa; }
+  .lipatan-indikator summary { cursor: pointer; color: #1a73e8; font-weight: bold; }
+  .baris-indikator { display: flex; gap: 6px; margin: 4px 0; }
+  .baris-indikator input[type=text] { flex: 1; }
   h3 { margin-bottom: 4px; }
   a { color: #1a73e8; }
 </style>
@@ -30,14 +37,33 @@
   <table id="tabel-variabel">
     <tr><th>Nama</th><th>Peran</th><th></th></tr>
     {% for v in model.variabel %}
+    {% set idx_var = loop.index0 %}
     <tr>
       <td><input type="text" name="vn" value="{{ v.nama }}" oninput="segarkanPilihan()"></td>
       <td><select name="vp" onchange="segarkanPilihan()">
         <option value="X" {% if v.peran == 'X' %}selected{% endif %}>X (bebas)</option>
-        <option value="Z" {% if v.peran in ('Z', 'M') %}selected{% endif %}>Z (perantara)</option>
+        <option value="M" {% if v.peran == 'M' %}selected{% endif %}>M (perantara)</option>
+        <option value="Z" {% if v.peran == 'Z' %}selected{% endif %}>Z (penguat)</option>
         <option value="Y" {% if v.peran == 'Y' %}selected{% endif %}>Y (hasil)</option>
       </select></td>
       <td><button class="tombol kedua" type="button" onclick="hapusBaris(this)">Hapus</button></td>
+    </tr>
+    <tr class="lipatan-indikator">
+      <td colspan="3">
+        <details {% if v.indikator %}open{% endif %}>
+          <summary>Indikator (<span class="jml-ind">{{ v.indikator | length if v.indikator else 0 }}</span>)</summary>
+          <div class="daftar-indikator">
+            {% for ind in v.indikator or [] %}
+            <div class="baris-indikator">
+              <input type="text" name="vi" value="{{ ind }}" oninput="segarkanIndikator()">
+              <input type="hidden" name="vk" value="{{ idx_var }}">
+              <button class="tombol kedua" type="button" onclick="hapusIndikator(this)">Hapus</button>
+            </div>
+            {% endfor %}
+          </div>
+          <button class="tombol kedua" type="button" onclick="tambahIndikator(this)">+ Indikator</button>
+        </details>
+      </td>
     </tr>
     {% endfor %}
   </table>
@@ -45,12 +71,17 @@
 
   <h3>Hipotesis</h3>
   <table id="tabel-hipotesis">
-    <tr><th>Dari</th><th>Ke</th><th>Lewat</th><th>Label</th><th>Arah</th><th></th></tr>
+    <tr><th>Dari</th><th>Ke</th><th>Lewat</th><th>Jenis</th><th>Label</th><th>Arah</th><th></th></tr>
     {% for j in model.jalur %}
     <tr>
       <td><select name="jd" class="pilih-variabel" data-awal="{{ j.dari }}" onchange="pilihBerubah(this)"></select></td>
       <td><select name="jk" class="pilih-variabel" data-awal="{{ j.ke }}" onchange="pilihBerubah(this)"></select></td>
       <td><select name="jl" class="pilih-variabel pilih-lewat" data-awal="{{ j.lewat or '' }}" onchange="pilihBerubah(this)"></select></td>
+      <td><select name="jj" class="pilih-jenis" data-awal="{{ j.jenis or 'langsung' }}" onchange="jenisBerubah(this)">
+        <option value="langsung" {% if (j.jenis or 'langsung') == 'langsung' %}selected{% endif %}>Langsung (panah lurus)</option>
+        <option value="tidak_langsung" {% if j.jenis == 'tidak_langsung' %}selected{% endif %}>Tidak langsung (panah putus-putus)</option>
+        <option value="interaksi" {% if j.jenis == 'interaksi' %}selected{% endif %}>Moderasi (panah putus-putus)</option>
+      </select></td>
       <td><input type="text" name="jh" value="{{ j.hipotesis }}"></td>
       <td><select name="ja">
         <option value="" {% if not j.arah %}selected{% endif %}>Tanpa arah</option>
@@ -62,32 +93,56 @@
     {% endfor %}
   </table>
   <p><button class="tombol kedua" type="button" onclick="tambahHipotesis()">+ Hipotesis</button></p>
+  <p>Hanya perantara (M) yang muncul di sini. Ubah peran jadi M bila variabel ini ingin dilewati.</p>
+  <p>Jalur dari penguat (Z) ke hasil (Y) digambar putus-putus.</p>
 
   <p><button class="tombol" type="submit">Lihat draf</button>
   <a href="/naskah/{{ berkas.id }}/diagram">Batal</a></p>
 </form>
 <script>
+function kodePeran(peran, nomor, jumlah) {
+  // Kode kotak: X selalu bernomor (X1, X2, ...); M/Z/Y bernomor
+  // HANYA bila lebih dari satu (M1/M2, Z1/Z2, Y1/Y2), satu saja
+  // tetap 'M'/'Z'/'Y' seperti dulu (dan seperti M1/M2 di Bab IV).
+  if (peran === 'X') return 'X' + nomor;
+  if (peran === 'M') return jumlah > 1 ? 'M' + nomor : 'M';
+  if (peran === 'Z') return jumlah > 1 ? 'Z' + nomor : 'Z';
+  return jumlah > 1 ? 'Y' + nomor : 'Y';
+}
 function barisVariabel() {
   var keluar = [];
-  var nX = 0, idx = 0;
+  var nX = 0, nM = 0, nZ = 0, nY = 0, idx = 0;
+  var baris = [];
   document.querySelectorAll('#tabel-variabel tr').forEach(function (tr) {
     var nama = tr.querySelector('input[name="vn"]');
     var peran = tr.querySelector('select[name="vp"]');
     if (!nama) return;
     var t = (nama.value || '').trim();
     if (!t) return;
-    var p = peran ? peran.value : 'X';
-    var kode = 'Y';
-    if (p === 'X') { nX += 1; kode = 'X' + nX; }
-    else if (p === 'Z') { kode = 'Z'; }
-    keluar.push({nama: t, peran: p, kode: kode, indeks: idx});
+    baris.push({nama: t, peran: peran ? peran.value : 'X', indeks: idx});
     idx += 1;
+  });
+  var jmlM = 0, jmlZ = 0, jmlY = 0;
+  baris.forEach(function (b) {
+    if (b.peran === 'M') jmlM += 1;
+    if (b.peran === 'Z') jmlZ += 1;
+    if (b.peran === 'Y') jmlY += 1;
+  });
+  baris.forEach(function (b) {
+    var kode = 'Y';
+    if (b.peran === 'X') { nX += 1; kode = kodePeran('X', nX, 0); }
+    else if (b.peran === 'M') { nM += 1; kode = kodePeran('M', nM, jmlM); }
+    else if (b.peran === 'Z') { nZ += 1; kode = kodePeran('Z', nZ, jmlZ); }
+    else if (b.peran === 'Y') { nY += 1; kode = kodePeran('Y', nY, jmlY); }
+    keluar.push({nama: b.nama, peran: b.peran, kode: kode, indeks: b.indeks});
   });
   return keluar;
 }
 function kunciSel(sel) {
   // Kunci tersimpan: JSON {indeks, nama, kode} di dataset.kunci,
-  // atau nilai lama data-awal (kode/nama) bila belum ada.
+  // atau nilai lama data-awal (kode/nama) bila belum ada. JSON null
+  // artinya sengaja dikosongkan (pilih 'Tidak ada'), bukan "belum ada",
+  // jadi jangan jatuh ke data-awal.
   try {
     if (sel.dataset.kunci) return JSON.parse(sel.dataset.kunci);
   } catch (e) { /* abaikan, pakai data-awal */ }
@@ -124,7 +179,26 @@ function isiPilihan(sel, kunci) {
     sel.appendChild(kosong);
   }
   var cocok = cariVariabel(daftar, kunci);
+  var lewat = sel.classList.contains('pilih-lewat');
+  if (lewat) {
+    // Lewat ikut Jenis jalur (kolom Jenis, Boss 18 Nov 16:12 WIB):
+    // langsung dan moderasi tidak memakai Lewat, jadi hanya
+    // 'Tidak ada' yang ditawarkan (pilihannya tetap terkirim
+    // kosong supaya daftar formulir tidak bergeser). Tidak
+    // langsung wajib lewat perantara (M).
+    var baris = sel.closest('tr');
+    var selJenis = baris ? baris.querySelector('select[name="jj"]') : null;
+    var jenis = selJenis ? selJenis.value : 'langsung';
+    if (jenis === 'langsung' || jenis === 'interaksi') {
+      sel.value = '';
+      sel.dataset.kunci = 'null';
+      return null;
+    }
+  }
   daftar.forEach(function (v) {
+    // Lewat harus perantara (M): penguat (Z) tidak ditawarkan
+    // sebagai Lewat (server juga menolaknya).
+    if (lewat && v.peran !== 'M') return;
     var o = document.createElement('option');
     o.value = v.kode;
     o.dataset.nama = v.nama;
@@ -144,18 +218,83 @@ function isiPilihan(sel, kunci) {
 }
 function pilihBerubah(sel) {
   var pilih = sel.options[sel.selectedIndex];
-  if (!pilih || !pilih.value) { sel.dataset.kunci = ''; return; }
-  sel.dataset.kunci = JSON.stringify({
-    indeks: parseInt(pilih.dataset.indeks || '-1', 10),
-    nama: pilih.dataset.nama || '',
-    kode: pilih.value});
+  // Kosongkan dengan JSON null (bukan ''), supaya kunciSel tidak jatuh
+  // kembali ke data-awal yang sudah basi (variabel dihapus): '' tidak
+  // bisa dibedakan dari "belum pernah diset", null bisa.
+  if (!pilih || !pilih.value) { sel.dataset.kunci = 'null'; }
+  else {
+    sel.dataset.kunci = JSON.stringify({
+      indeks: parseInt(pilih.dataset.indeks || '-1', 10),
+      nama: pilih.dataset.nama || '',
+      kode: pilih.value});
+  }
+  // Hitung ulang spanduk: tanpa ini spanduk tetap tampil walau pilihan
+  // sudah diperbaiki (basi), baru hilang sesudah muat ulang.
+  segarkanPilihan();
+}
+function jenisBerubah(sel) {
+  // Jenis berubah: Lewat ikut (langsung/moderasi tidak pakai Lewat).
+  segarkanPilihan();
+}
+function segarkanJenis() {
+  // Jenis jalur ikut peran Dari (kolom Jenis, Boss 18 Nov 16:12
+  // WIB): bila Dari penguat (Z), Jenis terkunci jadi Moderasi
+  // (panah putus-putus); bila Dari bukan penguat, pilihannya
+  // Langsung atau Tidak langsung, dan pilihan lama dikembalikan.
+  // Pilihan tidak pernah dihapus dari kiriman (bukan disabled),
+  // supaya daftar formulir tidak bergeser.
+  document.querySelectorAll('#tabel-hipotesis tr').forEach(function (tr) {
+    var selJenis = tr.querySelector('select[name="jj"]');
+    var selDari = tr.querySelector('select[name="jd"]');
+    if (!selJenis || !selDari) return;
+    var daftar = barisVariabel();
+    var pilihDari = selDari.options[selDari.selectedIndex];
+    var peranDari = '';
+    if (pilihDari && pilihDari.value) {
+      daftar.forEach(function (v) {
+        if (v.kode === pilihDari.value) peranDari = v.peran;
+      });
+    }
+    var kini = selJenis.value || 'langsung';
+    if (peranDari === 'Z') {
+      if (kini !== 'interaksi') selJenis.dataset.jenisLama = kini;
+      selJenis.innerHTML = '<option value="interaksi">Moderasi (panah putus-putus)</option>';
+      selJenis.value = 'interaksi';
+    } else {
+      selJenis.innerHTML = '<option value="langsung">Langsung (panah lurus)</option>'
+        + '<option value="tidak_langsung">Tidak langsung (panah putus-putus)</option>';
+      var lama = selJenis.dataset.jenisLama || '';
+      if (kini === 'langsung' || kini === 'tidak_langsung') {
+        selJenis.value = kini;
+      } else if (lama === 'langsung' || lama === 'tidak_langsung') {
+        selJenis.value = lama;
+      } else {
+        selJenis.value = 'langsung';
+      }
+    }
+  });
 }
 function segarkanPilihan() {
   var hilang = 0;
-  document.querySelectorAll('select.pilih-variabel').forEach(function (sel) {
+  // 1. Dari/Ke dulu (Lewat belakangan, karena Lewat ikut Jenis,
+  // dan Jenis ikut Dari).
+  document.querySelectorAll('select.pilih-variabel:not(.pilih-lewat)').forEach(function (sel) {
     var kunci = kunciSel(sel);
     var cocok = isiPilihan(sel, kunci);
     if (kunci && !cocok) hilang += 1;
+  });
+  // 2. Jenis ikut peran Dari (Z jadi Moderasi).
+  segarkanJenis();
+  // 3. Lewat ikut Jenis (langsung/moderasi: hanya 'Tidak ada').
+  // Lewat yang terkunci karena Jenis bukan pilihan hilang, jadi
+  // tidak dihitung ke spanduk.
+  document.querySelectorAll('select.pilih-lewat').forEach(function (sel) {
+    var kunci = kunciSel(sel);
+    var cocok = isiPilihan(sel, kunci);
+    var baris = sel.closest('tr');
+    var selJenis = baris ? baris.querySelector('select[name="jj"]') : null;
+    var jenis = selJenis ? selJenis.value : 'langsung';
+    if (kunci && !cocok && jenis !== 'langsung' && jenis !== 'interaksi') hilang += 1;
   });
   var p = document.getElementById('peringatan-pilihan');
   if (p) {
@@ -167,17 +306,77 @@ function segarkanPilihan() {
       p.hidden = true;
     }
   }
+  // Indikator ikut: nomor ulang vk (indeks baris variabel pemilik)
+  // supaya lipatan yang dipindah/dihapus tetap menunjuk variabel
+  // yang benar.
+  segarkanIndikator();
 }
-function hapusBaris(btn) { btn.closest('tr').remove(); segarkanPilihan(); }
+function segarkanIndikator() {
+  // Nomor ulang vk (indeks baris variabel pemilik, urutan baris di
+  // formulir termasuk yang namanya masih kosong) + hitung jumlah
+  // indikator terisi per lipatan. Indikator boleh kosong, tidak
+  // menghalangi (Boss 18 Nov 16:18 WIB).
+  var idx = -1;
+  document.querySelectorAll('#tabel-variabel tr').forEach(function (tr) {
+    if (tr.classList.contains('lipatan-indikator')) {
+      var n = 0;
+      tr.querySelectorAll('.baris-indikator').forEach(function (b) {
+        var inp = b.querySelector('input[name="vi"]');
+        var hid = b.querySelector('input[name="vk"]');
+        if (hid) hid.value = idx;
+        if (inp && inp.value.trim()) n += 1;
+      });
+      var jml = tr.querySelector('.jml-ind');
+      if (jml) jml.textContent = n;
+    } else if (tr.querySelector('input[name="vn"]')) {
+      idx += 1;
+    }
+  });
+}
+function tambahIndikator(btn) {
+  var det = btn.closest('details');
+  var daftar = det ? det.querySelector('.daftar-indikator') : null;
+  if (!daftar) return;
+  var div = document.createElement('div');
+  div.className = 'baris-indikator';
+  div.innerHTML = '<input type="text" name="vi" oninput="segarkanIndikator()">'
+    + '<input type="hidden" name="vk" value="0">'
+    + '<button class="tombol kedua" type="button" onclick="hapusIndikator(this)">Hapus</button>';
+  daftar.appendChild(div);
+  if (det) det.open = true;
+  segarkanIndikator();
+  div.querySelector('input[name="vi"]').focus();
+}
+function hapusIndikator(btn) {
+  btn.closest('.baris-indikator').remove();
+  segarkanIndikator();
+}
+function hapusBaris(btn) {
+  var tr = btn.closest('tr');
+  var berikut = tr.nextElementSibling;
+  tr.remove();
+  // Baris variabel punya lipatan indikator di bawahnya; hapus juga.
+  if (berikut && berikut.classList.contains('lipatan-indikator')) berikut.remove();
+  segarkanPilihan();
+}
 function tambahVariabel() {
   var t = document.getElementById('tabel-variabel');
   var tr = document.createElement('tr');
   tr.innerHTML = '<td><input type="text" name="vn" oninput="segarkanPilihan()"></td>'
     + '<td><select name="vp" onchange="segarkanPilihan()"><option value="X">X (bebas)</option>'
-    + '<option value="Z">Z (perantara)</option>'
+    + '<option value="M">M (perantara)</option>'
+    + '<option value="Z">Z (penguat)</option>'
     + '<option value="Y">Y (hasil)</option></select></td>'
     + '<td><button class="tombol kedua" type="button" onclick="hapusBaris(this)">Hapus</button></td>';
   t.appendChild(tr);
+  var lip = document.createElement('tr');
+  lip.className = 'lipatan-indikator';
+  lip.innerHTML = '<td colspan="3"><details><summary>Indikator (<span class="jml-ind">0</span>)</summary>'
+    + '<div class="daftar-indikator"></div>'
+    + '<button class="tombol kedua" type="button" onclick="tambahIndikator(this)">+ Indikator</button>'
+    + '</details></td>';
+  t.appendChild(lip);
+  segarkanPilihan();
 }
 function tambahHipotesis() {
   var t = document.getElementById('tabel-hipotesis');
@@ -186,6 +385,7 @@ function tambahHipotesis() {
   tr.innerHTML = '<td><select name="jd" class="pilih-variabel" onchange="pilihBerubah(this)"></select></td>'
     + '<td><select name="jk" class="pilih-variabel" onchange="pilihBerubah(this)"></select></td>'
     + '<td><select name="jl" class="pilih-variabel pilih-lewat" onchange="pilihBerubah(this)"></select></td>'
+    + '<td><select name="jj" class="pilih-jenis" onchange="jenisBerubah(this)"><option value="langsung">Langsung (panah lurus)</option><option value="tidak_langsung">Tidak langsung (panah putus-putus)</option><option value="interaksi">Moderasi (panah putus-putus)</option></select></td>'
     + '<td><input type="text" name="jh" value="H' + n + '"></td>'
     + '<td><select name="ja"><option value="">Tanpa arah</option><option value="+">+</option><option value="-">-</option></select></td>'
     + '<td><button class="tombol kedua" type="button" onclick="hapusBaris(this)">Hapus</button></td>';

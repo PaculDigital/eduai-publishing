@@ -20,7 +20,11 @@ Aturan yang diuji (RENCANA_DIAGRAM_MODEL_DESAIN.md + keputusan Boss):
   (bukan AI), gratis, bagian dari 1 token gambar Desain.
   Sederhana (Boss 17 Nov 09:26 WIB): label pendek Bahasa Indonesia polos.
 """
+import io
+import json
 import os
+import re
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -47,17 +51,31 @@ def cek(nama, benar, info=''):
 
 
 from docx import Document as _Docx
+from PIL import Image as _Image
 
 from app import bagian_awal as BA
 from app import diagram as DG
 from app import gambar as GB
+
+
+def _pad_teks(k):
+    """Ruang teks di dalam oval (px, atas = bawah): blok teks
+    (kode + nama) dipusatkan vertikal, sama dengan _teks_kotak
+    di app/gambar.py (blok 56 px nama 1 baris, 84 px 2 baris)."""
+    blok = 56 + 28 * (DG._jumlah_baris_nama(k['nama']) - 1)
+    return (k['h'] - blok) // 2
+
+
+def _rasio_oval(k):
+    """Rasio lebar:tinggi oval (contoh skripsi Boss: 1,2-1,8)."""
+    return k['w'] / k['h']
 
 # Model mediasi realistis (Nura: TikTok Shop, 7 hipotesis).
 MODEL_NURA = {
     'variabel': [
         {'nama': 'Keaslian Streamer', 'peran': 'X'},
         {'nama': 'Interaksi Parasosial', 'peran': 'X'},
-        {'nama': 'Keterlibatan Pelanggan', 'peran': 'Z'},
+        {'nama': 'Keterlibatan Pelanggan', 'peran': 'M'},
         {'nama': 'Pembelian Impulsif', 'peran': 'Y'}],
     'jalur': [
         {'dari': 'Keaslian Streamer', 'ke': 'Keterlibatan Pelanggan',
@@ -71,8 +89,10 @@ MODEL_NURA = {
         {'dari': 'Interaksi Parasosial', 'ke': 'Pembelian Impulsif',
          'hipotesis': 'H5', 'jenis': 'langsung', 'arah': '+'},
         {'dari': 'Keaslian Streamer', 'ke': 'Pembelian Impulsif',
+         'lewat': 'Keterlibatan Pelanggan',
          'hipotesis': 'H6', 'jenis': 'tidak_langsung', 'arah': '+'},
         {'dari': 'Interaksi Parasosial', 'ke': 'Pembelian Impulsif',
+         'lewat': 'Keterlibatan Pelanggan',
          'hipotesis': 'H7', 'jenis': 'tidak_langsung', 'arah': '+'}],
     'jenis': 'kuantitatif', 'desain': 'survei'}
 
@@ -210,9 +230,9 @@ def _docx_mini_penomeran_otomatis(path):
 def jalankan():
     # ── 1. Normalisasi model ──────────────────────────────────────────
     model, masalah = DG.normalisasi_model(MODEL_NURA)
-    cek('model Nura sah, kode X1/X2/Z/Y',
+    cek('model Nura sah, kode X1/X2/M/Y',
         model is not None and not masalah and
-        [v['kode'] for v in model['variabel']] == ['X1', 'X2', 'Z', 'Y'],
+        [v['kode'] for v in model['variabel']] == ['X1', 'X2', 'M', 'Y'],
         str(masalah))
     cek('bentuk model Nura = mediasi',
         model is not None and DG.bentuk_model(model) == 'mediasi')
@@ -222,9 +242,9 @@ def jalankan():
                       {'nama': 'C', 'peran': 'Y'}],
          'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1'},
                    {'dari': 'B', 'ke': 'C', 'hipotesis': 'H2'}]})
-    cek("peran 'M' (peta Bab IV) dibaca sebagai Z",
-        model_m is not None and model_m['variabel'][1]['peran'] == 'Z'
-        and model_m['variabel'][1]['kode'] == 'Z')
+    cek("peran 'M' (peta Bab IV) tetap M",
+        model_m is not None and model_m['variabel'][1]['peran'] == 'M'
+        and model_m['variabel'][1]['kode'] == 'M')
     _m, m1 = DG.normalisasi_model(
         {'variabel': [{'nama': 'B', 'peran': 'Y'}], 'jalur': []})
     cek('model tanpa X ditolak dengan pesan polos',
@@ -242,11 +262,11 @@ def jalankan():
                    {'dari': 'A', 'ke': 'B', 'hipotesis': 'H1'}]})
     cek('label hipotesis kembar ditolak',
         _m is None and any('dua jalur' in s for s in m3), str(m3))
-    cek('bentuk langsung (1 X, tanpa Z)',
+    cek('bentuk langsung (1 X, tanpa M)',
         DG.bentuk_model({'variabel': [{'nama': 'A', 'peran': 'X'},
                                       {'nama': 'B', 'peran': 'Y'}],
                          'jalur': []}) == 'langsung')
-    cek('bentuk banyak_x (2 X, tanpa Z)',
+    cek('bentuk banyak_x (2 X, tanpa M)',
         DG.bentuk_model({'variabel': [{'nama': 'A', 'peran': 'X'},
                                       {'nama': 'C', 'peran': 'X'},
                                       {'nama': 'B', 'peran': 'Y'}],
@@ -259,38 +279,38 @@ def jalankan():
          'jalur': [{'dari': 'Keaslian Streamer',
                     'ke': 'Keterlibatan Pelanggan', 'hipotesis': 'H1',
                     'jenis': 'langsung'}]})
-    cek('model dari peta Bab IV (M jadi Z)',
+    cek('model dari peta Bab IV (M tetap M)',
         ubah is not None and ubah['variabel'][1]['peran'] == 'M')
     cek('model dari peta kosong = None',
         DG.model_dari_peta_bab4({}) is None
         and DG.model_dari_peta_bab4({'variabel': []}) is None)
 
     # ── 1b. Perbaikan formulir (cacat uji live 17 Nov 10:50 WIB) ─────
-    # Cacat 1: jalur boleh memakai kode (X1/X2/Z/Y) atau nama.
+    # Cacat 1: jalur boleh memakai kode (X1/X2/M/Y) atau nama.
     model_kode, mk = DG.normalisasi_model(
         {'variabel': [{'nama': 'X1 Keaslian Streamer', 'peran': 'X'},
                       {'nama': 'X2 Interaksi Parasosial', 'peran': 'X'},
-                      {'nama': 'Z Keterlibatan Pelanggan', 'peran': 'Z'},
+                      {'nama': 'Z Keterlibatan Pelanggan', 'peran': 'M'},
                       {'nama': 'Y Pembelian Impulsif', 'peran': 'Y'}],
-         'jalur': [{'dari': 'X1', 'ke': 'Z', 'hipotesis': 'H1',
+         'jalur': [{'dari': 'X1', 'ke': 'M', 'hipotesis': 'H1',
                     'arah': '+'},
-                   {'dari': 'X2', 'ke': 'Z', 'hipotesis': 'H2',
+                   {'dari': 'X2', 'ke': 'M', 'hipotesis': 'H2',
                     'arah': '+'},
-                   {'dari': 'Z', 'ke': 'Y', 'hipotesis': 'H3',
+                   {'dari': 'M', 'ke': 'Y', 'hipotesis': 'H3',
                     'arah': '+'},
                    {'dari': 'X1', 'ke': 'Y', 'hipotesis': 'H4',
                     'arah': '+'},
                    {'dari': 'X2', 'ke': 'Y', 'hipotesis': 'H5',
                     'arah': '+'},
-                   {'dari': 'X1', 'ke': 'Y', 'lewat': 'Z',
+                   {'dari': 'X1', 'ke': 'Y', 'lewat': 'M',
                     'hipotesis': 'H6', 'arah': '+'},
-                   {'dari': 'X2', 'ke': 'Y', 'lewat': 'Z',
+                   {'dari': 'X2', 'ke': 'Y', 'lewat': 'M',
                     'hipotesis': 'H7', 'arah': '+'}]})
-    cek('jalur boleh memakai kode X1/X2/Z/Y (cacat 1)',
+    cek('jalur boleh memakai kode X1/X2/M/Y (cacat 1)',
         model_kode is not None and not mk, str(mk))
     model_campur, mc = DG.normalisasi_model(
         {'variabel': [{'nama': 'Keaslian Streamer', 'peran': 'X'},
-                      {'nama': 'Keterlibatan Pelanggan', 'peran': 'Z'},
+                      {'nama': 'Keterlibatan Pelanggan', 'peran': 'M'},
                       {'nama': 'Pembelian Impulsif', 'peran': 'Y'}],
          'jalur': [{'dari': 'Keaslian Streamer',
                     'ke': 'Keterlibatan Pelanggan', 'hipotesis': 'H1'},
@@ -298,18 +318,18 @@ def jalankan():
     cek('jalur campuran nama + kode diterima',
         model_campur is not None and not mc
         and model_campur['jalur'][1]['dari'] == 'X1', str(mc))
-    # Cacat 4: H6/H7 dua langkah lewat Z.
+    # Cacat 4: H6/H7 dua langkah lewat M.
     cek('H6/H7 dua langkah tersimpan sebagai tidak_langsung (cacat 4)',
         model_kode is not None
         and model_kode['jalur'][5]['jenis'] == 'tidak_langsung'
-        and model_kode['jalur'][5]['lewat'] == 'Z'
-        and model_kode['jalur'][6]['lewat'] == 'Z')
-    cek('tata H6/H7 lewat Z: 9 panah (5 langsung + 2x2 segmen lewat)',
+        and model_kode['jalur'][5]['lewat'] == 'M'
+        and model_kode['jalur'][6]['lewat'] == 'M')
+    cek('tata H6/H7 lewat M: 9 panah (5 langsung + 2x2 segmen lewat)',
         model_kode is not None
         and len(DG.tata_letak(model_kode)['panah']) == 9)
     _m, m4a = DG.normalisasi_model(
         {'variabel': [{'nama': 'A', 'peran': 'X'},
-                      {'nama': 'B', 'peran': 'Z'},
+                      {'nama': 'B', 'peran': 'M'},
                       {'nama': 'C', 'peran': 'Y'}],
          'jalur': [{'dari': 'A', 'ke': 'C', 'lewat': 'D',
                     'hipotesis': 'H1'}]})
@@ -317,7 +337,7 @@ def jalankan():
         _m is None and any('tidak ada' in s for s in m4a), str(m4a))
     _m, m4b = DG.normalisasi_model(
         {'variabel': [{'nama': 'A', 'peran': 'X'},
-                      {'nama': 'B', 'peran': 'Z'},
+                      {'nama': 'B', 'peran': 'M'},
                       {'nama': 'C', 'peran': 'Y'}],
          'jalur': [{'dari': 'A', 'ke': 'C', 'lewat': 'A',
                     'hipotesis': 'H1'}]})
@@ -329,49 +349,64 @@ def jalankan():
                       {'nama': 'C', 'peran': 'Y'}],
          'jalur': [{'dari': 'A', 'ke': 'C', 'lewat': 'B',
                     'hipotesis': 'H1'}]})
-    cek('lewat bukan perantara (Z) ditolak',
+    cek('lewat bukan perantara (X) ditolak',
         _m is None and any('perantara' in s for s in m4c), str(m4c))
-    cek('tidak_langsung tanpa lewat tetap sah (kompatibel)',
-        model is not None
-        and model['jalur'][5]['jenis'] == 'tidak_langsung'
-        and model['jalur'][5].get('lewat') == '')
+    _m, m4d = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'M'},
+                      {'nama': 'C', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'C',
+                    'hipotesis': 'H1', 'jenis': 'tidak_langsung'}]})
+    cek('tidak_langsung tanpa lewat ditolak (Jenis wajib Lewat)',
+        _m is None and any('perantara' in s for s in m4d), str(m4d))
     # Cacat 2: isian bertahan untuk ditampilkan lagi sesudah gagal.
     tampil = DG.model_tampilan(
         {'variabel': [{'nama': 'X1 Keaslian Streamer', 'peran': 'X'},
-                      {'nama': 'Z Keterlibatan Pelanggan', 'peran': 'Z'},
+                      {'nama': 'Z Keterlibatan Pelanggan', 'peran': 'M'},
                       {'nama': 'Y Pembelian Impulsif', 'peran': 'Y'}],
-         'jalur': [{'dari': 'X1', 'ke': 'Z', 'hipotesis': 'H1',
+         'jalur': [{'dari': 'X1', 'ke': 'M', 'hipotesis': 'H1',
                     'arah': '+'},
-                   {'dari': 'Z', 'ke': 'Y', 'hipotesis': 'H2',
+                   {'dari': 'M', 'ke': 'Y', 'hipotesis': 'H2',
                     'arah': '+'}]})
     cek('isian bertahan untuk ditampilkan lagi (cacat 2)',
         tampil['jalur'][0]['dari'] == 'X1'
-        and tampil['jalur'][0]['ke'] == 'Z'
-        and tampil['jalur'][1]['dari'] == 'Z'
+        and tampil['jalur'][0]['ke'] == 'M'
+        and tampil['jalur'][1]['dari'] == 'M'
         and tampil['jalur'][1]['ke'] == 'Y'
         and tampil['variabel'][0]['kode'] == 'X1'
-        and tampil['variabel'][1]['kode'] == 'Z')
+        and tampil['variabel'][1]['kode'] == 'M')
     tampil_nama = DG.model_tampilan(
         {'variabel': [{'nama': 'Keaslian Streamer', 'peran': 'X'},
-                      {'nama': 'Keterlibatan Pelanggan', 'peran': 'Z'},
+                      {'nama': 'Keterlibatan Pelanggan', 'peran': 'M'},
                       {'nama': 'Pembelian Impulsif', 'peran': 'Y'}],
          'jalur': [{'dari': 'Keaslian Streamer',
                     'ke': 'Keterlibatan Pelanggan', 'hipotesis': 'H1'}]})
     cek('tampilan mengubah Dari nama jadi kode supaya cocok pilihan',
         tampil_nama['jalur'][0]['dari'] == 'X1'
-        and tampil_nama['jalur'][0]['ke'] == 'Z')
+        and tampil_nama['jalur'][0]['ke'] == 'M')
 
     # ── 2. Tata letak ──────────────────────────────────────────────────
     tata = DG.tata_letak(model)
     kotak = {k['id']: k for k in tata['kotak']}
-    cek('tata Nura: 4 kotak (X1, X2, Z, Y)',
-        len(tata['kotak']) == 4 and set(kotak) == {'X1', 'X2', 'Z', 'Y'})
-    cek('tata Nura: X kiri, Z bawah tengah, Y kanan',
-        kotak['X1']['x'] == 60 and kotak['Z']['x'] == 450
-        and kotak['Z']['y'] == 520 and kotak['Y']['x'] == 840)
-    cek('tata Nura: 7 panah (H6/H7 tidak langsung digambar putus-putus)',
-        len(tata['panah']) == 7 and
-        sorted(p['label'] for p in tata['panah']) ==
+    cek('tata Nura: 4 kotak (X1, X2, M, Y)',
+        len(tata['kotak']) == 4 and set(kotak) == {'X1', 'X2', 'M', 'Y'})
+    # Putaran 6 (pilihan 1 Boss 18 Nov 13:03 WIB): posisi M dipilih
+    # dari skor, bukan aturan kaku. Nura (2 X) menang 'tengah'
+    # (silangan 0 vs 2 di 'atas'/'bawah', lihat Bagian 16): M
+    # kembali di garis tengah seperti v4, X1/X2 simetris, Y di
+    # garis tengah, semua lurus, tidak bersilangan.
+    cek('tata Nura: X kiri, M di garis tengah, Y kanan, X/Y sejajar',
+        tata.get('posisi_z') == 'tengah'
+        and kotak['X1']['x'] == 60 and kotak['M']['x'] == 550
+        and kotak['Y']['x'] == 1040
+        and kotak['M']['y'] + kotak['M']['h'] / 2 == tata.get('tengah')
+        and kotak['Y']['y'] + kotak['Y']['h'] / 2 == tata.get('tengah')
+        and (kotak['X1']['y'] + kotak['X1']['h'] / 2
+             + kotak['X2']['y'] + kotak['X2']['h'] / 2) / 2
+        == tata.get('tengah'))
+    cek('tata Nura: 9 panah (H6/H7 lewat M, 2 segmen putus-putus)',
+        len(tata['panah']) == 9 and
+        sorted(p['label'] for p in tata['panah'] if p['label']) ==
         ['H1 (+)', 'H2 (+)', 'H3 (+)', 'H4 (+)', 'H5 (+)', 'H6 (+)',
          'H7 (+)'])
     tata_l, _ = DG.normalisasi_model(
@@ -507,8 +542,10 @@ def jalankan():
     cek('keterangan tidak cocok = meragukan',
         vonis_salah['vonis'] == 'meragukan', str(vonis_salah))
     segar = DG.segarkan_daftar_gambar(jalur)
-    cek('Daftar Gambar segar: entri baru masuk otomatis',
-        segar.get('ok') and segar.get('jumlah') == 2, str(segar))
+    cek('Daftar Gambar segar: entri baru masuk otomatis (cacat 2)',
+        segar.get('ok') and segar.get('jumlah') == 1, str(segar))
+    cek('Daftar Gambar segar: entri lama tanpa keterangan dibuang',
+        'Gambar 1.1 Peta Jalan' not in _teks(), str(segar))
     cek('Daftar Gambar berisi Gambar 2.1 Model Penelitian',
         'Gambar 2.1 Model Penelitian' in _teks())
     # Nomor halaman dari render palsu (hal. 1 depan, hal. 2 Bab I,
@@ -563,14 +600,18 @@ def jalankan():
             berkas={'id': 126, 'nama': 'uji.docx'}, model=model_kode,
             sumber='', pesan='Jalur menunjuk "X9" yang tidak ada.')
         _render_ok = ('data-awal="X1"' in html_m
-                      and 'data-awal="Z"' in html_m
+                      and 'data-awal="M"' in html_m
                       and 'data-awal="Y"' in html_m
                       and 'Jalur menunjuk' in html_m
-                      and 'name="jl"' in html_m)
+                      and 'name="jl"' in html_m
+                      and 'name="jj"' in html_m
+                      and 'Langsung (panah lurus)' in html_m
+                      and 'Tidak langsung (panah putus-putus)' in html_m
+                      and 'data-awal="tidak_langsung"' in html_m)
     except Exception as e:                                  # noqa: BLE001
         _render_ok = False
         print('    render gagal: ' + str(e)[:200])
-    cek('formulir ter-render: data-awal berkode + pesan tampil',
+    cek('formulir ter-render: data-awal berkode + kolom Jenis tampil',
         _render_ok)
     # ── 7. Cacat uji live Diagram 18 Nov 07:15 WIB (fid 81) ──────────
     # Miniatur fid 81: penomoran otomatis, gambar milik mahasiswa,
@@ -639,9 +680,12 @@ def jalankan():
     shutil.copy(mini, mini_buang)
     buang_mini = DG.buang_gambar_bagian(mini_buang, '2.3.2',
                                         'Model Penelitian')
-    cek('buang gambar 2.3.2 (keterangan cocok) menghapus 2 paragraf',
-        buang_mini.get('ok') and buang_mini.get('dibuang') == 2,
+    cek('buang gambar 2.3.2 menghapus gambar + keterangan + Sumber (cacat 3)',
+        buang_mini.get('ok') and buang_mini.get('dibuang') == 3,
         str(buang_mini))
+    cek('buang gambar 2.3.2: baris Sumber hilang, isi lain utuh',
+        'Sumber: Data diolah' not in _teks_mini(mini_buang)
+        and 'Isi model.' in _teks_mini(mini_buang))
     cek('sesudah dibuang: 2.3.2 tidak ada gambar lagi',
         DG.periksa_gambar(mini_buang, '2.3.2', 'Model Penelitian')
         ['vonis'] == 'tidak_ada')
@@ -652,39 +696,47 @@ def jalankan():
     cek('buang gambar 3.1 satu-satunya (keterangan beda) menghapus 2',
         buang_mini31.get('ok') and buang_mini31.get('dibuang') == 2,
         str(buang_mini31))
-    # Lewat: 9 panah berkode, 7 panah Nura, gaya lewat.
+    # Lewat: 9 panah berkode, 7 panah Nura, gaya lewat. Label H6
+    # hanya di segmen pertama (X1 ke M); segmen kedua (M ke Y)
+    # tanpa label (contoh 3: tiap segmen berlabel beda, tidak ada
+    # label yang sama dua kali).
     tata_kode = DG.tata_letak(model_kode)
-    cek('tata berkode: H6 dua segmen lewat Z (X1 ke Z, Z ke Y)',
+    cek('tata berkode: H6/H7 dua segmen lewat M (X1 ke M, M ke Y)',
         sorted((p['dari'], p['ke'], p['gaya'])
                for p in tata_kode['panah']
-               if p['label'].startswith('H6')) ==
-        [('X1', 'Z', 'lewat'), ('Z', 'Y', 'lewat')])
-    cek('tata Nura: H6 satu segmen lewat putus-putus',
-        sorted((p['dari'], p['ke'], p['gaya']) for p in tata['panah']
-               if p['label'].startswith('H6')) ==
-        [('X1', 'Y', 'lewat')])
+               if p['gaya'] == 'lewat') ==
+        [('M', 'Y', 'lewat'), ('M', 'Y', 'lewat'),
+         ('X1', 'M', 'lewat'), ('X2', 'M', 'lewat')]
+        and sorted(p['label'] for p in tata_kode['panah']
+                   if p['gaya'] == 'lewat') == ['', '', 'H6 (+)', 'H7 (+)'])
+    cek('tata Nura: label H6/H7 sekali (segmen kedua tanpa label)',
+        [p['label'] for p in tata['panah']
+         if p['label'].startswith('H6')] == ['H6 (+)']
+        and [p['label'] for p in tata['panah']
+             if p['label'].startswith('H7')] == ['H7 (+)'])
     png_kode = GB.gambar_panah(model_kode, tata_kode)
     cek('gambar panah berkode = PNG asli (H6 tergambar)',
         png_kode[:8] == b'\x89PNG\r\n\x1a\n' and len(png_kode) > 10000,
         str(len(png_kode)))
-    # Tinggi kotak: nama 2 baris = 110, 1 baris = 90.
+    # Tinggi oval: nama 2 baris = 216, 1 baris = 180 (oval besar,
+    # rasio 1,39 / 1,67 seperti oval contoh; cacat 6).
     kotak_nura = {k['id']: k for k in tata['kotak']}
-    cek('tinggi kotak: Z/X2 2 baris = 110, X1/Y 1 baris = 90 (cacat 6)',
-        kotak_nura['Z']['h'] == 110 and kotak_nura['X2']['h'] == 110
-        and kotak_nura['X1']['h'] == 90 and kotak_nura['Y']['h'] == 90,
+    cek('tinggi oval: M/X2 2 baris = 216, X1/Y 1 baris = 180 (cacat 6)',
+        kotak_nura['M']['h'] == 216 and kotak_nura['X2']['h'] == 216
+        and kotak_nura['X1']['h'] == 180 and kotak_nura['Y']['h'] == 180,
         str({k: v['h'] for k, v in kotak_nura.items()}))
     tata_m, _ = DG.tata_dari_kotak(
-        [{'id': 'Z', 'nama': 'Keterlibatan Pelanggan', 'peran': 'Z',
+        [{'id': 'M', 'nama': 'Keterlibatan Pelanggan', 'peran': 'M',
           'x': 450, 'y': 520, 'h': 90},
          {'id': 'Y', 'nama': 'Pembelian Impulsif', 'peran': 'Y',
           'x': 840, 'y': 305, 'h': 90},
          {'id': 'X1', 'nama': 'Keaslian Streamer', 'peran': 'X',
           'x': 60, 'y': 110, 'h': 90}],
-        [{'dari': 'X1', 'ke': 'Z', 'label': 'H1', 'gaya': 'lewat'}],
+        [{'dari': 'X1', 'ke': 'M', 'label': 'H1', 'gaya': 'lewat'}],
         'model')
-    cek('tata manual: tinggi 90 dibetulkan 110 + gaya lewat dipertahankan',
+    cek('tata manual: tinggi 90 dibetulkan 216 + gaya lewat dipertahankan',
         tata_m is not None
-        and {k['id']: k['h'] for k in tata_m['kotak']}['Z'] == 110
+        and {k['id']: k['h'] for k in tata_m['kotak']}['M'] == 216
         and tata_m['panah'][0]['gaya'] == 'lewat', str(tata_m))
     # Baris variabel kosong = placeholder, dilewati (cacat 7).
     model_kosong, mkos = DG.normalisasi_model(
@@ -712,7 +764,2120 @@ def jalankan():
     cek('formulir Desain menyebut teks 3.1 otomatis + gratis (cacat 5)',
         'Teks 3.1' in isi_desain and 'gratis' in isi_desain)
 
+    # ── 8. Kosmetik Diagram 18 Nov 08:15 WIB (uji live putaran 2) ────
+    # Cacat 1: label H2 dan H6 bertumpuk di segmen M ke Y (fid 81).
+    model81, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                      {'nama': 'Orientasi Kewirausahaan', 'peran': 'M'},
+                      {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Digital Marketing',
+                    'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H1',
+                    'arah': '+', 'jenis': 'langsung'},
+                   {'dari': 'Orientasi Kewirausahaan',
+                    'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                    'arah': '+', 'jenis': 'langsung'},
+                   {'dari': 'Digital Marketing',
+                    'ke': 'Keberlanjutan Usaha',
+                    'lewat': 'Orientasi Kewirausahaan',
+                    'hipotesis': 'H6', 'arah': '+',
+                    'jenis': 'tidak_langsung'}]})
+    tata81 = DG.tata_letak(model81)
+    pl81 = GB.penempatan_label(tata81)
+
+    def _tumpang(a, b):
+        return not (a['kanan'] <= b['kiri'] or b['kanan'] <= a['kiri']
+                    or a['bawah'] <= b['atas'] or b['bawah'] <= a['atas'])
+
+    h2_81 = [p for p in pl81 if p['label'] == 'H2 (+)']
+    h6_81 = [p for p in pl81 if p['label'] == 'H6 (+)']
+    cek('label H2 dan H6 tidak bertumpuk (cacat 1, PNG)',
+        len(h2_81) == 1 and len(h6_81) == 1
+        and not any(_tumpang(h2_81[0], h) for h in h6_81),
+        str(pl81))
+    cek('label H6 satu kali saja (segmen pertama X1 ke M; segmen '
+        'kedua M ke Y tanpa label, contoh 3)',
+        len(h6_81) == 1 and h6_81[0]['dari'] == 'X1'
+        and h6_81[0]['ke'] == 'M'
+        and len([p for p in pl81 if p['gaya'] == 'lewat'
+                 and p['dari'] == 'M' and p['ke'] == 'Y'
+                 and p['label'] == '']) == 1)
+    # H1 (X1 ke Y) kini LURUS MENDATAR di garis tengah (segitiga
+    # mediasi, template default 18 Nov 12:12): X dan Y sejajar, Z
+    # di atas garis, H1 menempel di tengah tepi kanan X1 (y1 =
+    # pusat X1 = garis tengah), garis lurusnya di bawah Z, labelnya
+    # di garis tengah.
+    _h1_81 = [p for p in pl81 if p['label'] == 'H1 (+)']
+    _z81 = next(k for k in tata81['kotak'] if k['id'] == 'M')
+    _x1_81 = next(k for k in tata81['kotak'] if k['id'] == 'X1')
+    cek('label H1 sendiri: panah lurus mendatar di garis tengah '
+        '(segitiga mediasi)',
+        len(_h1_81) == 1
+        and _h1_81[0]['y1'] == _x1_81['y'] + _x1_81['h'] / 2
+        and _h1_81[0]['y1'] == _h1_81[0]['y2']
+        and _h1_81[0]['y1'] == tata81.get('tengah')
+        and not _h1_81[0].get('rute')
+        and _h1_81[0]['cy'] > _z81['y'] + _z81['h']
+        and not GB._segmen_lewat_kotak(
+            _h1_81[0]['x1'], _h1_81[0]['y1'], _h1_81[0]['x2'],
+            _h1_81[0]['y2'], _z81),
+        str(_h1_81))
+    png81 = GB.gambar_panah(model81, tata81)
+    cek('gambar panah fid 81 = PNG asli (label geser)',
+        png81[:8] == b'\x89PNG\r\n\x1a\n' and len(png81) > 10000,
+        str(len(png81)))
+    cek('editor menggeser label panah berbagi segmen (cacat 1)',
+        'geserLabel' in isi_editor and "p.gaya === 'lewat'" in isi_editor)
+    # Cacat 2: entri Daftar Gambar manual di luar urutan.
+    jalur2 = Path(TMP) / 'naskah_dg_manual.docx'
+    d2 = _Docx()
+    d2.add_paragraph('DAFTAR GAMBAR')
+    d2.add_paragraph('Gambar 2.1 Model Penelitian')
+    d2.add_paragraph('Gambar 3.1 Desain Penelitian')
+    d2.add_paragraph('BAB II')
+    d2.add_paragraph('2.3.2 Model Penelitian')
+    d2.add_paragraph('Isi model.')
+    d2.add_paragraph('Gambar 2.1 Model Penelitian')
+    d2.add_paragraph('BAB III')
+    d2.add_paragraph('3.1 Desain Penelitian')
+    d2.add_paragraph('Gambar 3.1 Desain Penelitian')
+    d2.save(str(jalur2))
+    sisip2 = GB.sisip_gambar_setelah_bagian(
+        jalur2, png81, '2.3.2', '2.4',
+        keterangan='Gambar 2.2 Model Penelitian', rata_keterangan='left')
+    segar2 = DG.segarkan_daftar_gambar(jalur2)
+    dg2 = BA.baca_bagian_awal(_teks_mini(jalur2).split('\n')
+                              )['bagian']['daftar_gambar']
+    cek('Daftar Gambar manual: 2.2 terselip urut (cacat 2)',
+        sisip2.get('ok') and segar2.get('ok')
+        and dg2 == ['Gambar 2.1 Model Penelitian',
+                    'Gambar 2.2 Model Penelitian',
+                    'Gambar 3.1 Desain Penelitian'],
+        str(dg2))
+    cek('Daftar Gambar manual: tanpa ganda',
+        len(dg2) == len(set(dg2)))
+    # Cacat 4: kotak X padat (5 X ke atas) meluap.
+    model5, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': n, 'peran': 'X'} for n in
+                      ('Harga', 'Kualitas', 'Merek', 'Promosi', 'Lokasi')]
+                     + [{'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': n, 'ke': 'Keputusan Beli',
+                    'hipotesis': f'H{i + 1}'} for i, n in enumerate(
+                        ('Harga', 'Kualitas', 'Merek', 'Promosi',
+                         'Lokasi'))]})
+    tata5 = DG.tata_letak(model5)
+    xs5 = [k for k in tata5['kotak'] if k['peran'] == 'X']
+    cek('kotak X padat 5: oval 180 (nama 1 baris), teks terpusat',
+        len(xs5) == 5 and all(k['h'] == 180 for k in xs5)
+        and all(_pad_teks(k) >= 20 for k in xs5),
+        str([(k['nama'], k['y'], k['h']) for k in xs5]))
+    cek('kotak X padat 5: tidak tumpang tindih',
+        all(xs5[i]['y'] + xs5[i]['h'] + 14 <= xs5[i + 1]['y']
+            for i in range(len(xs5) - 1)),
+        str([(k['y'], k['h']) for k in xs5]))
+    png5 = GB.gambar_panah(model5, tata5)
+    cek('gambar panah 5 X = PNG asli',
+        png5[:8] == b'\x89PNG\r\n\x1a\n' and len(png5) > 10000,
+        str(len(png5)))
+    model6, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': n, 'peran': 'X'} for n in
+                      ('Harga', 'Kualitas Produk dan Layanan', 'Merek',
+                       'Promosi', 'Lokasi', 'Pelayanan')]
+                     + [{'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': n, 'ke': 'Keputusan Beli',
+                    'hipotesis': f'H{i + 1}'} for i, n in enumerate(
+                        ('Harga', 'Kualitas Produk dan Layanan', 'Merek',
+                         'Promosi', 'Lokasi', 'Pelayanan'))]})
+    tata6 = DG.tata_letak(model6)
+    xs6 = [k for k in tata6['kotak'] if k['peran'] == 'X']
+    cek('kotak X padat 6: nama 2 baris 216, 1 baris 180, '
+        'tidak tumpang tindih',
+        len(xs6) == 6
+        and {k['nama']: k['h'] for k in xs6}[
+            'Kualitas Produk dan Layanan'] == 216
+        and all(k['h'] == 180 for k in xs6
+                if k['nama'] != 'Kualitas Produk dan Layanan')
+        and all(_pad_teks(k) >= 20 for k in xs6)
+        and all(xs6[i]['y'] + xs6[i]['h'] <= xs6[i + 1]['y']
+                for i in range(len(xs6) - 1)),
+        str([(k['nama'], k['y'], k['h']) for k in xs6]))
+
+    # ── 9. Label Nura lewat M + spanduk basi (uji draf 18 Nov 09:18) ──────
+    # Bentuk LIVE model Nura: H6/H7 lewat M (2 segmen), bukan H6/H7 tanpa
+    # lewat seperti MODEL_NURA (7 panah, 1 segmen). Tiga titik tumpuk di
+    # kode lama: H6 atas H1 (X1 ke M), H7 atas H2 (X2 ke M), H7 atas H3
+    # (M ke Y). Perbaikan label putaran 3 (kelompok segmen sama + geser
+    # tegak lurus) sudah mencakup bentuk ini tanpa ubah kode: dibuktikan
+    # tes ini (PNG) dan jsdom editor 4/4 (skrip scratch /tmp/dg4).
+    nura_lewat = {
+        'variabel': MODEL_NURA['variabel'],
+        'jalur': [dict(j, lewat='Keterlibatan Pelanggan')
+                  if j['hipotesis'] in ('H6', 'H7') else dict(j)
+                  for j in MODEL_NURA['jalur']],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    model_nl, _ = DG.normalisasi_model(nura_lewat)
+    tata_nl = DG.tata_letak(model_nl)
+    cek('tata Nura lewat M: 9 panah (5 langsung + 2x2 segmen lewat)',
+        len(tata_nl['panah']) == 9
+        and len([p for p in tata_nl['panah'] if p['gaya'] == 'lewat']) == 4,
+        str(tata_nl['panah']))
+    pl_nl = GB.penempatan_label(tata_nl)
+    cek('label Nura lewat M: 7 label (H1-H5, H6x1, H7x1; label tidak '
+        'langsung satu kali, contoh 3)',
+        len([p for p in pl_nl if p['label']]) == 7
+        and sorted(p['label'] for p in pl_nl if p['label']) == sorted(
+            ['H1 (+)', 'H2 (+)', 'H3 (+)', 'H4 (+)', 'H5 (+)',
+             'H6 (+)', 'H7 (+)'])
+        and len(pl_nl) == 9,
+        str([p['label'] for p in pl_nl]))
+    tumpang_nl = [(a['label'], b['label'])
+                  for i, a in enumerate(pl_nl) for b in pl_nl[i + 1:]
+                  if _tumpang(a, b)]
+    cek('label Nura lewat M: tidak ada pasangan bertumpuk (PNG, 36 pasang)',
+        not tumpang_nl, str(tumpang_nl))
+
+    def _pasangan(label_a, label_b):
+        # Pasangan dicari berdasarkan label saja (garisnya kini memang
+        # beda: tiap panah punya jalurnya sendiri, bukan satu segmen).
+        for a in pl_nl:
+            if a['label'] != label_a:
+                continue
+            for b in pl_nl:
+                if b['label'] == label_b:
+                    return a, b
+        return None, None
+
+    for _la, _lb, _titik in (
+            ('H1 (+)', 'H6 (+)', 'H6 atas H1 di X1 ke M'),
+            ('H2 (+)', 'H7 (+)', 'H7 atas H2 di X2 ke M'),
+            ('H3 (+)', 'H7 (+)', 'H7 (X2 ke M) tidak menimpa H3 (M ke Y)')):
+        _a, _b = _pasangan(_la, _lb)
+        cek('label Nura: %s tidak bertumpuk (titik live)' % _titik,
+            _a is not None and _b is not None and not _tumpang(_a, _b),
+            str((_a, _b)))
+    png_nl = GB.gambar_panah(model_nl, tata_nl)
+    cek('gambar panah Nura lewat M = PNG asli',
+        png_nl[:8] == b'\x89PNG\r\n\x1a\n' and len(png_nl) > 10000,
+        str(len(png_nl)))
+    # Spanduk basi: pilihBerubah harus hitung ulang spanduk, dan kunci
+    # yang dikosongkan harus JSON null (bukan '') supaya kunciSel tidak
+    # jatuh kembali ke data-awal yang sudah basi.
+    _badan_pilih = isi_model.split('function pilihBerubah')[1].split(
+        'function segarkanPilihan')[0]
+    cek('formulir Model hitung ulang spanduk sesudah pilih berubah '
+        '(spanduk basi)',
+        'segarkanPilihan();' in _badan_pilih)
+    cek("formulir Model kunci kosong = JSON null, bukan '' (spanduk basi)",
+        "dataset.kunci = 'null'" in _badan_pilih)
+
     cek('harga 1 token per gambar', DG.HARGA_GAMBAR == 1)
+
+    # ── 10. Rapikan tampilan (contoh skripsi Boss 18 Nov 09:41) ───────
+    # Oval (bukan kotak bersudut), jarak lega, jalur sejajar (lurus di
+    # tengah, putus-putus di atas/bawah, contoh ke-3), putus-putus di
+    # kedua segmen, celah label minimal 10 px.
+    def _celah(a, b):
+        import math as _m
+        gx = max(b['kiri'] - a['kanan'], a['kiri'] - b['kanan'], 0)
+        gy = max(b['atas'] - a['bawah'], a['atas'] - b['bawah'], 0)
+        if gx == 0 and gy == 0:
+            return -min(a['kanan'] - b['kiri'], b['kanan'] - a['kiri'],
+                        a['bawah'] - b['atas'], b['bawah'] - a['atas'])
+        return _m.hypot(gx, gy)
+
+    def _celah_min(pl):
+        return min((_celah(a, b)
+                    for i, a in enumerate(pl) for b in pl[i + 1:]),
+                   default=999.0)
+
+    def _garis_unik(pl):
+        # Tiap panah punya polilinia sendiri (termasuk titik belok).
+        temu = {}
+        for p in pl:
+            titik = ([(p['x1'], p['y1'])] + list(p.get('rute') or [])
+                     + [(p['x2'], p['y2'])])
+            kunci = tuple((round(x, 1), round(y, 1)) for x, y in titik)
+            temu.setdefault(kunci, []).append(p['label'])
+        return {k: v for k, v in temu.items() if len(v) > 1}
+
+    def _fraksi_terang(png, pl, p):
+        # Fraksi titik terang di tengah 60% polilinia (lewati kotak
+        # label): garis putus-putus ~0,5, garis lurus ~0.
+        import math as _m
+        im = _Image.open(io.BytesIO(png)).convert('RGB')
+        titik = ([(p['x1'], p['y1'])] + list(p.get('rute') or [])
+                 + [(p['x2'], p['y2'])])
+        ruas = [_m.hypot(titik[i + 1][0] - titik[i][0],
+                         titik[i + 1][1] - titik[i][1])
+                for i in range(len(titik) - 1)]
+        total = sum(ruas)
+        terang = gelap = 0
+        for t in range(41):
+            s = total * (0.2 + 0.6 * t / 40)
+            for i, r in enumerate(ruas):
+                if s <= r or i == len(ruas) - 1:
+                    f = s / r if r else 0.0
+                    x = titik[i][0] + (titik[i + 1][0] - titik[i][0]) * f
+                    y = titik[i][1] + (titik[i + 1][1] - titik[i][1]) * f
+                    break
+                s -= r
+            if any(q['kiri'] - 2 <= x <= q['kanan'] + 2 and
+                   q['atas'] - 2 <= y <= q['bawah'] + 2 for q in pl):
+                continue
+            rp, gp, bp = im.getpixel((int(x), int(y)))
+            if rp + gp + bp < 450:
+                gelap += 1
+            else:
+                terang += 1
+        return terang / max(1, terang + gelap)
+
+    # Oval: sudut kotak X1 latar (bukan garis tepi), tengah atas kotak
+    # garis tepi. Warna latar #FBFCFD, tepi X teal #1D7A8C.
+    _png81 = GB.gambar_panah(model81, tata81)
+    _im81 = _Image.open(io.BytesIO(_png81)).convert('RGB')
+    _kx = next(k for k in tata81['kotak'] if k['id'] == 'X1')
+    cek('kotak jadi elips (sudut latar, tengah atas garis tepi)',
+        _im81.getpixel((_kx['x'] + 20, _kx['y'] + 2)) == (251, 252, 253)
+        and _im81.getpixel((_kx['x'] + 150, _kx['y'] + 2))[1] < 200,
+        str(_im81.getpixel((_kx['x'] + 20, _kx['y'] + 2))))
+    cek('editor menggambar kotak model sebagai elips (bukan rect)',
+        'ellipse' in isi_editor
+        and "JENIS === 'model'" in isi_editor)
+    # Jalur sejajar: tiap panah punya garis sendiri (tidak menumpuk).
+    cek('Asih: tiap panah punya garis sendiri (tidak menumpuk)',
+        not _garis_unik(pl81), str(_garis_unik(pl81)))
+    cek('Nura lewat M: tiap panah punya garis sendiri (tidak menumpuk)',
+        not _garis_unik(pl_nl), str(_garis_unik(pl_nl)))
+    # Putus-putus di kedua segmen H6/H7, lurus tetap lurus (piksel).
+    # Segmen kedua M ke Y kini tanpa label, dicari lewat dari/ke.
+    _seg_h6_81 = [p for p in pl81 if p['label'] == 'H6 (+)']
+    _seg_h6b_81 = [p for p in pl81 if p['gaya'] == 'lewat'
+                   and p['dari'] == 'M' and p['ke'] == 'Y']
+    _seg_h2_81 = [p for p in pl81 if p['label'] == 'H2 (+)']
+    cek('Asih: H6 putus-putus di kedua segmen, H2 lurus (piksel)',
+        len(_seg_h6_81) == 1 and len(_seg_h6b_81) == 1
+        and all(_fraksi_terang(_png81, pl81, p) >= 0.25
+                for p in _seg_h6_81 + _seg_h6b_81)
+        and all(_fraksi_terang(_png81, pl81, p) <= 0.10
+                for p in _seg_h2_81),
+        str([round(_fraksi_terang(_png81, pl81, p), 2)
+             for p in _seg_h6_81 + _seg_h6b_81 + _seg_h2_81]))
+    _png_nl = GB.gambar_panah(model_nl, tata_nl)
+    _seg_nl = {lab: [p for p in pl_nl if p['label'] == lab]
+               for lab in ('H6 (+)', 'H7 (+)', 'H3 (+)')}
+    _seg_nl_tanpa = [p for p in pl_nl if p['gaya'] == 'lewat'
+                     and p['dari'] == 'M' and p['ke'] == 'Y']
+    cek('Nura: H6/H7 putus-putus di kedua segmen, H3 lurus (piksel)',
+        len(_seg_nl_tanpa) == 2
+        and all(_fraksi_terang(_png_nl, pl_nl, p) >= 0.25
+                for lab in ('H6 (+)', 'H7 (+)') for p in _seg_nl[lab])
+        and all(_fraksi_terang(_png_nl, pl_nl, p) >= 0.25
+                for p in _seg_nl_tanpa)
+        and all(_fraksi_terang(_png_nl, pl_nl, p) <= 0.10
+                for p in _seg_nl['H3 (+)']),
+        str({lab: [round(_fraksi_terang(_png_nl, pl_nl, p), 2)
+                   for p in ps] for lab, ps in _seg_nl.items()}))
+    # Celah minimum antar label minimal 10 px (bukan 4,5 px).
+    cek('Nura lewat M: celah label minimal 10 px',
+        _celah_min(pl_nl) >= 10, str(round(_celah_min(pl_nl), 1)))
+    cek('Asih: celah label minimal 10 px',
+        _celah_min(pl81) >= 10, str(round(_celah_min(pl81), 1)))
+    # Label tidak menyentuh kotak lain.
+    def _jarak_label_kotak(pl, tata):
+        def _jarak(p, k):
+            dx = max(k['x'] - p['kanan'], p['kiri'] - (k['x'] + k['w']), 0)
+            dy = max(k['y'] - p['bawah'], p['atas'] - (k['y'] + k['h']), 0)
+            import math as _m
+            return _m.hypot(dx, dy)
+        return min((_jarak(p, k) for p in pl for k in tata['kotak']),
+                   default=999.0)
+    cek('Nura lewat M: label tidak menyentuh kotak',
+        _jarak_label_kotak(pl_nl, tata_nl) > 0,
+        str(round(_jarak_label_kotak(pl_nl, tata_nl), 1)))
+    cek('Asih: label tidak menyentuh kotak',
+        _jarak_label_kotak(pl81, tata81) > 0,
+        str(round(_jarak_label_kotak(pl81, tata81), 1)))
+
+    # ── 11. Template default (Boss 18 Nov 12:12 WIB) ────────────────
+    # Aturan umum di tata_letak (bukan per model): X berhadapan
+    # dengan Y pada SATU garis tengah yang sama (tumpukan X dan Y
+    # simetris terhadap garis itu, berapapun jumlahnya). Posisi
+    # perantara M (tengah/atas/bawah) DIPILIH MESIN dari skor
+    # (putaran 6, pilihan 1 Boss 18 Nov 13:03 WIB, lihat Bagian
+    # 16), bukan aturan kaku "selalu di atas garis" (v5): pemenang
+    # per bentuk di tabel _menang_mat di bawah (1 X atas, 2 X
+    # tengah, 3 X atas, 5 X tengah/atas, 9 X tengah). Tanpa M
+    # tidak ada pilihan (posisi_z None). Ruas yang menembus kotak
+    # dibengkokkan, label yang mendarat di kotak atau label lain
+    # digeser sepanjang garisnya. Matriks: jumlah X 1, 2, 3, 5, 9
+    # x tanpa Z / dengan M x langsung / lewat. Bentuk lewat dengan
+    # 3 X atau lebih TIDAK diuji tanpa-tumpuk label: label
+    # berkumpul di segmen M ke Y (4-10 panah berbagi satu segmen,
+    # celah antar label 26 px atau kurang, lebar label ~104 px)
+    # sehingga satu label per panah tidak muat; jawabannya gaya
+    # label gabungan contoh 6 (putaran multi-tahap). Bentuk 9 X +
+    # Z + lewat juga tidak diuji label-kotak (padat ekstrem yang
+    # sama).
+    def _model_matriks(n_x, dengan_z, lewat):
+        nama_x = ['Harga', 'Kualitas', 'Merek', 'Promosi', 'Lokasi',
+                  'Pelayanan', 'Suasana', 'Harga Diri', 'Gaya Hidup'][:n_x]
+        variabel = [{'nama': n, 'peran': 'X'} for n in nama_x]
+        if dengan_z:
+            variabel.append({'nama': 'Minat Beli', 'peran': 'M'})
+        variabel.append({'nama': 'Keputusan Beli', 'peran': 'Y'})
+        jalur = []
+        for i, n in enumerate(nama_x):
+            jalur.append({'dari': n, 'ke': 'Keputusan Beli',
+                          'hipotesis': 'H%d' % (i + 1),
+                          'jenis': 'langsung', 'arah': '+'})
+        if dengan_z:
+            for i, n in enumerate(nama_x):
+                jalur.append({'dari': n, 'ke': 'Minat Beli',
+                              'hipotesis': 'D%d' % (i + 1),
+                              'jenis': 'langsung', 'arah': '+'})
+            jalur.append({'dari': 'Minat Beli', 'ke': 'Keputusan Beli',
+                          'hipotesis': 'DZ', 'jenis': 'langsung',
+                          'arah': '+'})
+            if lewat:
+                for i, n in enumerate(nama_x):
+                    jalur.append({'dari': n, 'ke': 'Keputusan Beli',
+                                  'lewat': 'Minat Beli',
+                                  'hipotesis': 'L%d' % (i + 1),
+                                  'jenis': 'tidak_langsung', 'arah': '+'})
+        model, _ = DG.normalisasi_model({'variabel': variabel,
+                                         'jalur': jalur})
+        return model
+
+    def _pusat(k):
+        return k['y'] + k['h'] / 2
+
+    def _ruas_lewat_kotak(x1, y1, x2, y2, k):
+        return GB._segmen_lewat_kotak(x1, y1, x2, y2, k)
+
+    # Pemenang skor per bentuk mediasi 3 kolom (putaran 6): mesin
+    # yang memutuskan dari angka (Bagian 16), bukan patokan jumlah
+    # X (1 X atas, 2 X tengah, 3 X atas, 5 X tengah/atas, 9 X
+    # tengah). Tanpa M tidak ada pilihan (posisi_z None).
+    _menang_mat = {(1, True, False): 'atas', (1, True, True): 'atas',
+                   (2, True, False): 'tengah',
+                   (2, True, True): 'tengah',
+                   (3, True, False): 'atas', (3, True, True): 'atas',
+                   (5, True, False): 'tengah',
+                   (5, True, True): 'atas',
+                   (9, True, False): 'tengah',
+                   (9, True, True): 'tengah'}
+
+    for _n_x in (1, 2, 3, 5, 9):
+        for _dengan_z in (False, True):
+            for _lewat in ((False, True) if _dengan_z else (False,)):
+                _m_mat = _model_matriks(_n_x, _dengan_z, _lewat)
+                _t_mat = DG.tata_letak(_m_mat)
+                _k_mat = {k['id']: k for k in _t_mat['kotak']}
+                _pl_mat = GB.penempatan_label(_t_mat)
+                # Garis tengah = 'tengah' dari tata_letak (pusat X/Y);
+                # kanvas kini memeluk isi, jadi garis tengah bukan
+                # lagi tinggi kanvas // 2.
+                _tinggi_mat = _t_mat.get('tinggi') or 800
+                _tengah = _t_mat.get('tengah', _tinggi_mat / 2)
+                _tag = '%d X%s%s' % (
+                    _n_x, ' + M' if _dengan_z else '',
+                    ' + lewat' if _lewat else '')
+                _menang = _menang_mat.get((_n_x, _dengan_z, _lewat))
+                if _dengan_z:
+                    _z_di = (_k_mat['M']['y'] + _k_mat['M']['h']
+                             < _tengah if _menang == 'atas'
+                             else _pusat(_k_mat['M']) == _tengah)
+                    cek('matriks %s: Y di garis tengah, Z di %s '
+                        '(pemenang skor)' % (_tag, _menang),
+                        _t_mat.get('posisi_z') == _menang
+                        and _pusat(_k_mat['Y']) == _tengah
+                        and _z_di,
+                        str((_menang, _pusat(_k_mat['M']),
+                             _pusat(_k_mat['Y']))))
+                else:
+                    cek('matriks %s: Y di garis tengah, tanpa Z '
+                        '(posisi_z None)' % _tag,
+                        _t_mat.get('posisi_z') is None
+                        and _pusat(_k_mat['Y']) == _tengah,
+                        str(_pusat(_k_mat['Y'])))
+                _xs_mat = [k for k in _t_mat['kotak']
+                           if k['peran'] == 'X']
+                if _n_x == 1:
+                    cek('matriks %s: 1 X di garis tengah' % _tag,
+                        _pusat(_xs_mat[0]) == _tengah,
+                        str(_pusat(_xs_mat[0])))
+                elif _n_x <= 4:
+                    _c = [_pusat(k) for k in _xs_mat]
+                    cek('matriks %s: X simetris' % _tag,
+                        all(_c[i] + _c[-1 - i] == 2 * _tengah
+                            for i in range(len(_c) // 2)),
+                        str(_c))
+                else:
+                    _atas = _xs_mat[0]['y']
+                    _bawah = _xs_mat[-1]['y'] + _xs_mat[-1]['h']
+                    cek('matriks %s: tumpukan X terpusat simetris' % _tag,
+                        (_atas + _bawah) / 2 == _tengah,
+                        str((_atas, _bawah)))
+                _kena = []
+                for _p in _pl_mat:
+                    _titik = ([(_p['x1'], _p['y1'])]
+                              + list(_p.get('rute') or [])
+                              + [(_p['x2'], _p['y2'])])
+                    for _j in range(len(_titik) - 1):
+                        for _k in _t_mat['kotak']:
+                            if _ruas_lewat_kotak(
+                                    _titik[_j][0], _titik[_j][1],
+                                    _titik[_j + 1][0], _titik[_j + 1][1],
+                                    _k):
+                                _kena.append((_p['label'], _j, _k['id']))
+                cek('matriks %s: tidak ada ruas menembus kotak' % _tag,
+                    not _kena, str(_kena))
+                # Panah lurus, kecuali pengecualian segaris yang
+                # KEMBALI untuk pemenang 'tengah' (putaran 4): bila
+                # Z di garis tengah dan jumlah X ganjil >= 3, panah
+                # langsung X tengah ke Y segaris dengan M, jadi
+                # dibengkokkan (satu-satunya panah bengkok); pemenang
+                # 'atas' tidak punya panah bengkok (Z di atas garis,
+                # garis lurus X tengah ke Y tidak terhalang).
+                _bengkok_mat = [(p['label'], p['dari'], p['ke'])
+                                for p in _pl_mat if p.get('rute')]
+                # 'dari'/'ke' di penempatan_label adalah ID kotak
+                # (X3, Y), bukan nama (Merek, Keputusan Beli).
+                if (_dengan_z and _menang == 'tengah'
+                        and _n_x % 2 == 1 and _n_x >= 3):
+                    _boleh_bengkok = [('H%d (+)' % (_n_x // 2 + 1),
+                                       'X%d' % (_n_x // 2 + 1), 'Y')]
+                else:
+                    _boleh_bengkok = []
+                cek('matriks %s: panah lurus%s' % (
+                    _tag, ' (kecuali X tengah segaris di tengah)'
+                    if _boleh_bengkok else ''),
+                    _bengkok_mat == _boleh_bengkok,
+                    str(_bengkok_mat))
+                # Label tidak menyentuh kotak, kecuali 9 X + Z + lewat
+                # (padat ekstrem, lihat catatan di atas).
+                if not (_dengan_z and _lewat and _n_x == 9):
+                    cek('matriks %s: label tidak menyentuh kotak' % _tag,
+                        _jarak_label_kotak(_pl_mat, _t_mat) > 0,
+                        str(round(_jarak_label_kotak(_pl_mat, _t_mat), 1)))
+                # Garis sendiri selalu; label tidak bertumpuk kecuali
+                # bentuk lewat 3 X ke atas (label gabungan, putaran
+                # multi-tahap).
+                cek('matriks %s: tiap panah punya garis sendiri' % _tag,
+                    not _garis_unik(_pl_mat),
+                    str(_garis_unik(_pl_mat)))
+                if not (_dengan_z and _lewat and _n_x >= 3):
+                    cek('matriks %s: tidak ada label bertumpuk' % _tag,
+                        _celah_min(_pl_mat) >= 0,
+                        str(round(_celah_min(_pl_mat), 1)))
+    # 3 X + Z: panah langsung X tengah (di garis tengah) kini LURUS
+    # mendatar: pemenang skornya 'atas' (Bagian 16), jadi Z di atas
+    # garis dan garis lurus X tengah ke Y tidak terhalang Z;
+    # pengecualian segaris putaran 4 hanya untuk pemenang 'tengah'
+    # (5 X dan 9 X + Z, lihat matriks di atas).
+    _m3 = _model_matriks(3, True, False)
+    _t3 = DG.tata_letak(_m3)
+    _pl3 = GB.penempatan_label(_t3)
+    _tengah3 = [p for p in _pl3 if p['label'] == 'H2 (+)']
+    cek('3 X + Z: panah X tengah lurus mendatar (bukan dibengkokkan)',
+        len(_tengah3) == 1 and not _tengah3[0].get('rute')
+        and _tengah3[0]['y1'] == _tengah3[0]['y2'],
+        str(_tengah3))
+
+    # ── 12. Template multi-tahap (N kolom, contoh 4 dan 5) ─────────
+    # Tahap tiap variabel diturunkan dari jalur (longest-path), tanpa
+    # ubah formulir/model data. Model Goal-Directed dan contoh 5
+    # dibangun langsung sebagai dict (bypass normalisasi_model yang
+    # menolak lebih dari 1 Y / 1 Z), karena formulir belum bisa
+    # menyatakan model seperti itu.
+    _goal = {
+        'variabel': [
+            {'nama': 'Self-efficacy', 'peran': 'X', 'kode': 'X1'},
+            {'nama': 'Mastery Goals', 'peran': 'M', 'kode': 'M1'},
+            {'nama': 'Performance-Approach Goals', 'peran': 'M',
+             'kode': 'M2'},
+            {'nama': 'Performance-Avoidance Goals', 'peran': 'M',
+             'kode': 'M3'},
+            {'nama': 'Positive Affect', 'peran': 'M', 'kode': 'M4'},
+            {'nama': 'Decision Confidence', 'peran': 'M', 'kode': 'M5'},
+            {'nama': 'Decision Satisfaction', 'peran': 'M', 'kode': 'M6'},
+            {'nama': 'Attitudinal Loyalty Intention', 'peran': 'Y',
+             'kode': 'Y1'},
+            {'nama': 'Switching Likelihood', 'peran': 'Y', 'kode': 'Y2'}],
+        'jalur': [
+            {'dari': 'X1', 'ke': 'M1', 'hipotesis': 'H1',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'X1', 'ke': 'M2', 'hipotesis': 'H2',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'X1', 'ke': 'M3', 'hipotesis': 'NH',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M1', 'ke': 'M4', 'hipotesis': 'H3',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M2', 'ke': 'M4', 'hipotesis': 'H4',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M3', 'ke': 'M4', 'hipotesis': 'H5',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M1', 'ke': 'M5', 'hipotesis': 'H6',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M2', 'ke': 'M5', 'hipotesis': 'H7',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M3', 'ke': 'M5', 'hipotesis': 'H8',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M4', 'ke': 'M6', 'hipotesis': 'H9',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M5', 'ke': 'M6', 'hipotesis': 'H10',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M6', 'ke': 'Y1', 'hipotesis': 'H11',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M6', 'ke': 'Y2', 'hipotesis': 'H12',
+             'jenis': 'langsung', 'arah': ''}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _c5 = {
+        'variabel': [
+            {'nama': 'kepemimpinan', 'peran': 'X', 'kode': 'X1'},
+            {'nama': 'reward', 'peran': 'X', 'kode': 'X2'},
+            {'nama': 'Kualitas sistem', 'peran': 'X', 'kode': 'X3'},
+            {'nama': 'Kondisi Pemfasilitasi', 'peran': 'X', 'kode': 'X4'},
+            {'nama': 'Kualitas pengetahuan', 'peran': 'M', 'kode': 'M1'},
+            {'nama': 'Penggunaan', 'peran': 'M', 'kode': 'M2'},
+            {'nama': 'Kepuasan Pengguna', 'peran': 'M', 'kode': 'M3'},
+            {'nama': 'Manfaat', 'peran': 'Y', 'kode': 'Y1'}],
+        'jalur': [
+            {'dari': 'X3', 'ke': 'M2', 'hipotesis': 'H1',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X3', 'ke': 'M3', 'hipotesis': 'H2',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X4', 'ke': 'M2', 'hipotesis': 'H3',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M1', 'ke': 'M2', 'hipotesis': 'H4',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M1', 'ke': 'M3', 'hipotesis': 'H5',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M3', 'ke': 'M2', 'hipotesis': 'H6',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M2', 'ke': 'Y1', 'hipotesis': 'H7',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M3', 'ke': 'Y1', 'hipotesis': 'H8',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X1', 'ke': 'M1', 'hipotesis': 'H9',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X2', 'ke': 'M1', 'hipotesis': 'H10',
+             'jenis': 'langsung', 'arah': '+'},
+        ],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+
+    def _kolom_simetris(tata):
+        # Simetri terhadap garis tengah ('tengah' dari tata_letak,
+        # pusat X/Y); kanvas kini memeluk isi, jadi garis tengah
+        # bukan lagi tinggi // 2. Untuk rantai multi-kolom
+        # (Goal-Directed, contoh 5) kolom perantara tetap simetris:
+        # perantaranya membentuk rantai utama, bukan penghalang
+        # garis langsung X ke Y (pengecualian template default,
+        # lihat tata_letak di app/diagram.py).
+        tinggi = tata.get('tinggi') or 800
+        tengah = tata.get('tengah', tinggi / 2)
+        kolom = {}
+        for k in tata['kotak']:
+            kolom.setdefault(k['x'], []).append(k)
+        for ks in kolom.values():
+            pusat = sorted(_pusat(k) for k in ks)
+            if len(ks) == 1:
+                if pusat[0] != tengah:
+                    return False, pusat
+            elif len(ks) <= 4:
+                if not all(pusat[i] + pusat[-1 - i] == 2 * tengah
+                           for i in range(len(pusat) // 2)):
+                    return False, pusat
+            else:
+                atas = min(k['y'] for k in ks)
+                bawah = max(k['y'] + k['h'] for k in ks)
+                if (atas + bawah) / 2 != tengah:
+                    return False, pusat
+        return True, None
+
+    def _tanpa_ruas_lewat_kotak(pl, tata):
+        kena = []
+        for p in pl:
+            titik = ([(p['x1'], p['y1'])] + list(p.get('rute') or [])
+                     + [(p['x2'], p['y2'])])
+            for j in range(len(titik) - 1):
+                for k in tata['kotak']:
+                    if _ruas_lewat_kotak(titik[j][0], titik[j][1],
+                                         titik[j + 1][0],
+                                         titik[j + 1][1], k):
+                        kena.append((p['label'], j, k['id']))
+        return kena
+
+    def _tanpa_kotak_tumpang(tata):
+        kolom = {}
+        for k in tata['kotak']:
+            kolom.setdefault(k['x'], []).append(k)
+        for ks in kolom.values():
+            ks = sorted(ks, key=lambda k: k['y'])
+            for i in range(len(ks) - 1):
+                if ks[i]['y'] + ks[i]['h'] > ks[i + 1]['y']:
+                    return False
+        return True
+
+    # Layering: Goal-Directed 5 kolom, klasik 3 kolom, tanpa Z 2 kolom.
+    cek('layering Goal-Directed: 5 tahap [0,1,1,1,2,2,3,4,4]',
+        DG._tahap_variabel(_goal['variabel'], _goal['jalur']) == {
+            'X1': 0, 'M1': 1, 'M2': 1, 'M3': 1, 'M4': 2, 'M5': 2,
+            'M6': 3, 'Y1': 4, 'Y2': 4},
+        str(DG._tahap_variabel(_goal['variabel'], _goal['jalur'])))
+    cek('layering klasik Nura: X=0, Z=1, Y=2',
+        DG._tahap_variabel(model_nl['variabel'], model_nl['jalur']) == {
+            'X1': 0, 'X2': 0, 'M': 1, 'Y': 2},
+        str(DG._tahap_variabel(model_nl['variabel'], model_nl['jalur'])))
+    cek('layering tanpa Z: X=0, Y=1',
+        DG._tahap_variabel(
+            [{'nama': 'Harga', 'peran': 'X'},
+             {'nama': 'Keputusan Beli', 'peran': 'Y'}],
+            [{'dari': 'Harga', 'ke': 'Keputusan Beli',
+              'hipotesis': 'H1', 'jenis': 'langsung', 'arah': '+'}])
+        == {'Harga': 0, 'Keputusan Beli': 1},
+        'tanpa Z')
+    cek('layering contoh 5: Kepuasan tahap 2, Penggunaan tahap 3',
+        DG._tahap_variabel(_c5['variabel'], _c5['jalur']) == {
+            'X1': 0, 'X2': 0, 'X3': 0, 'X4': 0, 'M1': 1, 'M3': 2,
+            'M2': 3, 'Y1': 4},
+        str(DG._tahap_variabel(_c5['variabel'], _c5['jalur'])))
+    # Siklus tidak menggantung (dibatasi sebanyak jumlah variabel).
+    _siklus = {'variabel': [{'nama': 'A', 'peran': 'X'},
+                            {'nama': 'B', 'peran': 'Y'}],
+               'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+                          'jenis': 'langsung', 'arah': ''},
+                         {'dari': 'B', 'ke': 'A', 'hipotesis': 'H2',
+                          'jenis': 'langsung', 'arah': ''}]}
+    _t_siklus = DG._tahap_variabel(_siklus['variabel'], _siklus['jalur'])
+    cek('layering siklus A-B berhenti deterministik',
+        isinstance(_t_siklus, dict) and set(_t_siklus) == {'A', 'B'},
+        str(_t_siklus))
+    _tata_siklus = DG.tata_letak(_siklus)
+    cek('tata siklus tetap tergambar (2 kotak)',
+        len(_tata_siklus['kotak']) == 2, str(_tata_siklus['kotak']))
+
+    for _nama, _model, _lebar in (('Goal-Directed', _goal, 2180),
+                                  ('contoh 5', _c5, 2180)):
+        _t = DG.tata_letak(_model)
+        _pl = GB.penempatan_label(_t)
+        cek('%s: lebar kanvas %d' % (_nama, _lebar),
+            _t.get('lebar') == _lebar, str(_t.get('lebar')))
+        _sim, _pusat_gagal = _kolom_simetris(_t)
+        cek('%s: tiap kolom simetris terhadap garis tengah' % _nama,
+            _sim, str(_pusat_gagal))
+        cek('%s: tidak ada kotak tumpang tindih' % _nama,
+            _tanpa_kotak_tumpang(_t), 'tumpang')
+        cek('%s: tidak ada ruas menembus kotak' % _nama,
+            not _tanpa_ruas_lewat_kotak(_pl, _t),
+            str(_tanpa_ruas_lewat_kotak(_pl, _t)))
+        cek('%s: label tidak menyentuh kotak' % _nama,
+            _jarak_label_kotak(_pl, _t) > 0,
+            str(round(_jarak_label_kotak(_pl, _t), 1)))
+        cek('%s: tidak ada label bertumpuk' % _nama,
+            _celah_min(_pl) >= 0, str(round(_celah_min(_pl), 1)))
+        cek('%s: tiap panah punya garis sendiri' % _nama,
+            not _garis_unik(_pl), str(_garis_unik(_pl)))
+    # Panah lompat kolom (H1 contoh 5: X3 tahap 0 ke M2 tahap 3)
+    # kini LURUS lewat di luar kotak antara, bukan dibengkokkan.
+    _tc5 = DG.tata_letak(_c5)
+    _plc5 = GB.penempatan_label(_tc5)
+    _h1c5 = [p for p in _plc5 if p['label'] == 'H1 (+)']
+    cek('contoh 5: panah lompat kolom H1 lurus (contoh 1 dan 3)',
+        len(_h1c5) == 1 and not _h1c5[0].get('rute'),
+        str(_h1c5[0].get('rute') if _h1c5 else None))
+    # H4 (M1 ke M2) dan H8 (M3 ke Y1) lompat kolom TAPI segaris
+    # dengan kotak antara (semua di garis tengah): pengecualian
+    # yang sama seperti X tengah, tetap dibengkokkan lewat atas.
+    _h4c5 = [p for p in _plc5 if p['label'] == 'H4 (+)']
+    _h8c5 = [p for p in _plc5 if p['label'] == 'H8 (+)']
+    cek('contoh 5: H4/H8 segaris tetap dibengkokkan (pengecualian)',
+        len(_h4c5) == 1 and len(_h4c5[0].get('rute') or []) >= 1
+        and len(_h8c5) == 1 and len(_h8c5[0].get('rute') or []) >= 1,
+        str([_h4c5[0].get('rute') if _h4c5 else None,
+             _h8c5[0].get('rute') if _h8c5 else None]))
+    # Panah vertikal: dua kotak satu kolom dihubungkan bawah ke atas.
+    _tata_v, _masalah_v = DG.tata_dari_kotak(
+        [{'id': 'A', 'nama': 'Atas', 'kode': 'A', 'peran': 'X',
+          'x': 60, 'y': 100, 'w': 300, 'h': 90},
+         {'id': 'B', 'nama': 'Bawah', 'kode': 'B', 'peran': 'Y',
+          'x': 60, 'y': 400, 'w': 300, 'h': 90}],
+        [{'dari': 'A', 'ke': 'B', 'label': 'H1 (+)', 'gaya': 'lurus'}],
+        jenis='model')
+    _pl_v = GB.penempatan_label(_tata_v)
+    cek('panah vertikal: tegak lurus bawah ke atas',
+        len(_pl_v) == 1 and _pl_v[0]['x1'] == _pl_v[0]['x2']
+        and _pl_v[0]['y1'] < _pl_v[0]['y2']
+        and not _pl_v[0].get('rute'),
+        str([(p['x1'], p['y1'], p['x2'], p['y2']) for p in _pl_v]))
+    cek('panah vertikal: label tidak menyentuh kotak',
+        _jarak_label_kotak(_pl_v, _tata_v) > 0,
+        str(round(_jarak_label_kotak(_pl_v, _tata_v), 1)))
+    # Editor 5 kolom: viewBox dan state memakai lebar/tinggi kanvas.
+    from jinja2 import Environment as _Env, FileSystemLoader as _FSL
+    _env = _Env(loader=_FSL(str(Path(__file__).resolve().parent.parent
+                             / 'app' / 'templates')))
+    _tpl = _env.get_template('diagram_editor.html')
+    _tata_goal = DG.tata_letak(_goal)
+    _html_goal = _tpl.render(
+        berkas={'id': 81, 'nama': 'x.docx'}, jenis='model',
+        tata=_tata_goal,
+        tinggi=_tata_goal.get('tinggi') or DG.KANVAS_TINGGI,
+        lebar=_tata_goal.get('lebar') or DG.KANVAS_LEBAR,
+        teks31=None)
+    cek('editor Goal-Directed: viewBox 2180 dan state lebar 2180',
+        'viewBox="0 0 2180 %d"' % (_tata_goal.get('tinggi') or 800)
+        in _html_goal
+        and '"lebar": 2180' in _html_goal,
+        'viewBox/state lebar')
+
+    # ── 13. Oval besar seperti contoh (Boss 18 Nov 11:09) ─────────────
+    # Oval contoh (diukur dari berkas gambar): rasio lebar:tinggi
+    # 1,18-1,45 (contoh 1), 1,48-1,78 (contoh 6); mesin lama pipih
+    # 300x90 (3,33) / 300x110 (2,73) dengan teks menempel tepi.
+    # Mesin kini: lebar 300, tinggi 180 (1 baris, rasio 1,67) / 216
+    # (2 baris, rasio 1,39), teks dipusatkan vertikal di dalam oval.
+    # Boss 18 Nov 11:43 minta dikecilkan sedikit dari v3 (320x200/240):
+    # 180 = 200 kurang 10 persen, 216 = 240 kurang 10 persen.
+    for _nama_m, _m13 in (('Nura', MODEL_NURA), ('Asih', model81),
+                          ('Goal-Directed', _goal)):
+        _t13 = DG.tata_letak(_m13)
+        cek('oval %s: rasio tiap kotak 1,3-1,8 (seperti contoh)' % _nama_m,
+            all(1.3 <= _rasio_oval(k) <= 1.8 for k in _t13['kotak']),
+            str([round(_rasio_oval(k), 2) for k in _t13['kotak']]))
+        cek('oval %s: teks punya ruang lega (pad atas/bawah >= 20 px)'
+            % _nama_m,
+            all(_pad_teks(k) >= 20 for k in _t13['kotak']),
+            str([_pad_teks(k) for k in _t13['kotak']]))
+        cek('oval %s: semua kotak muat di kanvas' % _nama_m,
+            all(k['y'] >= 0 and k['y'] + k['h'] <= _t13['tinggi']
+                and k['x'] + k['w'] <= _t13['lebar']
+                for k in _t13['kotak']),
+            str((_t13['lebar'], _t13['tinggi'])))
+    # Kanvas tumbuh mengikuti kolom tertinggi, garis tengah ikut.
+    _t5b = DG.tata_letak(model5)
+    cek('oval 5 X: kanvas tumbuh di atas 800 (oval tidak dirampingkan)',
+        _t5b.get('tinggi', 800) > 800
+        and all(k['h'] == 180 for k in _t5b['kotak']
+                if k['peran'] == 'X'),
+        str((_t5b.get('tinggi'), [k['h'] for k in _t5b['kotak']])))
+    _t9b = DG.tata_letak(_model_matriks(9, True, True))
+    _k9b = {k['id']: k for k in _t9b['kotak']}
+    cek('oval 9 X + Z + lewat: kanvas tumbuh, Y di garis tengah, '
+        'Z di garis tengah (pemenang skor)',
+        _t9b.get('tinggi', 800) > 800
+        and _t9b.get('posisi_z') == 'tengah'
+        and _pusat(_k9b['M']) == _t9b.get('tengah')
+        and _pusat(_k9b['Y']) == _t9b.get('tengah'),
+        str(_t9b.get('tinggi')))
+    # PNG ikut tinggi kanvas (bukan 800 tetap).
+    _png13 = GB.gambar_panah(model5, _t5b)
+    _img13 = _Image.open(io.BytesIO(_png13))
+    cek('oval 5 X: PNG setinggi kanvas dinamis',
+        _img13.size[1] == _t5b['tinggi'] and _img13.size[0] == 1400,
+        str(_img13.size))
+    # Editor: kotak baru 300x180, tinggi minimum oval 180/216.
+    cek('editor: kotak baru 300x180 (oval besar)',
+        "w: 300, h: 180" in isi_editor, 'tambahKotak')
+    cek('editor: tinggi minimum oval 216/180 (bukan 110/90)',
+        "(dua ? 216 : 180)" in isi_editor, 'tinggiTampil')
+    # ── 14. Panah lurus + label sekali + kanvas memeluk isi ──────────
+    # (Boss 18 Nov 11:38: bentuk v3 masih aneh dan membingungkan;
+    # contoh 1 dan 3 menggambar semua panah lurus tanpa siku, tiap
+    # segmen jalur tidak langsung berlabel beda, kanvas penuh.)
+    # Panah langsung lurus di semua bentuk (kecuali pengecualian
+    # segaris yang sudah dikunci di matriks dan contoh 5).
+    for _nama14, _m14 in (('Asih', model81), ('Nura lewat M', model_nl),
+                          ('Goal-Directed', _goal)):
+        _t14 = DG.tata_letak(_m14)
+        _pl14 = GB.penempatan_label(_t14)
+        cek('lurus %s: tidak ada panah bengkok' % _nama14,
+            not any(p.get('rute') for p in _pl14),
+            str([(p['label'], p['dari'], p['ke'])
+                 for p in _pl14 if p.get('rute')]))
+        # Label hipotesis tidak muncul dua kali (tidak langsung
+        # dilabeli satu kali saja di segmen pertama).
+        _lab14 = [p['label'] for p in _pl14 if p['label']]
+        cek('label sekali %s: tidak ada label ganda' % _nama14,
+            len(_lab14) == len(set(_lab14)), str(_lab14))
+        # Kanvas memeluk isi: atas 20 px, bawah = tinggi - 20.
+        _atas14 = min(k['y'] for k in _t14['kotak'])
+        _bawah14 = max(k['y'] + k['h'] for k in _t14['kotak'])
+        cek('kanvas memeluk isi %s: tinggi = bentang + 40' % _nama14,
+            _atas14 == 20 and _bawah14 == _t14['tinggi'] - 20
+            and _t14['tinggi'] == (_bawah14 - _atas14) + 40,
+            str((_t14['tinggi'], _atas14, _bawah14)))
+    # Editor memakai rute lurus yang sama dengan PNG (cermin JS).
+    cek("editor: fungsi ruteLurus ada dan dipakai di gambarUlang",
+        'function ruteLurus' in isi_editor
+        and 'ruteLurus(aT2, bT2' in isi_editor)
+    # PNG akhir dari editor (tata_dari_kotak) ikut memeluk isi.
+    _tm14, _ = DG.tata_dari_kotak(
+        [{'id': 'X1', 'nama': 'Digital Marketing', 'peran': 'X',
+          'x': 60, 'y': 20, 'w': 300, 'h': 180},
+         {'id': 'M', 'nama': 'Orientasi Kewirausahaan', 'peran': 'M',
+          'x': 550, 'y': 252, 'w': 300, 'h': 216},
+         {'id': 'Y', 'nama': 'Keberlanjutan Usaha', 'peran': 'Y',
+          'x': 1040, 'y': 252, 'w': 300, 'h': 216}],
+        [{'dari': 'X1', 'ke': 'Y', 'label': 'H1 (+)', 'gaya': 'lurus'},
+         {'dari': 'M', 'ke': 'Y', 'label': 'H2 (+)', 'gaya': 'lurus'},
+         {'dari': 'X1', 'ke': 'M', 'label': 'H6 (+)', 'gaya': 'lewat'},
+         {'dari': 'M', 'ke': 'Y', 'label': '', 'gaya': 'lewat'}],
+        jenis='model', tinggi=488)
+    _png14 = GB.gambar_panah(None, _tm14)
+    _img14 = _Image.open(io.BytesIO(_png14))
+    cek('PNG akhir editor: tinggi memeluk isi (bukan 800)',
+        _tm14['tinggi'] == 488 and _img14.size[1] == 488,
+        str((_tm14['tinggi'], _img14.size)))
+
+    # ── 15. Template default X-Y sejajar, posisi M dari skor
+    # (Boss 18 Nov 13:03 WIB, pilihan 1) ────────────────────────
+    # X berhadapan dengan Y pada SATU garis tengah yang sama,
+    # berapapun jumlah X dan Y; posisi M (tengah/atas/bawah)
+    # dipilih mesin dari skor (Bagian 16), bukan aturan kaku:
+    # Asih (1 X) dan 2 Y menang 'atas' (segitiga), Nura (2 X)
+    # menang 'tengah' (kembali seperti v4). Menggantikan aturan
+    # 18 Nov 12:12 (M/Z selalu di atas garis).
+    # 2 Y dalam mediasi 3 kolom (dict langsung, bypass
+    # normalisasi_model yang menolak lebih dari 1 Y): Y1/Y2
+    # simetris terhadap garis tengah, X di garis tengah, Z di atas
+    # garis, semua panah lurus.
+    _m2y = {
+        'variabel': [
+            {'nama': 'Harga', 'peran': 'X', 'kode': 'X1'},
+            {'nama': 'Minat Beli', 'peran': 'M', 'kode': 'M'},
+            {'nama': 'Keputusan Beli', 'peran': 'Y', 'kode': 'Y1'},
+            {'nama': 'Kepuasan', 'peran': 'Y', 'kode': 'Y2'}],
+        'jalur': [
+            {'dari': 'X1', 'ke': 'Y1', 'hipotesis': 'H1',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X1', 'ke': 'Y2', 'hipotesis': 'H2',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X1', 'ke': 'M', 'hipotesis': 'H3',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M', 'ke': 'Y1', 'hipotesis': 'H4',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M', 'ke': 'Y2', 'hipotesis': 'H5',
+             'jenis': 'langsung', 'arah': '+'}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _t2y = DG.tata_letak(_m2y)
+    _k2y = {k['id']: k for k in _t2y['kotak']}
+    _pl2y = GB.penempatan_label(_t2y)
+    cek('template 2 Y: X di garis tengah, Y1/Y2 simetris, Z di atas',
+        _t2y.get('posisi_z') == 'atas'
+        and _pusat(_k2y['X1']) == _t2y.get('tengah')
+        and _pusat(_k2y['Y1']) + _pusat(_k2y['Y2'])
+        == 2 * _t2y.get('tengah')
+        and _k2y['M']['y'] + _k2y['M']['h'] < _t2y.get('tengah'),
+        str({k: _pusat(v) for k, v in _k2y.items()}))
+    cek('template 2 Y: semua panah lurus',
+        not any(p.get('rute') for p in _pl2y),
+        str([(p['label'], p['dari'], p['ke'])
+             for p in _pl2y if p.get('rute')]))
+    # Segitiga mediasi Asih: X dan Y sejajar di garis tengah, Z
+    # seluruhnya di atas garis, H1 lurus mendatar.
+    _k81b = {k['id']: k for k in tata81['kotak']}
+    cek('template Asih: X dan Y sejajar di garis tengah',
+        _pusat(_k81b['X1']) == tata81.get('tengah')
+        and _pusat(_k81b['Y']) == tata81.get('tengah'),
+        str((_pusat(_k81b['X1']), _pusat(_k81b['Y']))))
+    cek('template Asih: Z seluruhnya di atas garis tengah',
+        tata81.get('posisi_z') == 'atas'
+        and _k81b['M']['y'] + _k81b['M']['h'] < tata81.get('tengah'),
+        str((_k81b['M']['y'], _k81b['M']['h'])))
+    # Nura: X1/X2 simetris, Y di garis tengah, Z di garis tengah
+    # (pemenang skor 'tengah', kembali seperti v4).
+    _t15n = DG.tata_letak(model_nl)
+    _k15n = {k['id']: k for k in _t15n['kotak']}
+    cek('template Nura: X1/X2 simetris, Y di garis tengah, '
+        'Z di garis tengah (pemenang skor)',
+        _t15n.get('posisi_z') == 'tengah'
+        and _pusat(_k15n['X1']) + _pusat(_k15n['X2'])
+        == 2 * _t15n.get('tengah')
+        and _pusat(_k15n['Y']) == _t15n.get('tengah')
+        and _pusat(_k15n['M']) == _t15n.get('tengah'),
+        str({k: _pusat(v) for k, v in _k15n.items()}))
+    # Pengecualian rantai multi-kolom (didokumentasikan, bukan
+    # pelanggaran): perantara Goal-Directed membentuk rantai utama,
+    # jadi kolomnya tetap simetris terhadap garis tengah, termasuk
+    # M6 yang pusatnya di garis tengah; X1 dan Y1/Y2 tetap sejajar
+    # di garis tengah.
+    _tg15 = DG.tata_letak(_goal)
+    _kg15 = {k['id']: k for k in _tg15['kotak']}
+    cek('template multi-kolom: X1 dan Y1/Y2 sejajar di garis tengah',
+        _pusat(_kg15['X1']) == _tg15.get('tengah')
+        and _pusat(_kg15['Y1']) + _pusat(_kg15['Y2'])
+        == 2 * _tg15.get('tengah'),
+        str({k: _pusat(v) for k, v in _kg15.items()}))
+    cek('template multi-kolom: M6 Goal-Directed tetap di garis '
+        'tengah (rantai, bukan penghalang)',
+        _pusat(_kg15['M6']) == _tg15.get('tengah'),
+        str(_pusat(_kg15['M6'])))
+
+    # ── 16. Skor pemilih posisi M (putaran 6, pilihan 1 Boss
+    # 18 Nov 13:03 WIB) ──────────────────────────────────────────
+    # Mesin mencoba tiga posisi perantara (tengah/atas/bawah),
+    # mengukur tiap kandidat dari ukuran yang bisa diukur, dan
+    # memilih skor terbaik (banding, urut prioritas):
+    # (a) silangan antar panah (kipas di tepi kotak bersama tidak
+    # dihitung); (b) hukuman celah label, hanya bila celah di
+    # bawah ambang nyaman 30 px (3x minimum 10 px); (c) panjang
+    # panah terpendek (besar = bagus) dan terpanjang (kecil =
+    # bagus); (d) simetri X/Y terhadap garis tengah; (e) celah
+    # panah ke kotak yang tidak disentuhnya; (f) jumlah panah
+    # bengkok. Seri = pilih 'atas' dulu (segitiga klasik). Yang
+    # memutuskan adalah SKOR, bukan patokan jumlah X: 1 X menang
+    # atas, 2 X tengah, 3 X atas, 5 X tengah/atas, 9 X tengah.
+    def _skor16(m, pz):
+        return GB.skor_tata_letak(DG.tata_letak(m, posisi_z=pz))
+
+    cek('skor: tata kosong = skor buruk',
+        GB.skor_tata_letak(None)['silangan'] == 999
+        and GB.skor_tata_letak({})['silangan'] == 999
+        and GB.skor_tata_letak(None)['banding'][0] == 999)
+    # Asih (1 X): tiga kandidat, 'atas' dan 'bawah' seri persis
+    # (cermin), 'tengah' kalah lewat (c) panah pendek, (d) simetri,
+    # (e) celah kotak; seri atas/bawah dimenangi 'atas'.
+    _s_asih = {pz: _skor16(model81, pz)
+               for pz in ('atas', 'tengah', 'bawah')}
+    cek('skor Asih: banding tiap kandidat (angka)',
+        _s_asih['atas']['banding']
+        == (0, 0.0, -314.0, 680.0, 0.0, -142.0, 0)
+        and _s_asih['tengah']['banding']
+        == (0, 0.0, -195.2, 730.4, 250.0, -9.7, 0)
+        and _s_asih['bawah']['banding']
+        == (0, 0.0, -314.0, 680.0, 0.0, -142.0, 0),
+        str({k: v['banding'] for k, v in _s_asih.items()}))
+    cek('skor Asih: atas dan bawah seri persis, pilih atas',
+        _s_asih['atas']['banding'] == _s_asih['bawah']['banding']
+        and DG.tata_letak(model81).get('posisi_z') == 'atas',
+        str(DG.tata_letak(model81).get('posisi_z')))
+    cek('skor Asih: atas menang lewat panjang, simetri, celah kotak',
+        _s_asih['atas']['panah_pendek']
+        > _s_asih['tengah']['panah_pendek']
+        and _s_asih['atas']['panah_panjang']
+        < _s_asih['tengah']['panah_panjang']
+        and _s_asih['atas']['simetri']
+        < _s_asih['tengah']['simetri']
+        and _s_asih['atas']['celah_kotak']
+        > _s_asih['tengah']['celah_kotak'],
+        str({k: (v['panah_pendek'], v['panah_panjang'],
+                 v['simetri'], v['celah_kotak'])
+             for k, v in _s_asih.items()}))
+    # Nura lewat M (2 X): 'tengah' menang lewat (a) silangan 0
+    # vs 2; 'atas'/'bawah' menyilangkan H4/H5 di tengah diagram.
+    _s_nl = {pz: _skor16(model_nl, pz)
+             for pz in ('atas', 'tengah', 'bawah')}
+    cek('skor Nura lewat M: banding tiap kandidat (angka)',
+        _s_nl['atas']['banding']
+        == (2, 18.0, -205.6, 724.5, 0.0, -21.4, 0)
+        and _s_nl['tengah']['banding']
+        == (0, 18.0, -190.0, 736.6, 0.0, -6.5, 0)
+        and _s_nl['bawah']['banding']
+        == (2, 18.0, -204.5, 724.5, 0.0, -21.4, 0),
+        str({k: v['banding'] for k, v in _s_nl.items()}))
+    cek('skor Nura lewat M: tengah menang, silangan 0 vs 2',
+        _s_nl['tengah']['silangan'] == 0
+        and _s_nl['atas']['silangan'] == 2
+        and _s_nl['bawah']['silangan'] == 2
+        and DG.tata_letak(model_nl).get('posisi_z') == 'tengah',
+        str({k: v['silangan'] for k, v in _s_nl.items()}))
+    # Nura (MODEL_NURA, kini H6/H7 lewat M seperti bentuk live):
+    # 'tengah' menang, silangan 0 vs 2 (sama seperti model_nl).
+    _s_nura = {pz: _skor16(model, pz)
+               for pz in ('atas', 'tengah', 'bawah')}
+    cek('skor Nura: tengah menang, silangan 0 vs 2',
+        _s_nura['tengah']['silangan'] == 0
+        and _s_nura['atas']['silangan'] == 2
+        and _s_nura['bawah']['silangan'] == 2
+        and DG.tata_letak(model).get('posisi_z') == 'tengah',
+        str({k: v['silangan'] for k, v in _s_nura.items()}))
+    # 2 Y: silangan seri (1), 'tengah' kalah lewat (b) hukuman
+    # celah 30 vs 6,1 dan (f) 1 panah bengkok; 'atas'/'bawah' seri,
+    # pilih 'atas'.
+    _s_2y = {pz: _skor16(_m2y, pz)
+             for pz in ('atas', 'tengah', 'bawah')}
+    cek('skor 2 Y: pemenang atas (hukuman celah 6,1 vs 30)',
+        _s_2y['atas']['banding']
+        == (1, 6.1, -194.8, 724.5, 0.0, -21.4, 0)
+        and _s_2y['tengah']['banding']
+        == (1, 30.0, -314.0, 959.0, 250.0, -41.9, 1)
+        and _s_2y['bawah']['banding']
+        == (1, 6.1, -194.8, 724.5, 0.0, -21.4, 0)
+        and DG.tata_letak(_m2y).get('posisi_z') == 'atas',
+        str({k: v['banding'] for k, v in _s_2y.items()}))
+    # Kipas tidak dihitung: garis H1 dan H2 Asih 'atas' MEMANG
+    # bersilangan (mentah), tapi titiknya 13 px sebelum tepi Y
+    # (kipas masuk), jadi skor silangan tetap 0.
+    _pl_asih_atas = GB.penempatan_label(
+        DG.tata_letak(model81, posisi_z='atas'))
+    _h1a = [p for p in _pl_asih_atas if p['label'] == 'H1 (+)'][0]
+    _h2a = [p for p in _pl_asih_atas if p['label'] == 'H2 (+)'][0]
+    cek('skor: silangan kipas di tepi kotak bersama tidak dihitung',
+        GB._segmen_potong(_h1a['x1'], _h1a['y1'], _h1a['x2'],
+                          _h1a['y2'], _h2a['x1'], _h2a['y1'],
+                          _h2a['x2'], _h2a['y2'])
+        and _skor16(model81, 'atas')['silangan'] == 0,
+        str((_h1a['x1'], _h1a['y1'], _h1a['x2'], _h1a['y2'],
+             _h2a['x1'], _h2a['y1'], _h2a['x2'], _h2a['y2'])))
+    # Hukuman celah: hanya bila celah di bawah 30 px (ambang
+    # nyaman); di atas ambang, hukuman 0 walau celahnya berbeda
+    # (Asih atas 91 px vs bawah 111 px, keduanya lega).
+    cek('skor: hukuman celah = max(0, 30 - celah_label)',
+        _s_asih['atas']['hukuman_celah'] == 0.0
+        and _s_asih['atas']['celah_label'] == 91.0
+        and _s_nl['tengah']['hukuman_celah'] == 18.0
+        and _s_nl['tengah']['celah_label'] == 12.0
+        and _s_2y['tengah']['hukuman_celah'] == 30.0
+        and _s_2y['tengah']['celah_label'] == 0.0,
+        str([(_s_asih['atas']['celah_label'],
+              _s_asih['atas']['hukuman_celah']),
+             (_s_nl['tengah']['celah_label'],
+              _s_nl['tengah']['hukuman_celah']),
+             (_s_2y['tengah']['celah_label'],
+              _s_2y['tengah']['hukuman_celah'])]))
+    # Pilih otomatis = kandidat dengan banding terkecil (matriks
+    # 15 bentuk): verifikasi independen, bukan hanya posisi_z.
+    for _n_x16 in (1, 2, 3, 5, 9):
+        for _dz16 in (False, True):
+            for _lw16 in ((False, True) if _dz16 else (False,)):
+                _m16 = _model_matriks(_n_x16, _dz16, _lw16)
+                _sk16 = {pz: _skor16(_m16, pz)
+                         for pz in ('atas', 'tengah', 'bawah')}
+                _menang16 = min(_sk16,
+                                key=lambda pz: _sk16[pz]['banding'])
+                _tag16 = '%d X%s%s' % (
+                    _n_x16, ' + M' if _dz16 else '',
+                    ' + lewat' if _lw16 else '')
+                if _dz16:
+                    cek('skor matriks %s: pilih otomatis = banding '
+                        'terkecil (%s)' % (_tag16, _menang16),
+                        DG.tata_letak(_m16).get('posisi_z')
+                        == _menang16
+                        == _menang_mat[(_n_x16, True, _lw16)],
+                        str({k: v['banding']
+                             for k, v in _sk16.items()}))
+                else:
+                    cek('skor matriks %s: tanpa Z, tidak ada pilihan'
+                        % _tag16,
+                        DG.tata_letak(_m16).get('posisi_z') is None,
+                        str(DG.tata_letak(_m16).get('posisi_z')))
+    # posisi_z eksplisit mengalahkan pilih otomatis (dipakai
+    # pratinjau dan uji): Asih bisa dipaksa 'tengah'/'bawah', Nura
+    # bisa dipaksa 'atas'.
+    cek('skor: posisi_z eksplisit mengalahkan pilih otomatis',
+        DG.tata_letak(model81, posisi_z='tengah').get('posisi_z')
+        == 'tengah'
+        and DG.tata_letak(model81, posisi_z='bawah').get('posisi_z')
+        == 'bawah'
+        and DG.tata_letak(model_nl, posisi_z='atas').get('posisi_z')
+        == 'atas',
+        str(DG.tata_letak(model81, posisi_z='tengah')
+            .get('posisi_z')))
+
+    # Bagian 17: cermin label editor JS vs PNG (Boss 18 Nov 13:42 WIB,
+    # samakan posisi label editor dan PNG). Editor JS
+    # (app/templates/diagram_editor.html) harus menaruh pusat label
+    # (cx, cy) di titik yang persis sama dengan PNG
+    # (GB.penempatan_label). Dulu beda sampai 143 px (contoh 5 H2)
+    # karena kotak tabrakan JS digeser ke atas (cy-28..cy-2) dan
+    # panah tanpa label tidak digeser/dicatat, sementara Python
+    # memusatkan kotak di titik label dan menggeser semua panah.
+    # Perbaikan di JS: kotak tabrakan dipusatkan seperti Python
+    # (lebar dari tabel huruf PIL, tinggi 20/16/0), urutan
+    # penempatan per kelompok + susunan, panah tanpa label ikut
+    # digeser dan dicatat (kotak 12x8). Cek lewat Node
+    # (tests/cermin_editor.js, fungsi geometri diekstrak dari
+    # template) untuk 20 bentuk; toleransi 0,5 px.
+    def _cermin_js(_tata, _n):
+        _masuk = {'kotak': _tata['kotak'], 'panah': _tata['panah'],
+                  'tinggi': _tata.get('tinggi') or 800,
+                  'lebar': _tata.get('lebar') or 1400,
+                  'indikator': [{'induk': _i.get('induk'),
+                                 'teks': _i.get('teks')}
+                                for _i in _tata.get('indikator') or []]}
+        _jalan = os.path.join(TMP, 'cermin_%02d.json' % _n)
+        with open(_jalan, 'w') as _f:
+            json.dump(_masuk, _f)
+        try:
+            _out = subprocess.run(
+                ['node', str(ROOT / 'tests' / 'cermin_editor.js'),
+                 _jalan, str(ROOT / 'app' / 'templates'
+                             / 'diagram_editor.html')],
+                capture_output=True, text=True, timeout=60)
+        except FileNotFoundError:
+            return None, 'node tidak ada'
+        if _out.returncode != 0:
+            return None, _out.stderr.strip()[:200]
+        return json.loads(_out.stdout), ''
+
+    def _banding_cermin(_nama, _model, _n):
+        _tata = DG.tata_letak(_model)
+        _py = GB.penempatan_label(_tata)
+        _js, _err = _cermin_js(_tata, _n)
+        if _js is None:
+            cek('cermin label %s: JS jalan' % _nama, False, _err)
+            return
+        _js = _js.get('label') or []
+        cek('cermin label %s: jumlah panah sama' % _nama,
+            len(_py) == len(_js),
+            'py=%d js=%d' % (len(_py), len(_js)))
+        if len(_py) != len(_js):
+            return
+        # Pasangkan per (dari, ke, label, gaya); bila ganda, pilih
+        # pasangan dengan selisih geometri terkecil.
+        def _kunci(_r):
+            return (_r['dari'], _r['ke'], _r.get('label', ''),
+                    _r.get('gaya', ''))
+        _sisa = {}
+        for _r in _js:
+            _sisa.setdefault(_kunci(_r), []).append(_r)
+        _maks = 0.0
+        _buruk = ''
+        for _a in _py:
+            _k = _kunci(_a)
+            if _k not in _sisa or not _sisa[_k]:
+                cek('cermin label %s: panah %s ada di JS' % (_nama, _k),
+                    False, str(_k))
+                return
+            def _beda(_b):
+                _j = abs(_a['x1'] - _b['x1']) + abs(_a['y1'] - _b['y1'])
+                _j += abs(_a['x2'] - _b['x2']) + abs(_a['y2'] - _b['y2'])
+                if len(_a['rute']) != len(_b['rute']):
+                    _j += 1000.0
+                else:
+                    for _p, _q in zip(_a['rute'], _b['rute']):
+                        _j += abs(_p[0] - _q[0]) + abs(_p[1] - _q[1])
+                return _j
+            _b = min(_sisa[_k], key=_beda)
+            _sisa[_k].remove(_b)
+            for _f in ('cx', 'cy'):
+                _d = abs(_a[_f] - _b[_f])
+                if _d > _maks:
+                    _maks = _d
+                    _buruk = '%s %s py=%.3f js=%.3f' % (
+                        _k, _f, _a[_f], _b[_f])
+        cek('cermin label %s: pusat label sama (maks %.3f px, %d panah)'
+            % (_nama, _maks, len(_py)), _maks <= 0.5, _buruk)
+
+    _bentuk_cermin = [
+        ('Asih', model81), ('Nura lewat M', model_nl),
+        ('Goal-Directed', _goal), ('contoh 5', _c5),
+        ('2 Y', _m2y),
+    ]
+    for _nx, _ada_z, _lewat in (
+            (1, False, False), (1, True, False), (1, True, True),
+            (2, False, False), (2, True, False), (2, True, True),
+            (3, False, False), (3, True, False), (3, True, True),
+            (5, False, False), (5, True, False), (5, True, True),
+            (9, False, False), (9, True, False), (9, True, True)):
+        _bentuk_cermin.append(
+            ('matriks %d X Z=%s lewat=%s' % (_nx, _ada_z, _lewat),
+             _model_matriks(_nx, _ada_z, _lewat)))
+    for _n, (_nama, _model) in enumerate(_bentuk_cermin):
+        _banding_cermin(_nama, _model, _n)
+
+    # ── 18. Moderasi + campuran + migrasi Asih + kolom Jenis ──────
+    #      (Boss 18 Nov 16:10-16:12 WIB) ──────────────────────────
+    # Istilah lazim: M = perantara (mediasi), Z = penguat
+    # (moderasi). Peran W dihapus; Z perantara lama (model Asih)
+    # dimigrasikan di kode jadi M, JANGAN ubah DB live. Kolom
+    # "Jenis jalur" di tabel Hipotesis: Langsung (panah lurus)
+    # atau Tidak langsung (panah putus-putus); bila Dari penguat
+    # (Z), Jenis terkunci jadi Moderasi (panah putus-putus).
+    # Peta Bab IV sudah memakai M/Z, jadi model_dari_peta_bab4
+    # meneruskannya apa adanya. Konvensi gambar TIDAK diubah:
+    # panah interaksi digambar putus-putus kotak-ke-kotak ke Y
+    # (bukan menunjuk ke garis X-Y seperti di buku).
+    _mod = {
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                     {'nama': 'Dukungan Sosial', 'peran': 'Z'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+        'jalur': [{'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H1',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Dukungan Sosial',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                   'arah': '+'}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _mod_n, _mod_mas = DG.normalisasi_model(_mod)
+    cek('moderasi: penguat Z diterima, H2 jadi interaksi',
+        _mod_n is not None and not _mod_mas
+        and _mod_n['variabel'][1]['kode'] == 'Z'
+        and _mod_n['jalur'][1]['jenis'] == 'interaksi',
+        str(_mod_mas))
+    _mod_x, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+                    'jenis': 'acak'}]})
+    cek("moderasi: jenis tidak dikenal tetap jadi 'langsung' "
+        "(interaksi tidak ikut terlipat)",
+        _mod_x is not None
+        and _mod_x['jalur'][0]['jenis'] == 'langsung')
+    # bentuk_model membedakan moderasi ('moderasi', bukan
+    # 'mediasi' seperti dulu) dan campuran ('campuran').
+    cek('moderasi: bentuk moderasi murni disebut moderasi',
+        _mod_n is not None
+        and DG.bentuk_model(_mod_n) == 'moderasi')
+    _t_mod = DG.tata_letak(_mod_n)
+    _k_mod = {k['id']: k for k in _t_mod['kotak']}
+    cek('moderasi murni: 2 kolom, X1 dan penguat Z di kiri, Y kanan',
+        _t_mod.get('posisi_z') is None
+        and _k_mod['X1']['x'] == 60 and _k_mod['Z']['x'] == 60
+        and _k_mod['Y']['x'] == 1040, str(_t_mod.get('posisi_z')))
+    cek('moderasi murni: penguat di bawah garis, X1 di atas garis',
+        _pusat(_k_mod['X1']) < _t_mod.get('tengah')
+        and _pusat(_k_mod['Z']) > _t_mod.get('tengah')
+        and _pusat(_k_mod['Y']) == _t_mod.get('tengah'))
+    _p_mod = _t_mod['panah']
+    cek('moderasi murni: H1 lurus, H2 interaksi putus-putus',
+        len(_p_mod) == 2
+        and _p_mod[0]['gaya'] == 'lurus'
+        and _p_mod[1]['gaya'] == 'putus'
+        and _p_mod[1]['label'] == 'H2 (+)',
+        str([(p['label'], p['gaya']) for p in _p_mod]))
+    _s_mod = GB.skor_tata_letak(_t_mod)
+    cek('moderasi murni: 0 silangan, 0 bengkok, tanpa hukuman celah',
+        _s_mod['banding'] == (0, 0.0, -724.5, 724.5, 250.0, -384.8, 0),
+        str(_s_mod['banding']))
+    _pl_mod = GB.penempatan_label(_t_mod)
+    cek('moderasi murni: celah label lega (222 px)',
+        _celah_min(_pl_mod) >= 30.0, str(_celah_min(_pl_mod)))
+    _png_mod = GB.gambar_panah(_mod_n, _t_mod)
+    cek('moderasi murni: PNG asli + deterministik',
+        _png_mod[:8] == b'\x89PNG\r\n\x1a\n' and len(_png_mod) > 10000
+        and _png_mod == GB.gambar_panah(_mod_n, _t_mod),
+        str(len(_png_mod)))
+    # Campuran mediasi + moderasi (NYATA: normalisasi menerima,
+    # bukan hipotetis lagi). Perantara M + penguat Z (dari formulir:
+    # mahasiswa memilih peran Z). H4 lewat M, H5 interaksi dari Z.
+    _mod_campur_mentah = {
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                     {'nama': 'Orientasi Kewirausahaan', 'peran': 'M'},
+                     {'nama': 'Dukungan Sosial', 'peran': 'Z'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+        'jalur': [{'dari': 'Digital Marketing',
+                   'ke': 'Orientasi Kewirausahaan', 'hipotesis': 'H1',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Orientasi Kewirausahaan',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H3',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha',
+                   'lewat': 'Orientasi Kewirausahaan',
+                   'hipotesis': 'H4', 'arah': '+'},
+                  {'dari': 'Dukungan Sosial',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H5',
+                   'arah': '+'}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _mod_campur, _mc_mas = DG.normalisasi_model(_mod_campur_mentah)
+    cek('campuran DITERIMA: perantara M + penguat Z',
+        _mod_campur is not None and not _mc_mas
+        and [v['kode'] for v in _mod_campur['variabel']]
+        == ['X1', 'M', 'Z', 'Y']
+        and _mod_campur['jalur'][3]['jenis'] == 'tidak_langsung'
+        and _mod_campur['jalur'][4]['jenis'] == 'interaksi',
+        str(_mc_mas))
+    cek('campuran: bentuk disebut campuran',
+        _mod_campur is not None
+        and DG.bentuk_model(_mod_campur) == 'campuran')
+    _t_campur = DG.tata_letak(_mod_campur)
+    _k_campur = {k['id']: k for k in _t_campur['kotak']}
+    cek('campuran: 3 kolom, penguat Z di kolom X, perantara M tengah',
+        _k_campur['X1']['x'] == 60 and _k_campur['Z']['x'] == 60
+        and _k_campur['M']['x'] == 550 and _k_campur['Y']['x'] == 1040)
+    cek('campuran: skor posisi M BERLAKU (perantara segitiga atas)',
+        _t_campur.get('posisi_z') == 'atas'
+        and _pusat(_k_campur['M']) < _t_campur.get('tengah'),
+        str(_t_campur.get('posisi_z')))
+    _p_campur = _t_campur['panah']
+    cek('campuran: 6 panah (H4 dua segmen), H5 interaksi putus-putus',
+        len(_p_campur) == 6
+        and [p['gaya'] for p in _p_campur].count('putus') == 1
+        and _p_campur[-1]['label'] == 'H5 (+)'
+        and _p_campur[-1]['gaya'] == 'putus',
+        str([(p['label'], p['gaya']) for p in _p_campur]))
+    _s_campur = GB.skor_tata_letak(_t_campur)
+    cek('campuran: 0 silangan, 0 bengkok (hukuman celah 18,0)',
+        _s_campur['banding'] == (0, 18.0, -205.6, 724.5, 250.0, -21.4, 0),
+        str(_s_campur['banding']))
+    _pl_campur = GB.penempatan_label(_t_campur)
+    cek('campuran: celah label terkecil 12 px (H1/H4, di atas minimum '
+        '10 px, di bawah ambang nyaman 30 px)',
+        _celah_min(_pl_campur) >= 10.0, str(_celah_min(_pl_campur)))
+    _png_campur = GB.gambar_panah(_mod_campur, _t_campur)
+    cek('campuran: PNG asli + deterministik',
+        _png_campur[:8] == b'\x89PNG\r\n\x1a\n'
+        and len(_png_campur) > 10000
+        and _png_campur == GB.gambar_panah(_mod_campur, _t_campur),
+        str(len(_png_campur)))
+    # Migrasi model Asih (fid 81, kunci Setelan diagram_model_81):
+    # Orientasi Kewirausahaan peran Z (perantara lama) dibaca jadi
+    # M; H6 lewat 'Z' (kode lama) ikut jadi M lewat alias; H2
+    # Z ke Y tetap langsung. DB live TIDAK diubah, migrasinya
+    # di kode. Bentuk tetap 'mediasi', posisi segitiga atas.
+    _asih_lama = {
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                     {'nama': 'Orientasi Kewirausahaan', 'peran': 'Z'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+        'jalur': [{'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H1',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Orientasi Kewirausahaan',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                   'jenis': 'langsung', 'arah': '+'},
+                  {'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'lewat': 'Z',
+                   'hipotesis': 'H6', 'arah': '+'}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _asih_n, _asih_mas = DG.normalisasi_model(_asih_lama)
+    cek('migrasi Asih: Z perantara lama jadi M, H6 lewat M',
+        _asih_n is not None and not _asih_mas
+        and [v['kode'] for v in _asih_n['variabel']] == ['X1', 'M', 'Y']
+        and _asih_n['jalur'][1]['dari'] == 'M'
+        and _asih_n['jalur'][2]['lewat'] == 'M'
+        and _asih_n['jalur'][2]['jenis'] == 'tidak_langsung'
+        and DG.bentuk_model(_asih_n) == 'mediasi',
+        str(_asih_mas))
+    cek('migrasi Asih: segitiga atas (posisi_z berlaku)',
+        _asih_n is not None
+        and DG.tata_letak(_asih_n).get('posisi_z') == 'atas',
+        str(DG.tata_letak(_asih_n).get('posisi_z')
+            if _asih_n else None))
+    # Lewat lewat nama juga ketemu perantara yang sudah migrasi.
+    _asih_nama, _ = DG.normalisasi_model(
+        {'variabel': _asih_lama['variabel'],
+         'jalur': [{'dari': 'Digital Marketing',
+                    'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H1',
+                    'jenis': 'langsung', 'arah': '+'},
+                   {'dari': 'Orientasi Kewirausahaan',
+                    'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                    'jenis': 'langsung', 'arah': '+'},
+                   {'dari': 'Digital Marketing',
+                    'ke': 'Keberlanjutan Usaha',
+                    'lewat': 'Orientasi Kewirausahaan',
+                    'hipotesis': 'H6', 'arah': '+'}],
+         'jenis': 'kuantitatif', 'desain': 'survei'})
+    cek('migrasi Asih: lewat lewat nama juga jadi M',
+        _asih_nama is not None
+        and _asih_nama['jalur'][2]['lewat'] == 'M')
+    # model_dari_peta_bab4: M/Z peta diteruskan apa adanya
+    # (peta sudah memakai istilah lazim); penguat peta ('Z' +
+    # jalur 'interaksi') tetap 'Z', bukan diubah lagi.
+    _peta_mod = {
+        'jenis': 'kuantitatif',
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                     {'nama': 'Dukungan Sosial', 'peran': 'Z'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+        'jalur': [{'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H1',
+                   'jenis': 'langsung'},
+                  {'dari': 'Dukungan Sosial',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                   'jenis': 'interaksi'}]}
+    _ubah_mod = DG.model_dari_peta_bab4(_peta_mod)
+    cek('moderasi dari peta: penguat tetap Z, jalur interaksi disalin',
+        _ubah_mod is not None
+        and _ubah_mod['jalur'][1]['jenis'] == 'interaksi'
+        and _ubah_mod['variabel'][1]['peran'] == 'Z')
+    _ubah_mod_n, _ = DG.normalisasi_model(_ubah_mod)
+    cek('moderasi dari peta: lolos normalisasi (kode Z)',
+        _ubah_mod_n is not None
+        and _ubah_mod_n['variabel'][1]['kode'] == 'Z'
+        and _ubah_mod_n['jalur'][1]['jenis'] == 'interaksi')
+    _peta_campur = {
+        'jenis': 'kuantitatif',
+        'variabel': [{'nama': 'Digital Marketing', 'peran': 'X'},
+                     {'nama': 'Orientasi Kewirausahaan', 'peran': 'M'},
+                     {'nama': 'Dukungan Sosial', 'peran': 'Z'},
+                     {'nama': 'Keberlanjutan Usaha', 'peran': 'Y'}],
+        'jalur': [{'dari': 'Digital Marketing',
+                   'ke': 'Orientasi Kewirausahaan', 'hipotesis': 'H1',
+                   'jenis': 'langsung'},
+                  {'dari': 'Orientasi Kewirausahaan',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H2',
+                   'jenis': 'langsung'},
+                  {'dari': 'Digital Marketing',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H3',
+                   'jenis': 'langsung'},
+                  {'dari': 'Dukungan Sosial',
+                   'ke': 'Keberlanjutan Usaha', 'hipotesis': 'H5',
+                   'jenis': 'interaksi'}]}
+    _ubah_campur = DG.model_dari_peta_bab4(_peta_campur)
+    _uc, _uc_mas = DG.normalisasi_model(_ubah_campur)
+    cek('campuran dari peta: M/Z diteruskan, lolos normalisasi',
+        _ubah_campur is not None
+        and _ubah_campur['variabel'][1]['peran'] == 'M'
+        and _ubah_campur['variabel'][2]['peran'] == 'Z'
+        and _uc is not None and not _uc_mas
+        and [v['kode'] for v in _uc['variabel']] == ['X1', 'M', 'Z', 'Y']
+        and DG.bentuk_model(_uc) == 'campuran',
+        str(_uc_mas))
+    # Formulir kini BISA menambah moderasi dan memilih Jenis jalur:
+    # peran 'M (perantara)' dan 'Z (penguat)' ditawarkan; kolom
+    # 'Jenis jalur' (name="jj") dengan pilihan Langsung / Tidak
+    # langsung / Moderasi; jalur dari Z otomatis interaksi (tanpa
+    # pilihan jenis jalur); Z tidak ditawarkan sebagai Lewat.
+    _html_form = (ROOT / 'app' / 'templates'
+                  / 'diagram_model.html').read_text()
+    cek('formulir: menawarkan M (perantara) dan Z (penguat)',
+        'M (perantara)' in _html_form
+        and 'Z (penguat)' in _html_form
+        and 'W (penguat)' not in _html_form)
+    cek('formulir: kolom Jenis jalur (jj) dengan tiga pilihan',
+        'Jenis jalur' in _html_form
+        and 'name="jj"' in _html_form
+        and 'Langsung (panah lurus)' in _html_form
+        and 'Tidak langsung (panah putus-putus)' in _html_form
+        and 'Moderasi (panah putus-putus)' in _html_form)
+    cek('formulir: segarkanJenis + jenisBerubah ada (JS kunci Jenis)',
+        'function segarkanJenis' in _html_form
+        and 'function jenisBerubah' in _html_form)
+    # Cermin label editor JS vs PNG untuk moderasi (Bagian 17):
+    # panah interaksi ('putus') ikut digeser seperti 'lewat'
+    # (bukan 'lurus'), jadi pusat labelnya harus sama persis.
+    _banding_cermin('Moderasi murni', _mod_n, 20)
+    _banding_cermin('Campuran (nyata)', _mod_campur, 21)
+
+    # ── 19. Lebih dari 1 M/Z + validasi Jenis ─────────────────
+    # Lebih dari 1 perantara (M1/M2) dan lebih dari 1 penguat
+    # (Z1/Z2) diizinkan; satu saja tetap 'M'/'Z' tanpa nomor
+    # (Boss 18 Nov 15:47 WIB). Validasi Jenis (Boss 18 Nov
+    # 16:12 WIB): langsung maka Lewat kosong; tidak_langsung
+    # maka Lewat harus M; interaksi maka Dari Z, Ke Y, Lewat
+    # kosong. Bila jenis tidak dikirim, disimpulkan seperti dulu
+    # (cocok mundur).
+    _par = {
+        'variabel': [{'nama': 'A', 'peran': 'X'},
+                     {'nama': 'M1', 'peran': 'M'},
+                     {'nama': 'M2', 'peran': 'M'},
+                     {'nama': 'B', 'peran': 'Y'}],
+        'jalur': [{'dari': 'A', 'ke': 'M1', 'hipotesis': 'H1'},
+                  {'dari': 'M1', 'ke': 'B', 'hipotesis': 'H2'},
+                  {'dari': 'A', 'ke': 'M2', 'hipotesis': 'H3'},
+                  {'dari': 'M2', 'ke': 'B', 'hipotesis': 'H4'}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _par_n, _par_mas = DG.normalisasi_model(_par)
+    cek('2 M diterima, kode M1/M2',
+        _par_n is not None and not _par_mas
+        and [v['kode'] for v in _par_n['variabel']]
+        == ['X1', 'M1', 'M2', 'Y'], str(_par_mas))
+    _t_par = DG.tata_letak(_par_n)
+    _k_par = {k['id']: k for k in _t_par['kotak']}
+    cek('2 M: dua perantara di kolom tengah, segitiga atas',
+        _t_par.get('posisi_z') == 'atas'
+        and _k_par['M1']['x'] == 550 and _k_par['M2']['x'] == 550
+        and _k_par['X1']['x'] == 60 and _k_par['Y']['x'] == 1040)
+    cek('2 M: skor 0 silangan, 0 bengkok',
+        GB.skor_tata_letak(_t_par)['banding']
+        == (0, 0.0, -190.0, 534.9, 0.0, -145.6, 0),
+        str(GB.skor_tata_letak(_t_par)['banding']))
+    _dua_z, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'P1', 'peran': 'Z'},
+                      {'nama': 'P2', 'peran': 'Z'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1'},
+                   {'dari': 'P1', 'ke': 'B', 'hipotesis': 'H2'},
+                   {'dari': 'P2', 'ke': 'B', 'hipotesis': 'H3'}]})
+    cek('2 Z diterima, kode Z1/Z2',
+        _dua_z is not None
+        and [v['kode'] for v in _dua_z['variabel']]
+        == ['X1', 'Z1', 'Z2', 'Y'])
+    _satu_m, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'M', 'peran': 'M'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'M', 'hipotesis': 'H1'},
+                   {'dari': 'M', 'ke': 'B', 'hipotesis': 'H2'}]})
+    cek('1 M tetap kode M (tanpa nomor)',
+        _satu_m is not None and _satu_m['variabel'][1]['kode'] == 'M')
+    # Validasi Jenis (eksplisit, dari kolom Jenis formulir).
+    def _tolak_jenis(jalur, kata):
+        _m, _mas = DG.normalisasi_model(
+            {'variabel': [{'nama': 'A', 'peran': 'X'},
+                          {'nama': 'C', 'peran': 'X'},
+                          {'nama': 'M', 'peran': 'M'},
+                          {'nama': 'P', 'peran': 'Z'},
+                          {'nama': 'B', 'peran': 'Y'}],
+             'jalur': [jalur]})
+        return _m is None and any(kata in s for s in _mas), str(_mas)
+    _ok, _d = _tolak_jenis(
+        {'dari': 'A', 'ke': 'B', 'lewat': 'M', 'hipotesis': 'H1',
+         'jenis': 'langsung'}, 'Lewat')
+    cek('Jenis langsung + Lewat ditolak', _ok, _d)
+    _ok, _d = _tolak_jenis(
+        {'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+         'jenis': 'tidak_langsung'}, 'perantara')
+    cek('Jenis tidak_langsung tanpa Lewat ditolak', _ok, _d)
+    _ok, _d = _tolak_jenis(
+        {'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+         'jenis': 'interaksi'}, 'penguat')
+    cek('Jenis interaksi dari X ditolak', _ok, _d)
+    _ok, _d = _tolak_jenis(
+        {'dari': 'P', 'ke': 'A', 'hipotesis': 'H1',
+         'jenis': 'interaksi'}, 'hasil')
+    cek('Jenis interaksi dari Z ke bukan-Y ditolak', _ok, _d)
+    _ok, _d = _tolak_jenis(
+        {'dari': 'P', 'ke': 'B', 'lewat': 'M', 'hipotesis': 'H1',
+         'jenis': 'interaksi'}, 'Lewat')
+    cek('Jenis interaksi + Lewat ditolak', _ok, _d)
+    _ok, _d = _tolak_jenis(
+        {'dari': 'A', 'ke': 'B', 'lewat': 'C', 'hipotesis': 'H1',
+         'jenis': 'tidak_langsung'}, 'perantara')
+    cek('Jenis tidak_langsung + Lewat bukan M ditolak', _ok, _d)
+    _m_w, _w_mas = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'P', 'peran': 'W'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'P', 'ke': 'B', 'hipotesis': 'H1'}]})
+    cek("peran 'W' ditolak (tidak dikenal lagi)",
+        _m_w is None and any('tidak dikenal' in s for s in _w_mas),
+        str(_w_mas))
+    # model_tampilan menomori M/Z sama seperti normalisasi.
+    _mt = DG.model_tampilan(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'M1', 'peran': 'M'},
+                      {'nama': 'M2', 'peran': 'M'},
+                      {'nama': 'P1', 'peran': 'Z'},
+                      {'nama': 'P2', 'peran': 'Z'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': []})
+    cek('model_tampilan: 2 M jadi M1/M2, 2 Z jadi Z1/Z2',
+        [v['kode'] for v in _mt['variabel']]
+        == ['X1', 'M1', 'M2', 'Z1', 'Z2', 'Y'])
+    # Campuran dari peta (_uc, Bagian 18) juga dapat segitiga.
+    _t_uc = DG.tata_letak(_uc)
+    cek('campuran dari peta: segitiga atas',
+        _t_uc.get('posisi_z') == 'atas',
+        str(_t_uc.get('posisi_z')))
+    # kodePeran di formulir (JS): X selalu bernomor; M/Z/Y bernomor
+    # HANYA bila lebih dari satu. Diuji lewat node (fungsi murni,
+    # tanpa DOM) supaya penomoran di pilihan formulir benar.
+    _m_kode = re.search(
+        r'function kodePeran\(peran, nomor, jumlah\) \{.*?\n\}',
+        _html_form, re.S)
+    cek('formulir: kodePeran ada di template', _m_kode is not None)
+    if _m_kode:
+        _kasus = [('X', 1, 0, 'X1'), ('X', 2, 0, 'X2'),
+                  ('M', 1, 1, 'M'), ('M', 1, 2, 'M1'),
+                  ('M', 2, 2, 'M2'), ('Z', 1, 1, 'Z'),
+                  ('Z', 1, 2, 'Z1'), ('Z', 2, 2, 'Z2'),
+                  ('Y', 1, 0, 'Y'), ('Y', 1, 2, 'Y1'),
+                  ('Y', 2, 2, 'Y2')]
+        _skrip = _m_kode.group(0) + '\n' + '\n'.join(
+            'console.log(kodePeran(%r, %d, %d));' % (p, n, j)
+            for p, n, j, _ in _kasus)
+        try:
+            _out = subprocess.run(['node', '-e', _skrip],
+                                  capture_output=True, text=True,
+                                  timeout=30)
+            _hasil = (_out.stdout.strip().split('\n')
+                      if _out.returncode == 0 else [])
+        except FileNotFoundError:
+            _hasil = []
+        cek('formulir: kodePeran bernomor benar (node)',
+            _hasil == [e for _, _, _, e in _kasus], str(_hasil))
+    # Warna M oranye di PNG dan editor; Z hijau di PNG dan editor.
+    cek('gambar: WARNA_PERAN M oranye, Z hijau',
+        GB.WARNA_PERAN.get('M') == '#E8833A'
+        and GB.WARNA_PERAN.get('Z') == '#2E7D32')
+    _html_editor = (ROOT / 'app' / 'templates'
+                    / 'diagram_editor.html').read_text()
+    cek('editor: warna M oranye, Z hijau, opsi peran M/Z',
+        "M: '#e8833a'" in _html_editor
+        and "Z: '#2e7d32'" in _html_editor
+        and 'M (perantara)' in _html_editor
+        and 'Z (penguat)' in _html_editor)
+    # Cermin label editor JS vs PNG untuk 2 M.
+    _banding_cermin('Dua perantara', _par_n, 22)
+
+    # ── 20. Indikator gaya SmartPLS (Boss 18 Nov 16:18/16:24/16:26 WIB)
+    # Model: 'indikator' per variabel (boleh kosong, maks 20); peta
+    # Bab IV menyalinnya; formulir lipatan; tata letak menaruh kotak
+    # kecil di samping oval (kiri X/M/Z, kanan Y) + panah dari oval;
+    # kotak selalu setinggi 2 baris (56 px), nama dibungkus seimbang
+    # maks 2 baris; cermin JS vs Python 0,000 px.
+    _model_ind, _m_ind = DG.normalisasi_model(
+        {'variabel': [
+            {'nama': 'Digital Marketing', 'peran': 'X',
+             'indikator': ['Media sosial', 'Konten promosi',
+                           'Iklan berbayar']},
+            {'nama': 'Orientasi Kewirausahaan', 'peran': 'M',
+             'indikator': ['Inovasi produk',
+                           'Keberanian mengambil risiko']},
+            {'nama': 'Keberlanjutan Usaha', 'peran': 'Y',
+             'indikator': ['Pertumbuhan penjualan',
+                           'Loyalitas pelanggan']}],
+         'jalur': [
+            {'dari': 'Digital Marketing', 'ke': 'Keberlanjutan Usaha',
+             'hipotesis': 'H1', 'arah': '+', 'jenis': 'langsung'},
+            {'dari': 'Orientasi Kewirausahaan',
+             'ke': 'Keberlanjutan Usaha',
+             'hipotesis': 'H2', 'arah': '+', 'jenis': 'langsung'},
+            {'dari': 'Digital Marketing', 'ke': 'Keberlanjutan Usaha',
+             'lewat': 'Orientasi Kewirausahaan',
+             'hipotesis': 'H6', 'arah': '+', 'jenis': 'tidak_langsung'}]})
+    cek('indikator: model menerima indikator per variabel',
+        _model_ind is not None and not _m_ind
+        and _model_ind['variabel'][0]['indikator']
+            == ['Media sosial', 'Konten promosi', 'Iklan berbayar']
+        and _model_ind['variabel'][1]['indikator']
+            == ['Inovasi produk', 'Keberanian mengambil risiko']
+        and _model_ind['variabel'][2]['indikator']
+            == ['Pertumbuhan penjualan', 'Loyalitas pelanggan'],
+        str(_m_ind))
+    _model_kos, _m_kos = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1'}]})
+    cek('indikator: kosong lolos (tidak menghalangi)',
+        _model_kos is not None and not _m_kos
+        and _model_kos['variabel'][0].get('indikator') == []
+        and _model_kos['variabel'][1].get('indikator') == [],
+        str(_m_kos))
+    _banyak = ['Indikator %d' % i for i in range(25)] + [
+        '', '  ', 'Indikator 1']
+    _model_batas, _ = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X', 'indikator': _banyak},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1'}]})
+    cek('indikator: dibatasi 20, kosong/ganda dibuang',
+        _model_batas is not None
+        and len(_model_batas['variabel'][0]['indikator']) == 20
+        and _model_batas['variabel'][0]['indikator'][0] == 'Indikator 0'
+        and _model_batas['variabel'][0]['indikator'][19]
+            == 'Indikator 19',
+        str(_model_batas['variabel'][0]['indikator'][:3]
+            if _model_batas else None))
+    _peta_ind = DG.model_dari_peta_bab4(
+        {'variabel': [{'nama': 'A', 'peran': 'X',
+                       'indikator': ['Satu', 'Dua']},
+                      {'nama': 'B', 'peran': 'Y', 'indikator': []}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+                    'jenis': 'langsung'}]})
+    cek('indikator: peta Bab IV menyalin indikator',
+        _peta_ind is not None
+        and _peta_ind['variabel'][0].get('indikator') == ['Satu', 'Dua']
+        and _peta_ind['variabel'][1].get('indikator') == [],
+        str(_peta_ind))
+    _tampil_ind = DG.model_tampilan(
+        {'variabel': [{'nama': 'A', 'peran': 'X',
+                       'indikator': ['Satu', 'Dua']},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': []})
+    cek('indikator: model_tampilan mempertahankan indikator',
+        _tampil_ind['variabel'][0].get('indikator') == ['Satu', 'Dua'],
+        str(_tampil_ind))
+    # Pasangan vi/vk dari formulir (rute).
+    from app import rute_diagram as _RD
+    _pasang = _RD._indikator_per_variabel(
+        ['Satu', '', 'Dua', 'Tiga'], ['0', '0', '1', '9'], 2)
+    cek('indikator: vi/vk dipasangkan ke baris variabel',
+        _pasang == [['Satu'], ['Dua']],
+        str(_pasang))
+    # Tata letak: 7 kotak indikator, sisi benar, ukuran seragam,
+    # tanpa tumpang tindih, kanvas melebar, skor struktural tetap.
+    _tata_ind = DG.tata_letak(_model_ind)
+    _ind_py = _tata_ind.get('indikator') or []
+    cek('indikator: tata menaruh 7 kotak indikator',
+        len(_ind_py) == 7, str(len(_ind_py)))
+    _sisi_ok = all(
+        (_i['sisi'] == 'kanan') == (_i['induk'] == 'Y')
+        for _i in _ind_py)
+    cek('indikator: kiri untuk X/M, kanan untuk Y',
+        _sisi_ok, str([(i['induk'], i['sisi']) for i in _ind_py]))
+    _ukuran_ok = all(_i['w'] == DG.LEBAR_IND
+                      and _i['h'] == DG.TINGGI_IND for _i in _ind_py)
+    cek('indikator: kotak selalu ramping 180x56 (setinggi 2 baris)',
+        _ukuran_ok, str([(i['w'], i['h']) for i in _ind_py]))
+    def _tumpang2(_a, _b):
+        return not (_a['x'] + _a['w'] <= _b['x']
+                    or _b['x'] + _b['w'] <= _a['x']
+                    or _a['y'] + _a['h'] <= _b['y']
+                    or _b['y'] + _b['h'] <= _a['y'])
+    _semua_kotak = list(_tata_ind['kotak']) + _ind_py
+    _tumpuk_ind = [(_a['id'], _b['id'])
+                   for _i, _a in enumerate(_semua_kotak)
+                   for _b in _semua_kotak[_i + 1:]
+                   if _tumpang2(_a, _b)]
+    cek('indikator: tidak menabrak kotak lain (struktural + indikator)',
+        not _tumpuk_ind, str(_tumpuk_ind))
+    _margin_ok = all(_i['x'] >= 60 and _i['y'] >= 20 for _i in _ind_py)
+    cek('indikator: margin kiri 60 px dan atas 20 px terjaga',
+        _margin_ok, str([(i['x'], i['y']) for i in _ind_py]))
+    # Label hipotesis tidak menimpa kotak indikator (temuan pratinjau
+    # campuran 18 Nov 2026: label H3 menimpa 'Pelayanan cepat').
+    def _label_tumpuk_ind(_tata):
+        _pl = GB.penempatan_label(_tata)
+        _ind = _tata.get('indikator') or []
+        return [(_p['label'], _i['id'])
+                for _p in _pl for _i in _ind
+                if _tumpang2({'x': _p['kiri'], 'y': _p['atas'],
+                              'w': _p['kanan'] - _p['kiri'],
+                              'h': _p['bawah'] - _p['atas']}, _i)]
+    cek('indikator: label hipotesis tidak menimpa kotak indikator',
+        not _label_tumpuk_ind(_tata_ind),
+        str(_label_tumpuk_ind(_tata_ind)))
+    # Indikator melebarkan jarak kolom (pitch 520 supaya kotak
+    # indikator muat), jadi skor mutlak berubah; yang dipertahankan
+    # adalah pemenang posisi perantara (mesin tetap memilih 'atas'
+    # untuk Asih) dan tidak ada silangan baru.
+    cek('indikator: pemenang posisi perantara tetap sama (Asih atas)',
+        _tata_ind.get('posisi_z') == 'atas'
+        and tata81.get('posisi_z') == 'atas',
+        'dengan=%s tanpa=%s' % (_tata_ind.get('posisi_z'),
+                                tata81.get('posisi_z')))
+    cek('indikator: tidak ada silangan baru (skor silangan tetap 0)',
+        GB.skor_tata_letak(_tata_ind)['silangan'] == 0
+        and GB.skor_tata_letak(tata81)['silangan'] == 0,
+        'dengan=%s tanpa=%s'
+        % (GB.skor_tata_letak(_tata_ind)['silangan'],
+           GB.skor_tata_letak(tata81)['silangan']))
+    # Panah indikator: mendatar, dari tepi oval ke tepi kotak.
+    _panah_ind = GB.panah_indikator(_tata_ind)
+    cek('indikator: 7 panah indikator (satu per kotak)',
+        len(_panah_ind) == 7, str(len(_panah_ind)))
+    _ind_peta = {i['id']: i for i in _ind_py}
+    _panah_ok = True
+    for _p in _panah_ind:
+        _ind = _ind_peta.get(_p['id'])
+        if not _ind:
+            _panah_ok = False
+            break
+        if _p['y1'] != _p['y2'] or _p['y2'] != _ind['y'] + 28:
+            _panah_ok = False
+            break
+        if _ind['sisi'] == 'kanan':
+            if _p['x2'] != _ind['x'] or _p['x1'] >= _p['x2']:
+                _panah_ok = False
+                break
+        else:
+            if _p['x2'] != _ind['x'] + _ind['w'] or _p['x1'] <= _p['x2']:
+                _panah_ok = False
+                break
+    cek('indikator: panah mendatar dari oval ke tepi kotak',
+        _panah_ok, str(_panah_ind))
+    # Bungkus seimbang: nama pendek 1 baris, panjang 2 baris
+    # seimbang, tidak pernah lebih dari 2 baris.
+    _uk1, _br1 = GB._pilih_font_indikator('Media sosial')
+    _uk2, _br2 = GB._pilih_font_indikator('Keberanian mengambil risiko')
+    _uk3, _br3 = GB._pilih_font_indikator('Pertumbuhan penjualan')
+    cek('indikator: nama pendek 1 baris, panjang 2 baris seimbang',
+        _uk1 == 18 and _br1 == ['Media sosial']
+        and len(_br2) == 2 and len(_br3) == 2
+        and all(not _b.endswith('…') for _b in _br2 + _br3),
+        'uk1=%s %s uk2=%s %s uk3=%s %s'
+        % (_uk1, _br1, _uk2, _br2, _uk3, _br3))
+    # Bungkus seimbang: baris yang dipilih adalah belahan dengan
+    # selisih lebar terkecil di antara semua belahan yang muat
+    # (bukan ambang mutlak: kata-katanya sendiri bisa timpang).
+    def _belahan_terbaik(_teks, _uk):
+        _kata = _teks.split()
+        _maks = DG.LEBAR_IND - 16
+        _terbaik = None
+        for _i in range(1, len(_kata)):
+            _b1 = ' '.join(_kata[:_i])
+            _b2 = ' '.join(_kata[_i:])
+            _w1 = GB._lebar_ind(_b1, _uk)
+            _w2 = GB._lebar_ind(_b2, _uk)
+            if _w1 > _maks or _w2 > _maks:
+                continue
+            _s = abs(_w1 - _w2)
+            if _terbaik is None or _s < _terbaik[0]:
+                _terbaik = (_s, [_b1, _b2])
+        return _terbaik
+    _terbaik2 = _belahan_terbaik('Keberanian mengambil risiko', _uk2)
+    cek('indikator: dua baris seimbang (belahan selisih terkecil)',
+        _terbaik2 is not None and _br2 == _terbaik2[1],
+        'dipilih=%s terbaik=%s' % (_br2, _terbaik2))
+    # PNG: kotak indikator kuning muda tergambar.
+    _png_ind = GB.gambar_panah(_model_ind, _tata_ind)
+    cek('indikator: PNG tergambar dengan indikator',
+        _png_ind[:8] == b'\x89PNG\r\n\x1a\n' and len(_png_ind) > 10000,
+        str(len(_png_ind)))
+    _g_ind = _Image.open(io.BytesIO(_png_ind))
+    _px_ind = _g_ind.load()
+    _kuning_ok = True
+    for _ind in _ind_py:
+        # Sudut kotak (jauh dari teks tengah) harus kuning muda.
+        if _px_ind[_ind['x'] + 5, _ind['y'] + 5] != (255, 245, 157):
+            _kuning_ok = False
+            break
+    cek('indikator: kotak kuning muda (#FFF59D) di PNG',
+        _kuning_ok, 'bukan kuning di sudut kotak')
+    # Tata manual (editor): indikator ikut dari kiriman editor,
+    # induk tak dikenal dibuang, posisi dihitung ulang.
+    _tata_man, _m_man = DG.tata_dari_kotak(
+        [{'id': 'X1', 'nama': 'A', 'peran': 'X', 'x': 300, 'y': 300,
+          'w': 300, 'h': 180},
+         {'id': 'Y', 'nama': 'B', 'peran': 'Y', 'x': 900, 'y': 300,
+          'w': 300, 'h': 180}],
+        [{'dari': 'X1', 'ke': 'Y', 'label': 'H1', 'gaya': 'lurus'}],
+        'model', indikator=[{'induk': 'X1', 'teks': 'Satu'},
+                            {'induk': 'X1', 'teks': 'Dua'},
+                            {'induk': 'Y', 'teks': 'Tiga'},
+                            {'induk': 'Z', 'teks': 'Hantu'}])
+    cek('indikator: tata manual menerima indikator editor',
+        _tata_man is not None and not _m_man
+        and len(_tata_man.get('indikator') or []) == 3
+        and [_i['induk'] for _i in _tata_man['indikator']]
+            == ['X1', 'X1', 'Y'],
+        str(_m_man))
+    # Formulir: lipatan indikator + masukan vi/vk + tombol tambah,
+    # dan petunjuk Lewat (Boss 18 Nov 16:36 WIB).
+    _html_form = (ROOT / 'app' / 'templates'
+                  / 'diagram_model.html').read_text()
+    cek('formulir: lipatan indikator (details + vi/vk + tambah)',
+        'lipatan-indikator' in _html_form
+        and 'name="vi"' in _html_form
+        and 'name="vk"' in _html_form
+        and 'tambahIndikator' in _html_form
+        and 'segarkanIndikator' in _html_form,
+        'lipatan tidak ada di template')
+    cek('formulir: petunjuk Lewat hanya perantara (M)',
+        'Hanya perantara (M) yang muncul di sini. Ubah peran jadi M '
+        'bila variabel ini ingin dilewati.' in _html_form,
+        'petunjuk Lewat tidak ada')
+    # Editor: fungsi indikator + gambar kotak/panah + kirim Selesai.
+    cek('editor: fungsi indikator + gambar + kirim Selesai',
+        'hitungPosisiIndikator' in _html_editor
+        and 'pilihFontIndikator' in _html_editor
+        and 'indikator-' in _html_editor
+        and "#fff59d" in _html_editor
+        and 'indikator:' in _html_editor,
+        'indikator tidak ada di editor')
+    # Cermin JS vs Python untuk indikator (kotak + panah 0,000 px,
+    # ukuran font + baris teks sama persis).
+    def _cermin_ind(_tata, _n):
+        _masuk = {'kotak': _tata['kotak'], 'panah': _tata['panah'],
+                  'tinggi': _tata.get('tinggi') or 800,
+                  'lebar': _tata.get('lebar') or 1400,
+                  'indikator': [{'induk': _i.get('induk'),
+                                 'teks': _i.get('teks')}
+                                for _i in _tata.get('indikator') or []]}
+        _jalan = os.path.join(TMP, 'cermin_ind_%02d.json' % _n)
+        with open(_jalan, 'w') as _f:
+            json.dump(_masuk, _f)
+        try:
+            _out = subprocess.run(
+                ['node', str(ROOT / 'tests' / 'cermin_editor.js'),
+                 _jalan, str(ROOT / 'app' / 'templates'
+                             / 'diagram_editor.html')],
+                capture_output=True, text=True, timeout=60)
+        except FileNotFoundError:
+            return None, 'node tidak ada'
+        if _out.returncode != 0:
+            return None, _out.stderr.strip()[:200]
+        _semua = json.loads(_out.stdout)
+        return _semua.get('indikator') or [], ''
+
+    def _banding_indikator(_nama, _model, _n):
+        _tata = DG.tata_letak(_model)
+        _py = _tata.get('indikator') or []
+        _py_panah = {p['id']: p for p in GB.panah_indikator(_tata)}
+        _js, _err = _cermin_ind(_tata, _n)
+        if _js is None:
+            cek('cermin indikator %s: JS jalan' % _nama, False, _err)
+            return
+        cek('cermin indikator %s: jumlah kotak sama' % _nama,
+            len(_py) == len(_js),
+            'py=%d js=%d' % (len(_py), len(_js)))
+        if len(_py) != len(_js):
+            return
+        _js_peta = {j['id']: j for j in _js}
+        _maks = 0.0
+        _buruk = ''
+        for _a in _py:
+            _j = _js_peta.get(_a['id'])
+            if not _j:
+                _buruk = 'tidak ada %s di JS' % _a['id']
+                _maks = 999.0
+                break
+            for _k in ('x', 'y', 'w', 'h'):
+                _d = abs(_a[_k] - _j[_k])
+                if _d > _maks:
+                    _maks = _d
+                    _buruk = '%s %s py=%s js=%s' % (_a['id'], _k,
+                                                    _a[_k], _j[_k])
+            _pa = _py_panah.get(_a['id'])
+            for _k in ('x1', 'y1', 'x2', 'y2'):
+                _d = abs(_pa[_k] - _j[_k])
+                if _d > _maks:
+                    _maks = _d
+                    _buruk = '%s panah %s py=%s js=%s' % (
+                        _a['id'], _k, _pa[_k], _j[_k])
+            _uk, _br = GB._pilih_font_indikator(_a['teks'])
+            if _j.get('ukuran') != _uk or _j.get('baris') != _br:
+                _buruk = '%s teks py=(%s,%s) js=(%s,%s)' % (
+                    _a['id'], _uk, _br, _j.get('ukuran'),
+                    _j.get('baris'))
+                _maks = 999.0
+                break
+        cek('cermin indikator %s: kotak + panah + teks sama '
+            '(maks %.3f px)' % (_nama, _maks),
+            _maks <= 0.001, _buruk or ('maks %.3f' % _maks))
+    _banding_indikator('Asih', _model_ind, 30)
+    _model_campur_ind, _ = DG.normalisasi_model(
+        {'variabel': [
+            {'nama': 'Harga', 'peran': 'X',
+             'indikator': ['Harga terjangkau', 'Diskon menarik']},
+            {'nama': 'Kepuasan', 'peran': 'M',
+             'indikator': ['Pelayanan cepat']},
+            {'nama': 'Loyalitas', 'peran': 'Y',
+             'indikator': ['Beli lagi', 'Rekomendasi teman']},
+            {'nama': 'Promosi', 'peran': 'Z',
+             'indikator': ['Iklan menarik']}],
+         'jalur': [
+            {'dari': 'Harga', 'ke': 'Loyalitas', 'hipotesis': 'H1',
+             'arah': '+', 'jenis': 'langsung'},
+            {'dari': 'Kepuasan', 'ke': 'Loyalitas', 'hipotesis': 'H2',
+             'arah': '+', 'jenis': 'langsung'},
+            {'dari': 'Harga', 'ke': 'Loyalitas', 'lewat': 'Kepuasan',
+             'hipotesis': 'H3', 'arah': '+', 'jenis': 'tidak_langsung'},
+            {'dari': 'Promosi', 'ke': 'Loyalitas', 'hipotesis': 'H4',
+             'arah': '+', 'jenis': 'interaksi'}]})
+    _tata_campur_ind = DG.tata_letak(_model_campur_ind)
+    _semua_campur = (list(_tata_campur_ind['kotak'])
+                     + list(_tata_campur_ind.get('indikator') or []))
+    _tumpuk_campur = [(_a.get('id'), _b.get('id'))
+                      for _i, _a in enumerate(_semua_campur)
+                      for _b in _semua_campur[_i + 1:]
+                      if _tumpang2(_a, _b)]
+    cek('indikator: kotak tidak menabrak (campuran, M_i1 dulu '
+        'menabrak X1)',
+        not _tumpuk_campur, str(_tumpuk_campur))
+    cek('indikator: label tidak menimpa kotak indikator (campuran)',
+        not _label_tumpuk_ind(_tata_campur_ind),
+        str(_label_tumpuk_ind(_tata_campur_ind)))
+    _banding_indikator('Campuran', _model_campur_ind, 31)
+    _banding_indikator('Nura', MODEL_NURA, 32)
+
+    # ── 21. Lebih dari 1 Y (Boss 18 Nov 17:06 WIB: cabut batas 1 Y)
+    # Pola sama seperti pencabutan batas 1 Z (putaran 8/9):
+    # penolakan 'Variabel hasil (Y) hanya boleh satu.' dihapus;
+    # kode Y1/Y2/... bila lebih dari satu, satu Y tetap 'Y'.
+    # Mesin tata letak sudah bisa multi-Y (Goal-Directed, contoh 5
+    # punya 2 Y) tapi dulu harus bypass normalisasi_model; kini
+    # Goal-Directed mentah lewat normalisasi dan tata letaknya
+    # byte-identik dengan fixture bypass.
+    _my, _mas_my = DG.normalisasi_model(
+        {'variabel': [{'nama': 'Harga', 'peran': 'X'},
+                      {'nama': 'Kepuasan', 'peran': 'M'},
+                      {'nama': 'Loyalitas', 'peran': 'Y'},
+                      {'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Harga', 'ke': 'Loyalitas',
+                    'hipotesis': 'H1', 'arah': '+',
+                    'jenis': 'langsung'},
+                   {'dari': 'Harga', 'ke': 'Keputusan Beli',
+                    'hipotesis': 'H2', 'arah': '+',
+                    'jenis': 'langsung'},
+                   {'dari': 'Kepuasan', 'ke': 'Loyalitas',
+                    'hipotesis': 'H3', 'arah': '+',
+                    'jenis': 'langsung'},
+                   {'dari': 'Harga', 'ke': 'Loyalitas',
+                    'lewat': 'Kepuasan', 'hipotesis': 'H4',
+                    'arah': '+', 'jenis': 'tidak_langsung'}]})
+    cek('multi-Y: diterima tanpa masalah',
+        _my is not None and not _mas_my, str(_mas_my))
+    cek('multi-Y: kode Y1/Y2',
+        [v['kode'] for v in _my['variabel']]
+        == ['X1', 'M', 'Y1', 'Y2'],
+        str([v['kode'] for v in _my['variabel']]))
+    cek('multi-Y: jalur ke Y1/Y2 + lewat M',
+        [(j['dari'], j['ke'], j.get('lewat', ''))
+         for j in _my['jalur']]
+        == [('X1', 'Y1', ''), ('X1', 'Y2', ''),
+            ('M', 'Y1', ''), ('X1', 'Y1', 'M')],
+        str(_my['jalur']))
+    # Satu Y tetap 'Y'.
+    _sy, _mas_sy = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+                    'arah': '+'}]})
+    cek('multi-Y: satu Y tetap Y',
+        [v['kode'] for v in _sy['variabel']] == ['X1', 'Y']
+        and not _mas_sy, str(_mas_sy))
+    # Tiga Y jadi Y1/Y2/Y3.
+    _ty, _mas_ty = DG.normalisasi_model(
+        {'variabel': [{'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B1', 'peran': 'Y'},
+                      {'nama': 'B2', 'peran': 'Y'},
+                      {'nama': 'B3', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B2', 'hipotesis': 'H1',
+                    'arah': '+'}]})
+    cek('multi-Y: tiga Y jadi Y1/Y2/Y3',
+        [v['kode'] for v in _ty['variabel']]
+        == ['X1', 'Y1', 'Y2', 'Y3'], str(_mas_ty))
+    # Referensi 'Y' lama (kode/nama) menunjuk Y pertama.
+    _ly, _mas_ly = DG.normalisasi_model(
+        {'variabel': [{'nama': 'Harga', 'peran': 'X'},
+                      {'nama': 'Loyalitas', 'peran': 'Y'},
+                      {'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Harga', 'ke': 'Y', 'hipotesis': 'H1',
+                    'arah': '+'}]})
+    cek('multi-Y: referensi Y lama ke Y pertama',
+        _ly['jalur'][0]['ke'] == 'Y1' and not _mas_ly,
+        str(_mas_ly))
+    # model_tampilan (tampil lagi saat validasi gagal) ikut Y1/Y2.
+    _ty_tampil = DG.model_tampilan(
+        {'variabel': [{'nama': 'Harga', 'peran': 'X'},
+                      {'nama': 'Loyalitas', 'peran': 'Y'},
+                      {'nama': 'Keputusan Beli', 'peran': 'Y'}],
+         'jalur': [{'dari': 'Harga', 'ke': 'Keputusan Beli',
+                    'hipotesis': 'H2', 'arah': '+'}]})
+    cek('multi-Y: model_tampilan Y1/Y2',
+        [v['kode'] for v in _ty_tampil['variabel']]
+        == ['X1', 'Y1', 'Y2']
+        and _ty_tampil['jalur'][0]['ke'] == 'Y2',
+        str(_ty_tampil))
+    # Bentuk model multi-Y murni tetap 'langsung'.
+    cek('multi-Y: bentuk langsung',
+        DG.bentuk_model({'variabel': [{'nama': 'A', 'peran': 'X'},
+                                      {'nama': 'B', 'peran': 'Y'},
+                                      {'nama': 'C', 'peran': 'Y'}]})
+        == 'langsung')
+    # Goal-Directed mentah lewat normalisasi: kode sama dengan
+    # fixture bypass, tata letak byte-identik.
+    _nama_dari_kode = {v['kode']: v['nama'] for v in _goal['variabel']}
+    _goal_mentah = {
+        'variabel': [{'nama': v['nama'], 'peran': v['peran']}
+                     for v in _goal['variabel']],
+        'jalur': [{'dari': _nama_dari_kode[j['dari']],
+                   'ke': _nama_dari_kode[j['ke']],
+                   'hipotesis': j['hipotesis'],
+                   'jenis': j['jenis'], 'arah': j['arah']}
+                  for j in _goal['jalur']]}
+    _goal_n, _mas_goal = DG.normalisasi_model(_goal_mentah)
+    cek('multi-Y: Goal-Directed mentah diterima',
+        _goal_n is not None and not _mas_goal, str(_mas_goal))
+    cek('multi-Y: Goal-Directed kode sama dengan fixture',
+        [v['kode'] for v in _goal_n['variabel']]
+        == [v['kode'] for v in _goal['variabel']],
+        str([v['kode'] for v in _goal_n['variabel']]))
+    _tata_goal_n = DG.tata_letak(_goal_n)
+    _tata_goal = DG.tata_letak(_goal)
+    cek('multi-Y: Goal-Directed tata letak byte-identik',
+        _tata_goal_n['kotak'] == _tata_goal['kotak']
+        and _tata_goal_n['panah'] == _tata_goal['panah'])
+    # Tata letak model multi-Y: dua oval Y, tidak menabrak.
+    _tata_my = DG.tata_letak(_my)
+    _kotak_my = _tata_my['kotak']
+    cek('multi-Y: dua oval Y tergambar',
+        len([k for k in _kotak_my if k['id'] in ('Y1', 'Y2')]) == 2,
+        str([k['id'] for k in _kotak_my]))
+    cek('multi-Y: kotak tidak menabrak',
+        not [(_a.get('id'), _b.get('id'))
+             for _i, _a in enumerate(_kotak_my)
+             for _b in _kotak_my[_i + 1:]
+             if _tumpang2(_a, _b)])
+    _banding_cermin('multi-Y', _my, 33)
+
+
 
 
 if __name__ == '__main__':

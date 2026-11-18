@@ -55,7 +55,7 @@ log = logging.getLogger(__name__)
 # ══════════════════════════════════════════════════════════════════════════
 # KONSTANTA GAYA
 # ══════════════════════════════════════════════════════════════════════════
-W, H = 1200, 700
+W, H = 1400, 800
 
 #  Bingkai plot (gaya modern: tanpa garis sumbu, hanya grid halus)
 X0, Y0, X1, Y1 = 130, 185, 1145, 585
@@ -67,6 +67,16 @@ TINTA = '#10222E'         # teks utama
 ABU = '#7C8B99'           # teks sekunder
 GRID = '#E8EEF2'          # garis bantu
 LATAR = '#FBFCFD'         # latar
+KUNING_IND = '#FFF59D'    # isi kotak indikator (kuning muda, contoh PLS-SEM Boss)
+OUTLINE_IND = '#F9A825'   # garis kotak indikator (kuning tua)
+# Lebar huruf DejaVu Sans Bold untuk indikator (diukur PIL,
+# 1 desimal; TABEL YANG SAMA dipakai editor JS, supaya
+# keputusan bungkus nama indikator sama persis di PNG dan
+# editor. Dibangkitkan /tmp/dg10/buat_tabel2.py.)
+LEBAR_HURUF_IND_18 = {" ": 6.3, "!": 8.2, "\"": 9.4, "#": 15.1, "$": 12.5, "%": 18.0, "&": 15.7, "'": 5.5, "(": 8.2, ")": 8.2, "*": 9.4, "+": 15.1, ",": 6.8, "-": 7.5, ".": 6.8, "/": 6.6, "0": 12.5, "1": 12.5, "2": 12.5, "3": 12.5, "4": 12.5, "5": 12.5, "6": 12.5, "7": 12.5, "8": 12.5, "9": 12.5, ":": 7.2, ";": 7.2, "<": 15.1, "=": 15.1, ">": 15.1, "?": 10.4, "@": 18.0, "A": 13.9, "B": 13.7, "C": 13.2, "D": 14.9, "E": 12.3, "F": 12.3, "G": 14.8, "H": 15.1, "I": 6.7, "J": 6.7, "K": 14.0, "L": 11.5, "M": 17.9, "N": 15.1, "O": 15.3, "P": 13.2, "Q": 15.3, "R": 13.9, "S": 13.0, "T": 12.3, "U": 14.6, "V": 13.9, "W": 19.9, "X": 13.9, "Y": 13.0, "Z": 13.0, "[": 8.2, "\\": 6.6, "]": 8.2, "^": 15.1, "_": 9.0, "`": 9.0, "a": 12.1, "b": 12.9, "c": 10.7, "d": 12.9, "e": 12.2, "f": 7.8, "g": 12.9, "h": 12.8, "i": 6.2, "j": 6.2, "k": 12.0, "l": 6.2, "m": 18.8, "n": 12.8, "o": 12.4, "p": 12.9, "q": 12.9, "r": 8.9, "s": 10.7, "t": 8.6, "u": 12.8, "v": 11.7, "w": 16.6, "x": 11.6, "y": 11.7, "z": 10.5, "{": 12.8, "|": 6.6, "}": 12.8, "~": 15.1, "é": 12.2, "è": 12.2, "ê": 12.2, "à": 12.1, "á": 12.1, "â": 12.1, "ä": 12.1, "ü": 12.8, "ö": 12.4, "ï": 6.2, "ç": 10.7, "ñ": 12.8}
+LEBAR_HURUF_IND_16 = {" ": 5.6, "!": 7.3, "\"": 8.3, "#": 13.4, "$": 11.1, "%": 16.0, "&": 14.0, "'": 4.9, "(": 7.3, ")": 7.3, "*": 8.4, "+": 13.4, ",": 6.1, "-": 6.6, ".": 6.1, "/": 5.8, "0": 11.1, "1": 11.1, "2": 11.1, "3": 11.1, "4": 11.1, "5": 11.1, "6": 11.1, "7": 11.1, "8": 11.1, "9": 11.1, ":": 6.4, ";": 6.4, "<": 13.4, "=": 13.4, ">": 13.4, "?": 9.3, "@": 16.0, "A": 12.4, "B": 12.2, "C": 11.8, "D": 13.3, "E": 10.9, "F": 10.9, "G": 13.1, "H": 13.4, "I": 6.0, "J": 6.0, "K": 12.4, "L": 10.2, "M": 15.9, "N": 13.4, "O": 13.6, "P": 11.7, "Q": 13.6, "R": 12.3, "S": 11.5, "T": 10.9, "U": 13.0, "V": 12.4, "W": 17.7, "X": 12.3, "Y": 11.6, "Z": 11.6, "[": 7.3, "\\": 5.8, "]": 7.3, "^": 13.4, "_": 8.0, "`": 8.0, "a": 10.8, "b": 11.5, "c": 9.5, "d": 11.5, "e": 10.9, "f": 7.0, "g": 11.5, "h": 11.4, "i": 5.5, "j": 5.5, "k": 10.6, "l": 5.5, "m": 16.7, "n": 11.4, "o": 11.0, "p": 11.5, "q": 11.5, "r": 7.9, "s": 9.5, "t": 7.7, "u": 11.4, "v": 10.4, "w": 14.8, "x": 10.3, "y": 10.4, "z": 9.3, "{": 11.4, "|": 5.8, "}": 11.4, "~": 13.4, "é": 10.9, "è": 10.9, "ê": 10.9, "à": 10.8, "á": 10.8, "â": 10.8, "ä": 10.8, "ü": 11.4, "ö": 11.0, "ï": 5.5, "ç": 9.5, "ñ": 11.4}
+LEBAR_HURUF_IND_14 = {" ": 4.9, "!": 6.4, "\"": 7.3, "#": 11.7, "$": 9.7, "%": 14.0, "&": 12.2, "'": 4.3, "(": 6.4, ")": 6.4, "*": 7.3, "+": 11.7, ",": 5.3, "-": 5.8, ".": 5.3, "/": 5.1, "0": 9.7, "1": 9.7, "2": 9.7, "3": 9.7, "4": 9.7, "5": 9.7, "6": 9.7, "7": 9.7, "8": 9.7, "9": 9.7, ":": 5.6, ";": 5.6, "<": 11.7, "=": 11.7, ">": 11.7, "?": 8.1, "@": 14.0, "A": 10.8, "B": 10.7, "C": 10.3, "D": 11.6, "E": 9.6, "F": 9.6, "G": 11.5, "H": 11.7, "I": 5.2, "J": 5.2, "K": 10.8, "L": 8.9, "M": 13.9, "N": 11.7, "O": 11.9, "P": 10.3, "Q": 11.9, "R": 10.8, "S": 10.1, "T": 9.5, "U": 11.4, "V": 10.8, "W": 15.4, "X": 10.8, "Y": 10.1, "Z": 10.2, "[": 6.4, "\\": 5.1, "]": 6.4, "^": 11.7, "_": 7.0, "`": 7.0, "a": 9.5, "b": 10.0, "c": 8.3, "d": 10.0, "e": 9.5, "f": 6.1, "g": 10.0, "h": 10.0, "i": 4.8, "j": 4.8, "k": 9.3, "l": 4.8, "m": 14.6, "n": 10.0, "o": 9.6, "p": 10.0, "q": 10.0, "r": 6.9, "s": 8.3, "t": 6.7, "u": 10.0, "v": 9.1, "w": 12.9, "x": 9.0, "y": 9.1, "z": 8.2, "{": 10.0, "|": 5.1, "}": 10.0, "~": 11.7, "é": 9.5, "è": 9.5, "ê": 9.5, "à": 9.5, "á": 9.5, "â": 9.5, "ä": 9.5, "ü": 10.0, "ö": 9.6, "ï": 4.8, "ç": 8.3, "ñ": 10.0}
+
 
 #  Palet pai (modern, tidak mentah)
 PALET = ('#1D7A8C', '#E8833A', '#5C6BC0', '#26A69A', '#EF5350',
@@ -413,10 +423,12 @@ def gambar_grafik(data: Any, jenis: str = 'batang', judul: str = 'Grafik',
 # ══════════════════════════════════════════════════════════════════════════
 # DIAGRAM PANAH MODEL PENELITIAN + ALUR DESAIN (17Nov26, GAS Bos 09:25)
 # Digambar mesin secara deterministik dari data model (bukan AI).
-# Panah = garis + kepala segitiga kecil. Kotak X teal, Z oranye, Y nila.
+# Panah = garis + kepala segitiga kecil. Kotak X teal, M oranye
+# (perantara), Z hijau (penguat, dibedakan dari perantara oranye),
+# Y nila.
 # ══════════════════════════════════════════════════════════════════════════
-WARNA_PERAN = {'X': TEAL, 'Z': ORANYE, 'M': ORANYE, 'Y': '#5C6BC0',
-               'langkah': TEAL}
+WARNA_PERAN = {'X': TEAL, 'M': ORANYE, 'Z': '#2E7D32',
+               'Y': '#5C6BC0', 'langkah': TEAL}
 
 
 def _bungkus_teks(d, teks: str, font, maks_lebar: int,
@@ -441,23 +453,186 @@ def _bungkus_teks(d, teks: str, font, maks_lebar: int,
     return baris or ['']
 
 
+def _lebar_ind(teks: str, ukuran: int) -> float:
+    """Lebar teks (px) menurut tabel lebar huruf DejaVu Sans Bold
+    (ukuran 18/16/14), sama persis dengan tabel JS editor.
+    Dipakai bungkus indikator supaya keputusan bungkus Python dan
+    JS sama persis (kerning membuat jumlah per huruf sedikit lebih
+    besar dari textlength utuh, jadi kedua sisi harus memakai
+    ukuran yang sama). Huruf di luar tabel memakai lebar 'm'."""
+    tabel = {18: LEBAR_HURUF_IND_18, 16: LEBAR_HURUF_IND_16,
+             14: LEBAR_HURUF_IND_14}.get(ukuran) or LEBAR_HURUF_IND_18
+    jatuh = tabel.get('m', 12)
+    return sum(tabel.get(ch, jatuh) for ch in str(teks or ''))
+
+
+def _bungkus_seimbang(teks: str, ukuran: int, maks_lebar: int) -> list:
+    """Bungkus teks jadi paling banyak 2 baris yang SEIMBANG.
+
+    Nama indikator (Boss 18 Nov 16:26 WIB): kotak selalu setinggi
+    2 baris dan ramping; nama panjang dibungkus jadi 2 baris yang
+    seimbang (selisih lebar kedua baris terkecil), nama pendek tetap
+    1 baris. Bila satu baris muat, kembalikan 1 baris. Bila tidak
+    ada belahan dua baris yang muat, jatuh ke _bungkus_teks
+    (terpotong '…' di baris kedua). Lebar diukur dari tabel bersama
+    (_lebar_ind), sama dengan editor JS."""
+    kata = str(teks or '').split()
+    if not kata:
+        return ['']
+    utuh = ' '.join(kata)
+    if _lebar_ind(utuh, ukuran) <= maks_lebar:
+        return [utuh]
+    terbaik = None
+    for i in range(1, len(kata)):
+        b1 = ' '.join(kata[:i])
+        b2 = ' '.join(kata[i:])
+        w1 = _lebar_ind(b1, ukuran)
+        w2 = _lebar_ind(b2, ukuran)
+        if w1 > maks_lebar or w2 > maks_lebar:
+            continue
+        selisih = abs(w1 - w2)
+        if terbaik is None or selisih < terbaik[0]:
+            terbaik = (selisih, [b1, b2])
+    if terbaik is not None:
+        return terbaik[1]
+    return _bungkus_teks_dari_lebar(teks, ukuran, maks_lebar, 2)
+
+
+def _bungkus_teks_dari_lebar(teks: str, ukuran: int, maks_lebar: int,
+                             maks_baris: int = 2) -> list:
+    """Bungkus teks (seperti _bungkus_teks) tapi lebar diukur dari
+    tabel bersama (_lebar_ind), supaya jatuhannya sama dengan
+    editor JS bila nama indikator tidak muat dua baris."""
+    kata = str(teks or '').split()
+    baris: list[str] = []
+    kini = ''
+    for k in kata:
+        coba = f'{kini} {k}'.strip()
+        if _lebar_ind(coba, ukuran) <= maks_lebar or not kini:
+            kini = coba
+        else:
+            baris.append(kini)
+            kini = k
+            if len(baris) >= maks_baris:
+                break
+    if kini and len(baris) < maks_baris:
+        baris.append(kini)
+    elif kini and baris:
+        baris[-1] = baris[-1] + '…'
+    return baris or ['']
+
+
+def _pilih_font_indikator(teks: str) -> tuple:
+    """Font indikator terbesar yang memuat nama dalam 2 baris.
+
+    Coba 18, lalu 16, lalu 14 (tebal); yang pertama yang
+    membungkus tanpa terpotong ('…') dipakai. Bila 14 pun
+    terpotong, pakai 14 (terpotong). Kembalikan
+    (ukuran, baris)."""
+    from .diagram import LEBAR_IND
+    maks_lebar = LEBAR_IND - 16
+    for ukuran in (18, 16, 14):
+        baris = _bungkus_seimbang(teks, ukuran, maks_lebar)
+        if not any(b.endswith('…') for b in baris):
+            return ukuran, baris
+    return 14, _bungkus_seimbang(teks, 14, maks_lebar)
+
+
+def _teks_indikator(d, ind: dict) -> None:
+    """Tulis nama indikator di dalam kotaknya (selalu setinggi
+    2 baris, Boss 18 Nov 16:26 WIB): nama dibungkus jadi 2 baris
+    yang seimbang, font mengecil sampai muat; blok teks dipusatkan
+    vertikal di kotak (1 baris tetap di tengah)."""
+    from .diagram import TINGGI_IND
+    ukuran, baris = _pilih_font_indikator(ind.get('teks') or '')
+    f = _font(ukuran, True)
+    tinggi_baris = ukuran + 4
+    blok = len(baris) * tinggi_baris
+    ty = ind['y'] + (TINGGI_IND - blok) / 2
+    for b in baris:
+        d.text((ind['x'] + ind['w'] / 2, ty), b, font=f, fill=TINTA,
+               anchor='ma')
+        ty += tinggi_baris
+
+
+def panah_indikator(tata: dict | None) -> list:
+    """Panah dari oval variabel ke tiap kotak indikatornya.
+
+    Kembalikan [{'id', 'induk', 'x1', 'y1', 'x2', 'y2'}]: dari
+    tepi oval (setinggi tengah kotak indikator, jepit 6) ke tepi
+    kotak indikator yang menghadap oval. Tata tanpa indikator
+    menghasilkan []."""
+    if not tata:
+        return []
+    kotak = {k['id']: k for k in tata.get('kotak') or []}
+    if not kotak:
+        return []
+    keluar = []
+    for ind in tata.get('indikator') or []:
+        induk = kotak.get(ind.get('induk'))
+        if not induk:
+            continue
+        tengah_ind = ind['y'] + ind['h'] / 2
+        geser = tengah_ind - (induk['y'] + induk['h'] / 2)
+        sisi = ind.get('sisi') or 'kiri'
+        x1, y1 = _titik_elips(induk, geser, sisi)
+        if sisi == 'kanan':
+            x2, y2 = ind['x'], tengah_ind
+        else:
+            x2, y2 = ind['x'] + ind['w'], tengah_ind
+        keluar.append({'id': ind['id'], 'induk': ind['induk'],
+                       'x1': round(x1, 3), 'y1': round(y1, 3),
+                       'x2': round(x2, 3), 'y2': round(y2, 3)})
+    return keluar
+
+
 def _teks_kotak(d, kotak: dict) -> None:
     """Tulis kode + nama di dalam kotak (nama dibungkus, ukuran mengecil
-    sampai muat; tidak pernah terpotong)."""
-    x, y, w = kotak['x'], kotak['y'], kotak['w']
-    f_kode = _font(24, True)
-    d.text((x + w / 2, y + 10), str(kotak.get('kode') or ''),
-           font=f_kode, fill=TINTA, anchor='ma')
+    sampai muat; tidak pernah terpotong). Kotak digambar sebagai elips
+    (contoh skripsi Boss 18 Nov 2026), jadi kode dikecilkan supaya
+    muat di bagian atas elips yang menyempit (lebar aman 170 px).
+    Blok teks (kode + nama) dipusatkan vertikal di dalam oval,
+    supaya teks punya ruang lega seperti oval contoh."""
+    x, y, w, h = kotak['x'], kotak['y'], kotak['w'], kotak['h']
+    f_kode, _uk = _font_muat(str(kotak.get('kode') or ''), 170, 24)
     f_nama, _uk = _font_muat(str(kotak.get('nama') or ''), w - 24, 24)
     baris = _bungkus_teks(d, kotak.get('nama') or '', f_nama, w - 24)
-    ty = y + 42
+    # Blok: kode di +10, nama mulai +42, tiap baris 28 px, tinggi
+    # glif 24; dipusatkan di dalam oval (blok 56 px 1 baris, 84 px
+    # 2 baris).
+    blok = 56 + 28 * (len(baris) - 1)
+    geser = (h - blok) / 2
+    d.text((x + w / 2, y + 10 + geser), str(kotak.get('kode') or ''),
+           font=f_kode, fill=TINTA, anchor='ma')
+    ty = y + 42 + geser
     for b in baris:
         d.text((x + w / 2, ty), b, font=f_nama, fill=TINTA, anchor='ma')
         ty += 28
 
 
+def _garis_ruas(d, x1: float, y1: float, x2: float, y2: float,
+                putus: bool = False, lebar: int = 4) -> None:
+    """Satu ruas garis tanpa kepala panah (untuk polilinia)."""
+    dx, dy = x2 - x1, y2 - y1
+    panjang = math.hypot(dx, dy)
+    if panjang < 4:
+        return
+    ux, uy = dx / panjang, dy / panjang
+    if putus:
+        langkah = 14
+        s = 0.0
+        while s < panjang:
+            t = min(langkah, panjang - s)
+            d.line([(x1 + ux * s, y1 + uy * s),
+                    (x1 + ux * (s + t), y1 + uy * (s + t))],
+                   fill=TINTA, width=lebar)
+            s += langkah * 2
+    else:
+        d.line([(x1, y1), (x2, y2)], fill=TINTA, width=lebar)
+
+
 def _garis_panah(d, x1: float, y1: float, x2: float, y2: float,
-                 putus: bool = False) -> None:
+                 putus: bool = False, lebar: int = 4) -> None:
     """Garis + kepala segitiga kecil di ujung."""
     dx, dy = x2 - x1, y2 - y1
     panjang = math.hypot(dx, dy)
@@ -466,35 +641,691 @@ def _garis_panah(d, x1: float, y1: float, x2: float, y2: float,
     ux, uy = dx / panjang, dy / panjang
     #  ujung garis berhenti 20 px sebelum titik (ruang kepala panah)
     ex, ey = x2 - ux * 20, y2 - uy * 20
-    if putus:
-        langkah = 14
-        s = 0.0
-        while s < panjang - 20:
-            t = min(langkah, panjang - 20 - s)
-            d.line([(x1 + ux * s, y1 + uy * s),
-                    (x1 + ux * (s + t), y1 + uy * (s + t))],
-                   fill=TINTA, width=4)
-            s += langkah * 2
-    else:
-        d.line([(x1, y1), (ex, ey)], fill=TINTA, width=4)
+    _garis_ruas(d, x1, y1, ex, ey, putus, lebar)
     px, py = -uy, ux
-    d.polygon([(x2, y2), (ex + px * 11, ey + py * 11),
-               (ex - px * 11, ey - py * 11)], fill=TINTA)
+    kepala = max(5, int(11 * lebar / 4))
+    d.polygon([(x2, y2), (ex + px * kepala, ey + py * kepala),
+               (ex - px * kepala, ey - py * kepala)], fill=TINTA)
 
 
-def _label_panah(d, x1: float, y1: float, x2: float, y2: float,
-                 label: str) -> None:
-    """Label hipotesis di tengah panah (kotak putih di belakang teks
+def _label_panah(d, cx: float, cy: float, label: str) -> None:
+    """Label hipotesis di tengah garisnya (kotak putih di belakang teks
     supaya tetap terbaca walau panah bersilangan)."""
     if not label:
         return
-    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
     f = _font(22, True)
     kiri, atas, kanan, bawah = d.textbbox((0, 0), label, font=f)
     lw, lh = kanan - kiri, bawah - atas
-    d.rectangle([mx - lw / 2 - 6, my - lh / 2 - 4,
-                 mx + lw / 2 + 6, my + lh / 2 + 4], fill='white')
-    d.text((mx, my - lh / 2), label, font=f, fill=TINTA, anchor='ma')
+    d.rectangle([cx - lw / 2 - 6, cy - lh / 2 - 4,
+                 cx + lw / 2 + 6, cy + lh / 2 + 4], fill='white')
+    d.text((cx, cy - lh / 2), label, font=f, fill=TINTA, anchor='ma')
+
+
+# Langkah antar jalur sejajar (px, tegak): label 92x28 px, jadi celah
+# antar label 40 - 28 = 12 px (bila dijepit ke 39 px, celah 11 px).
+JARAK_JALUR = 40
+
+
+def _titik_elips(kotak: dict, geser: float, sisi: str,
+                 jepit: float = 6) -> tuple:
+    """Titik di tepi elips ('kanan'/'kiri' setinggi tengah + geser,
+    'atas'/'bawah' selebar tengah + geser).
+
+    Dipakai jalur sejajar: tiap panah menempel di titiknya sendiri,
+    bukan di tengah tepi yang sama. Geser dijepit supaya titik tetap
+    di elips (ry - jepit untuk kanan/kiri, rx - jepit untuk
+    atas/bawah); jepit 2 dipakai rute lurus supaya titik tempel
+    bisa sampai dekat puncak elips (perlu untuk X tengah yang
+    segaris dengan Z).
+    """
+    cx = kotak['x'] + kotak['w'] / 2
+    cy = kotak['y'] + kotak['h'] / 2
+    rx = kotak['w'] / 2
+    ry = kotak['h'] / 2
+    if sisi in ('atas', 'bawah'):
+        geser = max(-(rx - jepit), min(rx - jepit, geser))
+        sisa = max(0.0, 1 - (geser / rx) ** 2)
+        y = cy - (ry * math.sqrt(sisa) if sisi == 'atas'
+                  else -ry * math.sqrt(sisa))
+        return cx + geser, y
+    geser = max(-(ry - jepit), min(ry - jepit, geser))
+    sisa = max(0.0, 1 - (geser / ry) ** 2)
+    x = cx + (rx * math.sqrt(sisa) if sisi == 'kanan'
+              else -rx * math.sqrt(sisa))
+    return x, cy + geser
+
+
+def _tumpuk_vertikal(a, b):
+    """Dua kotak bertumpuk vertikal (satu kolom): rentang x
+    bertumpang tindih lebih dari separuh lebar yang sempit, dan
+    ada celah vertikal di antara keduanya."""
+    lebar_sempit = min(a['w'], b['w'])
+    tumpang = (min(a['x'] + a['w'], b['x'] + b['w'])
+               - max(a['x'], b['x']))
+    if tumpang < lebar_sempit / 2:
+        return False
+    return (a['y'] + a['h'] <= b['y'] or b['y'] + b['h'] <= a['y'])
+
+
+def _susunan_kelompok(butir: list) -> list:
+    """Susun panah satu segmen: lurus di tengah, putus-putus di
+    atas/bawah (contoh ke-3 Boss 18 Nov 2026: PL di tengah, PT di
+    atas dan bawah). Panah lewat paruh awal ke atas, paruh akhir
+    ke bawah; lurus yang tidak ada tetap urutan semula."""
+    lurus = [b for b in butir if b[2].get('gaya') == 'lurus']
+    lewat = [b for b in butir if b[2].get('gaya') != 'lurus']
+    kiri = (len(lewat) + 1) // 2
+    return lewat[:kiri] + lurus + lewat[kiri:]
+
+
+def _arah(ax, ay, bx, by, cx, cy):
+    """Tanda putaran (untuk uji potong segmen)."""
+    return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax)
+
+
+def _segmen_potong(ax, ay, bx, by, cx, cy, dx, dy):
+    """Segmen AB memotong segmen CD (bersentuhan di ujung tidak dihitung)."""
+    d1 = _arah(cx, cy, dx, dy, ax, ay)
+    d2 = _arah(cx, cy, dx, dy, bx, by)
+    d3 = _arah(ax, ay, bx, by, cx, cy)
+    d4 = _arah(ax, ay, bx, by, dx, dy)
+    return (d1 != 0 and d2 != 0 and d3 != 0 and d4 != 0
+            and ((d1 > 0) != (d2 > 0)) and ((d3 > 0) != (d4 > 0)))
+
+
+def _titik_dalam_kotak(x, y, k, margin=0):
+    return (k['x'] - margin <= x <= k['x'] + k['w'] + margin
+            and k['y'] - margin <= y <= k['y'] + k['h'] + margin)
+
+
+def _segmen_lewat_kotak(x1, y1, x2, y2, k, margin=4):
+    """Segmen menembus kotak (diperluas margin)? Ujung di dalam kotak
+    tidak dihitung (itu kotak asal/tujuan)."""
+    if _titik_dalam_kotak(x1, y1, k, margin) or _titik_dalam_kotak(
+            x2, y2, k, margin):
+        return False
+    kx1, ky1 = k['x'] - margin, k['y'] - margin
+    kx2, ky2 = k['x'] + k['w'] + margin, k['y'] + k['h'] + margin
+    if max(x1, x2) < kx1 or min(x1, x2) > kx2:
+        return False
+    if max(y1, y2) < ky1 or min(y1, y2) > ky2:
+        return False
+    for (ax, ay, bx, by) in (
+            (kx1, ky1, kx2, ky1), (kx2, ky1, kx2, ky2),
+            (kx2, ky2, kx1, ky2), (kx1, ky2, kx1, ky1)):
+        if _segmen_potong(x1, y1, x2, y2, ax, ay, bx, by):
+            return True
+    return False
+
+
+def _panjang_polilinia(titik):
+    return sum(math.hypot(titik[i + 1][0] - titik[i][0],
+                          titik[i + 1][1] - titik[i][1])
+               for i in range(len(titik) - 1))
+
+
+def _titik_polilinia(titik, s):
+    """Titik pada polilinia pada jarak s dari awal."""
+    total = _panjang_polilinia(titik)
+    sisa = max(0.0, min(s, total))
+    for i in range(len(titik) - 1):
+        ax, ay = titik[i]
+        bx, by = titik[i + 1]
+        ruas = math.hypot(bx - ax, by - ay)
+        if sisa <= ruas or i == len(titik) - 2:
+            f = sisa / ruas if ruas else 0.0
+            return (ax + (bx - ax) * f, ay + (by - ay) * f)
+        sisa -= ruas
+    return titik[-1]
+
+
+def _rute_lurus(a, b, dy, kotak_semua, dari_id, ke_id, vertikal):
+    """Titik tempel supaya panah langsung LURUS lewat di luar kotak
+    perantara (contoh 1 dan 3 Boss 18 Nov 2026: H1 garis lurus
+    diagonal yang lewat di atas perantara, tanpa siku).
+
+    Titik tempel digeser vertikal di tepi elips (dari titik tengah
+    + dy ke arah atas/bawah) sampai segmen lurus tidak menembus
+    kotak lain. Sisi mengikuti posisi kotak asal terhadap kotak
+    yang ditembus: asal di atas perantara lewat atas, asal di bawah
+    lewat bawah (sama tinggi lewat atas). Utamakan titik asal tetap
+    (cari geser tujuan dulu), seperti contoh 1 yang H1-nya
+    menempel di tengah tepi kanan X dan di atas tengah tepi kiri Y.
+    Kembalikan (x1, y1, x2, y2) atau None bila tidak ada garis
+    lurus yang bersih (pemanggil memakai _rute_bengkok sebagai
+    jalan terakhir, bukan diam-diam).
+    """
+    if vertikal:
+        return None
+
+    def _bersih(x1, y1, x2, y2):
+        return not any(_segmen_lewat_kotak(x1, y1, x2, y2, k)
+                       for k in kotak_semua
+                       if k['id'] not in (dari_id, ke_id))
+
+    x1, y1 = _titik_elips(a, dy, 'kanan')
+    x2, y2 = _titik_elips(b, dy, 'kiri')
+    if _bersih(x1, y1, x2, y2):
+        return (x1, y1, x2, y2)
+    temu = None
+    for k in sorted(kotak_semua, key=lambda k: k['x']):
+        if k['id'] in (dari_id, ke_id):
+            continue
+        if _segmen_lewat_kotak(x1, y1, x2, y2, k):
+            temu = k
+            break
+    if temu is None:
+        return (x1, y1, x2, y2)
+    acy = a['y'] + a['h'] / 2
+    mcy = temu['y'] + temu['h'] / 2
+
+    def _geser_awal(d, ry, atas):
+        # Sampai dekat puncak elips (ry - 2): X tengah yang segaris
+        # dengan Z hanya bisa lurus bila titik tempelnya naik sampai
+        # dekat puncak (tepi kanan biasa mentok 6 px di bawah atas Z).
+        batas = -(ry - 2) if atas else (ry - 2)
+        out = []
+        g = d
+        while (g >= batas) if atas else (g <= batas):
+            out.append(g)
+            g += -6 if atas else 6
+        if out and out[-1] != batas:
+            out.append(batas)
+        return out
+
+    for atas in (acy <= mcy, acy > mcy):
+        for ga in _geser_awal(dy, a['h'] / 2, atas):
+            px, py = _titik_elips(a, ga, 'kanan', jepit=2)
+            for gb in _geser_awal(dy, b['h'] / 2, atas):
+                qx, qy = _titik_elips(b, gb, 'kiri', jepit=2)
+                if _bersih(px, py, qx, qy):
+                    return (px, py, qx, qy)
+    return None
+
+
+def _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua, dari_id, ke_id,
+                  lebar=W, tinggi=H):
+    """Titik belok bila segmen menembus kotak (bukan kotak ujung):
+    lewat atas/bawah kotak yang ditembus, di sisi titik tengah ruas
+    (seperti H1 contoh 1 yang lewat di atas Z). Ruas yang lebih tegak
+    daripada mendatar dibelokkan ke kiri/kanan kotak. Diulang sampai
+    3 belokan, karena polilinia bisa menembus kotak kedua sesudah
+    dibengkokkan. Kembalikan [] bila tidak menembus."""
+    titik = [(x1, y1), (x2, y2)]
+    for _ in range(3):
+        temu = None
+        for j in range(len(titik) - 1):
+            ax, ay = titik[j]
+            bx, by = titik[j + 1]
+            for k in kotak_semua:
+                if k['id'] in (dari_id, ke_id):
+                    continue
+                if _segmen_lewat_kotak(ax, ay, bx, by, k):
+                    temu = (j, k)
+                    break
+            if temu:
+                break
+        if not temu:
+            break
+        j, k = temu
+        ax, ay = titik[j]
+        bx, by = titik[j + 1]
+        # Ruas hampir tegak (panah vertikal satu kolom, dx kecil):
+        # belok ke kiri/kanan kotak. Diagonal curam antar kolom tetap
+        # pakai aturan mendatar (stub / atas-bawah).
+        if abs(bx - ax) < 40:
+            # Ruas tegak: belok ke kiri/kanan kotak yang ditembus.
+            kiri = (ax + bx) / 2 <= k['x'] + k['w'] / 2
+            if k['y'] <= ay <= k['y'] + k['h']:
+                wx, wy = ax, k['y'] + k['h'] + 20
+            elif k['y'] <= by <= k['y'] + k['h']:
+                wx, wy = bx, k['y'] - 20
+            else:
+                wx = ((k['x'] - 60 + dy) if kiri
+                      else (k['x'] + k['w'] + 60 + dy))
+                wy = (ay + by) / 2
+        else:
+            atas = (ay + by) / 2 <= k['y'] + k['h'] / 2
+            # Kotak di kolom awal (titik awal ruas di dalam rentang x
+            # kotak, mis. X2 tepat di bawah X1): titik belok di tengah-x
+            # kotak malah mundur ke dalam kolom itu. Pakai stub
+            # horizontal dulu melewati kolom (tepi kanan kotak + 20,
+            # setinggi titik awal), baru menyerong. Begitu juga kotak di
+            # kolom akhir. Kotak di tengah rute (mis. Z) tetap lewat
+            # atas/bawah tengah kotak itu.
+            if k['x'] <= ax <= k['x'] + k['w']:
+                wx, wy = k['x'] + k['w'] + 20, ay
+            elif k['x'] <= bx <= k['x'] + k['w']:
+                wx, wy = k['x'] - 20, by
+            else:
+                wx = k['x'] + k['w'] / 2
+                wy = (k['y'] - 60 + dy) if atas else (k['y'] + k['h'] + 60 + dy)
+        wy = max(20, min(tinggi - 20, wy))
+        wx = max(20, min(lebar - 20, wx))
+        titik = titik[:j + 1] + [(wx, wy)] + titik[j + 1:]
+    return titik[1:-1]
+
+
+def _geser_label_bebas(titik, mx, my, lw, lh, kotak_semua, sudah):
+    """Geser label sepanjang polilinia sampai tidak menabrak kotak
+    maupun label yang sudah ditempatkan. Cari dulu posisi dengan
+    celah 10 px antar label; bila tidak ada, pakai posisi bebas
+    pertama (tanpa tumpuk). Kembalikan (cx, cy); bila tidak ada
+    posisi bebas, kembalikan posisi semula."""
+    setengah_w, setengah_h = lw / 2 + 6, lh / 2 + 4
+
+    def _bebas(cx, cy, jeda=0.0):
+        kiri, atas = cx - setengah_w, cy - setengah_h
+        kanan, bawah = cx + setengah_w, cy + setengah_h
+        for k in kotak_semua:
+            if not (kanan <= k['x'] or kiri >= k['x'] + k['w']
+                    or bawah <= k['y'] or atas >= k['y'] + k['h']):
+                return False
+        for q in sudah:
+            if not (kanan <= q['kiri'] - jeda
+                    or kiri >= q['kanan'] + jeda
+                    or bawah <= q['atas'] - jeda
+                    or atas >= q['bawah'] + jeda):
+                return False
+        return True
+
+    def _cari(jeda):
+        if _bebas(mx, my, jeda):
+            return mx, my
+        panjang = _panjang_polilinia(titik)
+        s0 = panjang / 2
+        langkah = 12.0
+        k = 1
+        while k * langkah <= panjang / 2 + langkah:
+            for s in (s0 + k * langkah, s0 - k * langkah):
+                if 0 <= s <= panjang:
+                    cx, cy = _titik_polilinia(titik, s)
+                    if _bebas(cx, cy, jeda):
+                        return cx, cy
+            k += 1
+        return None
+
+    hasil = _cari(10.0)
+    if hasil is not None:
+        return hasil
+    hasil = _cari(0.0)
+    if hasil is not None:
+        return hasil
+    # Jalan terakhir: geser tegak lurus garis (bukan sepanjang
+    # garis). Dipakai bila label terjepit di antara dua kotak di
+    # sepanjang garisnya (temuan indikator 18 Nov 2026: label H3
+    # terjepit antara oval X1 dan kotak indikator M, tidak ada
+    # posisi bebas di sepanjang garis X1 ke M). Coba jarak
+    # membesar (24..96 px) ke dua arah tegak lurus, dari titik
+    # tengah garis; yang pertama bebas dipakai.
+    if len(titik) >= 2:
+        _dx = titik[-1][0] - titik[0][0]
+        _dy = titik[-1][1] - titik[0][1]
+        _pj = math.hypot(_dx, _dy)
+        if _pj > 0:
+            _nx, _ny = -_dy / _pj, _dx / _pj
+            for _jarak in (24.0, 36.0, 48.0, 60.0, 72.0, 84.0, 96.0):
+                for _tanda in (1.0, -1.0):
+                    _cx = mx + _nx * _jarak * _tanda
+                    _cy = my + _ny * _jarak * _tanda
+                    if _bebas(_cx, _cy, 0.0):
+                        return _cx, _cy
+    return mx, my
+
+
+def _titik_potong(ax, ay, bx, by, cx, cy, dx, dy):
+    """Titik potong segmen AB dan CD (None bila sejajar atau tidak
+    berpotongan di dalam ruas)."""
+    d = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx)
+    if d == 0:
+        return None
+    t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / d
+    u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / d
+    if 0 < t < 1 and 0 < u < 1:
+        return (ax + t * (bx - ax), ay + t * (by - ay))
+    return None
+
+
+def _jarak_titik_segmen(px, py, x1, y1, x2, y2):
+    """Jarak titik ke segmen (px)."""
+    dx, dy = x2 - x1, y2 - y1
+    if dx == 0 and dy == 0:
+        return math.hypot(px - x1, py - y1)
+    t = max(0.0, min(1.0, ((px - x1) * dx + (py - y1) * dy)
+                       / (dx * dx + dy * dy)))
+    return math.hypot(px - (x1 + t * dx), py - (y1 + t * dy))
+
+
+def _jarak_titik_persegi(px, py, kiri, atas, kanan, bawah):
+    """Jarak titik ke persegi (0 bila di dalam)."""
+    dx = max(kiri - px, 0.0, px - kanan)
+    dy = max(atas - py, 0.0, py - bawah)
+    return math.hypot(dx, dy)
+
+
+def _jarak_persegi_segmen(kiri, atas, kanan, bawah, x1, y1, x2, y2):
+    """Jarak persegi ke segmen (0 bila segmen menyentuh persegi)."""
+    if (_jarak_titik_persegi(x1, y1, kiri, atas, kanan, bawah) == 0
+            or _jarak_titik_persegi(x2, y2, kiri, atas, kanan, bawah)
+            == 0):
+        return 0.0
+    for (ax, ay, bx, by) in (
+            (kiri, atas, kanan, atas), (kanan, atas, kanan, bawah),
+            (kanan, bawah, kiri, bawah), (kiri, bawah, kiri, atas)):
+        if _segmen_potong(x1, y1, x2, y2, ax, ay, bx, by):
+            return 0.0
+    return min(
+        _jarak_titik_persegi(x1, y1, kiri, atas, kanan, bawah),
+        _jarak_titik_persegi(x2, y2, kiri, atas, kanan, bawah),
+        min(_jarak_titik_segmen(cx, cy, x1, y1, x2, y2)
+            for cx, cy in ((kiri, atas), (kanan, atas),
+                           (kanan, bawah), (kiri, bawah))))
+
+
+def _jarak_persegi_persegi(a, b):
+    """Jarak dua persegi (kiri, atas, kanan, bawah); negatif bila
+    tumpang tindih (minus kedalaman tumpuk terkecil)."""
+    dx = max(b[0] - a[2], a[0] - b[2])
+    dy = max(b[1] - a[3], a[1] - b[3])
+    if dx <= 0 and dy <= 0:
+        return -min(a[2] - b[0], b[2] - a[0],
+                    a[3] - b[1], b[3] - a[1])
+    return math.hypot(max(dx, 0.0), max(dy, 0.0))
+
+
+def skor_tata_letak(tata: dict | None) -> dict:
+    """Skor tata letak dari ukuran yang bisa diukur (pilihan 1 Boss
+    18 Nov 13:03 WIB: mesin fleksibel, bukan aturan kaku).
+
+    Dipakai tata_letak untuk memilih posisi perantara (tengah/atas/
+    bawah) pada mediasi 3 kolom: tiap kandidat dihitung lengkap
+    (kotak + panah + label lewat penempatan_label), lalu yang
+    skornya terbaik yang dipakai. Kriteria, urut prioritas (lebih
+    kecil lebih bagus di 'banding'):
+      (a) silangan: jumlah silangan antar panah (ujung yang bertemu
+          di kotak yang sama tidak dihitung, _segmen_potong; kipas
+          di tepi kotak bersama dalam 40 px juga tidak dihitung,
+          karena panah yang keluar/masuk dari kotak yang sama
+          memang berangkat dari titik berdekatan);
+      (b) celah_label: celah minimum label, px (label ke label,
+          label ke garis RUTE LAIN; label ke garisnya sendiri dan
+          ke garis sejalur tidak dihitung). Dihitung sebagai
+          hukuman bila celah di bawah ambang nyaman 30 px (3x
+          minimum 10 px); di atas ambang, semua dianggap sama
+          leganya, supaya selisih kecil yang tidak terlihat tidak
+          menentukan pemenang (mis. Asih 'atas' 91 px vs 'bawah'
+          111 px, keduanya lega; yang menentukan adalah (c)-(e)).
+          Tumpang (negatif) dihukum berat;
+      (c) panah_pendek/panjang: panjang panah terpendek (paling
+          besar paling bagus, supaya tidak ada panah yang
+          berdesakan) dan terpanjang (paling kecil paling bagus,
+          supaya tidak ada panah yang sangat panjang/miring curam);
+          utamakan panjang yang seimbang;
+      (d) simetri: simpangan maksimum pusat kotak X dan Y saja
+          dari cermin terhadap garis tengah, px (0 = simetris
+          sempurna; perantara M dan penguat Z tidak ikut, memang
+          di atas/bawah garis atau di kolom X);
+      (e) celah_kotak: jarak minimum panah ke kotak yang tidak
+          disentuhnya, px (paling besar paling bagus, harus > 0);
+      (f) bengkok: jumlah panah yang dibengkokkan (jalan terakhir
+          _rute_bengkok), paling sedikit paling bagus.
+    'banding' = (silangan, hukuman_celah, -panah_pendek,
+    panah_panjang, simetri, -celah_kotak, bengkok), dibulatkan ke
+    0,1 px supaya selisih desimal tidak menentukan; seri di semua
+    unsur diputus pemanggil dengan memilih 'atas' dulu.
+    Kembalikan dict dengan semua ukuran + 'banding'.
+    """
+    if not tata or not (tata.get('kotak') or []):
+        return {'silangan': 999, 'celah_label': -999.0,
+                'hukuman_celah': 999.0,
+                'panah_pendek': 0.0, 'panah_panjang': 9999.0,
+                'simetri': 9999.0, 'celah_kotak': -999.0,
+                'bengkok': 999,
+                'banding': (999, 999.0, 0.0, 9999.0, 9999.0, 999.0,
+                            999)}
+    pl = penempatan_label(tata)
+    kotak = list(tata.get('kotak') or [])
+    kotak_id = {k['id']: k for k in kotak}
+    garis = []
+    for p in pl:
+        titik = ([(p['x1'], p['y1'])] + list(p.get('rute') or [])
+                 + [(p['x2'], p['y2'])])
+        garis.append((p, titik))
+    # (a) Silangan antar panah (bukan satu panah). Kipas di tepi
+    # kotak bersama TIDAK dihitung: dua panah yang keluar/masuk
+    # dari kotak yang sama (sumber atau tujuan yang sama) memang
+    # berangkat dari titik yang berdekatan di tepi elips itu, jadi
+    # silangannya yang terjadi dalam 40 px dari kotak itu bukan
+    # cacat, melainkan pertemuan di kipas (mis. H1 dan H2 Asih
+    # bertemu 15 px sebelum tepi Y). Silangan di tengah diagram
+    # (mis. H2/H7 Nura menyilang H4) tetap dihitung.
+    silangan = 0
+    for i in range(len(garis)):
+        for j in range(i + 1, len(garis)):
+            _pi, _pj = garis[i][0], garis[j][0]
+            _bersama = ({_pi.get('dari'), _pi.get('ke')}
+                        & {_pj.get('dari'), _pj.get('ke')})
+            for a in range(len(garis[i][1]) - 1):
+                for b in range(len(garis[j][1]) - 1):
+                    _ax, _ay = garis[i][1][a]
+                    _bx, _by = garis[i][1][a + 1]
+                    _cx, _cy = garis[j][1][b]
+                    _dx, _dy = garis[j][1][b + 1]
+                    if not _segmen_potong(_ax, _ay, _bx, _by,
+                                          _cx, _cy, _dx, _dy):
+                        continue
+                    _tp = _titik_potong(_ax, _ay, _bx, _by,
+                                        _cx, _cy, _dx, _dy)
+                    _kipas = False
+                    if _tp is not None:
+                        for _bid in _bersama:
+                            _k = kotak_id.get(_bid)
+                            if _k is None:
+                                continue
+                            if _jarak_titik_persegi(
+                                    _tp[0], _tp[1], _k['x'], _k['y'],
+                                    _k['x'] + _k['w'],
+                                    _k['y'] + _k['h']) <= 40:
+                                _kipas = True
+                                break
+                    if not _kipas:
+                        silangan += 1
+    # (b) Celah label minimum: label ke label, label ke garis lain.
+    berlabel = [p for p in pl if p.get('label')]
+    celah = 999.0
+    for i in range(len(berlabel)):
+        for j in range(i + 1, len(berlabel)):
+            celah = min(celah, _jarak_persegi_persegi(
+                (berlabel[i]['kiri'], berlabel[i]['atas'],
+                 berlabel[i]['kanan'], berlabel[i]['bawah']),
+                (berlabel[j]['kiri'], berlabel[j]['atas'],
+                 berlabel[j]['kanan'], berlabel[j]['bawah'])))
+    for p in berlabel:
+        for q, titik in garis:
+            if q is p:
+                continue
+            # Garis sejalur (dari dan ke sama) tidak dihitung:
+            # jalur sejajar memang sengaja digeser 40 px, dan kotak
+            # putih label di garis curam kadang menyentuh garis
+            # tetangga sejalur itu (cacat kosmetik yang sudah
+            # diketahui, terbaca wajar); yang diukur di sini adalah
+            # label yang menyentuh garis RUTE LAIN.
+            if (q.get('dari'), q.get('ke')) == (p.get('dari'),
+                                                p.get('ke')):
+                continue
+            for a in range(len(titik) - 1):
+                celah = min(celah, _jarak_persegi_segmen(
+                    p['kiri'], p['atas'], p['kanan'], p['bawah'],
+                    titik[a][0], titik[a][1],
+                    titik[a + 1][0], titik[a + 1][1]))
+    # (c) Panjang panah terpendek / terpanjang.
+    panjang = [_panjang_polilinia(titik) for _, titik in garis]
+    panah_pendek = min(panjang) if panjang else 0.0
+    panah_panjang = max(panjang) if panjang else 0.0
+    # (d) Simetri: hanya kolom X dan Y (perantara M memang
+    # ditempatkan di atas/bawah garis, penguat Z di kolom X, bukan
+    # di garisnya, jadi tidak ikut diukur). Simpangan maksimum pusat kotak X/Y dari
+    # cermin terhadap garis tengah ('tengah' dari tata), px (0 =
+    # simetris sempurna).
+    tengah = tata.get('tengah')
+    if tengah is None:
+        tengah = (tata.get('tinggi') or H) / 2
+    simetri = 0.0
+    for _peran in ('X', 'Y'):
+        _pusat = sorted(k['y'] + k['h'] / 2 for k in kotak
+                        if str(k.get('peran') or '') == _peran)
+        for i in range(len(_pusat) // 2):
+            simetri = max(simetri, abs(
+                _pusat[i] + _pusat[-1 - i] - 2 * tengah))
+        if len(_pusat) % 2 == 1:
+            simetri = max(simetri, abs(_pusat[len(_pusat) // 2]
+                                       - tengah))
+    # (e) Celah panah ke kotak yang tidak disentuhnya.
+    celah_kotak = 999.0
+    for p, titik in garis:
+        for a in range(len(titik) - 1):
+            for k in kotak:
+                if k['id'] in (p.get('dari'), p.get('ke')):
+                    continue
+                celah_kotak = min(celah_kotak, _jarak_persegi_segmen(
+                    k['x'], k['y'], k['x'] + k['w'], k['y'] + k['h'],
+                    titik[a][0], titik[a][1],
+                    titik[a + 1][0], titik[a + 1][1]))
+    # (f) Panah yang dibengkokkan (jalan terakhir).
+    bengkok = sum(1 for p in pl if p.get('rute'))
+    # (b) sebagai hukuman: hanya bila celah di bawah ambang nyaman
+    # 30 px (3x minimum 10 px); di atas ambang, semua sama lega.
+    hukuman_celah = max(0.0, 30.0 - celah)
+    banding = (silangan, round(hukuman_celah, 1),
+               -round(panah_pendek, 1),
+               round(panah_panjang, 1), round(simetri, 1),
+               -round(celah_kotak, 1), bengkok)
+    return {'silangan': silangan, 'celah_label': round(celah, 1),
+            'hukuman_celah': round(hukuman_celah, 1),
+            'panah_pendek': round(panah_pendek, 1),
+            'panah_panjang': round(panah_panjang, 1),
+            'simetri': round(simetri, 1),
+            'celah_kotak': round(celah_kotak, 1),
+            'bengkok': bengkok, 'banding': banding}
+
+
+def penempatan_label(tata: dict | None) -> list:
+    """Posisi garis + label tiap panah (untuk uji + gambar).
+
+    Panah yang berbagi segmen yang sama (dari dan ke sama) digambar
+    di jalurnya sendiri, bukan menumpuk persis (cacat 18 Nov 2026:
+    segmen kedua H6 terbaca lurus karena putus-putusnya menutupi
+    garis lurus H2 di bawahnya). Tiap panah menempel di titik elips
+    setinggi tengah + dy, dy = (i - (n-1)/2) * JARAK_JALUR, lurus di
+    tengah, lewat di atas/bawah (contoh ke-3 Boss). Label di tengah
+    garisnya sendiri. Panah sendiri tetap di tengah (dy 0).
+    Panah langsung digambar LURUS seperti contoh 1 dan 3: titik
+    tempel dipilih supaya garis lurus lewat di luar kotak perantara
+    (_rute_lurus); bila tidak ada garis lurus yang bersih, ruas
+    dibengkokkan lewat atas/bawah kotak itu (_rute_bengkok, jalan
+    terakhir). Label yang mendarat di atas kotak atau label lain
+    digeser sepanjang garisnya sampai bebas. Kembalikan
+    [{'label', 'gaya', 'dari', 'ke', 'x1', 'y1', 'x2', 'y2',
+    'rute', 'cx', 'cy', 'geser', 'kiri', 'atas', 'kanan', 'bawah'}];
+    panah tanpa kotak dilewati. 'label' kosong berarti segmen kedua
+    jalur tidak langsung (labelnya hanya di segmen pertama).
+    """
+    if not tata:
+        return []
+    kotak = {k['id']: k for k in tata.get('kotak') or []}
+    if not kotak:
+        return []
+    g = Image.new('RGB', (W, H), LATAR)
+    d = ImageDraw.Draw(g)
+    f = _font(22, True)
+    kelompok: dict = {}
+    urutan: list = []
+    for p in tata.get('panah') or []:
+        a, b = kotak.get(p.get('dari')), kotak.get(p.get('ke'))
+        if not a or not b:
+            continue
+        kunci = (p.get('dari'), p.get('ke'))
+        if kunci not in kelompok:
+            kelompok[kunci] = []
+            urutan.append(kunci)
+        kelompok[kunci].append((a, b, p))
+    keluar = []
+    kotak_semua = list(kotak.values())
+    # Label juga menghindari kotak indikator (bukan hanya oval):
+    # kotak indikator duduk di antara oval (mis. di kiri M, di
+    # jalur X ke M), jadi label yang mendarat di tengah garisnya
+    # bisa menimpa kotak indikator (temuan pratinjau campuran
+    # 18 Nov 2026: label H3 menimpa 'Pelayanan cepat'). Rute panah
+    # tetap hanya menghindari oval (kotak_semua), supaya skor dan
+    # bentuk panah tidak berubah.
+    kotak_label = kotak_semua + [
+        {'x': ind['x'], 'y': ind['y'], 'w': ind['w'], 'h': ind['h']}
+        for ind in tata.get('indikator') or []]
+    lebar_kanvas = tata.get('lebar') or W
+    for kunci in urutan:
+        susun = _susunan_kelompok(kelompok[kunci])
+        n = len(susun)
+        for i, (a, b, p) in enumerate(susun):
+            # Sisi tempel mengikuti posisi relatif kotak: kotak yang
+            # bertumpuk vertikal (satu kolom) dihubungkan panah
+            # vertikal (bawah ke atas), bukan kanan ke kiri.
+            vertikal = _tumpuk_vertikal(a, b)
+            # Langkah jalur menyesuaikan ukuran kelompok supaya tidak
+            # ada dua panah menempel di titik elips yang sama (geser
+            # dijepit ke jari-jari - 6): langkah =
+            # min(40, 2*(r_min-6)/(n-1)).
+            r_min = (min(a['w'], b['w']) if vertikal
+                     else min(a['h'], b['h'])) / 2
+            langkah_jalur = (JARAK_JALUR if n <= 1 else
+                             min(JARAK_JALUR,
+                                 2 * (r_min - 6) / (n - 1)))
+            dy = (i - (n - 1) / 2) * langkah_jalur
+            if vertikal:
+                if a['y'] + a['h'] / 2 <= b['y'] + b['h'] / 2:
+                    x1, y1 = _titik_elips(a, dy, 'bawah')
+                    x2, y2 = _titik_elips(b, dy, 'atas')
+                else:
+                    x1, y1 = _titik_elips(a, dy, 'atas')
+                    x2, y2 = _titik_elips(b, dy, 'bawah')
+            else:
+                x1, y1 = _titik_elips(a, dy, 'kanan')
+                x2, y2 = _titik_elips(b, dy, 'kiri')
+            mx0 = (a['x'] + a['w'] + b['x']) / 2
+            my0 = (a['y'] + a['h'] / 2 + b['y'] + b['h'] / 2) / 2
+            label = p.get('label') or ''
+            kiri, atas, kanan, bawah = d.textbbox((0, 0), label, font=f)
+            lw, lh = kanan - kiri, bawah - atas
+            # Panah lurus seperti contoh 1 dan 3: titik tempel dipilih
+            # supaya garis lurus lewat di luar kotak perantara; bila
+            # tidak ada garis lurus yang bersih, dibengkokkan
+            # (jalan terakhir, dilaporkan tes).
+            lurus = _rute_lurus(a, b, dy, kotak_semua, p.get('dari'),
+                                p.get('ke'), vertikal)
+            if lurus is not None:
+                x1, y1, x2, y2 = lurus
+                rute = []
+            else:
+                rute = _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua,
+                                     p.get('dari'), p.get('ke'),
+                                     lebar_kanvas,
+                                     tata.get('tinggi') or H)
+            titik = [(x1, y1)] + rute + [(x2, y2)]
+            # Label di tengah polilinia; geser sepanjang garisnya bila
+            # mendarat di atas kotak atau label lain (aturan umum).
+            # Kotak indikator ikut dihindari (kotak_label).
+            mx, my = _titik_polilinia(titik, _panjang_polilinia(titik) / 2)
+            mx, my = _geser_label_bebas(
+                titik, mx, my, lw, lh, kotak_label, keluar)
+            keluar.append({
+                'label': label, 'gaya': p.get('gaya') or 'lurus',
+                'dari': p.get('dari'), 'ke': p.get('ke'),
+                'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
+                'rute': rute,
+                'cx': mx, 'cy': my,
+                'geser': (mx - mx0, my - my0),
+                'kiri': mx - lw / 2 - 6, 'atas': my - lh / 2 - 4,
+                'kanan': mx + lw / 2 + 6, 'bawah': my + lh / 2 + 4})
+    return keluar
 
 
 def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
@@ -506,29 +1337,52 @@ def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
     kotak = tata.get('kotak') or []
     if not kotak:
         return b''
-    g = Image.new('RGB', (W, H), LATAR)
+    # Tata tanpa indikator (draf lama / tata manual tanpa kiriman
+    # indikator): hitung dari model bila ada, supaya PNG akhir
+    # tetap menggambar indikator yang tersimpan di model.
+    if not tata.get('indikator') and model:
+        from .diagram import tambah_indikator as _tambah
+        from .diagram import _indikator_dari_model as _dari_model
+        _tambah(tata, _dari_model(model))
+    lebar_kanvas = tata.get('lebar') or W
+    tinggi_kanvas = tata.get('tinggi') or H
+    g = Image.new('RGB', (lebar_kanvas, tinggi_kanvas), LATAR)
     d = ImageDraw.Draw(g)
-    peta_kotak = {k['id']: k for k in kotak}
-    #  panah dulu (di bawah kotak), lalu kotak, lalu label.
-    for p in tata.get('panah') or []:
-        a, b = peta_kotak.get(p.get('dari')), peta_kotak.get(p.get('ke'))
-        if not a or not b:
-            continue
-        _garis_panah(d, a['x'] + a['w'], a['y'] + a['h'] / 2,
-                     b['x'], b['y'] + b['h'] / 2,
-                     putus=(p.get('gaya') in ('putus', 'lewat')))
+    #  panah dulu (di bawah kotak), lalu kotak, lalu label. Garis tiap
+    #  panah dari penempatan_label (jalur sendiri bila berbagi segmen),
+    #  supaya putus-putus tidak menutupi garis lurus di bawahnya.
+    #  Panah berbengkok (rute) digambar sebagai polilinia, kepala
+    #  panah hanya di ruas terakhir.
+    penempatan = penempatan_label(tata)
+    for pl in penempatan:
+        putus = pl.get('gaya') in ('putus', 'lewat')
+        titik = ([(pl['x1'], pl['y1'])] + list(pl.get('rute') or [])
+                 + [(pl['x2'], pl['y2'])])
+        for j in range(len(titik) - 1):
+            if j == len(titik) - 2:
+                _garis_panah(d, titik[j][0], titik[j][1],
+                             titik[j + 1][0], titik[j + 1][1], putus)
+            else:
+                _garis_ruas(d, titik[j][0], titik[j][1],
+                            titik[j + 1][0], titik[j + 1][1], putus)
+    # Panah indikator (tipis, dari oval ke tiap kotak indikator),
+    # lalu kotak indikator kuning + namanya.
+    for pi in panah_indikator(tata):
+        _garis_panah(d, pi['x1'], pi['y1'], pi['x2'], pi['y2'],
+                     lebar=2)
     for k in kotak:
         warna = WARNA_PERAN.get(str(k.get('peran') or 'X'), TEAL)
-        d.rounded_rectangle([k['x'], k['y'], k['x'] + k['w'],
-                             k['y'] + k['h']], radius=12,
-                            outline=warna, width=4, fill='white')
+        d.ellipse([k['x'], k['y'], k['x'] + k['w'],
+                   k['y'] + k['h']],
+                  outline=warna, width=4, fill='white')
         _teks_kotak(d, k)
-    for p in tata.get('panah') or []:
-        a, b = peta_kotak.get(p.get('dari')), peta_kotak.get(p.get('ke'))
-        if not a or not b:
-            continue
-        _label_panah(d, a['x'] + a['w'], a['y'] + a['h'] / 2,
-                     b['x'], b['y'] + b['h'] / 2, p.get('label') or '')
+    for ind in tata.get('indikator') or []:
+        d.rectangle([ind['x'], ind['y'],
+                     ind['x'] + ind['w'], ind['y'] + ind['h']],
+                    fill=KUNING_IND, outline=OUTLINE_IND, width=2)
+        _teks_indikator(d, ind)
+    for pl in penempatan:
+        _label_panah(d, pl['cx'], pl['cy'], pl['label'])
     buf = io.BytesIO()
     g.save(buf, 'PNG', optimize=True)
     return buf.getvalue()
