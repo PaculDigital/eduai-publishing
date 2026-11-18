@@ -259,6 +259,7 @@ async def diagram_editor_halaman(
                 status_code=303)
         tata = DG.tata_letak(normal)
         tinggi = DG.KANVAS_TINGGI
+        teks31 = []
     else:
         if not model.get('desain'):
             return RedirectResponse(
@@ -269,14 +270,16 @@ async def diagram_editor_halaman(
         tata = {'kotak': [{'id': f's{i + 1}', 'nama': s,
                            'kode': str(i + 1), 'peran': 'langkah',
                            'x': 300, 'y': 60 + i * 140,
-                           'w': 600, 'h': 90}
+                           'w': 600, 'h': DG.tinggi_kotak(s, lebar=600)}
                           for i, s in enumerate(langkah)],
                 'panah': [], 'bentuk': 'alur'}
         tinggi = 120 + len(langkah) * 140
+        teks31 = DG.teks_desain_31(model.get('jenis'), model.get('desain'))
     return _tpl.TemplateResponse(
         'diagram_editor.html',
         {'request': request, 'berkas': fb, 'jenis': jenis,
-         'tata': tata, 'tinggi': tinggi, 'harga': HARGA})
+         'tata': tata, 'tinggi': tinggi, 'harga': HARGA,
+         'teks31': teks31})
 
 
 # ── API: keadaan + Selesai + status ────────────────────────────────────
@@ -354,10 +357,15 @@ def _buat_kerja_selesai(p, fid, u, jenis, tata, jumlah):
                 ket_judul = 'Alur Penelitian'
             if not png:
                 raise RuntimeError('Gambar tidak bisa dibuat.')
-            # Perbarui: buang gambar lama dulu (atas perintah mahasiswa,
-            # bukan diam-diam), supaya tidak ada dua gambar yang sama.
-            hasil_lama = DG.muat_hasil(d2, fid) or {}
-            if hasil_lama.get(jenis):
+            # Perbarui: buang gambar lama di bagian ini dulu (atas
+            # perintah mahasiswa lewat Selesai, bukan diam-diam),
+            # supaya tidak ada dua gambar yang sama. Keadaan dibaca
+            # dari dokumen, bukan dari hasil tersimpan: gambar milik
+            # mahasiswa (tanpa entri hasil) ikut dibuang bila itu
+            # gambar bagian ini; bila belum ada gambar, tidak ada
+            # yang dibuang.
+            keadaan_gambar = DG.periksa_gambar(path, bagian, ket_judul)
+            if keadaan_gambar.get('ada'):
                 DG.buang_gambar_bagian(path, bagian, ket_judul)
                 teks = _tb(_pb(fb2), fb2.nama) or ''
             ket = f"{GB.label_berikut_bab(teks, bab)} {ket_judul}"
@@ -384,6 +392,7 @@ def _buat_kerja_selesai(p, fid, u, jenis, tata, jumlah):
             nomor = BA.perbarui_nomor_daftar(path, fid=fid, user_id=u.id)
             nomor_ok = bool(nomor.get('ok')) and not nomor.get('hilang')
             _segarkan_berkas(d2, fb2, path)
+            hasil_lama = DG.muat_hasil(d2, fid) or {}
             hasil_lama[jenis] = {'keterangan': ket,
                                  'nomor_terisi': nomor_ok,
                                  'teks_ditambah': teks_ditambah,

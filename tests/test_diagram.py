@@ -77,6 +77,136 @@ MODEL_NURA = {
     'jenis': 'kuantitatif', 'desain': 'survei'}
 
 
+def _teks_mini(path):
+    """Teks paragraf docx miniatur, sejajar urutan dokumen."""
+    import zipfile
+    from app.pustaka_periksa import _RE_P, _teks_par_xml
+    with zipfile.ZipFile(path) as z:
+        doc = z.read('word/document.xml').decode('utf-8')
+    return '\n'.join(_teks_par_xml(m.group(0))
+                     for m in _RE_P.finditer(doc))
+
+
+def _docx_mini_penomeran_otomatis(path):
+    """Docx miniatur fid 81: judul bernomor otomatis (numPr), bukan teks.
+
+    BAB I (1.1, 1.2), BAB II (2.1, 2.2, 2.3, 2.3.1, 2.3.2 berisi
+    gambar + 'Gambar 2. 1 Model Penelitian'), BAB III (3.1 dengan
+    3.1.1-3.1.3 berisi gambar + 'Gambar 3. 1 Desain Penelitian',
+    3.2). Baris Daftar Isi '2.3.2 Model Penelitian .... 45' di depan
+    wajib TIDAK cocok sebagai judul. Penomoran: Heading2/Heading3
+    menunjuk numId 34 (abstractNum 36, "%1.%2.%3"); baris kosong
+    ListParagraph numId 2 memajukan angka bab ("1.", "2.", "3."),
+    persis fid 81.
+    """
+    import zipfile
+
+    def _par(teks='', gaya='', numid=None, ilvl=None, gambar=False):
+        ppr = ''
+        if gaya or numid is not None:
+            isi = ''
+            if gaya:
+                isi += f'<w:pStyle w:val="{gaya}"/>'
+            if numid is not None:
+                isi += ('<w:numPr><w:ilvl w:val="%d"/>'
+                        '<w:numId w:val="%d"/></w:numPr>'
+                        % (ilvl or 0, numid))
+            ppr = '<w:pPr>' + isi + '</w:pPr>'
+        if gambar:
+            isi = '<w:r><w:drawing><wp:inline/></w:drawing></w:r>'
+        elif teks:
+            isi = ('<w:r><w:t xml:space="preserve">'
+                   + teks + '</w:t></w:r>')
+        else:
+            isi = ''
+        return '<w:p>' + ppr + isi + '</w:p>'
+
+    pars = [
+        _par('2.3.2 Model Penelitian .... 45'),
+        _par('BAB I', 'Heading1'),
+        _par('', numid=2, ilvl=0),
+        _par('Latar Belakang', 'Heading2'),
+        _par('Rumusan Masalah', 'Heading2'),
+        _par('BAB II', 'Heading1'),
+        _par('', numid=2, ilvl=0),
+        _par('Landasan Teori', 'Heading2'),
+        _par('Penelitian Terdahulu Relevan', 'Heading2'),
+        _par('Hipotesis dan Model Penelitian', 'Heading2'),
+        _par('Hipotesis', 'Heading3'),
+        _par('Isi hipotesis.'),
+        _par('Model Penelitian', 'Heading3'),
+        _par('Isi model.'),
+        _par(gambar=True),
+        _par('Gambar 2. 1 Model Penelitian'),
+        _par('Sumber: Data diolah penulis, 2026'),
+        _par('BAB III', 'Heading1'),
+        _par('', numid=2, ilvl=0),
+        _par('Jenis dan Desain Penelitian', 'Heading2'),
+        _par('Jenis Penelitian', 'Heading3'),
+        _par('Tempat dan Waktu Penelitian', 'Heading3'),
+        _par('Desain Penelitian', 'Heading3'),
+        _par(gambar=True),
+        _par('Gambar 3. 1 Desain Penelitian'),
+        _par('Definisi Operasional dan Pengukuran Variabel', 'Heading2'),
+        _par('Isi.'),
+    ]
+    ns = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/'
+          '2006/main" xmlns:wp="http://schemas.openxmlformats.org/'
+          'drawingml/2006/wordprocessingDrawing"')
+    doc = ('<w:document ' + ns + '><w:body>' + ''.join(pars)
+           + '</w:body></w:document>')
+    styles = (
+        '<w:styles ' + ns + '>'
+        '<w:style w:type="paragraph" w:styleId="Heading2">'
+        '<w:name w:val="heading 2"/><w:pPr><w:numPr>'
+        '<w:ilvl w:val="1"/><w:numId w:val="34"/>'
+        '</w:numPr></w:pPr></w:style>'
+        '<w:style w:type="paragraph" w:styleId="Heading3">'
+        '<w:name w:val="heading 3"/><w:pPr><w:numPr>'
+        '<w:ilvl w:val="2"/><w:numId w:val="34"/>'
+        '</w:numPr></w:pPr></w:style></w:styles>')
+    numbering = (
+        '<w:numbering ' + ns + '>'
+        '<w:abstractNum w:abstractNumId="36">'
+        '<w:lvl w:ilvl="0"><w:start w:val="1"/>'
+        '<w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl>'
+        '<w:lvl w:ilvl="1"><w:start w:val="1"/>'
+        '<w:numFmt w:val="decimal"/><w:lvlText w:val="%1.%2"/></w:lvl>'
+        '<w:lvl w:ilvl="2"><w:start w:val="1"/>'
+        '<w:numFmt w:val="decimal"/><w:lvlText w:val="%1.%2.%3"/></w:lvl>'
+        '</w:abstractNum>'
+        '<w:num w:numId="2"><w:abstractNumId w:val="36"/></w:num>'
+        '<w:num w:numId="34"><w:abstractNumId w:val="36"/></w:num>'
+        '</w:numbering>')
+    types = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/'
+        'content-types"><Default Extension="rels" ContentType='
+        '"application/vnd.openxmlformats-package.relationships+xml"/>'
+        '<Default Extension="xml" ContentType="application/xml"/>'
+        '<Override PartName="/word/document.xml" ContentType='
+        '"application/vnd.openxmlformats-officedocument.'
+        'wordprocessingml.document.main+xml"/></Types>')
+    rels_root = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/'
+        'package/2006/relationships"><Relationship Id="rId1" Type='
+        '"http://schemas.openxmlformats.org/officeDocument/2006/'
+        'relationships/officeDocument" Target="word/document.xml"/>'
+        '</Relationships>')
+    rels_doc = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/'
+        'package/2006/relationships"></Relationships>')
+    with zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED) as z:
+        z.writestr('[Content_Types].xml', types)
+        z.writestr('_rels/.rels', rels_root)
+        z.writestr('word/document.xml', doc)
+        z.writestr('word/styles.xml', styles)
+        z.writestr('word/numbering.xml', numbering)
+        z.writestr('word/_rels/document.xml.rels', rels_doc)
+
+
 def jalankan():
     # ── 1. Normalisasi model ──────────────────────────────────────────
     model, masalah = DG.normalisasi_model(MODEL_NURA)
@@ -174,9 +304,9 @@ def jalankan():
         and model_kode['jalur'][5]['jenis'] == 'tidak_langsung'
         and model_kode['jalur'][5]['lewat'] == 'Z'
         and model_kode['jalur'][6]['lewat'] == 'Z')
-    cek('tata H6/H7 lewat Z: tetap 5 panah (tidak digambar sendiri)',
+    cek('tata H6/H7 lewat Z: 9 panah (5 langsung + 2x2 segmen lewat)',
         model_kode is not None
-        and len(DG.tata_letak(model_kode)['panah']) == 5)
+        and len(DG.tata_letak(model_kode)['panah']) == 9)
     _m, m4a = DG.normalisasi_model(
         {'variabel': [{'nama': 'A', 'peran': 'X'},
                       {'nama': 'B', 'peran': 'Z'},
@@ -239,10 +369,11 @@ def jalankan():
     cek('tata Nura: X kiri, Z bawah tengah, Y kanan',
         kotak['X1']['x'] == 60 and kotak['Z']['x'] == 450
         and kotak['Z']['y'] == 520 and kotak['Y']['x'] == 840)
-    cek('tata Nura: 5 panah (H6/H7 tidak langsung tidak digambar)',
-        len(tata['panah']) == 5 and
+    cek('tata Nura: 7 panah (H6/H7 tidak langsung digambar putus-putus)',
+        len(tata['panah']) == 7 and
         sorted(p['label'] for p in tata['panah']) ==
-        ['H1 (+)', 'H2 (+)', 'H3 (+)', 'H4 (+)', 'H5 (+)'])
+        ['H1 (+)', 'H2 (+)', 'H3 (+)', 'H4 (+)', 'H5 (+)', 'H6 (+)',
+         'H7 (+)'])
     tata_l, _ = DG.normalisasi_model(
         {'variabel': [{'nama': 'A', 'peran': 'X'},
                       {'nama': 'B', 'peran': 'Y'}],
@@ -441,6 +572,146 @@ def jalankan():
         print('    render gagal: ' + str(e)[:200])
     cek('formulir ter-render: data-awal berkode + pesan tampil',
         _render_ok)
+    # ── 7. Cacat uji live Diagram 18 Nov 07:15 WIB (fid 81) ──────────
+    # Miniatur fid 81: penomoran otomatis, gambar milik mahasiswa,
+    # keterangan berspasi ("Gambar 2. 1").
+    import shutil
+    mini = Path(TMP) / 'mini_penomeran.docx'
+    _docx_mini_penomeran_otomatis(mini)
+    nomor_mini = GB.nomor_paragraf_docx(mini)
+    cek('nomor efektif 2.3.2 dari penomoran otomatis (cacat 1)',
+        nomor_mini[12] == '2.3.2', str(nomor_mini[12]))
+    cek('nomor efektif 3.1 / 3.1.3 / 3.2 dari penomoran otomatis',
+        nomor_mini[19] == '3.1' and nomor_mini[22] == '3.1.3'
+        and nomor_mini[25] == '3.2', str(nomor_mini[19:26]))
+    cek('nomor efektif 1.1 / 2.1 / 2.3 dari penomoran otomatis',
+        nomor_mini[3] == '1.1' and nomor_mini[7] == '2.1'
+        and nomor_mini[9] == '2.3', str(nomor_mini[3:10]))
+    cek('baris Daftar Isi tidak bernomor (bukan judul)',
+        nomor_mini[0] == '')
+    vonis_mini = DG.periksa_gambar(mini, '2.3.2', 'Model Penelitian')
+    cek('gambar milik mahasiswa di 2.3.2 terdeteksi sesuai (cacat 4)',
+        vonis_mini['vonis'] == 'sesuai' and vonis_mini['ada']
+        and vonis_mini['keterangan'] == ['Gambar 2. 1 Model Penelitian'],
+        str(vonis_mini))
+    vonis_mini31 = DG.periksa_gambar(mini, '3.1', 'Alur Penelitian')
+    cek('gambar 3.1 berketerangan Desain = meragukan (bukan tidak ada)',
+        vonis_mini31['vonis'] == 'meragukan' and vonis_mini31['ada'],
+        str(vonis_mini31))
+    cek('label berikut mengenali "Gambar 2. 1" berspasi (cacat 4)',
+        GB.label_berikut_bab('Gambar 2. 1 Model Penelitian', 2) ==
+        'Gambar 2.2')
+    # Sisip gambar di 2.3.2 (2.4 tidak ada, berakhir di BAB III).
+    mini_sisip = Path(TMP) / 'mini_sisip.docx'
+    shutil.copy(mini, mini_sisip)
+    sisip_mini = GB.sisip_gambar_setelah_bagian(
+        mini_sisip, png, '2.3.2', '2.4',
+        keterangan='Gambar 2.2 Model Penelitian', rata_keterangan='left')
+    cek('gambar tersisip di 2.3.2 bernomor otomatis',
+        sisip_mini.get('ok'), str(sisip_mini))
+    teks_mini = _teks_mini(mini_sisip)
+    cek('gambar 2.3.2 mendarat sebelum BAB III, sesudah Sumber',
+        'Gambar 2.2 Model Penelitian' in teks_mini
+        and teks_mini.index('Gambar 2.2 Model Penelitian') >
+        teks_mini.index('Sumber: Data diolah')
+        and teks_mini.index('Gambar 2.2 Model Penelitian') <
+        teks_mini.index('BAB III'))
+    cek('batas akhir 2.3.2 = BAB III (bukan akhir dokumen)',
+        sisip_mini.get('paragraf_judul') == 12
+        and sisip_mini.get('paragraf_akhir_bagian') == 17,
+        str(sisip_mini))
+    # Teks 3.1 tersisip sesudah judul 3.1.
+    mini_teks = Path(TMP) / 'mini_teks.docx'
+    shutil.copy(mini, mini_teks)
+    tulis_mini = DG.sisip_teks_setelah_judul(
+        mini_teks, '3.1', DG.teks_desain_31('kuantitatif', 'survei'))
+    cek('teks 3.1 tersisip sesudah judul 3.1 bernomor otomatis',
+        tulis_mini.get('ok'), str(tulis_mini))
+    teks_mini31 = _teks_mini(mini_teks)
+    cek('teks 3.1 ada sebelum 3.1.1',
+        'Penelitian ini memakai jenis kuantitatif' in teks_mini31
+        and teks_mini31.index('Penelitian ini memakai jenis kuantitatif')
+        > teks_mini31.index('Jenis dan Desain Penelitian')
+        and teks_mini31.index('Penelitian ini memakai jenis kuantitatif')
+        < teks_mini31.index('Jenis Penelitian'))
+    # Buang gambar: keterangan cocok (2.3.2) dan satu gambar saja (3.1).
+    mini_buang = Path(TMP) / 'mini_buang.docx'
+    shutil.copy(mini, mini_buang)
+    buang_mini = DG.buang_gambar_bagian(mini_buang, '2.3.2',
+                                        'Model Penelitian')
+    cek('buang gambar 2.3.2 (keterangan cocok) menghapus 2 paragraf',
+        buang_mini.get('ok') and buang_mini.get('dibuang') == 2,
+        str(buang_mini))
+    cek('sesudah dibuang: 2.3.2 tidak ada gambar lagi',
+        DG.periksa_gambar(mini_buang, '2.3.2', 'Model Penelitian')
+        ['vonis'] == 'tidak_ada')
+    mini_buang31 = Path(TMP) / 'mini_buang31.docx'
+    shutil.copy(mini, mini_buang31)
+    buang_mini31 = DG.buang_gambar_bagian(mini_buang31, '3.1',
+                                          'Alur Penelitian')
+    cek('buang gambar 3.1 satu-satunya (keterangan beda) menghapus 2',
+        buang_mini31.get('ok') and buang_mini31.get('dibuang') == 2,
+        str(buang_mini31))
+    # Lewat: 9 panah berkode, 7 panah Nura, gaya lewat.
+    tata_kode = DG.tata_letak(model_kode)
+    cek('tata berkode: H6 dua segmen lewat Z (X1 ke Z, Z ke Y)',
+        sorted((p['dari'], p['ke'], p['gaya'])
+               for p in tata_kode['panah']
+               if p['label'].startswith('H6')) ==
+        [('X1', 'Z', 'lewat'), ('Z', 'Y', 'lewat')])
+    cek('tata Nura: H6 satu segmen lewat putus-putus',
+        sorted((p['dari'], p['ke'], p['gaya']) for p in tata['panah']
+               if p['label'].startswith('H6')) ==
+        [('X1', 'Y', 'lewat')])
+    png_kode = GB.gambar_panah(model_kode, tata_kode)
+    cek('gambar panah berkode = PNG asli (H6 tergambar)',
+        png_kode[:8] == b'\x89PNG\r\n\x1a\n' and len(png_kode) > 10000,
+        str(len(png_kode)))
+    # Tinggi kotak: nama 2 baris = 110, 1 baris = 90.
+    kotak_nura = {k['id']: k for k in tata['kotak']}
+    cek('tinggi kotak: Z/X2 2 baris = 110, X1/Y 1 baris = 90 (cacat 6)',
+        kotak_nura['Z']['h'] == 110 and kotak_nura['X2']['h'] == 110
+        and kotak_nura['X1']['h'] == 90 and kotak_nura['Y']['h'] == 90,
+        str({k: v['h'] for k, v in kotak_nura.items()}))
+    tata_m, _ = DG.tata_dari_kotak(
+        [{'id': 'Z', 'nama': 'Keterlibatan Pelanggan', 'peran': 'Z',
+          'x': 450, 'y': 520, 'h': 90},
+         {'id': 'Y', 'nama': 'Pembelian Impulsif', 'peran': 'Y',
+          'x': 840, 'y': 305, 'h': 90},
+         {'id': 'X1', 'nama': 'Keaslian Streamer', 'peran': 'X',
+          'x': 60, 'y': 110, 'h': 90}],
+        [{'dari': 'X1', 'ke': 'Z', 'label': 'H1', 'gaya': 'lewat'}],
+        'model')
+    cek('tata manual: tinggi 90 dibetulkan 110 + gaya lewat dipertahankan',
+        tata_m is not None
+        and {k['id']: k['h'] for k in tata_m['kotak']}['Z'] == 110
+        and tata_m['panah'][0]['gaya'] == 'lewat', str(tata_m))
+    # Baris variabel kosong = placeholder, dilewati (cacat 7).
+    model_kosong, mkos = DG.normalisasi_model(
+        {'variabel': [{'nama': '', 'peran': 'X'},
+                      {'nama': 'A', 'peran': 'X'},
+                      {'nama': 'B', 'peran': 'Y'}],
+         'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1'}]})
+    cek('baris variabel kosong dilewati diam-diam (placeholder, cacat 7)',
+        model_kosong is not None and not mkos
+        and len(model_kosong['variabel']) == 2, str(mkos))
+    # Template: JS indeks + spanduk, editor lewat + teks31, desain note.
+    isi_editor = (ROOT / 'app' / 'templates'
+                  / 'diagram_editor.html').read_text()
+    cek("editor menggambar jalur lewat bengkok putus-putus (cacat 2)",
+        "p.gaya === 'lewat'" in isi_editor
+        and 'stroke-dasharray' in isi_editor
+        and 'tinggiTampil' in isi_editor)
+    cek('editor menampilkan pratinjau teks 3.1 (cacat 5)',
+        'panel-teks31' in isi_editor and 'teks31' in isi_editor)
+    cek('formulir Model memakai kunci indeks + spanduk hilang (cacat 3)',
+        'peringatan-pilihan' in isi_model and 'dataset.kunci' in isi_model
+        and 'cariVariabel' in isi_model)
+    isi_desain = (ROOT / 'app' / 'templates'
+                  / 'diagram_desain.html').read_text()
+    cek('formulir Desain menyebut teks 3.1 otomatis + gratis (cacat 5)',
+        'Teks 3.1' in isi_desain and 'gratis' in isi_desain)
+
     cek('harga 1 token per gambar', DG.HARGA_GAMBAR == 1)
 
 

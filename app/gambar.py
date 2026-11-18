@@ -516,7 +516,7 @@ def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
             continue
         _garis_panah(d, a['x'] + a['w'], a['y'] + a['h'] / 2,
                      b['x'], b['y'] + b['h'] / 2,
-                     putus=(p.get('gaya') == 'putus'))
+                     putus=(p.get('gaya') in ('putus', 'lewat')))
     for k in kotak:
         warna = WARNA_PERAN.get(str(k.get('peran') or 'X'), TEAL)
         d.rounded_rectangle([k['x'], k['y'], k['x'] + k['w'],
@@ -561,8 +561,14 @@ def gambar_alur(langkah: list) -> bytes:
 
 def label_berikut_bab(teks_naskah: str, bab: int) -> str:
     """Nomor gambar berikutnya di satu bab ('Gambar 2.1', 'Gambar 2.2',
-    ...). Beda dengan label_berikut (bab terbesar di seluruh naskah)."""
-    nomor = re.findall(r'Gambar\s+%d\.(\d+)' % int(bab), teks_naskah or '')
+    ...). Beda dengan label_berikut (bab terbesar di seluruh naskah).
+
+    Keterangan di naskah memakai spasi sesudah titik ("Gambar 2. 1"),
+    jadi polanya menerima spasi itu; kalau tidak, gambar baru bisa
+    mendapat nomor duplikat 2.1 padahal 2.1 sudah ada.
+    """
+    nomor = re.findall(r'Gambar\s+%d\.\s*(\d+)' % int(bab),
+                       teks_naskah or '')
     if not nomor:
         return f'Gambar {int(bab)}.1'
     return f'Gambar {int(bab)}.{max(int(n) for n in nomor) + 1}'
@@ -899,6 +905,276 @@ def _cocok_judul(teks: str, bagian: str) -> bool:
     return 0 < len(sisa) <= 120
 
 
+#  ══════════════════════════════════════════════════════════════════════
+#  PENOMORAN OTOMATIS (numPr) — 18 Nov 2026, cacat Diagram 1.
+#  Di naskah nyata (fid 81) nomor judul BUKAN teks paragraf, melainkan
+#  penomoran otomatis Word: gaya Heading menunjuk numId, numId menunjuk
+#  abstractNum, dan nomor dihitung dari penghitung per tingkat.
+#  _cocok_judul di atas hanya mengenal nomor literal ("2.3.2 Model"),
+#  jadi judul "Model Penelitian" (Heading3, numId 34, ilvl 2) tidak
+#  pernah ketemu, dan penyisipan gagal. Mesin di bawah merekonstruksi
+#  nomor efektif tiap paragraf persis seperti Word merendernya.
+#  ══════════════════════════════════════════════════════════════════════
+def _format_nomor(nilai: int, fmt: str) -> str:
+    """Satu angka penomoran menurut format tingkatnya."""
+    if fmt in ('lowerLetter', 'upperLetter'):
+        s = ''
+        n = max(1, int(nilai))
+        while n > 0:
+            n, r = divmod(n - 1, 26)
+            s = chr((97 if fmt == 'lowerLetter' else 65) + r) + s
+        return s or ('a' if fmt == 'lowerLetter' else 'A')
+    if fmt in ('lowerRoman', 'upperRoman'):
+        angka = [(1000, 'M'), (900, 'CM'), (500, 'D'), (400, 'CD'),
+                 (100, 'C'), (90, 'XC'), (50, 'L'), (40, 'XL'),
+                 (10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')]
+        n = max(1, int(nilai))
+        keluar = ''
+        for v, s in angka:
+            while n >= v:
+                keluar += s
+                n -= v
+        return keluar.lower() if fmt == 'lowerRoman' else keluar
+    return str(int(nilai))
+
+
+def _uraikan_penomoran(xml_numbering: str, xml_styles: str) -> tuple:
+    """Uraikan numbering.xml + styles.xml.
+
+    Kembalikan (abstract, nums, gaya_num):
+    - abstract: {abstractNumId: {ilvl: (fmt, lvlText, start)}}
+    - nums: {numId: (abstractNumId, {ilvl: startOverride})}
+    - gaya_num: {styleId: (numId, ilvl)}
+    """
+    abstract: dict = {}
+    for m in re.finditer(
+            r'<w:abstractNum[^>]*w:abstractNumId="(\d+)"[^>]*>'
+            r'(.*?)</w:abstractNum>', xml_numbering or '', re.S):
+        lvl: dict = {}
+        for lm in re.finditer(
+                r'<w:lvl[^>]*w:ilvl="(\d+)"[^>]*>(.*?)</w:lvl>',
+                m.group(2), re.S):
+            li = lm.group(2)
+            fmt = re.search(r'<w:numFmt w:val="([^"]+)"', li)
+            teks = re.search(r'<w:lvlText w:val="([^"]*)"', li)
+            awal = re.search(r'<w:start w:val="(\d+)"', li)
+            lvl[int(lm.group(1))] = (
+                fmt.group(1) if fmt else 'decimal',
+                teks.group(1) if teks else '%1',
+                int(awal.group(1)) if awal else 1)
+        abstract[m.group(1)] = lvl
+    nums: dict = {}
+    for m in re.finditer(
+            r'<w:num[^>]*w:numId="(\d+)"[^>]*>(.*?)</w:num>',
+            xml_numbering or '', re.S):
+        aid = re.search(r'<w:abstractNumId w:val="(\d+)"', m.group(2))
+        ganti: dict = {}
+        for lm in re.finditer(
+                r'<w:lvlOverride[^>]*w:ilvl="(\d+)"[^>]*>(.*?)'
+                r'</w:lvlOverride>', m.group(2), re.S):
+            s = re.search(r'<w:startOverride w:val="(\d+)"', lm.group(2))
+            if s:
+                ganti[int(lm.group(1))] = int(s.group(1))
+        nums[m.group(1)] = (aid.group(1) if aid else None, ganti)
+    gaya_num: dict = {}
+    for m in re.finditer(
+            r'<w:style[^>]*w:styleId="([^"]+)"[^>]*>(.*?)</w:style>',
+            xml_styles or '', re.S):
+        npr = re.search(r'<w:numPr>(.*?)</w:numPr>', m.group(2), re.S)
+        if npr:
+            ilvl = re.search(r'<w:ilvl w:val="(\d+)"', npr.group(1))
+            numid = re.search(r'<w:numId w:val="(\d+)"', npr.group(1))
+            gaya_num[m.group(1)] = (
+                numid.group(1) if numid else None,
+                int(ilvl.group(1)) if ilvl else 0)
+    return abstract, nums, gaya_num
+
+
+class _Penomoran:
+    """Penghitung nomor otomatis Word (satu penghitung per abstractNum).
+
+    Aturan Word, terverifikasi 25/25 judul fid 81 melawan Daftar Isi:
+    saat paragraf level L muncul, tingkat di atasnya (0..L-1)
+    diinisialisasi ke nilai start bila belum ada, penghitung level L
+    naik satu dari (start-1) bila belum ada, dan penghitung tingkat
+    yang lebih dalam dihapus. Nomor dirangkai dari lvlText ("%1.%2.%3")
+    dengan format tiap tingkat. Paragraf tanpa numPr mengembalikan ''.
+    """
+
+    def __init__(self, abstract, nums, gaya_num):
+        self.abstract = abstract
+        self.nums = nums
+        self.gaya_num = gaya_num
+        self.penghitung: dict = {}
+        self._ganti_pakai: set = set()
+
+    def nomor(self, xml_paragraf: str) -> str:
+        ppr = re.search(r'<w:pPr>(.*?)</w:pPr>', xml_paragraf or '', re.S)
+        p = ppr.group(1) if ppr else ''
+        g = re.search(r'<w:pStyle w:val="([^"]+)"', p)
+        npr = re.search(r'<w:numPr>(.*?)</w:numPr>', p, re.S)
+        nid = ilvl = None
+        if npr:
+            il = re.search(r'<w:ilvl w:val="(\d+)"', npr.group(1))
+            ni = re.search(r'<w:numId w:val="(\d+)"', npr.group(1))
+            nid = ni.group(1) if ni else None
+            ilvl = int(il.group(1)) if il else 0
+        elif g and g.group(1) in self.gaya_num:
+            nid, ilvl = self.gaya_num[g.group(1)]
+        if nid is None or nid not in self.nums:
+            return ''
+        aid, ganti = self.nums[nid]
+        if aid not in self.abstract:
+            return ''
+        lvl = self.abstract[aid]
+        if ilvl not in lvl:
+            return ''
+
+        def _awal(k):
+            return lvl.get(k, ('decimal', '%1', 1))[2]
+
+        for k in range(ilvl):
+            if (aid, k) not in self.penghitung:
+                self.penghitung[(aid, k)] = _awal(k)
+        kunci = (aid, ilvl)
+        if kunci in ganti and kunci not in self._ganti_pakai:
+            self.penghitung[kunci] = ganti[kunci]
+            self._ganti_pakai.add(kunci)
+        else:
+            self.penghitung[kunci] = \
+                self.penghitung.get(kunci, lvl[ilvl][2] - 1) + 1
+        for l in list(self.penghitung):
+            if l[0] == aid and l[1] > ilvl:
+                del self.penghitung[l]
+        hasil = lvl[ilvl][1]
+        for k in range(ilvl + 1):
+            fmt_k = lvl.get(k, ('decimal', '%1', 1))[0]
+            nilai = self.penghitung.get((aid, k), _awal(k))
+            hasil = hasil.replace('%' + str(k + 1),
+                                  _format_nomor(nilai, fmt_k))
+        return hasil
+
+
+def _penomoran_dari_zip(z) -> _Penomoran | None:
+    """Bangun _Penomoran dari isi zip docx (None bila tak bernomor)."""
+    try:
+        xml_numbering = z.read('word/numbering.xml').decode('utf-8')
+    except Exception:                                      # noqa: BLE001
+        return None
+    try:
+        xml_styles = z.read('word/styles.xml').decode('utf-8')
+    except Exception:                                      # noqa: BLE001
+        xml_styles = ''
+    abstract, nums, gaya_num = _uraikan_penomoran(xml_numbering,
+                                                 xml_styles)
+    if not abstract or not nums:
+        return None
+    return _Penomoran(abstract, nums, gaya_num)
+
+
+def nomor_untuk_paragraf(par_list, penomoran) -> list:
+    """Nomor efektif tiap paragraf (sejajar par_list; '' bila tak ada)."""
+    if penomoran is None:
+        return ['' for _ in par_list]
+    return [penomoran.nomor(p) for p in par_list]
+
+
+def nomor_paragraf_docx(docx_path) -> list:
+    """Nomor efektif tiap paragraf sebuah docx (sejajar _RE_P).
+
+    '' untuk paragraf tanpa penomoran, dan semua '' bila dokumen
+    tidak punya numbering.xml (mis. naskah yang nomornya memang teks).
+    """
+    with zipfile.ZipFile(docx_path) as z:
+        doc = z.read('word/document.xml').decode('utf-8')
+        penomoran = _penomoran_dari_zip(z)
+    par_list = [m.group(0) for m in _RE_P.finditer(doc)]
+    return nomor_untuk_paragraf(par_list, penomoran)
+
+
+def _gaya_paragraf(xml_paragraf: str) -> str:
+    m = re.search(r'<w:pStyle w:val="([^"]+)"', xml_paragraf or '')
+    return m.group(1) if m else ''
+
+
+def _adalah_judul(xml_paragraf: str, teks: str, nomor: str) -> bool:
+    """True bila paragraf ini judul bagian (batas seksi).
+
+    Gaya Heading, baris "BAB ...", atau baris berawalan nomor literal.
+    Paragraf KOSONG tidak pernah jadi batas: di naskah nyata ada
+    paragraf kosong bernomor ("1.", "2.", "3.1.") di tengah seksi
+    3.1 fid 81 yang bukan judul sama sekali; baris angka bab ("2.",
+    "3.") sudah ditangkap duluan oleh baris "BAB ..." di atasnya.
+    Butir daftar bernomor di badan (ListParagraph berteks) BUKAN judul.
+    """
+    if _gaya_paragraf(xml_paragraf).startswith('Heading'):
+        return True
+    t = (teks or '').strip()
+    if re.match(r'^BAB\s+(?:[IVX]+|\d+)\b', t, re.IGNORECASE):
+        return True
+    if re.match(r'^\d+(\.\d+)*\s+\S', t) and len(t) < 90 \
+            and not re.search(r'\.{3,}', t) \
+            and not re.search(r'\d{1,4}\s*$', t):
+        return True
+    return False
+
+
+def _cocok_judul_nomor(xml_paragraf: str, teks: str, nomor: str,
+                       bagian: str) -> bool:
+    """True bila paragraf ini judul bagian yang dimaksud.
+
+    Nomor efektif sama dengan bagian DAN paragrafnya judul (gaya
+    Heading), ATAU teksnya berawalan nomor literal (perilaku lama
+    _cocok_judul, untuk naskah yang nomornya memang teks). Baris
+    Daftar Isi tidak pernah cocok: tidak bernomor dan teksnya
+    ditolak _cocok_judul.
+    """
+    b = str(bagian).strip()
+    if not b or not teks:
+        return False
+    if nomor == b and _gaya_paragraf(xml_paragraf).startswith('Heading'):
+        return True
+    return _cocok_judul(teks, bagian)
+
+
+def rentang_bagian(par_list, teks_par, nomor_par, bagian: str,
+                   bagian_berikut: str = '') -> tuple:
+    """(idx_target, idx_akhir) satu bagian di naskah.
+
+    idx_target: paragraf judul bagian (nomor efektif atau literal).
+    idx_akhir: paragraf judul berikutnya yang BUKAN turunan bagian
+    ini (mis. 3.2 sesudah 3.1; 3.1.1-3.1.3 tidak mengakhiri 3.1),
+    atau len(par_list) bila tidak ada. (None, None) bila judul
+    tidak ditemukan.
+    """
+    target = None
+    for i, t in enumerate(teks_par):
+        if _cocok_judul_nomor(par_list[i], t, nomor_par[i], bagian):
+            target = i
+            break
+    if target is None:
+        return None, None
+    akhir = None
+    if bagian_berikut:
+        for i in range(target + 1, len(teks_par)):
+            if _cocok_judul_nomor(par_list[i], teks_par[i],
+                                  nomor_par[i], bagian_berikut):
+                akhir = i
+                break
+    if akhir is None:
+        for i in range(target + 1, len(teks_par)):
+            if not _adalah_judul(par_list[i], teks_par[i], nomor_par[i]):
+                continue
+            nomor = nomor_par[i]
+            if nomor and nomor.startswith(str(bagian).strip() + '.'):
+                continue
+            akhir = i
+            break
+    if akhir is None:
+        akhir = len(teks_par)
+    return target, akhir
+
+
 def sisip_gambar_setelah_bagian(docx_path, png: bytes, bagian: str,
                                 bagian_berikut: str = '',
                                 keterangan: str = '',
@@ -922,37 +1198,22 @@ def sisip_gambar_setelah_bagian(docx_path, png: bytes, bagian: str,
         isi_lain = {n: z.read(n) for n in nama
                     if n not in ('word/document.xml', '[Content_Types].xml',
                                  'word/_rels/document.xml.rels')}
+        penomoran = _penomoran_dari_zip(z)
 
     par_list = [m.group(0) for m in _RE_P.finditer(doc)]
     if not par_list:
         return {'ok': False, 'sebab': 'paragraf tidak terbaca'}
+    teks_par = [_teks_par(p) for p in par_list]
+    nomor_par = nomor_untuk_paragraf(par_list, penomoran)
 
-    #  ── 1. cari paragraf judul bagian target ──
-    idx_target = None
-    for i, p in enumerate(par_list):
-        if _cocok_judul(_teks_par(p), bagian):
-            idx_target = i
-            break
+    #  ── 1-2. cari paragraf judul bagian target + batas akhir bagian ──
+    #  Nomor efektif (penomoran otomatis) atau literal; batas akhir =
+    #  judul berikutnya yang bukan turunan (mis. 2.4 tidak ada di fid 81,
+    #  jadi Model berakhir di "BAB III", bukan di akhir dokumen).
+    idx_target, idx_akhir = rentang_bagian(
+        par_list, teks_par, nomor_par, bagian, bagian_berikut)
     if idx_target is None:
         return {'ok': False, 'sebab': f'judul bagian {bagian!r} tidak ditemukan'}
-
-    #  ── 2. cari paragraf judul bagian BERIKUTNYA (batas akhir bagian) ──
-    idx_akhir = None
-    if bagian_berikut:
-        for i in range(idx_target + 1, len(par_list)):
-            if _cocok_judul(_teks_par(par_list[i]), bagian_berikut):
-                idx_akhir = i
-                break
-    #  kalau bagian berikut tidak diketahui/ditemukan → pakai paragraf isi
-    #  terakhir sebelum paragraf yang SEOLAH judul (pola "N.N Judul")
-    if idx_akhir is None:
-        for i in range(idx_target + 1, len(par_list)):
-            t = _teks_par(par_list[i])
-            if re.match(r'^\d+\.\d+\s+\S', t) and len(t) < 90:
-                idx_akhir = i
-                break
-    if idx_akhir is None:
-        idx_akhir = len(par_list)          # taruh sebelum akhir badan
 
     #  ── 3. bangun paragraf gambar + keterangan (pola sama dgn fungsi lama) ──
     idx_media = 1
