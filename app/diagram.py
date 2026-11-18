@@ -322,90 +322,152 @@ def _tinggi_muat(nama: str, lebar: int = LEBAR_KOTAK) -> int:
     return 104 if _jumlah_baris_nama(nama, lebar) >= 2 else 76
 
 
+def _tahap_variabel(variabel, jalur):
+    """Tahap (kolom) tiap variabel dari graf jalur (longest-path).
+
+    Tahap 0 bila tanpa jalur masuk, bila tidak 1 + maks tahap
+    pendahulu. Jalur lewat diurai jadi dua sisi (Dari ke Lewat,
+    Lewat ke Ke). Diulang sebanyak jumlah variabel supaya graf
+    berputar (siklus) tetap berhenti dengan nilai deterministik.
+    X/Z/Y biasa kembali jadi X 0, Z 1, Y 2; tanpa Z jadi X 0, Y 1.
+    """
+    kode = [v.get('kode') or v.get('nama') for v in variabel]
+    tahap = {k: 0 for k in kode if k}
+    nama_ke_kode = {}
+    for v in variabel:
+        k = v.get('kode') or v.get('nama')
+        if k:
+            nama_ke_kode[_normalisasi_nama(v.get('nama') or '')] = k
+            nama_ke_kode[str(k).lower()] = k
+
+    def _kode(teks):
+        if not teks:
+            return None
+        t = str(teks)
+        if t in tahap:
+            return t
+        return nama_ke_kode.get(_normalisasi_nama(t))
+
+    sisi = []
+    for j in jalur or []:
+        dari = _kode(j.get('dari'))
+        ke = _kode(j.get('ke'))
+        lewat = _kode(j.get('lewat'))
+        if lewat and dari and ke:
+            sisi.append((dari, lewat))
+            sisi.append((lewat, ke))
+        elif dari and ke:
+            sisi.append((dari, ke))
+    for _ in range(max(1, len(tahap))):
+        berubah = False
+        for u, v in sisi:
+            if tahap[v] < tahap[u] + 1:
+                tahap[v] = tahap[u] + 1
+                berubah = True
+        if not berubah:
+            break
+    return tahap
+
+
+def _pusat_tumpukan(i, n, pusat_satu=400):
+    """Pusat vertikal kotak ke-i dari n kotak yang simetris terhadap
+    garis tengah. 1 kotak di pusat_satu; 2-4 kotak berjarak sama
+    dengan pusat terluar ±LANGKAH_X dari garis tengah."""
+    if n == 1:
+        return pusat_satu
+    langkah = 2 * LANGKAH_X / (n - 1)
+    return TENGAH_KANVAS + (i - (n - 1) / 2) * langkah
+
+
+def _y_tumpukan_padat(nama_list, lebar=LEBAR_KOTAK):
+    """Daftar y untuk tumpukan padat (5+ kotak), terpusat simetris
+    di garis tengah; celah 14 px, ditekan ke 6 px bila kolom lebih
+    tinggi dari kanvas."""
+    hs = [_tinggi_muat(n, lebar) for n in nama_list]
+    celah = 14
+    total = sum(hs) + (len(hs) - 1) * celah
+    if total > 760:
+        celah = max(6, (760 - sum(hs)) // max(1, len(hs) - 1))
+        total = sum(hs) + (len(hs) - 1) * celah
+    y0 = max(20, 400 - total // 2)
+    out, yy = [], y0
+    for h in hs:
+        out.append(yy)
+        yy += h + celah
+    return out
+
+
 def tata_letak(model: dict) -> dict:
-    """Tata letak deterministik: kotak + panah dalam kanvas 1400x800.
+    """Tata letak deterministik: kotak + panah dalam kanvas 1400x800
+    (dilebarkan bila kolom lebih dari 3).
 
     Template per jumlah variabel (aturan umum, bukan per model):
-    X di kiri, Z di tengah, Y di kanan; pusat Z = pusat Y = garis
-    tengah kanvas (400). Kolom X simetris terhadap garis tengah: 1 X
-    di atas garis tengah (bukan di garis tengah, supaya X, Z, Y tidak
-    segaris, seperti contoh 1 Boss); 2 X satu di atas satu di bawah
-    dengan jarak sama; 3-4 X berjarak sama simetris; 5 X ke atas
-    tumpukan terpusat simetris (lihat _y_x_padat). Kolom dilegakan
-    (celah 190 px) seperti contoh skripsi Boss 18 Nov 2026: oval
-    besar, jarak lega. Panah langsung X ke Y yang menabrak kotak Z
-    (X yang pusatnya di garis tengah) TIDAK dihindari dengan
-    menggeser Z ke bawah, melainkan dibengkokkan lewat atas Z di
-    penempatan_label (app/gambar.py) dan gambarUlang editor.
-    Panah 'tidak_langsung' digambar putus-putus: dua segmen (Dari ke
-    Lewat, Lewat ke Ke) bila ada Lewat, satu segmen (Dari ke Ke) bila
-    tidak ada; tiap segmen berlabel hipotesisnya, supaya H6/H7
-    terlihat di draf.
+    tahap tiap variabel diturunkan dari graf jalur (longest-path):
+    tanpa jalur masuk tahap 0, bila tidak 1 + maks tahap pendahulu;
+    X/Z/Y biasa kembali jadi 3 kolom (X 0, Z 1, Y 2), tanpa Z jadi
+    2 kolom; model bertahap (mis. Goal-Directed) jadi N kolom.
+    Tiap kolom simetris terhadap garis tengah: 1 kotak di garis
+    tengah (kecuali kolom X klasik yang 1 X-nya di atas garis
+    tengah, supaya X, Z, Y tidak segaris seperti contoh 1 Boss);
+    2-4 kotak berjarak sama simetris; 5 kotak ke atas tumpukan
+    terpusat simetris. Jarak antar kolom 490 px (3 kolom ke bawah,
+    sama seperti dulu: X 60, Z 550, Y 1040) atau 420 px (4 kolom ke
+    atas, kanvas dilebarkan supaya label panah muat di celah 120 px).
+    Panah langsung yang menabrak kotak (mis. X di garis tengah ke Y
+    lewat Z) TIDAK dihindari dengan menggeser kotak, melainkan
+    dibengkokkan lewat atas kotak itu di penempatan_label
+    (app/gambar.py) dan gambarUlang editor. Panah 'tidak_langsung'
+    digambar putus-putus: dua segmen (Dari ke Lewat, Lewat ke Ke)
+    bila ada Lewat, satu segmen (Dari ke Ke) bila tidak ada; tiap
+    segmen berlabel hipotesisnya, supaya H6/H7 terlihat di draf.
+    Kembalikan {'kotak', 'panah', 'bentuk', 'lebar'}; 'lebar' =
+    lebar kanvas model ini (1400 bila 3 kolom ke bawah).
     """
     variabel = model.get('variabel') or []
-    xs = [v for v in variabel if v['peran'] == 'X']
-    zs = [v for v in variabel if v['peran'] == 'Z']
-    ys = [v for v in variabel if v['peran'] == 'Y']
-    n_x = max(1, len(xs))
-    kotak: list[dict] = []
-
-    def _y_x(i: int, h: int) -> int:
-        # Template per jumlah X: pusat terluar selalu ±LANGKAH_X dari
-        # garis tengah (seperti contoh 1: X atas dan bawah jauh);
-        # 1 X di atas garis tengah; 2-4 X berjarak sama simetris.
-        if n_x == 1:
-            pusat = TENGAH_KANVAS - LANGKAH_X
-        else:
-            langkah = 2 * LANGKAH_X / (n_x - 1)
-            pusat = TENGAH_KANVAS + (i - (n_x - 1) / 2) * langkah
-        return round(pusat - h / 2)
-
-    # Posisi Y kolom X yang padat: tinggi mengikuti nama, celah 14 px,
-    # kolom di tengah (y=400); bila kolom lebih tinggi dari kanvas,
-    # celah ditekan ke 6 px dan atas ditekan ke 20.
-    if n_x > 4:
-        _hs_padat = [_tinggi_muat(v['nama']) for v in xs]
-        _celah = 14
-        _total = sum(_hs_padat) + (n_x - 1) * _celah
-        if _total > 760:
-            _celah = max(6, (760 - sum(_hs_padat)) // max(1, n_x - 1))
-            _total = sum(_hs_padat) + (n_x - 1) * _celah
-        _y0 = max(20, 400 - _total // 2)
-        _y_x_padat = []
-        _yy = _y0
-        for _h in _hs_padat:
-            _y_x_padat.append(_yy)
-            _yy += _h + _celah
+    tahap = _tahap_variabel(variabel, model.get('jalur') or [])
+    kolom: dict[int, list] = {}
+    for v in variabel:
+        kolom.setdefault(tahap.get(v.get('kode') or v.get('nama'), 0),
+                         []).append(v)
+    n_kolom = (max(tahap.values()) + 1) if tahap else 1
+    if n_kolom <= 1:
+        lebar_kanvas = KANVAS_LEBAR
+        x_kolom = [550]
+    elif n_kolom <= 3:
+        lebar_kanvas = KANVAS_LEBAR
+        pitch = 980 / (n_kolom - 1)
+        x_kolom = [60 + round(i * pitch) for i in range(n_kolom)]
     else:
-        _y_x_padat = []
-
-    for i, v in enumerate(xs):
-        # Kolom X yang padat (5 X ke atas): kotak setinggi nama (76/104)
-        # supaya teks tidak meluap (dulu ramping 64, nama 1 baris
-        # berakhir y+70 dan melewati tepi bawah), dan kolom direnggang
-        # supaya kotak tidak tumpang tindih (celah 14 px, tengah di
-        # y=400, ditekan ke 20 bila kolom lebih tinggi dari kanvas).
-        if n_x > 4:
-            h = _tinggi_muat(v['nama'])
-            y = _y_x_padat[i]
+        pitch = 420
+        lebar_kanvas = 420 + (n_kolom - 1) * pitch
+        x_kolom = [60 + i * pitch for i in range(n_kolom)]
+    kotak: list[dict] = []
+    for t in sorted(kolom):
+        vs = kolom[t]
+        n = len(vs)
+        # 1 kotak di kolom X klasik (3 kolom ke bawah) di atas garis
+        # tengah; kolom lain 1 kotaknya di garis tengah.
+        klasik_x = (n_kolom <= 3 and t == 0
+                    and all(v.get('peran') == 'X' for v in vs))
+        pusat_satu = (TENGAH_KANVAS - LANGKAH_X) if klasik_x \
+            else TENGAH_KANVAS
+        if n > 4:
+            # Tumpukan padat: kotak setinggi nama (76/104) supaya
+            # teks tidak meluap, kolom direnggang supaya kotak tidak
+            # tumpang tindih (celah 14 px, tengah di y=400).
+            ys = _y_tumpukan_padat([v['nama'] for v in vs])
+            hs = [_tinggi_muat(v['nama']) for v in vs]
         else:
-            h = tinggi_kotak(v['nama'])
-            y = _y_x(i, h)
-        kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
-                      'peran': 'X', 'x': 60, 'y': y,
-                      'w': LEBAR_KOTAK, 'h': h})
-    for v in zs:
-        # Pusat Z = garis tengah kanvas (sama tinggi dengan Y).
-        h = tinggi_kotak(v['nama'])
-        kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
-                      'peran': 'Z', 'x': 550, 'y': TENGAH_KANVAS - h // 2,
-                      'w': LEBAR_KOTAK, 'h': h})
-    for v in ys:
-        # Pusat Y = garis tengah kanvas.
-        h = tinggi_kotak(v['nama'])
-        kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
-                      'peran': 'Y', 'x': 1040, 'y': TENGAH_KANVAS - h // 2,
-                      'w': LEBAR_KOTAK, 'h': h})
+            hs = [tinggi_kotak(v['nama']) for v in vs]
+            ys = [round(_pusat_tumpukan(i, n, pusat_satu) - h / 2)
+                  for i, h in enumerate(hs)]
+        for v, h, y in zip(vs, hs, ys):
+            kotak.append({'id': v.get('kode') or v.get('nama'),
+                          'nama': v['nama'],
+                          'kode': v.get('kode') or v.get('nama'),
+                          'peran': v.get('peran') or 'X',
+                          'x': x_kolom[t], 'y': y,
+                          'w': LEBAR_KOTAK, 'h': h})
     panah: list[dict] = []
     for j in model.get('jalur') or []:
         label = j['hipotesis']
@@ -425,7 +487,7 @@ def tata_letak(model: dict) -> dict:
                       'gaya': 'putus' if j.get('jenis') == 'interaksi'
                       else 'lurus'})
     return {'kotak': kotak, 'panah': panah,
-            'bentuk': bentuk_model(model)}
+            'bentuk': bentuk_model(model), 'lebar': lebar_kanvas}
 
 
 def tata_dari_kotak(kotak, panah, jenis: str = 'model') -> tuple:
@@ -493,8 +555,11 @@ def tata_dari_kotak(kotak, panah, jenis: str = 'model') -> tuple:
                                  'putus', 'lewat') else 'lurus'})
     if masalah:
         return None, masalah
+    lebar_manual = max(
+        KANVAS_LEBAR,
+        max((b['x'] + b['w'] for b in bersih), default=0) + 60)
     return {'kotak': bersih, 'panah': panah_bersih,
-            'bentuk': 'manual'}, []
+            'bentuk': 'manual', 'lebar': lebar_manual}, []
 
 
 def langkah_alur(desain: str) -> list[str]:

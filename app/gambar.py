@@ -513,22 +513,41 @@ def _label_panah(d, cx: float, cy: float, label: str) -> None:
 JARAK_JALUR = 40
 
 
-def _titik_elips(kotak: dict, dy: float, sisi: str) -> tuple:
-    """Titik di tepi elips setinggi tengah + dy ('kanan'/'kiri').
+def _titik_elips(kotak: dict, geser: float, sisi: str) -> tuple:
+    """Titik di tepi elips ('kanan'/'kiri' setinggi tengah + geser,
+    'atas'/'bawah' selebar tengah + geser).
 
     Dipakai jalur sejajar: tiap panah menempel di titiknya sendiri,
-    bukan di tengah tepi yang sama. dy dijepit supaya titik tetap
-    di elips (ry - 6).
+    bukan di tengah tepi yang sama. Geser dijepit supaya titik tetap
+    di elips (ry - 6 untuk kanan/kiri, rx - 6 untuk atas/bawah).
     """
     cx = kotak['x'] + kotak['w'] / 2
     cy = kotak['y'] + kotak['h'] / 2
     rx = kotak['w'] / 2
     ry = kotak['h'] / 2
-    dy = max(-(ry - 6), min(ry - 6, dy))
-    sisa = max(0.0, 1 - (dy / ry) ** 2)
+    if sisi in ('atas', 'bawah'):
+        geser = max(-(rx - 6), min(rx - 6, geser))
+        sisa = max(0.0, 1 - (geser / rx) ** 2)
+        y = cy - (ry * math.sqrt(sisa) if sisi == 'atas'
+                  else -ry * math.sqrt(sisa))
+        return cx + geser, y
+    geser = max(-(ry - 6), min(ry - 6, geser))
+    sisa = max(0.0, 1 - (geser / ry) ** 2)
     x = cx + (rx * math.sqrt(sisa) if sisi == 'kanan'
               else -rx * math.sqrt(sisa))
-    return x, cy + dy
+    return x, cy + geser
+
+
+def _tumpuk_vertikal(a, b):
+    """Dua kotak bertumpuk vertikal (satu kolom): rentang x
+    bertumpang tindih lebih dari separuh lebar yang sempit, dan
+    ada celah vertikal di antara keduanya."""
+    lebar_sempit = min(a['w'], b['w'])
+    tumpang = (min(a['x'] + a['w'], b['x'] + b['w'])
+               - max(a['x'], b['x']))
+    if tumpang < lebar_sempit / 2:
+        return False
+    return (a['y'] + a['h'] <= b['y'] or b['y'] + b['h'] <= a['y'])
 
 
 def _susunan_kelompok(butir: list) -> list:
@@ -603,11 +622,13 @@ def _titik_polilinia(titik, s):
     return titik[-1]
 
 
-def _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua, dari_id, ke_id):
+def _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua, dari_id, ke_id,
+                  lebar=W):
     """Titik belok bila segmen menembus kotak (bukan kotak ujung):
     lewat atas/bawah kotak yang ditembus, di sisi titik tengah ruas
-    (seperti H1 contoh 1 yang lewat di atas Z). Diulang sampai 3
-    belokan, karena polilinia bisa menembus kotak kedua sesudah
+    (seperti H1 contoh 1 yang lewat di atas Z). Ruas yang lebih tegak
+    daripada mendatar dibelokkan ke kiri/kanan kotak. Diulang sampai
+    3 belokan, karena polilinia bisa menembus kotak kedua sesudah
     dibengkokkan. Kembalikan [] bila tidak menembus."""
     titik = [(x1, y1), (x2, y2)]
     for _ in range(3):
@@ -628,23 +649,38 @@ def _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua, dari_id, ke_id):
         j, k = temu
         ax, ay = titik[j]
         bx, by = titik[j + 1]
-        atas = (ay + by) / 2 <= k['y'] + k['h'] / 2
-        # Kotak di kolom awal (titik awal ruas di dalam rentang x
-        # kotak, mis. X2 tepat di bawah X1): titik belok di tengah-x
-        # kotak malah mundur ke dalam kolom itu. Pakai stub
-        # horizontal dulu melewati kolom (tepi kanan kotak + 20,
-        # setinggi titik awal), baru menyerong. Begitu juga kotak di
-        # kolom akhir. Kotak di tengah rute (mis. Z) tetap lewat
-        # atas/bawah tengah kotak itu.
-        if k['x'] <= ax <= k['x'] + k['w']:
-            wx, wy = k['x'] + k['w'] + 20, ay
-        elif k['x'] <= bx <= k['x'] + k['w']:
-            wx, wy = k['x'] - 20, by
+        # Ruas hampir tegak (panah vertikal satu kolom, dx kecil):
+        # belok ke kiri/kanan kotak. Diagonal curam antar kolom tetap
+        # pakai aturan mendatar (stub / atas-bawah).
+        if abs(bx - ax) < 40:
+            # Ruas tegak: belok ke kiri/kanan kotak yang ditembus.
+            kiri = (ax + bx) / 2 <= k['x'] + k['w'] / 2
+            if k['y'] <= ay <= k['y'] + k['h']:
+                wx, wy = ax, k['y'] + k['h'] + 20
+            elif k['y'] <= by <= k['y'] + k['h']:
+                wx, wy = bx, k['y'] - 20
+            else:
+                wx = ((k['x'] - 60 + dy) if kiri
+                      else (k['x'] + k['w'] + 60 + dy))
+                wy = (ay + by) / 2
         else:
-            wx = k['x'] + k['w'] / 2
-            wy = (k['y'] - 60 + dy) if atas else (k['y'] + k['h'] + 60 + dy)
+            atas = (ay + by) / 2 <= k['y'] + k['h'] / 2
+            # Kotak di kolom awal (titik awal ruas di dalam rentang x
+            # kotak, mis. X2 tepat di bawah X1): titik belok di tengah-x
+            # kotak malah mundur ke dalam kolom itu. Pakai stub
+            # horizontal dulu melewati kolom (tepi kanan kotak + 20,
+            # setinggi titik awal), baru menyerong. Begitu juga kotak di
+            # kolom akhir. Kotak di tengah rute (mis. Z) tetap lewat
+            # atas/bawah tengah kotak itu.
+            if k['x'] <= ax <= k['x'] + k['w']:
+                wx, wy = k['x'] + k['w'] + 20, ay
+            elif k['x'] <= bx <= k['x'] + k['w']:
+                wx, wy = k['x'] - 20, by
+            else:
+                wx = k['x'] + k['w'] / 2
+                wy = (k['y'] - 60 + dy) if atas else (k['y'] + k['h'] + 60 + dy)
         wy = max(20, min(H - 20, wy))
-        wx = max(20, min(W - 20, wx))
+        wx = max(20, min(lebar - 20, wx))
         titik = titik[:j + 1] + [(wx, wy)] + titik[j + 1:]
     return titik[1:-1]
 
@@ -736,20 +772,35 @@ def penempatan_label(tata: dict | None) -> list:
         kelompok[kunci].append((a, b, p))
     keluar = []
     kotak_semua = list(kotak.values())
+    lebar_kanvas = tata.get('lebar') or W
     for kunci in urutan:
         susun = _susunan_kelompok(kelompok[kunci])
         n = len(susun)
         for i, (a, b, p) in enumerate(susun):
+            # Sisi tempel mengikuti posisi relatif kotak: kotak yang
+            # bertumpuk vertikal (satu kolom) dihubungkan panah
+            # vertikal (bawah ke atas), bukan kanan ke kiri.
+            vertikal = _tumpuk_vertikal(a, b)
             # Langkah jalur menyesuaikan ukuran kelompok supaya tidak
-            # ada dua panah menempel di titik elips yang sama (dy
-            # dijepit ke ry-6): langkah = min(40, 2*(ry_min-6)/(n-1)).
-            ry_min = min(a['h'], b['h']) / 2
+            # ada dua panah menempel di titik elips yang sama (geser
+            # dijepit ke jari-jari - 6): langkah =
+            # min(40, 2*(r_min-6)/(n-1)).
+            r_min = (min(a['w'], b['w']) if vertikal
+                     else min(a['h'], b['h'])) / 2
             langkah_jalur = (JARAK_JALUR if n <= 1 else
                              min(JARAK_JALUR,
-                                 2 * (ry_min - 6) / (n - 1)))
+                                 2 * (r_min - 6) / (n - 1)))
             dy = (i - (n - 1) / 2) * langkah_jalur
-            x1, y1 = _titik_elips(a, dy, 'kanan')
-            x2, y2 = _titik_elips(b, dy, 'kiri')
+            if vertikal:
+                if a['y'] + a['h'] / 2 <= b['y'] + b['h'] / 2:
+                    x1, y1 = _titik_elips(a, dy, 'bawah')
+                    x2, y2 = _titik_elips(b, dy, 'atas')
+                else:
+                    x1, y1 = _titik_elips(a, dy, 'atas')
+                    x2, y2 = _titik_elips(b, dy, 'bawah')
+            else:
+                x1, y1 = _titik_elips(a, dy, 'kanan')
+                x2, y2 = _titik_elips(b, dy, 'kiri')
             mx0 = (a['x'] + a['w'] + b['x']) / 2
             my0 = (a['y'] + a['h'] / 2 + b['y'] + b['h'] / 2) / 2
             label = p.get('label') or ''
@@ -758,7 +809,8 @@ def penempatan_label(tata: dict | None) -> list:
             # Bengkok: ruas yang menembus kotak dibengkokkan lewat
             # atas/bawah kotak itu (aturan umum, bukan per model).
             rute = _rute_bengkok(x1, y1, x2, y2, dy, kotak_semua,
-                                 p.get('dari'), p.get('ke'))
+                                 p.get('dari'), p.get('ke'),
+                                 lebar_kanvas)
             titik = [(x1, y1)] + rute + [(x2, y2)]
             # Label di tengah polilinia; geser sepanjang garisnya bila
             # mendarat di atas kotak atau label lain (aturan umum).
@@ -785,7 +837,8 @@ def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
     kotak = tata.get('kotak') or []
     if not kotak:
         return b''
-    g = Image.new('RGB', (W, H), LATAR)
+    lebar_kanvas = tata.get('lebar') or W
+    g = Image.new('RGB', (lebar_kanvas, H), LATAR)
     d = ImageDraw.Draw(g)
     #  panah dulu (di bawah kotak), lalu kotak, lalu label. Garis tiap
     #  panah dari penempatan_label (jalur sendiri bila berbagi segmen),

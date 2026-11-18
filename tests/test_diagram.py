@@ -1152,6 +1152,231 @@ def jalankan():
         and _tengah3[0]['rute'][0][1] < 355,
         str(_tengah3))
 
+    # ── 12. Template multi-tahap (N kolom, contoh 4 dan 5) ─────────
+    # Tahap tiap variabel diturunkan dari jalur (longest-path), tanpa
+    # ubah formulir/model data. Model Goal-Directed dan contoh 5
+    # dibangun langsung sebagai dict (bypass normalisasi_model yang
+    # menolak lebih dari 1 Y / 1 Z), karena formulir belum bisa
+    # menyatakan model seperti itu.
+    _goal = {
+        'variabel': [
+            {'nama': 'Self-efficacy', 'peran': 'X', 'kode': 'X1'},
+            {'nama': 'Mastery Goals', 'peran': 'Z', 'kode': 'M1'},
+            {'nama': 'Performance-Approach Goals', 'peran': 'Z',
+             'kode': 'M2'},
+            {'nama': 'Performance-Avoidance Goals', 'peran': 'Z',
+             'kode': 'M3'},
+            {'nama': 'Positive Affect', 'peran': 'Z', 'kode': 'M4'},
+            {'nama': 'Decision Confidence', 'peran': 'Z', 'kode': 'M5'},
+            {'nama': 'Decision Satisfaction', 'peran': 'Z', 'kode': 'M6'},
+            {'nama': 'Attitudinal Loyalty Intention', 'peran': 'Y',
+             'kode': 'Y1'},
+            {'nama': 'Switching Likelihood', 'peran': 'Y', 'kode': 'Y2'}],
+        'jalur': [
+            {'dari': 'X1', 'ke': 'M1', 'hipotesis': 'H1',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'X1', 'ke': 'M2', 'hipotesis': 'H2',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'X1', 'ke': 'M3', 'hipotesis': 'NH',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M1', 'ke': 'M4', 'hipotesis': 'H3',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M2', 'ke': 'M4', 'hipotesis': 'H4',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M3', 'ke': 'M4', 'hipotesis': 'H5',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M1', 'ke': 'M5', 'hipotesis': 'H6',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M2', 'ke': 'M5', 'hipotesis': 'H7',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M3', 'ke': 'M5', 'hipotesis': 'H8',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M4', 'ke': 'M6', 'hipotesis': 'H9',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M5', 'ke': 'M6', 'hipotesis': 'H10',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M6', 'ke': 'Y1', 'hipotesis': 'H11',
+             'jenis': 'langsung', 'arah': ''},
+            {'dari': 'M6', 'ke': 'Y2', 'hipotesis': 'H12',
+             'jenis': 'langsung', 'arah': ''}],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+    _c5 = {
+        'variabel': [
+            {'nama': 'kepemimpinan', 'peran': 'X', 'kode': 'X1'},
+            {'nama': 'reward', 'peran': 'X', 'kode': 'X2'},
+            {'nama': 'Kualitas sistem', 'peran': 'X', 'kode': 'X3'},
+            {'nama': 'Kondisi Pemfasilitasi', 'peran': 'X', 'kode': 'X4'},
+            {'nama': 'Kualitas pengetahuan', 'peran': 'Z', 'kode': 'M1'},
+            {'nama': 'Penggunaan', 'peran': 'Z', 'kode': 'M2'},
+            {'nama': 'Kepuasan Pengguna', 'peran': 'Z', 'kode': 'M3'},
+            {'nama': 'Manfaat', 'peran': 'Y', 'kode': 'Y1'}],
+        'jalur': [
+            {'dari': 'X3', 'ke': 'M2', 'hipotesis': 'H1',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X3', 'ke': 'M3', 'hipotesis': 'H2',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X4', 'ke': 'M2', 'hipotesis': 'H3',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M1', 'ke': 'M2', 'hipotesis': 'H4',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M1', 'ke': 'M3', 'hipotesis': 'H5',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M3', 'ke': 'M2', 'hipotesis': 'H6',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M2', 'ke': 'Y1', 'hipotesis': 'H7',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'M3', 'ke': 'Y1', 'hipotesis': 'H8',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X1', 'ke': 'M1', 'hipotesis': 'H9',
+             'jenis': 'langsung', 'arah': '+'},
+            {'dari': 'X2', 'ke': 'M1', 'hipotesis': 'H10',
+             'jenis': 'langsung', 'arah': '+'},
+        ],
+        'jenis': 'kuantitatif', 'desain': 'survei'}
+
+    def _kolom_simetris(tata):
+        kolom = {}
+        for k in tata['kotak']:
+            kolom.setdefault(k['x'], []).append(k)
+        for ks in kolom.values():
+            pusat = sorted(_pusat(k) for k in ks)
+            if len(ks) == 1:
+                if pusat[0] != 400:
+                    return False, pusat
+            elif len(ks) <= 4:
+                if not all(pusat[i] + pusat[-1 - i] == 800
+                           for i in range(len(pusat) // 2)):
+                    return False, pusat
+            else:
+                atas = min(k['y'] for k in ks)
+                bawah = max(k['y'] + k['h'] for k in ks)
+                if (atas + bawah) / 2 != 400:
+                    return False, pusat
+        return True, None
+
+    def _tanpa_ruas_lewat_kotak(pl, tata):
+        kena = []
+        for p in pl:
+            titik = ([(p['x1'], p['y1'])] + list(p.get('rute') or [])
+                     + [(p['x2'], p['y2'])])
+            for j in range(len(titik) - 1):
+                for k in tata['kotak']:
+                    if _ruas_lewat_kotak(titik[j][0], titik[j][1],
+                                         titik[j + 1][0],
+                                         titik[j + 1][1], k):
+                        kena.append((p['label'], j, k['id']))
+        return kena
+
+    def _tanpa_kotak_tumpang(tata):
+        kolom = {}
+        for k in tata['kotak']:
+            kolom.setdefault(k['x'], []).append(k)
+        for ks in kolom.values():
+            ks = sorted(ks, key=lambda k: k['y'])
+            for i in range(len(ks) - 1):
+                if ks[i]['y'] + ks[i]['h'] > ks[i + 1]['y']:
+                    return False
+        return True
+
+    # Layering: Goal-Directed 5 kolom, klasik 3 kolom, tanpa Z 2 kolom.
+    cek('layering Goal-Directed: 5 tahap [0,1,1,1,2,2,3,4,4]',
+        DG._tahap_variabel(_goal['variabel'], _goal['jalur']) == {
+            'X1': 0, 'M1': 1, 'M2': 1, 'M3': 1, 'M4': 2, 'M5': 2,
+            'M6': 3, 'Y1': 4, 'Y2': 4},
+        str(DG._tahap_variabel(_goal['variabel'], _goal['jalur'])))
+    cek('layering klasik Nura: X=0, Z=1, Y=2',
+        DG._tahap_variabel(model_nl['variabel'], model_nl['jalur']) == {
+            'X1': 0, 'X2': 0, 'Z': 1, 'Y': 2},
+        str(DG._tahap_variabel(model_nl['variabel'], model_nl['jalur'])))
+    cek('layering tanpa Z: X=0, Y=1',
+        DG._tahap_variabel(
+            [{'nama': 'Harga', 'peran': 'X'},
+             {'nama': 'Keputusan Beli', 'peran': 'Y'}],
+            [{'dari': 'Harga', 'ke': 'Keputusan Beli',
+              'hipotesis': 'H1', 'jenis': 'langsung', 'arah': '+'}])
+        == {'Harga': 0, 'Keputusan Beli': 1},
+        'tanpa Z')
+    cek('layering contoh 5: Kepuasan tahap 2, Penggunaan tahap 3',
+        DG._tahap_variabel(_c5['variabel'], _c5['jalur']) == {
+            'X1': 0, 'X2': 0, 'X3': 0, 'X4': 0, 'M1': 1, 'M3': 2,
+            'M2': 3, 'Y1': 4},
+        str(DG._tahap_variabel(_c5['variabel'], _c5['jalur'])))
+    # Siklus tidak menggantung (dibatasi sebanyak jumlah variabel).
+    _siklus = {'variabel': [{'nama': 'A', 'peran': 'X'},
+                            {'nama': 'B', 'peran': 'Y'}],
+               'jalur': [{'dari': 'A', 'ke': 'B', 'hipotesis': 'H1',
+                          'jenis': 'langsung', 'arah': ''},
+                         {'dari': 'B', 'ke': 'A', 'hipotesis': 'H2',
+                          'jenis': 'langsung', 'arah': ''}]}
+    _t_siklus = DG._tahap_variabel(_siklus['variabel'], _siklus['jalur'])
+    cek('layering siklus A-B berhenti deterministik',
+        isinstance(_t_siklus, dict) and set(_t_siklus) == {'A', 'B'},
+        str(_t_siklus))
+    _tata_siklus = DG.tata_letak(_siklus)
+    cek('tata siklus tetap tergambar (2 kotak)',
+        len(_tata_siklus['kotak']) == 2, str(_tata_siklus['kotak']))
+
+    for _nama, _model, _lebar in (('Goal-Directed', _goal, 2100),
+                                  ('contoh 5', _c5, 2100)):
+        _t = DG.tata_letak(_model)
+        _pl = GB.penempatan_label(_t)
+        cek('%s: lebar kanvas %d' % (_nama, _lebar),
+            _t.get('lebar') == _lebar, str(_t.get('lebar')))
+        _sim, _pusat_gagal = _kolom_simetris(_t)
+        cek('%s: tiap kolom simetris terhadap garis tengah' % _nama,
+            _sim, str(_pusat_gagal))
+        cek('%s: tidak ada kotak tumpang tindih' % _nama,
+            _tanpa_kotak_tumpang(_t), 'tumpang')
+        cek('%s: tidak ada ruas menembus kotak' % _nama,
+            not _tanpa_ruas_lewat_kotak(_pl, _t),
+            str(_tanpa_ruas_lewat_kotak(_pl, _t)))
+        cek('%s: label tidak menyentuh kotak' % _nama,
+            _jarak_label_kotak(_pl, _t) > 0,
+            str(round(_jarak_label_kotak(_pl, _t), 1)))
+        cek('%s: tidak ada label bertumpuk' % _nama,
+            _celah_min(_pl) >= 0, str(round(_celah_min(_pl), 1)))
+        cek('%s: tiap panah punya garis sendiri' % _nama,
+            not _garis_unik(_pl), str(_garis_unik(_pl)))
+    # Panah lompat kolom (H1 contoh 5: X3 tahap 0 ke M2 tahap 3)
+    # dibengkokkan melewati kotak antara, bukan menembus.
+    _tc5 = DG.tata_letak(_c5)
+    _plc5 = GB.penempatan_label(_tc5)
+    _h1c5 = [p for p in _plc5 if p['label'] == 'H1 (+)']
+    cek('contoh 5: panah lompat kolom H1 dibengkokkan',
+        len(_h1c5) == 1 and len(_h1c5[0].get('rute') or []) >= 1,
+        str(_h1c5[0].get('rute') if _h1c5 else None))
+    # Panah vertikal: dua kotak satu kolom dihubungkan bawah ke atas.
+    _tata_v, _masalah_v = DG.tata_dari_kotak(
+        [{'id': 'A', 'nama': 'Atas', 'kode': 'A', 'peran': 'X',
+          'x': 60, 'y': 100, 'w': 300, 'h': 90},
+         {'id': 'B', 'nama': 'Bawah', 'kode': 'B', 'peran': 'Y',
+          'x': 60, 'y': 400, 'w': 300, 'h': 90}],
+        [{'dari': 'A', 'ke': 'B', 'label': 'H1 (+)', 'gaya': 'lurus'}],
+        jenis='model')
+    _pl_v = GB.penempatan_label(_tata_v)
+    cek('panah vertikal: tegak lurus bawah ke atas',
+        len(_pl_v) == 1 and _pl_v[0]['x1'] == _pl_v[0]['x2']
+        and _pl_v[0]['y1'] < _pl_v[0]['y2']
+        and not _pl_v[0].get('rute'),
+        str([(p['x1'], p['y1'], p['x2'], p['y2']) for p in _pl_v]))
+    cek('panah vertikal: label tidak menyentuh kotak',
+        _jarak_label_kotak(_pl_v, _tata_v) > 0,
+        str(round(_jarak_label_kotak(_pl_v, _tata_v), 1)))
+    # Editor 5 kolom: viewBox dan state memakai lebar kanvas.
+    from jinja2 import Environment as _Env, FileSystemLoader as _FSL
+    _env = _Env(loader=_FSL(str(Path(__file__).resolve().parent.parent
+                             / 'app' / 'templates')))
+    _tpl = _env.get_template('diagram_editor.html')
+    _html_goal = _tpl.render(
+        berkas={'id': 81, 'nama': 'x.docx'}, jenis='model',
+        tata=DG.tata_letak(_goal), tinggi=DG.KANVAS_TINGGI,
+        lebar=DG.tata_letak(_goal).get('lebar') or DG.KANVAS_LEBAR,
+        teks31=None)
+    cek('editor Goal-Directed: viewBox 2100 dan state lebar 2100',
+        'viewBox="0 0 2100 800"' in _html_goal
+        and '"lebar": 2100' in _html_goal,
+        'viewBox/state lebar')
+
 
 if __name__ == '__main__':
     jalankan()

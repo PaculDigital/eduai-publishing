@@ -278,7 +278,10 @@ async def diagram_editor_halaman(
     return _tpl.TemplateResponse(
         'diagram_editor.html',
         {'request': request, 'berkas': fb, 'jenis': jenis,
-         'tata': tata, 'tinggi': tinggi, 'harga': HARGA,
+         'tata': tata, 'tinggi': tinggi,
+         'lebar': (tata.get('lebar') or DG.KANVAS_LEBAR)
+         if jenis == 'model' else DG.KANVAS_LEBAR,
+         'harga': HARGA,
          'teks31': teks31})
 
 

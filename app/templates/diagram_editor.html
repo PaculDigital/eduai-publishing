@@ -24,7 +24,7 @@
 <p>Geser kotak untuk mengatur letak. Klik kotak untuk mengubah tulisannya.</p>
 <div id="pesan" class="pesan" hidden></div>
 <div id="galat" class="galat" hidden></div>
-<svg id="kanvas" viewBox="0 0 1400 {{ tinggi }}">
+<svg id="kanvas" viewBox="0 0 {{ lebar | default(1400) }} {{ tinggi }}">
   <defs>
     <marker id="panah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#10222e"></path>
@@ -76,6 +76,7 @@
 var JENIS = {{ jenis | tojson }};
 var FID = {{ berkas.id }};
 var state = {{ tata | tojson }};
+var LEBAR_KANVAS = state.lebar || 1400;
 var diubah = false;
 var manual = false;
 var sambung = false;
@@ -107,17 +108,35 @@ function tinggiTampil(k) {
   var maks = k.w > 400 ? 30 : 18;
   return Math.max(k.h, bungkus(k.nama, maks).length >= 2 ? 110 : 90);
 }
-function titikElips(k, h, dy, sisi) {
-  // Titik di tepi elips setinggi tengah + dy ('kanan'/'kiri'), sama
-  // dengan _titik_elips di app/gambar.py. dy dijepit supaya titik
-  // tetap di elips (ry - 6).
+function titikElips(k, h, geser, sisi) {
+  // Titik di tepi elips ('kanan'/'kiri' setinggi tengah + geser,
+  // 'atas'/'bawah' selebar tengah + geser), sama dengan _titik_elips
+  // di app/gambar.py. Geser dijepit supaya titik tetap di elips
+  // (ry - 6 untuk kanan/kiri, rx - 6 untuk atas/bawah).
   var cx = k.x + k.w / 2, cy = k.y + h / 2;
   var rx = k.w / 2, ry = h / 2;
-  dy = Math.max(-(ry - 6), Math.min(ry - 6, dy));
-  var sisa = Math.max(0, 1 - (dy / ry) * (dy / ry));
-  var x = cx + (sisi === 'kanan' ? rx * Math.sqrt(sisa)
-                                  : -rx * Math.sqrt(sisa));
-  return [x, cy + dy];
+  if (sisi === 'atas' || sisi === 'bawah') {
+    geser = Math.max(-(rx - 6), Math.min(rx - 6, geser));
+    var sisa = Math.max(0, 1 - (geser / rx) * (geser / rx));
+    var y = cy - (sisi === 'atas' ? ry * Math.sqrt(sisa)
+                                  : -ry * Math.sqrt(sisa));
+    return [cx + geser, y];
+  }
+  geser = Math.max(-(ry - 6), Math.min(ry - 6, geser));
+  var sisa2 = Math.max(0, 1 - (geser / ry) * (geser / ry));
+  var x = cx + (sisi === 'kanan' ? rx * Math.sqrt(sisa2)
+                                 : -rx * Math.sqrt(sisa2));
+  return [x, cy + geser];
+}
+function tumpukVertikal(a, b) {
+  // Dua kotak bertumpuk vertikal (satu kolom): rentang x
+  // bertumpang tindih lebih dari separuh lebar yang sempit, dan
+  // ada celah vertikal di antara keduanya. Sama dengan
+  // _tumpuk_vertikal di app/gambar.py.
+  var sempit = Math.min(a.w, b.w);
+  var tumpang = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+  if (tumpang < sempit / 2) return false;
+  return a.y + a.h <= b.y || b.y + b.h <= a.y;
 }
 function susunanKelompok(idxs, daftar) {
   // Lurus di tengah, putus-putus di atas/bawah (contoh ke-3 Bos).
@@ -215,25 +234,41 @@ function ruteBengkok(x1, y1, x2, y2, dy, kotak, dariId, keId) {
     var j = temu[0], k = temu[1];
     var ax = titik[j][0], ay = titik[j][1];
     var bx = titik[j + 1][0], by = titik[j + 1][1];
-    var atas = (ay + by) / 2 <= k.y + k.h / 2;
-    // Kotak di kolom awal (titik awal ruas di dalam rentang x kotak,
-    // mis. X2 tepat di bawah X1): titik belok di tengah-x kotak
-    // malah mundur ke dalam kolom itu. Pakai stub horizontal dulu
-    // melewati kolom (tepi kanan kotak + 20, setinggi titik awal),
-    // baru menyerong. Begitu juga kotak di kolom akhir. Kotak di
-    // tengah rute (mis. Z) tetap lewat atas/bawah tengah kotak itu.
-    // Sama dengan _rute_bengkok di app/gambar.py.
     var wx, wy;
-    if (k.x <= ax && ax <= k.x + k.w) {
-      wx = k.x + k.w + 20; wy = ay;
-    } else if (k.x <= bx && bx <= k.x + k.w) {
-      wx = k.x - 20; wy = by;
+    // Ruas hampir tegak (panah vertikal satu kolom, dx kecil):
+    // belok ke kiri/kanan kotak. Diagonal curam antar kolom tetap
+    // pakai aturan mendatar (stub / atas-bawah).
+    if (Math.abs(bx - ax) < 40) {
+      // Ruas tegak: belok ke kiri/kanan kotak yang ditembus.
+      var kiri = (ax + bx) / 2 <= k.x + k.w / 2;
+      if (k.y <= ay && ay <= k.y + k.h) {
+        wx = ax; wy = k.y + k.h + 20;
+      } else if (k.y <= by && by <= k.y + k.h) {
+        wx = bx; wy = k.y - 20;
+      } else {
+        wx = kiri ? k.x - 60 + dy : k.x + k.w + 60 + dy;
+        wy = (ay + by) / 2;
+      }
     } else {
-      wx = k.x + k.w / 2;
-      wy = atas ? k.y - 60 + dy : k.y + k.h + 60 + dy;
+      var atas = (ay + by) / 2 <= k.y + k.h / 2;
+      // Kotak di kolom awal (titik awal ruas di dalam rentang x kotak,
+      // mis. X2 tepat di bawah X1): titik belok di tengah-x kotak
+      // malah mundur ke dalam kolom itu. Pakai stub horizontal dulu
+      // melewati kolom (tepi kanan kotak + 20, setinggi titik awal),
+      // baru menyerong. Begitu juga kotak di kolom akhir. Kotak di
+      // tengah rute (mis. Z) tetap lewat atas/bawah tengah kotak itu.
+      // Sama dengan _rute_bengkok di app/gambar.py.
+      if (k.x <= ax && ax <= k.x + k.w) {
+        wx = k.x + k.w + 20; wy = ay;
+      } else if (k.x <= bx && bx <= k.x + k.w) {
+        wx = k.x - 20; wy = by;
+      } else {
+        wx = k.x + k.w / 2;
+        wy = atas ? k.y - 60 + dy : k.y + k.h + 60 + dy;
+      }
     }
     wy = Math.max(20, Math.min(780, wy));
-    wx = Math.max(20, Math.min(1380, wx));
+    wx = Math.max(20, Math.min(LEBAR_KANVAS - 20, wx));
     titik = titik.slice(0, j + 1).concat([[wx, wy]], titik.slice(j + 1));
   }
   return titik.slice(1, -1);
@@ -319,19 +354,36 @@ function gambarUlang() {
     idxs.forEach(function (idx, i) {
       var p = daftar[idx];
       var a = peta[p.dari], b = peta[p.ke];
-      // Langkah jalur menyesuaikan ukuran kelompok supaya tidak ada
-      // dua panah menempel di titik elips yang sama (dy dijepit ke
-      // ry-6): langkah = min(40, 2*(ryMin-6)/(n-1)). Sama dengan
+      // Sisi tempel mengikuti posisi relatif kotak: kotak yang
+      // bertumpuk vertikal (satu kolom) dihubungkan panah vertikal
+      // (bawah ke atas), bukan kanan ke kiri. Sama dengan
       // penempatan_label di app/gambar.py.
-      var ryMin = Math.min(tinggi[a.id], tinggi[b.id]) / 2;
+      var aT = {x: a.x, y: a.y, w: a.w, h: tinggi[a.id]};
+      var bT = {x: b.x, y: b.y, w: b.w, h: tinggi[b.id]};
+      var vertikal = tumpukVertikal(aT, bT);
+      // Langkah jalur menyesuaikan ukuran kelompok supaya tidak ada
+      // dua panah menempel di titik elips yang sama (geser dijepit
+      // ke jari-jari - 6): langkah = min(40, 2*(rMin-6)/(n-1)).
+      var rMin = vertikal ? Math.min(a.w, b.w) / 2
+                          : Math.min(tinggi[a.id], tinggi[b.id]) / 2;
       var langkahJalur = n <= 1 ? JARAK_JALUR
-        : Math.min(JARAK_JALUR, 2 * (ryMin - 6) / (n - 1));
+        : Math.min(JARAK_JALUR, 2 * (rMin - 6) / (n - 1));
       var dy = (i - (n - 1) / 2) * langkahJalur;
       geserLabel[idx] = dy;
       var ujung;
       if (JENIS === 'desain') {
         ujung = [a.x + a.w / 2, a.y + tinggi[a.id],
                  b.x + b.w / 2, b.y];
+      } else if (vertikal) {
+        var s, e;
+        if (a.y + tinggi[a.id] / 2 <= b.y + tinggi[b.id] / 2) {
+          s = titikElips(a, tinggi[a.id], dy, 'bawah');
+          e = titikElips(b, tinggi[b.id], dy, 'atas');
+        } else {
+          s = titikElips(a, tinggi[a.id], dy, 'atas');
+          e = titikElips(b, tinggi[b.id], dy, 'bawah');
+        }
+        ujung = [s[0], s[1], e[0], e[1]];
       } else {
         var s = titikElips(a, tinggi[a.id], dy, 'kanan'),
             e = titikElips(b, tinggi[b.id], dy, 'kiri');
@@ -435,7 +487,7 @@ document.getElementById('kanvas').addEventListener('pointermove', function (ev) 
   var pt = svg.createSVGPoint();
   pt.x = ev.clientX; pt.y = ev.clientY;
   var p = pt.matrixTransform(svg.getScreenCTM().inverse());
-  var nx = Math.max(0, Math.min(1400 - seret.k.w, p.x - seret.dx));
+  var nx = Math.max(0, Math.min(LEBAR_KANVAS - seret.k.w, p.x - seret.dx));
   var ny = Math.max(0, p.y - seret.dy);
   if (Math.abs(nx - seret.k.x) + Math.abs(ny - seret.k.y) > 2) seret.gerak = true;
   seret.k.x = Math.round(nx); seret.k.y = Math.round(ny);
