@@ -55,7 +55,7 @@ log = logging.getLogger(__name__)
 # ══════════════════════════════════════════════════════════════════════════
 # KONSTANTA GAYA
 # ══════════════════════════════════════════════════════════════════════════
-W, H = 1200, 700
+W, H = 1400, 800
 
 #  Bingkai plot (gaya modern: tanpa garis sumbu, hanya grid halus)
 X0, Y0, X1, Y1 = 130, 185, 1145, 585
@@ -443,9 +443,11 @@ def _bungkus_teks(d, teks: str, font, maks_lebar: int,
 
 def _teks_kotak(d, kotak: dict) -> None:
     """Tulis kode + nama di dalam kotak (nama dibungkus, ukuran mengecil
-    sampai muat; tidak pernah terpotong)."""
+    sampai muat; tidak pernah terpotong). Kotak digambar sebagai elips
+    (contoh skripsi Boss 18 Nov 2026), jadi kode dikecilkan supaya
+    muat di bagian atas elips yang menyempit (lebar aman 170 px)."""
     x, y, w = kotak['x'], kotak['y'], kotak['w']
-    f_kode = _font(24, True)
+    f_kode, _uk = _font_muat(str(kotak.get('kode') or ''), 170, 24)
     d.text((x + w / 2, y + 10), str(kotak.get('kode') or ''),
            font=f_kode, fill=TINTA, anchor='ma')
     f_nama, _uk = _font_muat(str(kotak.get('nama') or ''), w - 24, 24)
@@ -482,31 +484,66 @@ def _garis_panah(d, x1: float, y1: float, x2: float, y2: float,
                (ex - px * 11, ey - py * 11)], fill=TINTA)
 
 
-def _label_panah(d, x1: float, y1: float, x2: float, y2: float,
-                 label: str, geser=(0.0, 0.0)) -> None:
-    """Label hipotesis di tengah panah (kotak putih di belakang teks
-    supaya tetap terbaca walau panah bersilangan). `geser` menggeser
-    label tegak lurus segmen (untuk panah yang berbagi segmen)."""
+def _label_panah(d, cx: float, cy: float, label: str) -> None:
+    """Label hipotesis di tengah garisnya (kotak putih di belakang teks
+    supaya tetap terbaca walau panah bersilangan)."""
     if not label:
         return
-    mx, my = (x1 + x2) / 2 + geser[0], (y1 + y2) / 2 + geser[1]
     f = _font(22, True)
     kiri, atas, kanan, bawah = d.textbbox((0, 0), label, font=f)
     lw, lh = kanan - kiri, bawah - atas
-    d.rectangle([mx - lw / 2 - 6, my - lh / 2 - 4,
-                 mx + lw / 2 + 6, my + lh / 2 + 4], fill='white')
-    d.text((mx, my - lh / 2), label, font=f, fill=TINTA, anchor='ma')
+    d.rectangle([cx - lw / 2 - 6, cy - lh / 2 - 4,
+                 cx + lw / 2 + 6, cy + lh / 2 + 4], fill='white')
+    d.text((cx, cy - lh / 2), label, font=f, fill=TINTA, anchor='ma')
+
+
+# Langkah antar jalur sejajar (px, tegak): label 92x28 px, jadi celah
+# antar label 40 - 28 = 12 px (bila dijepit ke 39 px, celah 11 px).
+JARAK_JALUR = 40
+
+
+def _titik_elips(kotak: dict, dy: float, sisi: str) -> tuple:
+    """Titik di tepi elips setinggi tengah + dy ('kanan'/'kiri').
+
+    Dipakai jalur sejajar: tiap panah menempel di titiknya sendiri,
+    bukan di tengah tepi yang sama. dy dijepit supaya titik tetap
+    di elips (ry - 6).
+    """
+    cx = kotak['x'] + kotak['w'] / 2
+    cy = kotak['y'] + kotak['h'] / 2
+    rx = kotak['w'] / 2
+    ry = kotak['h'] / 2
+    dy = max(-(ry - 6), min(ry - 6, dy))
+    sisa = max(0.0, 1 - (dy / ry) ** 2)
+    x = cx + (rx * math.sqrt(sisa) if sisi == 'kanan'
+              else -rx * math.sqrt(sisa))
+    return x, cy + dy
+
+
+def _susunan_kelompok(butir: list) -> list:
+    """Susun panah satu segmen: lurus di tengah, putus-putus di
+    atas/bawah (contoh ke-3 Boss 18 Nov 2026: PL di tengah, PT di
+    atas dan bawah). Panah lewat paruh awal ke atas, paruh akhir
+    ke bawah; lurus yang tidak ada tetap urutan semula."""
+    lurus = [b for b in butir if b[2].get('gaya') == 'lurus']
+    lewat = [b for b in butir if b[2].get('gaya') != 'lurus']
+    kiri = (len(lewat) + 1) // 2
+    return lewat[:kiri] + lurus + lewat[kiri:]
 
 
 def penempatan_label(tata: dict | None) -> list:
-    """Posisi label tiap panah (untuk uji + gambar).
+    """Posisi garis + label tiap panah (untuk uji + gambar).
 
-    Panah yang berbagi segmen yang sama (dari dan ke sama) digeser
-    tegak lurus supaya labelnya tidak bertumpuk di tengah segmen
-    (cacat kosmetik 18 Nov 2026: H2 dan H6 berbagi segmen Z ke Y,
-    labelnya bersentuhan). Panah sendiri tetap di tengah (geser 0).
-    Kembalikan [{'label', 'x1', 'y1', 'x2', 'y2', 'geser', 'kiri',
-    'atas', 'kanan', 'bawah'}]; label tanpa segmen dilewati.
+    Panah yang berbagi segmen yang sama (dari dan ke sama) digambar
+    di jalurnya sendiri, bukan menumpuk persis (cacat 18 Nov 2026:
+    segmen kedua H6 terbaca lurus karena putus-putusnya menutupi
+    garis lurus H2 di bawahnya). Tiap panah menempel di titik elips
+    setinggi tengah + dy, dy = (i - (n-1)/2) * JARAK_JALUR, lurus di
+    tengah, lewat di atas/bawah (contoh ke-3 Boss). Label di tengah
+    garisnya sendiri. Panah sendiri tetap di tengah (dy 0).
+    Kembalikan [{'label', 'gaya', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy',
+    'geser', 'kiri', 'atas', 'kanan', 'bawah'}]; panah tanpa kotak
+    dilewati.
     """
     if not tata:
         return []
@@ -520,7 +557,7 @@ def penempatan_label(tata: dict | None) -> list:
     urutan: list = []
     for p in tata.get('panah') or []:
         a, b = kotak.get(p.get('dari')), kotak.get(p.get('ke'))
-        if not a or not b or not p.get('label'):
+        if not a or not b:
             continue
         kunci = (p.get('dari'), p.get('ke'))
         if kunci not in kelompok:
@@ -529,38 +566,25 @@ def penempatan_label(tata: dict | None) -> list:
         kelompok[kunci].append((a, b, p))
     keluar = []
     for kunci in urutan:
-        butir = kelompok[kunci]
-        n = len(butir)
-        lebar = tinggi = 0
-        for _a, _b, p in butir:
-            kiri, atas, kanan, bawah = d.textbbox(
-                (0, 0), p.get('label') or '', font=f)
-            lebar = max(lebar, kanan - kiri + 12)
-            tinggi = max(tinggi, bawah - atas + 8)
-        a, b, _p = butir[0]
-        x1, y1 = a['x'] + a['w'], a['y'] + a['h'] / 2
-        x2, y2 = b['x'], b['y'] + b['h'] / 2
-        dx, dy = x2 - x1, y2 - y1
-        pj = math.hypot(dx, dy) or 1.0
-        px, py = -dy / pj, dx / pj
-        # Langkah antar label: cukup supaya kotak putih tidak
-        # bersentuhan pada arah tegak lurus (pilih syarat yang lebih
-        # kecil dari keduanya, supaya label tetap dekat garis).
-        langkah = min(lebar / abs(px) if abs(px) > 1e-6 else 1e9,
-                      tinggi / abs(py) if abs(py) > 1e-6 else 1e9) + 12
-        mx, my = (x1 + x2) / 2, (y1 + y2) / 2
-        for i, (_a, _b, p) in enumerate(butir):
-            geser = (i - (n - 1) / 2) * langkah
-            cx, cy = mx + px * geser, my + py * geser
-            kiri, atas, kanan, bawah = d.textbbox(
-                (0, 0), p.get('label') or '', font=f)
+        susun = _susunan_kelompok(kelompok[kunci])
+        n = len(susun)
+        for i, (a, b, p) in enumerate(susun):
+            dy = (i - (n - 1) / 2) * JARAK_JALUR
+            x1, y1 = _titik_elips(a, dy, 'kanan')
+            x2, y2 = _titik_elips(b, dy, 'kiri')
+            mx0 = (a['x'] + a['w'] + b['x']) / 2
+            my0 = (a['y'] + a['h'] / 2 + b['y'] + b['h'] / 2) / 2
+            mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+            label = p.get('label') or ''
+            kiri, atas, kanan, bawah = d.textbbox((0, 0), label, font=f)
             lw, lh = kanan - kiri, bawah - atas
             keluar.append({
-                'label': p.get('label') or '',
+                'label': label, 'gaya': p.get('gaya') or 'lurus',
                 'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2,
-                'geser': (px * geser, py * geser),
-                'kiri': cx - lw / 2 - 6, 'atas': cy - lh / 2 - 4,
-                'kanan': cx + lw / 2 + 6, 'bawah': cy + lh / 2 + 4})
+                'cx': mx, 'cy': my,
+                'geser': (mx - mx0, my - my0),
+                'kiri': mx - lw / 2 - 6, 'atas': my - lh / 2 - 4,
+                'kanan': mx + lw / 2 + 6, 'bawah': my + lh / 2 + 4})
     return keluar
 
 
@@ -575,24 +599,21 @@ def gambar_panah(model: dict, tata: dict | None = None) -> bytes:
         return b''
     g = Image.new('RGB', (W, H), LATAR)
     d = ImageDraw.Draw(g)
-    peta_kotak = {k['id']: k for k in kotak}
-    #  panah dulu (di bawah kotak), lalu kotak, lalu label.
-    for p in tata.get('panah') or []:
-        a, b = peta_kotak.get(p.get('dari')), peta_kotak.get(p.get('ke'))
-        if not a or not b:
-            continue
-        _garis_panah(d, a['x'] + a['w'], a['y'] + a['h'] / 2,
-                     b['x'], b['y'] + b['h'] / 2,
-                     putus=(p.get('gaya') in ('putus', 'lewat')))
+    #  panah dulu (di bawah kotak), lalu kotak, lalu label. Garis tiap
+    #  panah dari penempatan_label (jalur sendiri bila berbagi segmen),
+    #  supaya putus-putus tidak menutupi garis lurus di bawahnya.
+    penempatan = penempatan_label(tata)
+    for pl in penempatan:
+        _garis_panah(d, pl['x1'], pl['y1'], pl['x2'], pl['y2'],
+                     putus=(pl.get('gaya') in ('putus', 'lewat')))
     for k in kotak:
         warna = WARNA_PERAN.get(str(k.get('peran') or 'X'), TEAL)
-        d.rounded_rectangle([k['x'], k['y'], k['x'] + k['w'],
-                             k['y'] + k['h']], radius=12,
-                            outline=warna, width=4, fill='white')
+        d.ellipse([k['x'], k['y'], k['x'] + k['w'],
+                   k['y'] + k['h']],
+                  outline=warna, width=4, fill='white')
         _teks_kotak(d, k)
-    for pl in penempatan_label(tata):
-        _label_panah(d, pl['x1'], pl['y1'], pl['x2'], pl['y2'],
-                     pl['label'], pl['geser'])
+    for pl in penempatan:
+        _label_panah(d, pl['cx'], pl['cy'], pl['label'])
     buf = io.BytesIO()
     g.save(buf, 'PNG', optimize=True)
     return buf.getvalue()

@@ -20,6 +20,7 @@ Aturan yang diuji (RENCANA_DIAGRAM_MODEL_DESAIN.md + keputusan Boss):
   (bukan AI), gratis, bagian dari 1 token gambar Desain.
   Sederhana (Boss 17 Nov 09:26 WIB): label pendek Bahasa Indonesia polos.
 """
+import io
 import os
 import sys
 import tempfile
@@ -47,6 +48,7 @@ def cek(nama, benar, info=''):
 
 
 from docx import Document as _Docx
+from PIL import Image as _Image
 
 from app import bagian_awal as BA
 from app import diagram as DG
@@ -367,8 +369,8 @@ def jalankan():
     cek('tata Nura: 4 kotak (X1, X2, Z, Y)',
         len(tata['kotak']) == 4 and set(kotak) == {'X1', 'X2', 'Z', 'Y'})
     cek('tata Nura: X kiri, Z bawah tengah, Y kanan',
-        kotak['X1']['x'] == 60 and kotak['Z']['x'] == 450
-        and kotak['Z']['y'] == 520 and kotak['Y']['x'] == 840)
+        kotak['X1']['x'] == 60 and kotak['Z']['x'] == 550
+        and kotak['Z']['y'] == 600 and kotak['Y']['x'] == 1040)
     cek('tata Nura: 7 panah (H6/H7 tidak langsung digambar putus-putus)',
         len(tata['panah']) == 7 and
         sorted(p['label'] for p in tata['panah']) ==
@@ -866,16 +868,14 @@ def jalankan():
     cek('label Nura lewat Z: tidak ada pasangan bertumpuk (PNG, 36 pasang)',
         not tumpang_nl, str(tumpang_nl))
 
-    def _segmen_sama(a, b):
-        return (a['x1'], a['y1'], a['x2'], a['y2']) == (
-            b['x1'], b['y1'], b['x2'], b['y2'])
-
     def _pasangan(label_a, label_b):
+        # Pasangan dicari berdasarkan label saja (garisnya kini memang
+        # beda: tiap panah punya jalurnya sendiri, bukan satu segmen).
         for a in pl_nl:
             if a['label'] != label_a:
                 continue
             for b in pl_nl:
-                if b['label'] == label_b and _segmen_sama(a, b):
+                if b['label'] == label_b:
                     return a, b
         return None, None
 
@@ -903,6 +903,110 @@ def jalankan():
         "dataset.kunci = 'null'" in _badan_pilih)
 
     cek('harga 1 token per gambar', DG.HARGA_GAMBAR == 1)
+
+    # ── 10. Rapikan tampilan (contoh skripsi Boss 18 Nov 09:41) ───────
+    # Oval (bukan kotak bersudut), jarak lega, jalur sejajar (lurus di
+    # tengah, putus-putus di atas/bawah, contoh ke-3), putus-putus di
+    # kedua segmen, celah label minimal 10 px.
+    def _celah(a, b):
+        import math as _m
+        gx = max(b['kiri'] - a['kanan'], a['kiri'] - b['kanan'], 0)
+        gy = max(b['atas'] - a['bawah'], a['atas'] - b['bawah'], 0)
+        if gx == 0 and gy == 0:
+            return -min(a['kanan'] - b['kiri'], b['kanan'] - a['kiri'],
+                        a['bawah'] - b['atas'], b['bawah'] - a['atas'])
+        return _m.hypot(gx, gy)
+
+    def _celah_min(pl):
+        return min((_celah(a, b)
+                    for i, a in enumerate(pl) for b in pl[i + 1:]),
+                   default=999.0)
+
+    def _garis_unik(pl):
+        temu = {}
+        for p in pl:
+            temu.setdefault((round(p['x1'], 1), round(p['y1'], 1),
+                             round(p['x2'], 1), round(p['y2'], 1)),
+                            []).append(p['label'])
+        return {k: v for k, v in temu.items() if len(v) > 1}
+
+    def _fraksi_terang(png, pl, p):
+        # Fraksi titik terang di tengah 60% garis (lewati kotak label):
+        # garis putus-putus ~0,5, garis lurus ~0.
+        im = _Image.open(io.BytesIO(png)).convert('RGB')
+        terang = gelap = 0
+        for t in range(41):
+            f = 0.2 + 0.6 * t / 40
+            x = p['x1'] + (p['x2'] - p['x1']) * f
+            y = p['y1'] + (p['y2'] - p['y1']) * f
+            if any(q['kiri'] - 2 <= x <= q['kanan'] + 2 and
+                   q['atas'] - 2 <= y <= q['bawah'] + 2 for q in pl):
+                continue
+            r, g, b = im.getpixel((int(x), int(y)))
+            if r + g + b < 450:
+                gelap += 1
+            else:
+                terang += 1
+        return terang / max(1, terang + gelap)
+
+    # Oval: sudut kotak X1 latar (bukan garis tepi), tengah atas kotak
+    # garis tepi. Warna latar #FBFCFD, tepi X teal #1D7A8C.
+    _png81 = GB.gambar_panah(model81, tata81)
+    _im81 = _Image.open(io.BytesIO(_png81)).convert('RGB')
+    _kx = next(k for k in tata81['kotak'] if k['id'] == 'X1')
+    cek('kotak jadi elips (sudut latar, tengah atas garis tepi)',
+        _im81.getpixel((_kx['x'] + 20, _kx['y'] + 2)) == (251, 252, 253)
+        and _im81.getpixel((_kx['x'] + 150, _kx['y'] + 2))[1] < 200,
+        str(_im81.getpixel((_kx['x'] + 20, _kx['y'] + 2))))
+    cek('editor menggambar kotak model sebagai elips (bukan rect)',
+        'ellipse' in isi_editor
+        and "JENIS === 'model'" in isi_editor)
+    # Jalur sejajar: tiap panah punya garis sendiri (tidak menumpuk).
+    cek('Asih: tiap panah punya garis sendiri (tidak menumpuk)',
+        not _garis_unik(pl81), str(_garis_unik(pl81)))
+    cek('Nura lewat Z: tiap panah punya garis sendiri (tidak menumpuk)',
+        not _garis_unik(pl_nl), str(_garis_unik(pl_nl)))
+    # Putus-putus di kedua segmen H6/H7, lurus tetap lurus (piksel).
+    _seg_h6_81 = [p for p in pl81 if p['label'] == 'H6 (+)']
+    _seg_h2_81 = [p for p in pl81 if p['label'] == 'H2 (+)']
+    cek('Asih: H6 putus-putus di kedua segmen, H2 lurus (piksel)',
+        len(_seg_h6_81) == 2
+        and all(_fraksi_terang(_png81, pl81, p) >= 0.25
+                for p in _seg_h6_81)
+        and all(_fraksi_terang(_png81, pl81, p) <= 0.10
+                for p in _seg_h2_81),
+        str([round(_fraksi_terang(_png81, pl81, p), 2)
+             for p in _seg_h6_81 + _seg_h2_81]))
+    _png_nl = GB.gambar_panah(model_nl, tata_nl)
+    _seg_nl = {lab: [p for p in pl_nl if p['label'] == lab]
+               for lab in ('H6 (+)', 'H7 (+)', 'H3 (+)')}
+    cek('Nura: H6/H7 putus-putus di kedua segmen, H3 lurus (piksel)',
+        all(_fraksi_terang(_png_nl, pl_nl, p) >= 0.25
+            for lab in ('H6 (+)', 'H7 (+)') for p in _seg_nl[lab])
+        and all(_fraksi_terang(_png_nl, pl_nl, p) <= 0.10
+                for p in _seg_nl['H3 (+)']),
+        str({lab: [round(_fraksi_terang(_png_nl, pl_nl, p), 2)
+                   for p in ps] for lab, ps in _seg_nl.items()}))
+    # Celah minimum antar label minimal 10 px (bukan 4,5 px).
+    cek('Nura lewat Z: celah label minimal 10 px',
+        _celah_min(pl_nl) >= 10, str(round(_celah_min(pl_nl), 1)))
+    cek('Asih: celah label minimal 10 px',
+        _celah_min(pl81) >= 10, str(round(_celah_min(pl81), 1)))
+    # Label tidak menyentuh kotak lain.
+    def _jarak_label_kotak(pl, tata):
+        def _jarak(p, k):
+            dx = max(k['x'] - p['kanan'], p['kiri'] - (k['x'] + k['w']), 0)
+            dy = max(k['y'] - p['bawah'], p['atas'] - (k['y'] + k['h']), 0)
+            import math as _m
+            return _m.hypot(dx, dy)
+        return min((_jarak(p, k) for p in pl for k in tata['kotak']),
+                   default=999.0)
+    cek('Nura lewat Z: label tidak menyentuh kotak',
+        _jarak_label_kotak(pl_nl, tata_nl) > 0,
+        str(round(_jarak_label_kotak(pl_nl, tata_nl), 1)))
+    cek('Asih: label tidak menyentuh kotak',
+        _jarak_label_kotak(pl81, tata81) > 0,
+        str(round(_jarak_label_kotak(pl81, tata81), 1)))
 
 
 if __name__ == '__main__':

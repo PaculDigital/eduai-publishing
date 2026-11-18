@@ -65,8 +65,8 @@ LANGKAH_DESAIN = {
                  'Simpulkan'],
 }
 
-KANVAS_LEBAR = 1200
-KANVAS_TINGGI = 700
+KANVAS_LEBAR = 1400
+KANVAS_TINGGI = 800
 LEBAR_KOTAK = 300
 
 
@@ -315,13 +315,15 @@ def _tinggi_muat(nama: str, lebar: int = LEBAR_KOTAK) -> int:
 
 
 def tata_letak(model: dict) -> dict:
-    """Tata letak deterministik: kotak + panah dalam kanvas 1200x700.
+    """Tata letak deterministik: kotak + panah dalam kanvas 1400x800.
 
     X di kiri, Y di kanan, Z di bawah tengah (supaya panah langsung
-    X ke Y tidak menabrak kotak Z). Panah 'tidak_langsung' digambar
-    putus-putus: dua segmen (Dari ke Lewat, Lewat ke Ke) bila ada
-    Lewat, satu segmen (Dari ke Ke) bila tidak ada; tiap segmen
-    berlabel hipotesisnya, supaya H6/H7 terlihat di draf.
+    X ke Y tidak menabrak kotak Z). Kolom dilegakan (celah 190 px)
+    seperti contoh skripsi Boss 18 Nov 2026: oval besar, jarak lega.
+    Panah 'tidak_langsung' digambar putus-putus: dua segmen (Dari ke
+    Lewat, Lewat ke Ke) bila ada Lewat, satu segmen (Dari ke Ke) bila
+    tidak ada; tiap segmen berlabel hipotesisnya, supaya H6/H7
+    terlihat di draf.
     """
     variabel = model.get('variabel') or []
     xs = [v for v in variabel if v['peran'] == 'X']
@@ -332,20 +334,20 @@ def tata_letak(model: dict) -> dict:
 
     def _y_x(i: int) -> int:
         if n_x == 1:
-            return 305
-        return round(110 + i * (390 / (n_x - 1)))
+            return 355
+        return round(140 + i * (420 / (n_x - 1)))
 
     # Posisi Y kolom X yang padat: tinggi mengikuti nama, celah 14 px,
-    # kolom di tengah (y=350); bila kolom lebih tinggi dari kanvas,
+    # kolom di tengah (y=400); bila kolom lebih tinggi dari kanvas,
     # celah ditekan ke 6 px dan atas ditekan ke 20.
     if n_x > 4:
         _hs_padat = [_tinggi_muat(v['nama']) for v in xs]
         _celah = 14
         _total = sum(_hs_padat) + (n_x - 1) * _celah
-        if _total > 660:
-            _celah = max(6, (660 - sum(_hs_padat)) // max(1, n_x - 1))
+        if _total > 760:
+            _celah = max(6, (760 - sum(_hs_padat)) // max(1, n_x - 1))
             _total = sum(_hs_padat) + (n_x - 1) * _celah
-        _y0 = max(20, 350 - _total // 2)
+        _y0 = max(20, 400 - _total // 2)
         _y_x_padat = []
         _yy = _y0
         for _h in _hs_padat:
@@ -371,11 +373,11 @@ def tata_letak(model: dict) -> dict:
                       'w': LEBAR_KOTAK, 'h': h})
     for v in zs:
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
-                      'peran': 'Z', 'x': 450, 'y': 520,
+                      'peran': 'Z', 'x': 550, 'y': 600,
                       'w': LEBAR_KOTAK, 'h': tinggi_kotak(v['nama'])})
     for v in ys:
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
-                      'peran': 'Y', 'x': 840, 'y': 305,
+                      'peran': 'Y', 'x': 1040, 'y': 355,
                       'w': LEBAR_KOTAK, 'h': tinggi_kotak(v['nama'])})
     panah: list[dict] = []
     for j in model.get('jalur') or []:

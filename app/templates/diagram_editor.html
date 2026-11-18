@@ -24,7 +24,7 @@
 <p>Geser kotak untuk mengatur letak. Klik kotak untuk mengubah tulisannya.</p>
 <div id="pesan" class="pesan" hidden></div>
 <div id="galat" class="galat" hidden></div>
-<svg id="kanvas" viewBox="0 0 1200 {{ tinggi }}">
+<svg id="kanvas" viewBox="0 0 1400 {{ tinggi }}">
   <defs>
     <marker id="panah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#10222e"></path>
@@ -107,6 +107,25 @@ function tinggiTampil(k) {
   var maks = k.w > 400 ? 30 : 18;
   return Math.max(k.h, bungkus(k.nama, maks).length >= 2 ? 110 : 90);
 }
+function titikElips(k, h, dy, sisi) {
+  // Titik di tepi elips setinggi tengah + dy ('kanan'/'kiri'), sama
+  // dengan _titik_elips di app/gambar.py. dy dijepit supaya titik
+  // tetap di elips (ry - 6).
+  var cx = k.x + k.w / 2, cy = k.y + h / 2;
+  var rx = k.w / 2, ry = h / 2;
+  dy = Math.max(-(ry - 6), Math.min(ry - 6, dy));
+  var sisa = Math.max(0, 1 - (dy / ry) * (dy / ry));
+  var x = cx + (sisi === 'kanan' ? rx * Math.sqrt(sisa)
+                                  : -rx * Math.sqrt(sisa));
+  return [x, cy + dy];
+}
+function susunanKelompok(idxs, daftar) {
+  // Lurus di tengah, putus-putus di atas/bawah (contoh ke-3 Bos).
+  var lurus = idxs.filter(function (i) { return daftar[i].gaya === 'lurus'; });
+  var lewat = idxs.filter(function (i) { return daftar[i].gaya !== 'lurus'; });
+  var kiri = Math.ceil(lewat.length / 2);
+  return lewat.slice(0, kiri).concat(lurus, lewat.slice(kiri));
+}
 function panahUntuk() {
   if (JENIS === 'desain') {
     var urut = state.kotak.slice().sort(function (a, b) { return a.y - b.y; });
@@ -124,9 +143,12 @@ function gambarUlang() {
   var peta = {};
   var tinggi = {};
   state.kotak.forEach(function (k) { peta[k.id] = k; tinggi[k.id] = tinggiTampil(k); });
-  // Geser label tegak lurus untuk panah yang berbagi segmen yang sama
-  // (cacat kosmetik 18 Nov 2026: label H2 dan H6 bertumpuk di Z ke Y).
-  // Panah sendiri tetap di tengah (geser 0); panah lewat sendiri tetap
+  // Jalur sejajar untuk panah yang berbagi segmen yang sama (18 Nov
+  // 2026: segmen kedua H6 terbaca lurus karena putus-putusnya menutupi
+  // garis lurus H2 di bawahnya). Tiap panah menempel di titik elips
+  // setinggi tengah + dy, lurus di tengah, lewat di atas/bawah
+  // (contoh ke-3 Bos). Label di tengah garisnya sendiri. Panah
+  // sendiri tetap di tengah (dy 0); panah lewat sendiri tetap
   // bengkok 30 px seperti dulu.
   var daftar = panahUntuk();
   var kelompok = {};
@@ -137,52 +159,52 @@ function gambarUlang() {
     if (!kelompok[kunci]) kelompok[kunci] = [];
     kelompok[kunci].push(idx);
   });
+  var JARAK_JALUR = 40;
   var geserLabel = {};
+  var garis = {};
+  var anggota = {};
   Object.keys(kelompok).forEach(function (kunci) {
-    var idxs = kelompok[kunci];
-    if (idxs.length < 2) return;
-    var p0 = daftar[idxs[0]];
-    var a = peta[p0.dari], b = peta[p0.ke];
-    var x1 = a.x + a.w, y1 = a.y + tinggi[a.id] / 2, x2 = b.x, y2 = b.y + tinggi[b.id] / 2;
-    if (JENIS === 'desain') { x1 = a.x + a.w / 2; y1 = a.y + tinggi[a.id]; x2 = b.x + b.w / 2; y2 = b.y; }
-    var dx = x2 - x1, dy = y2 - y1;
-    var pj = Math.sqrt(dx * dx + dy * dy) || 1;
-    var px = -dy / pj, py = dx / pj;
-    var lebar = 0;
-    idxs.forEach(function (idx) {
-      lebar = Math.max(lebar, (daftar[idx].label || '').length * 13 + 12);
-    });
-    var tinggiLab = 30;
-    var langkah = Math.min(
-      Math.abs(px) > 1e-6 ? lebar / Math.abs(px) : 1e9,
-      Math.abs(py) > 1e-6 ? tinggiLab / Math.abs(py) : 1e9) + 12;
+    var idxs = susunanKelompok(kelompok[kunci], daftar);
+    var n = idxs.length;
     idxs.forEach(function (idx, i) {
-      geserLabel[idx] = (i - (idxs.length - 1) / 2) * langkah;
+      var p = daftar[idx];
+      var a = peta[p.dari], b = peta[p.ke];
+      var dy = (i - (n - 1) / 2) * JARAK_JALUR;
+      geserLabel[idx] = dy;
+      anggota[idx] = n;
+      var ujung;
+      if (JENIS === 'desain') {
+        ujung = [a.x + a.w / 2, a.y + tinggi[a.id],
+                 b.x + b.w / 2, b.y];
+      } else {
+        var s = titikElips(a, tinggi[a.id], dy, 'kanan'),
+            e = titikElips(b, tinggi[b.id], dy, 'kiri');
+        ujung = [s[0], s[1], e[0], e[1]];
+      }
+      garis[idx] = {x1: ujung[0], y1: ujung[1], x2: ujung[2],
+                    y2: ujung[3],
+                    lx: (ujung[0] + ujung[2]) / 2,
+                    ly: (ujung[1] + ujung[3]) / 2};
     });
   });
   daftar.forEach(function (p, idx) {
     var a = peta[p.dari], b = peta[p.ke];
-    if (!a || !b) return;
-    var x1 = a.x + a.w, y1 = a.y + tinggi[a.id] / 2, x2 = b.x, y2 = b.y + tinggi[b.id] / 2;
-    if (JENIS === 'desain') { x1 = a.x + a.w / 2; y1 = a.y + tinggi[a.id]; x2 = b.x + b.w / 2; y2 = b.y; }
-    var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-    var dx = x2 - x1, dy = y2 - y1;
-    var pj = Math.sqrt(dx * dx + dy * dy) || 1;
-    var px = -dy / pj, py = dx / pj;
-    var geser = geserLabel[idx];
+    if (!a || !b || !garis[idx]) return;
+    var u = garis[idx];
+    var mx = u.lx, my = u.ly;
     var g;
-    if (p.gaya === 'lewat') {
-      // Jalur lewat: bengkok lewat titik tengah yang digeser tegak
-      // lurus, putus-putus, supaya dua segmen H6/H7 terlihat sebagai
-      // jalur lewat Z, bukan garis lurus. Bila berbagi segmen, titik
-      // bengkok mengikuti geser labelnya supaya label tetap di jalur.
-      var bengkok = (geser === undefined) ? 30 : geser;
-      mx = mx + px * bengkok; my = my + py * bengkok;
-      g = el('path', {d: 'M ' + x1 + ' ' + y1 + ' L ' + mx + ' ' + my + ' L ' + x2 + ' ' + y2, fill: 'none', stroke: '#10222e', 'stroke-width': 4, 'stroke-dasharray': '12 10', 'marker-end': 'url(#panah)'});
+    if (p.gaya === 'lewat' && anggota[idx] === 1) {
+      // Jalur lewat sendiri: bengkok lewat titik tengah yang digeser
+      // tegak lurus 30 px, putus-putus, supaya terlihat sebagai jalur
+      // lewat, bukan garis lurus.
+      var dx = u.x2 - u.x1, dy = u.y2 - u.y1;
+      var pj = Math.sqrt(dx * dx + dy * dy) || 1;
+      var px = -dy / pj, py = dx / pj;
+      mx = mx + px * 30; my = my + py * 30;
+      g = el('path', {d: 'M ' + u.x1 + ' ' + u.y1 + ' L ' + mx + ' ' + my + ' L ' + u.x2 + ' ' + u.y2, fill: 'none', stroke: '#10222e', 'stroke-width': 4, 'stroke-dasharray': '12 10', 'marker-end': 'url(#panah)'});
     } else {
-      g = el('line', {x1: x1, y1: y1, x2: x2, y2: y2, stroke: '#10222e', 'stroke-width': 4, 'marker-end': 'url(#panah)'});
-      if (p.gaya === 'putus') g.setAttribute('stroke-dasharray', '12 10');
-      if (geser !== undefined) { mx = mx + px * geser; my = my + py * geser; }
+      g = el('line', {x1: u.x1, y1: u.y1, x2: u.x2, y2: u.y2, stroke: '#10222e', 'stroke-width': 4, 'marker-end': 'url(#panah)'});
+      if (p.gaya === 'putus' || p.gaya === 'lewat') g.setAttribute('stroke-dasharray', '12 10');
     }
     lp.appendChild(g);
     if (p.label) {
@@ -193,7 +215,11 @@ function gambarUlang() {
   });
   state.kotak.forEach(function (k) {
     var g = el('g', {id: 'kotak-' + k.id, style: 'cursor: move'});
-    var r = el('rect', {x: k.x, y: k.y, width: k.w, height: tinggi[k.id], rx: 12, fill: 'white', stroke: WARNA[k.peran] || '#1d7a8c', 'stroke-width': 4});
+    if (JENIS === 'model') {
+      var r = el('ellipse', {cx: k.x + k.w / 2, cy: k.y + tinggi[k.id] / 2, rx: k.w / 2, ry: tinggi[k.id] / 2, fill: 'white', stroke: WARNA[k.peran] || '#1d7a8c', 'stroke-width': 4});
+    } else {
+      var r = el('rect', {x: k.x, y: k.y, width: k.w, height: tinggi[k.id], rx: 12, fill: 'white', stroke: WARNA[k.peran] || '#1d7a8c', 'stroke-width': 4});
+    }
     g.appendChild(r);
     var maks = k.w > 400 ? 30 : 18;
     var baris = bungkus(k.nama, maks);
@@ -232,7 +258,7 @@ document.getElementById('kanvas').addEventListener('pointermove', function (ev) 
   var pt = svg.createSVGPoint();
   pt.x = ev.clientX; pt.y = ev.clientY;
   var p = pt.matrixTransform(svg.getScreenCTM().inverse());
-  var nx = Math.max(0, Math.min(1200 - seret.k.w, p.x - seret.dx));
+  var nx = Math.max(0, Math.min(1400 - seret.k.w, p.x - seret.dx));
   var ny = Math.max(0, p.y - seret.dy);
   if (Math.abs(nx - seret.k.x) + Math.abs(ny - seret.k.y) > 2) seret.gerak = true;
   seret.k.x = Math.round(nx); seret.k.y = Math.round(ny);
