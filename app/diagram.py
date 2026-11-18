@@ -277,19 +277,41 @@ def bentuk_model(model: dict) -> str:
     return 'langsung'
 
 
+def tinggi_kotak(nama: str, lebar: int = LEBAR_KOTAK) -> int:
+    """Tinggi kotak supaya nama muat di dalamnya (tidak terpotong).
+
+    Aturan bungkus sama dengan editor (maks 18 karakter per baris
+    untuk lebar 300, 30 untuk lebar 600): 1 baris = 90, 2 baris = 110
+    (baris kedua berakhir di y+98 di PNG dan y+91 di editor).
+    """
+    maks = 30 if lebar > 400 else 18
+    kata = str(nama or '').split()
+    baris = 1
+    kini = ''
+    for k in kata:
+        coba = (kini + ' ' + k).strip()
+        if len(coba) <= maks or not kini:
+            kini = coba
+        else:
+            baris += 1
+            kini = k
+    return 110 if baris >= 2 else 90
+
+
 def tata_letak(model: dict) -> dict:
     """Tata letak deterministik: kotak + panah dalam kanvas 1200x700.
 
     X di kiri, Y di kanan, Z di bawah tengah (supaya panah langsung
-    X ke Y tidak menabrak kotak Z). Panah 'tidak_langsung' tidak
-    digambar sendiri (jalurnya lewat Z, sudah terlihat di gambar).
+    X ke Y tidak menabrak kotak Z). Panah 'tidak_langsung' digambar
+    putus-putus: dua segmen (Dari ke Lewat, Lewat ke Ke) bila ada
+    Lewat, satu segmen (Dari ke Ke) bila tidak ada; tiap segmen
+    berlabel hipotesisnya, supaya H6/H7 terlihat di draf.
     """
     variabel = model.get('variabel') or []
     xs = [v for v in variabel if v['peran'] == 'X']
     zs = [v for v in variabel if v['peran'] == 'Z']
     ys = [v for v in variabel if v['peran'] == 'Y']
     n_x = max(1, len(xs))
-    tinggi = 90 if n_x <= 4 else 64
     kotak: list[dict] = []
 
     def _y_x(i: int) -> int:
@@ -298,24 +320,35 @@ def tata_letak(model: dict) -> dict:
         return round(110 + i * (390 / (n_x - 1)))
 
     for i, v in enumerate(xs):
+        # Kolom X yang padat (5 X ke atas) tetap ramping 64 supaya
+        # kotak tidak tumpang tindih; sisanya setinggi nama.
+        h = 64 if n_x > 4 else tinggi_kotak(v['nama'])
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
                       'peran': 'X', 'x': 60, 'y': _y_x(i),
-                      'w': LEBAR_KOTAK, 'h': tinggi})
+                      'w': LEBAR_KOTAK, 'h': h})
     for v in zs:
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
                       'peran': 'Z', 'x': 450, 'y': 520,
-                      'w': LEBAR_KOTAK, 'h': tinggi})
+                      'w': LEBAR_KOTAK, 'h': tinggi_kotak(v['nama'])})
     for v in ys:
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
                       'peran': 'Y', 'x': 840, 'y': 305,
-                      'w': LEBAR_KOTAK, 'h': tinggi})
+                      'w': LEBAR_KOTAK, 'h': tinggi_kotak(v['nama'])})
     panah: list[dict] = []
     for j in model.get('jalur') or []:
-        if j.get('jenis') == 'tidak_langsung':
-            continue
         label = j['hipotesis']
         if j.get('arah'):
             label = f"{label} ({j['arah']})"
+        if j.get('jenis') == 'tidak_langsung':
+            if j.get('lewat'):
+                panah.append({'dari': j['dari'], 'ke': j['lewat'],
+                              'label': label, 'gaya': 'lewat'})
+                panah.append({'dari': j['lewat'], 'ke': j['ke'],
+                              'label': label, 'gaya': 'lewat'})
+            else:
+                panah.append({'dari': j['dari'], 'ke': j['ke'],
+                              'label': label, 'gaya': 'lewat'})
+            continue
         panah.append({'dari': j['dari'], 'ke': j['ke'], 'label': label,
                       'gaya': 'putus' if j.get('jenis') == 'interaksi'
                       else 'lurus'})
@@ -354,9 +387,18 @@ def tata_dari_kotak(kotak, panah, jenis: str = 'model') -> tuple:
         if kid in id_ada:
             kid = f'{kid}_{len(bersih) + 1}'
         id_ada.add(kid)
+        # Tinggi mengikuti nama (kotak 2 baris = 110), supaya teks
+        # tidak terpotong sesudah kotak digeser atau diubah tulisannya;
+        # tinggi yang dikirim editor tidak boleh lebih pendek dari itu.
+        try:
+            h_kirim = int(k.get('h') or 90)
+        except (TypeError, ValueError):
+            h_kirim = 90
+        h = h_kirim if jenis == 'desain' else max(
+            h_kirim, tinggi_kotak(nama, LEBAR_KOTAK))
         bersih.append({'id': kid, 'nama': nama, 'kode': kid,
                        'peran': peran, 'x': x, 'y': y,
-                       'w': LEBAR_KOTAK, 'h': 90})
+                       'w': LEBAR_KOTAK, 'h': h})
     if not bersih:
         return None, ['Belum ada kotak di gambar.']
     if jenis == 'model':
@@ -375,8 +417,8 @@ def tata_dari_kotak(kotak, panah, jenis: str = 'model') -> tuple:
             continue
         panah_bersih.append({'dari': dari, 'ke': ke,
                              'label': _rapi(p.get('label')),
-                             'gaya': 'putus' if p.get('gaya') == 'putus'
-                             else 'lurus'})
+                             'gaya': p.get('gaya') if p.get('gaya') in (
+                                 'putus', 'lewat') else 'lurus'})
     if masalah:
         return None, masalah
     return {'kotak': bersih, 'panah': panah_bersih,
@@ -424,6 +466,34 @@ def model_dari_peta_bab4(peta: dict) -> dict | None:
 
 
 # ── Periksa gambar yang sudah ada (poin 2 rencana) ────────────────────
+def _baca_dokumen(path):
+    """(doc, cocok, teks_par, nomor_par, lain) dari docx; None bila
+    tak terbaca. nomor_par = nomor efektif tiap paragraf dari
+    penomoran otomatis (numPr); '' untuk paragraf tanpa penomoran.
+    Daftar paragraf yang sama dipakai untuk teks dan nomor supaya
+    sejajar; `lain` = isi zip selain document.xml (untuk tulis ulang).
+    """
+    from .gambar import _penomoran_dari_zip, nomor_untuk_paragraf
+    from .pustaka_periksa import _RE_P, _teks_par_xml
+    path = Path(path)
+    if not path.exists():
+        return None
+    try:
+        with zipfile.ZipFile(path) as z:
+            nama = z.namelist()
+            doc = z.read('word/document.xml').decode('utf-8')
+            penomoran = _penomoran_dari_zip(z)
+            lain = {n: z.read(n) for n in nama
+                    if n != 'word/document.xml'}
+    except Exception:                                      # noqa: BLE001
+        return None
+    cocok = list(_RE_P.finditer(doc))
+    teks_par = [_teks_par_xml(m.group(0)) for m in cocok]
+    nomor_par = nomor_untuk_paragraf([m.group(0) for m in cocok],
+                                     penomoran)
+    return doc, cocok, teks_par, nomor_par, lain
+
+
 def periksa_gambar(path, bagian: str, judul_harapan: str) -> dict:
     """Periksa gambar di satu bagian naskah.
 
@@ -433,41 +503,24 @@ def periksa_gambar(path, bagian: str, judul_harapan: str) -> dict:
     'meragukan' (ada tapi keterangan salah/tidak ada),
     'tidak_ada' (belum ada gambar).
     """
-    from .gambar import _cocok_judul
-    from .pustaka_periksa import _RE_P, _teks_par_xml
-    path = Path(path)
-    if not path.exists():
+    from .gambar import rentang_bagian
+    baca = _baca_dokumen(path)
+    if baca is None:
+        path = Path(path)
+        if not path.exists():
+            return {'ada': False, 'keterangan': [], 'vonis': 'tidak_ada',
+                    'sebab': 'berkas tidak ada'}
         return {'ada': False, 'keterangan': [], 'vonis': 'tidak_ada',
-                'sebab': 'berkas tidak ada'}
-    try:
-        with zipfile.ZipFile(path) as z:
-            doc = z.read('word/document.xml').decode('utf-8')
-    except Exception as e:                                      # noqa: BLE001
-        return {'ada': False, 'keterangan': [], 'vonis': 'tidak_ada',
-                'sebab': f'berkas tidak bisa dibaca: {e}'}
-    cocok = list(_RE_P.finditer(doc))
-    teks_par = [_teks_par_xml(m.group(0)) for m in cocok]
-    awal = None
-    for i, t in enumerate(teks_par):
-        if _cocok_judul(t, bagian):
-            awal = i
-            break
+                'sebab': 'berkas tidak bisa dibaca'}
+    _doc, cocok, teks_par, nomor_par, _lain = baca
+    awal, akhir = rentang_bagian(
+        [m.group(0) for m in cocok], teks_par, nomor_par, bagian)
     if awal is None:
         return {'ada': False, 'keterangan': [], 'vonis': 'tidak_ada',
                 'sebab': f'Bagian {bagian} tidak ditemukan di naskah.'}
-    akhir = len(teks_par)
-    for i in range(awal + 1, len(teks_par)):
-        t = teks_par[i]
-        if re.match(r'^\d+\.\d+\s+\S', t) and len(t) < 90:
-            akhir = i
-            break
-        if re.match(r'^BAB\s+(?:[IVX]+|\d+)\b', t.strip(),
-                    re.IGNORECASE):
-            akhir = i
-            break
     keterangan: list[str] = []
     ada_gambar = False
-    pola_cap = re.compile(r'^\s*Gambar\s+\d+\.\d+\b.*', re.IGNORECASE)
+    pola_cap = re.compile(r'^\s*Gambar\s+\d+\.\s*\d+\b.*', re.IGNORECASE)
     for i in range(awal, akhir):
         xml = cocok[i].group(0)
         if '<w:drawing' in xml:
@@ -493,53 +546,51 @@ def buang_gambar_bagian(path, bagian: str, judul_harapan: str) -> dict:
 
     Hanya dipakai saat mahasiswa menekan Perbarui lalu Selesai (bukan
     diam-diam): gambar lama diganti gambar baru atas perintahnya.
-    Yang dibuang hanya paragraf gambar + keterangan yang judulnya
-    cocok; berkas media lama dibiarkan di dalam zip (tidak terpakai,
-    tidak merusak dokumen).
+    Yang dibuang: pasangan gambar + keterangan yang judulnya cocok;
+    bila bagian ini hanya punya SATU gambar, gambar itu beserta
+    keterangannya (gambar milik bagian ini apa pun keterangannya,
+    supaya tidak ada duplikat; gambar milik mahasiswa yang
+    keterangannya "Desain Penelitian" ikut terbuang saat diganti
+    gambar "Alur Penelitian"). Berkas media lama dibiarkan di dalam
+    zip (tidak terpakai, tidak merusak dokumen).
     """
-    from .gambar import _cocok_judul
-    from .pustaka_periksa import _RE_P, _teks_par_xml
+    from .gambar import rentang_bagian
     path = Path(path)
     if not path.exists():
         return {'ok': False, 'dibuang': 0, 'sebab': 'berkas tidak ada'}
-    try:
-        with zipfile.ZipFile(path) as z:
-            nama = z.namelist()
-            doc = z.read('word/document.xml').decode('utf-8')
-            lain = {n: z.read(n) for n in nama if n != 'word/document.xml'}
-    except Exception as e:                                      # noqa: BLE001
+    baca = _baca_dokumen(path)
+    if baca is None:
         return {'ok': False, 'dibuang': 0,
-                'sebab': f'berkas tidak bisa dibaca: {e}'}
-    cocok = list(_RE_P.finditer(doc))
-    teks_par = [_teks_par_xml(m.group(0)) for m in cocok]
-    awal = None
-    for i, t in enumerate(teks_par):
-        if _cocok_judul(t, bagian):
-            awal = i
-            break
+                'sebab': 'berkas tidak bisa dibaca'}
+    doc, cocok, teks_par, nomor_par, lain = baca
+    awal, akhir = rentang_bagian(
+        [m.group(0) for m in cocok], teks_par, nomor_par, bagian)
     if awal is None:
         return {'ok': False, 'dibuang': 0,
                 'sebab': f'Bagian {bagian} tidak ditemukan di naskah.'}
-    akhir = len(teks_par)
-    for i in range(awal + 1, len(teks_par)):
-        t = teks_par[i]
-        if re.match(r'^\d+\.\d+\s+\S', t) and len(t) < 90:
-            akhir = i
-            break
-        if re.match(r'^BAB\s+(?:[IVX]+|\d+)\b', t.strip(),
-                    re.IGNORECASE):
-            akhir = i
-            break
     harapan = _normalisasi_nama(judul_harapan)
-    pola_cap = re.compile(r'^\s*Gambar\s+\d+\.\d+\b.*', re.IGNORECASE)
-    buang: set[int] = set()
+    pola_cap = re.compile(r'^\s*Gambar\s+\d+\.\s*\d+\b.*', re.IGNORECASE)
+    # Pasangan gambar + keterangan sesudahnya di bagian ini.
+    pasangan: list[tuple] = []
     for i in range(awal, akhir):
-        if pola_cap.match(teks_par[i] or '') and \
-                harapan in _normalisasi_nama(teks_par[i]):
-            buang.add(i)
-            # Paragraf gambar ada tepat sebelum keterangan.
-            if i - 1 >= awal and '<w:drawing' in cocok[i - 1].group(0):
-                buang.add(i - 1)
+        if '<w:drawing' not in cocok[i].group(0):
+            continue
+        ket = None
+        for j in range(i + 1, akhir):
+            if '<w:drawing' in cocok[j].group(0):
+                break
+            if pola_cap.match(teks_par[j] or ''):
+                ket = j
+                break
+        pasangan.append((i, ket))
+    buang: set[int] = set()
+    for g, ket in pasangan:
+        cocok_judul = ket is not None and \
+            harapan in _normalisasi_nama(teks_par[ket])
+        if cocok_judul or len(pasangan) == 1:
+            buang.add(g)
+            if ket is not None:
+                buang.add(ket)
     if not buang:
         return {'ok': True, 'dibuang': 0, 'sebab': ''}
     ganti = []
@@ -566,60 +617,35 @@ def buang_gambar_bagian(path, bagian: str, judul_harapan: str) -> dict:
 
 def bagian_punya_isi(path, bagian: str) -> bool:
     """True bila bagian ini sudah punya paragraf isi (bukan judul saja)."""
-    from .gambar import _cocok_judul
-    from .pustaka_periksa import _RE_P, _teks_par_xml
-    path = Path(path)
-    if not path.exists():
+    from .gambar import rentang_bagian
+    baca = _baca_dokumen(path)
+    if baca is None:
         return False
-    try:
-        with zipfile.ZipFile(path) as z:
-            doc = z.read('word/document.xml').decode('utf-8')
-    except Exception:                                          # noqa: BLE001
-        return False
-    cocok = list(_RE_P.finditer(doc))
-    teks_par = [_teks_par_xml(m.group(0)) for m in cocok]
-    awal = None
-    for i, t in enumerate(teks_par):
-        if _cocok_judul(t, bagian):
-            awal = i
-            break
+    _doc, cocok, teks_par, nomor_par, _lain = baca
+    awal, akhir = rentang_bagian(
+        [m.group(0) for m in cocok], teks_par, nomor_par, bagian)
     if awal is None:
         return False
-    for i in range(awal + 1, len(teks_par)):
-        t = teks_par[i]
-        if re.match(r'^\d+\.\d+\s+\S', t) and len(t) < 90:
-            break
-        if re.match(r'^BAB\s+(?:[IVX]+|\d+)\b', t.strip(),
-                    re.IGNORECASE):
-            break
-        if t.strip():
+    for i in range(awal + 1, akhir):
+        if teks_par[i].strip():
             return True
     return False
 
 
 def sisip_teks_setelah_judul(path, bagian: str, baris: list[str]) -> dict:
     """Sisipkan paragraf teks tepat sesudah judul bagian."""
-    from .gambar import _cocok_judul
-    from .pustaka_periksa import _RE_P, _teks_par_xml
+    from .gambar import rentang_bagian
     path = Path(path)
     if not path.exists():
         return {'ok': False, 'sebab': 'berkas tidak ada'}
     if not baris:
         return {'ok': True, 'ditambah': 0}
-    try:
-        with zipfile.ZipFile(path) as z:
-            nama = z.namelist()
-            doc = z.read('word/document.xml').decode('utf-8')
-            lain = {n: z.read(n) for n in nama if n != 'word/document.xml'}
-    except Exception as e:                                      # noqa: BLE001
-        return {'ok': False, 'sebab': f'berkas tidak bisa dibaca: {e}'}
-    cocok = list(_RE_P.finditer(doc))
-    teks_par = [_teks_par_xml(m.group(0)) for m in cocok]
-    awal = None
-    for i, t in enumerate(teks_par):
-        if _cocok_judul(t, bagian):
-            awal = i
-            break
+    baca = _baca_dokumen(path)
+    if baca is None:
+        return {'ok': False, 'sebab': 'berkas tidak bisa dibaca'}
+    doc, cocok, teks_par, nomor_par, lain = baca
+    awal, _akhir = rentang_bagian(
+        [m.group(0) for m in cocok], teks_par, nomor_par, bagian)
     if awal is None:
         return {'ok': False,
                 'sebab': f'Bagian {bagian} tidak ditemukan di naskah.'}

@@ -34,6 +34,14 @@
   <g id="lapis-kotak"></g>
 </svg>
 
+{% if jenis == 'desain' and teks31 %}
+<div class="panel" id="panel-teks31">
+  <h3>Teks 3.1 yang akan ditulis</h3>
+  {% for b in teks31 %}<p>{{ b }}</p>{% endfor %}
+  <p>Teks ini gratis, ditulis di 3.1 bila masih kosong.</p>
+</div>
+{% endif %}
+
 <div class="panel" id="panel-ubah" hidden>
   <label>Tulisan kotak</label>
   <input type="text" id="isi-kotak" style="width: 60%">
@@ -93,6 +101,12 @@ function bungkus(teks, maks) {
   if (kini) baris.push(kini);
   return baris.slice(0, 2);
 }
+function tinggiTampil(k) {
+  // Tinggi kotak di layar: setinggi nama (2 baris = 110), supaya teks
+  // tidak terpotong di tepi bawah kotak sesudah digeser.
+  var maks = k.w > 400 ? 30 : 18;
+  return Math.max(k.h, bungkus(k.nama, maks).length >= 2 ? 110 : 90);
+}
 function panahUntuk() {
   if (JENIS === 'desain') {
     var urut = state.kotak.slice().sort(function (a, b) { return a.y - b.y; });
@@ -108,24 +122,37 @@ function gambarUlang() {
   var lk = document.getElementById('lapis-kotak');
   lp.innerHTML = ''; lk.innerHTML = '';
   var peta = {};
-  state.kotak.forEach(function (k) { peta[k.id] = k; });
+  var tinggi = {};
+  state.kotak.forEach(function (k) { peta[k.id] = k; tinggi[k.id] = tinggiTampil(k); });
   panahUntuk().forEach(function (p) {
     var a = peta[p.dari], b = peta[p.ke];
     if (!a || !b) return;
-    var x1 = a.x + a.w, y1 = a.y + a.h / 2, x2 = b.x, y2 = b.y + b.h / 2;
-    if (JENIS === 'desain') { x1 = a.x + a.w / 2; y1 = a.y + a.h; x2 = b.x + b.w / 2; y2 = b.y; }
-    var g = el('line', {x1: x1, y1: y1, x2: x2, y2: y2, stroke: '#10222e', 'stroke-width': 4, 'marker-end': 'url(#panah)'});
-    if (p.gaya === 'putus') g.setAttribute('stroke-dasharray', '12 10');
+    var x1 = a.x + a.w, y1 = a.y + tinggi[a.id] / 2, x2 = b.x, y2 = b.y + tinggi[b.id] / 2;
+    if (JENIS === 'desain') { x1 = a.x + a.w / 2; y1 = a.y + tinggi[a.id]; x2 = b.x + b.w / 2; y2 = b.y; }
+    var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+    var g;
+    if (p.gaya === 'lewat') {
+      // Jalur lewat: bengkok lewat titik tengah yang digeser tegak
+      // lurus 30 px, putus-putus, supaya dua segmen H6/H7 terlihat
+      // sebagai jalur lewat Z, bukan garis lurus.
+      var dx = x2 - x1, dy = y2 - y1;
+      var pj = Math.sqrt(dx * dx + dy * dy) || 1;
+      mx = mx + (-dy / pj) * 30; my = my + (dx / pj) * 30;
+      g = el('path', {d: 'M ' + x1 + ' ' + y1 + ' L ' + mx + ' ' + my + ' L ' + x2 + ' ' + y2, fill: 'none', stroke: '#10222e', 'stroke-width': 4, 'stroke-dasharray': '12 10', 'marker-end': 'url(#panah)'});
+    } else {
+      g = el('line', {x1: x1, y1: y1, x2: x2, y2: y2, stroke: '#10222e', 'stroke-width': 4, 'marker-end': 'url(#panah)'});
+      if (p.gaya === 'putus') g.setAttribute('stroke-dasharray', '12 10');
+    }
     lp.appendChild(g);
     if (p.label) {
-      var t = el('text', {x: (x1 + x2) / 2, y: (y1 + y2) / 2 - 8, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 'bold', fill: '#10222e'});
+      var t = el('text', {x: mx, y: my - 8, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 'bold', fill: '#10222e'});
       t.textContent = p.label;
       lp.appendChild(t);
     }
   });
   state.kotak.forEach(function (k) {
     var g = el('g', {id: 'kotak-' + k.id, style: 'cursor: move'});
-    var r = el('rect', {x: k.x, y: k.y, width: k.w, height: k.h, rx: 12, fill: 'white', stroke: WARNA[k.peran] || '#1d7a8c', 'stroke-width': 4});
+    var r = el('rect', {x: k.x, y: k.y, width: k.w, height: tinggi[k.id], rx: 12, fill: 'white', stroke: WARNA[k.peran] || '#1d7a8c', 'stroke-width': 4});
     g.appendChild(r);
     var maks = k.w > 400 ? 30 : 18;
     var baris = bungkus(k.nama, maks);
