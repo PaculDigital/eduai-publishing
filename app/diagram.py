@@ -67,6 +67,14 @@ LANGKAH_DESAIN = {
 
 KANVAS_LEBAR = 1400
 KANVAS_TINGGI = 800
+# Garis tengah horizontal kanvas: pusat Z dan Y selalu di sini, kolom X
+# simetris terhadap garis ini (contoh skripsi Boss 18 Nov 2026).
+TENGAH_KANVAS = KANVAS_TINGGI // 2
+# Jarak pusat X terluar ke garis tengah (1 X) / setengah bentang
+# kolom X (2-4 X). 250 px supaya panah langsung X ke Y lewat jelas
+# di atas/bawah Z (dengan 210 px, panah itu hanya 3,7 px di atas Z
+# bila Z 2 baris, sehingga ikut terbengkok).
+LANGKAH_X = 250
 LEBAR_KOTAK = 300
 
 
@@ -317,9 +325,18 @@ def _tinggi_muat(nama: str, lebar: int = LEBAR_KOTAK) -> int:
 def tata_letak(model: dict) -> dict:
     """Tata letak deterministik: kotak + panah dalam kanvas 1400x800.
 
-    X di kiri, Y di kanan, Z di bawah tengah (supaya panah langsung
-    X ke Y tidak menabrak kotak Z). Kolom dilegakan (celah 190 px)
-    seperti contoh skripsi Boss 18 Nov 2026: oval besar, jarak lega.
+    Template per jumlah variabel (aturan umum, bukan per model):
+    X di kiri, Z di tengah, Y di kanan; pusat Z = pusat Y = garis
+    tengah kanvas (400). Kolom X simetris terhadap garis tengah: 1 X
+    di atas garis tengah (bukan di garis tengah, supaya X, Z, Y tidak
+    segaris, seperti contoh 1 Boss); 2 X satu di atas satu di bawah
+    dengan jarak sama; 3-4 X berjarak sama simetris; 5 X ke atas
+    tumpukan terpusat simetris (lihat _y_x_padat). Kolom dilegakan
+    (celah 190 px) seperti contoh skripsi Boss 18 Nov 2026: oval
+    besar, jarak lega. Panah langsung X ke Y yang menabrak kotak Z
+    (X yang pusatnya di garis tengah) TIDAK dihindari dengan
+    menggeser Z ke bawah, melainkan dibengkokkan lewat atas Z di
+    penempatan_label (app/gambar.py) dan gambarUlang editor.
     Panah 'tidak_langsung' digambar putus-putus: dua segmen (Dari ke
     Lewat, Lewat ke Ke) bila ada Lewat, satu segmen (Dari ke Ke) bila
     tidak ada; tiap segmen berlabel hipotesisnya, supaya H6/H7
@@ -332,10 +349,16 @@ def tata_letak(model: dict) -> dict:
     n_x = max(1, len(xs))
     kotak: list[dict] = []
 
-    def _y_x(i: int) -> int:
+    def _y_x(i: int, h: int) -> int:
+        # Template per jumlah X: pusat terluar selalu ±LANGKAH_X dari
+        # garis tengah (seperti contoh 1: X atas dan bawah jauh);
+        # 1 X di atas garis tengah; 2-4 X berjarak sama simetris.
         if n_x == 1:
-            return 355
-        return round(140 + i * (420 / (n_x - 1)))
+            pusat = TENGAH_KANVAS - LANGKAH_X
+        else:
+            langkah = 2 * LANGKAH_X / (n_x - 1)
+            pusat = TENGAH_KANVAS + (i - (n_x - 1) / 2) * langkah
+        return round(pusat - h / 2)
 
     # Posisi Y kolom X yang padat: tinggi mengikuti nama, celah 14 px,
     # kolom di tengah (y=400); bila kolom lebih tinggi dari kanvas,
@@ -361,24 +384,28 @@ def tata_letak(model: dict) -> dict:
         # supaya teks tidak meluap (dulu ramping 64, nama 1 baris
         # berakhir y+70 dan melewati tepi bawah), dan kolom direnggang
         # supaya kotak tidak tumpang tindih (celah 14 px, tengah di
-        # y=350, ditekan ke 20 bila kolom lebih tinggi dari kanvas).
+        # y=400, ditekan ke 20 bila kolom lebih tinggi dari kanvas).
         if n_x > 4:
             h = _tinggi_muat(v['nama'])
             y = _y_x_padat[i]
         else:
             h = tinggi_kotak(v['nama'])
-            y = _y_x(i)
+            y = _y_x(i, h)
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
                       'peran': 'X', 'x': 60, 'y': y,
                       'w': LEBAR_KOTAK, 'h': h})
     for v in zs:
+        # Pusat Z = garis tengah kanvas (sama tinggi dengan Y).
+        h = tinggi_kotak(v['nama'])
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
-                      'peran': 'Z', 'x': 550, 'y': 600,
-                      'w': LEBAR_KOTAK, 'h': tinggi_kotak(v['nama'])})
+                      'peran': 'Z', 'x': 550, 'y': TENGAH_KANVAS - h // 2,
+                      'w': LEBAR_KOTAK, 'h': h})
     for v in ys:
+        # Pusat Y = garis tengah kanvas.
+        h = tinggi_kotak(v['nama'])
         kotak.append({'id': v['kode'], 'nama': v['nama'], 'kode': v['kode'],
-                      'peran': 'Y', 'x': 1040, 'y': 355,
-                      'w': LEBAR_KOTAK, 'h': tinggi_kotak(v['nama'])})
+                      'peran': 'Y', 'x': 1040, 'y': TENGAH_KANVAS - h // 2,
+                      'w': LEBAR_KOTAK, 'h': h})
     panah: list[dict] = []
     for j in model.get('jalur') or []:
         label = j['hipotesis']

@@ -368,9 +368,13 @@ def jalankan():
     kotak = {k['id']: k for k in tata['kotak']}
     cek('tata Nura: 4 kotak (X1, X2, Z, Y)',
         len(tata['kotak']) == 4 and set(kotak) == {'X1', 'X2', 'Z', 'Y'})
-    cek('tata Nura: X kiri, Z bawah tengah, Y kanan',
+    cek('tata Nura: X kiri, Z tengah, Y kanan, simetris',
         kotak['X1']['x'] == 60 and kotak['Z']['x'] == 550
-        and kotak['Z']['y'] == 600 and kotak['Y']['x'] == 1040)
+        and kotak['Y']['x'] == 1040
+        and kotak['Z']['y'] + kotak['Z']['h'] / 2 == 400
+        and kotak['Y']['y'] + kotak['Y']['h'] / 2 == 400
+        and (kotak['X1']['y'] + kotak['X1']['h'] / 2
+             + kotak['X2']['y'] + kotak['X2']['h'] / 2) / 2 == 400)
     cek('tata Nura: 7 panah (H6/H7 tidak langsung digambar putus-putus)',
         len(tata['panah']) == 7 and
         sorted(p['label'] for p in tata['panah']) ==
@@ -923,27 +927,41 @@ def jalankan():
                    default=999.0)
 
     def _garis_unik(pl):
+        # Tiap panah punya polilinia sendiri (termasuk titik belok).
         temu = {}
         for p in pl:
-            temu.setdefault((round(p['x1'], 1), round(p['y1'], 1),
-                             round(p['x2'], 1), round(p['y2'], 1)),
-                            []).append(p['label'])
+            titik = ([(p['x1'], p['y1'])] + list(p.get('rute') or [])
+                     + [(p['x2'], p['y2'])])
+            kunci = tuple((round(x, 1), round(y, 1)) for x, y in titik)
+            temu.setdefault(kunci, []).append(p['label'])
         return {k: v for k, v in temu.items() if len(v) > 1}
 
     def _fraksi_terang(png, pl, p):
-        # Fraksi titik terang di tengah 60% garis (lewati kotak label):
-        # garis putus-putus ~0,5, garis lurus ~0.
+        # Fraksi titik terang di tengah 60% polilinia (lewati kotak
+        # label): garis putus-putus ~0,5, garis lurus ~0.
+        import math as _m
         im = _Image.open(io.BytesIO(png)).convert('RGB')
+        titik = ([(p['x1'], p['y1'])] + list(p.get('rute') or [])
+                 + [(p['x2'], p['y2'])])
+        ruas = [_m.hypot(titik[i + 1][0] - titik[i][0],
+                         titik[i + 1][1] - titik[i][1])
+                for i in range(len(titik) - 1)]
+        total = sum(ruas)
         terang = gelap = 0
         for t in range(41):
-            f = 0.2 + 0.6 * t / 40
-            x = p['x1'] + (p['x2'] - p['x1']) * f
-            y = p['y1'] + (p['y2'] - p['y1']) * f
+            s = total * (0.2 + 0.6 * t / 40)
+            for i, r in enumerate(ruas):
+                if s <= r or i == len(ruas) - 1:
+                    f = s / r if r else 0.0
+                    x = titik[i][0] + (titik[i + 1][0] - titik[i][0]) * f
+                    y = titik[i][1] + (titik[i + 1][1] - titik[i][1]) * f
+                    break
+                s -= r
             if any(q['kiri'] - 2 <= x <= q['kanan'] + 2 and
                    q['atas'] - 2 <= y <= q['bawah'] + 2 for q in pl):
                 continue
-            r, g, b = im.getpixel((int(x), int(y)))
-            if r + g + b < 450:
+            rp, gp, bp = im.getpixel((int(x), int(y)))
+            if rp + gp + bp < 450:
                 gelap += 1
             else:
                 terang += 1
@@ -1007,6 +1025,132 @@ def jalankan():
     cek('Asih: label tidak menyentuh kotak',
         _jarak_label_kotak(pl81, tata81) > 0,
         str(round(_jarak_label_kotak(pl81, tata81), 1)))
+
+    # ── 11. Template simetris (contoh skripsi Boss 18 Nov 10:09) ────
+    # Aturan umum di tata_letak (bukan per model): Z dan Y sejajar di
+    # garis tengah, kolom X simetris terhadap garis tengah, ruas yang
+    # menembus kotak dibengkokkan, label yang mendarat di kotak atau
+    # label lain digeser sepanjang garisnya. Matriks: jumlah X 1, 2,
+    # 3, 5, 9 x tanpa Z / dengan Z x langsung / lewat. Bentuk lewat
+    # dengan 3 X atau lebih TIDAK diuji tanpa-tumpuk label: label
+    # berkumpul di segmen Z ke Y (4-10 panah berbagi satu segmen,
+    # celah antar label 26 px atau kurang, lebar label ~104 px)
+    # sehingga satu label per panah tidak muat; jawabannya gaya label
+    # gabungan contoh 6 (putaran multi-tahap). Bentuk 9 X + Z + lewat
+    # juga tidak diuji label-kotak (padat ekstrem yang sama).
+    def _model_matriks(n_x, dengan_z, lewat):
+        nama_x = ['Harga', 'Kualitas', 'Merek', 'Promosi', 'Lokasi',
+                  'Pelayanan', 'Suasana', 'Harga Diri', 'Gaya Hidup'][:n_x]
+        variabel = [{'nama': n, 'peran': 'X'} for n in nama_x]
+        if dengan_z:
+            variabel.append({'nama': 'Minat Beli', 'peran': 'Z'})
+        variabel.append({'nama': 'Keputusan Beli', 'peran': 'Y'})
+        jalur = []
+        for i, n in enumerate(nama_x):
+            jalur.append({'dari': n, 'ke': 'Keputusan Beli',
+                          'hipotesis': 'H%d' % (i + 1),
+                          'jenis': 'langsung', 'arah': '+'})
+        if dengan_z:
+            for i, n in enumerate(nama_x):
+                jalur.append({'dari': n, 'ke': 'Minat Beli',
+                              'hipotesis': 'D%d' % (i + 1),
+                              'jenis': 'langsung', 'arah': '+'})
+            jalur.append({'dari': 'Minat Beli', 'ke': 'Keputusan Beli',
+                          'hipotesis': 'DZ', 'jenis': 'langsung',
+                          'arah': '+'})
+            if lewat:
+                for i, n in enumerate(nama_x):
+                    jalur.append({'dari': n, 'ke': 'Keputusan Beli',
+                                  'lewat': 'Minat Beli',
+                                  'hipotesis': 'L%d' % (i + 1),
+                                  'jenis': 'tidak_langsung', 'arah': '+'})
+        model, _ = DG.normalisasi_model({'variabel': variabel,
+                                         'jalur': jalur})
+        return model
+
+    def _pusat(k):
+        return k['y'] + k['h'] / 2
+
+    def _ruas_lewat_kotak(x1, y1, x2, y2, k):
+        return GB._segmen_lewat_kotak(x1, y1, x2, y2, k)
+
+    for _n_x in (1, 2, 3, 5, 9):
+        for _dengan_z in (False, True):
+            for _lewat in ((False, True) if _dengan_z else (False,)):
+                _m_mat = _model_matriks(_n_x, _dengan_z, _lewat)
+                _t_mat = DG.tata_letak(_m_mat)
+                _k_mat = {k['id']: k for k in _t_mat['kotak']}
+                _pl_mat = GB.penempatan_label(_t_mat)
+                _tag = '%d X%s%s' % (
+                    _n_x, ' + Z' if _dengan_z else '',
+                    ' + lewat' if _lewat else '')
+                if _dengan_z:
+                    cek('matriks %s: Z dan Y di garis tengah' % _tag,
+                        _pusat(_k_mat['Z']) == 400
+                        and _pusat(_k_mat['Y']) == 400,
+                        str((_pusat(_k_mat['Z']), _pusat(_k_mat['Y']))))
+                else:
+                    cek('matriks %s: Y di garis tengah' % _tag,
+                        _pusat(_k_mat['Y']) == 400,
+                        str(_pusat(_k_mat['Y'])))
+                _xs_mat = [k for k in _t_mat['kotak']
+                           if k['peran'] == 'X']
+                if _n_x == 1:
+                    cek('matriks %s: 1 X di atas garis tengah' % _tag,
+                        _pusat(_xs_mat[0]) == 150,
+                        str(_pusat(_xs_mat[0])))
+                elif _n_x <= 4:
+                    _c = [_pusat(k) for k in _xs_mat]
+                    cek('matriks %s: X simetris' % _tag,
+                        all(_c[i] + _c[-1 - i] == 800
+                            for i in range(len(_c) // 2)),
+                        str(_c))
+                else:
+                    _atas = _xs_mat[0]['y']
+                    _bawah = _xs_mat[-1]['y'] + _xs_mat[-1]['h']
+                    cek('matriks %s: tumpukan X terpusat simetris' % _tag,
+                        (_atas + _bawah) / 2 == 400,
+                        str((_atas, _bawah)))
+                _kena = []
+                for _p in _pl_mat:
+                    _titik = ([(_p['x1'], _p['y1'])]
+                              + list(_p.get('rute') or [])
+                              + [(_p['x2'], _p['y2'])])
+                    for _j in range(len(_titik) - 1):
+                        for _k in _t_mat['kotak']:
+                            if _ruas_lewat_kotak(
+                                    _titik[_j][0], _titik[_j][1],
+                                    _titik[_j + 1][0], _titik[_j + 1][1],
+                                    _k):
+                                _kena.append((_p['label'], _j, _k['id']))
+                cek('matriks %s: tidak ada ruas menembus kotak' % _tag,
+                    not _kena, str(_kena))
+                # Label tidak menyentuh kotak, kecuali 9 X + Z + lewat
+                # (padat ekstrem, lihat catatan di atas).
+                if not (_dengan_z and _lewat and _n_x == 9):
+                    cek('matriks %s: label tidak menyentuh kotak' % _tag,
+                        _jarak_label_kotak(_pl_mat, _t_mat) > 0,
+                        str(round(_jarak_label_kotak(_pl_mat, _t_mat), 1)))
+                # Garis sendiri selalu; label tidak bertumpuk kecuali
+                # bentuk lewat 3 X ke atas (label gabungan, putaran
+                # multi-tahap).
+                cek('matriks %s: tiap panah punya garis sendiri' % _tag,
+                    not _garis_unik(_pl_mat),
+                    str(_garis_unik(_pl_mat)))
+                if not (_dengan_z and _lewat and _n_x >= 3):
+                    cek('matriks %s: tidak ada label bertumpuk' % _tag,
+                        _celah_min(_pl_mat) >= 0,
+                        str(round(_celah_min(_pl_mat), 1)))
+    # 3 X + Z: panah langsung X tengah (di garis tengah) ke Y harus
+    # dibengkokkan lewat atas Z, bukan menembus Z.
+    _m3 = _model_matriks(3, True, False)
+    _t3 = DG.tata_letak(_m3)
+    _pl3 = GB.penempatan_label(_t3)
+    _tengah3 = [p for p in _pl3 if p['label'] == 'H2 (+)']
+    cek('3 X + Z: panah X tengah dibengkokkan lewat atas Z',
+        len(_tengah3) == 1 and len(_tengah3[0].get('rute') or []) == 1
+        and _tengah3[0]['rute'][0][1] < 355,
+        str(_tengah3))
 
 
 if __name__ == '__main__':
