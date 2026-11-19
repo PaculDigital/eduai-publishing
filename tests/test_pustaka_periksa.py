@@ -339,6 +339,10 @@ def jalankan():
         and '10.1016' in (h3['entri'][0]['apa7_benar'] or '')
         and h3['entri'][0]['apa7_benar'].count('10.1016') == 1,
         f"{h3['entri'][0]['vonis']} {h3['entri'][0]['apa7_benar']}")
+    cek('alasan format: DOI tidak tertulis ditunjuk spesifik (bukan sekadar salah)',
+        'DOI' in (h3['entri'][0].get('alasan_teks') or '')
+        and 'belum ada' in (h3['entri'][0].get('alasan_teks') or ''),
+        f"{h3['entri'][0].get('alasan_teks')!r}")
 
     # ── 6. Hemat: sidik sama tidak diperiksa ulang ────────────────────────
     AUDIT_PANGGIL.clear(); CARI_PANGGIL.clear()
@@ -885,6 +889,38 @@ def jalankan():
         any(s.get('author') == 'Chaffey dan Smith'
             and s.get('year') == '2020' for s in sit),
         str(sit))
+
+    # ── 16. Alasan format spesifik (Gas Bos 19 Nov 2026: tunjuk letaknya,
+    #      jangan bilang 'salah' saja) ────────────────────────────────────
+    _alasan = PP._alasan_format
+    _u = {'penulis': 'Agil, M. S.', 'tahun': 2025, 'judul': 'Pengaruh X',
+          'sumber': 'Jurnal Y, 4(3), 1-2', 'doi': '', 'jenis': 'artikel'}
+    _m = dict(_u, doi='10.9999/abc')
+    cek('alasan format: DOI belum ada ditunjuk',
+        _alasan(_u, _m) == 'DOI-nya belum ada di entri.',
+        _alasan(_u, _m))
+    _u2 = dict(_u, sumber='')
+    _m2 = dict(_u, sumber='Jurnal Y, 4(3), 1-2', doi='')
+    cek('alasan format: nama jurnal belum ada ditunjuk',
+        _alasan(_u2, _m2) == 'nama jurnal/sumber belum ada di entri.',
+        _alasan(_u2, _m2))
+    _u3 = dict(_u, judul='Pengaruh X')
+    _m3 = dict(_u, judul='Pengaruh Y yang Berbeda', doi='')
+    cek('alasan format: judul beda ditunjuk',
+        'judul tidak sama persis' in _alasan(_u3, _m3),
+        _alasan(_u3, _m3))
+    _u4 = dict(_u, penulis='Agil, M. S.')
+    _m4 = dict(_u, penulis='Agil, M.', doi='')
+    cek('alasan format: nama penulis beda ditunjuk',
+        'nama penulis tidak sama persis' in _alasan(_u4, _m4),
+        _alasan(_u4, _m4))
+    cek('alasan format: tidak ada beda yang dikenali jadi kalimat umum',
+        _alasan(_u, dict(_u)) == 'Formatnya belum sesuai APA 7.',
+        _alasan(_u, dict(_u)))
+    cek('alasan format: tidak ada kata salah di alasan spesifik',
+        'salah' not in _alasan(_u, _m).lower()
+        and 'salah' not in _alasan(_u2, _m2).lower(),
+        _alasan(_u, _m) + ' | ' + _alasan(_u2, _m2))
 
 
 if __name__ == '__main__':
