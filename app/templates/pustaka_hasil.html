@@ -96,8 +96,7 @@
     <div class="ringkas">
       <div class="angka"><b>{{ hasil.ringkasan.total_entri }}</b>entri</div>
       <div class="angka"><b>{{ hasil.ringkasan.nyata }}</b>nyata</div>
-      <div class="angka"><b>{{ hasil.ringkasan.format_salah }}</b>format salah</div>
-      <div class="angka"><b>{{ hasil.ringkasan.tidak_ditemukan }}</b>tidak ditemukan</div>
+      <div class="angka"><b>{{ hasil.ringkasan.tidak_ditemukan + hasil.ringkasan.format_salah }}</b>tidak ditemukan</div>
       <div class="angka"><b>{{ hasil.ringkasan.sumber_lama }}</b>sumber lama</div>
       <div class="angka"><b>{{ hasil.ringkasan.sitasi_tanpa_entri }}</b>sitasi tanpa entri</div>
       <div class="angka"><b>{{ hasil.ringkasan.entri_tanpa_sitasi }}</b>entri tak dikutip</div>
@@ -130,13 +129,12 @@
   <div class="kartu">
     <div class="meta">
       {% if e.vonis == 'nyata' %}<span class="badge nyata">Nyata</span>
-      {% elif e.vonis == 'format_salah' %}<span class="badge format">Format salah</span>
       {% else %}<span class="badge tidak">Tidak ditemukan</span>{% endif %}
       {% if e.sumber_lama %}<span class="badge lama">Sumber lama (belum terverifikasi)</span>{% endif %}
       {% if not e.dikutip %}<span class="badge takutip">Tidak dikutip di badan</span>{% endif %}
     </div>
     <blockquote>{{ e.teks }}</blockquote>
-    <div class="kecil">{{ alasan.get(e.alasan, '') }}</div>
+    <div class="kecil">{{ e.alasan_teks or alasan.get(e.alasan, '') }}</div>
     {% if e.apa7_benar %}
     <div class="kecil" style="margin-top:6px">Bentuk yang benar (APA 7):</div>
     <blockquote class="benar">{{ e.apa7_benar }}</blockquote>
@@ -181,7 +179,8 @@
   {% endfor %}
 
   {% if hasil.sitasi_tanpa_entri %}
-  <h2 style="font-size:20px;margin:24px 0 12px">Sitasi di badan yang tidak ada di daftar</h2>
+  <h2 style="font-size:20px;margin:24px 0 12px">Sitasi di badan yang tidak ditemukan di daftar</h2>
+  <p class="kecil" style="margin:0 0 12px">Daftar ini hanya penunjuk. Tidak memblokir apa pun, naskah tetap bisa dilanjutkan.</p>
   {% for s in hasil.sitasi_tanpa_entri %}
   <div class="kartu">
     <div class="meta"><b>{{ s.raw }}</b></div>

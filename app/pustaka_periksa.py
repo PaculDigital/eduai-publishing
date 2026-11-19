@@ -766,6 +766,33 @@ def periksa_jaringan() -> bool:
 #  VONIS PER ENTRI + PEMERIKSAAN NASKAH
 # ══════════════════════════════════════════════════════════════════════════
 
+def _alasan_format(urai: dict, meta: dict) -> str:
+    """Alasan spesifik kenapa format entri belum sesuai APA 7.
+
+    Bandingkan field entri (urai) dengan metadata benar (meta).
+    Kembalikan kalimat Bahasa Indonesia yang menunjuk bagian yang
+    kurang/berbeda, supaya mahasiswa tahu persis apa yang diperbaiki
+    tombol 'Perbaiki format' (Gas Bos 19 Nov 2026: jangan bilang
+    'salah' tanpa menunjuk letaknya).
+    """
+    kurang = []
+    if meta.get('doi') and not urai.get('doi'):
+        kurang.append('DOI-nya belum ada di entri')
+    if meta.get('sumber') and not urai.get('sumber'):
+        kurang.append('nama jurnal/sumber belum ada di entri')
+    judul_u = set((urai.get('judul') or '').lower().split())
+    judul_m = set((meta.get('judul') or '').lower().split())
+    if judul_u and judul_m and judul_u != judul_m:
+        kurang.append('judul tidak sama persis dengan sumber')
+    penulis_u = re.sub(r'\s+', ' ', (urai.get('penulis') or '').lower()).strip()
+    penulis_m = re.sub(r'\s+', ' ', (meta.get('penulis') or '').lower()).strip()
+    if penulis_u and penulis_m and penulis_u != penulis_m:
+        kurang.append('nama penulis tidak sama persis dengan sumber')
+    if not kurang:
+        return 'Formatnya belum sesuai APA 7.'
+    return '; '.join(kurang) + '.'
+
+
 def _vonis_entri(urai: dict, audit_map: dict,
                  cari_hasil: dict | None) -> dict:
     """Vonis satu entri: nyata / format_salah / tidak_ditemukan.
@@ -829,7 +856,8 @@ def _vonis_entri(urai: dict, audit_map: dict,
         return {'vonis': 'nyata', 'alasan': 'terverifikasi',
                 'apa7_benar': '', 'kandidat': kandidat}
     return {'vonis': 'format_salah', 'alasan': 'format_salah',
-            'apa7_benar': apa7, 'kandidat': kandidat}
+            'apa7_benar': apa7, 'kandidat': kandidat,
+            'alasan_teks': _alasan_format(urai, meta)}
 
 
 def _nama_sitasi(sitasi: dict) -> str:
