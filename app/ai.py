@@ -4805,6 +4805,22 @@ async def peta_status(
     ringkasan = _str_s.ringkas_peta(
         prof.peta_json if prof and prof.peta_json else None,
         menunggu_idx=menunggu_idx)
+    # ── CEKLIST STRUKTUR (19 Nov 2026, perintah Bos 'Lanjut') ─────────
+    #  Panel 'Struktur naskah' jadi ceklist 5 baris bab (tanpa tombol
+    #  konfirmasi, tanpa nomor halaman: angka di Daftar Isi sudah
+    #  kedaluwarsa dan ukur baru butuh render). 'Langkah berikut'
+    #  dihitung dari tahap yang belum selesai (Bagian Awal, lalu
+    #  Diagram); bila semua selesai, tidak tampil.
+    ceklist = _str_s.ceklist_struktur(
+        prof.peta_json if prof and prof.peta_json else None,
+        menunggu_idx=menunggu_idx)
+    from .bagian_awal import muat_json as _muat_json_ba
+    _hasil_ba = _muat_json_ba(db, f'bagian_awal_hasil_{int(file_id)}')
+    _ba_selesai = bool(_hasil_ba and _hasil_ba.get('ditempel'))
+    _hasil_dg = _muat_json_ba(db, f'diagram_hasil_{int(file_id)}')
+    _dg_selesai = bool(_hasil_dg)
+    langkah = _str_s.langkah_berikut_struktur(
+        ceklist.get('bab') or [], _ba_selesai, _dg_selesai)
     # ── BATAS LAJU OTOMATIS (15 Nov 2026, perintah Bos 09:15) ──────────
     #  `otomatis` dari gerbang hanya soal UKURAN perubahan; batas 24 jam
     #  (sekali per naskah, dan tidak jalan bila pemeriksaan terakhir
@@ -4826,6 +4842,7 @@ async def peta_status(
                                if prof is not None and prof.peta_dibuat
                                else None),
             'ringkasan': ringkasan,
+            'ceklist': ceklist, 'langkah_berikut': langkah,
             'pemeriksaan': pemeriksaan}
 
 

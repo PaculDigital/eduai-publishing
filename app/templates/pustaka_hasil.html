@@ -41,6 +41,23 @@
   .badge.tidak{background:#fdecea;color:#8c2f20}
   .badge.lama{background:#eee;color:#555}
   .badge.takutip{background:#fff3d6;color:#8a6d00}
+  /* Daftar Pustaka Hidup (19 Nov 2026): ceklist ringkas satu baris per
+     entri, ketuk barisnya lompat ke kartu lengkapnya di halaman ini. */
+  .ceklist-pustaka{list-style:none;margin:0;padding:0}
+  .ceklist-pustaka .baris-entri{display:flex;align-items:center;gap:8px;
+    padding:7px 4px;border-bottom:1px solid var(--garis);cursor:pointer}
+  .ceklist-pustaka .baris-entri:last-child{border-bottom:0}
+  .ceklist-pustaka .tanda-status{display:inline-flex;align-items:center;
+    justify-content:center;width:20px;height:20px;border-radius:50%;
+    font-size:12px;font-weight:700;flex:none}
+  .ceklist-pustaka .baris-entri.nyata .tanda-status{background:#e8f5ef;color:#14543c}
+  .ceklist-pustaka .baris-entri.tidak .tanda-status{background:#fdecea;color:#8c2f20}
+  .ceklist-pustaka .nama-entri{flex:1;font-weight:600;font-size:14px}
+  .ceklist-pustaka .kutip{font-size:12.5px;color:var(--tinta2);flex:none}
+  .ceklist-pustaka .kutip.tak{color:#8a6d00;font-weight:600}
+  .langkah-berikut{font-size:14px;margin-top:12px;padding-top:10px;
+    border-top:1px solid var(--garis);color:var(--tinta2)}
+  .kartu.sorot{outline:2px solid var(--oranye);outline-offset:2px}
   .tombol{border:none;border-radius:10px;padding:12px 18px;font-size:15px;
          cursor:pointer;background:#f4a025;color:#fff;font-weight:600}
   .tombol:hover{background:#e08d10}
@@ -121,12 +138,36 @@
     <p class="kecil" style="margin-top:10px">Periksa ulang hanya memeriksa entri yang berubah. Pemeriksaan ulang bisa dilakukan 15 menit sesudah pemeriksaan terakhir; bila berkas tidak berubah, hasil terakhir langsung ditampilkan tanpa pemeriksaan baru. Bila naskah sedang terbuka di editor, tutup lalu buka lagi supaya perubahan terlihat.</p>
   </div>
 
+  {# ── Daftar Pustaka Hidup (19 Nov 2026): ceklist ringkas, satu baris
+       per entri. Ketuk barisnya lompat ke kartu lengkapnya. Tanpa nomor
+       halaman (ukur halaman butuh render); yang ditampilkan status +
+       penulis-tahun + sudah dikutip atau belum. ── #}
+  <div class="kartu">
+    <div class="meta"><b>Daftar Pustaka Hidup</b> &middot; {{ hasil.ringkasan.total_entri }} entri</div>
+    <ul class="ceklist-pustaka">
+      {% for e in hasil.entri %}
+      <li class="baris-entri {% if e.vonis == 'nyata' %}nyata{% else %}tidak{% endif %}" data-entri="{{ e.id }}">
+        <span class="tanda-status" aria-hidden="true">{% if e.vonis == 'nyata' %}✓{% else %}!{% endif %}</span>
+        <span class="nama-entri">{{ e.penulis }}{% if e.tahun %} ({{ e.tahun }}){% endif %}</span>
+        <span class="kutip {% if not e.dikutip %}tak{% endif %}">{% if e.dikutip %}dikutip{% else %}tidak dikutip{% endif %}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% set n_hilang = hasil.ringkasan.sitasi_tanpa_entri %}
+    {% set n_takutip = hasil.ringkasan.entri_tanpa_sitasi %}
+    {% if n_hilang > 0 or n_takutip > 0 %}
+    <div class="langkah-berikut">Langkah berikut: {{ n_hilang }} sitasi belum ada entrinya, {{ n_takutip }} entri belum dikutip.</div>
+    {% else %}
+    <div class="langkah-berikut">Langkah berikut: semua sitasi sudah ada entrinya dan semua entri sudah dikutip.</div>
+    {% endif %}
+  </div>
+
   {% if not hasil.ada_pustaka %}
   <div class="info">Bagian <b>Daftar Pustaka</b> tidak ditemukan di naskah ini. Semua sitasi di bawah ini belum punya entri. Tulis bagian Daftar Pustaka di akhir naskah, lalu tekan "Periksa lagi".</div>
   {% endif %}
 
   {% for e in hasil.entri %}
-  <div class="kartu">
+  <div class="kartu" id="entri-{{ e.id }}">
     <div class="meta">
       {% if e.vonis == 'nyata' %}<span class="badge nyata">Nyata</span>
       {% else %}<span class="badge tidak">Tidak ditemukan</span>{% endif %}
@@ -276,6 +317,16 @@ function mulaiPeriksa() {
 }
 if (KEADAAN === 'jalan') { cekStatus(); }
 if (SISA_JEDA > 0) { mulaiHitungMundur(SISA_JEDA); }
+/* Daftar Pustaka Hidup: ketuk baris entri lompat ke kartu lengkapnya. */
+document.querySelectorAll('.ceklist-pustaka .baris-entri').forEach(function (baris) {
+  baris.addEventListener('click', function () {
+    var kartu = document.getElementById('entri-' + baris.getAttribute('data-entri'));
+    if (!kartu) return;
+    kartu.scrollIntoView({behavior: 'smooth', block: 'start'});
+    kartu.classList.add('sorot');
+    setTimeout(function () { kartu.classList.remove('sorot'); }, 2000);
+  });
+});
 </script>
 </body>
 </html>

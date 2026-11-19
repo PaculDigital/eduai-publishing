@@ -145,6 +145,92 @@ def _teks_subbab_normal(teks: str) -> str:
     return s.strip()
 
 
+def _judul_bab_penuh(baris, label, idx_awal: int, nomor: int) -> str:
+    """Judul bab lengkap ('BAB I PENDAHULUAN') dari penanda telanjang.
+
+    Penanda telanjang ('BAB I') tidak membawa nama bab; namanya ada di
+    baris tak berlabel pertama sesudahnya ('PENDAHULUAN', baris 2 fid 81;
+    'TINJAUAN PUSTAKA', baris 213). Dipakai panel ceklist Struktur
+    naskah (19 Nov 2026): mahasiswa melihat nama babnya, bukan cuma
+    'BAB I'. Bila tidak ketemu, kembalikan penanda telanjangnya saja.
+    """
+    romawi = _ANGKA_ROMAWI_BAB.get(nomor) or str(nomor)
+    dasar = f'BAB {romawi}'
+    for j in range(idx_awal + 1, min(idx_awal + 4, len(baris))):
+        teks = ' '.join(str(baris[j] or '').split()).strip()
+        if not teks:
+            continue
+        lab = label.get(str(j)) or label.get(j) or ''
+        if lab:
+            break
+        if _nomor_penanda_bab_telanjang(teks) is not None:
+            break
+        if teks.upper() in ('LAMPIRAN', 'DAFTAR PUSTAKA'):
+            break
+        return f'{dasar} {teks}'
+    return dasar
+
+
+def ceklist_struktur(peta_json, menunggu_idx: set | None = None) -> dict:
+    """Ceklist Struktur naskah: 5 baris bab untuk layar mahasiswa.
+
+    Membungkus `ringkas_peta`: hanya kelompok bab (LAMPIRAN bukan bab,
+    jadi tidak masuk), tiap baris membawa `judul` lengkap
+    ('BAB I PENDAHULUAN'), `nomor` (1-5), `ada` (True bila babnya
+    ketemu di naskah), dan `diperiksa`. Bab yang tidak ketemu tetap
+    tampil sebagai baris Belum (!), supaya mahasiswa langsung tahu
+    bab mana yang hilang. Dipakai panel ceklist (19 Nov 2026).
+    """
+    ringkasan = ringkas_peta(peta_json, menunggu_idx=menunggu_idx)
+    keluar: dict = {'bab': [], 'jumlah_ragu': ringkasan['jumlah_ragu'],
+                    'jumlah_curiga': ringkasan['jumlah_curiga'],
+                    'jumlah_menunggu': ringkasan['jumlah_menunggu']}
+    ada_nomor = set()
+    for bab in ringkasan.get('bab', []):
+        judul = str(bab.get('judul', '') or '').strip()
+        if judul.upper() == 'LAMPIRAN':
+            continue
+        nomor = bab.get('nomor')
+        if nomor is None:
+            nomor = _nomor_dari_judul_bab(judul)
+        if nomor is None or not 1 <= nomor <= 6:
+            continue
+        ada_nomor.add(nomor)
+        keluar['bab'].append({
+            'judul': bab.get('judul_penuh') or judul,
+            'nomor': nomor, 'ada': True,
+            'diperiksa': bool(bab.get('diperiksa')),
+            'subbab': bab.get('subbab') or []})
+    for nomor in range(1, 6):
+        if nomor in ada_nomor:
+            continue
+        romawi = _ANGKA_ROMAWI_BAB.get(nomor) or str(nomor)
+        keluar['bab'].append({
+            'judul': f'BAB {romawi}', 'nomor': nomor, 'ada': False,
+            'diperiksa': False, 'subbab': []})
+    keluar['bab'].sort(key=lambda b: b['nomor'])
+    return keluar
+
+
+def langkah_berikut_struktur(ceklist_bab, bagian_awal_selesai: bool,
+                             diagram_selesai: bool) -> str | None:
+    """Satu baris 'Langkah berikut' untuk ceklist Struktur naskah.
+
+    - Ada bab yang tidak ketemu -> periksa judul bab di naskah.
+    - Semua bab ada -> tahap berikutnya yang belum selesai
+      (Bagian Awal dulu, lalu Diagram). Bila semua sudah selesai,
+      None (baris tidak tampil). Murni, tanpa DB.
+    """
+    for bab in ceklist_bab or []:
+        if not bab.get('ada'):
+            return 'Periksa judul bab di naskah'
+    if not bagian_awal_selesai:
+        return 'Lengkapi Bagian Awal'
+    if not diagram_selesai:
+        return 'Buat Diagram Model'
+    return None
+
+
 def ringkas_peta(peta_json, menunggu_idx: set | None = None) -> dict:
     """Ringkas peta tersimpan jadi pohon bab/subbab untuk layar mahasiswa.
 
@@ -188,6 +274,9 @@ def ringkas_peta(peta_json, menunggu_idx: set | None = None) -> dict:
             if nomor is not None and (nomor_bab_kini is None
                                       or nomor > nomor_bab_kini):
                 bab_kini = {'judul': f'BAB {_ANGKA_ROMAWI_BAB[nomor]}',
+                            'judul_penuh': _judul_bab_penuh(
+                                baris, label, i, nomor),
+                            'nomor': nomor,
                             'subbab': [],
                             'diperiksa': i not in menunggu_idx}
                 keluar['bab'].append(bab_kini)
@@ -216,10 +305,12 @@ def ringkas_peta(peta_json, menunggu_idx: set | None = None) -> dict:
         butir = {'teks': teks_ringan, 'label': lab,
                  'diperiksa': i not in menunggu_idx}
         if lab == 'bab':
-            bab_kini = {'judul': teks_ringan, 'subbab': [],
+            _nomor = _nomor_dari_judul_bab(teks_ringan)
+            bab_kini = {'judul': teks_ringan,
+                        'judul_penuh': teks_ringan, 'nomor': _nomor,
+                        'subbab': [],
                         'diperiksa': butir['diperiksa']}
             keluar['bab'].append(bab_kini)
-            _nomor = _nomor_dari_judul_bab(teks_ringan)
             if _nomor is not None:
                 nomor_bab_kini = _nomor
         elif lab == 'subbab':

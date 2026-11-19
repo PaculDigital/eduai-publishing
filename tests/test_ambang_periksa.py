@@ -674,6 +674,47 @@ def main():
         sum(1 for t in semua126 if t == 'Ringkasan Bab') == 5
         and len(r126['bab']) == 3 and len(semua126) == 50)
 
+    # ── 12. CEKLIST STRUKTUR (19 Nov 2026, perintah Bos 'Lanjut') ─────
+    #  Penanda telanjang + nama bab di baris tak berlabel sesudahnya.
+    peta_cek = {
+        'peta_surveyor': {
+            'baris': ['BAB I', '', 'PENDAHULUAN', '1.1 Latar Belakang',
+                      'Isi latar.', 'BAB II', '', 'TINJAUAN PUSTAKA',
+                      '2.1 Teori', 'Isi teori.', 'LAMPIRAN',
+                      'Lampiran 1'],
+            'label': {'3': 'subbab', '8': 'subbab', '11': 'subbab'}},
+        'hakim': {'jumlah_ragu': 0, 'jumlah_curiga': 0}}
+    ck = st.ceklist_struktur(peta_cek)
+    cek('ceklist: 5 baris bab (I-V), LAMPIRAN tidak masuk',
+        len(ck['bab']) == 5
+        and all(b['nomor'] in range(1, 6) for b in ck['bab']))
+    cek('ceklist: judul lengkap dari baris sesudah penanda telanjang',
+        ck['bab'][0]['judul'] == 'BAB I PENDAHULUAN'
+        and ck['bab'][1]['judul'] == 'BAB II TINJAUAN PUSTAKA')
+    cek('ceklist: bab yang ada ditandai ada + lengkap',
+        ck['bab'][0]['ada'] is True and ck['bab'][0]['diperiksa'] is True
+        and len(ck['bab'][0]['subbab']) == 1)
+    cek('ceklist: bab yang tidak ketemu tetap tampil sebagai Belum',
+        ck['bab'][2]['judul'] == 'BAB III'
+        and ck['bab'][2]['ada'] is False
+        and ck['bab'][2]['diperiksa'] is False
+        and ck['bab'][2]['subbab'] == [])
+    cek('ceklist: tidak ada kata salah di keluaran',
+        'salah' not in json.dumps(ck, ensure_ascii=False).lower())
+    # Langkah berikut.
+    cek('langkah: bab hilang -> periksa judul bab di naskah',
+        st.langkah_berikut_struktur(ck['bab'], False, False)
+        == 'Periksa judul bab di naskah')
+    penuh = [{'ada': True, 'diperiksa': True} for _ in range(5)]
+    cek('langkah: semua ada, Bagian Awal belum -> Lengkapi Bagian Awal',
+        st.langkah_berikut_struktur(penuh, False, False)
+        == 'Lengkapi Bagian Awal')
+    cek('langkah: Bagian Awal selesai, Diagram belum -> Buat Diagram Model',
+        st.langkah_berikut_struktur(penuh, True, False)
+        == 'Buat Diagram Model')
+    cek('langkah: semua selesai -> tidak ada baris langkah',
+        st.langkah_berikut_struktur(penuh, True, True) is None)
+
     print(f'\n{len(LULUS)} lulus, {len(GAGAL)} gagal')
     if GAGAL:
         print('GAGAL:')
