@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from app import konsistensi_bab as kb
+from app import konsistensi as kb
 
 
 def cek(nama, benar):
@@ -78,7 +78,7 @@ def main():
             lulus += 1
 
     # --- Ekstrak 6 bagian dari peta tiruan ---
-    bagian = kb.ekstrak_bagian(peta_tiruan())
+    bagian = kb.ekstrak_bagian_bab(peta_tiruan())
     t('masalah terekstrak (ada pertanyaan)',
       'Digital Marketing berpengaruh' in bagian['masalah'])
     t('tujuan terekstrak',
@@ -118,7 +118,7 @@ def main():
             },
         }
     }
-    b3 = kb.ekstrak_bagian(peta_wadah)
+    b3 = kb.ekstrak_bagian_bab(peta_wadah)
     t('wadah hipotesis dilewati, isi H1 dipakai',
       'Hipotesis Pertama' in b3['hipotesis'])
     t('wadah hasil dilewati, isi uji t dipakai',
@@ -127,14 +127,14 @@ def main():
     # --- Bagian hilang -> '' ---
     peta_kosong = {'peta_surveyor': {'baris': ['BAB I', 'PENDAHULUAN'],
                                      'label': {}}}
-    b2 = kb.ekstrak_bagian(peta_kosong)
+    b2 = kb.ekstrak_bagian_bab(peta_kosong)
     t('peta tanpa bagian -> semua kosong',
       all(v == '' for v in b2.values()))
     t('peta rusak (bukan JSON) -> semua kosong',
-      all(v == '' for v in kb.ekstrak_bagian('bukan-json').values()))
+      all(v == '' for v in kb.ekstrak_bagian_bab('bukan-json').values()))
 
     # --- Prompt memuat 6 bagian + 5 sambungan ---
-    prompt = kb.susun_prompt(bagian)
+    prompt = kb.susun_prompt_bab(bagian)
     t('prompt memuat 6 judul bagian',
       all(x in prompt for x in ('Rumusan Masalah', 'Tujuan Penelitian',
                                 'Hipotesis', 'Metode', 'Hasil Penelitian',
@@ -144,7 +144,7 @@ def main():
                                 'hipotesis_metode', 'metode_hasil',
                                 'hasil_kesimpulan')))
     t('prompt menandai bagian hilang',
-      '(tidak ditemukan di naskah)' in kb.susun_prompt({}))
+      '(tidak ditemukan di naskah)' in kb.susun_prompt_bab({}))
 
     # --- Urai jawaban LLM ---
     jawaban = json.dumps({'sambungan': [
@@ -157,7 +157,7 @@ def main():
         {'nama': 'hasil_kesimpulan', 'vonis': 'aneh',
          'alasan': 'Vonis tidak sah.'},
     ]})
-    vonis = kb.urai_jawaban(jawaban)
+    vonis = kb.urai_jawaban_bab(jawaban)
     t('urai: 5 vonis', len(vonis) == 5)
     t('urai: nyambung dipertahankan',
       vonis[0]['vonis'] == 'nyambung')
@@ -168,19 +168,19 @@ def main():
     t('urai: vonis tidak sah -> ragu',
       vonis[4]['vonis'] == 'ragu')
     t('urai: jawaban rusak -> semua ragu',
-      all(v['vonis'] == 'ragu' for v in kb.urai_jawaban('bukan json')))
+      all(v['vonis'] == 'ragu' for v in kb.urai_jawaban_bab('bukan json')))
     t('urai: jawaban kosong -> semua ragu',
-      all(v['vonis'] == 'ragu' for v in kb.urai_jawaban('')))
+      all(v['vonis'] == 'ragu' for v in kb.urai_jawaban_bab('')))
 
     # --- Langkah berikut ---
     t('langkah: ada putus -> sebut sambungannya',
-      kb.langkah_berikut(vonis) == 'Perbaiki sambungan Hipotesis ke Metode.')
+      kb.langkah_berikut_bab(vonis) == 'Perbaiki sambungan Hipotesis ke Metode.')
     t('langkah: hanya ragu -> cek ke pembimbing',
-      'pembimbing' in (kb.langkah_berikut(
+      'pembimbing' in (kb.langkah_berikut_bab(
           [{'nama': 'x', 'label': 'A ke B', 'vonis': 'ragu',
             'alasan': ''}]) or ''))
     t('langkah: semua nyambung -> None',
-      kb.langkah_berikut([{'nama': 'x', 'label': 'A', 'vonis': 'nyambung',
+      kb.langkah_berikut_bab([{'nama': 'x', 'label': 'A', 'vonis': 'nyambung',
                            'alasan': ''}]) is None)
 
     print(f'\n{lulus}/{total} lulus')
