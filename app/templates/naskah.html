@@ -604,6 +604,30 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
 .panel-konsistensi .langkah-berikut{font-size:13.5px;margin-top:10px;padding-top:8px;
   border-top:1px solid var(--garis);color:var(--teks-abu)}
 
+/* --- panel Cek Format (19 Nov 2026, pola panel-konsistensi) ---
+   8 baris pemeriksaan, ketuk baris buka/tutup alasan. Tiga status:
+   lulus (✓ hijau), tidak (! merah), ragu (? kuning, perlu diperiksa). */
+.panel-format{background:#fff;border:1px solid var(--garis);border-radius:13px;
+  padding:16px 18px;margin:-4px 0 11px}
+.panel-format h4{font-size:15px;margin-bottom:4px}
+.panel-format .keterangan{font-size:13px;color:var(--teks-abu);margin-top:8px}
+.panel-format .galat{color:#8c2f20;font-size:14px}
+.panel-format .ceklist-format{margin:8px 0 4px 0;list-style:none;padding:0}
+.panel-format .baris-format{display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:6px 4px;border-bottom:1px solid var(--garis);margin-bottom:0}
+.panel-format .tanda-status{display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;font-size:12px;font-weight:700;flex:none}
+.panel-format .baris-format.lulus .tanda-status{background:#e6f4ea;color:#1e7e34}
+.panel-format .baris-format.tidak .tanda-status{background:#fdecea;color:#b3261e}
+.panel-format .baris-format.ragu .tanda-status{background:#fef7e0;color:#8a6d00}
+.panel-format .nama-format{flex:1;font-weight:600}
+.panel-format .panah-format{color:var(--teks-abu);font-size:16px;transition:transform .15s}
+.panel-format .baris-format.terbuka .panah-format{transform:rotate(90deg)}
+.panel-format .alasan-format{list-style:none;margin:0;padding:2px 0 6px 32px}
+.panel-format .alasan-format p{margin:0;font-size:13.5px;color:var(--teks-abu)}
+.panel-format .langkah-berikut{font-size:13.5px;margin-top:10px;padding-top:8px;
+  border-top:1px solid var(--garis);color:var(--teks-abu)}
+
 /* --- tong sampah (ACC Bos 14Sep26) --- */
 .judul-baris{display:flex;align-items:center;justify-content:space-between;gap:14px;
              flex-wrap:wrap;margin-bottom:16px}
@@ -1033,6 +1057,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
         {% if e in ['docx','odt','txt','md','markdown','csv','pdf'] %}
         <button class="periksa" type="button" data-periksa data-file-id="{{ f.id }}">Periksa Struktur</button>
         <button class="periksa" type="button" data-konsistensi data-file-id="{{ f.id }}">Cek Konsistensi</button>
+        <button class="periksa" type="button" data-format data-file-id="{{ f.id }}">Cek Format</button>
         <button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/pustaka'">Periksa Daftar Pustaka</button>
         <button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/diagram'" title="Gambar Model dan Desain Penelitian.">Diagram</button>
         <span class="bungkus-tip" title="Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi."><button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/bagian-awal'" title="Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi.">Lengkapi Bagian Awal<span class="tip">Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi.</span></button></span>
@@ -1059,6 +1084,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
     {% if e in ['docx','odt','txt','md','markdown','csv','pdf'] %}
     <div class="panel-struktur" id="panel-{{ f.id }}" hidden></div>
     <div class="panel-konsistensi" id="panel-konsistensi-{{ f.id }}" hidden></div>
+    <div class="panel-format" id="panel-format-{{ f.id }}" hidden></div>
     {% endif %}
     {% endfor %}
   {% else %}
@@ -1540,6 +1566,137 @@ function fdPesan(t) {
   document.querySelectorAll('[data-konsistensi]').forEach(function (btn) {
     btn.addEventListener('click', function () { cekKonsistensi(btn); });
     muatKonsistensi(btn);
+  });
+})();
+</script>
+
+<script>
+/* ── Cek Format Pedoman (19 Nov 2026) ─────────────────────────────────
+   Pola yang SAMA dengan Cek Konsistensi: tombol titip ke pekerja latar
+   (POST /v1/format/mulai-latar), lalu baca keadaan lewat /v1/format/status
+   sampai selesai. 8 baris pemeriksaan, ketuk baris membuka alasannya.
+   Tiga status: lulus (✓), tidak (!), ragu (? = perlu diperiksa).
+   Deterministik, tanpa LLM, GRATIS, tanpa token. */
+(function () {
+  function escF(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function tampilFormat(fid, d) {
+    var panel = document.getElementById('panel-format-' + fid);
+    if (!panel) return;
+    var temuan = d.temuan || [];
+    var html = '<h4>Cek Format</h4>';
+    if (temuan.length) {
+      html += '<ul class="ceklist-format">';
+      temuan.forEach(function (t, i) {
+        var st = t.vonis === 'lulus' ? 'lulus'
+          : (t.vonis === 'tidak' ? 'tidak' : 'ragu');
+        var tanda = st === 'lulus' ? '✓' : (st === 'tidak' ? '!' : '?');
+        html += '<li class="baris-format ' + st + '" data-i="' + i + '">' +
+          '<span class="tanda-status" aria-hidden="true">' + tanda + '</span>' +
+          '<span class="nama-format">' + escF(t.label || t.id) + '</span>' +
+          '<span class="panah-format" aria-hidden="true">›</span></li>' +
+          '<li class="alasan-format" data-untuk="' + i + '" hidden><p>' +
+          escF(t.alasan || '') + '</p></li>';
+      });
+      html += '</ul>';
+    } else {
+      html += '<div class="keterangan">Format belum bisa ditampilkan untuk naskah ini.</div>';
+    }
+    if (d.langkah_berikut) {
+      html += '<div class="langkah-berikut">Langkah berikut: ' +
+        escF(d.langkah_berikut) + '</div>';
+    }
+    panel.innerHTML = html;
+    panel.hidden = false;
+    panel.querySelectorAll('.baris-format').forEach(function (baris) {
+      baris.addEventListener('click', function () {
+        var i = baris.getAttribute('data-i');
+        var wadah = panel.querySelector('.alasan-format[data-untuk="' + i + '"]');
+        if (!wadah) return;
+        var buka = wadah.hidden;
+        wadah.hidden = !buka;
+        baris.classList.toggle('terbuka', buka);
+      });
+    });
+  }
+  function tampilGagalFormat(fid, pesan) {
+    var panel = document.getElementById('panel-format-' + fid);
+    if (!panel) return;
+    var div = document.createElement('div');
+    div.className = 'galat';
+    div.textContent = 'Pemeriksaan belum berhasil' +
+      (pesan ? ': ' + pesan : '') + '. Coba lagi sebentar lagi.';
+    panel.insertBefore(div, panel.firstChild);
+    panel.hidden = false;
+  }
+  function tampilSedangF(btn) {
+    btn.disabled = true;
+    btn.classList.add('sedang');
+    btn.innerHTML = '<img class="logo-muat" src="/static/logo-96.png" alt=""> Sedang Diperiksa';
+  }
+  function tampilTombolF(btn) {
+    btn.textContent = 'Cek Format';
+    btn.disabled = false;
+    btn.classList.remove('sedang');
+  }
+  function jadwalPollF(btn) {
+    if (btn._tPollF) { return; }
+    btn._tPollF = setTimeout(function () {
+      btn._tPollF = null;
+      muatFormat(btn);
+    }, 3000);
+  }
+  function hentiPollF(btn) {
+    if (btn._tPollF) { clearTimeout(btn._tPollF); btn._tPollF = null; }
+  }
+  function terapkanFormat(btn, d) {
+    if (!d.ok) { return; }
+    if (d.keadaan === 'jalan') {
+      tampilSedangF(btn);
+      var panelJ = document.getElementById('panel-format-' + btn.dataset.fileId);
+      if (panelJ) { var g = panelJ.querySelector('.galat'); if (g) { g.remove(); } }
+      if (d.temuan) { tampilFormat(btn.dataset.fileId, d); }
+      jadwalPollF(btn);
+      return;
+    }
+    hentiPollF(btn);
+    tampilTombolF(btn);
+    if (d.temuan) { tampilFormat(btn.dataset.fileId, d); }
+    if (d.keadaan === 'gagal') {
+      tampilGagalFormat(btn.dataset.fileId, d.galat);
+    }
+  }
+  function muatFormat(btn) {
+    var fid = btn.dataset.fileId;
+    fetch('/v1/format/status?file_id=' + encodeURIComponent(fid))
+      .then(function (r) { return r.json(); })
+      .then(function (d) { terapkanFormat(btn, d); })
+      .catch(function () {});
+  }
+  function cekFormat(btn) {
+    var fid = btn.dataset.fileId;
+    tampilSedangF(btn);
+    fetch('/v1/format/mulai-latar', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({file_id: Number(fid)})
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.ok) {
+        tampilGagalFormat(fid, d.alasan || '');
+        muatFormat(btn);
+        return;
+      }
+      muatFormat(btn);
+    }).catch(function () {
+      tampilGagalFormat(fid, '');
+      muatFormat(btn);
+    });
+  }
+  document.querySelectorAll('[data-format]').forEach(function (btn) {
+    btn.addEventListener('click', function () { cekFormat(btn); });
+    muatFormat(btn);
   });
 })();
 </script>
