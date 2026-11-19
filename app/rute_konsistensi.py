@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
-from . import konsistensi_bab as KB
+from . import konsistensi as KB
 from . import proses as proses_mod
 from . import struktur as _str
 from .auth import wajib_login_api
@@ -202,21 +202,21 @@ async def konsistensi_mulai_latar(
             if not prof2 or not (prof2.peta_json or '').strip():
                 raise RuntimeError(
                     'Periksa Struktur dulu, supaya naskah bisa dibaca.')
-            bagian = KB.ekstrak_bagian(prof2.peta_json)
+            bagian = KB.ekstrak_bagian_bab(prof2.peta_json)
             if not any((v or '').strip() for v in bagian.values()):
                 raise RuntimeError(
                     'Enam bagian (masalah, tujuan, hipotesis, metode, '
                     'hasil, kesimpulan) tidak ditemukan di naskah.')
-            prompt = KB.susun_prompt(bagian)
+            prompt = KB.susun_prompt_bab(bagian)
             teks_jawaban, _info = await _panggil_router(
                 prompt, timeout=TIMEOUT_LLM_DETIK,
                 system=SYSTEM_KONSISTENSI)
-            vonis = KB.urai_jawaban(teks_jawaban or '')
+            vonis = KB.urai_jawaban_bab(teks_jawaban or '')
             hasil = {
                 'peta_sidik': prof2.peta_sidik or '',
                 'diperiksa_pada': datetime.now(timezone.utc).isoformat(),
                 'vonis': vonis,
-                'langkah_berikut': KB.langkah_berikut(vonis),
+                'langkah_berikut': KB.langkah_berikut_bab(vonis),
             }
             simpan_hasil(d2, fid, hasil)
             proses_mod.tandai_selesai(

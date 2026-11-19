@@ -2,7 +2,7 @@
 
 Gambaran besar dalam satu kalimat: EduAi adalah alat bantu mahasiswa menulis skripsi yang benar, dan cek konsistensi memastikan rumusan masalah, tujuan, hipotesis, metode, hasil, dan kesimpulan nyambung satu sama lain, sebelum mahasiswa maju ke sidang.
 
-Status: DIBANGUN 19 Nov 2026 atas Gas Boss ("Ok, yang rapi, sederhana dan presisi serta mudah digunakan"). Keputusan Boss 19 Nov 16:09 WIB: GRATIS untuk mahasiswa, Boss yang tanggung biayanya (dari saldo Apinex, sama seperti Jev/Hakim).
+Status: DIBANGUN 19 Nov 2026 atas Gas Boss ("Ok, yang rapi, sederhana dan presisi serta mudah digunakan"). Keputusan Boss 19 Nov 16:09 WIB: GRATIS untuk mahasiswa, Boss yang tanggung biayanya (dari saldo Apinex, sama seperti Jev/Hakim). PERINTAH Boss 19 Nov 16:43 WIB: jangan buat baru, lengkapi yang sudah ada dan rapikan sehingga layak produksi. Karena itu logika cek antar bab tinggal di `app/konsistensi.py` yang SUDAH ADA (Bagian 2, fungsi `*_bab`), bukan modul baru; modul `konsistensi_bab.py` yang sempat dibuat sudah dihapus.
 
 ## 1. Yang dicek: 5 sambungan
 
