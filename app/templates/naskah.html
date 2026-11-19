@@ -559,12 +559,26 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
 .panel-struktur{background:#fff;border:1px solid var(--garis);border-radius:13px;
     padding:16px 18px;margin:-4px 0 11px}
 .panel-struktur h4{font-size:15px;margin-bottom:4px}
-.panel-struktur .waktu{font-size:12.5px;color:var(--teks-abu);margin-bottom:10px}
 .panel-struktur ul{margin:4px 0 4px 20px;font-size:14px}
 .panel-struktur li{margin-bottom:4px}
-.panel-struktur .tanda-diperiksa{color:#8a6d00;font-weight:700;font-size:12px}
 .panel-struktur .keterangan{font-size:13px;color:var(--teks-abu);margin-top:8px}
 .panel-struktur .galat{color:#8c2f20;font-size:14px}
+/* Ceklist Struktur naskah (19 Nov 2026): 5 baris bab, ketuk buka/tutup. */
+.panel-struktur .ceklist-struktur{margin:8px 0 4px 0;list-style:none;padding:0}
+.panel-struktur .baris-bab{display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:6px 4px;border-bottom:1px solid var(--garis);margin-bottom:0}
+.panel-struktur .tanda-status{display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;font-size:12px;font-weight:700;flex:none}
+.panel-struktur .baris-bab.lengkap .tanda-status{background:#e6f4ea;color:#1e7e34}
+.panel-struktur .baris-bab.belum .tanda-status{background:#fdecea;color:#b3261e}
+.panel-struktur .nama-bab{flex:1;font-weight:600}
+.panel-struktur .panah-bab{color:var(--teks-abu);font-size:16px;transition:transform .15s}
+.panel-struktur .baris-bab.terbuka .panah-bab{transform:rotate(90deg)}
+.panel-struktur .subbab-bab{list-style:none;margin:0;padding:2px 0 6px 32px}
+.panel-struktur .subbab-bab ul{margin:0;font-size:13.5px}
+.panel-struktur .subbab-bab li{margin-bottom:2px;color:var(--teks-abu)}
+.panel-struktur .langkah-berikut{font-size:13.5px;margin-top:10px;padding-top:8px;
+  border-top:1px solid var(--garis);color:var(--teks-abu)}
 
 /* --- tong sampah (ACC Bos 14Sep26) --- */
 .judul-baris{display:flex;align-items:center;justify-content:space-between;gap:14px;
@@ -1213,37 +1227,61 @@ function fdPesan(t) {
   function tampilHasil(fid, d) {
     var panel = document.getElementById('panel-' + fid);
     if (!panel) return;
-    var r = d.ringkasan || {bab: []};
+    /* Ceklist Struktur naskah (19 Nov 2026): 5 baris bab, subbab
+       tersembunyi sampai babnya diketuk. Hanya dua status: Lengkap
+       (✓) dan Belum (!). Tanpa bahasa sistem, tanpa tombol
+       konfirmasi, tanpa nomor halaman (angka di Daftar Isi sudah
+       kedaluwarsa, ukur baru butuh render). */
+    var c = d.ceklist || d.ringkasan || {bab: []};
     var html = '<h4>Struktur naskah</h4>';
-    if (d.diperiksa_pada) {
-      html += '<div class="waktu">Terakhir diperiksa: ' + esc(d.diperiksa_pada) + '</div>';
-    }
-    if (r.bab && r.bab.length) {
-      html += '<ul>';
-      r.bab.forEach(function (b) {
-        var tanda = b.diperiksa ? '' : ' <span class="tanda-diperiksa">(sedang diperiksa)</span>';
-        html += '<li><b>' + esc(b.judul || 'Bab') + '</b>' + tanda;
-        if (b.subbab && b.subbab.length) {
-          html += '<ul>';
-          b.subbab.forEach(function (s) {
-            var t2 = s.diperiksa ? '' : ' <span class="tanda-diperiksa">(sedang diperiksa)</span>';
-            html += '<li>' + esc(s.teks) + t2 + '</li>';
+    var daftar = c.bab || [];
+    if (daftar.length) {
+      html += '<ul class="ceklist-struktur">';
+      daftar.forEach(function (b, i) {
+        var lengkap = !!b.diperiksa && b.ada !== false;
+        var tanda = lengkap ? '✓' : '!';
+        var kelas = lengkap ? 'lengkap' : 'belum';
+        var judul = b.judul || 'Bab';
+        var subs = b.subbab || [];
+        html += '<li class="baris-bab ' + kelas + '" data-i="' + i + '">' +
+          '<span class="tanda-status" aria-hidden="true">' + tanda + '</span>' +
+          '<span class="nama-bab">' + esc(judul) + '</span>' +
+          (subs.length ? '<span class="panah-bab" aria-hidden="true">›</span>' : '') +
+          '</li>';
+        if (subs.length) {
+          html += '<li class="subbab-bab" data-untuk="' + i + '" hidden><ul>';
+          subs.forEach(function (s) {
+            html += '<li>' + esc(s.teks || s) + '</li>';
           });
-          html += '</ul>';
+          html += '</ul></li>';
         }
-        html += '</li>';
       });
       html += '</ul>';
     } else {
       html += '<div class="keterangan">Struktur belum bisa ditampilkan untuk naskah ini.</div>';
     }
-    var menunggu = (r.jumlah_menunggu || 0);
+    if (d.langkah_berikut) {
+      html += '<div class="langkah-berikut">Langkah berikut: ' +
+        esc(d.langkah_berikut) + '</div>';
+    }
+    var menunggu = (c.jumlah_menunggu || 0);
     if (menunggu > 0) {
       html += '<div class="keterangan">' + menunggu +
-        ' baris sedang diperiksa admin. Hasilnya muncul di sini setelah diputuskan.</div>';
+        ' baris masih menunggu keputusan.</div>';
     }
     panel.innerHTML = html;
     panel.hidden = false;
+    /* Ketuk baris bab: buka/tutup subbabnya. */
+    panel.querySelectorAll('.baris-bab').forEach(function (baris) {
+      baris.addEventListener('click', function () {
+        var i = baris.getAttribute('data-i');
+        var wadah = panel.querySelector('.subbab-bab[data-untuk="' + i + '"]');
+        if (!wadah) return;
+        var buka = wadah.hidden;
+        wadah.hidden = !buka;
+        baris.classList.toggle('terbuka', buka);
+      });
+    });
   }
   function tampilSedang(btn) {
     /* Keadaan "Sedang Diperiksa": logo EduAi yang SUDAH ADA (bukan logo
