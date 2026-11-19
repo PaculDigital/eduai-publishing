@@ -150,6 +150,10 @@ rute_diagram.pasang(templates)
 app.include_router(rute_diagram.router)
 app.include_router(rute_diagram.router_api)
 
+#  Cek Konsistensi Antar Bab (19Nov26, Gas Bos), API saja, panel di naskah.html.
+from . import rute_konsistensi
+app.include_router(rute_konsistensi.router)
+
 #  🤝 27Sep26 (T5.1 Opsi A, ACC Bos): TAB 2 dasbor — daftar naskah yang
 #  diundangkan KE akun + jembatan kaitkan link undangan → akun.
 #  ⚠️ wajib_login didefinisikan DI BAWAH (blok KEAMANAN baris ~220) —

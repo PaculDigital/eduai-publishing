@@ -580,6 +580,30 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
 .panel-struktur .langkah-berikut{font-size:13.5px;margin-top:10px;padding-top:8px;
   border-top:1px solid var(--garis);color:var(--teks-abu)}
 
+/* Cek Konsistensi antar bab (19 Nov 2026): 5 baris sambungan, ketuk
+   buka/tutup alasan. Tiga status: nyambung (✓ hijau), putus (! merah),
+   ragu (? kuning, perlu diperiksa ke pembimbing). */
+.panel-konsistensi{background:#fff;border:1px solid var(--garis);border-radius:13px;
+  padding:16px 18px;margin:-4px 0 11px}
+.panel-konsistensi h4{font-size:15px;margin-bottom:4px}
+.panel-konsistensi .keterangan{font-size:13px;color:var(--teks-abu);margin-top:8px}
+.panel-konsistensi .galat{color:#8c2f20;font-size:14px}
+.panel-konsistensi .ceklist-konsistensi{margin:8px 0 4px 0;list-style:none;padding:0}
+.panel-konsistensi .baris-sambungan{display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:6px 4px;border-bottom:1px solid var(--garis);margin-bottom:0}
+.panel-konsistensi .tanda-status{display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;font-size:12px;font-weight:700;flex:none}
+.panel-konsistensi .baris-sambungan.nyambung .tanda-status{background:#e6f4ea;color:#1e7e34}
+.panel-konsistensi .baris-sambungan.putus .tanda-status{background:#fdecea;color:#b3261e}
+.panel-konsistensi .baris-sambungan.ragu .tanda-status{background:#fef7e0;color:#8a6d00}
+.panel-konsistensi .nama-sambungan{flex:1;font-weight:600}
+.panel-konsistensi .panah-sambungan{color:var(--teks-abu);font-size:16px;transition:transform .15s}
+.panel-konsistensi .baris-sambungan.terbuka .panah-sambungan{transform:rotate(90deg)}
+.panel-konsistensi .alasan-sambungan{list-style:none;margin:0;padding:2px 0 6px 32px}
+.panel-konsistensi .alasan-sambungan p{margin:0;font-size:13.5px;color:var(--teks-abu)}
+.panel-konsistensi .langkah-berikut{font-size:13.5px;margin-top:10px;padding-top:8px;
+  border-top:1px solid var(--garis);color:var(--teks-abu)}
+
 /* --- tong sampah (ACC Bos 14Sep26) --- */
 .judul-baris{display:flex;align-items:center;justify-content:space-between;gap:14px;
              flex-wrap:wrap;margin-bottom:16px}
@@ -1008,6 +1032,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
       <div class="aksi">
         {% if e in ['docx','odt','txt','md','markdown','csv','pdf'] %}
         <button class="periksa" type="button" data-periksa data-file-id="{{ f.id }}">Periksa Struktur</button>
+        <button class="periksa" type="button" data-konsistensi data-file-id="{{ f.id }}">Cek Konsistensi</button>
         <button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/pustaka'">Periksa Daftar Pustaka</button>
         <button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/diagram'" title="Gambar Model dan Desain Penelitian.">Diagram</button>
         <span class="bungkus-tip" title="Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi."><button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/bagian-awal'" title="Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi.">Lengkapi Bagian Awal<span class="tip">Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi.</span></button></span>
@@ -1033,6 +1058,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
     </div>
     {% if e in ['docx','odt','txt','md','markdown','csv','pdf'] %}
     <div class="panel-struktur" id="panel-{{ f.id }}" hidden></div>
+    <div class="panel-konsistensi" id="panel-konsistensi-{{ f.id }}" hidden></div>
     {% endif %}
     {% endfor %}
   {% else %}
@@ -1383,6 +1409,137 @@ function fdPesan(t) {
   document.querySelectorAll('[data-periksa]').forEach(function (btn) {
     btn.addEventListener('click', function () { periksaSekarang(btn); });
     muatStatus(btn);
+  });
+})();
+</script>
+
+<script>
+/* ── Cek Konsistensi antar bab (19 Nov 2026) ──────────────────────────
+   Pola yang SAMA dengan Periksa Struktur: tombol titip ke pekerja
+   latar (POST /v1/konsistensi/mulai-latar), lalu baca keadaan lewat
+   /v1/konsistensi/status sampai selesai. 5 baris sambungan, ketuk
+   baris membuka alasannya. Tiga status: nyambung (✓), putus (!),
+   ragu (? = perlu diperiksa ke pembimbing). GRATIS, tanpa token. */
+(function () {
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function tampilKonsistensi(fid, d) {
+    var panel = document.getElementById('panel-konsistensi-' + fid);
+    if (!panel) return;
+    var vonis = d.vonis || [];
+    var html = '<h4>Cek Konsistensi</h4>';
+    if (vonis.length) {
+      html += '<ul class="ceklist-konsistensi">';
+      vonis.forEach(function (v, i) {
+        var st = v.vonis === 'nyambung' ? 'nyambung'
+          : (v.vonis === 'putus' ? 'putus' : 'ragu');
+        var tanda = st === 'nyambung' ? '✓' : (st === 'putus' ? '!' : '?');
+        html += '<li class="baris-sambungan ' + st + '" data-i="' + i + '">' +
+          '<span class="tanda-status" aria-hidden="true">' + tanda + '</span>' +
+          '<span class="nama-sambungan">' + esc(v.label || v.nama) + '</span>' +
+          '<span class="panah-sambungan" aria-hidden="true">›</span></li>' +
+          '<li class="alasan-sambungan" data-untuk="' + i + '" hidden><p>' +
+          esc(v.alasan || '') + '</p></li>';
+      });
+      html += '</ul>';
+    } else {
+      html += '<div class="keterangan">Konsistensi belum bisa ditampilkan untuk naskah ini.</div>';
+    }
+    if (d.langkah_berikut) {
+      html += '<div class="langkah-berikut">Langkah berikut: ' +
+        esc(d.langkah_berikut) + '</div>';
+    }
+    panel.innerHTML = html;
+    panel.hidden = false;
+    panel.querySelectorAll('.baris-sambungan').forEach(function (baris) {
+      baris.addEventListener('click', function () {
+        var i = baris.getAttribute('data-i');
+        var wadah = panel.querySelector('.alasan-sambungan[data-untuk="' + i + '"]');
+        if (!wadah) return;
+        var buka = wadah.hidden;
+        wadah.hidden = !buka;
+        baris.classList.toggle('terbuka', buka);
+      });
+    });
+  }
+  function tampilGagalKonsistensi(fid, pesan) {
+    var panel = document.getElementById('panel-konsistensi-' + fid);
+    if (!panel) return;
+    var div = document.createElement('div');
+    div.className = 'galat';
+    div.textContent = 'Pemeriksaan belum berhasil' +
+      (pesan ? ': ' + pesan : '') + '. Coba lagi sebentar lagi.';
+    panel.insertBefore(div, panel.firstChild);
+    panel.hidden = false;
+  }
+  function tampilSedangK(btn) {
+    btn.disabled = true;
+    btn.classList.add('sedang');
+    btn.innerHTML = '<img class="logo-muat" src="/static/logo-96.png" alt=""> Sedang Diperiksa';
+  }
+  function tampilTombolK(btn) {
+    btn.textContent = 'Cek Konsistensi';
+    btn.disabled = false;
+    btn.classList.remove('sedang');
+  }
+  function jadwalPollK(btn) {
+    if (btn._tPollK) { return; }
+    btn._tPollK = setTimeout(function () {
+      btn._tPollK = null;
+      muatKonsistensi(btn);
+    }, 3000);
+  }
+  function hentiPollK(btn) {
+    if (btn._tPollK) { clearTimeout(btn._tPollK); btn._tPollK = null; }
+  }
+  function terapkanKonsistensi(btn, d) {
+    if (!d.ok) { return; }
+    if (d.keadaan === 'jalan') {
+      tampilSedangK(btn);
+      var panelJ = document.getElementById('panel-konsistensi-' + btn.dataset.fileId);
+      if (panelJ) { var g = panelJ.querySelector('.galat'); if (g) { g.remove(); } }
+      if (d.vonis) { tampilKonsistensi(btn.dataset.fileId, d); }
+      jadwalPollK(btn);
+      return;
+    }
+    hentiPollK(btn);
+    tampilTombolK(btn);
+    if (d.vonis) { tampilKonsistensi(btn.dataset.fileId, d); }
+    if (d.keadaan === 'gagal') {
+      tampilGagalKonsistensi(btn.dataset.fileId, d.galat);
+    }
+  }
+  function muatKonsistensi(btn) {
+    var fid = btn.dataset.fileId;
+    fetch('/v1/konsistensi/status?file_id=' + encodeURIComponent(fid))
+      .then(function (r) { return r.json(); })
+      .then(function (d) { terapkanKonsistensi(btn, d); })
+      .catch(function () {});
+  }
+  function cekKonsistensi(btn) {
+    var fid = btn.dataset.fileId;
+    tampilSedangK(btn);
+    fetch('/v1/konsistensi/mulai-latar', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({file_id: Number(fid)})
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.ok) {
+        tampilGagalKonsistensi(fid, d.alasan || '');
+        muatKonsistensi(btn);
+        return;
+      }
+      muatKonsistensi(btn);
+    }).catch(function () {
+      tampilGagalKonsistensi(fid, '');
+      muatKonsistensi(btn);
+    });
+  }
+  document.querySelectorAll('[data-konsistensi]').forEach(function (btn) {
+    btn.addEventListener('click', function () { cekKonsistensi(btn); });
+    muatKonsistensi(btn);
   });
 })();
 </script>
