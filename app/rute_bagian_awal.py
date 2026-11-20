@@ -38,6 +38,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
 from . import bagian_awal as BA
+from . import konsistensi as KB
 from . import onlyoffice
 from . import proses as proses_mod
 from . import saldo as _saldo
@@ -1067,3 +1068,209 @@ async def bagian_awal_perbarui_daftar(
     return RedirectResponse(
         f'/naskah/{fid}/bagian-awal?pesan={_pesan_ke(pesan)}',
         status_code=303)
+
+
+# ── Cek Abstrak (fitur 4 dari 10 · 20 Nov 2026, Gas Boss) ─────────────
+# Melengkapi berkas ini (bukan berkas baru). Pola yang SAMA dengan
+# /v1/konsistensi/mulai-latar: titip ke pekerja latar, gerbang sidik
+# (abstrak + peta), hasil di Setelan. GRATIS (1 panggil LLM, biaya
+# dari Apinex Boss); yang 6 token HANYA untuk MEMBUAT abstrak.
+# Tanpa abstrak tersimpan -> tolak "Belum ada abstrak." (tanpa LLM).
+# Tanpa peta Jev -> tolak "Periksa Struktur dulu."
+KUNCI_HASIL_ABSTRAK = 'abstrak_hasil_berkas_{fid}'
+KOMENTAR_PROSES_ABSTRAK_CEK = 'Cek Abstrak'
+SYSTEM_ABSTRAK = (
+    'Kamu penilai skripsi yang teliti dan jujur. '
+    'Jawab hanya dengan JSON.')
+TIMEOUT_LLM_ABSTRAK_DETIK = 180
+
+
+def simpan_hasil_abstrak(db, fid: int, hasil: dict) -> None:
+    """Simpan hasil cek abstrak ke Setelan (JSON). Menimpa hasil lama."""
+    import json as _json
+    kunci = KUNCI_HASIL_ABSTRAK.format(fid=int(fid))
+    isi = _json.dumps(hasil or {}, ensure_ascii=False)
+    from .models import Setelan as _Setelan
+    baris = db.get(_Setelan, kunci)
+    if baris is None:
+        db.add(_Setelan(kunci=kunci, nilai=isi, oleh='cek-abstrak'))
+    else:
+        baris.nilai = isi
+    db.commit()
+
+
+def muat_hasil_abstrak(db, fid: int) -> dict | None:
+    """Muat hasil cek abstrak. Tidak ada / rusak -> None."""
+    import json as _json
+    kunci = KUNCI_HASIL_ABSTRAK.format(fid=int(fid))
+    from .models import Setelan as _Setelan
+    baris = db.get(_Setelan, kunci)
+    if baris is None or not (baris.nilai or '').strip():
+        return None
+    try:
+        data = _json.loads(baris.nilai)
+    except Exception:                                          # noqa: BLE001
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _adalah_proses_cek_abstrak(komentar_json) -> bool:
+    """True bila proses ini pemeriksaan abstrak (bukan tempel/abstrak-ai)."""
+    try:
+        import json as _json
+        isi = _json.loads(komentar_json or '[]')
+    except Exception:                                          # noqa: BLE001
+        isi = []
+    if isinstance(isi, list):
+        return KOMENTAR_PROSES_ABSTRAK_CEK in [str(x) for x in isi]
+    return KOMENTAR_PROSES_ABSTRAK_CEK in str(isi)
+
+
+def _pemeriksaan_terkini_abstrak(db: Session, user_id: int, file_id: int,
+                                 hasil_ada: bool) -> dict:
+    """Keadaan pemeriksaan abstrak (pola konsistensi)."""
+    try:
+        semua = (db.query(ProsesAI)
+                   .filter(ProsesAI.user_id == int(user_id),
+                           ProsesAI.file_id == int(file_id))
+                   .order_by(ProsesAI.id.desc()).limit(20).all())
+    except Exception:                                          # noqa: BLE001
+        return _str.keadaan_pemeriksaan(
+            proses_jalan=None, proses_terakhir=None, peta_ada=hasil_ada)
+    jalan = None
+    terakhir = None
+    for p in semua:
+        if not _adalah_proses_cek_abstrak(
+                getattr(p, 'komentar_json', '') or ''):
+            continue
+        d = {'kode': p.kode, 'status': p.status, 'galat': p.galat or ''}
+        if terakhir is None:
+            terakhir = d
+        if p.status in ('menunggu', 'jalan') and jalan is None:
+            jalan = d
+    return _str.keadaan_pemeriksaan(
+        proses_jalan=jalan, proses_terakhir=terakhir, peta_ada=hasil_ada)
+
+
+@router.get('/v1/abstrak/status')
+async def abstrak_status(file_id: int,
+                         u: User = Depends(wajib_login_api),
+                         db: Session = Depends(get_db)):
+    """Keadaan cek abstrak untuk polling halaman (ringan)."""
+    fb = _berkas(db, file_id, u.id)
+    hasil = muat_hasil_abstrak(db, file_id)
+    keadaan = _pemeriksaan_terkini_abstrak(db, u.id, file_id,
+                                           hasil is not None)
+    abstrak_ada = BA.muat_abstrak(db, file_id) is not None
+    prof = (db.query(ProfilDokumen)
+              .filter(ProfilDokumen.file_id == int(file_id),
+                      ProfilDokumen.user_id == u.id).first())
+    peta_ada = bool(prof and (prof.peta_json or '').strip())
+    return {'ok': True, 'file_id': int(file_id),
+            'keadaan': keadaan.get('keadaan', 'belum'),
+            'galat': keadaan.get('galat', ''),
+            'abstrak_ada': abstrak_ada,
+            'peta_ada': peta_ada,
+            'temuan': (hasil or {}).get('temuan'),
+            'ringkasan': (hasil or {}).get('ringkasan'),
+            'langkah_berikut': (hasil or {}).get('langkah_berikut'),
+            'diperiksa_pada': (hasil or {}).get('diperiksa_pada')}
+
+
+@router.post('/v1/abstrak/mulai-latar')
+async def abstrak_mulai_latar(
+    request: Request,
+    u: User = Depends(wajib_login_api),
+    db: Session = Depends(get_db),
+):
+    """TITIP cek abstrak lalu BALAS CEPAT (pola konsistensi).
+
+    Tanpa abstrak tersimpan: ditolak, karena yang diperiksa adalah
+    abstrak di Setelan (muat_abstrak). Tanpa peta: ditolak, karena 6
+    bagian isi diekstrak dari peta Jev. Abstrak + peta tidak berubah
+    sejak cek terakhir: hasil terakhir langsung (sudah_tersedia),
+    tanpa panggil LLM baru.
+    """
+    body = await request.json()
+    if not isinstance(body, dict):
+        body = {}
+    try:
+        fid = int(body.get('file_id') or 0)
+    except (TypeError, ValueError):
+        raise HTTPException(400, detail={'ok': False,
+                                         'pesan': '`file_id` harus angka.'})
+    fb = _berkas(db, fid, u.id)
+    jalan = []
+    try:
+        semua = proses_mod.yang_sedang_jalan(db, u.id)
+        jalan = [p for p in semua if p.file_id == fid
+                 and _adalah_proses_cek_abstrak(
+                     getattr(p, 'komentar_json', '') or '')]
+    except Exception as e:                                  # noqa: BLE001
+        log.warning('[cek-abstrak] cek proses berjalan gagal: %s', e)
+    if jalan:
+        return {'ok': True, 'dijadwalkan': False, 'sedang_jalan': True,
+                'kode': jalan[0].kode,
+                'alasan': 'masih ada pemeriksaan berjalan untuk naskah ini'}
+    draf = BA.muat_abstrak(db, fid)
+    if not draf:
+        return {'ok': False, 'dijadwalkan': False, 'sedang_jalan': False,
+                'alasan': 'Belum ada abstrak. Buat dulu lewat pembuat '
+                          'abstrak.'}
+    prof = (db.query(ProfilDokumen)
+              .filter(ProfilDokumen.file_id == fid,
+                      ProfilDokumen.user_id == u.id).first())
+    if not prof or not (prof.peta_json or '').strip():
+        return {'ok': False, 'dijadwalkan': False, 'sedang_jalan': False,
+                'alasan': 'Periksa Struktur dulu, supaya naskah bisa dibaca.'}
+    lama = muat_hasil_abstrak(db, fid)
+    sidik_kini = BA.sidik_abstrak(draf)
+    if lama and (lama.get('sidik_abstrak') or '') == sidik_kini \
+            and (lama.get('peta_sidik') or '') == (prof.peta_sidik or ''):
+        return {'ok': True, 'dijadwalkan': False, 'sedang_jalan': False,
+                'sudah_tersedia': True,
+                'diperiksa_pada': lama.get('diperiksa_pada'),
+                'alasan': 'Abstrak dan naskah tidak berubah sejak '
+                          'pemeriksaan terakhir. Menampilkan hasil terakhir.'}
+    p = proses_mod.mulai(db, user_id=u.id, file_id=fid,
+                         komentar=[KOMENTAR_PROSES_ABSTRAK_CEK])
+
+    async def _kerja(lapor):
+        d2 = proses_mod._sesi_baru()
+        try:
+            from .ai import _panggil_router
+            fb2 = _berkas(d2, fid, u.id)
+            draf2 = BA.muat_abstrak(d2, fid)
+            if not draf2:
+                raise RuntimeError('Belum ada abstrak.')
+            prof2 = (d2.query(ProfilDokumen)
+                       .filter(ProfilDokumen.file_id == fid,
+                               ProfilDokumen.user_id == u.id).first())
+            if not prof2 or not (prof2.peta_json or '').strip():
+                raise RuntimeError(
+                    'Periksa Struktur dulu, supaya naskah bisa dibaca.')
+            bagian = KB.ekstrak_bagian_bab(prof2.peta_json)
+            if not any((v or '').strip() for v in bagian.values()):
+                raise RuntimeError(
+                    'Enam bagian (masalah, tujuan, hipotesis, metode, '
+                    'hasil, kesimpulan) tidak ditemukan di naskah.')
+            abstrak = BA._teks_abstrak(draf2)
+            prompt = BA.susun_prompt_abstrak(abstrak, bagian)
+            teks_jawaban, _info = await _panggil_router(
+                prompt, timeout=TIMEOUT_LLM_ABSTRAK_DETIK,
+                system=SYSTEM_ABSTRAK)
+            hasil = BA.periksa_abstrak(
+                draf2, bagian, jalur_docx=_path_berkas(fb2),
+                jawaban_llm=teks_jawaban or '')
+            hasil['peta_sidik'] = prof2.peta_sidik or ''
+            simpan_hasil_abstrak(d2, fid, hasil)
+            proses_mod.tandai_selesai(
+                p.kode, hasil='Cek Abstrak selesai.')
+        except Exception as e:                              # noqa: BLE001
+            log.error('[cek-abstrak] pemeriksaan %s gagal: %s', p.kode, e)
+            proses_mod.tandai_gagal(p.kode, str(e)[:300])
+        finally:
+            d2.close()
+
+    proses_mod.jalankan(p.kode, _kerja)
+    return {'ok': True, 'dijadwalkan': True, 'kode': p.kode}

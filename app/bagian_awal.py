@@ -3792,3 +3792,326 @@ def hapus_abstrak(db, fid: int) -> None:
     if baris is not None:
         db.delete(baris)
         db.commit()
+
+
+# ── Pemeriksa Abstrak (Cek Abstrak, fitur 4 dari 10 · 20 Nov 2026) ──
+# Melengkapi modul ini (bukan modul baru). Tiga vonis LLM (SATU panggil,
+# pola konsistensi Bagian 2) + dua deterministik (panjang, spasi).
+# GRATIS seperti konsistensi (1 panggil LLM, biaya dari Apinex Boss);
+# yang 6 token HANYA untuk MEMBUAT abstrak, bukan memeriksa.
+# Abstrak dibaca dari Setelan (muat_abstrak); isi dibaca dari peta Jev
+# (ekstrak_bagian_bab di konsistensi.py); spasi dibaca dari docx.
+
+PEMERIKSAAN_ABSTRAK = ('cocok_id', 'cocok_en', 'kunci', 'panjang', 'spasi')
+VONIS_SAH_ABSTRAK = ('cocok', 'tidak', 'ragu')
+PANJANG_MIN_ABSTRAK = 150
+PANJANG_MAKS_ABSTRAK = 300
+LABEL_ABSTRAK = {
+    'cocok_id': 'Abstrak cocok dengan isi',
+    'cocok_en': 'Abstract cocok dengan abstrak',
+    'kunci': 'Kata kunci cocok dengan isi',
+    'panjang': 'Panjang abstrak sesuai',
+    'spasi': 'Spasi abstrak 1',
+}
+
+
+def _teks_abstrak(draf) -> dict:
+    """Normalisasi draf abstrak jadi {id, en, kunci_id, kunci_en} (teks).
+
+    Draf menyimpan tiap bahasa sebagai list paragraf; kata kunci sebagai
+    list kata. Bukan dict / kosong -> semua ''.
+    """
+    keluar = {'id': '', 'en': '', 'kunci_id': '', 'kunci_en': ''}
+    if not isinstance(draf, dict):
+        return keluar
+    for kunci in ('id', 'en'):
+        nilai = draf.get(kunci)
+        if isinstance(nilai, list):
+            keluar[kunci] = ' '.join(str(x).strip() for x in nilai
+                                     if str(x).strip())
+        elif isinstance(nilai, str):
+            keluar[kunci] = nilai.strip()
+    for kunci in ('kunci_id', 'kunci_en'):
+        nilai = draf.get(kunci)
+        if isinstance(nilai, list):
+            keluar[kunci] = ', '.join(str(x).strip() for x in nilai
+                                      if str(x).strip())
+        elif isinstance(nilai, str):
+            keluar[kunci] = nilai.strip()
+    return keluar
+
+
+def sidik_abstrak(draf) -> str:
+    """Sidik abstrak (SHA-256 dari teks 4 bagian) untuk gerbang
+    'sudah diperiksa'. Berubah bila abstrak diubah."""
+    teks = _teks_abstrak(draf)
+    gabung = '\n'.join(teks[k] for k in ('id', 'en', 'kunci_id', 'kunci_en'))
+    return hashlib.sha256(gabung.encode('utf-8')).hexdigest()
+
+
+def susun_prompt_abstrak(abstrak: dict, bagian: dict) -> str:
+    """Satu prompt untuk 3 vonis LLM (Bahasa Indonesia, tanpa jargon)."""
+    nama_tampil = {
+        'masalah': 'Rumusan Masalah',
+        'tujuan': 'Tujuan Penelitian',
+        'hipotesis': 'Hipotesis',
+        'metode': 'Metode',
+        'hasil': 'Hasil Penelitian',
+        'kesimpulan': 'Kesimpulan',
+    }
+    isi = []
+    for nama in ('masalah', 'tujuan', 'hipotesis', 'metode', 'hasil',
+                 'kesimpulan'):
+        teks = (bagian.get(nama) or '').strip()
+        isi.append(f"## {nama_tampil[nama]}\n"
+                   f"{teks if teks else '(tidak ditemukan di naskah)'}")
+    badan = '\n\n'.join(isi)
+    abs_id = (abstrak.get('id') or '').strip()
+    abs_en = (abstrak.get('en') or '').strip()
+    kunci = (abstrak.get('kunci_id') or '').strip()
+    kunci_en = (abstrak.get('kunci_en') or '').strip()
+    return (
+        "Kamu penilai skripsi. Nilai apakah abstrak di bawah ini cocok "
+        "dengan isi naskah. Jawab HANYA dengan JSON, tanpa teks lain.\n\n"
+        "## Abstrak (Bahasa Indonesia)\n"
+        f"{abs_id if abs_id else '(tidak ada)'}\n\n"
+        "## Abstract (Bahasa Inggris)\n"
+        f"{abs_en if abs_en else '(tidak ada)'}\n\n"
+        "## Kata kunci\n"
+        f"Indonesia: {kunci if kunci else '(tidak ada)'}; "
+        f"Inggris: {kunci_en if kunci_en else '(tidak ada)'}\n\n"
+        f"{badan}\n\n"
+        "Nilai tiga hal:\n"
+        "1. cocok_id: apakah Abstrak Indonesia mencakup masalah, metode, "
+        "hasil, dan kesimpulan di atas? (bukan sekadar menyebut judul)\n"
+        "2. cocok_en: apakah Abstract Inggris isinya SAMA dengan Abstrak "
+        "Indonesia (bukan terjemahan yang mengubah arti)?\n"
+        "3. kunci: apakah kata kunci sesuai variabel dan isi naskah?\n\n"
+        "Format jawaban (JSON saja):\n"
+        '{"vonis": ['
+        '{"nama": "cocok_id", "vonis": "cocok", "alasan": "..."}, '
+        '{"nama": "cocok_en", "vonis": "tidak", "alasan": "..."}, '
+        '{"nama": "kunci", "vonis": "ragu", "alasan": "..."}]}\n\n'
+        'Vonis hanya boleh "cocok", "tidak", atau "ragu". '
+        '"ragu" bila bukti di naskah tidak cukup untuk memutuskan. '
+        'Alasan SATU kalimat Bahasa Indonesia, sebut bagian yang tidak '
+        'cocok bila vonis "tidak". Bila satu bagian "(tidak ditemukan '
+        'di naskah)", vonis yang melibatkannya WAJIB "ragu".'
+    )
+
+
+def urai_jawaban_abstrak(teks: str) -> list[dict]:
+    """Parse jawaban LLM jadi 3 vonis (gagal parse -> semua 'ragu').
+
+    Tiap vonis: {'nama', 'label', 'vonis', 'alasan'}. Vonis di luar
+    tiga yang sah dianggap 'ragu'. Alasan kosong diganti kalimat baku.
+    """
+    baku = {nama: 'Belum bisa diputuskan dari naskah.'
+            for nama in ('cocok_id', 'cocok_en', 'kunci')}
+    hasil: list[dict] = []
+    data = None
+    try:
+        awal = teks.index('{')
+        akhir = teks.rindex('}') + 1
+        data = json.loads(teks[awal:akhir])
+    except Exception:                                       # noqa: BLE001
+        data = None
+    peta_jawaban = {}
+    if isinstance(data, dict):
+        for item in (data.get('vonis') or []):
+            if not isinstance(item, dict):
+                continue
+            nama = str(item.get('nama') or '').strip()
+            vonis = str(item.get('vonis') or '').strip().lower()
+            if vonis not in VONIS_SAH_ABSTRAK:
+                vonis = 'ragu'
+            alasan = ' '.join(str(item.get('alasan') or '').split())
+            peta_jawaban[nama] = {'vonis': vonis, 'alasan': alasan}
+    for nama in ('cocok_id', 'cocok_en', 'kunci'):
+        vonis = peta_jawaban.get(nama, {}).get('vonis', 'ragu')
+        alasan = peta_jawaban.get(nama, {}).get('alasan', '') or baku[nama]
+        hasil.append({'nama': nama, 'label': LABEL_ABSTRAK[nama],
+                      'vonis': vonis, 'alasan': alasan})
+    return hasil
+
+
+def _jumlah_kata(teks: str) -> int:
+    return len((teks or '').split())
+
+
+def periksa_panjang_abstrak(abstrak: dict) -> dict:
+    """Deterministik: tiap bahasa 150-300 kata.
+
+    Generator menargetkan sekitar 250 kata; ambang v1 ini (150-300)
+    memberi ruang di sekitar target itu. Lulus bila KEDUA bahasa
+    masuk rentang; tidak bila ada yang di luar (alasan menyebut yang
+    mana dan berapa kata).
+    """
+    abs_id = (abstrak.get('id') or '').strip()
+    abs_en = (abstrak.get('en') or '').strip()
+    kata_id = _jumlah_kata(abs_id)
+    kata_en = _jumlah_kata(abs_en)
+    luar = []
+    if kata_id < PANJANG_MIN_ABSTRAK or kata_id > PANJANG_MAKS_ABSTRAK:
+        luar.append(f'Indonesia {kata_id} kata')
+    if kata_en < PANJANG_MIN_ABSTRAK or kata_en > PANJANG_MAKS_ABSTRAK:
+        luar.append(f'Inggris {kata_en} kata')
+    if not luar:
+        return {'nama': 'panjang', 'label': LABEL_ABSTRAK['panjang'],
+                'vonis': 'lulus',
+                'alasan': (f'Abstrak Indonesia {kata_id} kata dan Abstract '
+                           f'Inggris {kata_en} kata, keduanya '
+                           f'{PANJANG_MIN_ABSTRAK}-'
+                           f'{PANJANG_MAKS_ABSTRAK} kata.')}
+    return {'nama': 'panjang', 'label': LABEL_ABSTRAK['panjang'],
+            'vonis': 'tidak',
+            'alasan': (f'Panjang di luar {PANJANG_MIN_ABSTRAK}-'
+                       f'{PANJANG_MAKS_ABSTRAK} kata: '
+                       + '; '.join(luar) + '.')}
+
+
+def _spasi_efektif(paragraf) -> float | None:
+    """Spasi baris efektif paragraf (paragraf dulu, lalu gayanya)."""
+    try:
+        nilai = paragraf.paragraph_format.line_spacing
+        if nilai is not None:
+            return float(nilai)
+    except Exception:                                       # noqa: BLE001
+        pass
+    try:
+        gaya = paragraf.style
+        nilai = gaya.paragraph_format.line_spacing
+        if nilai is not None:
+            return float(nilai)
+    except Exception:                                       # noqa: BLE001
+        pass
+    return None
+
+
+def periksa_spasi_abstrak(jalur_docx) -> dict:
+    """Deterministik: spasi baris bagian ABSTRAK/ABSTRACT di docx = 1.
+
+    Cari judul bagian 'ABSTRAK'/'ABSTRACT' (bukan entri Daftar Isi:
+    entri memakai tab + nomor halaman, judul asli tidak), lalu baca
+    spasi paragraf isinya sampai bab berikut. Bila tidak ada bagian
+    abstrak di docx -> 'ragu' (belum bisa diperiksa, abstrak belum
+    ditempel). Bila spasi tidak tertulis di mana pun -> 'ragu'.
+    """
+    label = LABEL_ABSTRAK['spasi']
+    try:
+        from docx import Document
+        doc = Document(str(jalur_docx))
+    except Exception as e:                                   # noqa: BLE001
+        return {'nama': 'spasi', 'label': label, 'vonis': 'ragu',
+                'alasan': f'Dokumen tidak bisa dibaca ({e}).'.strip()}
+    paras = list(doc.paragraphs)
+    awal = None
+    for i, p in enumerate(paras):
+        t = (p.text or '').strip()
+        if not t or '\t' in t:
+            continue
+        up = t.upper()
+        if up in ('ABSTRAK', 'ABSTRACT'):
+            awal = i + 1
+            break
+    if awal is None:
+        return {'nama': 'spasi', 'label': label, 'vonis': 'ragu',
+                'alasan': 'Abstrak belum ada di naskah, spasi belum bisa '
+                          'diperiksa.'}
+    spasi = []
+    for p in paras[awal:]:
+        t = (p.text or '').strip()
+        if not t:
+            continue
+        up = t.upper()
+        if up.startswith('BAB ') or up in ('DAFTAR PUSTAKA', 'ABSTRACT',
+                                           'ABSTRAK'):
+            break
+        nilai = _spasi_efektif(p)
+        if nilai is not None:
+            spasi.append(nilai)
+    if not spasi:
+        return {'nama': 'spasi', 'label': label, 'vonis': 'ragu',
+                'alasan': 'Spasi abstrak tidak tertulis di naskah, belum '
+                          'bisa dipastikan.'}
+    if all(abs(s - 1.0) < 0.01 for s in spasi):
+        return {'nama': 'spasi', 'label': label, 'vonis': 'lulus',
+                'alasan': f'Semua paragraf abstrak memakai spasi 1 '
+                          f'({len(spasi)} paragraf).'}
+    lain = sorted({s for s in spasi if abs(s - 1.0) >= 0.01})
+    return {'nama': 'spasi', 'label': label, 'vonis': 'tidak',
+            'alasan': 'Spasi abstrak bukan 1 (ditemukan spasi '
+                      + ', '.join(str(s) for s in lain) + ').'}
+
+
+def langkah_berikut_abstrak(temuan: list[dict]) -> str | None:
+    """Satu baris 'Langkah berikut' untuk ceklist abstrak.
+
+    - Ada yang tidak cocok -> perbaiki bagian yang tidak cocok (sebut
+      yang pertama).
+    - Ada yang ragu -> cek ke pembimbing.
+    - Semua cocok/lulus -> None (baris tidak tampil).
+    """
+    for v in temuan or []:
+        if v.get('vonis') == 'tidak':
+            return f"Perbaiki {v.get('label', '')}."
+    for v in temuan or []:
+        if v.get('vonis') == 'ragu':
+            return 'Cek bagian yang belum bisa diputuskan ke pembimbing.'
+    return None
+
+
+def periksa_abstrak(abstrak, bagian=None, jalur_docx=None,
+                    jawaban_llm: str | None = None) -> dict:
+    """Pemeriksa lengkap abstrak (fungsi murni, tanpa LLM dan tanpa DB).
+
+    `abstrak`: draf dari muat_abstrak (atau dict {id, en, kunci_id,
+    kunci_en}). `bagian`: 6 bagian dari ekstrak_bagian_bab.
+    `jawaban_llm`: teks jawaban LLM (bila None, vonis LLM 'ragu' —
+    pemanggil/rute yang memanggil _panggil_router dulu, pola
+    konsistensi). `jalur_docx`: jalur .docx untuk cek spasi (bila
+    None, spasi 'ragu'). Abstrak kosong -> semua 'ragu'.
+    Kembalikan {sidik_abstrak, diperiksa_pada, ringkasan, temuan[5],
+    langkah_berikut}.
+    """
+    teks = _teks_abstrak(abstrak)
+    ada = bool((teks.get('id') or '').strip()
+               or (teks.get('en') or '').strip())
+    if jawaban_llm is not None:
+        vonis_llm = urai_jawaban_abstrak(jawaban_llm)
+    else:
+        vonis_llm = [{'nama': n, 'label': LABEL_ABSTRAK[n],
+                      'vonis': 'ragu',
+                      'alasan': 'Belum bisa diputuskan dari naskah.'}
+                     for n in ('cocok_id', 'cocok_en', 'kunci')]
+    if not ada:
+        vonis_llm = [{'nama': n, 'label': LABEL_ABSTRAK[n],
+                      'vonis': 'ragu',
+                      'alasan': 'Belum ada abstrak.'}
+                     for n in ('cocok_id', 'cocok_en', 'kunci')]
+        panjang = {'nama': 'panjang', 'label': LABEL_ABSTRAK['panjang'],
+                   'vonis': 'ragu', 'alasan': 'Belum ada abstrak.'}
+        spasi = {'nama': 'spasi', 'label': LABEL_ABSTRAK['spasi'],
+                 'vonis': 'ragu', 'alasan': 'Belum ada abstrak.'}
+    else:
+        panjang = periksa_panjang_abstrak(teks)
+        spasi = (periksa_spasi_abstrak(jalur_docx)
+                 if jalur_docx else
+                 {'nama': 'spasi', 'label': LABEL_ABSTRAK['spasi'],
+                  'vonis': 'ragu',
+                  'alasan': 'Spasi belum bisa diperiksa tanpa dokumen.'})
+    temuan = vonis_llm + [panjang, spasi]
+    ringkasan = {'cocok': 0, 'lulus': 0, 'tidak': 0, 'ragu': 0}
+    for t in temuan:
+        v = t.get('vonis')
+        if v in ringkasan:
+            ringkasan[v] += 1
+        else:
+            ringkasan['ragu'] += 1
+    return {
+        'sidik_abstrak': sidik_abstrak(abstrak),
+        'diperiksa_pada': datetime.now(timezone.utc).isoformat(),
+        'ringkasan': ringkasan,
+        'temuan': temuan,
+        'langkah_berikut': langkah_berikut_abstrak(temuan),
+    }
