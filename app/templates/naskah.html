@@ -652,6 +652,32 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
 .panel-bahasa .langkah-berikut{font-size:13.5px;margin-top:10px;padding-top:8px;
   border-top:1px solid var(--garis);color:var(--teks-abu)}
 
+/* --- panel Cek Abstrak (20 Nov 2026, pola panel-bahasa) ---
+   5 baris pemeriksaan, ketuk baris buka/tutup alasan. Status:
+   cocok/lulus (✓ hijau), tidak (! merah), ragu (? kuning).
+   Bila belum ada abstrak, panel menampilkan pesan dan arahan. */
+.panel-abstrak{background:#fff;border:1px solid var(--garis);border-radius:13px;
+  padding:16px 18px;margin:-4px 0 11px}
+.panel-abstrak h4{font-size:15px;margin-bottom:4px}
+.panel-abstrak .keterangan{font-size:13px;color:var(--teks-abu);margin-top:8px}
+.panel-abstrak .galat{color:#8c2f20;font-size:14px}
+.panel-abstrak .ceklist-abstrak{margin:8px 0 4px 0;list-style:none;padding:0}
+.panel-abstrak .baris-abstrak{display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:6px 4px;border-bottom:1px solid var(--garis);margin-bottom:0}
+.panel-abstrak .tanda-status{display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;font-size:12px;font-weight:700;flex:none}
+.panel-abstrak .baris-abstrak.cocok .tanda-status,
+.panel-abstrak .baris-abstrak.lulus .tanda-status{background:#e6f4ea;color:#1e7e34}
+.panel-abstrak .baris-abstrak.tidak .tanda-status{background:#fdecea;color:#b3261e}
+.panel-abstrak .baris-abstrak.ragu .tanda-status{background:#fef7e0;color:#8a6d00}
+.panel-abstrak .nama-abstrak{flex:1;font-weight:600}
+.panel-abstrak .panah-abstrak{color:var(--teks-abu);font-size:16px;transition:transform .15s}
+.panel-abstrak .baris-abstrak.terbuka .panah-abstrak{transform:rotate(90deg)}
+.panel-abstrak .alasan-abstrak{list-style:none;margin:0;padding:2px 0 6px 32px}
+.panel-abstrak .alasan-abstrak p{margin:0;font-size:13.5px;color:var(--teks-abu)}
+.panel-abstrak .langkah-berikut{font-size:13.5px;margin-top:10px;padding-top:8px;
+  border-top:1px solid var(--garis);color:var(--teks-abu)}
+
 /* --- tong sampah (ACC Bos 14Sep26) --- */
 .judul-baris{display:flex;align-items:center;justify-content:space-between;gap:14px;
              flex-wrap:wrap;margin-bottom:16px}
@@ -1083,6 +1109,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
         <button class="periksa" type="button" data-konsistensi data-file-id="{{ f.id }}">Cek Konsistensi</button>
         <button class="periksa" type="button" data-format data-file-id="{{ f.id }}">Cek Format</button>
         <button class="periksa" type="button" data-bahasa data-file-id="{{ f.id }}">Cek Bahasa</button>
+        <button class="periksa" type="button" data-abstrak data-file-id="{{ f.id }}">Cek Abstrak</button>
         <button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/pustaka'">Periksa Daftar Pustaka</button>
         <button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/diagram'" title="Gambar Model dan Desain Penelitian.">Diagram</button>
         <span class="bungkus-tip" title="Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi."><button class="periksa" type="button" onclick="location.href='/naskah/{{ f.id }}/bagian-awal'" title="Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi.">Lengkapi Bagian Awal<span class="tip">Menempelkan bagian depan skripsi: sampul, judul, persetujuan, pengesahan, kata pengantar, daftar isi, daftar tabel, daftar gambar, dan daftar lampiran. Abstrak hanya di tahap final. Tombol muncul sesudah Bab I sampai III selesai dan terverifikasi, untuk ujian proposal. Update lanjut sampai Bab V atau VI final untuk ujian skripsi.</span></button></span>
@@ -1111,6 +1138,7 @@ a.tombol-mulaibaru .tb-teks small{font-size:11px;font-weight:500;color:#2E1B00;o
     <div class="panel-konsistensi" id="panel-konsistensi-{{ f.id }}" hidden></div>
     <div class="panel-format" id="panel-format-{{ f.id }}" hidden></div>
     <div class="panel-bahasa" id="panel-bahasa-{{ f.id }}" hidden></div>
+    <div class="panel-abstrak" id="panel-abstrak-{{ f.id }}" hidden></div>
     {% endif %}
     {% endfor %}
   {% else %}
@@ -1852,6 +1880,141 @@ function fdPesan(t) {
   document.querySelectorAll('[data-bahasa]').forEach(function (btn) {
     btn.addEventListener('click', function () { cekBahasa(btn); });
     muatBahasa(btn);
+  });
+})();
+
+/* ── Cek Abstrak (20 Nov 2026) ────────────────────────────────────────
+   Pola yang SAMA dengan Cek Bahasa: tombol titip ke pekerja latar
+   (POST /v1/abstrak/mulai-latar), lalu baca keadaan lewat
+   /v1/abstrak/status sampai selesai. 5 baris pemeriksaan, ketuk baris
+   membuka alasannya. Status: cocok/lulus (✓), tidak (!), ragu (?)
+   = perlu diperiksa. GRATIS (1 panggil LLM); yang 6 token hanya untuk
+   MEMBUAT abstrak. Bila belum ada abstrak, panel mengarahkan ke
+   pembuat abstrak, tanpa panggil LLM. */
+(function () {
+  function escA(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function tampilAbstrak(fid, d) {
+    var panel = document.getElementById('panel-abstrak-' + fid);
+    if (!panel) return;
+    var temuan = d.temuan || [];
+    var html = '<h4>Cek Abstrak</h4>';
+    if (d.abstrak_ada === false && !temuan.length) {
+      html += '<div class="keterangan">Belum ada abstrak. Buat dulu lewat ' +
+        'pembuat abstrak di halaman Bagian Awal.</div>';
+    } else if (temuan.length) {
+      html += '<ul class="ceklist-abstrak">';
+      temuan.forEach(function (t, i) {
+        var st = (t.vonis === 'cocok' || t.vonis === 'lulus') ? 'cocok'
+          : (t.vonis === 'tidak' ? 'tidak' : 'ragu');
+        var tanda = st === 'cocok' ? '✓' : (st === 'tidak' ? '!' : '?');
+        var kelas = (t.vonis === 'lulus') ? 'lulus' : st;
+        html += '<li class="baris-abstrak ' + kelas + '" data-i="' + i + '">' +
+          '<span class="tanda-status" aria-hidden="true">' + tanda + '</span>' +
+          '<span class="nama-abstrak">' + escA(t.label || t.nama) + '</span>' +
+          '<span class="panah-abstrak" aria-hidden="true">›</span></li>' +
+          '<li class="alasan-abstrak" data-untuk="' + i + '" hidden><p>' +
+          escA(t.alasan || '') + '</p></li>';
+      });
+      html += '</ul>';
+    } else {
+      html += '<div class="keterangan">Abstrak belum bisa ditampilkan untuk naskah ini.</div>';
+    }
+    if (d.langkah_berikut) {
+      html += '<div class="langkah-berikut">Langkah berikut: ' +
+        escA(d.langkah_berikut) + '</div>';
+    }
+    panel.innerHTML = html;
+    panel.hidden = false;
+    panel.querySelectorAll('.baris-abstrak').forEach(function (baris) {
+      baris.addEventListener('click', function () {
+        var i = baris.getAttribute('data-i');
+        var wadah = panel.querySelector('.alasan-abstrak[data-untuk="' + i + '"]');
+        if (!wadah) return;
+        var buka = wadah.hidden;
+        wadah.hidden = !buka;
+        baris.classList.toggle('terbuka', buka);
+      });
+    });
+  }
+  function tampilGagalAbstrak(fid, pesan) {
+    var panel = document.getElementById('panel-abstrak-' + fid);
+    if (!panel) return;
+    var div = document.createElement('div');
+    div.className = 'galat';
+    div.textContent = 'Pemeriksaan belum berhasil' +
+      (pesan ? ': ' + pesan : '') + '. Coba lagi sebentar lagi.';
+    panel.insertBefore(div, panel.firstChild);
+    panel.hidden = false;
+  }
+  function tampilSedangA(btn) {
+    btn.disabled = true;
+    btn.classList.add('sedang');
+    btn.innerHTML = '<img class="logo-muat" src="/static/logo-96.png" alt=""> Sedang Diperiksa';
+  }
+  function tampilTombolA(btn) {
+    btn.textContent = 'Cek Abstrak';
+    btn.disabled = false;
+    btn.classList.remove('sedang');
+  }
+  function jadwalPollA(btn) {
+    if (btn._tPollA) { return; }
+    btn._tPollA = setTimeout(function () {
+      btn._tPollA = null;
+      muatAbstrak(btn);
+    }, 3000);
+  }
+  function hentiPollA(btn) {
+    if (btn._tPollA) { clearTimeout(btn._tPollA); btn._tPollA = null; }
+  }
+  function terapkanAbstrak(btn, d) {
+    if (!d.ok) { return; }
+    if (d.keadaan === 'jalan') {
+      tampilSedangA(btn);
+      var panelJ = document.getElementById('panel-abstrak-' + btn.dataset.fileId);
+      if (panelJ) { var g = panelJ.querySelector('.galat'); if (g) { g.remove(); } }
+      if (d.temuan) { tampilAbstrak(btn.dataset.fileId, d); }
+      jadwalPollA(btn);
+      return;
+    }
+    hentiPollA(btn);
+    tampilTombolA(btn);
+    if (d.temuan || d.abstrak_ada === false) { tampilAbstrak(btn.dataset.fileId, d); }
+    if (d.keadaan === 'gagal') {
+      tampilGagalAbstrak(btn.dataset.fileId, d.galat);
+    }
+  }
+  function muatAbstrak(btn) {
+    var fid = btn.dataset.fileId;
+    fetch('/v1/abstrak/status?file_id=' + encodeURIComponent(fid))
+      .then(function (r) { return r.json(); })
+      .then(function (d) { terapkanAbstrak(btn, d); })
+      .catch(function () {});
+  }
+  function cekAbstrak(btn) {
+    var fid = btn.dataset.fileId;
+    tampilSedangA(btn);
+    fetch('/v1/abstrak/mulai-latar', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({file_id: Number(fid)})
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.ok) {
+        tampilGagalAbstrak(fid, d.alasan || '');
+        muatAbstrak(btn);
+        return;
+      }
+      muatAbstrak(btn);
+    }).catch(function () {
+      tampilGagalAbstrak(fid, '');
+      muatAbstrak(btn);
+    });
+  }
+  document.querySelectorAll('[data-abstrak]').forEach(function (btn) {
+    btn.addEventListener('click', function () { cekAbstrak(btn); });
+    muatAbstrak(btn);
   });
 })();
 </script>
