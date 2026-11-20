@@ -1137,3 +1137,227 @@ def langkah_berikut_format(temuan: list[dict]) -> str:
         return ('Ada yang perlu diperiksa sendiri — ketuk tiap baris '
                 'untuk melihat alasannya.')
     return 'Semua format sudah sesuai pedoman.'
+
+# ─────────────────────────────────────────────────────────────────
+# BAGIAN 3 — CEK BAHASA PEDOMAN (Gas Boss 20 Nov 2026, fitur 3 dari 10)
+# ─────────────────────────────────────────────────────────────────
+# Pemeriksa deterministik TANPA LLM untuk aturan bahasa di
+# ATURAN_BAKU["bahasa"]. Melengkapi modul ini (bukan modul baru).
+# Memakai ulang baca_docx_format + _batas_isi dari Bagian 2 (Cek Format)
+# supaya ruang lingkup paragraf isi sama persis.
+# Batas jujur: pasif TIDAK bisa dipastikan mesin; vonis 'aktif' selalu
+# 'ragu', tidak pernah 'tidak'. "pada" di depan subjek dan angka di awal
+# kalimat TIDAK diperiksa di v1 (positif palsu: keterangan waktu dan
+# potongan sitasi). KBBI dan istilah asing miring ditunda ke v2.
+
+PEMERIKSAAN_BAHASA = [
+    ('saya', 'Kata saya/aku/kita'),
+    ('hubung_awal', 'Kata penghubung di awal kalimat'),
+    ('dimana', 'Kata "dimana"'),
+    ('dike_tempat', 'Awalan di-/ke- menempel'),
+    ('desimal', 'Desimal pakai titik'),
+    ('aktif', 'Kalimat aktif'),
+]
+VONIS_SAH_BAHASA = ('lulus', 'tidak', 'ragu')
+
+# Kata tempat/waktu yang umum: awalan di-/ke- menempel pada kata ini
+# hampir pasti salah (seharusnya dipisah: "di rumah", "ke kampus").
+# 'mana' sengaja tidak ada: "dimana" ditangkap pemeriksa sendiri.
+KATA_TEMPAT_BAHASA = (
+    'rumah', 'kampus', 'sekolah', 'kantor', 'pasar', 'kota', 'desa',
+    'jalan', 'tahun', 'bulan', 'hari', 'sini', 'sana', 'situ', 'dalam',
+    'luar', 'atas', 'bawah', 'depan', 'belakang', 'samping', 'tengah',
+    'pinggir', 'seberang',
+)
+# Subjek + kata kerja aktif yang umum (contoh untuk vonis 'ragu').
+KATA_KERJA_AKTIF_BAHASA = (
+    'melakukan', 'menunjukkan', 'menggunakan', 'memilih', 'meneliti',
+    'menganalisis', 'mengumpulkan', 'mengolah', 'menyusun', 'menentukan',
+    'memberikan',
+)
+PANJANG_MINIMAL_KALIMAT_BAHASA = 20
+
+_POLAA_SAYA_BAHASA = re.compile(r'\b(?:saya|aku|kita|kami)\b', re.I)
+_POLAA_HUBUNG_AWAL_BAHASA = re.compile(
+    r'(?:^|[.!?]\s+)(?:sehingga|sedangkan)\b', re.I)
+_POLAA_DIMANA_BAHASA = re.compile(r'\bdimana\b', re.I)
+_POLAA_TEMPAT_BAHASA = re.compile(
+    r'\b(?:di|ke)(?:' + '|'.join(KATA_TEMPAT_BAHASA) + r')\b', re.I)
+_POLAA_DESIMAL_BAHASA = re.compile(r'(?<![A-Za-z0-9.])\d+\.\d{1,2}(?!\d)')
+_POLAA_DESIMAL_KONTEKS_BAHASA = re.compile(
+    r'(?:tabel|gambar|bab|subbab|bagian)\s+\d+\.\d+', re.I)
+_POLAA_PASIF_BAHASA = re.compile(r'\b(?:di|ter)[a-z]{3,}\b', re.I)
+_POLAA_AKTIF_BAHASA = re.compile(
+    r'\b(?:peneliti|penulis|mahasiswa|penelitian ini)\s+(?:'
+    + '|'.join(KATA_KERJA_AKTIF_BAHASA) + r')\b', re.I)
+_POLAA_BELAH_BAHASA = re.compile(r'(?<=[.!?])\s+(?=[A-Z0-9"\'])')
+
+
+def _teks_isi_bahasa(model: dict) -> list[str]:
+    """Teks paragraf isi (ruang lingkup sama persis seperti Cek Format).
+
+    Gaya Normal/List Paragraph, panjang >= 80, di antara judul bab
+    pertama dan 'DAFTAR PUSTAKA'. Pola _cek_dominan: _batas_isi memberi
+    posisi ke daftar paragraf, bukan indeks elemen.
+    """
+    elemen = model['elemen']
+    awal, akhir = _batas_isi(elemen)
+    paragraf_idx = [i for i, (k, _) in enumerate(elemen) if k == 'p']
+    isi = []
+    for pos in range(awal, akhir):
+        info = elemen[paragraf_idx[pos]][1]
+        teks = (info['teks'] or '').strip()
+        if len(teks) < PANJANG_MINIMAL_ISI_FORMAT:
+            continue
+        if info['gaya'] not in GAYA_ISI_FORMAT:
+            continue
+        isi.append(teks)
+    return isi
+
+
+def _kalimat_isi_bahasa(isi: list[str]) -> list[str]:
+    """Pecah paragraf isi jadi kalimat.
+
+    Belah hanya sesudah . ! ? + spasi + huruf kapital/angka, supaya
+    pecahan desimal (50,5) dan nomor daftar tidak memecah kalimat.
+    Kalimat pendek (< 20 karakter, potongan sitasi) dibuang.
+    """
+    kalimat = []
+    for t in isi:
+        for k in _POLAA_BELAH_BAHASA.split(t):
+            k = k.strip()
+            if len(k) >= PANJANG_MINIMAL_KALIMAT_BAHASA:
+                kalimat.append(k)
+    return kalimat
+
+
+def _temuan_bahasa(cek_id: str, vonis: str, alasan: str,
+                   lokasi: str = '') -> dict:
+    """Satu baris temuan bahasa (pola _temuan Bagian 2)."""
+    label = dict(PEMERIKSAAN_BAHASA).get(cek_id, cek_id)
+    return {'id': cek_id, 'label': label, 'vonis': vonis,
+            'alasan': alasan, 'lokasi': lokasi}
+
+
+def _contoh_bahasa(cocok: list, maks: int = 1) -> str:
+    """Contoh pertama yang pendek, untuk alasan temuan."""
+    for c in cocok:
+        s = str(c).strip()
+        if s:
+            return s[:60]
+    return ''
+
+
+def _cek_kata_bahasa(isi: list[str], cek_id: str, pola) -> dict:
+    """Pemeriksa tingkat kata: hitung kemunculan pola di teks isi.
+
+    Ketemu -> 'tidak' (jumlah + contoh). Bersih -> 'lulus'.
+    """
+    gabung = '\n'.join(isi)
+    cocok = pola.findall(gabung)
+    if not cocok:
+        return _temuan_bahasa(cek_id, 'lulus',
+                              'Tidak ditemukan di paragraf isi.')
+    contoh = _contoh_bahasa(cocok)
+    return _temuan_bahasa(
+        cek_id, 'tidak',
+        f'Ditemukan {len(cocok)} kali di paragraf isi '
+        f'(contoh: {contoh}).')
+
+
+def _cek_desimal_bahasa(isi: list[str]) -> dict:
+    """Desimal pakai titik (50.5), bukan pemisah ribuan (293.753) dan
+    bukan rujukan Tabel/Gambar/Bab (4.1)."""
+    gabung = '\n'.join(isi)
+    cocok = []
+    for m in _POLAA_DESIMAL_BAHASA.finditer(gabung):
+        awal = max(0, m.start() - 30)
+        konteks = gabung[awal:m.end() + 10]
+        if _POLAA_DESIMAL_KONTEKS_BAHASA.search(konteks):
+            continue
+        cocok.append(m.group(0))
+    if not cocok:
+        return _temuan_bahasa('desimal', 'lulus',
+                              'Tidak ada desimal pakai titik di isi.')
+    return _temuan_bahasa(
+        'desimal', 'tidak',
+        f'Ditemukan {len(cocok)} desimal pakai titik '
+        f'(contoh: {cocok[0]}). Seharusnya pakai koma (50,5).')
+
+
+def _cek_aktif_bahasa(kalimat: list[str]) -> dict:
+    """Kalimat yang tampak aktif (tanpa kata berawalan di-/ter-).
+
+    Vonis selalu 'ragu', tidak pernah 'tidak': mesin tidak bisa
+    memastikan pasif. Contoh diambil dari pola aktif eksplisit bila ada.
+    """
+    if not kalimat:
+        return _temuan_bahasa('aktif', 'lulus',
+                              'Tidak ada kalimat isi untuk diperiksa.')
+    tanpa = [k for k in kalimat if not _POLAA_PASIF_BAHASA.search(k)]
+    if not tanpa:
+        return _temuan_bahasa('aktif', 'lulus',
+                              'Semua kalimat isi memakai kata pasif.')
+    contoh = _POLAA_AKTIF_BAHASA.search('\n'.join(tanpa))
+    contoh_teks = (contoh.group(0) if contoh else tanpa[0][:60])
+    return _temuan_bahasa(
+        'aktif', 'ragu',
+        f'{len(tanpa)} dari {len(kalimat)} kalimat tampak aktif '
+        f'(contoh: {contoh_teks}). Perlu diperiksa, mesin tidak bisa '
+        f'memastikan kalimat pasif.')
+
+
+def periksa_bahasa(jalur: str | Path,
+                   aturan: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Periksa bahasa satu .docx terhadap pedoman (deterministik, tanpa LLM).
+
+    `aturan` = ATURAN_BAKU atau panduan user (gabung, pola ringkas_untuk_ai).
+    Balasan: {'sidik_berkas', 'diperiksa_pada', 'ringkasan', 'temuan',
+    'langkah_berikut'}. Tidak menulis apa pun ke docx.
+    """
+    from datetime import datetime, timezone
+    import hashlib
+
+    aturan = dict(aturan or ATURAN_BAKU)
+    sidik = None
+    try:
+        with open(jalur, 'rb') as f:
+            sidik = hashlib.sha256(f.read()).hexdigest()
+    except Exception:                                          # noqa: BLE001
+        sidik = None
+    model = baca_docx_format(jalur)
+    isi = _teks_isi_bahasa(model)
+    kalimat = _kalimat_isi_bahasa(isi)
+    temuan = [
+        _cek_kata_bahasa(isi, 'saya', _POLAA_SAYA_BAHASA),
+        _cek_kata_bahasa(isi, 'hubung_awal', _POLAA_HUBUNG_AWAL_BAHASA),
+        _cek_kata_bahasa(isi, 'dimana', _POLAA_DIMANA_BAHASA),
+        _cek_kata_bahasa(isi, 'dike_tempat', _POLAA_TEMPAT_BAHASA),
+        _cek_desimal_bahasa(isi),
+        _cek_aktif_bahasa(kalimat),
+    ]
+    ringkasan = {'lulus': sum(1 for t in temuan if t['vonis'] == 'lulus'),
+                 'tidak': sum(1 for t in temuan if t['vonis'] == 'tidak'),
+                 'ragu': sum(1 for t in temuan if t['vonis'] == 'ragu')}
+    return {
+        'sidik_berkas': sidik,
+        'diperiksa_pada': datetime.now(timezone.utc).isoformat(),
+        'ringkasan': ringkasan,
+        'temuan': temuan,
+        'langkah_berikut': langkah_berikut_bahasa(temuan),
+    }
+
+
+def langkah_berikut_bahasa(temuan: list[dict]) -> str:
+    """Satu kalimat langkah berikut dari hasil pemeriksaan bahasa."""
+    tidak = [t for t in (temuan or []) if t.get('vonis') == 'tidak']
+    ragu = [t for t in (temuan or []) if t.get('vonis') == 'ragu']
+    if tidak:
+        nama = ', '.join(t['label'] for t in tidak[:3])
+        lebih = f' dan {len(tidak) - 3} lagi' if len(tidak) > 3 else ''
+        return (f'Perbaiki dulu: {nama}{lebih}. '
+                f'Ketuk tiap baris untuk melihat alasannya.')
+    if ragu:
+        return ('Ada kalimat yang perlu diperiksa sendiri — ketuk tiap '
+                'baris untuk melihat alasannya.')
+    return 'Semua bahasa sudah sesuai pedoman.'
