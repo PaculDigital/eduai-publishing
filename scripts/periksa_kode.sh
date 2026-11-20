@@ -342,7 +342,15 @@ fi
 if [ -f "$PROYEK/_gerbang_qc_brief_dua_bahasa.py" ]; then
     echo
     echo "── QC BRIEF DUA BAHASA (19 Okt 2026) ──"
-    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_qc_brief_dua_bahasa.py" 2>&1 | tee "$LOG_QC_BRIEF" | grep -qE "0 GAGAL"; then
+    # AKAR 20 Nov 2026: pola lama `python ... | tee LOG | grep -qE "0 GAGAL"`
+    # rapuh di bawah `set -o pipefail` — grep -q keluar begitu cocok, tee
+    # bisa kena SIGPIPE (exit 141), dan pipefail mengubahnya jadi gagal
+    # padahal ceknya lulus (merah palsu, terbukti di gerbang pasca-build
+    # 20 Nov 19:05 WIB: sapaan 35/0 tapi gerbang bilang GAGAL). Perbaikan:
+    # jalankan dulu, tulis ke berkas, BARU grep berkasnya. Tanpa pipa,
+    # tidak ada balapan. Ceknya sama persis ("0 GAGAL" di berkas).
+    /opt/data/.venv/bin/python "$PROYEK/_gerbang_qc_brief_dua_bahasa.py" > "$LOG_QC_BRIEF" 2>&1
+    if grep -qE "0 GAGAL" "$LOG_QC_BRIEF"; then
         grep -E "LULUS /" "$LOG_QC_BRIEF" | tail -1
     else
         echo "  ✗ GAGAL — QC brief dua bahasa tidak lulus"; tail -20 "$LOG_QC_BRIEF"; GAGAL=$((GAGAL+1))
@@ -352,7 +360,8 @@ fi
 if [ -f "$PROYEK/_gerbang_ilustrasi_tak_dibuang.py" ]; then
     echo
     echo "── ILUSTRASI TIDAK DIBUANG (19 Okt 2026) ──"
-    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_ilustrasi_tak_dibuang.py" 2>&1 | tee "$LOG_ILUSTRASI" | grep -qE "0 GAGAL"; then
+    /opt/data/.venv/bin/python "$PROYEK/_gerbang_ilustrasi_tak_dibuang.py" > "$LOG_ILUSTRASI" 2>&1
+    if grep -qE "0 GAGAL" "$LOG_ILUSTRASI"; then
         grep -E "LULUS /" "$LOG_ILUSTRASI" | tail -1
     else
         echo "  ✗ GAGAL — ilustrasi bisa dibuang lagi"; tail -20 "$LOG_ILUSTRASI"; GAGAL=$((GAGAL+1))
@@ -363,7 +372,8 @@ fi
 if [ -f "$PROYEK/_gerbang_sapaan_jenis.py" ]; then
     echo
     echo "── SAPAAN PER JENIS BUKU (20 Okt 2026) ──"
-    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_sapaan_jenis.py" 2>&1 | tee "$LOG_SAPAAN" | grep -qE "0 GAGAL"; then
+    /opt/data/.venv/bin/python "$PROYEK/_gerbang_sapaan_jenis.py" > "$LOG_SAPAAN" 2>&1
+    if grep -qE "0 GAGAL" "$LOG_SAPAAN"; then
         grep -E "LULUS /" "$LOG_SAPAAN" | tail -1
     else
         echo "  ✗ GAGAL — sapaan jenis buku bocor"; tail -20 "$LOG_SAPAAN"; GAGAL=$((GAGAL+1))
@@ -375,7 +385,8 @@ fi
 if [ -f "$PROYEK/_gerbang_perbaikan_bab.py" ]; then
     echo
     echo "── PERBAIKAN BAB BERMASALAH (19-20 Okt 2026) ──"
-    if /opt/data/.venv/bin/python "$PROYEK/_gerbang_perbaikan_bab.py" 2>&1 | tee "$LOG_PERBAIKAN" | grep -qE "0 GAGAL"; then
+    /opt/data/.venv/bin/python "$PROYEK/_gerbang_perbaikan_bab.py" > "$LOG_PERBAIKAN" 2>&1
+    if grep -qE "0 GAGAL" "$LOG_PERBAIKAN"; then
         grep -E "LULUS /" "$LOG_PERBAIKAN" | tail -1
     else
         echo "  ✗ GAGAL — perbaikan bab bermasalah tidak lulus"; tail -20 "$LOG_PERBAIKAN"; GAGAL=$((GAGAL+1))
