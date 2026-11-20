@@ -158,6 +158,10 @@ app.include_router(rute_konsistensi.router)
 from . import rute_format
 app.include_router(rute_format.router)
 
+#  Cek Bahasa Pedoman (20Nov26, Gas Bos), API saja, panel di naskah.html.
+from . import rute_bahasa
+app.include_router(rute_bahasa.router)
+
 #  🤝 27Sep26 (T5.1 Opsi A, ACC Bos): TAB 2 dasbor — daftar naskah yang
 #  diundangkan KE akun + jembatan kaitkan link undangan → akun.
 #  ⚠️ wajib_login didefinisikan DI BAWAH (blok KEAMANAN baris ~220) —
